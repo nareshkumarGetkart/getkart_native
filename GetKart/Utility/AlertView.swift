@@ -57,7 +57,7 @@ class AlertView: NSObject {
         }
     }
     
-    func showToast(message : String, font: UIFont = UIFont.Inter.regular(size: 14).font) {
+    func showToast(message : String, font: UIFont = UIFont.Manrope.regular(size: 14).font) {
 
         if let controller = AppDelegate.sharedInstance.navigationController?.topViewController{
             let toastLabel = UILabel(frame: CGRect(x: 50, y: controller.view.frame.size.height - 200, width: controller.view.frame.size.width - 100, height: 35))

@@ -9,10 +9,18 @@ import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+   
+    let reachability = Reachability()!
+    var isInternetConnected:Bool=Bool()
+    var byreachable : String = String()
     @objc static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
     var window: UIWindow?
     var navigationController: UINavigationController?
-
+    var sharedProfileID = ""
+    var notificationType = ""
+    var userId = ""
+    var roomId = ""
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -27,8 +35,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
-
-
     
 
 }

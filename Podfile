@@ -9,6 +9,16 @@ target 'GetKart' do
 
 pod 'GoogleSignIn'
 pod 'GoogleSignInSwiftSupport'
+pod 'Alamofire'
+pod 'Kingfisher', '~> 7.0'
+pod 'GoogleMaps', '7.1.0'
+pod "MMMaterialDesignSpinner"
+pod 'Firebase/Messaging'
+pod 'FirebaseCore'
+pod 'FittedSheets'
+pod 'Socket.IO-Client-Swift', '~> 15.2.0'
+pod 'GooglePlaces'
+pod 'SwiftyGif'
 
   target 'GetKartTests' do
     inherit! :search_paths

@@ -160,6 +160,7 @@
 				F0EA7EE42D65D9CF0026815A /* Frameworks */,
 				F0EA7EE52D65D9CF0026815A /* Resources */,
 				A95745F858294DABF1F49C5A /* [CP] Embed Pods Frameworks */,
+				E6B99B3860E5CBB15DA07564 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -204,6 +205,7 @@
 				F0EA7F042D65D9D40026815A /* Frameworks */,
 				F0EA7F052D65D9D40026815A /* Resources */,
 				89ECD83A3CB273D4B0F859CA /* [CP] Embed Pods Frameworks */,
+				695EBAF6886DB62994075B72 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -331,6 +333,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		695EBAF6886DB62994075B72 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		74A5446BA464B639C63A439A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -387,6 +406,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		E6B99B3860E5CBB15DA07564 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -439,6 +475,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GetKart/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Getkart;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera for adding ads images and user's profile picture.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to show relevant local ads and listings items. For example, it may display ads for nearby items based on your current location and also when you add or update an item.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to display relevant local ads and listings items. For example, it shows the geographic distribution of ads in your area to help you find nearby ads or choose optimal locations for your own ads.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We are using microphone to send audio messages in chat functionality";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to add files to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library because we upload profile picture and ads images";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -469,6 +512,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GetKart/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Getkart;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera for adding ads images and user's profile picture.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app uses your location to show relevant local ads and listings items. For example, it may display ads for nearby items based on your current location and also when you add or update an item.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to display relevant local ads and listings items. For example, it shows the geographic distribution of ads in your area to help you find nearby ads or choose optimal locations for your own ads.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We are using microphone to send audio messages in chat functionality";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to add files to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library because we upload profile picture and ads images";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
