@@ -1,0 +1,324 @@
+//
+//  SocketIoManger.swift
+//  PickzonDating
+//
+//  Created by Radheshyam Yadav on 17/09/24.
+//
+
+import Foundation
+import SocketIO
+
+enum SocketEvents:String,CaseIterable{
+
+    case chatUsers = "chatUsers"
+    case joinRoom = "joinRoom"
+    case leaveRoom = "leaveRoom"
+    case matchList = "matchList"
+    case roomMessages = "roomMessages"
+    case sendMessage = "sendMessage"
+    case typing = "typing"
+    case messageAcknowledge = "messageAcknowledge"
+    case messageDelete = "messageDelete"
+    case onlineOfflineStatus = "onlineOfflineStatus"
+    case complimentMessages = "complimentMessages"
+    case userInfo = "userInfo"
+    case firstMatchList = "firstMatchList"
+    case blockUnblock = "blockUnblock"
+    case unreadNotification = "unreadNotification"
+    case newCompliment = "newCompliment"
+    case newMatch = "newMatch"
+    case socketConnected = "socketConnected"
+    case singleMessageDelete = "singleMessageDelete"
+    case clearAllMessage = "clearAllMessage"
+    case unMatch = "unMatch"
+    
+}
+
+
+final class SocketIOManager: NSObject {
+    
+    static let sharedInstance = SocketIOManager()
+    var socket:SocketIOClient?
+    var manager:SocketManager?
+
+    private override init() {
+        super.init()
+        if Local.shared.getUserId().count == 0 {
+        }else{
+            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["authToken": Local.shared.getHashToken()])])
+            
+            socket = manager?.socket(forNamespace: "/chat")
+        }
+    }
+    
+    func establishConnection(){
+
+        if Local.shared.getUserId().count == 0 { return }
+        if socket == nil{
+            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["authToken": Local.shared.getHashToken()])])
+
+            socket = manager?.socket(forNamespace: "/chat")
+     
+        }
+        
+        socket?.removeAllHandlers()
+        addListeners()
+        
+        socket?.connect()
+        socket?.on(clientEvent: .connect, callback: {data, ack in
+            if ISDEBUG == true {
+                print("socket connected")
+            }
+            //Unread notififcation
+            let params = ["sender":Local.shared.getUserId()]
+            SocketIOManager.sharedInstance.emitEvent(SocketEvents.unreadNotification.rawValue, params)
+            
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.socketConnected.rawValue), object: nil, userInfo: nil)
+        })
+        
+        socket?.on(clientEvent: .error) {data, ack in
+            print("socket disconnect with Error \(data) \(ack)")
+            DispatchQueue.global(qos: .background).async {
+               // self.socket?.connect()
+               // self.socket = nil
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+            }
+        }
+        
+        socket?.on(clientEvent: .disconnect) {data, ack in
+            print("socket disconnect client \(data) \(ack)")
+            DispatchQueue.global(qos: .background).async {
+              //  self.socket?.connect()
+               // self.socket = nil
+            }
+        }
+    }
+    
+    
+    func emitEvent(_ event : String, _ param : Dictionary<String,Any>){
+       
+        if (UIApplication.shared.delegate as! AppDelegate).isInternetConnected == false{
+            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+            return
+        }
+        
+        if ISDEBUG == true {
+            print("socketURL",socket?.manager?.socketURL ?? "")
+            print("nsps",socket?.manager?.nsps ?? "")
+            print("event: ",event,"param: ", param)
+        }
+        
+        socket?.emit(event, param )
+    }
+    
+    
+    func addListeners(){
+        
+        socket?.on(SocketEvents.chatUsers.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.chatUsers.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.chatUsers.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.matchList.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.matchList.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.matchList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.roomMessages.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.roomMessages.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.roomMessages.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.sendMessage.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.sendMessage.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.joinRoom.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.joinRoom.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.joinRoom.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.typing.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.typing.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.typing.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.messageAcknowledge.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.messageAcknowledge.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.messageAcknowledge.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.messageDelete.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.messageDelete.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.messageDelete.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.onlineOfflineStatus.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.onlineOfflineStatus.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+
+        socket?.on(SocketEvents.complimentMessages.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.complimentMessages.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.complimentMessages.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.userInfo.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.userInfo.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.firstMatchList.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.firstMatchList.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.firstMatchList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.blockUnblock.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.blockUnblock.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.blockUnblock.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        
+        
+        socket?.on(SocketEvents.unreadNotification.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.unreadNotification.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.unreadNotification.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.newCompliment.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.newCompliment.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.newCompliment.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.newMatch.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.newMatch.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.newMatch.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.singleMessageDelete.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.singleMessageDelete.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.singleMessageDelete.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        socket?.on(SocketEvents.clearAllMessage.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.clearAllMessage.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.clearAllMessage.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+        socket?.on(SocketEvents.unMatch.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.unMatch.rawValue) responseDict =>\(responseDict)")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.unMatch.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
+        
+     
+        
+    }
+    
+}
+
+
+
+class SocketParser {
+
+    static func convert<T: Decodable>(data: Any) throws -> T {
+        let jsonData = try JSONSerialization.data(withJSONObject: data)
+        let decoder = JSONDecoder()
+        do{
+           let  _ = try decoder.decode(T.self, from: jsonData)
+            
+        }catch{
+            print("CheckError \(error)")
+        }
+        return try decoder.decode(T.self, from: jsonData)
+    }
+
+}
