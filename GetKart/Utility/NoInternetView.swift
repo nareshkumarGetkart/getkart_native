@@ -39,7 +39,7 @@ class NoInternetView:UIView {
         lblTitle.numberOfLines = 0
         bgView.addSubview(lblTitle)
         lblTitle.textAlignment = .center
-        lblTitle.font = UIFont.Inter.semiBold(size: 16.0).font
+        lblTitle.font = UIFont.Manrope.semiBold(size: 16.0).font
         lblTitle.text = "No Internet Connection"
         
        // lblDescription .frame =  CGRect(x: 40, y: (lblTitle.frame.origin.y) + (lblTitle.frame.size.height) + 0, width: (bgView.frame.size.width) - 80, height: 50)
@@ -47,7 +47,7 @@ class NoInternetView:UIView {
         bgView.addSubview(lblDescription)
         
         lblDescription.textAlignment = .center
-        lblDescription.font = UIFont.Inter.regular(size: 12.0).font
+        lblDescription.font = UIFont.Manrope.regular(size: 12.0).font
         lblDescription.text = "Please check your connection to continue exploring!"
         updateLabelHeights()
 
@@ -56,7 +56,7 @@ class NoInternetView:UIView {
     
     func setGIfImage(gif:String = "noInternetConnection"){
         do{
-            try  self.imageView.setGifImage(UIImage(gifName: gif), loopCount: -1)
+            //try  self.imageView.setGifImage(UIImage(gifName: gif), loopCount: -1)
             self.imageView.startAnimating()
 
         }catch{
@@ -67,9 +67,9 @@ class NoInternetView:UIView {
     
     func updateLabelHeights(){
         
-        let htTitle = String(lblTitle.text ?? "").stringHeightWithFontSize(16.0, width: lblTitle.frame.width,textFont:UIFont.Inter.semiBold(size: 16.0).font)
+        let htTitle = String(lblTitle.text ?? "").stringHeightWithFontSize(16.0, width: lblTitle.frame.width,textFont:UIFont.Manrope.semiBold(size: 16.0).font)
         
-        let htDesc = String(lblDescription.text ?? "").stringHeightWithFontSize(12.0, width: lblDescription.frame.width,textFont: UIFont.Inter.regular(size: 12.0).font)
+        let htDesc = String(lblDescription.text ?? "").stringHeightWithFontSize(12.0, width: lblDescription.frame.width,textFont: UIFont.Manrope.regular(size: 12.0).font)
         
         lblTitle .frame =  CGRect(x: 40, y: (imageView.frame.origin.y) + (imageView.frame.size.height) + 0, width: (bgView.frame.size.width) - 80, height: htTitle)
         
@@ -92,3 +92,5 @@ class NoInternetView:UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+

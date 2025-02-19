@@ -97,10 +97,10 @@ class URLhandler: NSObject{
                         }
                     }
                     
-                    if response.response?.statusCode == 404{
-                         AppDelegate.sharedInstance.logoutFromApp()
-                         return
-                     }
+//                    if response.response?.statusCode == 404{
+//                         AppDelegate.sharedInstance.logoutFromApp()
+//                         return
+//                     }
                     
                     self.respDictionary = [:]
                     switch response.result {
@@ -123,7 +123,7 @@ class URLhandler: NSObject{
                 }
         }else {
             //AlertView.sharedManager.showToast(message: "No Network Connection")
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+            //(AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
         }
     }
@@ -213,10 +213,10 @@ class URLhandler: NSObject{
                     Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                 }
                 
-                if response.response?.statusCode == 404{
-                     AppDelegate.sharedInstance.logoutFromApp()
-                     return
-                 }
+//                if response.response?.statusCode == 404{
+//                     AppDelegate.sharedInstance.logoutFromApp()
+//                     return
+//                 }
                 
                 if response.error == nil{
                     do{
@@ -242,7 +242,7 @@ class URLhandler: NSObject{
             }
         }else {
            // AlertView.sharedManager.showToast(message: "No Network Connection")
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+          //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
         }
     }
@@ -273,11 +273,11 @@ class URLhandler: NSObject{
             })
             .response{ response in
                 
-                if response.response?.statusCode == 404{
-                     AppDelegate.sharedInstance.logoutFromApp()
-                     return
-                 }
-                
+//                if response.response?.statusCode == 404{
+//                     AppDelegate.sharedInstance.logoutFromApp()
+//                     return
+//                 }
+//                
                 if response.error == nil{
                     do{
                         self.respDictionary = try JSONSerialization.jsonObject(
@@ -301,7 +301,7 @@ class URLhandler: NSObject{
                 }               
             }
         }else {
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+           // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
             //AlertView.sharedManager.showToast(message: "No Network Connection")
         }

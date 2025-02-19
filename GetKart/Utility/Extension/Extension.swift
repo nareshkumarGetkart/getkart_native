@@ -9,6 +9,28 @@ import Foundation
 import UIKit
 import SwiftUI
 
+extension String {
+    
+    func stringHeightWithFontSize(_ fontSize: CGFloat,width: CGFloat,textFont:UIFont?=nil) -> CGFloat {
+        var font = UIFont.systemFont(ofSize: fontSize)
+        
+        if let fnt =  textFont{
+            font = fnt
+        }
+        
+        let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byWordWrapping;
+        let attributes = [NSAttributedString.Key.font:font,
+                          NSAttributedString.Key.paragraphStyle:paragraphStyle.copy()]
+        
+        let text = self as NSString
+        let rect = text.boundingRect(with: size, options:.usesLineFragmentOrigin, attributes: attributes, context:nil)
+        return rect.size.height
+    }
+    
+}
+
 
 extension UIDevice {
     

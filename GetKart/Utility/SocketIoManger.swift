@@ -98,7 +98,7 @@ final class SocketIOManager: NSObject {
     func emitEvent(_ event : String, _ param : Dictionary<String,Any>){
        
         if (UIApplication.shared.delegate as! AppDelegate).isInternetConnected == false{
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+           // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
             return
         }
         

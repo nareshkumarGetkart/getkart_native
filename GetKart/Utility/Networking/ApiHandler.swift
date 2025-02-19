@@ -56,10 +56,10 @@ class ApiHandler:NSObject{
                         }
                     }
                     
-                    if response.response?.statusCode == 404{
-                         AppDelegate.sharedInstance.logoutFromApp()
-                         return
-                     }
+//                    if response.response?.statusCode == 404{
+//                         AppDelegate.sharedInstance.logoutFromApp()
+//                         return
+//                     }
                     
                     switch response.result{
                         
@@ -96,7 +96,7 @@ class ApiHandler:NSObject{
                     }
                 }
         }else {
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+           // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
 
         }
@@ -130,10 +130,10 @@ class ApiHandler:NSObject{
                             Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                         }
                     }
-                    if response.response?.statusCode == 404{
-                         AppDelegate.sharedInstance.logoutFromApp()
-                         return
-                     }
+//                    if response.response?.statusCode == 404{
+//                         AppDelegate.sharedInstance.logoutFromApp()
+//                         return
+//                     }
                      
                     
                     switch response.result{
@@ -174,7 +174,7 @@ class ApiHandler:NSObject{
                     }
                 }
         }else {
-            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+          //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
         }
         
