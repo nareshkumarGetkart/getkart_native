@@ -9,28 +9,6 @@ import Foundation
 import UIKit
 import SwiftUI
 
-extension String {
-    
-    func stringHeightWithFontSize(_ fontSize: CGFloat,width: CGFloat,textFont:UIFont?=nil) -> CGFloat {
-        var font = UIFont.systemFont(ofSize: fontSize)
-        
-        if let fnt =  textFont{
-            font = fnt
-        }
-        
-        let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineBreakMode = .byWordWrapping;
-        let attributes = [NSAttributedString.Key.font:font,
-                          NSAttributedString.Key.paragraphStyle:paragraphStyle.copy()]
-        
-        let text = self as NSString
-        let rect = text.boundingRect(with: size, options:.usesLineFragmentOrigin, attributes: attributes, context:nil)
-        return rect.size.height
-    }
-    
-}
-
 
 extension UIDevice {
     
@@ -260,20 +238,8 @@ func addShadow(shadowColor: CGColor = UIColor.black.cgColor,
     
 }
 
-//MARK: UITextfield
 
-extension UITextField {
-func addShadow(shadowColor: CGColor = UIColor.black.cgColor,
-                   shadowOffset: CGSize = CGSize(width: 1.0, height: 2.0),
-                   shadowOpacity: Float = 0.4,
-                   shadowRadius: CGFloat = 3.0) {
-        layer.shadowColor = shadowColor
-        layer.shadowOffset = shadowOffset
-        layer.shadowOpacity = shadowOpacity
-        layer.shadowRadius = shadowRadius
-        layer.masksToBounds = false
-    }
-}
+
 
 //MARK: UIView
 extension UIView {
@@ -410,7 +376,16 @@ extension UIView {
 
 
 extension  UITextField {
-        
+    func addShadow(shadowColor: CGColor = UIColor.black.cgColor,
+                       shadowOffset: CGSize = CGSize(width: 1.0, height: 2.0),
+                       shadowOpacity: Float = 0.4,
+                       shadowRadius: CGFloat = 3.0) {
+            layer.shadowColor = shadowColor
+            layer.shadowOffset = shadowOffset
+            layer.shadowOpacity = shadowOpacity
+            layer.shadowRadius = shadowRadius
+            layer.masksToBounds = false
+        }
     func addLeftPadding() -> Void {
 
         let leftPaddingVw = UIView()
@@ -521,12 +496,122 @@ extension UILabel{
     }
 }
 
-extension String
-{
+//MARK: UITextfield
+extension String {
+    func stringHeightWithFontSize(_ fontSize: CGFloat,width: CGFloat,textFont:UIFont?=nil) -> CGFloat {
+        var font = UIFont.systemFont(ofSize: fontSize)
+        
+        if let fnt =  textFont{
+            font = fnt
+        }
+        
+        let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byWordWrapping;
+        let attributes = [NSAttributedString.Key.font:font,
+                          NSAttributedString.Key.paragraphStyle:paragraphStyle.copy()]
+        
+        let text = self as NSString
+        let rect = text.boundingRect(with: size, options:.usesLineFragmentOrigin, attributes: attributes, context:nil)
+        return rect.size.height
+    }
     func trim() -> String
-   {
-    return self.trimmingCharacters(in: CharacterSet.whitespaces)
-   }
+    {
+        return self.trimmingCharacters(in: CharacterSet.whitespaces)
+    }
+    
+    
+       var isNumeric: Bool {
+         return !(self.isEmpty) && self.allSatisfy { $0.isNumber }
+       }
+        
+       
+        
+        func getDateFrom() ->String{
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            
+            guard  let date = dateFormatter.date(from: self) else{ return ""}
+            dateFormatter.dateFormat = "dd MMMM yyyy"
+            return dateFormatter.string(from: date)
+            
+        }
+
+        
+        func isValidName() -> Bool {
+            let alphaNumericRegEx = #"[a-zA-Z\s]"#
+            let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)
+            return predicate.evaluate(with: self)
+        }
+        
+        
+    func isValidEmail()-> Bool {
+            
+            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+            let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+            return emailTest.evaluate(with: self)
+        }
+        
+    func isValidPhone() -> Bool {
+            let phoneRegex = "^[0-9+]{0,1}+[0-9]{5,16}$"
+            let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
+            return phoneTest.evaluate(with: self)
+        }
+        
+        var isAlphanumeric: Bool {
+            return range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil
+        }
+        
+        var isValidPassword: Bool{
+            //Password must be of minimum 5 characters at least 1 Alphabet and 1 Number
+            let passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d$@$!%*#?&]{5,}$"
+            let passTest = NSPredicate(format:"SELF MATCHES %@", passwordRegex)
+            return passTest.evaluate(with: self)
+        }
+        
+        
+        var containsSpecialCharacter: Bool {
+            let regex = ".*[^A-Za-z0-9].*"
+            let testString = NSPredicate(format:"SELF MATCHES %@", regex)
+            return testString.evaluate(with: self)
+        }
+        
+        var isValidNameWithNumber: Bool {
+            let alphaNumericRegEx = "[a-zA-Z0-9]"
+            let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)
+            return predicate.evaluate(with: self)
+        }
+        
+        var isPanCardValid: Bool {
+            let alphaNumericRegEx = "[A-Z]{5}[0-9]{4}[A-Z]{1}"
+            let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)
+            return predicate.evaluate(with: self)
+        }
+        
+        
+        var isIfscCodeValid: Bool {
+            let alphaNumericRegEx = "^[a-zA-Z0-9]{11}"
+            let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)
+            return predicate.evaluate(with: self)
+        }
+        
+        var isPhoneNumber: Bool {
+            do {
+                let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.phoneNumber.rawValue)
+                let matches = detector.matches(in: self, options: [], range: NSRange(location: 0, length: self.count))
+                if let res = matches.first {
+                    return res.resultType == .phoneNumber && res.range.location == 0 && res.range.length == self.count
+                } else {
+                    return false
+                }
+            } catch {
+                return false
+            }
+        }
+    
+    
+    
 }
 
 

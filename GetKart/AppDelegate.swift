@@ -29,9 +29,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         
-        let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
-        self.navigationController?.navigationBar.isHidden = true
+       // let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
+        //self.navigationController?.viewControllers = [landingVC]
+        
+        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
         self.navigationController?.viewControllers = [landingVC]
+        
+        
+        self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
         
         return true
