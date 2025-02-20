@@ -26,7 +26,7 @@ class HomeVC: UIViewController {
     
     func registerCells(){
         
-        tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
+        tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
 
     }
     
