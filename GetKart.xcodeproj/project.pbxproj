@@ -65,15 +65,11 @@
 		};
 		F0EA7F002D65D9D40026815A /* GetKartTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = GetKartTests;
 			sourceTree = "<group>";
 		};
 		F0EA7F0A2D65D9D40026815A /* GetKartUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = GetKartUITests;
 			sourceTree = "<group>";
 		};
@@ -133,12 +129,12 @@
 		F0EA7EDE2D65D9CF0026815A = {
 			isa = PBXGroup;
 			children = (
+				210FA789654A04C183C245F4 /* Frameworks */,
 				F0EA7EE92D65D9CF0026815A /* GetKart */,
 				F0EA7F002D65D9D40026815A /* GetKartTests */,
 				F0EA7F0A2D65D9D40026815A /* GetKartUITests */,
-				F0EA7EE82D65D9CF0026815A /* Products */,
 				3C41A5EB717ABDDA9173B4FF /* Pods */,
-				210FA789654A04C183C245F4 /* Frameworks */,
+				F0EA7EE82D65D9CF0026815A /* Products */,
 			);
 			sourceTree = "<group>";
 		};

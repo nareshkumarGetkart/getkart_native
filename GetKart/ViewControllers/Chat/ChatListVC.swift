@@ -8,10 +8,11 @@
 import UIKit
 
 class ChatListVC: UIViewController {
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        cnstrntHtNavBar.constant = self.getNavBarHt
         // Do any additional setup after loading the view.
     }
     

@@ -8,11 +8,12 @@
 import UIKit
 
 class HomeVC: UIViewController {
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        cnstrntHtNavBar.constant = self.getNavBarHt
     }
     
 

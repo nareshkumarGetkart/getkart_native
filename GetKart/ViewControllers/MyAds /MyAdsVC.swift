@@ -1,15 +1,16 @@
 //
-//  ProfileVC.swift
-//  Getkart
+//  MyAdsVC.swift
+//  GetKart
 //
-//  Created by Radheshyam Yadav on 19/02/25.
+//  Created by Radheshyam Yadav on 20/02/25.
 //
 
 import UIKit
 
-class ProfileVC: UIViewController {
-   
+class MyAdsVC: UIViewController {
+    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,6 +18,8 @@ class ProfileVC: UIViewController {
         // Do any additional setup after loading the view.
     }
     
+    
 
+    
 
 }

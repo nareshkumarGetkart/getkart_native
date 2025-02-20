@@ -28,7 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
-        let landingVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+        
+        let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
         self.navigationController?.navigationBar.isHidden = true
         self.navigationController?.viewControllers = [landingVC]
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
