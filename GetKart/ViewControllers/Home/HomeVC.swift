@@ -9,22 +9,40 @@ import UIKit
 
 class HomeVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+    @IBOutlet weak var tblView:UITableView!
+    @IBOutlet weak var lblAddress:UILabel!
 
+    
+    //MARK: Controller life cycle methods
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         cnstrntHtNavBar.constant = self.getNavBarHt
+        registerCells()
     }
     
+    
+    func registerCells(){
+        
+        tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
     }
-    */
+    
+    
+    //MARK: UIButton Action
+    
+    @IBAction func locationBtnAction(_ sender : UIButton){
+        
+   
+    }
+    
+    @IBAction func searchBtnAction(_ sender : UIButton){
+        
+    }
 
 }
+
+
+
+

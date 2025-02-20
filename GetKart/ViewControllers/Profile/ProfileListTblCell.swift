@@ -19,6 +19,8 @@ class ProfileListTblCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        bgview.layer.cornerRadius = 8.0
+        bgview.clipsToBounds = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
