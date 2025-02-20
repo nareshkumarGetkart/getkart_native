@@ -45,6 +45,11 @@ class LoginVC: UIViewController {
             lblCharCount.text = "\(txtEmailPhone.text?.count ?? 0)/50"
         }
     }
+    @IBAction func skipButtonAction() {
+        if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
     
     @IBAction func continueLoginAction() {
         self.view.endEditing(true)
