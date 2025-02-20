@@ -54,6 +54,9 @@
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="location_icon"/>
+                                        <connections>
+                                            <action selector="locationBtnAction:" destination="Grg-Y3-Yrf" eventType="touchUpInside" id="v0N-ih-x1n"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fmf-AX-Jov">
                                         <rect key="frame" x="343" y="45" width="40" height="40"/>
@@ -64,6 +67,9 @@
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="search"/>
+                                        <connections>
+                                            <action selector="searchBtnAction:" destination="Grg-Y3-Yrf" eventType="touchUpInside" id="EhS-4Q-wgx"/>
+                                        </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="RDA-ek-SgE">
                                         <rect key="frame" x="65" y="43" width="268" height="44"/>
@@ -98,6 +104,10 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="R3F-XL-nmr">
                                 <rect key="frame" x="0.0" y="90" width="393" height="728"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="Grg-Y3-Yrf" id="4Jn-s5-ZBO"/>
+                                    <outlet property="delegate" destination="Grg-Y3-Yrf" id="oMJ-l3-Tml"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MgS-0P-WLW"/>
@@ -114,6 +124,8 @@
                     </view>
                     <connections>
                         <outlet property="cnstrntHtNavBar" destination="BYc-oE-l85" id="MlM-Bu-NAX"/>
+                        <outlet property="lblAddress" destination="WHG-6H-1mN" id="F2s-Oh-MVU"/>
+                        <outlet property="tblView" destination="R3F-XL-nmr" id="FtX-PN-OEb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qLq-4i-6gJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

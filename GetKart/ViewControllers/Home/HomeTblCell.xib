@@ -86,6 +86,7 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="bgViewSeeAll" destination="4ob-YJ-eXI" id="IMf-dl-q8F"/>
                 <outlet property="btnSeeAll" destination="6yu-mb-dYd" id="Oup-Ta-CVv"/>
                 <outlet property="cllctnView" destination="Slo-RA-z2V" id="qoe-Hj-c5O"/>
                 <outlet property="lblTtitle" destination="zuJ-cH-6DH" id="fyt-ho-hCB"/>
