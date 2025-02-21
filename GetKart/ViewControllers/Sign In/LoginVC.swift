@@ -8,6 +8,7 @@ import UIKit
 import GoogleSignInSwift
 import AuthenticationServices
 import GoogleSignIn
+import SwiftUI
 
 enum SocialMediaLoginType{
     case gmail, apple
@@ -91,6 +92,7 @@ class LoginVC: UIViewController {
     }
     
     @IBAction func continueLoginAction() {
+        
         self.view.endEditing(true)
         txtEmailPhone.layer.borderColor = UIColor.black.cgColor
         lblError.isHidden = true
@@ -110,6 +112,29 @@ class LoginVC: UIViewController {
             self.btnContinueLogin.backgroundColor = UIColor.orange
         }
     }
+    
+    @IBAction func signUpBtnAction(_ sender : UIButton){
+        
+        let swiftUIView = SignUpView(navigationController: self.navigationController) // Create SwiftUI view
+        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+    }
+
+    
+    @IBAction func termsAndCondition(_ sender : UIButton){
+        
+        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of service", type: .termsAndConditions) // Create SwiftUI view
+        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+    }
+    
+    @IBAction func privacyCondition(_ sender : UIButton){
+        
+        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy) // Create SwiftUI view
+        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+    }
+
     
     
 }

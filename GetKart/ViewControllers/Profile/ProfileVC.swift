@@ -12,7 +12,7 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
 
-    var isLoggedIn = true
+    var isLoggedIn = false
     
     let titleArray =  ["Anonymous","My Boost Ads","Subscription","Transaction History","Language","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
@@ -63,6 +63,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
+                cell.btnLogin.addTarget(self, action: #selector(loginToScren), for: .touchUpInside)
 
             }
             return cell
@@ -90,4 +91,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
+    //MARK: Selector methods
+    @objc func loginToScren(){
+        AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+    }
 }
