@@ -16,8 +16,11 @@ enum SocialMediaLoginType{
 class LoginVC: UIViewController {
     @IBOutlet weak var scrScrollView:UIScrollView!
     @IBOutlet weak var txtEmailPhone:UITextFieldX!
+    @IBOutlet weak var btnCountryCode:UIButton!
     @IBOutlet weak var lblError:UILabel!
     @IBOutlet weak var lblCharCount:UILabel!
+    @IBOutlet weak var btnContinueLogin:UIButtonX!
+    @IBOutlet weak var viewContent:UIView!
     
     var socialId:String = ""
     var socialName:String = ""
@@ -26,13 +29,41 @@ class LoginVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
+        txtEmailPhone.maxLength = 50
+        txtEmailPhone.text = "naresh.kumar@getkart.com"
+        txtEmailPhone.leftPadding = 10
+        self.fetChAndSetInitialCodeFromLocale()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)
-        txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
-        txtEmailPhone.maxLength = 50
+        
 
+    }
+    
+    func fetChAndSetInitialCodeFromLocale(){
+        let locale: NSLocale = NSLocale.current as NSLocale
+        let countryCode: String = locale.countryCode ?? ""
+        for countryDic in CountryCodeJson {
+            if (countryDic["locale"] as? String ?? "").lowercased() == countryCode.lowercased() {
+                self.btnCountryCode.setTitle("+\(countryDic["code"] ?? "")", for: .normal)
+                break
+            }
+        }
+    }
+    
+    @IBAction func countruCodeButton(_ sender : UIButton){
+        
+        if let destVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "MobileCodeVC") as? MobileCodeVC{
+           
+            destVC.selectedCountryCallBack = { countryDic in
+                print(countryDic)
+                self.btnCountryCode.setTitle("+\(countryDic["code"] ?? "")", for: .normal)
+            }
+            destVC.modalPresentationStyle = .overCurrentContext
+            self.present(destVC, animated: true, completion: nil)
+        }
     }
     
     @objc func changedCharacters(textField: UITextField){
@@ -43,6 +74,14 @@ class LoginVC: UIViewController {
             lblCharCount.text = "50/50"
         }else {
             lblCharCount.text = "\(txtEmailPhone.text?.count ?? 0)/50"
+        }
+        
+        if input.isNumeric == true {
+            txtEmailPhone.leftPadding = 50
+            btnCountryCode.isHidden = false
+        }else {
+            txtEmailPhone.leftPadding = 10
+            btnCountryCode.isHidden = true
         }
     }
     @IBAction func skipButtonAction() {
@@ -55,14 +94,20 @@ class LoginVC: UIViewController {
         self.view.endEditing(true)
         txtEmailPhone.layer.borderColor = UIColor.black.cgColor
         lblError.isHidden = true
+        self.btnContinueLogin.backgroundColor = UIColor(hexString: "555357", alpha: 1.0)
         
         if txtEmailPhone.text?.isValidEmail() == true {
+            let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+            self.navigationController?.pushViewController(vc, animated: true)
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
+            let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+            self.navigationController?.pushViewController(vc, animated: true)
             
         }else {
             txtEmailPhone.layer.borderColor = UIColor.red.cgColor
             lblError.isHidden = false
+            self.btnContinueLogin.backgroundColor = UIColor.orange
         }
     }
     

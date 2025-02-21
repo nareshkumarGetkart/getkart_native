@@ -19,6 +19,7 @@ pod 'FittedSheets'
 pod 'Socket.IO-Client-Swift', '~> 15.2.0'
 pod 'GooglePlaces'
 pod 'SwiftyGif'
+pod 'IQKeyboardManagerSwift'
 
   target 'GetKartTests' do
     inherit! :search_paths
