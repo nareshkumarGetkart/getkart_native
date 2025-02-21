@@ -1,23 +1,15 @@
 //
-//  HomeTblCell.swift
+//  HomeHorizontalCell.swift
 //  GetKart
 //
-//  Created by Radheshyam Yadav on 20/02/25.
+//  Created by Radheshyam Yadav on 21/02/25.
 //
 
 import UIKit
 
-
-enum CellType{
+class HomeHorizontalCell: UITableViewCell {
     
-    case product
-    case categories
-}
-
-
-class HomeTblCell: UITableViewCell {
-
-    @IBOutlet weak var cllctnView:DynamicHeightCollectionView!
+    @IBOutlet weak var collctnView:DynamicHeightCollectionView!
     @IBOutlet weak var lblTtitle:UILabel!
     @IBOutlet weak var btnSeeAll:UIButton!
     @IBOutlet weak var bgViewSeeAll:UIView!
@@ -29,12 +21,15 @@ class HomeTblCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        cllctnView.register(UINib(nibName: "ProductCell", bundle: nil), forCellWithReuseIdentifier: "ProductCell")
-        cllctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
-        self.cllctnView.delegate = self
-        self.cllctnView.dataSource = self
+        collctnView.register(UINib(nibName: "ProductCell", bundle: nil), forCellWithReuseIdentifier: "ProductCell")
+        collctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
+        self.collctnView.delegate = self
+        self.collctnView.dataSource = self
     }
 
+ 
+    
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
@@ -44,7 +39,7 @@ class HomeTblCell: UITableViewCell {
 }
 
 
-extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
+extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
     
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -59,12 +54,14 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         if cellTypes == .categories{
-            return CGSize(width: self.cllctnView.bounds.size.width/3.0 + 60, height: 130)
+            return CGSize(width: self.collctnView.bounds.size.width/3.0 + 60, height: 130)
         }else{
+            
         
-            return CGSize(width: self.cllctnView.bounds.size.width/2.0 - 2.5 , height: 260)
+            return CGSize(width: self.collctnView.bounds.size.width/2.0 - 2.5 , height: 260)
         }
     }
+    
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if cellTypes == .categories{
@@ -91,16 +88,3 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
 
 
 
-
-class DynamicHeightCollectionView: UICollectionView {
-   override func layoutSubviews() {
-   super.layoutSubviews()
-   if !__CGSizeEqualToSize(bounds.size, self.intrinsicContentSize) {
-      self.invalidateIntrinsicContentSize()
-   }
- }
-
-   override var intrinsicContentSize: CGSize {
-     return collectionViewLayout.collectionViewContentSize
-   }
-}
