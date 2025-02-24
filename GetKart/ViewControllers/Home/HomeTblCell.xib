@@ -56,7 +56,7 @@
                         </constraints>
                     </view>
                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Slo-RA-z2V" customClass="DynamicHeightCollectionView" customModule="GetKart" customModuleProvider="target">
-                        <rect key="frame" x="4" y="30" width="312" height="165"/>
+                        <rect key="frame" x="4" y="40" width="312" height="150"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="mBY-to-dRO">
                             <size key="itemSize" width="128" height="128"/>
@@ -73,11 +73,11 @@
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="4ob-YJ-eXI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2.5" id="0WT-1i-JuP"/>
-                    <constraint firstAttribute="bottom" secondItem="Slo-RA-z2V" secondAttribute="bottom" constant="5" id="7DF-hb-rZn"/>
+                    <constraint firstAttribute="bottom" secondItem="Slo-RA-z2V" secondAttribute="bottom" constant="10" id="7DF-hb-rZn"/>
                     <constraint firstItem="4ob-YJ-eXI" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="VKS-E9-iRG"/>
                     <constraint firstItem="Slo-RA-z2V" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="4" id="Vc1-oc-RXd"/>
                     <constraint firstAttribute="trailing" secondItem="Slo-RA-z2V" secondAttribute="trailing" constant="4" id="fJq-dQ-xnb"/>
-                    <constraint firstItem="Slo-RA-z2V" firstAttribute="top" secondItem="4ob-YJ-eXI" secondAttribute="bottom" id="ghu-tu-OKc"/>
+                    <constraint firstItem="Slo-RA-z2V" firstAttribute="top" secondItem="4ob-YJ-eXI" secondAttribute="bottom" constant="10" id="ghu-tu-OKc"/>
                     <constraint firstAttribute="trailing" secondItem="4ob-YJ-eXI" secondAttribute="trailing" constant="2.5" id="ym0-Lk-1U6"/>
                 </constraints>
             </tableViewCellContentView>

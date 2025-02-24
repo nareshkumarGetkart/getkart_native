@@ -50,12 +50,16 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        if indexPath.section == 1{
+            return  310
+        }
         return UITableView.automaticDimension
     }
     
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+//    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return UITableView.automaticDimension
+//    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -79,7 +83,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             
         }else  if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
-            cell.cnstrntHeightSeeAllView.constant = 30
+            cell.cnstrntHeightSeeAllView.constant = 35
             cell.cellTypes = .product
           //  (cell.cllctnView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: cell.cllctnView.bounds.size.width/3.0 - 2.5 , height: 160)
           
@@ -91,7 +95,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         }else{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
-            cell.cnstrntHeightSeeAllView.constant = 30
+            cell.cnstrntHeightSeeAllView.constant = 35
             cell.cllctnView.isScrollEnabled = false
             cell.cellTypes = .product
             cell.cllctnView.updateConstraints()

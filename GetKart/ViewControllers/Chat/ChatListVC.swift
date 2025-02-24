@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class ChatListVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -63,17 +64,15 @@ class ChatListVC: UIViewController {
         // or use pageMenu controller in you view hierachy as desired
         pageMenu?.viewBackgroundColor = .clear
         self.view.addSubview(pageMenu!.view)
-        
-        
-      
     }
     
     
     @IBAction func blockedUSerBtnAction(_ sender : UIButton){
         
-   
+        let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
+        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
-
+    
 }
 
 extension ChatListVC : CAPSPageMenuDelegate {

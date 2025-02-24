@@ -15,7 +15,16 @@ class HomeHorizontalCell: UITableViewCell {
     @IBOutlet weak var bgViewSeeAll:UIView!
     @IBOutlet weak var cnstrntHeightSeeAllView:NSLayoutConstraint!
 
-    var cellTypes:CellType?
+    var cellTypes:CellType?{
+        didSet{
+            if cnstrntHeightSeeAllView.constant == 0{
+                btnSeeAll.setTitle("", for: .normal)
+            }else{
+                btnSeeAll.setTitle("See All", for: .normal)
+
+            }
+        }
+    }
     
 
     override func awakeFromNib() {
@@ -54,7 +63,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         if cellTypes == .categories{
-            return CGSize(width: self.collctnView.bounds.size.width/3.0 + 60, height: 130)
+            return CGSize(width: self.collctnView.bounds.size.width/3.0, height: 130)
         }else{
             
         
