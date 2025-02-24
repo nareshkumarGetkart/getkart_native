@@ -166,7 +166,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1F-hp-sqY">
-                                                <rect key="frame" x="246.66666666666663" y="392.66666666666669" width="53" height="35"/>
+                                                <rect key="frame" x="246.66666666666663" y="392.66666666666669" width="54" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="vQs-Uv-56b"/>
                                                 </constraints>
@@ -334,7 +334,7 @@
                                 <viewLayoutGuide key="frameLayoutGuide" id="XM6-Wk-2wO"/>
                             </scrollView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="By signing up/Loggin in , you agree to our" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PdW-0T-Yqc">
-                                <rect key="frame" x="55.666666666666657" y="767" width="281.66666666666674" height="20"/>
+                                <rect key="frame" x="56.333333333333343" y="767" width="280.66666666666663" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="8hY-5w-Udh"/>
                                 </constraints>
@@ -358,7 +358,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XLF-Sh-Gfw" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                <rect key="frame" x="63.666666666666657" y="802" width="113" height="20"/>
+                                <rect key="frame" x="66.666666666666671" y="802" width="110.00000000000001" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="bKV-un-pMi"/>
                                 </constraints>
@@ -372,7 +372,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WE-xX-bHq" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                <rect key="frame" x="216.66666666666663" y="795.66666666666663" width="94" height="33"/>
+                                <rect key="frame" x="216.66666666666663" y="797" width="94" height="30"/>
                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Privacy Policy">
@@ -538,6 +538,9 @@
                                         <real key="value" value="10"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="signInAction" destination="8xO-7t-Z1v" eventType="touchUpInside" id="dDT-D0-AR0"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="q59-Hd-z4S"/>
@@ -579,7 +582,7 @@
                                 <rect key="frame" x="0.0" y="179" width="393" height="673"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iDe-Lt-3FD">
-                                        <rect key="frame" x="20" y="20" width="143" height="40"/>
+                                        <rect key="frame" x="20" y="20" width="137" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="JDo-eZ-vku"/>
                                         </constraints>

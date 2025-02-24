@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class OTPViewController: UIViewController {
 
@@ -19,5 +20,8 @@ class OTPViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
-
+    @IBAction func signInAction(){
+        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
+        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+    }
 }

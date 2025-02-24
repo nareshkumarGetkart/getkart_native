@@ -28,11 +28,11 @@ final class Constant: NSObject {
     var baseURL:String {
         get {
             if devEnvironment == .live {
-                return "https://pickzon.io"
+                return "https://adminweb.getkart.com/api/"
             }else if devEnvironment == .staging {
-                return "https://backend.getkart.ca"
+                return "https://admin.gupsup.com/api/"
             }else {
-                return "https://backend.getkart.ca"
+                return "https://admin.gupsup.com/api/"
             }
         }
     }
@@ -190,3 +190,8 @@ enum NotificationKeys:String,CaseIterable{
     case reconnectInternet = "reconnectInternet"
     case noInternet = "noInternet"
 }
+
+
+let sendMobileOtpUrl = "send-mobile-otp"
+let verifyMobileOtpUrl = "verify-mobile-otp"
+let userSignupUrl = "user-signup"
