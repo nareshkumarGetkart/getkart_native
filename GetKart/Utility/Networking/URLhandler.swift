@@ -34,8 +34,22 @@ class URLhandler: NSObject{
     }
   
    
-    func getHeaderFields(isFormData:Bool=false)->HTTPHeaders {
+    func getHeaderFields(isFormData:Bool=false)->HTTPHeaders? {
         
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        print()
+        
+
+        if objLoggedInUser.token != nil {
+            
+            let token = "Bearer \(objLoggedInUser.token ?? "")"
+            var headers =  [ "Accept":"application/json", "Authorization":token]
+            print("Header == \(headers)")
+            return HTTPHeaders.init(headers)
+        }
+
+        /*
+
        let timeZone = TimeZone.current.identifier
         var headers = [ "Content-Type":"application/x-www-form-urlencoded", "device":"ios","timezone":"\(timeZone)", "version":"\(Local.shared.getAppVersion())"]
          
@@ -55,8 +69,8 @@ class URLhandler: NSObject{
         if ISDEBUG == true {
             print(headers)
         }
-        
-        return HTTPHeaders.init(headers)
+         */
+        return nil
     }
     
     
@@ -81,7 +95,8 @@ class URLhandler: NSObject{
                 }
             }
             
-            AF.request(url, method: methodType, parameters: param , encoding: JSONEncoding.default, headers: nil)
+            
+            AF.request(url, method: methodType, parameters: param , encoding: JSONEncoding.default, headers: getHeaderFields())
                 
                 .responseJSON { response in
                     

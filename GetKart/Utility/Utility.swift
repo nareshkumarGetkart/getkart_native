@@ -7,6 +7,14 @@
 
 import Foundation
 import SwiftUICore
+import UIKit
+
+
+let scenes = UIApplication.shared.connectedScenes
+let windowScene = scenes.first as? UIWindowScene
+let window = windowScene?.windows.first
+let heightScreen = window?.screen.bounds.height ?? 0
+let widthScreen = window?.screen.bounds.width ?? 0
 
 extension Font {
     enum ManropeFont {

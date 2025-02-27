@@ -14,6 +14,8 @@ class HomeVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
     
+    var homeModel:HomeViewModel?
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +23,8 @@ class HomeVC: UIViewController {
         tblView.estimatedRowHeight = 200
         tblView.rowHeight = UITableView.automaticDimension
         registerCells()
+        homeModel = HomeViewModel()
+        homeModel?.getProductListApi()
     }
     
     

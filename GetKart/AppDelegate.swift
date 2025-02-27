@@ -34,7 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         
-       /* let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        print()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
             let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
@@ -43,10 +44,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
             self.navigationController?.viewControllers = [landingVC]
         }
-        */
+        /*
         let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
         self.navigationController?.viewControllers = [landingVC]
-        
+        */
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
         
