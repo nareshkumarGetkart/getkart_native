@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class HomeVC: UIViewController {
    
@@ -37,7 +38,8 @@ class HomeVC: UIViewController {
     }
     
     @IBAction func searchBtnAction(_ sender : UIButton){
-        
+        let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
+        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
 
 }
