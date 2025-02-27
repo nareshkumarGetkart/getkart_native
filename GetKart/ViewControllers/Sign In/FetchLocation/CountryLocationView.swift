@@ -24,7 +24,7 @@ struct CountryLocationView: View {
                     Text("Location").font(.custom("Manrope-Bold", size: 20.0))
                         .foregroundColor(.black)
                     Spacer()
-                }.frame(height:60).background(Color.white)
+                }.frame(height:44).background(Color.white)
                 
                 // MARK: - Search Bar
                 HStack {

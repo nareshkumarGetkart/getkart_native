@@ -28,11 +28,11 @@ final class Constant: NSObject {
     var baseURL:String {
         get {
             if devEnvironment == .live {
-                return "https://adminweb.getkart.com/api/"
+                return "https://adminweb.getkart.com/api"
             }else if devEnvironment == .staging {
-                return "https://admin.gupsup.com/api/"
+                return "https://admin.gupsup.com/api"
             }else {
-                return "https://admin.gupsup.com/api/"
+                return "https://admin.gupsup.com/api"
             }
         }
     }
@@ -55,7 +55,22 @@ final class Constant: NSObject {
         }
     }
     
-   
+    
+    var sendMobileOtpUrl:String {
+        get {
+            return"\(Constant.shared.baseURL)/send-mobile-otp"
+        }
+    }
+    var verifyMobileOtpUrl:String{
+        get {
+            return  "\(Constant.shared.baseURL)/verify-mobile-otp"
+        }
+    }
+    var userSignupUrl:String{
+        get {
+            return "\(Constant.shared.baseURL)/user-signup"
+        }
+    }
     
 }
 
@@ -192,6 +207,4 @@ enum NotificationKeys:String,CaseIterable{
 }
 
 
-let sendMobileOtpUrl = "send-mobile-otp"
-let verifyMobileOtpUrl = "verify-mobile-otp"
-let userSignupUrl = "user-signup"
+

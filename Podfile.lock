@@ -128,6 +128,11 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
+  - Realm (10.54.2):
+    - Realm/Headers (= 10.54.2)
+  - Realm/Headers (10.54.2)
+  - RealmSwift (10.54.2):
+    - Realm (= 10.54.2)
   - Socket.IO-Client-Swift (15.2.0):
     - Starscream (~> 3.1)
   - Starscream (3.1.1)
@@ -145,6 +150,7 @@ DEPENDENCIES:
   - IQKeyboardManagerSwift
   - Kingfisher (~> 7.0)
   - MMMaterialDesignSpinner
+  - RealmSwift (~> 10)
   - Socket.IO-Client-Swift (~> 15.2.0)
   - SwiftyGif
 
@@ -179,6 +185,8 @@ SPEC REPOS:
     - MMMaterialDesignSpinner
     - nanopb
     - PromisesObjC
+    - Realm
+    - RealmSwift
     - Socket.IO-Client-Swift
     - Starscream
     - SwiftyGif
@@ -213,10 +221,12 @@ SPEC CHECKSUMS:
   MMMaterialDesignSpinner: a548042720c2e5f04212048483085d7942ac3e81
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  Realm: 16852517a207e98cc6acba9336b56c30d06d84ad
+  RealmSwift: bca777b3904ee58a9b16036e1840012f03348060
   Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: 2906c0603ab38c49e4f9e7651bdfd8761111fbca
+PODFILE CHECKSUM: d6e99595d4828435b8220eaff59ca65ce8d76548
 
 COCOAPODS: 1.16.2

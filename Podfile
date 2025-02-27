@@ -20,7 +20,7 @@ pod 'Socket.IO-Client-Swift', '~> 15.2.0'
 pod 'GooglePlaces'
 pod 'SwiftyGif'
 pod 'IQKeyboardManagerSwift'
-
+pod 'RealmSwift', '~>10'
   target 'GetKartTests' do
     inherit! :search_paths
     # Pods for testing

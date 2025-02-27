@@ -517,6 +517,9 @@
                                 <buttonConfiguration key="configuration" style="plain" title="Resend OTP">
                                     <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </buttonConfiguration>
+                                <connections>
+                                    <action selector="reSendOTPApi" destination="8xO-7t-Z1v" eventType="touchUpInside" id="cZq-zT-fWo"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dav-M3-6uI" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="20" y="384" width="353" height="50"/>
@@ -565,6 +568,10 @@
                             <constraint firstItem="q59-Hd-z4S" firstAttribute="trailing" secondItem="1Il-XP-MZp" secondAttribute="trailing" constant="20" id="ww6-fk-Mxa"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="lblMobileNo" destination="nKq-cq-Dtt" id="2I6-h8-zAx"/>
+                        <outlet property="txtOtp" destination="1Il-XP-MZp" id="GEQ-MP-aA4"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pUA-o4-j6v" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

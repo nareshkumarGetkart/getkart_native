@@ -37,10 +37,8 @@ class URLhandler: NSObject{
     func getHeaderFields(isFormData:Bool=false)->HTTPHeaders {
         
        let timeZone = TimeZone.current.identifier
-        
-        var headers = [ "Content-Type":"application/json",  "device":"ios","timezone":"\(timeZone)", "version":"\(Local.shared.getAppVersion())"
-        ]
-        
+        var headers = [ "Content-Type":"application/x-www-form-urlencoded", "device":"ios","timezone":"\(timeZone)", "version":"\(Local.shared.getAppVersion())"]
+         
         if isFormData{
             
             headers = [ "Content-Type":"multipart/form-data","Content-Disposition" : "form-data", "device":"ios","timezone":"\(timeZone)", "version":"\(Local.shared.getAppVersion())"
@@ -68,6 +66,7 @@ class URLhandler: NSObject{
         if ISDEBUG == true{
             print("Url: ", url)
             print("Param: ",param)
+            
         }
         
         if isConnectedToNetwork() == true {
@@ -82,7 +81,7 @@ class URLhandler: NSObject{
                 }
             }
             
-            AF.request(url, method: methodType, parameters: param , encoding: JSONEncoding.default, headers: self.getHeaderFields())
+            AF.request(url, method: methodType, parameters: param , encoding: JSONEncoding.default, headers: nil)
                 
                 .responseJSON { response in
                     

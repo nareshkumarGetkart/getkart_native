@@ -23,6 +23,7 @@ class LoginVC: UIViewController {
     @IBOutlet weak var btnContinueLogin:UIButtonX!
     @IBOutlet weak var viewContent:UIView!
     
+    var countryCode = ""
     var socialId:String = ""
     var socialName:String = ""
     var socialEmail:String = ""
@@ -32,7 +33,7 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
-        txtEmailPhone.text = "naresh.kumar@getkart.com"
+        txtEmailPhone.text = ""
         txtEmailPhone.leftPadding = 10
         self.fetChAndSetInitialCodeFromLocale()
     }
@@ -48,7 +49,8 @@ class LoginVC: UIViewController {
         let countryCode: String = locale.countryCode ?? ""
         for countryDic in CountryCodeJson {
             if (countryDic["locale"] as? String ?? "").lowercased() == countryCode.lowercased() {
-                self.btnCountryCode.setTitle("+\(countryDic["code"] ?? "")", for: .normal)
+                self.countryCode = "+\(countryDic["code"] ?? "")"
+                self.btnCountryCode.setTitle(self.countryCode, for: .normal)
                 break
             }
         }
@@ -60,7 +62,9 @@ class LoginVC: UIViewController {
            
             destVC.selectedCountryCallBack = { countryDic in
                 print(countryDic)
-                self.btnCountryCode.setTitle("+\(countryDic["code"] ?? "")", for: .normal)
+                
+                self.countryCode = "+\(countryDic["code"] ?? "")"
+                self.btnCountryCode.setTitle(self.countryCode, for: .normal)
             }
             destVC.modalPresentationStyle = .overCurrentContext
             self.present(destVC, animated: true, completion: nil)
@@ -103,8 +107,10 @@ class LoginVC: UIViewController {
             self.navigationController?.pushViewController(vc, animated: true)
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
-            let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+            /*let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
             self.navigationController?.pushViewController(vc, animated: true)
+             */
+            self.sendOTPApi()
             
         }else {
             txtEmailPhone.layer.borderColor = UIColor.red.cgColor
@@ -112,6 +118,48 @@ class LoginVC: UIViewController {
             self.btnContinueLogin.backgroundColor = UIColor.orange
         }
     }
+    
+    func sendOTPApi(){
+        
+        var params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)"] as [String : Any]
+        
+        
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                    /*if let payload =  result["payload"] as? Dictionary<String,Any>{
+                        
+                        self?.uid = payload["uid"] as? String ?? ""
+                        
+                        self?.delegate?.navigateToNextScreen(message: message)
+                    }*/
+                    let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+                    vc.countryCode = self?.countryCode ?? ""
+                    vc.mobile =  self?.txtEmailPhone.text ?? ""
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
+    
+    
     
     @IBAction func signUpBtnAction(_ sender : UIButton){
         
