@@ -1,0 +1,136 @@
+//
+//  SearchProductView.swift
+//  GetKart
+//
+//  Created by Radheshyam Yadav on 25/02/25.
+//
+
+import SwiftUI
+
+struct SearchProductView: View {
+    
+    var navigation:UINavigationController?
+    
+    @State private var searchText = ""
+
+    let items: [Item] = [
+        Item(image: "ipad_mini", price: "\u{20B9}12000.0", title: "Ipad mini 5th generation 64gb", location: "Delhi, Delhi, India"),
+        Item(image: "samsung_tab", price: "\u{20B9}12000.0", title: "SAMSUNG GALAXY TAB 3 T211 TABLET", location: "Mayur Vihar, New Delhi, Delhi, India"),
+        Item(image: "oppo_f23", price: "\u{20B9}12000.0", title: "OPPO f23 5G. 8+256", location: "Kundli, Sonipat, Haryana, India"),
+        Item(image: "samsung_a9", price: "\u{20B9}12000.0", title: "Samsung a9 4&64 storage", location: "Sector 122, Noida, Uttar Pradesh, India")
+    ]
+    
+    var body: some View {
+        VStack{
+        HStack {
+         
+            Button(action: {
+                // Action to go back
+                navigation?.popViewController(animated: true)
+            }) {
+                Image("arrow_left").renderingMode(.template)
+                    .foregroundColor(.black).padding(5)
+            }
+            Text("Search").font(.custom("Manrope-Bold", size: 20.0))
+                .foregroundColor(.black)
+            
+            Spacer()
+        }.frame(height: 44).padding(.horizontal)
+            
+            HStack {
+                HStack{
+                    Image("search").resizable().frame(width: 20,height: 20)
+                    TextField("Search any item...", text: $searchText).tint(.orange)
+                        .frame(height: 45)
+                        .background(Color.white)
+//                        .cornerRadius(10)
+                }.background(Color.white).padding().frame(height: 45).overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray, lineWidth: 1)
+                }
+                
+                Button(action: { /* Filter action */ }) {
+                    ZStack{
+                        
+                    Image("filter")
+                            .foregroundColor(.orange)
+                    }.frame(width: 50,height: 45).overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                    }
+                }.padding(.leading,10)
+            }.padding(.leading,10)
+            .padding(.horizontal,10)
+            
+            Text("Searched Items")
+                .font(.headline)
+                .padding(.horizontal)
+                .padding(.top, 5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+       
+     
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(items) { item in
+                       // ItemRow(item: item)
+                        FavoritesCell()
+
+                    }
+                }.padding([.leading,.trailing],10)
+            }
+        }
+
+    }
+}
+
+#Preview {
+    SearchProductView()
+}
+
+
+
+struct Item: Identifiable {
+    let id = UUID()
+    let image: String
+    let price: String
+    let title: String
+    let location: String
+}
+
+struct ItemRow: View {
+    let item: Item
+    
+    var body: some View {
+        HStack {
+            Image(item.image) // Replace with actual asset names
+                .resizable()
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .cornerRadius(10)
+            
+            VStack(alignment: .leading) {
+                Text(item.price)
+                    .font(.headline)
+                    .foregroundColor(.orange)
+                Text(item.title)
+                    .font(.body)
+                    .lineLimit(1)
+                Text(item.location)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            Spacer()
+            
+            Button(action: { /* Favorite action */ }) {
+                Image(systemName: "heart")
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(color: .gray.opacity(0.2), radius: 2, x: 0, y: 2)
+        .padding(.horizontal)
+    }
+}
+
