@@ -72,6 +72,28 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var get_slider:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-slider"
+        }
+    }
+    
+    var get_item:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-item"
+        }
+    }
+   
+    
+    var get_categories:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-categories"
+        }
+    }
+    
+    
+    
 }
 
 
