@@ -76,8 +76,8 @@ struct MyLocationView: View {
         
         if let coordinate = locationManager.lastKnownLocation {
             print("Latitude: \(coordinate.latitude)")
-            
             print("Longitude: \(coordinate.longitude)")
+            print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
             
             locationManager.delegate = nil
             if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
@@ -103,7 +103,12 @@ extension MyLocationView :LocationAutorizationUpdated {
             if let coordinate = locationManager.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")
                 print("Longitude: \(coordinate.longitude)")
-                self.findMyLocationAction()
+                print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
+                
+                locationManager.delegate = nil
+                if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
                 
                 
             } else {

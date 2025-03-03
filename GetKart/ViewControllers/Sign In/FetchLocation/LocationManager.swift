@@ -69,6 +69,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                         self.city = addressDict["City"] as? String ?? ""
                         self.state = addressDict["State"] as? String ?? ""
                         self.country = addressDict["Country"] as? String ?? ""
+                        Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
                         self.delegate?.locationAuthorizationUpdate()
                     }
                 }
