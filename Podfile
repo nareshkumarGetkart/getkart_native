@@ -15,6 +15,7 @@ pod 'GoogleMaps', '7.1.0'
 pod "MMMaterialDesignSpinner"
 pod 'Firebase/Messaging'
 pod 'FirebaseCore'
+pod 'FirebaseAuth'
 pod 'FittedSheets'
 pod 'Socket.IO-Client-Swift', '~> 15.2.0'
 pod 'GooglePlaces'

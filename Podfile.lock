@@ -15,10 +15,23 @@ PODS:
   - Firebase/Messaging (11.6.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.6.0)
+  - FirebaseAppCheckInterop (11.8.0)
+  - FirebaseAuth (11.6.0):
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseAuthInterop (~> 11.0)
+    - FirebaseCore (~> 11.6.0)
+    - FirebaseCoreExtension (~> 11.6.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GTMSessionFetcher/Core (< 5.0, >= 3.4)
+    - RecaptchaInterop (~> 100.0)
+  - FirebaseAuthInterop (11.8.0)
   - FirebaseCore (11.6.0):
     - FirebaseCoreInternal (~> 11.6.0)
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/Logger (~> 8.0)
+  - FirebaseCoreExtension (11.6.0):
+    - FirebaseCore (~> 11.6.0)
   - FirebaseCoreInternal (11.6.0):
     - "GoogleUtilities/NSData+zlib (~> 8.0)"
   - FirebaseInstallations (11.6.0):
@@ -133,6 +146,7 @@ PODS:
   - Realm/Headers (10.54.2)
   - RealmSwift (10.54.2):
     - Realm (= 10.54.2)
+  - RecaptchaInterop (100.0.0)
   - Socket.IO-Client-Swift (15.2.0):
     - Starscream (~> 3.1)
   - Starscream (3.1.1)
@@ -141,6 +155,7 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - Firebase/Messaging
+  - FirebaseAuth
   - FirebaseCore
   - FittedSheets
   - GoogleMaps (= 7.1.0)
@@ -160,7 +175,11 @@ SPEC REPOS:
     - AppAuth
     - AppCheckCore
     - Firebase
+    - FirebaseAppCheckInterop
+    - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
+    - FirebaseCoreExtension
     - FirebaseCoreInternal
     - FirebaseInstallations
     - FirebaseMessaging
@@ -187,6 +206,7 @@ SPEC REPOS:
     - PromisesObjC
     - Realm
     - RealmSwift
+    - RecaptchaInterop
     - Socket.IO-Client-Swift
     - Starscream
     - SwiftyGif
@@ -196,7 +216,11 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   Firebase: 374a441a91ead896215703a674d58cdb3e9d772b
+  FirebaseAppCheckInterop: 7bf86d55a2b7e9bd91464120eba3e52e4b63b2e2
+  FirebaseAuth: 0304982cfe00df8d49bf533bc4becd3de36c7122
+  FirebaseAuthInterop: 651756e70d9a0b9160db39ead71fd5507dbb6c84
   FirebaseCore: 48b0dd707581cf9c1a1220da68223fb0a562afaa
+  FirebaseCoreExtension: 2d77d6430c16cf43ca2b04608302ed02b3598361
   FirebaseCoreInternal: d98ab91e2d80a56d7b246856a8885443b302c0c2
   FirebaseInstallations: efc0946fc756e4d22d8113f7c761948120322e8c
   FirebaseMessaging: e1aca1fcc23e8b9eddb0e33f375ff90944623021
@@ -223,10 +247,11 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Realm: 16852517a207e98cc6acba9336b56c30d06d84ad
   RealmSwift: bca777b3904ee58a9b16036e1840012f03348060
+  RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: d6e99595d4828435b8220eaff59ca65ce8d76548
+PODFILE CHECKSUM: 505c92a58f34879c98e89c9660fd3a3bc2235d71
 
 COCOAPODS: 1.16.2

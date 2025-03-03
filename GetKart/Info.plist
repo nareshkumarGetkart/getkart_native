@@ -8,10 +8,37 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.ios.Getkart</string>
+			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.968056389209-a30r9sqnm5hq5abb56v7null15bnkvh3</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-6343732161-ios-5cc58a2dcfbbb66b2b5d40</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.appsflutter</string>
+				<string>.6343732161-2d2p8ap7p3t8telagot152vrnotuptav</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.ios.Getkart</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>getkart.com</string>
 			</array>
 		</dict>
 	</array>
