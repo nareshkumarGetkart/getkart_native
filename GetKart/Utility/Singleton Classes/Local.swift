@@ -75,7 +75,6 @@ final class Local {
         UserDefaults.standard.removeObject(forKey:LocalKeys.userId.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalKeys.token.rawValue)
         UserDefaults.standard.synchronize()
-       
         AppDelegate.sharedInstance.sharedProfileID = ""
         AppDelegate.sharedInstance.notificationType = ""
         AppDelegate.sharedInstance.userId = ""

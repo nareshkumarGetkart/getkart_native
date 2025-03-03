@@ -13,12 +13,12 @@ struct NotificationView: View {
     var  navigation:UINavigationController?
   
     let notifications: [NotificationModel] = [
-        NotificationModel(image: "notificationImage", title: "New Listing in Your Neighborhood!", message: "A new item has just been listed near you. Take a look and make an offer."),
-        NotificationModel(image: "notificationImage", title: "🚨 Hurry! New Listings Won’t Last!", message: "Hot new products have just been added. Don’t miss out—explore now! 🔥"),
-        NotificationModel(image: "notificationImage", title: "New Listings in Your Favorite Category!", message: "Discover the latest items in Mobiles. Start browsing!"),
-        NotificationModel(image: "notificationImage", title: "📢 New to the Market!", message: "Fresh used items have just been listed. Find your next bargain today! 🛍"),
-        NotificationModel(image: "notificationImage", title: "🔥 New Listings Just Dropped!", message: "Check out the latest items and get them before they’re gone! 🛒"),
-        NotificationModel(image: "notificationImage", title: "Check Out the Latest Listings!", message: "New items have just been listed. Explore the latest deals now.")
+        NotificationModel(image: "getkartplaceholder", title: "New Listing in Your Neighborhood!", message: "A new item has just been listed near you. Take a look and make an offer."),
+        NotificationModel(image: "getkartplaceholder", title: "🚨 Hurry! New Listings Won’t Last!", message: "Hot new products have just been added. Don’t miss out—explore now! 🔥"),
+        NotificationModel(image: "getkartplaceholder", title: "New Listings in Your Favorite Category!", message: "Discover the latest items in Mobiles. Start browsing!"),
+        NotificationModel(image: "getkartplaceholder", title: "📢 New to the Market!", message: "Fresh used items have just been listed. Find your next bargain today! 🛍"),
+        NotificationModel(image: "getkartplaceholder", title: "🔥 New Listings Just Dropped!", message: "Check out the latest items and get them before they’re gone! 🛒"),
+        NotificationModel(image: "getkartplaceholder", title: "Check Out the Latest Listings!", message: "New items have just been listed. Explore the latest deals now.")
     ]
 
     var body: some View {

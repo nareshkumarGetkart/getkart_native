@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class HomeBaseVC: UITabBarController {
     
@@ -14,7 +15,7 @@ class HomeBaseVC: UITabBarController {
    
     var controllers: [UIViewController]?
     let middleButton = UIButton()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -64,9 +65,37 @@ class HomeBaseVC: UITabBarController {
             tabBar.bringSubviewToFront(middleButton)
         }
 
+    
+    func isUserLoggedInRequest() -> Bool {
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+          
+            return true
+            
+        }else{
+            
+            let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
+                //Login
+                AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+                
+            }))
+            deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+            deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+            deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+            present(deleteAccountView, animated: true, completion: nil)
+            return false
+        }
+    }
+    
+    
         @objc func middleButtonTapped() {
             print("Middle button tapped!")
             // Handle action (e.g., present a modal view)
+            if isUserLoggedInRequest(){
+                
+            }
+          
         }
     
     func getControllers() -> [UINavigationController]{
@@ -120,6 +149,13 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         
+        if let index = viewControllers?.firstIndex(of: viewController), index == 1 || index == 3 {
+            
+            if isUserLoggedInRequest() == false {
+                return false
+            }
+        }
+
         if let index = viewControllers?.firstIndex(of: viewController), index == 2 {
             return false // Prevent selection of the middle (dummy) tab
         }
@@ -150,24 +186,20 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         switch tabBarController.selectedIndex{
             
         case 0:
-           // items[tabBarController.selectedIndex].image = UIImage(named: "home_active")?.withRenderingMode(.alwaysOriginal)?.withRenderingMode(.alwaysOriginal)
             break
             
         case 1:
-           // items[tabBarController.selectedIndex].image = UIImage(named: "chat_active")?.withRenderingMode(.alwaysOriginal)
+         
             break
             
         case 2:
-            
-           // items[tabBarController.selectedIndex].image = UIImage(named: "myads_active")?.withRenderingMode(.alwaysOriginal)
+            //Center tab
             break
         case 3:
             
-          //  items[tabBarController.selectedIndex].image = UIImage(named: "myads_active")?.withRenderingMode(.alwaysOriginal)
             break
         case 4:
             
-          //  items[tabBarController.selectedIndex].image = UIImage(named: "profile_active")?.withRenderingMode(.alwaysOriginal)
             
             break
             

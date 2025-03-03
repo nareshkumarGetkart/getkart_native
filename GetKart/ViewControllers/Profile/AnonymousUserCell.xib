@@ -47,7 +47,7 @@
                                         </constraints>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" image="pencil" catalog="system"/>
+                                        <state key="normal" image="pencil"/>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="ITh-oJ-7ya">
                                         <rect key="frame" x="90" y="14" width="210" height="72"/>
@@ -192,9 +192,9 @@
     <resources>
         <image name="delete_illustrator" width="255" height="255"/>
         <image name="no_data_found_illustrator" width="255" height="255"/>
-        <image name="pencil" catalog="system" width="128" height="113"/>
+        <image name="pencil" width="25" height="25"/>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

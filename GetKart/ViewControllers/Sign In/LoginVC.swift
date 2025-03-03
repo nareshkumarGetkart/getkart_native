@@ -29,6 +29,19 @@ class LoginVC: UIViewController {
     var socialEmail:String = ""
     var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
     
+    
+    //MARK: Controller life cycle methods
+    override func loadView() {
+        super.loadView()
+        let deleteAccountView = UIHostingController(rootView: DemoView())
+        deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+//        deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+//        deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+        
+        AppDelegate.sharedInstance.navigationController?.pushViewController(deleteAccountView, animated: false)
+      //  present(deleteAccountView, animated: false, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
@@ -36,6 +49,10 @@ class LoginVC: UIViewController {
         txtEmailPhone.text = ""
         txtEmailPhone.leftPadding = 10
         self.fetChAndSetInitialCodeFromLocale()
+        
+        
+
+
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -13,8 +13,6 @@ class ProfileVC: UIViewController {
    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
-
-    var isLoggedIn = true
     
     let titleArray =  ["Anonymous","My Boost Ads","Subscription","Transaction History","Language","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
@@ -28,12 +26,16 @@ class ProfileVC: UIViewController {
         tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
         
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
-
         
     }
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        self.tblView.reloadData()
+    }
 
 }
+
 
 extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
    
@@ -49,7 +51,12 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
        
-        return titleArray.count + (isLoggedIn ? 0  : -2)
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+            return titleArray.count
+        }else{
+            return (titleArray.count-2)
+        }
     }
     
     
@@ -58,7 +65,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
          
         if indexPath.row == 0{
             let cell = tableView.dequeueReusableCell(withIdentifier: "AnonymousUserCell") as! AnonymousUserCell
-            if isLoggedIn{
+            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+            
+            if objLoggedInUser.id != nil {
                 cell.bgViewAnonymousUser.isHidden = true
                 cell.bgViewLoggedInUser.isHidden = false
                 cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
@@ -68,7 +77,6 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
                 cell.btnLogin.addTarget(self, action: #selector(loginToScren), for: .touchUpInside)
-
 
             }
             return cell
@@ -98,17 +106,45 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
         }else{
-            
-            if titleArray[indexPath.row] == "Notifications"{
+      
+            if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
                 
-                let hostingController = UIHostingController(rootView: NotificationView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+            }else if titleArray[indexPath.row] == "Delete Account"{
+                
+            }else if titleArray[indexPath.row] == "Logout"{
+                
+            }else if titleArray[indexPath.row] == "My Boost Ads"{
+                if isUserLoggedInRequest(){
+                    
+                }
+                
+            }
+            else if titleArray[indexPath.row] == "Subscription"{
+                
+                if isUserLoggedInRequest(){
+                    
+                }
+                
+                
+            }else if titleArray[indexPath.row] == "Language"{
+                
+                let deleteAccountView = UIHostingController(rootView: LanguageView())
+                AppDelegate.sharedInstance.navigationController?.pushViewController(deleteAccountView, animated: true)
+                
+            }else if titleArray[indexPath.row] == "Notifications"{
+                if isUserLoggedInRequest(){
+                    
+                    let hostingController = UIHostingController(rootView: NotificationView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
+                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                }
                 
             }else if titleArray[indexPath.row] == "Favorites"{
                 
-                let hostingController = UIHostingController(rootView: FavoritesView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-           
+                if isUserLoggedInRequest(){
+                    let hostingController = UIHostingController(rootView: FavoritesView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
+                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                }
+                
             }else if titleArray[indexPath.row] == "Rate us"{
                 
                 rateApp()
@@ -117,17 +153,20 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 ShareMedia.shareMediafrom(type: .appShare, mediaId: "", controller: self)
                 
             }else if titleArray[indexPath.row] ==  "Transaction History"{
-                
-                let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                
+               
+                if isUserLoggedInRequest(){
+                    
+                    let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
+                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                    
+                }
             }else if titleArray[indexPath.row] ==  "Delete Account"{
                 let deleteAccountView = UIHostingController(rootView: DeleteAccountView())
                 deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
                 deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
                 deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
                 present(deleteAccountView, animated: true, completion: nil)
-           
+                
             }else if titleArray[indexPath.row] ==  "Logout"{
                 let deleteAccountView = UIHostingController(rootView: LogoutView())
                 deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
@@ -135,11 +174,35 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
                 present(deleteAccountView, animated: true, completion: nil)
             }
-            
         }
     }
     
 
+    
+    func isUserLoggedInRequest() -> Bool {
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+       
+            return true
+
+       
+        }else{
+            let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
+                //Login
+                AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+                
+            }))
+            deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+            deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+            deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+            present(deleteAccountView, animated: true, completion: nil)
+            
+            return false
+        }
+    }
+    
+    
     func rateApp() {
         if #available(iOS 10.3, *) {
             SKStoreReviewController.requestReview()
