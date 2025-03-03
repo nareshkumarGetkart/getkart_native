@@ -78,56 +78,17 @@ struct MyLocationView: View {
             print("Latitude: \(coordinate.latitude)")
             
             print("Longitude: \(coordinate.longitude)")
-            self.userSignupApi()
+            
+            locationManager.delegate = nil
+            if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
             
             
         } else {
             print("Unknown Location")
         }
         
-    }
-    func userSignupApi(){
-        let timestamp = Date.timeStamp
-        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)"] as [String : Any]
-        
-        
-      
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
-            
-        
-            if(error != nil)
-            {
-                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
-                print(error ?? "defaultValue")
-                
-            }else{
-                
-                let result = responseObject! as NSDictionary
-                let status = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
-
-                if status == 200{
-                    
-                    if let payload =  result["data"] as? Dictionary<String,Any>{
-                        let token = result["token"] as? String ?? ""
-                        let objUserInfo = UserInfo(dict: payload, token: token)
-                        RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
-                       let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                        print(objLoggedInUser)
-                        
-                        if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
-                            locationManager.delegate = nil
-                            self.navigationController?.pushViewController(vc, animated: true)
-                            
-                        }
-                    }
-                    
-                }else{
-                    //self?.delegate?.showError(message: message)
-                }
-                
-            }
-        }
     }
     
     func otherLocationAction(){
@@ -142,7 +103,7 @@ extension MyLocationView :LocationAutorizationUpdated {
             if let coordinate = locationManager.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")
                 print("Longitude: \(coordinate.longitude)")
-                self.userSignupApi()
+                self.findMyLocationAction()
                 
                 
             } else {

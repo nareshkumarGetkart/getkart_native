@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SignUpView: View {
     var navigationController: UINavigationController?
@@ -127,6 +128,7 @@ struct SignUpView: View {
                         
                     }else{
                         showError = false
+                        self.verifyEmailAction()
                     }
                     
                 }) {
@@ -213,7 +215,36 @@ struct SignUpView: View {
         }
         
     }
+    
+    func verifyEmailAction() {
+        print(email)
+        let actionCodeSettings = ActionCodeSettings()
+        actionCodeSettings.url = URL(string: "test")
+        // The sign-in operation has to always be completed in the app.
+        actionCodeSettings.handleCodeInApp = true
+        actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
+        
+       // actionCodeSettings.setAndroidPackageName("com.getkart.android",
+                                                // installIfNotAvailable: false, minimumVersion: "12")
+        print("\(Bundle.main.bundleIdentifier)")
+        Auth.auth().sendSignInLink(toEmail: email,
+                                   actionCodeSettings: actionCodeSettings) { error in
+          // ...
+            if let error = error {
+                print("Error Received: ",error.localizedDescription)
+                AlertView.sharedManager.showToast(message:error.localizedDescription)
+              return
+            }
+            // The link was successfully sent. Inform the user.
+            // Save the email locally so you don't need to ask the user for it again
+            // if they open the link on the same device.
+            UserDefaults.standard.set(email, forKey: "Email")
+            //self.showMessagePrompt("Check your email for link")
+            AlertView.sharedManager.showToast(message: "Check your email for link")
+            // ...
         }
+    }
+}
     
 
     

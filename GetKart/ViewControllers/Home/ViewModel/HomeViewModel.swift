@@ -19,7 +19,6 @@ class HomeViewModel{
     
     func getProductListApi(){
         let strUrl = "\(Constant.shared.get_item)?page=\(page)&city=New%20Delhi"
-        
         URLhandler.sharedinstance.makeCall(url: strUrl,param: nil, methodType:.get) { responseObject, error in
             
         }

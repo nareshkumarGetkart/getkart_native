@@ -218,12 +218,58 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             self.socialId = gmailUserID ?? ""
             self.loginType = .gmail
            
-           // self.loginWithSocialID()
+            self.signInUsingGmailorAppleApi()
             
         }
         
     }
     
+    
+    func signInUsingGmailorAppleApi(){
+        let timestamp = Date.timeStamp
+        var params: Dictionary<String,Any> =  [:]
+        
+        if self.loginType == .gmail {
+            params = ["firebase_id":"\(self.socialId)", "type":"google","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)"]
+        }else {
+            params = ["firebase_id":"\(self.socialId)", "type":"apple","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)"]
+        }
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                    if let payload =  result["data"] as? Dictionary<String,Any>{
+                        let token = result["token"] as? String ?? ""
+                        let objUserInfo = UserInfo(dict: payload, token: token)
+                        RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
+                       let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                        print(objLoggedInUser)
+                        
+                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                        self.navigationController?.pushViewController(hostingController, animated: true)
+                        
+                    }
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
         
     
     @IBAction func loginWithAppleButton(_ sender : UIButton){
@@ -268,6 +314,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             socialId = socialUser
             loginType = .apple
             
+            self.signInUsingGmailorAppleApi()
             //self.loginWithSocialID()
             
             

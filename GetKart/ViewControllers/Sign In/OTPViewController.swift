@@ -58,9 +58,7 @@ class OTPViewController: UIViewController {
                         
                         self?.delegate?.navigateToNextScreen(message: message)
                     }*/
-                    let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self?.navigationController, countryCode: self?.countryCode ?? "", mobile: self?.mobile ?? "")) // Wrap in UIHostingController
-                    
-                    self?.navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+                    self?.userSignupApi()
                 }else{
                     //self?.delegate?.showError(message: message)
                 }
@@ -68,6 +66,50 @@ class OTPViewController: UIViewController {
             }
         }
     }
+    
+    func userSignupApi(){
+        let timestamp = Date.timeStamp
+        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)"] as [String : Any]
+        
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    if let payload =  result["data"] as? Dictionary<String,Any>{
+                        let token = result["token"] as? String ?? ""
+                        let objUserInfo = UserInfo(dict: payload, token: token)
+                        RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
+                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                        print(objLoggedInUser)
+                        
+                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                        self.navigationController?.pushViewController(hostingController, animated: true) // Push to
+                        
+                        
+                    }
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
+    
     
     @IBAction func reSendOTPApi(){
         
