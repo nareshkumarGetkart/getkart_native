@@ -26,6 +26,7 @@ class HomeHorizontalCell: UITableViewCell {
         }
     }
     
+    var listArray:[Any]?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -56,6 +57,9 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if cellTypes == .categories{
+            return listArray?.count ?? 0
+        }
         return  10
     }
     
@@ -76,6 +80,10 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
         if cellTypes == .categories{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
             
+            if let obj = listArray?[indexPath.item] as? CategoryModel{
+                cell.lblTitle.text = obj.name
+                cell.imgView.kf.setImage(with:  URL(string: obj.image) , placeholder:UIImage(named: "getkartplaceholder"))
+            }
             return cell
             
         }else  if cellTypes == .product{

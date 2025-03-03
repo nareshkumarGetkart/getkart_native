@@ -14,7 +14,7 @@ class HomeVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
     
-    var homeModel:HomeViewModel?
+    var homeVModel:HomeViewModel?
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -23,8 +23,9 @@ class HomeVC: UIViewController {
         tblView.estimatedRowHeight = 200
         tblView.rowHeight = UITableView.automaticDimension
         registerCells()
-        homeModel = HomeViewModel()
-        homeModel?.getProductListApi()
+        homeVModel = HomeViewModel()
+        homeVModel?.delegate = self
+        homeVModel?.getProductListApi()
     }
     
     
@@ -69,6 +70,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        if section == 0{
+            return homeVModel?.categoryObj?.data?.count ?? 0
+        }
         return 1
     }
     
@@ -79,6 +83,8 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
             cell.cnstrntHeightSeeAllView.constant = 0
             cell.cellTypes = .categories
+            cell.listArray = homeVModel?.categoryObj?.data
+
            // (cell.cllctnView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: cell.cllctnView.bounds.size.width/3.0 , height: 130)
             cell.collctnView.updateConstraints()
             cell.collctnView.reloadData()
@@ -116,3 +122,10 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 }
 
 
+
+
+extension HomeVC: RefreshScreen{
+    func refreshScreen(){
+        self.tblView.reloadData()
+    }
+}

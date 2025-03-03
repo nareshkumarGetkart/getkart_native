@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 
 enum CellType{
@@ -24,7 +25,7 @@ class HomeTblCell: UITableViewCell {
     @IBOutlet weak var cnstrntHeightSeeAllView:NSLayoutConstraint!
 
     var cellTypes:CellType?
-    
+    var listArray:[Any]?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -52,6 +53,10 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        if cellTypes == .categories{
+            return listArray?.count ?? 0
+        }
         return  10
     }
     
@@ -70,6 +75,10 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         if cellTypes == .categories{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
             
+            if let obj = listArray?[indexPath.item] as? CategoryModel{
+                cell.lblTitle.text = obj.name
+                cell.imgView.kf.setImage(with:  URL(string: obj.image) , placeholder:UIImage(named: "getkartplaceholder"))
+            }
             return cell
             
         }else  if cellTypes == .product{

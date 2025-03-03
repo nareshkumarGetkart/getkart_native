@@ -7,13 +7,20 @@
 
 import Foundation
 
+protocol RefreshScreen:AnyObject{
+    func refreshScreen()
+}
+
 class HomeViewModel{
     
     var sliderArray = [SliderModel]()
+    var categoryObj:CategoryModelClass?
+    weak var delegate:RefreshScreen?
     
     var page = 1
+    
     init(){
-        
+        getCategoriesListApi()
     }
     
     
@@ -38,9 +45,14 @@ class HomeViewModel{
     
     func getCategoriesListApi(){
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.get_categories ,param: nil, methodType:.get) { responseObject, error in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_categories) { (obj:CategoryParse) in
             
+            if obj.data != nil {
+                self.categoryObj = obj.data
+                self.delegate?.refreshScreen()
+            }
         }
+        
         
     }
     

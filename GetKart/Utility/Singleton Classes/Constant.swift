@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .development
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
