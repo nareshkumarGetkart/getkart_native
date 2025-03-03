@@ -13,7 +13,6 @@ enum DevEnvironment{
     case development
 }
 
-
 var devEnvironment: DevEnvironment = .development
 var ISDEBUG = true
 
