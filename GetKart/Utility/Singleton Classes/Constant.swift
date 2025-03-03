@@ -93,6 +93,13 @@ final class Constant: NSObject {
     }
     
     
+    var get_featured_section:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-featured-section"
+
+        }
+    }
+    
     
 }
 

@@ -8,18 +8,31 @@
 import Foundation
 
 
-struct SliderModel{
-    
-    var id:Int?
-    var sequence:Int?
-    var image:String?
-    var third_party_link:String?
-    var created_at:String?
-    var updated_at:String?
-    var model_type:String?
-    var appRedirection:String?
-    var redirectionType:String?
-    var model:String?
+struct SliderModelParse: Codable {
+    let error: Bool
+    let message: Message
+    let data: [SliderModel]?
+    let code: Int
 }
 
+// MARK: - Datum
+struct SliderModel: Codable {
+    let id: Int
+    let image: String
+    let sequence, thirdPartyLink, createdAt, updatedAt: String
+    let modelType, modelID: JSONNull?
+    let appRedirection: Bool
+    let redirectionType: String
+    let model: JSONNull?
+
+    enum CodingKeys: String, CodingKey {
+        case id, image, sequence
+        case thirdPartyLink = "third_party_link"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case modelType = "model_type"
+        case modelID = "model_id"
+        case appRedirection, redirectionType, model
+    }
+}
 

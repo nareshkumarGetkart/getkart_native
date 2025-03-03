@@ -32,6 +32,9 @@ class HomeVC: UIViewController {
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
+        tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")
+
+        
     }
     
     
@@ -58,8 +61,12 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if indexPath.section == 1{
-            return  310
+        if indexPath.section == 0{
+           
+            return (homeVModel?.sliderArray?.count ?? 0) > 0 ? 200 : 0
+
+        } else if indexPath.section == 1{
+           // return  310
         }
         return UITableView.automaticDimension
     }
@@ -70,16 +77,36 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        
         if section == 0{
-            return homeVModel?.categoryObj?.data?.count ?? 0
+            return (homeVModel?.sliderArray?.count ?? 0) > 0 ? 1 : 0
+
+        }else if section == 1{
+            return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 1 : 0
+        }else {
+            return (homeVModel?.itemObj?.data?.count ?? 0) > 0 ? 1 : 0
         }
-        return 1
+        
+        
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
+       
         if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "BannerTblCell") as! BannerTblCell
+          
+            cell.listArray = homeVModel?.sliderArray
+
+           // (cell.cllctnView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: cell.cllctnView.bounds.size.width/3.0 , height: 130)
+            cell.collctnView.updateConstraints()
+            cell.collctnView.reloadData()
+            cell.updateConstraints()
+
+
+            return cell
+            
+        } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
             cell.cnstrntHeightSeeAllView.constant = 0
             cell.cellTypes = .categories
@@ -93,23 +120,14 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 
             return cell
             
-        }else  if indexPath.section == 1 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
-            cell.cnstrntHeightSeeAllView.constant = 35
-            cell.cellTypes = .product
-          //  (cell.cllctnView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: cell.cllctnView.bounds.size.width/3.0 - 2.5 , height: 160)
-          
-            cell.collctnView.updateConstraints()
-            cell.collctnView.reloadData()
-            cell.updateConstraints()
-            return cell
-            
-        }else{
+        } else{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
             cell.cnstrntHeightSeeAllView.constant = 35
             cell.cllctnView.isScrollEnabled = false
             cell.cellTypes = .product
+            cell.listArray = homeVModel?.itemObj?.data
+
             cell.cllctnView.updateConstraints()
             cell.cllctnView.reloadData()
             cell.updateConstraints()

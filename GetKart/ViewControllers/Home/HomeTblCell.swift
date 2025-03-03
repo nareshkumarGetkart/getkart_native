@@ -54,9 +54,8 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        if cellTypes == .categories{
-            return listArray?.count ?? 0
-        }
+        return listArray?.count ?? 0
+        
         return  10
     }
     
@@ -84,6 +83,12 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         }else  if cellTypes == .product{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
             cell.bgView.addShadow()
+            if let obj = listArray?[indexPath.item] as? ItemModel{
+                cell.lblItem.text = obj.name
+                cell.lblAddress.text = obj.address
+                cell.lblPrice.text =  "\(obj.price)"
+                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image) , placeholder:UIImage(named: "getkartplaceholder"))
+            }
             
             return cell
             

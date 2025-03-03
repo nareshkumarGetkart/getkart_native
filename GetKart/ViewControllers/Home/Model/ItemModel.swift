@@ -10,13 +10,13 @@ struct ItemParse: Codable {
     
     let error: Bool
     let message: String
-    let data: ItemClass
+    let data: ItemModelClass?
     let code: Int
 }
 
 
 // MARK: - ItemClass
-struct ItemClass: Codable {
+struct ItemModelClass: Codable {
     let currentPage: Int
     let data: [ItemModel]?
     let firstPageURL: String
@@ -67,14 +67,14 @@ struct ItemModel: Codable {
     let allCategoryIDS, expiryDate, createdAt, updatedAt: String
     let deletedAt: JSONNull?
     let user: User
-    let category: Category
+    let category: Category?
     let galleryImages: [GalleryImage]
     let featuredItems, favourites: [JSONAny]
     let area: JSONNull?
     let isFeature: Bool
     let totalLikes: Int
     let isLiked: Bool
-    let customFields: [CustomField]
+   // let customFields: [CustomField]
     let isAlreadyOffered, isAlreadyReported: Bool
     let isPurchased: Int
 
@@ -103,7 +103,7 @@ struct ItemModel: Codable {
         case isFeature = "is_feature"
         case totalLikes = "total_likes"
         case isLiked = "is_liked"
-        case customFields = "custom_fields"
+       // case customFields = "custom_fields"
         case isAlreadyOffered = "is_already_offered"
         case isAlreadyReported = "is_already_reported"
         case isPurchased = "is_purchased"
