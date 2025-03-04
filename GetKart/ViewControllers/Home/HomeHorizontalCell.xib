@@ -26,10 +26,7 @@
                         <rect key="frame" x="2.6666666666666572" y="5" width="315" height="0.0"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nYA-OS-ssX">
-                                <rect key="frame" x="245" y="0.0" width="65" height="0.0"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="65" id="ldu-NX-o7w"/>
-                                </constraints>
+                                <rect key="frame" x="262" y="0.0" width="48" height="0.0"/>
                                 <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="15"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="See All">
@@ -37,7 +34,7 @@
                                 </state>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Products" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2wq-B7-H5I">
-                                <rect key="frame" x="5" y="0.0" width="235" height="0.0"/>
+                                <rect key="frame" x="5" y="0.0" width="68.666666666666671" height="0.0"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -47,7 +44,6 @@
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="nYA-OS-ssX" secondAttribute="bottom" id="F5v-Ej-F1D"/>
                             <constraint firstAttribute="bottom" secondItem="2wq-B7-H5I" secondAttribute="bottom" id="Fd8-rw-oRn"/>
-                            <constraint firstItem="nYA-OS-ssX" firstAttribute="leading" secondItem="2wq-B7-H5I" secondAttribute="trailing" constant="5" id="So7-QA-T0C"/>
                             <constraint firstItem="nYA-OS-ssX" firstAttribute="top" secondItem="eZh-RQ-rte" secondAttribute="top" id="WC6-U2-gAr"/>
                             <constraint firstAttribute="trailing" secondItem="nYA-OS-ssX" secondAttribute="trailing" constant="5" id="X0a-zj-y4w"/>
                             <constraint firstItem="2wq-B7-H5I" firstAttribute="leading" secondItem="eZh-RQ-rte" secondAttribute="leading" constant="5" id="Yxf-cc-QGX"/>
@@ -56,7 +52,7 @@
                         </constraints>
                     </view>
                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="XIS-t7-I8F" customClass="DynamicHeightCollectionView" customModule="GetKart" customModuleProvider="target">
-                        <rect key="frame" x="2.6666666666666572" y="15" width="315" height="175"/>
+                        <rect key="frame" x="2.6666666666666572" y="10" width="315" height="185"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="5" minimumInteritemSpacing="5" id="otc-34-CYA">
                             <size key="itemSize" width="0.0" height="0.0"/>
@@ -76,8 +72,8 @@
                     <constraint firstItem="XIS-t7-I8F" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2.5" id="CN3-O0-4fe"/>
                     <constraint firstItem="eZh-RQ-rte" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2.5" id="JW5-na-KTw"/>
                     <constraint firstAttribute="trailing" secondItem="XIS-t7-I8F" secondAttribute="trailing" constant="2.5" id="N4j-WL-ob8"/>
-                    <constraint firstAttribute="bottom" secondItem="XIS-t7-I8F" secondAttribute="bottom" constant="10" id="NvT-wn-bsl"/>
-                    <constraint firstItem="XIS-t7-I8F" firstAttribute="top" secondItem="eZh-RQ-rte" secondAttribute="bottom" constant="10" id="bHv-em-cNl"/>
+                    <constraint firstAttribute="bottom" secondItem="XIS-t7-I8F" secondAttribute="bottom" constant="5" id="NvT-wn-bsl"/>
+                    <constraint firstItem="XIS-t7-I8F" firstAttribute="top" secondItem="eZh-RQ-rte" secondAttribute="bottom" constant="5" id="bHv-em-cNl"/>
                     <constraint firstAttribute="trailing" secondItem="eZh-RQ-rte" secondAttribute="trailing" constant="2.5" id="jhR-PF-Aid"/>
                 </constraints>
             </tableViewCellContentView>

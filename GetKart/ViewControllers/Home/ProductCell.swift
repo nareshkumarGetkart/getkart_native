@@ -23,6 +23,9 @@ class ProductCell: UICollectionViewCell {
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true
         
+        imgViewitem.layer.cornerRadius = 8.0
+        imgViewitem.clipsToBounds = true
+        
         btnLike.layer.cornerRadius = btnLike.frame.size.height/2.0
         btnLike.clipsToBounds = true
         btnLike.addShadow(shadowRadius: 5.0)

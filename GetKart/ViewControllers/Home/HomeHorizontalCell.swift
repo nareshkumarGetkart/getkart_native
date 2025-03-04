@@ -82,7 +82,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             
             if let obj = listArray?[indexPath.item] as? CategoryModel{
                 cell.lblTitle.text = obj.name
-                cell.imgView.kf.setImage(with:  URL(string: obj.image) , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             }
             return cell
             
@@ -93,8 +93,13 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             if let obj = listArray?[indexPath.item] as? ItemModel{
                 cell.lblItem.text = obj.name
                 cell.lblAddress.text = obj.address
-                cell.lblPrice.text =  "\(obj.price)"
-                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image) , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.lblPrice.text =  "\(obj.price ?? 0)"
+                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            }else  if let obj = listArray?[indexPath.item] as? Featured{
+                cell.lblItem.text = obj.name
+                cell.lblAddress.text = obj.address
+                cell.lblPrice.text =  "\(obj.price ?? 0)"
+                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             }
             
             return cell
