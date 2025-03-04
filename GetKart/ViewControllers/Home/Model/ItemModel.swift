@@ -4,29 +4,29 @@
 //
 //  Created by Radheshyam Yadav on 27/02/25.
 //
+import Foundation
 
-// MARK: - ItemParse
+ 
+// MARK: - Empty
 struct ItemParse: Codable {
-    
-    let error: Bool
-    let message: String
+    let error: Bool?
+    let message: String?
     let data: ItemModelClass?
-    let code: Int
+    let code: Int?
 }
 
-
-// MARK: - ItemClass
+// MARK: - DataClass
 struct ItemModelClass: Codable {
-    let currentPage: Int
+    let currentPage: Int?
     let data: [ItemModel]?
-    let firstPageURL: String
-    let from, lastPage: Int
-    let lastPageURL: String
-    let links: [Link]
-    let nextPageURL, path: String
-    let perPage: Int
-    //let prevPageURL: JSONNull?
-    let to, total: Int
+    let firstPageURL: String?
+    let from, lastPage: Int?
+    let lastPageURL: String?
+    let links: [Link]?
+    let nextPageURL, path: String?
+    let perPage: Int?
+    let prevPageURL: JSONNull?
+    let to, total: Int?
 
     enum CodingKeys: String, CodingKey {
         case currentPage = "current_page"
@@ -39,44 +39,45 @@ struct ItemModelClass: Codable {
         case nextPageURL = "next_page_url"
         case path
         case perPage = "per_page"
-       // case prevPageURL = "prev_page_url"
+        case prevPageURL = "prev_page_url"
         case to, total
     }
 }
 
-// MARK: - Datum
+// MARK: - ItemModel
 struct ItemModel: Codable {
-    let id: Int
-    let name, slug, description: String
-    let price: Int
-    let image: String
+    let id: Int?
+    let name, slug, description: String?
+    let price: Int?
+    let image: String?
     let watermarkImage: JSONNull?
-    let latitude, longitude: Double
-    let address, contact: String
-    let showOnlyToPremium: Int
-    let status: Status
-    let rejectedReason: String
-    let videoLink: JSONNull?
-    let clicks: Int
-    let city, state: String
-    let country: Country
+    let latitude, longitude: Double?
+    let address, contact: String?
+    let showOnlyToPremium: Int?
+    let status: Status?
+    let rejectedReason: String?
+    let videoLink: String?
+    let clicks: Int?
+    let city, state: String?
+    let country: Country?
     let areaID: JSONNull?
-    let userID: Int
+    let userID: Int?
     let soldTo: JSONNull?
-    let categoryID: Int
-    let allCategoryIDS, expiryDate, createdAt, updatedAt: String
+    let categoryID: Int?
+    let allCategoryIDS, expiryDate, createdAt, updatedAt: String?
     let deletedAt: JSONNull?
-    let user: User
+    let user: User?
     let category: Category?
-    let galleryImages: [GalleryImage]
-    let featuredItems, favourites: [JSONAny]
+    let galleryImages: [GalleryImage]?
+    let featuredItems: [JSONAny]?
+    let favourites: [Favourite]?
     let area: JSONNull?
-    let isFeature: Bool
-    let totalLikes: Int
-    let isLiked: Bool
-   // let customFields: [CustomField]
-    let isAlreadyOffered, isAlreadyReported: Bool
-    let isPurchased: Int
+    let isFeature: Bool?
+    let totalLikes: Int?
+    let isLiked: Bool?
+    let customFields: [CustomField]?
+    let isAlreadyOffered, isAlreadyReported: Bool?
+    let isPurchased: Int?
 
     enum CodingKeys: String, CodingKey {
         case id, name, slug, description, price, image
@@ -103,7 +104,7 @@ struct ItemModel: Codable {
         case isFeature = "is_feature"
         case totalLikes = "total_likes"
         case isLiked = "is_liked"
-       // case customFields = "custom_fields"
+        case customFields = "custom_fields"
         case isAlreadyOffered = "is_already_offered"
         case isAlreadyReported = "is_already_reported"
         case isPurchased = "is_purchased"
@@ -112,10 +113,10 @@ struct ItemModel: Codable {
 
 // MARK: - Category
 struct Category: Codable {
-    let id: Int
-    let name: String
-    let image: String
-    let translatedName: String
+    let id: Int?
+    let name: String?
+    let image: String?
+    let translatedName: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, image
@@ -129,16 +130,16 @@ enum Country: String, Codable {
 
 // MARK: - CustomField
 struct CustomField: Codable {
-    let id: Int
-    let name: String
-    let type: TypeEnum
-    let image: String
-    let customFieldRequired: Int
-    let values: [String]
+    let id: Int?
+    let name: String?
+    let type: TypeEnum?
+    let image: String?
+    let customFieldRequired: Int?
+    let values: [String]?
     let minLength, maxLength: Int?
-    let status: Int
-    let value: [String]
-    let customFieldValue: CustomFieldValue
+    let status: Int?
+    let value: [String]?
+    let customFieldValue: CustomFieldValue?
 
     enum CodingKeys: String, CodingKey {
         case id, name, type, image
@@ -153,9 +154,9 @@ struct CustomField: Codable {
 
 // MARK: - CustomFieldValue
 struct CustomFieldValue: Codable {
-    let id, itemID, customFieldID: Int
-    let value: [String]
-    let createdAt, updatedAt: AtedAt
+    let id, itemID, customFieldID: Int?
+    let value: Value?
+    let createdAt, updatedAt: AtedAt?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -171,19 +172,63 @@ enum AtedAt: String, Codable {
     case the0000011130T000000000000Z = "-000001-11-30T00:00:00.000000Z"
 }
 
+enum Value: Codable {
+    case string(String)
+    case stringArray([String])
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode([String].self) {
+            self = .stringArray(x)
+            return
+        }
+        if let x = try? container.decode(String.self) {
+            self = .string(x)
+            return
+        }
+        throw DecodingError.typeMismatch(Value.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Value"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let x):
+            try container.encode(x)
+        case .stringArray(let x):
+            try container.encode(x)
+        }
+    }
+}
+
 enum TypeEnum: String, Codable {
     case checkbox = "checkbox"
     case dropdown = "dropdown"
+    case fileinput = "fileinput"
     case number = "number"
     case radio = "radio"
     case textbox = "textbox"
 }
 
+// MARK: - Favourite
+struct Favourite: Codable {
+    let id: Int?
+    let createdAt, updatedAt: String?
+    let userID, itemID: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case userID = "user_id"
+        case itemID = "item_id"
+    }
+}
+
 // MARK: - GalleryImage
 struct GalleryImage: Codable {
-    let id: Int
-    let image: String
-    let itemID: Int
+    let id: Int?
+    let image: String?
+    let itemID: Int?
 
     enum CodingKeys: String, CodingKey {
         case id, image
@@ -197,16 +242,16 @@ enum Status: String, Codable {
 
 // MARK: - User
 struct User: Codable {
-    let id: Int
-    let name, email: String
+    let id: Int?
+    let name, email: String?
     let mobile: String?
     let profile: String?
-    let createdAt: String
-    let isVerified, showPersonalDetails: Int
-    let countryCode: String?
-    let reviewsCount: Int
+    let createdAt: String?
+    let isVerified, showPersonalDetails: Int?
+    let countryCode: CountryCode?
+    let reviewsCount: Int?
     let averageRating: JSONNull?
-    let sellerReview: [JSONAny]
+    let sellerReview: [JSONAny]?
 
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, profile
@@ -220,7 +265,8 @@ struct User: Codable {
     }
 }
 
-
-
-
+enum CountryCode: String, Codable {
+    case empty = ""
+    case the91 = "+91"
+}
 

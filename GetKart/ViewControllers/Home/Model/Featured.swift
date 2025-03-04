@@ -20,12 +20,12 @@ struct FeaturedParse: Codable {
 struct FeaturedClass: Codable {
     let id: Int
     let title, slug: String
-    let sequence: Int
-    let filter, value, style: String
-    let minPrice, maxPrice: JSONNull?
+    let sequence: Int?
+    let filter, value, style: String?
+    let minPrice, maxPrice: Int?
     let createdAt, updatedAt: String
-    let description: JSONNull?
-    let totalData: Int
+    let description: String?
+    let totalData: Int?
     let sectionData: [Featured]?
 
     enum CodingKeys: String, CodingKey {
@@ -34,7 +34,7 @@ struct FeaturedClass: Codable {
         case maxPrice = "max_price"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
-        case description
+        case description = "description"
         case totalData = "total_data"
         case sectionData = "section_data"
     }
@@ -44,24 +44,24 @@ struct FeaturedClass: Codable {
 struct Featured: Codable {
     let id: Int
     let name, slug, description: String
-    let price: Int
-    let image: String
-    let watermarkImage: JSONNull?
+    let price: Int?
+    let image: String?
+    let watermarkImage: String?
     let latitude, longitude: Double
     let address, contact: String
     let showOnlyToPremium: Int
     let status: Status
     let rejectedReason: String
-    let videoLink: JSONNull?
+    let videoLink: String?
     let clicks: Int
     let city, state: String
     let country: Country
-    let areaID: JSONNull?
+    let areaID: Int?
     let userID: Int
-    let soldTo: JSONNull?
+    let soldTo: String?
     let categoryID: Int
     let allCategoryIDS, expiryDate, createdAt, updatedAt: String
-    let deletedAt: JSONNull?
+    let deletedAt: String?
     let favouritesCount: Int
     let user: User
     let category: Category
