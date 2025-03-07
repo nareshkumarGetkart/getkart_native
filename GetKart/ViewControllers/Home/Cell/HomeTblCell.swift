@@ -7,6 +7,7 @@
 
 import UIKit
 import Kingfisher
+import SwiftUI
 
 
 enum CellType{
@@ -16,17 +17,23 @@ enum CellType{
 }
 
 
-class HomeTblCell: UITableViewCell {
+protocol CollectionTableViewCellDelegate: AnyObject {
+    func didUpdateCollectionViewHeight()
+}
 
+class HomeTblCell: UITableViewCell {
+    
     @IBOutlet weak var cllctnView:DynamicHeightCollectionView!
     @IBOutlet weak var lblTtitle:UILabel!
     @IBOutlet weak var btnSeeAll:UIButton!
     @IBOutlet weak var bgViewSeeAll:UIView!
     @IBOutlet weak var cnstrntHeightSeeAllView:NSLayoutConstraint!
-
+    weak var delegateUpdate: CollectionTableViewCellDelegate?
+    
     var cellTypes:CellType?
     var listArray:[Any]?
-
+    var istoIncreaseWidth = false
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -35,11 +42,23 @@ class HomeTblCell: UITableViewCell {
         self.cllctnView.delegate = self
         self.cllctnView.dataSource = self
     }
-
+    /*
+     https://adminweb.getkart.com/images/app_styles/style_1.png
+     https://adminweb.getkart.com/images/app_styles/style_2.png
+     https://adminweb.getkart.com/images/app_styles/style_3.png
+     https://adminweb.getkart.com/images/app_styles/style_4.png
+     */
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+       // DispatchQueue.main.async {
+            // self.delegateUpdate?.didUpdateCollectionViewHeight()
+      //  }
     }
     
 }
@@ -56,7 +75,6 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         
         return listArray?.count ?? 0
         
-        return  10
     }
     
     
@@ -66,7 +84,8 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             return CGSize(width: self.cllctnView.bounds.size.width/3.0 + 60, height: 130)
         }else{
         
-            return CGSize(width: self.cllctnView.bounds.size.width/2.0 - 2.5 , height: 260)
+            let widthCell = (istoIncreaseWidth) ? (self.cllctnView.bounds.size.width/2.0 + 20.0) : (self.cllctnView.bounds.size.width/2.0 - 2.5)
+            return CGSize(width: widthCell , height: 260)
         }
     }
 
@@ -78,6 +97,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 cell.lblTitle.text = obj.name
                 cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             }
+            
             return cell
             
         }else  if cellTypes == .product{
@@ -88,8 +108,14 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 cell.lblAddress.text = obj.address
                 cell.lblPrice.text =  "\(obj.price ?? 0)"
                 cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+           
             }
-            
+//            else if let obj = listArray?[indexPath.item] as? Featured{
+//                cell.lblItem.text = obj.name
+//                cell.lblAddress.text = obj.address
+//                cell.lblPrice.text =  "\(obj.price ?? 0)"
+//                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+//            }
             return cell
             
         }
@@ -98,6 +124,15 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         
     }
     
+   
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+   
+        if cellTypes == .product{
+            
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemObj:(listArray?[indexPath.item] as? ItemModel)))
+            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        }        
+    }
     
 }
 

@@ -30,11 +30,30 @@ struct ProductCard: View {
         VStack(alignment: .leading) {
 
             ZStack(alignment: .topTrailing) {
-                          Image(systemName: imageName)
-                              .resizable()
-                              .frame(width: widthScreen/2.0 - 25 , height: widthScreen/2.0 - 25)
-                              .background(Color.gray.opacity(0.3))
-                              .cornerRadius(10).padding(.bottom,10)
+//                          Image(systemName: imageName)
+//                              .resizable()
+//                              .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
+//                              .background(Color.gray.opacity(0.3))
+//                              .cornerRadius(10).padding(.bottom,10)
+                
+                
+                
+                AsyncImage(url: URL(string: imageName)) { image in
+                    image
+                        .resizable()
+                        .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(10).padding(.bottom,10)
+                    
+                }placeholder: {
+                    
+                    Image("getkartplaceholder")
+                        .resizable()
+                        .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(10).padding(.bottom,10)
+                }
+                
                           
                           Button(action: {
                             //  toggleLike()
@@ -56,15 +75,15 @@ struct ProductCard: View {
                       }
             
             VStack(alignment: .leading){
-                Text(price)
+                Text(price).lineLimit(1)
                     .font(.headline)
                     .foregroundColor(.orange)
-                Text(title)
+                Text(title).lineLimit(1)
                     .font(.subheadline)
-                    .bold()
-                Text(location)
+                Text(location).lineLimit(1)
                     .font(.caption)
                     .foregroundColor(.gray)
+                
             }.padding([.trailing,.leading,.bottom],10)
             
         }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class HomeHorizontalCell: UITableViewCell {
     
@@ -25,7 +26,9 @@ class HomeHorizontalCell: UITableViewCell {
             }
         }
     }
-    
+    weak var delegateUpdate: CollectionTableViewCellDelegate?
+    var istoIncreaseWidth = false
+
     var listArray:[Any]?
 
     override func awakeFromNib() {
@@ -46,6 +49,13 @@ class HomeHorizontalCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    override func layoutSubviews() {
+            super.layoutSubviews()
+            DispatchQueue.main.async {
+               // self.delegateUpdate?.didUpdateCollectionViewHeight()
+            }
+        }
+    
 }
 
 
@@ -57,21 +67,23 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //if cellTypes == .categories{
+        if cellTypes == .categories{
+            return (listArray?.count ?? 0) > 0 ?  (listArray?.count ?? 0) + 1 : 0
+       }
             return listArray?.count ?? 0
-//        }
-//        return  10
     }
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         if cellTypes == .categories{
-            return CGSize(width: self.collctnView.bounds.size.width/3.0, height: 130)
+            return CGSize(width: self.collctnView.bounds.size.width/3.0 - 35, height: 130)
         }else{
             
         
-            return CGSize(width: self.collctnView.bounds.size.width/2.0 - 2.5 , height: 260)
+            let widthCell = (istoIncreaseWidth) ? (self.collctnView.bounds.size.width/2.0 + 20.0) : (self.collctnView.bounds.size.width/2.0 - 2.5)
+
+            return CGSize(width: widthCell , height: 260)
         }
     }
     
@@ -79,11 +91,23 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if cellTypes == .categories{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
-            
-            if let obj = listArray?[indexPath.item] as? CategoryModel{
+           
+            if (listArray?.count ?? 0) == indexPath.item{
+                cell.imgView.image = UIImage(named:"threeDotHori")
+               // cell.imgView.setImageTintColor(color: .yellow)
+                cell.lblTitle.text = "More"
+                cell.imgView.layer.borderColor = UIColor.lightGray.cgColor
+                cell.imgView.layer.borderWidth = 1.0
+
+            }else if let obj = listArray?[indexPath.item] as? CategoryModel{
                 cell.lblTitle.text = obj.name
                 cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgView.layer.borderColor = UIColor.clear.cgColor
+                cell.imgView.layer.borderWidth = 0.0
             }
+            
+            cell.imgView.layer.cornerRadius = 10.0
+            cell.imgView.clipsToBounds = true
             return cell
             
         }else  if cellTypes == .product{
@@ -95,12 +119,13 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 cell.lblAddress.text = obj.address
                 cell.lblPrice.text =  "\(obj.price ?? 0)"
                 cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-            }else  if let obj = listArray?[indexPath.item] as? Featured{
-                cell.lblItem.text = obj.name
-                cell.lblAddress.text = obj.address
-                cell.lblPrice.text =  "\(obj.price ?? 0)"
-                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             }
+//            else  if let obj = listArray?[indexPath.item] as? Featured{
+//                cell.lblItem.text = obj.name
+//                cell.lblAddress.text = obj.address
+//                cell.lblPrice.text =  "\(obj.price ?? 0)"
+//                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+//            }
             
             return cell
             
@@ -110,6 +135,18 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
         
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if cellTypes == .categories{
+            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+            }
+        }else if cellTypes == .product{
+            
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemObj:(listArray?[indexPath.item] as? ItemModel)))
+            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        }
+    }
+  
     
 }
 

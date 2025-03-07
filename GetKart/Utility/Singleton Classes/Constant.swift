@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -22,7 +22,7 @@ final class Constant: NSObject {
     let ErrorMessage = "No Network Connection. Please check your internet connection."
     var userActiveStatus = 0 //0-> account Unapproved ,1 - account Approved
     var isLaunchFirstTime = 1
-   
+    
     private override init(){ }
     
     var baseURL:String {
@@ -84,7 +84,7 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/get-item"
         }
     }
-   
+    
     
     var get_categories:String{
         get {
@@ -96,27 +96,33 @@ final class Constant: NSObject {
     var get_featured_section:String{
         get{
             return "\(Constant.shared.baseURL)/get-featured-section"
-
+            
         }
     }
     
     var get_Countries:String{
         get{
             return "\(Constant.shared.baseURL)/countries"
-
+            
         }
     }
     var get_States:String{
         get{
             return "\(Constant.shared.baseURL)/states"
-
+            
         }
     }
     
     var get_Cities:String{
         get{
             return "\(Constant.shared.baseURL)/cities"
-
+            
+        }
+    }
+    var get_seller:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-seller"
+            
         }
     }
     

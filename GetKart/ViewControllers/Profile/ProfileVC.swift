@@ -109,10 +109,6 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
       
             if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
                 
-            }else if titleArray[indexPath.row] == "Delete Account"{
-                
-            }else if titleArray[indexPath.row] == "Logout"{
-                
             }else if titleArray[indexPath.row] == "My Boost Ads"{
                 if isUserLoggedInRequest(){
                     

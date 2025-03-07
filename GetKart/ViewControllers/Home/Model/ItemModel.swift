@@ -18,14 +18,14 @@ struct ItemParse: Codable {
 // MARK: - DataClass
 struct ItemModelClass: Codable {
     let currentPage: Int?
-    let data: [ItemModel]?
+    var data: [ItemModel]?
     let firstPageURL: String?
     let from, lastPage: Int?
     let lastPageURL: String?
     let links: [Link]?
     let nextPageURL, path: String?
     let perPage: Int?
-    let prevPageURL: JSONNull?
+    let prevPageURL: String?
     let to, total: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -45,12 +45,12 @@ struct ItemModelClass: Codable {
 }
 
 // MARK: - ItemModel
-struct ItemModel: Codable {
+struct ItemModel: Codable,Identifiable {
     let id: Int?
     let name, slug, description: String?
     let price: Int?
     let image: String?
-    let watermarkImage: JSONNull?
+    let watermarkImage: String?
     let latitude, longitude: Double?
     let address, contact: String?
     let showOnlyToPremium: Int?
@@ -59,19 +59,19 @@ struct ItemModel: Codable {
     let videoLink: String?
     let clicks: Int?
     let city, state: String?
-    let country: Country?
-    let areaID: JSONNull?
+    let country: String?
+    let areaID: String?
     let userID: Int?
-    let soldTo: JSONNull?
+    let soldTo: String?
     let categoryID: Int?
     let allCategoryIDS, expiryDate, createdAt, updatedAt: String?
-    let deletedAt: JSONNull?
+    let deletedAt: String?
     let user: User?
     let category: Category?
     let galleryImages: [GalleryImage]?
     let featuredItems: [JSONAny]?
     let favourites: [Favourite]?
-    let area: JSONNull?
+    let area: Int?
     let isFeature: Bool?
     let totalLikes: Int?
     let isLiked: Bool?
@@ -129,7 +129,7 @@ enum Country: String, Codable {
 }
 
 // MARK: - CustomField
-struct CustomField: Codable {
+struct CustomField: Codable,Identifiable {
     let id: Int?
     let name: String?
     let type: TypeEnum?
@@ -156,7 +156,7 @@ struct CustomField: Codable {
 struct CustomFieldValue: Codable {
     let id, itemID, customFieldID: Int?
     let value: Value?
-    let createdAt, updatedAt: AtedAt?
+    let createdAt, updatedAt: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -250,7 +250,7 @@ struct User: Codable {
     let isVerified, showPersonalDetails: Int?
     let countryCode: CountryCode?
     let reviewsCount: Int?
-    let averageRating: JSONNull?
+    let averageRating: Int?
     let sellerReview: [JSONAny]?
 
     enum CodingKeys: String, CodingKey {

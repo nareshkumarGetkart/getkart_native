@@ -144,7 +144,17 @@ extension UIDevice {
     
 }
 
-
+extension UIButton{
+    
+    func setImageColor(color:UIColor){
+        let tintedImage = self.currentImage?.withRenderingMode(.alwaysTemplate)
+        self.setImage(tintedImage, for: .normal)
+        self.tintColor = color
+        
+    }
+    
+ 
+}
 
 //MARK: UIImageview
 
