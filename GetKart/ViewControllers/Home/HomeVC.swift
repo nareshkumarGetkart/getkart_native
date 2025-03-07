@@ -41,7 +41,9 @@ class HomeVC: UIViewController {
     
     @IBAction func locationBtnAction(_ sender : UIButton){
         
-   
+            let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController))
+            self.navigationController?.pushViewController(vc, animated: true)
+        
     }
     
     @IBAction func searchBtnAction(_ sender : UIButton){

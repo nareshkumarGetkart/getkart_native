@@ -100,6 +100,26 @@ final class Constant: NSObject {
         }
     }
     
+    var get_Countries:String{
+        get{
+            return "\(Constant.shared.baseURL)/countries"
+
+        }
+    }
+    var get_States:String{
+        get{
+            return "\(Constant.shared.baseURL)/states"
+
+        }
+    }
+    
+    var get_Cities:String{
+        get{
+            return "\(Constant.shared.baseURL)/cities"
+
+        }
+    }
+    
     
 }
 

@@ -92,9 +92,18 @@ struct MyLocationView: View {
     }
     
     func otherLocationAction(){
-        let vc = UIHostingController(rootView: CountryLocationView())
-        self.navigationController?.pushViewController(vc, animated: true)
+        self.fetchCountryListing()
     }
+    
+    func fetchCountryListing(){
+       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+            let arrCountry = obj.data?.data ?? []
+           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry))
+           self.navigationController?.pushViewController(vc, animated: true)
+           
+       }
+   }
+    
 }
 
 extension MyLocationView :LocationAutorizationUpdated {

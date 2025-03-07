@@ -10,13 +10,15 @@ import SwiftUI
 struct CountryLocationView: View {
     @State private var searchText = ""
     @Environment(\.presentationMode) var presentationMode
+    var navigationController: UINavigationController?
+    @State var arrCountries:Array<CountryModel> = []
     var body: some View {
         
             VStack(spacing: 0) {
                 HStack{
                     
                     Button {
-                        AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                        self.navigationController?.popViewController(animated: true)
                     } label: {
                         Image("arrow_left").renderingMode(.template).foregroundColor(.black)
                     }.frame(width: 40,height: 40)
@@ -79,23 +81,57 @@ struct CountryLocationView: View {
                 Divider()
                 
                 // MARK: - List of Countries
-                List {
-                    NavigationLink(destination: Text("All Countries")) {
-                        Text("All Countries")
-                    }
-                    NavigationLink(destination: Text("India")) {
-                        Text("India")
-                    }
-                    NavigationLink(destination: Text("United States")) {
-                        Text("United States")
+                ScrollView{
+                    ForEach(arrCountries) { country in
+                        CountryRow(strTitle:country.name ?? "").frame(height: 40)
+                            .onTapGesture{
+                                self.navigateToStateListing(country: country)
+                            }
+                        Divider()
                     }
                 }
-                .listStyle(.plain)
+                
+                Spacer()
+            }.onAppear{
+                fetchCountryListing()
             }
             .navigationTitle("Location")
             .navigationBarBackButtonHidden()
         
     }
+    
+     func fetchCountryListing(){
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+            arrCountries = obj.data?.data ?? []
+        }
+    }
+    
+    func navigateToStateListing(country:CountryModel){
+       
+           let vc = UIHostingController(rootView: StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country))
+           self.navigationController?.pushViewController(vc, animated: true)
+           
+       
+   }
 }
 
+
+
+struct CountryRow: View {
+    var strTitle: String = "India"
+    var body: some View {
+        HStack {
+            Text("\(strTitle)")
+                .font(Font.manrope(.medium, size: 15))
+            Spacer()
+            Image(systemName: "")
+                .foregroundColor(.orange)
+        }.padding(.leading, 30)
+        
+    }
+}
+
+#Preview {
+    CountryRow()
+}
 
