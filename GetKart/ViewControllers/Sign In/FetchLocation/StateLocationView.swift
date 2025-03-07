@@ -116,7 +116,7 @@ struct StateLocationView: View {
     
     func NavigateToCityListing(state:StateModal){
         
-        let vc = UIHostingController(rootView: CityLocationView(navigationController: self.navigationController, state: state))
+        let vc = UIHostingController(rootView: CityLocationView(navigationController: self.navigationController,country: country, state: state))
            self.navigationController?.pushViewController(vc, animated: true)
            
        

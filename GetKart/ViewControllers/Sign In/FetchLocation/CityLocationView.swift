@@ -6,6 +6,7 @@ struct CityLocationView: View {
     var navigationController: UINavigationController?
     @State var arrCities:Array<CityModal> = []
     @State private var searchText = ""
+    var country:CountryModel = CountryModel()
     var state:StateModal = StateModal()
     @State var pageNo = 1
     @State var totalRecords = 1
@@ -69,9 +70,9 @@ struct CityLocationView: View {
                                     }
                                 }
                              
-                                
                             }
                             .onTapGesture{
+                                self.citySelected(city: city)
                             }
                         Divider()
                     }
@@ -100,6 +101,16 @@ struct CityLocationView: View {
            
        }
    }
+    
+    func citySelected(city:CityModal) {
+        Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+        for vc in self.navigationController?.viewControllers ?? [] {
+            if vc.isKind(of: HomeVC.self) == true || vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                self.navigationController?.popToViewController(vc, animated: true)
+                break
+            }
+        }
+    }
     
 }
 

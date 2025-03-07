@@ -27,7 +27,11 @@ class HomeVC: UIViewController {
         homeVModel?.getProductListApi()
     }
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.lblAddress.text = "\(Local.shared.getUserCity()), \(Local.shared.getUserState()), \(Local.shared.getUserCountry())"
+        
+    }
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")

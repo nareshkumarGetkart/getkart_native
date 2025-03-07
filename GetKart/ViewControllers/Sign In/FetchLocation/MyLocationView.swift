@@ -66,6 +66,13 @@ struct MyLocationView: View {
                 }.padding(.top ,30)
                 
                 Spacer()
+            }.onAppear {
+                if Local.shared.getUserCity().count > 0 {
+                    if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }
+                    
+                }
             }
         
     }

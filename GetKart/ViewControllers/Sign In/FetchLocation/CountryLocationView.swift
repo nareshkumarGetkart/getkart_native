@@ -85,6 +85,7 @@ struct CountryLocationView: View {
                     ForEach(arrCountries) { country in
                         CountryRow(strTitle:country.name ?? "").frame(height: 40)
                             .onTapGesture{
+                                
                                 self.navigateToStateListing(country: country)
                             }
                         Divider()
