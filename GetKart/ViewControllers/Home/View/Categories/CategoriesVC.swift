@@ -83,8 +83,8 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if isNewPost == true {
-            let subCategories = objViewModel?.listArray?[indexPath.item].subcategories 
-            Subcategory
+//            let subCategories = objViewModel?.listArray?[indexPath.item].subcategories 
+//            Subcategory
         }
     }
     

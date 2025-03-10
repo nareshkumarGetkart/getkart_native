@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SubCategoriesView: View {
-    @State let subcategories: [Subcategory]?
+    @State var subcategories: [Subcategory]?
     
     var navigationController: UINavigationController?
     var body: some View {
@@ -30,9 +30,9 @@ struct SubCategoriesView: View {
             
             ScrollView{
                 LazyVStack {
-                    ForEach(subcategories) { objsubCategory in
-                        CategoryCellView(subCategory: objsubCategory)
-                    }
+//                    ForEach(subcategories) { objsubCategory in
+//                        CategoryCellView(subCategory: objsubCategory)
+//                    }
                 }
             }
             
