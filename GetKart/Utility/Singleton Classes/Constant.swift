@@ -127,6 +127,15 @@ final class Constant: NSObject {
     }
     
     
+    var tips:String{
+        get{
+            return "\(Constant.shared.baseURL)/tips"
+            
+        }
+    }
+    
+
+    
 }
 
 

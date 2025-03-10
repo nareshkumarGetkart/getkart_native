@@ -22,6 +22,7 @@ pod 'GooglePlaces'
 pod 'SwiftyGif'
 pod 'IQKeyboardManagerSwift'
 pod 'RealmSwift', '~>10'
+pod 'SVGKit'
   target 'GetKartTests' do
     inherit! :search_paths
     # Pods for testing

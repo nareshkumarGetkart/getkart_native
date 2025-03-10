@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import Foundation
+import SVGKit
 
 struct ItemDetailView: View {
     
@@ -18,9 +19,10 @@ struct ItemDetailView: View {
     @State private var selectedIndex = 0
     @State var isLiked = false
     @StateObject private var objVM = ItemDetailViewModel()
-    
-    
+    @State private var showSheet = false
+
     var body: some View {
+        
         HStack{
             Button {
                 AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
@@ -69,6 +71,7 @@ struct ItemDetailView: View {
                         }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
                         .frame(height: 200)
                         
+                        
                         Button(action: {
                             isLiked.toggle()
                         }) {
@@ -79,24 +82,7 @@ struct ItemDetailView: View {
                                 .padding()
                         }
                     }
-                    
-                    // Spacer()
-                  /*  HStack {
-                        Spacer()
-                        if let arr = itemObj?.galleryImages{
-                            
-//                            ForEach(arr.indices, id: \ .self) { index in
-//                                
-//                                // ForEach(imgArray.indices, id: \ .self) { index in
-//                                Circle()
-//                                    .frame(width: 8, height: 8)
-//                                    .foregroundColor(selectedIndex == index ? .orange : .gray)
-//                            }
-                            Spacer()
-                        }
-                        
-                    }.padding(.top, 5)
-                    */
+    
                     
                     Text(itemObj?.name ?? "''").font(Font.manrope(.medium, size: 16))
                         .font(.headline)
@@ -118,10 +104,10 @@ struct ItemDetailView: View {
                     }.padding(5).padding(.bottom,10)
                
                     let columns = [
-                        GridItem(.fixed(widthScreen/2.0-20)),
-                        GridItem(.fixed(widthScreen/2.0-20)),
+                        GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
+                        GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
                        ]
-                    LazyVGrid(columns: columns, alignment:.leading, spacing: 15) {
+                    LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
                         if let arr = itemObj?.customFields{
                             ForEach(arr){obj in
                                 
@@ -148,7 +134,7 @@ struct ItemDetailView: View {
                         Spacer()
                     }
                     
-                    MapView(lat: itemObj?.latitude ?? 0.0, long: itemObj?.longitude ?? 0.0)
+                    MapView(latitude: itemObj?.latitude ?? 0.0, longitude: itemObj?.longitude ?? 0.0,address: itemObj?.address ?? "")
                         .frame(height: 200)
                         .cornerRadius(10)
                         .padding(.bottom)
@@ -173,6 +159,14 @@ struct ItemDetailView: View {
                            ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
                                 print("Report Ad tapped")
+                                
+                                let destVC = UIHostingController(rootView: ReportAdsView())
+                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                self.navController?.present(destVC, animated: true, completion: nil)
+                                
+                                    
                             }
                     }  .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -217,11 +211,38 @@ struct ItemDetailView: View {
                 objVM.getSeller(sellerId: self.itemObj?.userID ?? 0)
                 objVM.getProductListApi(categoryId: self.itemObj?.categoryID ?? 0)
             }
+              
+               
         }
+        
+            .sheet(isPresented: $showSheet) {
+                if #available(iOS 16.0, *) {
+                    SafetyTipsView()
+                        .presentationDetents([.medium, .large]) // Customizable sizes
+                        .presentationDragIndicator(.visible)
+                } else {
+                    // Fallback on earlier versions
+                    
+                    if showSheet {
+                        SafetyTipsView()
+                            .transition(.move(edge: .bottom))
+                            .zIndex(1)
+                    }
+                } // Shows the drag indicator
+                    }
         
         Spacer()
         Button(action: {
             print("Make an Offer")
+            showSheet = true
+//
+//            let destVC = UIHostingController(rootView: SafetyTipsView())
+//            destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+//            destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+//            destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+//            self.navController?.present(destVC, animated: true, completion: nil)
+            
+               
         }) {
             Text("Make an Offer")
                 .frame(maxWidth: .infinity)
@@ -246,25 +267,32 @@ struct InfoView: View {
     let value:String
     var body: some View {
         HStack {
-      
-            AsyncImage(url: URL(string: "https://adminweb.getkart.com/storage/custom-fields/66b5deb7963ec8.529669121723195063.svg")) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width:40, height: 40)
-                
-            }placeholder: {
-                
-//                Image("getkartplaceholder").resizable()
-//                    .scaledToFit()
-//                    .frame(width:40, height: 40)
+            if icon.lowercased().contains(".svg"){
+            SVGImageView(url: URL(string: icon)).frame(width:30, height: 30)
+            }else{
+               
+                AsyncImage(url: URL(string: icon)) { image in
+                     image
+                         .resizable()
+                         .scaledToFit()
+                         .frame(width:30, height: 30)
+                     
+                 }placeholder: {
+                     
+                     Image("getkartplaceholder").resizable()
+                         .scaledToFit()
+                         .frame(width:30, height: 30)
+                 }
             }
-            
-            VStack{
+       
+            VStack(alignment: .leading){
+                Spacer()
                 Text(text)
-                    .font(.manrope(.regular, size: 12)).foregroundColor(.gray)
+                    .font(.manrope(.regular, size: 10)).foregroundColor(.gray)
                 Text(value)
-                    .font(.manrope(.medium, size: 14)).foregroundColor(.gray)
+                    .font(.manrope(.medium, size: 14)).foregroundColor(.black)
+                Spacer()
+
             }
         }
         .padding(.horizontal)
@@ -343,55 +371,58 @@ struct SellerInfoView: View {
     }
 }
 
-struct MapView: View {
-    let lat:Double
-    let long:Double
+//struct MapView: View {
+//    let lat:Double
+//    let long:Double
+//
+//    var body: some View {
+//        Map(coordinateRegion: .constant(MKCoordinateRegion(
+//            center: CLLocationCoordinate2D(latitude: lat, longitude: long),
+//            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+//        )))
+//    }
+//}
 
-    var body: some View {
-        Map(coordinateRegion: .constant(MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: lat, longitude: long),
-            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        )))
+
+
+
+
+
+
+
+
+import MapKit
+
+struct MapView: UIViewRepresentable {
+    let latitude: Double
+    let longitude: Double
+    let address: String
+
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+        let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+        mapView.setRegion(region, animated: true)
+
+        // 📌 Add marker (annotation)
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = location
+        annotation.title = address
+        mapView.addAnnotation(annotation)
+
+        return mapView
     }
-}
 
-struct Bike {
-    let name: String
-    let price: Int
-    let color: String
-    let kmDriven: Int
-    let modelYear: Int
-    let fuelType: String
-    let location: String
-    let seller: String
-    let email: String
-}
-
-
-
-
-
-import SwiftUI
-import WebKit
-
-struct SVGWebView: UIViewRepresentable {
-    let url: URL
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        let request = URLRequest(url: url)
-        webView.load(request)
-        return webView
+    func updateUIView(_ mapView: MKMapView, context: Context) {
+        let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+        mapView.setRegion(region, animated: true)
     }
 
-    func updateUIView(_ webView: WKWebView, context: Context) {}
-}
-
-struct ContentView: View {
-    let svgURL = URL(string: "https://adminweb.getkart.com/storage/custom-fields/66b5deb7963ec8.529669121723195063.svg")!
-
-    var body: some View {
-        SVGWebView(url: svgURL)
-            .frame(width: 200, height: 200)  // Set frame size as needed
+    func makeCoordinator() -> Coordinator {
+        return Coordinator()
     }
+
+    class Coordinator: NSObject, MKMapViewDelegate {}
 }
