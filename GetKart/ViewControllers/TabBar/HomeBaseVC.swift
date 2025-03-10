@@ -93,7 +93,10 @@ class HomeBaseVC: UITabBarController {
             print("Middle button tapped!")
             // Handle action (e.g., present a modal view)
             if isUserLoggedInRequest(){
-                
+                if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                    destVC.isNewPost = true
+                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                }
             }
           
         }

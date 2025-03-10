@@ -13,7 +13,7 @@ class CategoriesVC: UIViewController {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var collctionView:UICollectionView!
     @IBOutlet weak var btnBack:UIButton!
-
+    var isNewPost = false
     
     private var objViewModel:CategoryViewModel?
     
@@ -79,6 +79,13 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
                 
         return cell
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if isNewPost == true {
+            let subCategories = objViewModel?.listArray?[indexPath.item].subcategories 
+            Subcategory
+        }
     }
     
 //    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
