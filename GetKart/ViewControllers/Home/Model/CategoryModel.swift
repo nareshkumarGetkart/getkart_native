@@ -72,7 +72,7 @@ struct CategoryModel: Codable {
 }
 
 // MARK: - Subcategory
-struct Subcategory: Codable {
+struct Subcategory: Codable, Identifiable {
     let id: Int?
     let sequence: Int?
     let name: String?

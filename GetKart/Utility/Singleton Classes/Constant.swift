@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .development
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -134,7 +134,21 @@ final class Constant: NSObject {
         }
     }
     
-
+    
+    var getLimits:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-limits"
+            
+        }
+    }
+    
+    
+    var getCustomfields:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-customfields"
+            
+        }
+    }
     
 }
 
@@ -142,6 +156,7 @@ final class Constant: NSObject {
 enum StoryBoard {
     static let main = UIStoryboard(name: "Main", bundle: nil)
     static let preLogin = UIStoryboard(name: "PreLogin", bundle: nil)
+    static let postAdd = UIStoryboard(name: "PostAdd", bundle: nil)
 }
 
 

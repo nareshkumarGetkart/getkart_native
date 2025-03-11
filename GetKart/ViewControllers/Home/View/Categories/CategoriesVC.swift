@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class CategoriesVC: UIViewController {
     
@@ -83,8 +84,10 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if isNewPost == true {
-//            let subCategories = objViewModel?.listArray?[indexPath.item].subcategories 
-//            Subcategory
+            let objCategory = objViewModel?.listArray?[indexPath.item]
+            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, isNewPost: true, strTitle: objCategory?.name ?? "", category_ids:"\(objCategory?.id ?? 0)") // Create SwiftUI view
+            let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+            navigationController?.pushViewController(hostingController, animated: true) //
         }
     }
     
