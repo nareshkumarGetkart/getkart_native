@@ -32,6 +32,7 @@ class CreateAddVC2: UIViewController {
     */
 
 }
+/*
 
 extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -88,3 +89,4 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
         return UITableViewCell()
     }
 }
+*/

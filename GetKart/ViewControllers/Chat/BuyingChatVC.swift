@@ -17,17 +17,20 @@ class BuyingChatVC: UIViewController {
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        getChatList()
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
     }
-    */
 
+    func getChatList(){
+        
+//    "type": "seller"  // or buyer
+        let params = ["page":1,"type":"buyer"] as [String : Any]
+        
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatList.rawValue, params)
+     
+    }
 }
 
 extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{

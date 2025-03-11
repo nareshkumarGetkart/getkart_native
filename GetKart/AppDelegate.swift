@@ -59,6 +59,61 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func applicationWillResignActive(_ application: UIApplication) {
+   
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication){
+        print("applicationDidEnterBackground")
+    }
+        
+    func applicationWillEnterForeground(_ application: UIApplication){
+        print("applicationWillEnterForeground")
+        checkSocketStatus()
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        print("applicationDidBecomeActive")
+        checkSocketStatus()
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.token != nil {
+            SocketIOManager.sharedInstance.socket?.disconnect()
+        }
+    }
+    
+    
+    func checkSocketStatus(){
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.token == nil {
+            return
+        }
+        
+        switch SocketIOManager.sharedInstance.socket?.status{
+            
+        case .disconnected:
+            SocketIOManager.sharedInstance.establishConnection()
+            return
+        case .notConnected:
+            SocketIOManager.sharedInstance.establishConnection()
+            return
+        case .connecting:
+            SocketIOManager.sharedInstance.establishConnection()
+            return
+            
+        default:
+            if (SocketIOManager.sharedInstance.socket == nil){
+                SocketIOManager.sharedInstance.establishConnection()
+            }
+            break
+        }
+    }
+     
+    
     func reachabilityListener(){
         NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),name: ReachabilityChangedNotification, object: reachability)
         do{

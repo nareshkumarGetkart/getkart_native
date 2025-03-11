@@ -24,14 +24,14 @@ struct PrivacyView: View {
     var navigationController: UINavigationController?
     var title:String
     var type:ViewType
-    
+    var htmlString:String?
     var body: some View {
-        let ht = UIDevice().hasNotch ? (navigationController?.getNavBarHt ?? 0.0) - 20 : (navigationController?.getNavBarHt ?? 0.0) + 20
+       // let ht = UIDevice().hasNotch ? (navigationController?.getNavBarHt ?? 0.0) - 20 : (navigationController?.getNavBarHt ?? 0.0) + 20
         HStack{
             
             Button {
                 
-                navigationController?.popViewController(animated: true)
+                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
@@ -39,22 +39,16 @@ struct PrivacyView: View {
             Text(title).font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)
             Spacer()
-        }.frame(height:ht).background()
+        }.frame(height:44).background()
         //+ 44.0
         
         VStack{
-            
-//            let keyWindow = UIApplication.shared.connectedScenes
-//                 .filter({$0.activationState == .foregroundActive})
-//                 .compactMap({$0 as? UIWindowScene})
-//                 .first?.windows
-//                 .filter({$0.isKeyWindow}).first
-             
-           
-           
-            
-            if let url = URL(string:getUrlTYpe(type: type)){
-                Webview(url: url).navigationBarBackButtonHidden(true)
+
+            if (htmlString?.count ?? 0) > 1{
+                Webview(url:nil, htmlText:htmlString ?? "")
+               
+            }else  if let url = URL(string:getUrlTYpe(type: type)){
+                Webview(url: url, htmlText: "").navigationBarBackButtonHidden(true)
             }
         }.navigationBarTitleDisplayMode(.inline).navigationBarHidden(true)
     }

@@ -71,7 +71,15 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.bgViewAnonymousUser.isHidden = true
                 cell.bgViewLoggedInUser.isHidden = false
                 cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
+                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""))
+                cell.lblName.text =  objLoggedInUser.name ?? ""
+                cell.lblEmail.text =  objLoggedInUser.email ?? ""
+                if (objLoggedInUser.is_verified ?? 0) == 1{
+                    cell.btnGetVerifiedBadge.isHidden = true
+                }else{
+                    cell.btnGetVerifiedBadge.isHidden = false
 
+                }
 
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
@@ -114,8 +122,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     
                 }
                 
-            }
-            else if titleArray[indexPath.row] == "Subscription"{
+            } else if titleArray[indexPath.row] == "Subscription"{
                 
                 if isUserLoggedInRequest(){
                     
@@ -127,6 +134,30 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 let deleteAccountView = UIHostingController(rootView: LanguageView())
                 AppDelegate.sharedInstance.navigationController?.pushViewController(deleteAccountView, animated: true)
                 
+            }else if titleArray[indexPath.row] == "Blogs"{
+                
+                let swiftUIView = Blogsview(title: "Blogs") // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+
+            }else if titleArray[indexPath.row] == "Privacy Policy"{
+                
+                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+
+            }else if titleArray[indexPath.row] == "About us"{
+                
+                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "About us", type: .aboutUs) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+
+            }else if titleArray[indexPath.row] == "Terms of Service"{
+                
+                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of Service", type: .termsAndConditions) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+
             }else if titleArray[indexPath.row] == "Notifications"{
                 if isUserLoggedInRequest(){
                     

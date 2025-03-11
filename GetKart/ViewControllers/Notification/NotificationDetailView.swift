@@ -28,7 +28,19 @@ struct NotificationDetailView: View {
         }.frame(height: 44)
        
         VStack{
-            Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill).frame(width: UIScreen.main.bounds.width ,height: 150)
+            
+            
+            AsyncImage(url: URL(string: notification?.image ?? "")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+                    .frame(width:  UIScreen.main.bounds.width, height: 150)
+                
+            }placeholder: {
+                
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill)
+                        .frame(width:  UIScreen.main.bounds.width, height: 150)
+//                ProgressView().progressViewStyle(.circular)
+                
+            }
             
             VStack(alignment: .leading,spacing: 5){
                 Text("\(notification?.title ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black)

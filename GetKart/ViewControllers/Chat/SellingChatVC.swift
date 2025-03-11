@@ -16,7 +16,21 @@ class SellingChatVC: UIViewController {
 
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
     }
-    
+  
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        getChatList()
+
+    }
+
+    func getChatList(){
+        
+//    "type": "seller"  // or buyer
+        let params = ["page":1,"type":"seller"] as [String : Any]
+        
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatList.rawValue, params)
+     
+    }
 
 }
 

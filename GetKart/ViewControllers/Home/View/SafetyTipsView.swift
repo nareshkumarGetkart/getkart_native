@@ -21,7 +21,7 @@ struct SafetyTipsView: View {
             VStack {
                 
                 
-                Image(systemName: "lightbulb.fill")
+                Image("safety_tips")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 80, height: 80)
@@ -40,7 +40,7 @@ struct SafetyTipsView: View {
                     }
                    
                 }
-                .padding(.horizontal)
+                .padding([.horizontal,.bottom])
                 
                 Button("Continue to offer") {
                     presentationMode.wrappedValue.dismiss()
@@ -53,11 +53,8 @@ struct SafetyTipsView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 20)
             } .edgesIgnoringSafeArea(.all)
-                .padding()
                 .background(Color.white)
-                .cornerRadius(20)
-                .shadow(radius: 10)
-                //.padding(.horizontal, 20)
+    
         }.onAppear{
             if listArray.count == 0{
                 getSafetyTipsApi()
@@ -71,7 +68,7 @@ struct SafetyTipsView: View {
     func SafetyTipRow(_ text: String) -> some View {
         HStack {
             Image("active_mark")
-            Text(text)
+            Text(text).font(.manrope(.medium, size: 16))
                 .font(.body)
         }
     }

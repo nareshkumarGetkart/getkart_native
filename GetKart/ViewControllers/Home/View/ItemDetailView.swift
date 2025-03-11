@@ -199,7 +199,7 @@ struct ItemDetailView: View {
                                 }
                         }
                     }
-                    .padding()
+                    .padding([.leading,.trailing,.bottom])
                 }
             }
             .padding(8)
@@ -210,15 +210,15 @@ struct ItemDetailView: View {
             if objVM.sellerObj == nil {
                 objVM.getSeller(sellerId: self.itemObj?.userID ?? 0)
                 objVM.getProductListApi(categoryId: self.itemObj?.categoryID ?? 0)
+                objVM.setItemTotalApi(itemId: self.itemObj?.id ?? 0)
             }
-              
                
         }
         
             .sheet(isPresented: $showSheet) {
                 if #available(iOS 16.0, *) {
-                    SafetyTipsView()
-                        .presentationDetents([.medium, .large]) // Customizable sizes
+                    SafetyTipsView().transition(.move(edge: .bottom))
+                        .presentationDetents([.medium, .medium]) // Customizable sizes
                         .presentationDragIndicator(.visible)
                 } else {
                     // Fallback on earlier versions

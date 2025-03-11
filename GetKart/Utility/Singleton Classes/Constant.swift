@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .development
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -40,14 +40,16 @@ final class Constant: NSObject {
     var socketUrl:String{
         get{
             if devEnvironment == .live {
-                return "https://chat.pickzon.io/chat"
+                return "https://getkartchat.getkart.ca"
             }else if devEnvironment == .staging {
-                return "https://chatter.getkart.ca"
+                return "https://getkartchat.getkart.ca/chat"
             }else{
-                return "https://chatter.getkart.ca"
+                return "https://getkartchat.getkart.ca/chat"
             }
         }
     }
+    
+    
     
     var user_Insights:String {
         get {
@@ -138,6 +140,12 @@ final class Constant: NSObject {
     var getLimits:String{
         get{
             return "\(Constant.shared.baseURL)/get-limits"
+        }
+    }
+  
+    var get_report_reasons:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-report-reasons"
             
         }
     }
@@ -149,7 +157,30 @@ final class Constant: NSObject {
             
         }
     }
+    var set_item_total_click:String{
+        get{
+            return "\(Constant.shared.baseURL)/set-item-total-click"
+            
+        }
+    }
     
+    var get_notification_list:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-notification-list"
+            
+        }
+    }
+    
+    
+    var blogs:String{
+        get{
+            return "\(Constant.shared.baseURL)/blogs"
+            
+        }
+        
+    }
+    
+        
 }
 
 
