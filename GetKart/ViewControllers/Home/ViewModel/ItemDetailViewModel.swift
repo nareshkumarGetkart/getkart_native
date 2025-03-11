@@ -43,4 +43,13 @@ class ItemDetailViewModel:ObservableObject{
         
         }
     }
+    
+    func setItemTotalApi(itemId:Int){
+     //   let strUrl = "\(Constant.shared.set_item_total_click)?item_id=\(itemId)"
+        let params = ["item_id":"\(itemId)"]
+
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.set_item_total_click, param: params,methodType:.post, showLoader: false) { responseObject, error in
+            
+        }
+    }
 }

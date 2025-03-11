@@ -12,11 +12,16 @@ import WebKit
 struct Webview: UIViewRepresentable{
     
     let url:URL?
+    let htmlText:String?
     
     func makeUIView(context:Context) -> WKWebView{
         let wkWebview = WKWebView()
-        
-        if let urll = url {
+        wkWebview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        if (htmlText?.count ?? 0) > 0 {
+ 
+           // wkWebview.loadHTMLString(htmlText ?? "", baseURL: nil)
+        }else  if let urll = url {
             let request = URLRequest(url: urll)
             wkWebview.load(request)
         }
@@ -24,6 +29,15 @@ struct Webview: UIViewRepresentable{
     }
     
     func updateUIView(_ uiView:WKWebView, context:Context){
+        if (htmlText?.count ?? 0) > 0 {
+            // Load the HTML String
+            uiView.loadHTMLString(htmlText ?? "", baseURL: nil)
+
+        }
+
         
     }
 }
+
+
+

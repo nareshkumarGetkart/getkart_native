@@ -42,7 +42,7 @@ class CreateAddDetailVC: UIViewController {
 
 extension CreateAddDetailVC:RefreshScreen {
     func refreshScreen() {
-        print(self.objViewModel?.listArray)
+      //  print(self.objViewModel?.listArray)
     }
 }
 

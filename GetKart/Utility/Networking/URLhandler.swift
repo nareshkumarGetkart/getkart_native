@@ -43,7 +43,7 @@ class URLhandler: NSObject{
         if objLoggedInUser.token != nil {
             
             let token = "Bearer \(objLoggedInUser.token ?? "")"
-            var headers =  [ "Accept":"application/json", "Authorization":token]
+            let headers =  [ "Accept":"application/json", "Authorization":token]
             print("Header == \(headers)")
             return HTTPHeaders.init(headers)
         }

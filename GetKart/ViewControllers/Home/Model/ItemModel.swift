@@ -17,6 +17,7 @@ struct ItemParse: Codable {
 
 // MARK: - DataClass
 struct ItemModelClass: Codable {
+    
     let currentPage: Int?
     var data: [ItemModel]?
     let firstPageURL: String?
@@ -29,6 +30,7 @@ struct ItemModelClass: Codable {
     let to, total: Int?
 
     enum CodingKeys: String, CodingKey {
+        
         case currentPage = "current_page"
         case data
         case firstPageURL = "first_page_url"

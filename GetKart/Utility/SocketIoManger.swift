@@ -10,7 +10,7 @@ import SocketIO
 
 enum SocketEvents:String,CaseIterable{
 
-    case chatUsers = "chatUsers"
+    case chatList = "chatList"
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
     case matchList = "matchList"
@@ -31,7 +31,6 @@ enum SocketEvents:String,CaseIterable{
     case singleMessageDelete = "singleMessageDelete"
     case clearAllMessage = "clearAllMessage"
     case unMatch = "unMatch"
-    
 }
 
 
@@ -43,28 +42,44 @@ final class SocketIOManager: NSObject {
 
     private override init() {
         super.init()
-        if Local.shared.getUserId().count == 0 {
-        }else{
-            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["authToken": Local.shared.getHashToken()])])
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.token == nil {
+       // if Local.shared.getUserId().count == 0 {
             
+        }else{
+            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["Authorization": getHeaderToken()])])
             socket = manager?.socket(forNamespace: "/chat")
         }
     }
     
+    
+    private func getHeaderToken() ->String{
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.token != nil {
+            return "Bearer \(objLoggedInUser.token ?? "")"
+        }
+        return ""
+    }
+    
+    
     func establishConnection(){
 
-        if Local.shared.getUserId().count == 0 { return }
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.token == nil {
+            return
+        }
+        
         if socket == nil{
-            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["authToken": Local.shared.getHashToken()])])
-
+            manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["Authorization": getHeaderToken()])])
             socket = manager?.socket(forNamespace: "/chat")
-     
         }
         
         socket?.removeAllHandlers()
         addListeners()
-        
         socket?.connect()
+        
         socket?.on(clientEvent: .connect, callback: {data, ack in
             if ISDEBUG == true {
                 print("socket connected")
@@ -114,12 +129,12 @@ final class SocketIOManager: NSObject {
     
     func addListeners(){
         
-        socket?.on(SocketEvents.chatUsers.rawValue) { data, ack in
+        socket?.on(SocketEvents.chatList.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
-                    print("\(SocketEvents.chatUsers.rawValue) responseDict =>\(responseDict)")
+                    print("\(SocketEvents.chatList.rawValue) responseDict =>\(responseDict.printAsJSON())")
                 }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.chatUsers.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.chatList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
         
@@ -128,6 +143,7 @@ final class SocketIOManager: NSObject {
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
                     print("\(SocketEvents.matchList.rawValue) responseDict =>\(responseDict)")
+                    
                 }
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.matchList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
@@ -322,3 +338,34 @@ class SocketParser {
     }
 
 }
+
+
+extension Data
+{
+    func printJSON()
+    {
+        if let JSONString = String(data: self, encoding: String.Encoding.utf8)
+        {
+            print(JSONString)
+        }
+    }
+}
+
+
+extension NSDictionary{
+    
+  func printAsJSON(){
+      do{
+          // Serialize to JSON
+          let jsonData = try JSONSerialization.data(withJSONObject: self)
+          
+          // Convert to a string and print
+          if let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
+              print(JSONString)
+          }
+      } catch  {
+          print(error.localizedDescription)
+      }
+    }
+}
+

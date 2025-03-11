@@ -40,6 +40,8 @@ class HomeBaseVC: UITabBarController {
         }
         setupMiddleButton()
 
+        AppDelegate.sharedInstance.checkSocketStatus()
+        
         // Do any additional setup after loading the view.
     }
     

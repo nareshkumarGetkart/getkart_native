@@ -12,14 +12,9 @@ import SwiftUI
 struct NotificationView: View {
     var  navigation:UINavigationController?
   
-    let notifications: [NotificationModel] = [
-        NotificationModel(image: "getkartplaceholder", title: "New Listing in Your Neighborhood!", message: "A new item has just been listed near you. Take a look and make an offer."),
-        NotificationModel(image: "getkartplaceholder", title: "🚨 Hurry! New Listings Won’t Last!", message: "Hot new products have just been added. Don’t miss out—explore now! 🔥"),
-        NotificationModel(image: "getkartplaceholder", title: "New Listings in Your Favorite Category!", message: "Discover the latest items in Mobiles. Start browsing!"),
-        NotificationModel(image: "getkartplaceholder", title: "📢 New to the Market!", message: "Fresh used items have just been listed. Find your next bargain today! 🛍"),
-        NotificationModel(image: "getkartplaceholder", title: "🔥 New Listings Just Dropped!", message: "Check out the latest items and get them before they’re gone! 🛒"),
-        NotificationModel(image: "getkartplaceholder", title: "Check Out the Latest Listings!", message: "New items have just been listed. Explore the latest deals now.")
-    ]
+    @State private var page = 1
+    @State var  listArray = [NotificationModel]()
+
 
     var body: some View {
         HStack {
@@ -46,7 +41,7 @@ struct NotificationView: View {
                 
                 HStack{  }.frame(height: 5)
                 VStack(spacing: 10) {
-                    ForEach(notifications) { notification in
+                    ForEach(listArray) { notification in
                         NotificationRow(notification: notification).onTapGesture{
                             
                             let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
@@ -63,7 +58,24 @@ struct NotificationView: View {
                 
             
         }.background(Color(.systemGray6))
+            .onAppear{
+                if listArray.count == 0{
+                    getNoticiationlistApi()
+                }
+            }
         
+    }
+    
+    func getNoticiationlistApi(){
+        let strURl = Constant.shared.get_notification_list + "?page=\(page)"
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURl) { (obj:NotificationParse) in
+            
+       
+            if obj.data != nil {
+                self.listArray.append(contentsOf: obj.data?.data ?? [])
+            }
+        }
     }
 }
 
@@ -76,18 +88,24 @@ struct NotificationRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(notification.image)
-                .resizable()
-                .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-
+            
+            AsyncImage(url: URL(string: notification.image ?? "")) { image in
+                image.resizable()
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                
+            }placeholder: {
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill).frame(width: 60, height: 60)
+               // ProgressView().progressViewStyle(.circular)
+            }
+          
             VStack(alignment: .leading, spacing: 5) {
-                Text(notification.title)
+                Text(notification.title ?? "")
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.black)
 
-                Text(notification.message)
+                Text(notification.message ?? "")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }

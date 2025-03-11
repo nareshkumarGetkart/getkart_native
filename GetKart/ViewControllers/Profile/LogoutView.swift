@@ -43,7 +43,10 @@ struct LogoutView: View {
                     Button(action: {
                         /* Delete account action */
                         
-                        presentationMode.wrappedValue.dismiss()
+                       // presentationMode.wrappedValue.dismiss()
+//                        RealmManager.shared.deleteUserInfoObjects()
+//                        RealmManager.shared.clearDB()
+//                        AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: false)
 
                     }) {
                         Text("OK").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()

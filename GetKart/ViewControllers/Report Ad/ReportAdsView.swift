@@ -11,17 +11,9 @@ struct ReportAdsView: View {
    
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedReason: String? = nil
+    @State private var listArray = [ReportModel]()
 
-    let reportReasons = [
-        "Item Not as Described",
-        "Misleading Description",
-        "Incomplete Information",
-        "Poor Quality Images",
-        "Pricing Discrepancies",
-        "Unresponsive Seller",
-        "Fake Items",
-        "Other"
-    ]
+   
 
     var body: some View {
         
@@ -29,24 +21,29 @@ struct ReportAdsView: View {
             Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
             
             VStack {
-                Text("Report item")
+                Text("Report item").font(.manrope(.semiBold, size: 20))
                     .font(.title2)
                     .bold()
-                    .padding([.top, .bottom], 10)
+                    .padding([.top, .bottom], 15)
                 
-                ForEach(reportReasons, id: \.self) { reason in
+                ForEach(listArray) { report in
+                    
+                    let selReason = report.reason ?? ""
+
+
                     Button(action: {
-                        selectedReason = reason
+                        selectedReason = selReason
                     }) {
-                        Text(reason)
+                        
+                        Text(selReason).font(.manrope(.medium, size: 17))
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(selectedReason == reason ? Color.orange.opacity(0.2) : Color(UIColor.systemGray6))
-                            .foregroundColor(selectedReason == reason ? .orange : .black)
+                            .background(selectedReason == selReason ? Color.orange.opacity(0.2) : Color(UIColor.systemGray6))
+                            .foregroundColor(selectedReason == selReason ? .orange : .black)
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(selectedReason == reason ? Color.orange : Color.clear, lineWidth: 2)
+                                    .stroke(selectedReason == selReason ? Color.orange : Color.clear, lineWidth: 2)
                             )
                     }
                 }
@@ -62,7 +59,9 @@ struct ReportAdsView: View {
                     
                     Button("Ok") {
                         // Handle report submission
-                        presentationMode.wrappedValue.dismiss()
+//                        if (selectedReason?.count ?? "") == 0 {
+//                            presentationMode.wrappedValue.dismiss()
+//                        }
                     }.font(.manrope(.semiBold, size: 15))
                     .frame(maxWidth: .infinity,minHeight: 40,maxHeight:40)
                     .background(Color.orange)
@@ -78,8 +77,25 @@ struct ReportAdsView: View {
                 .cornerRadius(20)
                 .shadow(radius: 10)
                 .padding(.horizontal, 20)
+        }.onAppear{
+            if listArray.count == 0{
+                getReportListApi()
+            }
         }
     }
+    
+    
+    func getReportListApi(){
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_report_reasons) { (obj:Report) in
+            
+            if obj.data != nil {
+                self.listArray = obj.data?.data ?? []
+            }
+            
+        }
+    }
+
 }
 
 
