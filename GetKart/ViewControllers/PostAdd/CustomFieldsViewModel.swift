@@ -46,6 +46,7 @@ struct CustomFields: Codable {
     var image: String?
     var datumRequired: Int?
     var values: [String]?
+    var arrIsSelected:Array<Bool>!
     var minLength, maxLength: Int?
     var status: Int?
 

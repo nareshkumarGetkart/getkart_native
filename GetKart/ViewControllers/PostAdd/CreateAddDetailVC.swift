@@ -38,11 +38,18 @@ class CreateAddDetailVC: UIViewController {
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
+    @IBAction func nextButtonAction() {
+        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
+            vc.dataArray = self.objViewModel?.dataArray ?? []
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
 }
 
 extension CreateAddDetailVC:RefreshScreen {
     func refreshScreen() {
-      //  print(self.objViewModel?.listArray)
+        print(self.objViewModel?.dataArray)
     }
 }
 

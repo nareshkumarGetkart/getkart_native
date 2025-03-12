@@ -152,4 +152,12 @@ class DynamicHeightCollectionView: UICollectionView {
    override var intrinsicContentSize: CGSize {
      return collectionViewLayout.collectionViewContentSize
    }
+    
+    override var contentSize: CGSize {
+      didSet {
+        invalidateIntrinsicContentSize()
+        setNeedsLayout()
+        layoutIfNeeded()
+      }
+    }
 }

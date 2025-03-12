@@ -15,12 +15,16 @@ class CreateAddVC2: UIViewController {
         super.viewDidLoad()
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
-        
+        tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
+        tblView.rowHeight = UITableView.automaticDimension
+        tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
         // Do any additional setup after loading the view.
     }
     
-
+    @IBAction func backButtonAction() {
+        self.navigationController?.popViewController(animated: true)
+    }
     /*
     // MARK: - Navigation
 
@@ -32,7 +36,7 @@ class CreateAddVC2: UIViewController {
     */
 
 }
-/*
+
 
 extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -44,49 +48,45 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let objCustomField = dataArray[indexPath.row]
+        var objCustomField = dataArray[indexPath.row]
         
-        if indexPath.row == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AlmostThereCell") as! AlmostThereCell
-            cell.lblCategory.text = strCategoryTitle
-            cell.lblSubCategory.text = "> \(strSubCategoryTitle)"
-            return cell
-        }else if indexPath.row == 1 {
+        if objCustomField.type ?? "" == "textbox" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Add Title"
             return cell
-        }else if indexPath.row == 2 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
-            cell.lblTitle.text = "Description"
+        }else if objCustomField.type ?? "" == "radio" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
+            if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected?.count ?? 0 {
+                objCustomField.arrIsSelected?.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
+                dataArray[indexPath.row] = objCustomField
+            }
+            cell.lblTitle.text = objCustomField.name ?? ""
+            
+            cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.objData = objCustomField
+            
+            cell.clnCollectionView.invalidateIntrinsicContentSize()
+            cell.clnCollectionView.setNeedsLayout()
+            cell.clnCollectionView.layoutIfNeeded()
+            
+            cell.clnCollectionView.reloadData()
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        
+            
             return cell
-        }else if indexPath.row == 3 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
-            cell.lblTitle.text = "Main Picture(Max 3MB)"
-            cell.btnAddPicture.setTitle("Add Main Picture", for: .normal)
-            return cell
-        }else if indexPath.row == 4 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
-            cell.lblTitle.text = "Other Pictures(Max 5 Images)"
-            cell.btnAddPicture.setTitle("Add Other Pictures", for: .normal)
-            return cell
-        }else if indexPath.row == 5 {
+        }else if objCustomField.type ?? "" == "dropdown" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Price"
-            return cell
-        }else if indexPath.row == 6 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
-            cell.lblTitle.text = "Phone Number"
-            return cell
-        }else if indexPath.row == 7 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
-            cell.lblTitle.text = "Video Link"
-            cell.txtField.placeholder = "http://example.com/video.mp4"
             return cell
         }
         return UITableViewCell()
     }
 }
-*/
+
