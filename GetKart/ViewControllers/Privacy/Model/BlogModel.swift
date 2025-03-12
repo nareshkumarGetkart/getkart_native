@@ -56,7 +56,7 @@ struct BlogsClass: Codable {
 // MARK: - Datum
 struct BlogsModel: Codable,Identifiable {
     let id: Int?
-    let title, slug, description: String?
+    var title, slug, description: String?
     let image: String?
     let tags: [String]?
     let views: Int?

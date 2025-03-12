@@ -115,9 +115,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         if indexPath.row == 0{
         }else{
       
-            if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
-                
-            }else if titleArray[indexPath.row] == "My Boost Ads"{
+            if titleArray[indexPath.row] == "My Boost Ads"{
                 if isUserLoggedInRequest(){
                     
                 }
@@ -129,15 +127,19 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 }
                 
                 
+            }else if titleArray[indexPath.row] == "FAQs"{
+                
+                let destVC = UIHostingController(rootView: FaqView())
+                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                
             }else if titleArray[indexPath.row] == "Language"{
                 
-                let deleteAccountView = UIHostingController(rootView: LanguageView())
-                AppDelegate.sharedInstance.navigationController?.pushViewController(deleteAccountView, animated: true)
+                let destVC = UIHostingController(rootView: LanguageView())
+                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
                 
             }else if titleArray[indexPath.row] == "Blogs"{
                 
-                let swiftUIView = Blogsview(title: "Blogs") // Create SwiftUI view
-                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                let hostingController = UIHostingController(rootView: Blogsview(title: "Blogs")) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
 
             }else if titleArray[indexPath.row] == "Privacy Policy"{
@@ -146,6 +148,12 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
 
+            }else if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
+              
+                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Refunds & Cancellation policy", type: .refundAndCancellationPolicy,htmlString: "") // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                
             }else if titleArray[indexPath.row] == "About us"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "About us", type: .aboutUs) // Create SwiftUI view

@@ -180,6 +180,33 @@ final class Constant: NSObject {
         
     }
     
+   
+    
+    var cancellation_refund_policy:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-system-settings?type=cancellation_refund_policy"
+            
+        }
+        
+    }
+    
+    var privacy_policy:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-system-settings?type=privacy_policy"
+            
+        }
+        
+    }
+    
+    var faq:String{
+        get{
+            return "\(Constant.shared.baseURL)/faq"
+            
+        }
+        
+    }
+    
+    
         
 }
 
