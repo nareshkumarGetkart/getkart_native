@@ -30,7 +30,9 @@ struct BlogDetailView: View {
         }.frame(height:44).background()
         
             ScrollView{
-                
+               
+                HStack{ Spacer() }.frame(height: 15)
+
                 
                 if (obj?.image ?? "").count > 0{
                     AsyncImage(url: URL(string: obj?.image ?? "")) { image in
@@ -47,7 +49,7 @@ struct BlogDetailView: View {
                 }
                 if (obj?.title ?? "").count > 0{
                     
-                    Text(obj?.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing])
+                    Text(obj?.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing]).padding(.top,10)
                     
                 }
                 
@@ -63,7 +65,7 @@ struct BlogDetailView: View {
                     let txt   = ("<html><head>\(metaTag)</head><body>\(obj?.description ?? "")</body></html>")
                     Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom)
                 }
-            }
+            }.background(Color(UIColor.systemGroupedBackground))
             
             Spacer()
             

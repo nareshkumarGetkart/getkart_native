@@ -5,6 +5,13 @@
 //  Created by Radheshyam Yadav on 25/02/25.
 //
 
+/*
+ Item(image: "ipad_mini", price: "\u{20B9}12000.0", title: "Ipad mini 5th generation 64gb", location: "Delhi, Delhi, India"),
+ Item(image: "samsung_tab", price: "\u{20B9}12000.0", title: "SAMSUNG GALAXY TAB 3 T211 TABLET", location: "Mayur Vihar, New Delhi, Delhi, India"),
+ Item(image: "oppo_f23", price: "\u{20B9}12000.0", title: "OPPO f23 5G. 8+256", location: "Kundli, Sonipat, Haryana, India"),
+ Item(image: "samsung_a9", price: "\u{20B9}12000.0", title: "Samsung a9 4&64 storage", location: "Sector 122, Noida, Uttar Pradesh, India")
+ */
+
 import SwiftUI
 
 struct SearchProductView: View {
@@ -13,12 +20,7 @@ struct SearchProductView: View {
     
     @State private var searchText = ""
 
-    let items: [Item] = [
-        Item(image: "ipad_mini", price: "\u{20B9}12000.0", title: "Ipad mini 5th generation 64gb", location: "Delhi, Delhi, India"),
-        Item(image: "samsung_tab", price: "\u{20B9}12000.0", title: "SAMSUNG GALAXY TAB 3 T211 TABLET", location: "Mayur Vihar, New Delhi, Delhi, India"),
-        Item(image: "oppo_f23", price: "\u{20B9}12000.0", title: "OPPO f23 5G. 8+256", location: "Kundli, Sonipat, Haryana, India"),
-        Item(image: "samsung_a9", price: "\u{20B9}12000.0", title: "Samsung a9 4&64 storage", location: "Sector 122, Noida, Uttar Pradesh, India")
-    ]
+    @State var items = [ItemModel]()
     
     var body: some View {
         VStack{
@@ -73,7 +75,7 @@ struct SearchProductView: View {
                 VStack(spacing: 10) {
                     ForEach(items) { item in
                        // ItemRow(item: item)
-                        FavoritesCell()
+                        FavoritesCell(itemObj: item)
 
                     }
                 }.padding([.leading,.trailing],10)

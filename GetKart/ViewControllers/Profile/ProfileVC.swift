@@ -38,19 +38,19 @@ class ProfileVC: UIViewController {
 
 
 extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
-   
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
         if indexPath.row == 0{
             return 120
         }
-
+        
         return 70.0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       
+        
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
             return titleArray.count
@@ -62,7 +62,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-         
+        
         if indexPath.row == 0{
             let cell = tableView.dequeueReusableCell(withIdentifier: "AnonymousUserCell") as! AnonymousUserCell
             let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
@@ -78,17 +78,20 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.btnGetVerifiedBadge.isHidden = true
                 }else{
                     cell.btnGetVerifiedBadge.isHidden = false
-
+                    
                 }
-
+                cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
+                
+                
+                
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
                 cell.btnLogin.addTarget(self, action: #selector(loginToScren), for: .touchUpInside)
-
+                
             }
             return cell
-
+            
         }else{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "ProfileListTblCell") as! ProfileListTblCell
@@ -108,13 +111,13 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             return cell
         }
         
-       // return UITableViewCell()
+        // return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
         }else{
-      
+            
             if titleArray[indexPath.row] == "My Boost Ads"{
                 if isUserLoggedInRequest(){
                     
@@ -125,7 +128,6 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 if isUserLoggedInRequest(){
                     
                 }
-                
                 
             }else if titleArray[indexPath.row] == "FAQs"{
                 
@@ -141,15 +143,15 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
                 let hostingController = UIHostingController(rootView: Blogsview(title: "Blogs")) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-
+                
             }else if titleArray[indexPath.row] == "Privacy Policy"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-
+                
             }else if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
-              
+                
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Refunds & Cancellation policy", type: .refundAndCancellationPolicy,htmlString: "") // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
@@ -159,13 +161,13 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "About us", type: .aboutUs) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-
+                
             }else if titleArray[indexPath.row] == "Terms of Service"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of Service", type: .termsAndConditions) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-
+                
             }else if titleArray[indexPath.row] == "Notifications"{
                 if isUserLoggedInRequest(){
                     
@@ -188,7 +190,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 ShareMedia.shareMediafrom(type: .appShare, mediaId: "", controller: self)
                 
             }else if titleArray[indexPath.row] ==  "Transaction History"{
-               
+                
                 if isUserLoggedInRequest(){
                     
                     let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
@@ -212,16 +214,16 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         }
     }
     
-
+    
     
     func isUserLoggedInRequest() -> Bool {
         
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
-       
+            
             return true
-
-       
+            
+            
         }else{
             let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
                 //Login
@@ -241,11 +243,11 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     func rateApp() {
         if #available(iOS 10.3, *) {
             SKStoreReviewController.requestReview()
-
+            
         } else if let url = URL(string: "itms-apps://itunes.apple.com/app/" + "id1488570846") {
             if #available(iOS 10, *) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
-
+                
             } else {
                 UIApplication.shared.openURL(url)
             }
@@ -255,6 +257,11 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     //MARK: Selector methods
     @objc func loginToScren(){
         AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+    }
+    
+    @objc func editProfileBtnACtion(){
+        let destVC = UIHostingController(rootView: ProfileEditView())
+        AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
     }
     
     @objc func getVerified(){

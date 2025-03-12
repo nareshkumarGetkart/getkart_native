@@ -10,8 +10,8 @@ import SwiftUI
 struct FavoritesView: View {
    
     var  navigation:UINavigationController?
-  
-   
+    @State var page = 1
+   @State var listArray = [ItemModel]()
 
     var body: some View {
         HStack {
@@ -38,19 +38,13 @@ struct FavoritesView: View {
                 
                 HStack{  }.frame(height: 5)
                 VStack(spacing: 10) {
-                   // ForEach(notifications) { notification in
+                    ForEach(listArray) { item in
                         
-                        ForEach(0..<3){ index in
-
-                            FavoritesCell()
-                       /* NotificationRow(notification: notification).onTapGesture{
-                            
-                            let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
-                            self.navigation?.pushViewController(hostingVC, animated: true)
-                            print("horizontal list item tapped \n \(notification.title)")
-                            
-                            
-                        }*/
+                        FavoritesCell(itemObj: item).onTapGesture {
+                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemObj:item ))
+                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                        }
+                        
                     }
                 }
                 .padding(.horizontal, 10)
@@ -58,8 +52,20 @@ struct FavoritesView: View {
 
                 
             
-        }.background(Color(.systemGray6))
+        }.background(Color(.systemGray6)).onAppear{
+            
+            getFavoriteHistory()
+        }
         
+    }
+    
+    func getFavoriteHistory(){
+        let strUrl = Constant.shared.get_favourite_item + "?page=\(page)"
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:FavoriteParse) in
+            if obj.code == 200 {
+                self.listArray = obj.data?.data ?? []
+            }
+        }
     }
 }
 
@@ -70,14 +76,25 @@ struct FavoritesView: View {
 
 struct FavoritesCell:View {
     
-    
+    let itemObj:ItemModel
     var body: some View {
         
         HStack{
-            Image("getkartplaceholder").resizable().frame(width:90).aspectRatio(contentMode: .fit)
+            
+            if  let img = itemObj.image {
+                AsyncImage(url: URL(string: img)) { image in
+                    image
+                        .resizable()
+                        .frame(width: 90)
+                        .aspectRatio(contentMode: .fit)
+                    
+                }placeholder: { ProgressView().progressViewStyle(.circular) }
+            }
+            
+           // Image("getkartplaceholder").resizable().frame(width:90).aspectRatio(contentMode: .fit)
             VStack(alignment: .leading, spacing: 5){
                 HStack{
-                    Text("₹ 6000.0").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.orange)
+                    Text("₹ \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.orange)
                     Spacer()
                     Button {
                         
@@ -93,11 +110,11 @@ struct FavoritesCell:View {
                     
                     
                 }
-                Text("Mi A2 mobile").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black).padding(.bottom,10)
+                Text(itemObj.name ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black).padding(.bottom,10)
                 
                 HStack{
                     Image("location_icon").resizable().frame(width: 15, height: 15).foregroundColor(.gray)
-                    Text("Vikaspuri, New Delhi 110034").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray)
+                    Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray)
                     Spacer()
                 }
                 

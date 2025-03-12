@@ -27,24 +27,26 @@ struct Blogsview: View {
         }.frame(height:44).background()
         
      
-        VStack(spacing:0){
-          
-            ForEach(blogsArray) { blog in
-                BlogCell(obj:blog)
-                    .onTapGesture {
-                        
-                        let hostingController = UIHostingController(rootView: BlogDetailView(title: "Blogs",obj:blog)) // Wrap in UIHostingController
-                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                    
+        ScrollView{
+            VStack(spacing:0){
+                
+                ForEach(blogsArray) { blog in
+                    BlogCell(obj:blog)
+                        .onTapGesture {
+                            
+                            let hostingController = UIHostingController(rootView: BlogDetailView(title: "Blogs",obj:blog)) // Wrap in UIHostingController
+                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                            
+                        }
+                }
+                Spacer()
+            }.onAppear()
+            {
+                if blogsArray.count == 0{
+                    blogslistApi()
                 }
             }
-            Spacer()
-        }.onAppear()
-        {
-            if blogsArray.count == 0{
-                blogslistApi()
-            }
-        }
+        }.background(Color(UIColor.systemGroupedBackground))
     }
     
     func blogslistApi(){
@@ -72,6 +74,7 @@ struct BlogCell:View{
         
         VStack(alignment: .leading){
             
+            HStack{ Spacer()}.frame(height: 10)
             AsyncImage(url: URL(string: obj.image ?? "")) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
                     .frame(width:  UIScreen.main.bounds.width-20, height: 150)
@@ -83,7 +86,7 @@ struct BlogCell:View{
                 //                ProgressView().progressViewStyle(.circular)
                 
             }
-            Text(obj.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing])
+            Text(obj.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing]).padding(.top,10)
             
             if let nsAttributedString = try? NSAttributedString(data: Data((obj.description ?? "").utf8), options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil),
                let attributedString = try? AttributedString(nsAttributedString, including: \.uiKit) {

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Inter-Regular.otf">
+            <string>Inter-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="RecieveChatCell" rowHeight="59" id="KGk-i7-Jjw" customClass="RecieveChatCell" customModule="PickzonDating" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="55"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="55"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CCB-Vu-aqV">
+                        <rect key="frame" x="15" y="10" width="202.33333333333334" height="25"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="friend are you background: #FF3E45;" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="none" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="imu-rr-Brz">
+                                <rect key="frame" x="10" y="10" width="182.33333333333334" height="5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="220" id="uzE-Gp-yIK"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="0.24313725490196078" blue="0.27058823529411763" alpha="0.29824748260295941" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="imu-rr-Brz" secondAttribute="trailing" constant="10" id="4nV-KC-BYj"/>
+                            <constraint firstItem="imu-rr-Brz" firstAttribute="leading" secondItem="CCB-Vu-aqV" secondAttribute="leading" constant="10" id="Oml-Nh-ibz"/>
+                            <constraint firstItem="imu-rr-Brz" firstAttribute="top" secondItem="CCB-Vu-aqV" secondAttribute="top" constant="10" id="S2s-Ie-Hr9"/>
+                            <constraint firstAttribute="bottom" secondItem="imu-rr-Brz" secondAttribute="bottom" constant="10" id="pKH-qr-dDv"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3:02 PM" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2rG-au-H7A">
+                        <rect key="frame" x="15" y="37" width="40" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15" id="qod-i2-1z2"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="10"/>
+                        <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="2rG-au-H7A" secondAttribute="bottom" constant="3" id="AdK-EX-5kR"/>
+                    <constraint firstItem="CCB-Vu-aqV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="RSJ-ze-gtD"/>
+                    <constraint firstItem="2rG-au-H7A" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="ZER-eT-pC5"/>
+                    <constraint firstItem="CCB-Vu-aqV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="cMj-K5-sPr"/>
+                    <constraint firstAttribute="bottom" secondItem="CCB-Vu-aqV" secondAttribute="bottom" constant="20" id="kOy-1p-ht4"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="bgview" destination="CCB-Vu-aqV" id="KEc-LS-oyg"/>
+                <outlet property="lblMessage" destination="imu-rr-Brz" id="KeP-fS-t4Y"/>
+                <outlet property="lblTime" destination="2rG-au-H7A" id="Fl5-dC-6aN"/>
+            </connections>
+            <point key="canvasLocation" x="196.94656488549617" y="-45.422535211267608"/>
+        </tableViewCell>
+    </objects>
+</document>

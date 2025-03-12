@@ -10,12 +10,8 @@ import SwiftUI
 struct TransactionHistoryView: View {
     
     var  navigation:UINavigationController?
-    let transactions: [TransactionModel] = [
-        TransactionModel(platform: "google", transactionId: "GPA.3335-8423-5985-68820", amount: "₹249.0"),
-        TransactionModel(platform: "google", transactionId: "GPA.3386-8591-5918-25179", amount: "₹149.0"),
-        TransactionModel(platform: "google", transactionId: "GPA.3379-7910-0293-40790", amount: "₹49.0"),
-        TransactionModel(platform: "google", transactionId: "GPA.3334-0395-6145-36064", amount: "₹199.0"),
-        TransactionModel(platform: "google", transactionId: "GPA.3334-0395-6145-36064", amount: "₹199.0")]
+   
+    @State var transactions = [TransactionModel]()
         
     var body: some View {
         HStack {
@@ -40,15 +36,28 @@ struct TransactionHistoryView: View {
                 HStack{  }.frame(height: 5)
                 VStack(spacing: 15) {
                     ForEach(transactions) { transaction in
+                      
                         TransactionRow(transaction: transaction).background(Color.white)
                             .cornerRadius(10)
                             .shadow(radius: 2)
                     }
                 }
             }
+            
+            Spacer()
                         
-        }.padding([.leading,.trailing],10).background(Color(.systemGray6))
+        }.padding([.leading,.trailing],10).background(Color(.systemGray6)).onAppear{
+            getTransactionHistory()
+        }
         
+    }
+    
+    func getTransactionHistory(){
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.payment_transactions) { (obj:TransactionParse) in
+            if obj.code == 200 {
+                self.transactions = obj.data ?? []
+            }
+        }
     }
 }
 
@@ -79,27 +88,37 @@ struct TransactionRow: View {
                 
             }.frame(width: 3,height: 40).background(Color.orange).cornerRadius(5)
             VStack(alignment: .leading, spacing: 5) {
-                Text(transaction.platform.capitalized)
+                Text(transaction.paymentGateway?.capitalized ?? "")
                     .font(.caption)
                     .padding(5)
                     .background(Color.orange.opacity(0.2))
                     .cornerRadius(5)
-                Text(transaction.transactionId)
+                Text(transaction.orderID ?? "")
                     .font(.body)
                     .foregroundColor(.black)
             }.padding(5)
             Spacer()
             
             Button(action: {
-                UIPasteboard.general.string = transaction.transactionId
+                UIPasteboard.general.string = transaction.orderID
+                AlertView.sharedManager.showToast(message: "Copied successfully")
+
             }) {
                 Image(systemName: "doc.on.doc")
                     .foregroundColor(.gray)
             }
             
-            Text(transaction.amount)
-                .font(.headline)
-                .foregroundColor(.orange).padding(.trailing,5)
+            Spacer()
+
+            VStack{
+                
+                Text("\(transaction.amount ?? 0)")
+                    .font(.headline)
+                    .foregroundColor(.orange).padding(.trailing,10)
+                
+                Text(transaction.paymentStatus ?? "")
+                    .foregroundColor(.gray).padding(.trailing,10)
+            }
         }
         .padding([.top,.bottom],10)
         .background(Color.white).cornerRadius(10)

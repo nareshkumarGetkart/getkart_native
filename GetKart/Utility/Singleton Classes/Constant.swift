@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -42,9 +42,9 @@ final class Constant: NSObject {
             if devEnvironment == .live {
                 return "https://getkartchat.getkart.ca"
             }else if devEnvironment == .staging {
-                return "https://getkartchat.getkart.ca/chat"
+                return "https://getkartchat.getkart.ca"
             }else{
-                return "https://getkartchat.getkart.ca/chat"
+                return "https://getkartchat.getkart.ca"
             }
         }
     }
@@ -189,6 +189,24 @@ final class Constant: NSObject {
         }
         
     }
+    var about_us:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-system-settings?type=about_us"
+            
+        }
+        
+    }
+    
+    
+    
+    var terms_conditions:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-system-settings?type=terms_conditions"
+            
+        }
+        
+    }
+    
     
     var privacy_policy:String{
         get{
@@ -205,6 +223,25 @@ final class Constant: NSObject {
         }
         
     }
+    
+    
+    var payment_transactions:String{
+        get{
+            return "\(Constant.shared.baseURL)/payment-transactions"
+            
+        }
+        
+    }
+    
+    
+    var get_favourite_item:String{
+        get{
+            return "\(Constant.shared.baseURL)/get-favourite-item"
+            
+        }
+        
+    }
+    
     
     
         

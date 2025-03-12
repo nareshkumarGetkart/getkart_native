@@ -67,7 +67,7 @@ struct PrivacyView: View {
 //            else  if let url = URL(string:getUrlTYpe(type: type)){
 //                Webview(url: url, htmlText: "").navigationBarBackButtonHidden(true)
 //            }
-        }.navigationBarTitleDisplayMode(.inline).navigationBarHidden(true).onAppear{
+        }.background(Color(.systemGray6)).navigationBarTitleDisplayMode(.inline).navigationBarHidden(true).onAppear{
             callApi(type: type)
         }
     }
@@ -77,16 +77,20 @@ struct PrivacyView: View {
        var url:String = ""
 
        if type == .privacy{
+           
            url =  Constant.shared.privacy_policy
-       }else if type == .faq{
-           url = "https://getkart.com/privacy-polic"
+      
        }else if type == .termsAndConditions{
-           url =  Constant.shared.privacy_policy
+           url =  Constant.shared.terms_conditions
        }else if type == .aboutUs{
-           url = "https://getkart.com/privacy-polic"
+           url =  Constant.shared.about_us
+           
        }else if type == .refundAndCancellationPolicy{
+           
            url =  Constant.shared.cancellation_refund_policy
+           
        }
+        
         
        return url
    }
@@ -139,7 +143,17 @@ struct PrivacyView: View {
                               
                               htmlString = privacy_policy
                               
+                          }else if let terms_conditions = data["terms_conditions"] as? String{
+                              
+                              htmlString = terms_conditions
+                              
+                          }else if let about_us = data["about_us"] as? String{
+                              
+                              htmlString = about_us
+                              
                           }
+                          
+                          
                       }
                       
                   }
