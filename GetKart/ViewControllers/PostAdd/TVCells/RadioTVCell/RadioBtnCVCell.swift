@@ -8,6 +8,7 @@
 import UIKit
 
 class RadioBtnCVCell: UICollectionViewCell {
+    @IBOutlet weak var backView:UIViewX!
     @IBOutlet weak var btnValue:UIButtonX!
     override func awakeFromNib() {
         super.awakeFromNib()

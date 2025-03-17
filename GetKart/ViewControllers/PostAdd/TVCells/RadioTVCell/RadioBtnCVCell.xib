@@ -79,6 +79,7 @@
             </constraints>
             <size key="customSize" width="120" height="44"/>
             <connections>
+                <outlet property="backView" destination="Mt9-st-y4K" id="HyL-um-MYj"/>
                 <outlet property="btnValue" destination="zzm-hy-80n" id="C2F-sk-Vir"/>
             </connections>
             <point key="canvasLocation" x="24.427480916030532" y="-3.5211267605633805"/>

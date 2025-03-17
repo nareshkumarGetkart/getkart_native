@@ -6,6 +6,9 @@
 //
 
 import UIKit
+protocol radioCellTappedDelegate{
+    func radioCellTapped(row:Int, clnCell:Int)
+}
 
 class RadioTVCell: UITableViewCell {
     @IBOutlet weak var imgImage:UIImageView!
@@ -14,6 +17,8 @@ class RadioTVCell: UITableViewCell {
     @IBOutlet weak var clnHeight:NSLayoutConstraint!
     
     var objData:CustomFields!
+    var del:radioCellTappedDelegate!
+    var rowValue:Int = 0
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -32,16 +37,8 @@ class RadioTVCell: UITableViewCell {
     @objc func buttonClicked(sender:UIButton)
     {
         print("Tag: ", sender.tag)
-        let indexPath = IndexPath(index: sender.tag)
-        if let cell =  clnCollectionView.cellForItem(at: indexPath) as? RadioBtnCVCell {
-            if objData.arrIsSelected?[indexPath.item] == true {
-                objData.arrIsSelected?[indexPath.item] = false
-                cell.btnValue.titleLabel?.textColor = .orange
-            }else {
-                objData.arrIsSelected?[indexPath.item] = true
-                cell.btnValue.titleLabel?.textColor = .black
-            }
-        }
+        self.del?.radioCellTapped(row: self.rowValue, clnCell: sender.tag)
+        
     }
     
     
@@ -67,6 +64,13 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
         cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
         cell.btnValue.tag = indexPath.item
         cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+        if objData.arrIsSelected[indexPath.item] == true {
+            cell.btnValue.setTitleColor(.orange, for: .normal)
+            cell.backView.borderColor = UIColor.orange
+        }else {
+            cell.btnValue.setTitleColor(.black, for: .normal)
+            cell.backView.borderColor = UIColor.black
+        }
 
         return cell
     }

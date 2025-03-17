@@ -38,7 +38,7 @@ class CreateAddVC2: UIViewController {
 }
 
 
-extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
+extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTappedDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -62,15 +62,17 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
             return cell
         }else if objCustomField.type ?? "" == "radio" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
-            if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected?.count ?? 0 {
-                objCustomField.arrIsSelected?.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
+            if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
+                
+                objCustomField.arrIsSelected.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
                 dataArray[indexPath.row] = objCustomField
             }
             cell.lblTitle.text = objCustomField.name ?? ""
             
             cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.objData = objCustomField
-            
+            cell.del = self
+            cell.rowValue = indexPath.row
             cell.clnCollectionView.invalidateIntrinsicContentSize()
             cell.clnCollectionView.setNeedsLayout()
             cell.clnCollectionView.layoutIfNeeded()
@@ -88,5 +90,28 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate {
         }
         return UITableViewCell()
     }
+    
+    func radioCellTapped(row:Int, clnCell:Int){
+        print(dataArray)
+        print(self.dataArray[row])
+        
+        var objCustomField = self.dataArray[row]
+        if objCustomField.arrIsSelected[clnCell] == true {
+            objCustomField.arrIsSelected[clnCell] = false
+        }else {
+            objCustomField.arrIsSelected[clnCell] = true
+        }
+        dataArray[row] = objCustomField
+        
+        let indexPath = IndexPath(row: row, section: 0)
+        if let cell = tblView.cellForRow(at: indexPath)as?
+            RadioTVCell {
+            cell.objData = objCustomField
+            cell.clnCollectionView.reloadData()
+        }
+            
+    }
+    
+    
 }
 
