@@ -6,13 +6,15 @@
 //
 
 import UIKit
-
+import SwiftUI
 class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     var dataArray:[CustomFields] = []
-    
+    var params:Dictionary<String,Any> = [:]
+    var dictCustomFields:Dictionary<String,Any> = [:]
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(params)
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
@@ -39,6 +41,59 @@ class CreateAddVC2: UIViewController {
     }
     */
 
+    @IBAction func nextButtonAction (){
+        self.fetchCountryListing()
+    }
+    func fetchCountryListing(){
+       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+            let arrCountry = obj.data?.data ?? []
+           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, isNewPost: true))
+           self.navigationController?.pushViewController(vc, animated: true)
+           
+       }
+   }
+    
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+        params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
+        params[AddKeys.latitude.rawValue] = latitude
+        params[AddKeys.longitude.rawValue] = longitude
+        params[AddKeys.country.rawValue] = country
+        params[AddKeys.city.rawValue] = city
+        params[AddKeys.state.rawValue] = state
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            self.addNewItemApi()
+        })
+        
+    }
+    
+    func addNewItemApi(){
+        params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.add_itemURL, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                   
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
 }
 
 
@@ -168,8 +223,10 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         var objCustomField = self.dataArray[row]
         if objCustomField.arrIsSelected[clnCell] == true {
             objCustomField.arrIsSelected[clnCell] = false
+            dictCustomFields.removeValue(forKey: "\(objCustomField.id ?? 0)")
         }else {
             objCustomField.arrIsSelected[clnCell] = true
+            dictCustomFields["\(objCustomField.id ?? 0)"] = [ objCustomField.values?[clnCell] ?? ""]
         }
         for ind in 0..<objCustomField.arrIsSelected.count {
             if ind != clnCell {
@@ -213,16 +270,16 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         objCustomField.selectedValue = objCustomField.values?[selectedRow] ?? ""
         dataArray[dropDownRowIndex] = objCustomField
         //tblView.reloadData()
-        
+        dictCustomFields["\(objCustomField.id ?? 0)"] = [objCustomField.name ?? ""]
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
-        
         
     }
     
     func textFieldEditingDone(selectedRow:Int, strText:String) {
         var objCustomField = self.dataArray[selectedRow]
         objCustomField.selectedValue = strText
+        dictCustomFields["\(objCustomField.id ?? 0)"] = [strText]
         dataArray[selectedRow] = objCustomField
         
     }

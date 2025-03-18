@@ -8,6 +8,11 @@
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Manrope-Regular.ttf">
+            <string>Manrope-Regular</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Create Add DetailVC-->
         <scene sceneID="s0d-6b-0kx">
@@ -139,26 +144,47 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bUz-ZR-qkI">
-                                <rect key="frame" x="0.0" y="84" width="393" height="673"/>
+                                <rect key="frame" x="0.0" y="84" width="393" height="634"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="s3A-R0-GDc" id="fhy-h0-4al"/>
                                     <outlet property="delegate" destination="s3A-R0-GDc" id="V8H-Kk-PZ0"/>
                                 </connections>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SZj-xL-l8w" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="20" y="728" width="353" height="50"/>
+                                <color key="backgroundColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="P7k-Sf-UNP"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="18"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Next"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="nextButtonAction" destination="s3A-R0-GDc" eventType="touchUpInside" id="Z4H-1y-BpL"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Agz-S2-7oI"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Agz-S2-7oI" firstAttribute="bottom" secondItem="SZj-xL-l8w" secondAttribute="bottom" constant="40" id="3Fy-7Q-2td"/>
                             <constraint firstItem="20p-Ah-3A6" firstAttribute="leading" secondItem="Agz-S2-7oI" secondAttribute="leading" constant="30" id="6V2-fL-SAI"/>
                             <constraint firstItem="95j-Aq-n6F" firstAttribute="leading" secondItem="20p-Ah-3A6" secondAttribute="trailing" constant="10" id="BA7-kO-GsL"/>
                             <constraint firstItem="95j-Aq-n6F" firstAttribute="centerY" secondItem="20p-Ah-3A6" secondAttribute="centerY" id="IJY-RF-Lmq"/>
                             <constraint firstItem="95j-Aq-n6F" firstAttribute="top" secondItem="KRf-pT-epp" secondAttribute="top" constant="40" id="Ofk-Cs-kKr"/>
+                            <constraint firstItem="SZj-xL-l8w" firstAttribute="top" secondItem="bUz-ZR-qkI" secondAttribute="bottom" constant="10" id="Pjs-yp-Do8"/>
                             <constraint firstItem="20p-Ah-3A6" firstAttribute="top" secondItem="KRf-pT-epp" secondAttribute="top" constant="40" id="YEh-ym-o0z"/>
+                            <constraint firstItem="SZj-xL-l8w" firstAttribute="leading" secondItem="Agz-S2-7oI" secondAttribute="leading" constant="20" id="eWj-Q0-WXF"/>
                             <constraint firstItem="Agz-S2-7oI" firstAttribute="trailing" secondItem="bUz-ZR-qkI" secondAttribute="trailing" id="gRs-Mz-O3d"/>
                             <constraint firstItem="bUz-ZR-qkI" firstAttribute="top" secondItem="20p-Ah-3A6" secondAttribute="bottom" constant="14" id="lDR-qd-I51"/>
                             <constraint firstItem="bUz-ZR-qkI" firstAttribute="leading" secondItem="Agz-S2-7oI" secondAttribute="leading" id="lcX-2o-S4f"/>
-                            <constraint firstItem="Agz-S2-7oI" firstAttribute="bottom" secondItem="bUz-ZR-qkI" secondAttribute="bottom" constant="61" id="xub-4W-J82"/>
+                            <constraint firstItem="Agz-S2-7oI" firstAttribute="trailing" secondItem="SZj-xL-l8w" secondAttribute="trailing" constant="20" id="ykg-7y-AAI"/>
                         </constraints>
                     </view>
                     <connections>

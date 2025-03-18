@@ -12,6 +12,7 @@ struct CountryLocationView: View {
     @Environment(\.presentationMode) var presentationMode
     var navigationController: UINavigationController?
     @State var arrCountries:Array<CountryModel> = []
+    @State var isNewPost = false
     var body: some View {
         
             VStack(spacing: 0) {
@@ -109,7 +110,7 @@ struct CountryLocationView: View {
     
     func navigateToStateListing(country:CountryModel){
        
-           let vc = UIHostingController(rootView: StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country))
+           let vc = UIHostingController(rootView: StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country, isNewPost: self.isNewPost))
            self.navigationController?.pushViewController(vc, animated: true)
            
        

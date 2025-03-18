@@ -230,7 +230,6 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/payment-transactions"
             
         }
-        
     }
     
     
@@ -239,10 +238,16 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/get-favourite-item"
             
         }
+    }
+   
+    
+    var add_itemURL:String{
+        get{
+            return "\(Constant.shared.baseURL)/add-item"
+            
+        }
         
     }
-    
-    
     
         
 }

@@ -10,7 +10,7 @@ struct CityLocationView: View {
     var state:StateModal = StateModal()
     @State var pageNo = 1
     @State var totalRecords = 1
-    
+    @State var isNewPost = false
     var body: some View {
         
         
@@ -103,9 +103,19 @@ struct CityLocationView: View {
    }
     
     func citySelected(city:CityModal) {
-        Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+        if isNewPost == false {
+            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+        }
         for vc in self.navigationController?.viewControllers ?? [] {
-            if vc.isKind(of: HomeVC.self) == true || vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+            if isNewPost == true {
+                if vc.isKind(of: CreateAddVC2.self){
+                    if let vc1 = vc as? CreateAddVC2 {
+                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                }
+            }else if vc.isKind(of: HomeVC.self) == true || vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
                 self.navigationController?.popToViewController(vc, animated: true)
                 break
             }
