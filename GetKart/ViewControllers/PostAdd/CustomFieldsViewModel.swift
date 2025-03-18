@@ -46,9 +46,12 @@ struct CustomFields: Codable {
     var image: String?
     var datumRequired: Int?
     var values: [String]?
-    var arrIsSelected:Array<Bool> = Array()
     var minLength, maxLength: Int?
     var status: Int?
+    
+    var arrIsSelected:Array<Bool> = Array()
+    //value inserted by user
+    var selectedValue:String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, type, image

@@ -14,5 +14,4 @@ class RadioBtnCVCell: UICollectionViewCell {
         super.awakeFromNib()
         // Initialization code
     }
-
 }

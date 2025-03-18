@@ -25,9 +25,25 @@ class RadioTVCell: UITableViewCell {
         // Initialization code
         
         clnCollectionView.register(UINib(nibName: "RadioBtnCVCell", bundle: .main), forCellWithReuseIdentifier: "RadioBtnCVCell")
-
+        
+        
+        let alignedFlowLayout = clnCollectionView?.collectionViewLayout as? AlignedCollectionViewFlowLayout
+        alignedFlowLayout?.horizontalAlignment = .left
+                alignedFlowLayout?.verticalAlignment = .top
+        alignedFlowLayout?.minimumLineSpacing = 0
+        alignedFlowLayout?.minimumInteritemSpacing = 0
+                alignedFlowLayout?.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.clnCollectionView.collectionViewLayout.invalidateLayout()
+        self.clnCollectionView.layoutIfNeeded()
+    }
+    
+    
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
@@ -46,10 +62,11 @@ class RadioTVCell: UITableViewCell {
 
 extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        return CGSize(width:lblTitle.intrinsicContentSize.width + 20 , height: 35) // Adjust size accordingly
-        }
+    /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = UILabel.textWidth(font: UIFont.Manrope.regular(size: 15).font, text: objData.values?[indexPath.item] ?? "")
+        print("\(width)")
+        return CGSize(width:width + 20 , height: 45) // Adjust size accordingly
+    }*/
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1

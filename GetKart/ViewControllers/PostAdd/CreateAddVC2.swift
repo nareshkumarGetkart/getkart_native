@@ -22,6 +22,10 @@ class CreateAddVC2: UIViewController {
         // Do any additional setup after loading the view.
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tblView.reloadData()
+    }
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
@@ -38,7 +42,7 @@ class CreateAddVC2: UIViewController {
 }
 
 
-extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTappedDelegate {
+extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTappedDelegate, DropDownSelectionDelegate, TextFieldDoneDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -58,7 +62,45 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         
         if objCustomField.type ?? "" == "textbox" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
-            cell.lblTitle.text = "Add Title"
+            cell.imgView.isHidden = false
+            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.lblTitle.text = objCustomField.name ?? ""
+            cell.txtField.keyboardType = .default
+            cell.txtField.tag = indexPath.row
+            cell.btnOption.isHidden = true
+            cell.btnOptionBig.isHidden = true
+            cell.textFieldDoneDelegate = self
+            
+            if objCustomField.selectedValue == nil {
+                objCustomField.selectedValue = ""
+                dataArray[indexPath.row] = objCustomField
+                cell.txtField.text = ""
+            }else {
+                cell.txtField.text = objCustomField.selectedValue
+            }
+            cell.selectionStyle = .none
+            
+            return cell
+            
+            
+        }else if objCustomField.type ?? "" == "number" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
+            cell.imgView.isHidden = false
+            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.lblTitle.text = objCustomField.name ?? ""
+            cell.txtField.keyboardType = .numberPad
+            cell.txtField.tag = indexPath.row
+            cell.btnOption.isHidden = true
+            cell.btnOptionBig.isHidden = true
+            cell.textFieldDoneDelegate = self
+            if objCustomField.selectedValue == nil {
+                objCustomField.selectedValue = ""
+                dataArray[indexPath.row] = objCustomField
+                cell.txtField.text = ""
+            }else {
+                cell.txtField.text = objCustomField.selectedValue
+            }
+            cell.selectionStyle = .none
             return cell
         }else if objCustomField.type ?? "" == "radio" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
@@ -73,19 +115,47 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.objData = objCustomField
             cell.del = self
             cell.rowValue = indexPath.row
-            cell.clnCollectionView.invalidateIntrinsicContentSize()
-            cell.clnCollectionView.setNeedsLayout()
-            cell.clnCollectionView.layoutIfNeeded()
             
-            cell.clnCollectionView.reloadData()
-            self.tblView.beginUpdates()
-            self.tblView.endUpdates()
-        
+            cell.clnCollectionView.performBatchUpdates({
+                cell.clnCollectionView.reloadData()
+                //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+            }) { _ in
+                // Code to execute after reloadData and layout updates
+                print("CollectionView finished updating!")
+                self.tblView.beginUpdates()
+                self.tblView.endUpdates()
+            }
+            
+            cell.selectionStyle = .none
+            
+           /* DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute:  {
+                self.tblView.beginUpdates()
+                self.tblView.endUpdates()
+            })*/
             
             return cell
         }else if objCustomField.type ?? "" == "dropdown" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
-            cell.lblTitle.text = "Price"
+            cell.imgView.isHidden = false
+            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.lblTitle.text = objCustomField.name ?? ""
+            if objCustomField.selectedValue == nil {
+                objCustomField.selectedValue = ""
+                dataArray[indexPath.row] = objCustomField
+                cell.txtField.text = ""
+            }else {
+                cell.txtField.text = objCustomField.selectedValue
+            }
+            cell.btnOptionBig.isHidden = false
+            cell.btnOptionBig.tag = indexPath.row
+            cell.btnOptionBig.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchDown)
+
+            
+            cell.btnOption.isHidden = false
+            cell.btnOption.tag = indexPath.row
+            cell.btnOption.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)
+            cell.selectionStyle = .none
+            
             return cell
         }
         return UITableViewCell()
@@ -101,6 +171,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }else {
             objCustomField.arrIsSelected[clnCell] = true
         }
+        for ind in 0..<objCustomField.arrIsSelected.count {
+            if ind != clnCell {
+                objCustomField.arrIsSelected[ind] = false
+            }
+        }
         dataArray[row] = objCustomField
         
         let indexPath = IndexPath(row: row, section: 0)
@@ -112,6 +187,45 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
     }
     
+    @objc func dropDownnAction(_ sender:UIButton) {
+        print(sender.tag)
+        
+        if let destVC = StoryBoard.postAdd.instantiateViewController(withIdentifier: "DropDownVC")as?  DropDownVC {
+            destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+            destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+            destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+            let objCustomField = self.dataArray[sender.tag]
+            destVC.selectionDelegate = self
+            destVC.dropDownRowIndex = sender.tag
+            destVC.dataArray = objCustomField.values ?? []
+            self.navigationController?.present(destVC, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+  
+    
+    func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
+        print(dropDownRowIndex, selectedRow)
+        
+        var objCustomField = self.dataArray[dropDownRowIndex]
+        objCustomField.selectedValue = objCustomField.values?[selectedRow] ?? ""
+        dataArray[dropDownRowIndex] = objCustomField
+        //tblView.reloadData()
+        
+        let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
+        tblView.reloadRows(at: [indexPath], with: .automatic)
+        
+        
+    }
+    
+    func textFieldEditingDone(selectedRow:Int, strText:String) {
+        var objCustomField = self.dataArray[selectedRow]
+        objCustomField.selectedValue = strText
+        dataArray[selectedRow] = objCustomField
+        
+    }
     
 }
 

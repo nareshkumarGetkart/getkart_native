@@ -55,6 +55,7 @@
                             <constraint firstAttribute="bottom" secondItem="zzm-hy-80n" secondAttribute="bottom" id="IxM-P3-kJp"/>
                             <constraint firstAttribute="trailing" secondItem="zzm-hy-80n" secondAttribute="trailing" constant="10" id="MzZ-Pu-Ff1"/>
                             <constraint firstItem="zzm-hy-80n" firstAttribute="leading" secondItem="Mt9-st-y4K" secondAttribute="leading" constant="10" id="rRL-U4-dmw"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="z7e-BA-Etc"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

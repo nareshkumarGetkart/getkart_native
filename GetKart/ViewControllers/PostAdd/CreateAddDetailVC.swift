@@ -73,6 +73,15 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }else if indexPath.row == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Add Title"
+            
+            cell.txtField.keyboardType = .default
+            cell.txtField.tag = indexPath.row
+            cell.btnOption.isHidden = true
+            cell.btnOptionBig.isHidden = true
+            cell.textFieldDoneDelegate = self
+            
+            
+            
             return cell
         }else if indexPath.row == 2 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
@@ -103,5 +112,14 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             return cell
         }
         return UITableViewCell()
+    }
+    
+    
+}
+
+extension CreateAddDetailVC: TextFieldDoneDelegate{
+    func textFieldEditingDone(selectedRow:Int, strText:String) {
+        print(selectedRow, strText)
+        
     }
 }

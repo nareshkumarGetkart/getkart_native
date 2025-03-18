@@ -49,6 +49,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Utility/AlignedCollectionViewFlowLayout/AlignedCollectionViewFlowLayout.swift,
 			);
 			target = F0EA7EE62D65D9CF0026815A /* GetKart */;
 		};
