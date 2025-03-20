@@ -10,12 +10,14 @@ import SocketIO
 
 enum SocketEvents:String,CaseIterable{
 
-    case chatList = "chatList"
+    case buyerChatList = "buyerChatList"
+    case sellerChatList = "sellerChatList"
+    case chatMessages = "chatMessages"
+    case sendMessage = "sendMessage"
+
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
     case matchList = "matchList"
-    case roomMessages = "roomMessages"
-    case sendMessage = "sendMessage"
     case typing = "typing"
     case messageAcknowledge = "messageAcknowledge"
     case messageDelete = "messageDelete"
@@ -31,6 +33,7 @@ enum SocketEvents:String,CaseIterable{
     case singleMessageDelete = "singleMessageDelete"
     case clearAllMessage = "clearAllMessage"
     case unMatch = "unMatch"
+    
 }
 
 
@@ -85,8 +88,8 @@ final class SocketIOManager: NSObject {
                 print("socket connected")
             }
             //Unread notififcation
-            let params = ["sender":Local.shared.getUserId()]
-            SocketIOManager.sharedInstance.emitEvent(SocketEvents.unreadNotification.rawValue, params)
+//            let params = ["sender":Local.shared.getUserId()]
+//            SocketIOManager.sharedInstance.emitEvent(SocketEvents.unreadNotification.rawValue, params)
             
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.socketConnected.rawValue), object: nil, userInfo: nil)
         })
@@ -129,15 +132,24 @@ final class SocketIOManager: NSObject {
     
     func addListeners(){
         
-        socket?.on(SocketEvents.chatList.rawValue) { data, ack in
+        socket?.on(SocketEvents.buyerChatList.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
-                    print("\(SocketEvents.chatList.rawValue) responseDict =>\(responseDict.printAsJSON())")
+                    print("\(SocketEvents.buyerChatList.rawValue) responseDict =>\(responseDict.printAsJSON())")
                 }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.chatList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.buyerChatList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
         
+        
+        socket?.on(SocketEvents.sellerChatList.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.sellerChatList.rawValue) responseDict =>\(responseDict.printAsJSON())")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.sellerChatList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
         
         socket?.on(SocketEvents.matchList.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
@@ -149,12 +161,12 @@ final class SocketIOManager: NSObject {
             }
         }
         
-        socket?.on(SocketEvents.roomMessages.rawValue) { data, ack in
+        socket?.on(SocketEvents.chatMessages.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
-                    print("\(SocketEvents.roomMessages.rawValue) responseDict =>\(responseDict)")
+                    print("\(SocketEvents.chatMessages.rawValue) responseDict =>\(responseDict.printAsJSON())")
                 }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.roomMessages.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.chatMessages.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
         

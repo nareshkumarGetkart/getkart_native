@@ -13,6 +13,7 @@ class ChatListTblCell: UITableViewCell {
     @IBOutlet weak var lblName:UILabel!
     @IBOutlet weak var lblDesc:UILabel!
     @IBOutlet weak var bgView:UIView!
+    @IBOutlet weak var imgViewItem:UIImageView!
 
 
     override func awakeFromNib() {
@@ -20,6 +21,11 @@ class ChatListTblCell: UITableViewCell {
         // Initialization code
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true
+        
+        imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
+        imgViewProfile.clipsToBounds = true
+        
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

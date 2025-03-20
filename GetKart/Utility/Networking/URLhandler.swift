@@ -42,10 +42,18 @@ class URLhandler: NSObject{
 
         if objLoggedInUser.token != nil {
             
+            
             let token = "Bearer \(objLoggedInUser.token ?? "")"
-            let headers =  [ "Accept":"application/json", "Authorization":token]
-            print("Header == \(headers)")
-            return HTTPHeaders.init(headers)
+            
+            if isFormData{
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token]
+                print("Header == \(headers)")
+                return HTTPHeaders.init(headers)
+            }else{
+                let headers =  [ "Accept":"application/json", "Authorization":token]
+                print("Header == \(headers)")
+                return HTTPHeaders.init(headers)
+            }
         }
 
         /*
@@ -279,7 +287,7 @@ class URLhandler: NSObject{
                     multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
                 }
                 
-            },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
+            },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields(isFormData: true))
             .uploadProgress(queue: .main, closure: { (progress) in
                 let myDict = ["progress": progress.fractionCompleted]
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "uploadProgress"), object: myDict)
@@ -321,6 +329,56 @@ class URLhandler: NSObject{
         }
     }
     
+    
+    
+    func uploadImageWithParameters(profileImg : UIImage,imageName:String, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
+    
+        
+        if ISDEBUG{
+            print(url)
+            print(params)
+        }
+        //let param = [String:AnyObject]()
+        AF.upload(multipartFormData: { (multipartFormData) in
+            
+            if let data = profileImg.jpegData(compressionQuality: 0.3) {
+                
+                multipartFormData.append(data, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+            }else {
+                
+            }
+            
+
+            for (key, value) in params {
+                multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
+            }
+            print("\nmultipartFormData= \(multipartFormData)")
+        
+        },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
+        .uploadProgress(queue: .main, closure: { (progress) in
+           
+        })
+        .response{ response in
+            if response.error == nil{
+                do{
+                    self.respDictionary = try JSONSerialization.jsonObject(
+                        with: response.value!!,
+                        options: JSONSerialization.ReadingOptions.mutableContainers
+                    ) as? NSDictionary
+                    
+                    if ISDEBUG == true {
+                        print("\(url) Response received: ",self.respDictionary)
+                    }
+                    completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                }catch let error{
+                    completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                }
+            }else{
+                
+                completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+            }
+        }
+    }
     
     deinit {
     }

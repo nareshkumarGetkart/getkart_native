@@ -56,7 +56,7 @@ struct ItemModel: Codable,Identifiable {
     let latitude, longitude: Double?
     let address, contact: String?
     let showOnlyToPremium: Int?
-    let status: Status?
+    let status: String?
     let rejectedReason: String?
     let videoLink: String?
     let clicks: Int?
@@ -238,9 +238,9 @@ struct GalleryImage: Codable {
     }
 }
 
-enum Status: String, Codable {
-    case approved = "approved"
-}
+//enum Status: String, Codable {
+//    case approved = "approved"
+//}
 
 // MARK: - User
 struct User: Codable {

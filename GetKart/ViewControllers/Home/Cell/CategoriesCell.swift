@@ -14,6 +14,7 @@ class CategoriesCell: UICollectionViewCell {
     @IBOutlet weak var imgView:UIImageView!
     @IBOutlet weak var imageBgView:UIView!
 
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

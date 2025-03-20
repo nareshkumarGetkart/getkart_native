@@ -18,7 +18,7 @@ class HomeBaseVC: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        AppDelegate.sharedInstance.checkSocketStatus()
 //       tabBar.isTranslucent = true
         tabBar.tintColor = .orange
     
@@ -40,7 +40,6 @@ class HomeBaseVC: UITabBarController {
         }
         setupMiddleButton()
 
-        AppDelegate.sharedInstance.checkSocketStatus()
         
         // Do any additional setup after loading the view.
     }
