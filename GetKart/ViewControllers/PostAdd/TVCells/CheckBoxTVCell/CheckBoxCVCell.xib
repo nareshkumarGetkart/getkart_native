@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Manrope-Regular.ttf">
+            <string>Manrope-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CheckBoxCVCell" id="gTV-IL-0wX" customClass="CheckBoxCVCell" customModule="GetKart" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="134" height="45"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="134" height="45"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cew-fA-jAb" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
+                        <rect key="frame" x="5" y="5" width="124" height="35"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="q2E-PY-yua">
+                                <rect key="frame" x="5" y="5" width="114" height="25"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="pR4-HS-U7N">
+                                        <rect key="frame" x="0.0" y="2.3333333333333321" width="25" height="21.000000000000004"/>
+                                        <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="25" id="VeN-Et-pO9"/>
+                                            <constraint firstAttribute="height" constant="25" id="lGM-cK-Loq"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yLi-7q-uke" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
+                                        <rect key="frame" x="31" y="0.0" width="83" height="25"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Button">
+                                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="q2E-PY-yua" secondAttribute="bottom" constant="5" id="H7h-Qy-scq"/>
+                            <constraint firstAttribute="height" constant="35" id="Ink-47-wRO"/>
+                            <constraint firstAttribute="trailing" secondItem="q2E-PY-yua" secondAttribute="trailing" constant="5" id="NTe-dA-oea"/>
+                            <constraint firstItem="q2E-PY-yua" firstAttribute="leading" secondItem="Cew-fA-jAb" secondAttribute="leading" constant="5" id="n37-IC-ZCK"/>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="10" id="pUQ-d8-bTV"/>
+                            <constraint firstItem="q2E-PY-yua" firstAttribute="top" secondItem="Cew-fA-jAb" secondAttribute="top" constant="5" id="qT0-gZ-aQo"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                <real key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="Cew-fA-jAb" secondAttribute="bottom" constant="5" id="89x-Iz-jDO"/>
+                <constraint firstItem="Cew-fA-jAb" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="5" id="Cny-Wy-ZHh"/>
+                <constraint firstItem="Cew-fA-jAb" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="5" id="fyf-xy-bFc"/>
+                <constraint firstAttribute="trailing" secondItem="Cew-fA-jAb" secondAttribute="trailing" constant="5" id="mKl-14-bnS"/>
+            </constraints>
+            <size key="customSize" width="134" height="50"/>
+            <connections>
+                <outlet property="backView" destination="Cew-fA-jAb" id="sqp-kX-WMb"/>
+                <outlet property="btnValue" destination="yLi-7q-uke" id="QV7-F5-XiK"/>
+                <outlet property="imgSelect" destination="pR4-HS-U7N" id="wtQ-zP-NDW"/>
+            </connections>
+            <point key="canvasLocation" x="16.793893129770993" y="-1.7605633802816902"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="checkmark" catalog="system" width="128" height="114"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

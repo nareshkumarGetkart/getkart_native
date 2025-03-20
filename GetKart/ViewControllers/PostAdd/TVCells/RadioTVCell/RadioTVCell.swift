@@ -25,7 +25,7 @@ class RadioTVCell: UITableViewCell {
         // Initialization code
         
         clnCollectionView.register(UINib(nibName: "RadioBtnCVCell", bundle: .main), forCellWithReuseIdentifier: "RadioBtnCVCell")
-        
+        clnCollectionView.register(UINib(nibName: "CheckBoxCVCell", bundle: .main), forCellWithReuseIdentifier: "CheckBoxCVCell")
         
         let alignedFlowLayout = clnCollectionView?.collectionViewLayout as? AlignedCollectionViewFlowLayout
         alignedFlowLayout?.horizontalAlignment = .left
@@ -77,19 +77,40 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
-        cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
-        cell.btnValue.tag = indexPath.item
-        cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-        if objData.arrIsSelected[indexPath.item] == true {
-            cell.btnValue.setTitleColor(.orange, for: .normal)
-            cell.backView.borderColor = UIColor.orange
+        
+        if objData.type == "checkbox" {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
+            cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
+            cell.btnValue.tag = indexPath.item
+            cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+            if objData.arrIsSelected[indexPath.item] == true {
+                cell.imgSelect.image = UIImage.init(systemName: "checkmark")
+                cell.imgSelect.setImageTintColor(color: UIColor.systemOrange)
+                cell.btnValue.setTitleColor(.orange, for: .normal)
+                cell.backView.borderColor = UIColor.orange
+            }else {
+                cell.imgSelect.image = UIImage.init(systemName: "plus")
+                cell.imgSelect.setImageTintColor(color: UIColor.black)
+                cell.btnValue.setTitleColor(.black, for: .normal)
+                cell.backView.borderColor = UIColor.black
+            }
+            
+            return cell
         }else {
-            cell.btnValue.setTitleColor(.black, for: .normal)
-            cell.backView.borderColor = UIColor.black
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
+            cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
+            cell.btnValue.tag = indexPath.item
+            cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+            if objData.arrIsSelected[indexPath.item] == true {
+                cell.btnValue.setTitleColor(.orange, for: .normal)
+                cell.backView.borderColor = UIColor.orange
+            }else {
+                cell.btnValue.setTitleColor(.black, for: .normal)
+                cell.backView.borderColor = UIColor.black
+            }
+            
+            return cell
         }
-
-        return cell
     }
     
  

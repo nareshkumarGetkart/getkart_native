@@ -18,6 +18,7 @@ class HomeVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(self.navigationController?.viewControllers)
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = 200

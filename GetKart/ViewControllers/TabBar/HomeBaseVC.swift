@@ -114,10 +114,18 @@ class HomeBaseVC: UITabBarController {
                         let message = result["message"] as? String ?? ""
 
                         if status == 200{
-                            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-                                destVC.isNewPost = true
-                                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                            
+                            
+                            if let selectedVC =  self?.selectedViewController as? UINavigationController {
+                                print(selectedVC)
+                                if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                                    destVC.isNewPost = true
+                                    selectedVC.pushViewController(destVC, animated: true)
+                                }
+                                
                             }
+                            
+                            
                             
                         }else{
                             //self?.delegate?.showError(message: message)
@@ -230,6 +238,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
             
         case 2:
             //Center tab
+            
             break
         case 3:
             

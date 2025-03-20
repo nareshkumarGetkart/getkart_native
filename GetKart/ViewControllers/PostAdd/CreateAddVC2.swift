@@ -18,6 +18,8 @@ class CreateAddVC2: UIViewController {
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
+        tblView.register(UINib(nibName: "AddPictureCell", bundle: nil), forCellReuseIdentifier: "AddPictureCell")
+        
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
@@ -118,7 +120,10 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         if objCustomField.type ?? "" == "textbox" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+            
+            
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.keyboardType = .default
             cell.txtField.tag = indexPath.row
@@ -141,7 +146,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }else if objCustomField.type ?? "" == "number" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
@@ -157,7 +163,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
             cell.selectionStyle = .none
             return cell
-        }else if objCustomField.type ?? "" == "radio" {
+        }else if objCustomField.type ?? "" == "radio" || objCustomField.type ?? "" ==  "checkbox"{
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
             if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
                 
@@ -166,7 +172,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
             cell.lblTitle.text = objCustomField.name ?? ""
             
-            cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            //cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
             cell.objData = objCustomField
             cell.del = self
             cell.rowValue = indexPath.row
@@ -182,17 +189,12 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
             
             cell.selectionStyle = .none
-            
-           /* DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute:  {
-                self.tblView.beginUpdates()
-                self.tblView.endUpdates()
-            })*/
-            
             return cell
         }else if objCustomField.type ?? "" == "dropdown" {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-            cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.lblTitle.text = objCustomField.name ?? ""
             if objCustomField.selectedValue == nil {
                 objCustomField.selectedValue = ""
@@ -212,6 +214,15 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.selectionStyle = .none
             
             return cell
+        }else  if objCustomField.type ?? "" == "fileinput" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
+            cell.imgView.isHidden = true
+            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+            cell.lblTitle.text = objCustomField.name ?? ""
+            cell.lblTitle.text = objCustomField.name ?? ""
+            cell.btnAddPicture.setTitle("+ Add File", for: .normal)
+            return cell
         }
         return UITableViewCell()
     }
@@ -228,9 +239,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             objCustomField.arrIsSelected[clnCell] = true
             dictCustomFields["\(objCustomField.id ?? 0)"] = [ objCustomField.values?[clnCell] ?? ""]
         }
-        for ind in 0..<objCustomField.arrIsSelected.count {
-            if ind != clnCell {
-                objCustomField.arrIsSelected[ind] = false
+        if objCustomField.type == "radio" {
+            for ind in 0..<objCustomField.arrIsSelected.count {
+                if ind != clnCell {
+                    objCustomField.arrIsSelected[ind] = false
+                }
             }
         }
         dataArray[row] = objCustomField

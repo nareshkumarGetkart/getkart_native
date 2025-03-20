@@ -8,6 +8,7 @@
 import UIKit
 
 class AddPictureCell: UITableViewCell {
+    @IBOutlet weak var imgView:UIImageView!
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var btnAddPicture:UIButtonX!
     override func awakeFromNib() {
