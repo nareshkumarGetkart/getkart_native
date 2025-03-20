@@ -503,6 +503,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ios.Getkart;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "${SRCROOT}//GetKart/Getkart-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -545,6 +546,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ios.Getkart;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "${SRCROOT}//GetKart/Getkart-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
