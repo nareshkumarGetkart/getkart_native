@@ -50,7 +50,6 @@ final class Constant: NSObject {
     }
     
     
-    
     var user_Insights:String {
         get {
             return "\(baseURL)/v1/user-Insights"
@@ -248,8 +247,27 @@ final class Constant: NSObject {
         }
         
     }
+
     
+    var my_items:String{
+        get{
+            return "\(Constant.shared.baseURL)/my-items"
+            
+        }
         
+    }
+    
+    
+    var upload_chat_files:String{
+        get{
+            return "\(Constant.shared.baseURL)/upload-chat-files"
+            
+        }
+        
+    }
+    
+    
+            
 }
 
 
@@ -257,6 +275,8 @@ enum StoryBoard {
     static let main = UIStoryboard(name: "Main", bundle: nil)
     static let preLogin = UIStoryboard(name: "PreLogin", bundle: nil)
     static let postAdd = UIStoryboard(name: "PostAdd", bundle: nil)
+    static let chat = UIStoryboard(name: "Chats", bundle: nil)
+
 }
 
 

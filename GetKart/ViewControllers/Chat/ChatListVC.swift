@@ -28,6 +28,8 @@ class ChatListVC: UIViewController {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         // Array to keep track of controllers in page menu
+        AppDelegate.sharedInstance.checkSocketStatus()
+        
         var controllerArray : [UIViewController] = []
         
         let peopleVC = StoryBoard.main.instantiateViewController(withIdentifier: "BuyingChatVC") as! BuyingChatVC
@@ -67,6 +69,12 @@ class ChatListVC: UIViewController {
     }
     
     
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    }
+    
     @IBAction func blockedUSerBtnAction(_ sender : UIButton){
         
         let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
@@ -79,11 +87,11 @@ extension ChatListVC : CAPSPageMenuDelegate {
 
   
     func willMoveToPage(_ controller: UIViewController, index: Int){
-        //print(index)
+        print(index)
     }
 
     func didMoveToPage(_ controller: UIViewController, index: Int){
-        //print(index)
+        print(index)
     }
 
 }

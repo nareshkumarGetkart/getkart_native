@@ -60,8 +60,8 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="qSn-h0-zIR"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="17"/>
-                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
+                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -91,7 +91,8 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bgView" destination="Svt-8B-KGg" id="om1-LE-QOu"/>
-                <outlet property="imgViewProfile" destination="uuS-Mc-LQk" id="pRR-Ma-ZE2"/>
+                <outlet property="imgViewItem" destination="uuS-Mc-LQk" id="Lir-Sy-Bvg"/>
+                <outlet property="imgViewProfile" destination="Al7-1I-uME" id="thJ-v4-PPM"/>
                 <outlet property="lblDesc" destination="Jpp-iv-N9r" id="sa1-Db-xu6"/>
                 <outlet property="lblName" destination="Syi-sc-OzF" id="JGe-ui-jkN"/>
             </connections>

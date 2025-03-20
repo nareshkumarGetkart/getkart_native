@@ -9,6 +9,19 @@ import Foundation
 
 extension Date {
     
+    
+    func getISODateFormat() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // UTC
+
+        let formattedString = dateFormatter.string(from: self)
+        print("Formatted Date:", formattedString)
+        return formattedString
+    }
+    
+  
+    
     func timeAgoDisplay() -> String {
  
         let calendar = Calendar.current
