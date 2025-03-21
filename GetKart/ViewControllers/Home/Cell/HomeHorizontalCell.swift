@@ -93,20 +93,22 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
            
             if (listArray?.count ?? 0) == indexPath.item{
-                cell.imgView.image = UIImage(named:"threeDotHori")?.withAlignmentRectInsets(UIEdgeInsets(top: 20, left: 20, bottom: 20,  right: 20))
-                cell.imgView.setImageTintColor(color: .yellow)
+                cell.imgView.image = UIImage(named:"moreHor")
                 cell.lblTitle.text = "More"
                 cell.imgView.layer.borderColor = UIColor.lightGray.cgColor
                 cell.imgView.layer.borderWidth = 1.0
-                cell.imgView.contentMode = .scaleAspectFit
-
+                cell.imgView.isHidden = false
+                cell.threeDotImgView.isHidden = false
+                cell.imgView.image = nil
+                
             }else if let obj = listArray?[indexPath.item] as? CategoryModel{
                 cell.lblTitle.text = obj.name
                 cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
                 cell.imgView.layer.borderColor = UIColor.clear.cgColor
                 cell.imgView.layer.borderWidth = 0.0
                 cell.imgView.contentMode = .scaleAspectFill
-                cell.imgView.setImageTintColor(color: .clear)
+                cell.imgView.isHidden = false
+                cell.threeDotImgView.isHidden = true
 
 
             }

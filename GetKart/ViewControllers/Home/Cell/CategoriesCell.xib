@@ -26,7 +26,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="105" height="130"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jLO-4C-L03">
-                                <rect key="frame" x="0.0" y="78" width="105" height="47"/>
+                                <rect key="frame" x="0.0" y="78" width="105" height="16.666666666666671"/>
                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -38,15 +38,24 @@
                                         <rect key="frame" x="5" y="5" width="65" height="65"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </imageView>
+                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="moreHor" translatesAutoresizingMaskIntoConstraints="NO" id="OKM-Rl-vDc">
+                                        <rect key="frame" x="25" y="25" width="25" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="25" id="e7d-Bp-ShF"/>
+                                            <constraint firstAttribute="height" constant="25" id="o9g-DM-2X9"/>
+                                        </constraints>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="75" id="HT8-Pz-bpd"/>
                                     <constraint firstAttribute="height" constant="75" id="OW1-fb-caf"/>
                                     <constraint firstAttribute="bottom" secondItem="8HJ-ZD-eQb" secondAttribute="bottom" constant="5" id="Qxz-OH-pfP"/>
+                                    <constraint firstItem="OKM-Rl-vDc" firstAttribute="centerY" secondItem="mOB-oQ-SIY" secondAttribute="centerY" id="Xvo-bR-yfv"/>
                                     <constraint firstAttribute="trailing" secondItem="8HJ-ZD-eQb" secondAttribute="trailing" constant="5" id="auo-it-PfW"/>
                                     <constraint firstItem="8HJ-ZD-eQb" firstAttribute="leading" secondItem="mOB-oQ-SIY" secondAttribute="leading" constant="5" id="hH8-dr-P5t"/>
                                     <constraint firstItem="8HJ-ZD-eQb" firstAttribute="top" secondItem="mOB-oQ-SIY" secondAttribute="top" constant="5" id="uhX-XH-0JZ"/>
+                                    <constraint firstItem="OKM-Rl-vDc" firstAttribute="centerX" secondItem="mOB-oQ-SIY" secondAttribute="centerX" id="yGx-42-TBb"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -55,7 +64,7 @@
                             <constraint firstItem="jLO-4C-L03" firstAttribute="top" secondItem="mOB-oQ-SIY" secondAttribute="bottom" constant="1" id="Q1K-VA-g6s"/>
                             <constraint firstItem="mOB-oQ-SIY" firstAttribute="centerX" secondItem="S2i-48-uTp" secondAttribute="centerX" id="TVN-S1-hJk"/>
                             <constraint firstItem="mOB-oQ-SIY" firstAttribute="top" secondItem="S2i-48-uTp" secondAttribute="top" constant="2" id="aFp-aB-tTR"/>
-                            <constraint firstAttribute="bottom" secondItem="jLO-4C-L03" secondAttribute="bottom" constant="5" id="eZ6-MW-U9Q"/>
+                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jLO-4C-L03" secondAttribute="bottom" constant="5" id="eZ6-MW-U9Q"/>
                             <constraint firstItem="jLO-4C-L03" firstAttribute="leading" secondItem="S2i-48-uTp" secondAttribute="leading" id="fQ8-Ay-Q3f"/>
                             <constraint firstAttribute="trailing" secondItem="jLO-4C-L03" secondAttribute="trailing" id="v5b-0U-b75"/>
                         </constraints>
@@ -76,11 +85,13 @@
                 <outlet property="imageBgView" destination="mOB-oQ-SIY" id="iUa-GO-jxZ"/>
                 <outlet property="imgView" destination="8HJ-ZD-eQb" id="rBq-CA-Dh6"/>
                 <outlet property="lblTitle" destination="jLO-4C-L03" id="aeg-a8-hgi"/>
+                <outlet property="threeDotImgView" destination="OKM-Rl-vDc" id="cfl-Na-yXZ"/>
             </connections>
             <point key="canvasLocation" x="133.58778625954199" y="46.478873239436624"/>
         </collectionViewCell>
     </objects>
     <resources>
         <image name="getkartplaceholder" width="251" height="147"/>
+        <image name="moreHor" width="24" height="24"/>
     </resources>
 </document>

@@ -13,6 +13,7 @@ class CategoriesCell: UICollectionViewCell {
     @IBOutlet weak var bgView:UIView!
     @IBOutlet weak var imgView:UIImageView!
     @IBOutlet weak var imageBgView:UIView!
+    @IBOutlet weak var threeDotImgView:UIView!
 
 
     override func awakeFromNib() {

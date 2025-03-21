@@ -61,7 +61,9 @@ struct ItemDetailView: View {
                                                 .scaledToFill()
                                                 .frame(height: 200)
                                                 .cornerRadius(10)
-                                                .tag(index)
+                                                .tag(index).onTapGesture {
+                                                    navigateToPager()
+                                                }
                                             
                                         }placeholder: { ProgressView().progressViewStyle(.circular) }
                                     }
@@ -252,6 +254,15 @@ struct ItemDetailView: View {
                 .cornerRadius(10)
         }
         .padding([.leading,.trailing])
+    }
+    
+    
+    func navigateToPager(){
+        
+        let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
+        vc.currentTag = selectedIndex
+        vc.imageArrayUrl = itemObj?.galleryImages ?? []
+        AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
     }
 }
 

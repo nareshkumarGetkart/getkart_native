@@ -14,6 +14,7 @@ enum SocketEvents:String,CaseIterable{
     case sellerChatList = "sellerChatList"
     case chatMessages = "chatMessages"
     case sendMessage = "sendMessage"
+    case userInfo = "userInfo"
 
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
@@ -23,7 +24,6 @@ enum SocketEvents:String,CaseIterable{
     case messageDelete = "messageDelete"
     case onlineOfflineStatus = "onlineOfflineStatus"
     case complimentMessages = "complimentMessages"
-    case userInfo = "userInfo"
     case firstMatchList = "firstMatchList"
     case blockUnblock = "blockUnblock"
     case unreadNotification = "unreadNotification"

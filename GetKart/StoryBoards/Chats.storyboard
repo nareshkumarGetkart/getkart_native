@@ -294,12 +294,12 @@
         <!--AudioPlayerVC-->
         <scene sceneID="lG4-OY-psj">
             <objects>
-                <viewController storyboardIdentifier="AudioPlayerVC" title="AudioPlayerVC" id="qpW-zq-Gs4" customClass="AudioPlayerVC" customModule="PickzonDating" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AudioPlayerVC" title="AudioPlayerVC" id="qpW-zq-Gs4" customClass="AudioPlayerVC" customModule="GetKart" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2xy-Ub-exe">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1qG-zJ-XCf" customClass="UIViewX" customModule="PickzonDating" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1qG-zJ-XCf" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="618" width="393" height="200"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uzl-gH-Qbe">
@@ -428,10 +428,81 @@
             </objects>
             <point key="canvasLocation" x="2459" y="-87"/>
         </scene>
+        <!--Zoom Image View Controller-->
+        <scene sceneID="eB5-ca-9Uj">
+            <objects>
+                <viewController storyboardIdentifier="ZoomImageViewController" id="38z-rW-V8t" customClass="ZoomImageViewController" customModule="PickZon" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="irU-nj-WxN">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lhk-eE-lgs">
+                                <rect key="frame" x="343" y="65" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="loM-EI-X7K"/>
+                                    <constraint firstAttribute="width" constant="40" id="out-Gz-fFL"/>
+                                </constraints>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="arrowshape.down.circle" catalog="system"/>
+                                <connections>
+                                    <action selector="downloadBtnAction:" destination="38z-rW-V8t" eventType="touchUpInside" id="ptt-SJ-zfe"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mph-gQ-OCa">
+                                <rect key="frame" x="10" y="65" width="40" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="YhM-9h-1yp"/>
+                                    <constraint firstAttribute="width" constant="40" id="iKp-AK-pr6"/>
+                                </constraints>
+                                <state key="normal" image="arrow_left"/>
+                                <connections>
+                                    <action selector="btnBackAction:" destination="38z-rW-V8t" eventType="touchUpInside" id="2ms-Ji-gii"/>
+                                </connections>
+                            </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nZA-NE-opY">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="777"/>
+                                <viewLayoutGuide key="contentLayoutGuide" id="2DD-JX-Hz5"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="hUD-Bh-WNr"/>
+                            </scrollView>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="KvR-lc-4wj">
+                                <rect key="frame" x="160" y="759" width="73" height="26"/>
+                            </pageControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Hye-1x-8wv"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Mph-gQ-OCa" firstAttribute="top" secondItem="Hye-1x-8wv" secondAttribute="top" constant="6" id="1Zx-dD-L8s"/>
+                            <constraint firstAttribute="bottom" secondItem="nZA-NE-opY" secondAttribute="bottom" constant="27" id="2Ew-Rf-3Yo"/>
+                            <constraint firstItem="Hye-1x-8wv" firstAttribute="bottom" secondItem="KvR-lc-4wj" secondAttribute="bottom" constant="33" id="AEI-cf-MzT"/>
+                            <constraint firstItem="Hye-1x-8wv" firstAttribute="trailing" secondItem="Lhk-eE-lgs" secondAttribute="trailing" constant="10" id="DmP-TE-F1q"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="top" secondItem="irU-nj-WxN" secondAttribute="top" constant="102" id="VqT-IN-SEk"/>
+                            <constraint firstItem="KvR-lc-4wj" firstAttribute="centerX" secondItem="irU-nj-WxN" secondAttribute="centerX" id="bDZ-U6-2oj"/>
+                            <constraint firstItem="Lhk-eE-lgs" firstAttribute="top" secondItem="Hye-1x-8wv" secondAttribute="top" constant="6" id="ckf-Kn-zmC"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="top" secondItem="Hye-1x-8wv" secondAttribute="top" constant="12" id="ddx-an-osl"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="trailing" secondItem="Hye-1x-8wv" secondAttribute="trailing" id="h0h-eq-fBy"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="trailing" secondItem="Hye-1x-8wv" secondAttribute="trailing" id="lEi-Ml-Y23"/>
+                            <constraint firstAttribute="bottom" secondItem="nZA-NE-opY" secondAttribute="bottom" constant="119" id="pHE-Vp-r0a"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="leading" secondItem="Hye-1x-8wv" secondAttribute="leading" id="pHe-uf-gwV"/>
+                            <constraint firstItem="Mph-gQ-OCa" firstAttribute="leading" secondItem="Hye-1x-8wv" secondAttribute="leading" constant="10" id="rJN-f8-F8S"/>
+                            <constraint firstItem="nZA-NE-opY" firstAttribute="leading" secondItem="Hye-1x-8wv" secondAttribute="leading" id="yJk-jL-Hv3"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="btnDownload" destination="Lhk-eE-lgs" id="3t6-7e-Yce"/>
+                        <outlet property="pager" destination="KvR-lc-4wj" id="7Fl-7t-Tno"/>
+                        <outlet property="parentZoomingScrollView" destination="nZA-NE-opY" id="dZm-xa-UHl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9ev-AE-YF2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1310" y="1735"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Mic" width="24" height="24"/>
         <image name="arrow_left" width="24" height="24"/>
+        <image name="arrowshape.down.circle" catalog="system" width="128" height="123"/>
         <image name="attachment" width="24" height="24"/>
         <image name="backward" catalog="system" width="128" height="76"/>
         <image name="forward" catalog="system" width="128" height="76"/>
@@ -446,13 +517,13 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

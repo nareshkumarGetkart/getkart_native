@@ -54,6 +54,7 @@ class ChatVC: UIViewController {
     }()
     
     var isDataLoading = true
+    var userId = 0
     
     
     //MARK: Controller life cycle methods
@@ -77,7 +78,9 @@ class ChatVC: UIViewController {
         textView.maxNumberOfLines = 5
         textView.delegate = self
         addObservers()
+        getUserInfo()
         getMessageList()
+
     }
     
     
@@ -194,9 +197,10 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.chatMessages), name: NSNotification.Name(rawValue: SocketEvents.chatMessages.rawValue), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.sendMessage), name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil)
-
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo), name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
     }
+    
     //MARK: Other helpful methods
     func registerTblCell(){
         
@@ -217,6 +221,13 @@ class ChatVC: UIViewController {
         
         
   
+    }
+    
+    
+    func getUserInfo(){
+        
+        let params = ["user_id":userId] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.userInfo.rawValue, params)
     }
     
     
@@ -317,6 +328,26 @@ class ChatVC: UIViewController {
         tblView.scrollToRow(at: IndexPath(row: chatArray.count - 1, section: 0), at: .bottom, animated: animated)
     }
     
+    
+    @objc func userInfo(notification: Notification) {
+        
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let dataDict = data["data"] as? Dictionary<String,Any>{
+            
+            let name = dataDict["name"] as? String ?? ""
+            let profile = dataDict["profile"] as? String ?? ""
+
+            self.lblName.text = name
+            self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
+        }
+        
+    }
+    
+    
+   
     
     @objc func chatMessages(notification: Notification) {
         
@@ -713,6 +744,9 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.imgView.kf.indicatorType = .activity
                 cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
+                cell.imgView.isUserInteractionEnabled = true
+                cell.imgView.tag = indexPath.row
+                cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
             }
                 
                
@@ -837,15 +871,20 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.bgview.updateConstraints()
                     }
                     /*if chatObj.messageStatus == 1{
-                        cell.imgViewSeen.setImageTintColor(color: .gray)
-                        cell.lblSeen.isHidden = true
-                    }else if chatObj.messageStatus == 3{
-                        cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
-                        cell.lblSeen.isHidden = false
-                    }*/
+                     cell.imgViewSeen.setImageTintColor(color: .gray)
+                     cell.lblSeen.isHidden = true
+                     }else if chatObj.messageStatus == 3{
+                     cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
+                     cell.lblSeen.isHidden = false
+                     }*/
                     cell.lblTime.text = dateFormatter.string(from: date)
                     cell.imgView.kf.indicatorType = .activity
                     cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
+                    
+                    cell.imgView.isUserInteractionEnabled = true
+                    cell.imgView.tag = indexPath.row
+                    cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+                    
                 }
                  
                 case "audio": do{
@@ -913,6 +952,9 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         right.direction = .right
         cell.contentView.addGestureRecognizer(right)
         */
+        
+        
+      
         cell.backgroundColor = .clear
         cell.contentView.backgroundColor = .clear
         
@@ -920,6 +962,20 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         
         
     }
+    
+    @objc func imageTapped(sender: UITapGestureRecognizer) {
+       
+        if sender.state == .ended {
+            
+            let ind = sender.view?.tag ?? 0
+            let imgStr = chatArray[ind].file ?? ""
+            let zoomCtrl = VKImageZoom()
+            zoomCtrl.image_url = URL(string: imgStr)
+            zoomCtrl.modalPresentationStyle = .fullScreen
+            AppDelegate.sharedInstance.navigationController?.present(zoomCtrl, animated: true, completion: nil)
+        }
+    }
+    
     
     @objc func playPauseTapped(sender: UIButton) {
          

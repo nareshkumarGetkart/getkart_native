@@ -90,6 +90,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
+        destVC.userId = listArray[indexPath.item].sellerID ?? 0
         AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
     }
     

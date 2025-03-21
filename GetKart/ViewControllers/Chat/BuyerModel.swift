@@ -30,16 +30,16 @@ struct BuyerChatClass: Codable {
     let perPage, to: Int?
 
     enum CodingKeys: String, CodingKey {
-        case lastPageURL
-        case prevPageURL
+        case lastPageURL = "last_page_url"
+        case prevPageURL = "prev_page_url"
         case from, total, path
-        case firstPageURL
-        case lastPage
-        case nextPageURL
+        case firstPageURL = "first_page_url"
+        case lastPage = "last_page"
+        case nextPageURL = "next_page_url"
         case data
-        case currentPage
+        case currentPage = "current_page"
         case links
-        case perPage
+        case perPage = "per_page"
         case to
     }
 }
@@ -61,15 +61,15 @@ struct ChatList: Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case buyerID
-        case lastMessageTime
+        case buyerID = "buyer_id"
+        case lastMessageTime = "last_message_time"
         case buyer, amount
-        case createdAt
-        case itemID
+        case createdAt = "created_at"
+        case itemID = "item_id"
         case item
-        case updatedAt
-        case userBlocked
-        case sellerID
+        case updatedAt = "updated_at"
+        case userBlocked = "user_blocked"
+        case sellerID = "seller_id"
         case seller, chat
     }
 }
