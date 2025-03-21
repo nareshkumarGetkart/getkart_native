@@ -37,6 +37,7 @@ class CreateAddDetailVC: UIViewController {
     
     var objViewModel:CustomFieldsViewModel?
     var params:Dictionary<String,Any> = [:]
+    lazy var imagePicker = UIImagePickerController()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -116,11 +117,15 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
             cell.lblTitle.text = "Main Picture(Max 3MB)"
             cell.btnAddPicture.setTitle("Add Main Picture", for: .normal)
+            cell.btnAddPicture.tag = indexPath.row
+            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
             return cell
         }else if indexPath.row == 4 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
             cell.lblTitle.text = "Other Pictures(Max 5 Images)"
             cell.btnAddPicture.setTitle("Add Other Pictures", for: .normal)
+            cell.btnAddPicture.tag = indexPath.row
+            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
             return cell
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -181,4 +186,65 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
             params[AddKeys.description.rawValue] = strText
         }
     }
+}
+
+
+// MARK: ImagePicker Delegate
+extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentPickerDelegate {
+
+   
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let pickedImage = info[.originalImage] as? UIImage {
+            self.uploadFIleToServer(img: pickedImage, name: "file")
+        }
+        dismiss(animated: true, completion: nil)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        // Handle the user canceling the image picker, if needed.
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+    print(urls)
+        
+      
+    }
+    
+    @objc func uploadPictureBtnAction(_ sender:UIButtonX){
+        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+        imagePicker.delegate = self
+        self.present(imagePicker, animated: true)
+    }
+    
+    func uploadFIleToServer(img:UIImage,name:String){
+        
+        
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
+
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if code == 200{
+                    
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        if let fileStr = data["file"] as? String{
+                            
+                            //self.sendMessageList(msg: fileStr, msgType: "file")
+                        }
+                        
+                        if let audio = data["audio"] as? String{
+                           // self.sendMessageList(msg: audio, msgType: "audio")
+                        }
+                 
+                        
+                    }
+                }
+            }
+        }
+    }
+   
 }

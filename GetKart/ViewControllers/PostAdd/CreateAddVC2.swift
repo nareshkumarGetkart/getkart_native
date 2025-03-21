@@ -12,6 +12,8 @@ class CreateAddVC2: UIViewController {
     var dataArray:[CustomFields] = []
     var params:Dictionary<String,Any> = [:]
     var dictCustomFields:Dictionary<String,Any> = [:]
+    lazy var imagePicker = UIImagePickerController()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print(params)
@@ -222,10 +224,14 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.btnAddPicture.setTitle("+ Add File", for: .normal)
+            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
             return cell
         }
         return UITableViewCell()
     }
+    
+    
+    
     
     func radioCellTapped(row:Int, clnCell:Int){
         print(dataArray)
@@ -299,3 +305,63 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
     
 }
 
+
+// MARK: ImagePicker Delegate
+extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentPickerDelegate {
+
+   
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let pickedImage = info[.originalImage] as? UIImage {
+            self.uploadFIleToServer(img: pickedImage, name: "file")
+        }
+        dismiss(animated: true, completion: nil)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        // Handle the user canceling the image picker, if needed.
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+    print(urls)
+        
+      
+    }
+    
+    @objc func uploadPictureBtnAction(_ sender:UIButtonX){
+        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+        imagePicker.delegate = self
+        self.present(imagePicker, animated: true)
+    }
+    
+    func uploadFIleToServer(img:UIImage,name:String){
+        
+        
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
+
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if code == 200{
+                    
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        if let fileStr = data["file"] as? String{
+                            
+                            //self.sendMessageList(msg: fileStr, msgType: "file")
+                        }
+                        
+                        if let audio = data["audio"] as? String{
+                           // self.sendMessageList(msg: audio, msgType: "audio")
+                        }
+                 
+                        
+                    }
+                }
+            }
+        }
+    }
+   
+}
