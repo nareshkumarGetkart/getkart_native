@@ -12,6 +12,8 @@ struct SafetyTipsView: View {
 
     @State private var listArray = [TipsModel]()
     
+    var onContinueOfferTap: (() -> Void)?
+
     var body: some View {
         
         
@@ -44,6 +46,8 @@ struct SafetyTipsView: View {
                 
                 Button("Continue to offer") {
                     presentationMode.wrappedValue.dismiss()
+
+
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -59,6 +63,10 @@ struct SafetyTipsView: View {
             if listArray.count == 0{
                 getSafetyTipsApi()
             }
+        }
+        
+        .onDisappear {
+            onContinueOfferTap?()
         }
     }
     

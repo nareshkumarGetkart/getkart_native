@@ -20,6 +20,7 @@ struct ItemDetailView: View {
     @State var isLiked = false
     @StateObject private var objVM = ItemDetailViewModel()
     @State private var showSheet = false
+    @State private var showOfferPopup = false
 
     var body: some View {
         
@@ -214,25 +215,41 @@ struct ItemDetailView: View {
                 objVM.getProductListApi(categoryId: self.itemObj?.categoryID ?? 0)
                 objVM.setItemTotalApi(itemId: self.itemObj?.id ?? 0)
             }
+            
+         
                
         }
         
             .sheet(isPresented: $showSheet) {
                 if #available(iOS 16.0, *) {
-                    SafetyTipsView().transition(.move(edge: .bottom))
+                    SafetyTipsView(onContinueOfferTap: {
+                        print("offer tap")
+                            self.showOfferPopup = true
+
+                    }).transition(.move(edge: .bottom))
                         .presentationDetents([.medium, .medium]) // Customizable sizes
                         .presentationDragIndicator(.visible)
+                    
+                        
                 } else {
                     // Fallback on earlier versions
                     
                     if showSheet {
-                        SafetyTipsView()
-                            .transition(.move(edge: .bottom))
+                        SafetyTipsView(onContinueOfferTap: {
+                            
+                                self.showOfferPopup = true
+
+                            print("offer tap")
+                        }).transition(.move(edge: .bottom))
                             .zIndex(1)
                     }
                 } // Shows the drag indicator
-                    }
-        
+            }
+//
+//        if showOfferPopup{
+//            MakeAnOfferView(isPresented: $showOfferPopup)
+//                //.transition(.opacity)
+//        }
         Spacer()
         Button(action: {
             print("Make an Offer")
@@ -254,11 +271,22 @@ struct ItemDetailView: View {
                 .cornerRadius(10)
         }
         .padding([.leading,.trailing])
+            
+            
+            if showOfferPopup{
+                MakeAnOfferView(
+                    isPresented: $showOfferPopup,
+                    sellerPrice: "₹ 60000.0",
+                    onOfferSubmit: { offer in
+                        // submittedOffer = offer
+                        print("User submitted offer: ₹\(offer)")
+                    }
+                )
+        }
     }
     
     
     func navigateToPager(){
-        
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex
         vc.imageArrayUrl = itemObj?.galleryImages ?? []

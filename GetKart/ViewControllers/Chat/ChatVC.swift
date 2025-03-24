@@ -79,7 +79,14 @@ class ChatVC: UIViewController {
         textView.delegate = self
         addObservers()
         getUserInfo()
+        getItemOfferId()
         getMessageList()
+        self.btnSend.isHidden = true
+        self.btnMic.isHidden = false
+
+        self.btnMic.addTarget(self, action: #selector(voiceRecord), for: .touchDown)
+        self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
+        self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
 
     }
     
@@ -199,6 +206,10 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.sendMessage), name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo), name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.getItemOffer), name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil)
+
+        
     }
     
     //MARK: Other helpful methods
@@ -221,6 +232,12 @@ class ChatVC: UIViewController {
         
         
   
+    }
+    
+    func getItemOfferId(){
+        
+        let params = ["item_offer_id":item_offer_id] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.getItemOffer.rawValue, params)
     }
     
     
@@ -303,8 +320,8 @@ class ChatVC: UIViewController {
                 statusBarHeight = Int(UIApplication.shared.statusBarFrame.height) - 5
             }
             inputBarBottomSpace.constant = keyboardFrame.height - CGFloat(statusBarHeight) + 10
-            //            self.btnMic.isHidden = true
-            //            self.btnGift.isHidden = true
+            self.btnMic.isHidden = true
+            self.btnSend.isHidden = true
             view.setNeedsLayout()
             view.layoutIfNeeded()
             scrollToBottom(animated: false)
@@ -314,8 +331,8 @@ class ChatVC: UIViewController {
     
     @objc func keyboardWillHide(_ notification: Notification) {
         inputBarBottomSpace.constant = 0
-        //        self.btnMic.isHidden = false
-        //        self.btnGift.isHidden = false
+        self.btnMic.isHidden = false
+        self.btnSend.isHidden = false
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
@@ -326,6 +343,33 @@ class ChatVC: UIViewController {
             return
         }
         tblView.scrollToRow(at: IndexPath(row: chatArray.count - 1, section: 0), at: .bottom, animated: animated)
+    }
+    
+    
+    
+    
+    @objc func getItemOffer(notification: Notification) {
+        
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let dataDict = data["data"] as? Dictionary<String,Any>{
+            
+            if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
+                
+                
+                
+                let name = itemDict["name"] as? String ?? ""
+                let profile = itemDict["profile"] as? String ?? ""
+                let price = itemDict["price"] as? Int ?? 0
+
+                self.lblProduct.text = name
+                self.lblPrice.text = "\(price)"
+                self.imgViewProduct.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
+            }
+            
+        }
     }
     
     

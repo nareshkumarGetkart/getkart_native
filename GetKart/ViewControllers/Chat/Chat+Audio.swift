@@ -222,12 +222,11 @@ extension ChatVC:Mp3RecorderDelegate{
                                     self?.sendMessageList(msg: audio, msgType: "audio")
                                     self?.removeFiles(fileUrl: fileURL)
                                 }
-                         
-                                
                             }
                         }
                     }
                 }
+                
             } catch (let error) {
                 print("error saving file to documents:", error.localizedDescription)
             }

@@ -15,24 +15,21 @@ enum SocketEvents:String,CaseIterable{
     case chatMessages = "chatMessages"
     case sendMessage = "sendMessage"
     case userInfo = "userInfo"
+    case getItemOffer = "getItemOffer"
+    case itemOffer = "itemOffer"
 
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
-    case matchList = "matchList"
     case typing = "typing"
     case messageAcknowledge = "messageAcknowledge"
     case messageDelete = "messageDelete"
     case onlineOfflineStatus = "onlineOfflineStatus"
     case complimentMessages = "complimentMessages"
-    case firstMatchList = "firstMatchList"
     case blockUnblock = "blockUnblock"
     case unreadNotification = "unreadNotification"
-    case newCompliment = "newCompliment"
-    case newMatch = "newMatch"
     case socketConnected = "socketConnected"
     case singleMessageDelete = "singleMessageDelete"
     case clearAllMessage = "clearAllMessage"
-    case unMatch = "unMatch"
     
 }
 
@@ -132,6 +129,16 @@ final class SocketIOManager: NSObject {
     
     func addListeners(){
         
+        
+        socket?.on(SocketEvents.getItemOffer.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.getItemOffer.rawValue) responseDict =>\(responseDict.printAsJSON())")
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
+        
         socket?.on(SocketEvents.buyerChatList.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
@@ -151,13 +158,15 @@ final class SocketIOManager: NSObject {
             }
         }
         
-        socket?.on(SocketEvents.matchList.rawValue) { data, ack in
+        
+        
+        socket?.on(SocketEvents.itemOffer.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
-                    print("\(SocketEvents.matchList.rawValue) responseDict =>\(responseDict)")
+                    print("\(SocketEvents.itemOffer.rawValue) responseDict =>\(responseDict)")
                     
                 }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.matchList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.itemOffer.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
         
@@ -246,15 +255,7 @@ final class SocketIOManager: NSObject {
         }
         
         
-        socket?.on(SocketEvents.firstMatchList.rawValue) { data, ack in
-            if let responseDict = data[0] as? NSDictionary{
-                if ISDEBUG == true {
-                    print("\(SocketEvents.firstMatchList.rawValue) responseDict =>\(responseDict)")
-                }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.firstMatchList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
-            }
-        }
-        
+       
         
         socket?.on(SocketEvents.blockUnblock.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
@@ -278,24 +279,7 @@ final class SocketIOManager: NSObject {
         }
         
         
-        socket?.on(SocketEvents.newCompliment.rawValue) { data, ack in
-            if let responseDict = data[0] as? NSDictionary{
-                if ISDEBUG == true {
-                    print("\(SocketEvents.newCompliment.rawValue) responseDict =>\(responseDict)")
-                }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.newCompliment.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
-            }
-        }
-        
-        
-        socket?.on(SocketEvents.newMatch.rawValue) { data, ack in
-            if let responseDict = data[0] as? NSDictionary{
-                if ISDEBUG == true {
-                    print("\(SocketEvents.newMatch.rawValue) responseDict =>\(responseDict)")
-                }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.newMatch.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
-            }
-        }
+     
         
         
         socket?.on(SocketEvents.singleMessageDelete.rawValue) { data, ack in
@@ -316,18 +300,6 @@ final class SocketIOManager: NSObject {
             }
         }
         
-        
-        socket?.on(SocketEvents.unMatch.rawValue) { data, ack in
-            if let responseDict = data[0] as? NSDictionary{
-                if ISDEBUG == true {
-                    print("\(SocketEvents.unMatch.rawValue) responseDict =>\(responseDict)")
-                }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.unMatch.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
-            }
-        }
-        
-        
-     
         
     }
     
