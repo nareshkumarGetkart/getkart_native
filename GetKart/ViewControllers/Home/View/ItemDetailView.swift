@@ -162,15 +162,15 @@ struct ItemDetailView: View {
                                     .stroke(Color.gray, lineWidth: 0.5)
                            ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
-                                print("Report Ad tapped")
-                                
-                                let destVC = UIHostingController(rootView: ReportAdsView())
-                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                self.navController?.present(destVC, animated: true, completion: nil)
-                                
-                                    
+                               // if (objVM.itemObj.isAlreadyReported ?? false) == false {
+                                    let destVC = UIHostingController(rootView: ReportAdsView())
+                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                    self.navController?.present(destVC, animated: true, completion: nil)
+//                                }else{
+//                                    print("Already Reported")
+//                                }
                             }
                     }  .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -217,11 +217,6 @@ struct ItemDetailView: View {
                // objVM.getProductListApi(categoryId: self.objVM.itemObj?.categoryID ?? 0)
                // objVM.setItemTotalApi(itemId: self.objVM.itemObj?.id ?? 0)
             }
-            
-
-         
-            
-               
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.itemOffer.rawValue))) { notification in
 
