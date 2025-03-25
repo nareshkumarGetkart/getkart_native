@@ -38,6 +38,13 @@ class CreateAddDetailVC: UIViewController {
     var objViewModel:CustomFieldsViewModel?
     var params:Dictionary<String,Any> = [:]
     lazy var imagePicker = UIImagePickerController()
+    
+    var imgData:Data?
+    var imgName = ""
+    var gallery_images:Array<Data> = []
+    var gallery_imageNames:Array<String> = []
+    var isImgData = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -61,10 +68,32 @@ class CreateAddDetailVC: UIViewController {
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
+    
+    func generateSlug(_ title: String) -> String {
+        // Convert to lowercase
+        var slug = title.lowercased()
+
+        // Replace spaces with dashes
+        slug = slug.replacingOccurrences(of: " ", with: "-")
+
+        // Remove invalid characters (keep only a-z, 0-9, and dashes)
+        slug = slug.replacingOccurrences(of: "[^a-z0-9-]", with: "", options: .regularExpression)
+        return slug
+    }
+    
+    
+    
     @IBAction func nextButtonAction() {
+        
+        self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
+                                                            
         if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
             vc.dataArray = self.objViewModel?.dataArray ?? []
             vc.params = self.params
+            vc.imgData = self.imgData
+            vc.imgName = self.imgName
+            vc.gallery_images = self.gallery_images
+            vc.gallery_imageNames = self.gallery_imageNames
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -103,9 +132,6 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
-            
-            
-            
             return cell
         }else if indexPath.row == 2 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
@@ -118,14 +144,14 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.lblTitle.text = "Main Picture(Max 3MB)"
             cell.btnAddPicture.setTitle("Add Main Picture", for: .normal)
             cell.btnAddPicture.tag = indexPath.row
-            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
+            cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
             return cell
         }else if indexPath.row == 4 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
             cell.lblTitle.text = "Other Pictures(Max 5 Images)"
             cell.btnAddPicture.setTitle("Add Other Pictures", for: .normal)
             cell.btnAddPicture.tag = indexPath.row
-            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
+            cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
             return cell
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -195,7 +221,14 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
-            self.uploadFIleToServer(img: pickedImage, name: "file")
+            if isImgData == true {
+                imgData = pickedImage.jpegData(compressionQuality: 0.0)
+                imgName = "image"
+            }else {
+                gallery_images.append(pickedImage.jpegData(compressionQuality: 0.0) ?? Data())
+                gallery_imageNames.append("gallery_images[]")
+            }
+            
         }
         dismiss(animated: true, completion: nil)
     }
@@ -211,40 +244,18 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
       
     }
     
-    @objc func uploadPictureBtnAction(_ sender:UIButtonX){
+    @objc func addPictureBtnAction(_ sender:UIButtonX){
+        if sender.tag == 3 {
+            isImgData = true
+        }else {
+            isImgData = false
+        }
+        
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
         self.present(imagePicker, animated: true)
     }
     
-    func uploadFIleToServer(img:UIImage,name:String){
-        
-        
-        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
-
-            if error == nil {
-                let result = responseObject! as NSDictionary
-                let code = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
-                
-                if code == 200{
-                    
-                    if let data = result["data"] as? Dictionary<String,Any>{
-                        
-                        if let fileStr = data["file"] as? String{
-                            
-                            //self.sendMessageList(msg: fileStr, msgType: "file")
-                        }
-                        
-                        if let audio = data["audio"] as? String{
-                           // self.sendMessageList(msg: audio, msgType: "audio")
-                        }
-                 
-                        
-                    }
-                }
-            }
-        }
-    }
+   
    
 }

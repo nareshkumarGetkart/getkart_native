@@ -14,6 +14,11 @@ class CreateAddVC2: UIViewController {
     var dictCustomFields:Dictionary<String,Any> = [:]
     lazy var imagePicker = UIImagePickerController()
     
+    var imgData:Data?
+    var imgName = ""
+    var gallery_images:Array<Data> = []
+    var gallery_imageNames:Array<String> = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print(params)
@@ -66,7 +71,7 @@ class CreateAddVC2: UIViewController {
         params[AddKeys.state.rawValue] = state
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-            self.addNewItemApi()
+            self.uploadFIleToServer()
         })
         
     }
@@ -243,7 +248,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             dictCustomFields.removeValue(forKey: "\(objCustomField.id ?? 0)")
         }else {
             objCustomField.arrIsSelected[clnCell] = true
-            dictCustomFields["\(objCustomField.id ?? 0)"] = [ objCustomField.values?[clnCell] ?? ""]
+            dictCustomFields["\(objCustomField.id ?? 0)"] =  objCustomField.values?[clnCell] ?? ""
         }
         if objCustomField.type == "radio" {
             for ind in 0..<objCustomField.arrIsSelected.count {
@@ -289,7 +294,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         objCustomField.selectedValue = objCustomField.values?[selectedRow] ?? ""
         dataArray[dropDownRowIndex] = objCustomField
         //tblView.reloadData()
-        dictCustomFields["\(objCustomField.id ?? 0)"] = [objCustomField.name ?? ""]
+        dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.name ?? ""
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
         
@@ -298,7 +303,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
     func textFieldEditingDone(selectedRow:Int, strText:String) {
         var objCustomField = self.dataArray[selectedRow]
         objCustomField.selectedValue = strText
-        dictCustomFields["\(objCustomField.id ?? 0)"] = [strText]
+        dictCustomFields["\(objCustomField.id ?? 0)"] = strText
         dataArray[selectedRow] = objCustomField
         
     }
@@ -312,7 +317,13 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
-            self.uploadFIleToServer(img: pickedImage, name: "file")
+            print(picker.navigationBar.tag)
+            let tag = picker.navigationBar.tag
+                let data = pickedImage.jpegData(compressionQuality: 0.0)
+                imgName = "image"
+            let objCustomField = self.dataArray[tag]
+            dictCustomFields["\(objCustomField.id ?? 0)"] = data
+           
         }
         dismiss(animated: true, completion: nil)
     }
@@ -331,37 +342,40 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
     @objc func uploadPictureBtnAction(_ sender:UIButtonX){
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
+        imagePicker.navigationBar.tag = sender.tag
         self.present(imagePicker, animated: true)
     }
+     
     
-    func uploadFIleToServer(img:UIImage,name:String){
+    
+    
+    
+    
+    
+    
+    func uploadFIleToServer(){
+        let url = Constant.shared.add_itemURL
+        params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
         
         
-        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
+        URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: imgData ?? Data(), imageName: imgName, imagesData: gallery_images, imageNames: gallery_imageNames, url: url, params: self.params, completionHandler: { responseObject, error in
 
             if error == nil {
                 let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
+               
+
                 if code == 200{
                     
-                    if let data = result["data"] as? Dictionary<String,Any>{
-                        
-                        if let fileStr = data["file"] as? String{
-                            
-                            //self.sendMessageList(msg: fileStr, msgType: "file")
-                        }
-                        
-                        if let audio = data["audio"] as? String{
-                           // self.sendMessageList(msg: audio, msgType: "audio")
-                        }
-                 
-                        
-                    }
+                   
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
                 }
             }
-        }
+        })
     }
    
 }

@@ -118,11 +118,16 @@ class HomeBaseVC: UITabBarController {
                             if let selectedVC =  self?.selectedViewController as? UINavigationController {
                                 print(selectedVC)
                                 if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                                    destVC.hidesBottomBarWhenPushed = true
                                     destVC.isNewPost = true
                                     selectedVC.pushViewController(destVC, animated: true)
+                                    
                                 }
                                 
                             }
+                            
+                            
+                            
                             
                             
                             
