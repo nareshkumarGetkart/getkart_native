@@ -15,7 +15,8 @@ struct ItemDetailView: View {
     
     var navController:UINavigationController?
     
-    @State var itemObj:ItemModel?
+    //@State var itemObj?:ItemModel?
+    var itemId = 0
     @State private var selectedIndex = 0
     @State var isLiked = false
     @StateObject private var objVM = ItemDetailViewModel()
@@ -51,7 +52,7 @@ struct ItemDetailView: View {
                         
                         TabView(selection: $selectedIndex) {
                             
-                            if let arr = itemObj?.galleryImages as? [GalleryImage]{
+                            if let arr = objVM.itemObj?.galleryImages as? [GalleryImage]{
                                 
                                 ForEach(0..<arr.count){ index in
                                     
@@ -87,11 +88,11 @@ struct ItemDetailView: View {
                     }
     
                     
-                    Text(itemObj?.name ?? "''").font(Font.manrope(.medium, size: 16))
+                    Text(objVM.itemObj?.name ?? "''").font(Font.manrope(.medium, size: 16))
                         .font(.headline)
                         .padding(.top, 10).padding(5)
                     
-                    Text("\u{20B9}\(itemObj?.price ?? 0)")
+                    Text("\u{20B9}\(objVM.itemObj?.price ?? 0)")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.orange).padding(5).padding(.bottom,10)
@@ -100,10 +101,10 @@ struct ItemDetailView: View {
                     HStack{
                         HStack{
                             Image("location_icon").renderingMode(.template).foregroundColor(.orange)
-                            Text(itemObj?.address ?? "").lineLimit(1)
+                            Text(objVM.itemObj?.address ?? "").lineLimit(1)
                         }
                         Spacer()
-                        Text(itemObj?.expiryDate ?? "")
+                        Text(objVM.itemObj?.expiryDate ?? "")
                     }.padding(5).padding(.bottom,10)
                
                     let columns = [
@@ -111,7 +112,7 @@ struct ItemDetailView: View {
                         GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
                        ]
                     LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
-                        if let arr = itemObj?.customFields{
+                        if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
                                 
                                 InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:obj.value?.first ?? "")
@@ -122,7 +123,7 @@ struct ItemDetailView: View {
                     Divider()
                     VStack(alignment: .leading) {
                         Text("About this item").font(Font.manrope(.semiBold, size: 16))
-                        Text(itemObj?.description ?? "")
+                        Text(objVM.itemObj?.description ?? "")
                     }.padding(.vertical,1).padding(.horizontal,5)
                     
                     Divider().padding(.vertical)
@@ -133,11 +134,11 @@ struct ItemDetailView: View {
                     
                     HStack{
                         Image("location_icon").renderingMode(.template).foregroundColor(.orange)
-                        Text(itemObj?.address ?? "")
+                        Text(objVM.itemObj?.address ?? "")
                         Spacer()
                     }
                     
-                    MapView(latitude: itemObj?.latitude ?? 0.0, longitude: itemObj?.longitude ?? 0.0,address: itemObj?.address ?? "")
+                    MapView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0,address: objVM.itemObj?.address ?? "")
                         .frame(height: 200)
                         .cornerRadius(10)
                         .padding(.bottom)
@@ -197,7 +198,7 @@ struct ItemDetailView: View {
                                                             
                             ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemObj:item))
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
                                     self.navController?.pushViewController(hostingController, animated: true)
                                 }
                         }
@@ -211,20 +212,54 @@ struct ItemDetailView: View {
         }.onAppear{
             
             if objVM.sellerObj == nil {
-                objVM.getSeller(sellerId: self.itemObj?.userID ?? 0)
-                objVM.getProductListApi(categoryId: self.itemObj?.categoryID ?? 0)
-                objVM.setItemTotalApi(itemId: self.itemObj?.id ?? 0)
+                objVM.getItemDetail(id: self.itemId)
+               // objVM.getSeller(sellerId: self.objVM.itemObj?.userID ?? 0)
+               // objVM.getProductListApi(categoryId: self.objVM.itemObj?.categoryID ?? 0)
+               // objVM.setItemTotalApi(itemId: self.objVM.itemObj?.id ?? 0)
             }
             
+
          
+            
                
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.itemOffer.rawValue))) { notification in
+
+            guard let data = notification.userInfo else{
+                return
+            }
+            
+            if let dataDict = data["data"] as? Dictionary<String,Any>{
+                
+                let id = dataDict["id"] as? Int ?? 0
+                let buyer_id = dataDict["buyer_id"] as? Int ?? 0
+                let seller_id = dataDict["seller_id"] as? Int ?? 0
+                
+                
+                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                var userId = 0
+                if (objLoggedInUser.id ?? 0) == buyer_id{
+                    userId = seller_id
+                }else if (objLoggedInUser.id ?? 0) == seller_id{
+                    userId = buyer_id
+                }
+                
+                let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                destVC.item_offer_id = id
+                destVC.userId = userId
+                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                
+            }
+        }
         
-            .sheet(isPresented: $showSheet) {
+        
+            .sheet(isPresented: $showSheet ) {
                 if #available(iOS 16.0, *) {
                     SafetyTipsView(onContinueOfferTap: {
                         print("offer tap")
+                            
                             self.showOfferPopup = true
+                        
 
                     }).transition(.move(edge: .bottom))
                         .presentationDetents([.medium, .medium]) // Customizable sizes
@@ -236,8 +271,9 @@ struct ItemDetailView: View {
                     
                     if showSheet {
                         SafetyTipsView(onContinueOfferTap: {
-                            
+                                
                                 self.showOfferPopup = true
+                            
 
                             print("offer tap")
                         }).transition(.move(edge: .bottom))
@@ -245,25 +281,42 @@ struct ItemDetailView: View {
                     }
                 } // Shows the drag indicator
             }
-//
-//        if showOfferPopup{
-//            MakeAnOfferView(isPresented: $showOfferPopup)
-//                //.transition(.opacity)
-//        }
+
         Spacer()
         Button(action: {
             print("Make an Offer")
-            showSheet = true
-//
-//            let destVC = UIHostingController(rootView: SafetyTipsView())
-//            destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-//            destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-//            destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-//            self.navController?.present(destVC, animated: true, completion: nil)
             
-               
+            if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
+                
+                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
+                let offerId =
+                objVM.itemObj?.itemOffers?.first?.id ?? 0
+                let sellerId =
+                objVM.itemObj?.itemOffers?.first?.sellerID ?? 0
+                let buyerId =
+                objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
+                var userId = 0
+                if sellerId == objLoggedInUser.id{
+                    userId = buyerId
+                }else{
+                    userId = sellerId
+                }
+                
+                let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                destVC.item_offer_id = offerId
+                destVC.userId = userId
+                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                
+            }else{
+                showSheet = true
+
+            }
+
         }) {
-            Text("Make an Offer")
+            
+            let str = (objVM.itemObj?.isAlreadyOffered ?? false) == true ? "Chat" : "Make an Offer"
+            Text(str)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.orange)
@@ -271,32 +324,57 @@ struct ItemDetailView: View {
                 .cornerRadius(10)
         }
         .padding([.leading,.trailing])
-            
-            
-            if showOfferPopup{
+        
+        .fullScreenCover(isPresented: $showOfferPopup) {
+            if #available(iOS 16.4, *) {
                 MakeAnOfferView(
                     isPresented: $showOfferPopup,
-                    sellerPrice: "₹ 60000.0",
+                    sellerPrice: "\(objVM.itemObj?.price ?? 0)",
                     onOfferSubmit: { offer in
                         // submittedOffer = offer
                         print("User submitted offer: ₹\(offer)")
+                        callOfferSocket(amount: offer)
+                        
+                    }
+                ).presentationDetents([.large, .large]) // Optional for different heights
+                    .background(.clear) // Remove default background
+                    .presentationBackground(.clear)
+            } else {
+                // Fallback on earlier versions
+                
+                MakeAnOfferView(
+                    isPresented: $showOfferPopup,
+                    sellerPrice: "\(objVM.itemObj?.price ?? 0)",
+                    onOfferSubmit: { offer in
+                        // submittedOffer = offer
+                        callOfferSocket(amount: offer)
+
+                        print("User submitted offer: ₹\(offer)")
                     }
                 )
+            } // Works in iOS 16+
         }
+     
     }
     
+    
+    func callOfferSocket(amount:String){
+        let params = ["item_id":(objVM.itemObj?.id ?? 0), "amount":amount] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.itemOffer.rawValue, params)
+    }
     
     func navigateToPager(){
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex
-        vc.imageArrayUrl = itemObj?.galleryImages ?? []
+        vc.imageArrayUrl = objVM.itemObj?.galleryImages ?? []
         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
     }
+
 }
 
 
 #Preview {
-    ItemDetailView(navController:nil,itemObj:nil)
+    ItemDetailView(navController:nil,itemId:0)
 }
 
 

@@ -15,6 +15,15 @@ struct ItemParse: Codable {
     let code: Int?
 }
 
+
+struct SingleItemParse: Codable {
+    
+    let error: Bool?
+    let message: String?
+    let data: [ItemModel]?
+    let code: Int?
+}
+
 // MARK: - DataClass
 struct ItemModelClass: Codable {
     
@@ -80,7 +89,8 @@ struct ItemModel: Codable,Identifiable {
     let customFields: [CustomField]?
     let isAlreadyOffered, isAlreadyReported: Bool?
     let isPurchased: Int?
-
+    let itemOffers:[ItemOffers]?
+    
     enum CodingKeys: String, CodingKey {
         case id, name, slug, description, price, image
         case watermarkImage = "watermark_image"
@@ -110,7 +120,32 @@ struct ItemModel: Codable,Identifiable {
         case isAlreadyOffered = "is_already_offered"
         case isAlreadyReported = "is_already_reported"
         case isPurchased = "is_purchased"
+        case itemOffers = "item_offers"
+
     }
+}
+
+struct ItemOffers: Codable {
+    
+    let amount: Int?
+    let buyerID: Int?
+    let createdAt: String?
+    let id: Int?
+    let itemId: Int?
+    let sellerID: Int?
+    let updatedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        
+        case amount = "amount"
+        case buyerID = "buyer_id"
+        case createdAt = "created_at"
+        case id = "id"
+        case itemId = "item_id"
+        case sellerID = "seller_id"
+        case updatedAt = "updated_at"
+    }
+    
 }
 
 // MARK: - Category

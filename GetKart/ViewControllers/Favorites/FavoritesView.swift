@@ -41,7 +41,7 @@ struct FavoritesView: View {
                     ForEach(listArray) { item in
                         
                         FavoritesCell(itemObj: item).onTapGesture {
-                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemObj:item ))
+                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
                             AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                         }
                         

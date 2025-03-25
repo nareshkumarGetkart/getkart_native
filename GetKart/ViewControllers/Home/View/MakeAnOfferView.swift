@@ -17,7 +17,7 @@ struct MakeAnOfferView: View {
     var body: some View {
         ZStack {
             // Dimmed background
-            Color.black.opacity(0.3)
+            Color.black.opacity(0.7)
                           .edgesIgnoringSafeArea(.all)
                           .onTapGesture {
                               withAnimation {
@@ -37,7 +37,7 @@ struct MakeAnOfferView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
-                TextField("Your Offer", text: $offer)
+                TextField("Your Offer", text: $offer) .multilineTextAlignment(.center)
                     .padding()
                     .frame(height: 45)
                     .background(Color(.systemGray6))
@@ -51,7 +51,7 @@ struct MakeAnOfferView: View {
                             isPresented = false
                         }
                     }) {
-                        Text("Cancel")
+                        Text("Cancel").foregroundColor(.black)
                             .frame(maxWidth: .infinity)
                             .frame(height: 45)
                             .background(Color(.systemGray5))

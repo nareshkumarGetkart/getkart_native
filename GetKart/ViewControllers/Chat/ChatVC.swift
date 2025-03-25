@@ -8,6 +8,7 @@
 import UIKit
 import IQKeyboardManagerSwift
 import MobileCoreServices
+import SwiftUI
 
 class ChatVC: UIViewController {
     
@@ -55,7 +56,7 @@ class ChatVC: UIViewController {
     
     var isDataLoading = true
     var userId = 0
-    
+    var itemId = 0
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -122,6 +123,15 @@ class ChatVC: UIViewController {
     @IBAction func backButtonAction(sender : UIButton){
         self.navigationController?.popViewController(animated: true)
     }
+    
+    
+    @IBAction func productBtnAction(sender : UIButton){
+        
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId))
+        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+    }
+    
+    
     
     @IBAction func sendMessageButtonAction(sender : UIButton){
         
@@ -191,7 +201,7 @@ class ChatVC: UIViewController {
         //            actionSheetAlertController.addAction(unblock)
         //
         //        }else{
-       // actionSheetAlertController.addAction(block)
+        actionSheetAlertController.addAction(block)
         //  }
         
         self.present(actionSheetAlertController, animated: true, completion: nil)
@@ -363,7 +373,7 @@ class ChatVC: UIViewController {
                 let name = itemDict["name"] as? String ?? ""
                 let profile = itemDict["profile"] as? String ?? ""
                 let price = itemDict["price"] as? Int ?? 0
-
+                self.itemId = itemDict["id"] as? Int ?? 0
                 self.lblProduct.text = name
                 self.lblPrice.text = "\(price)"
                 self.imgViewProduct.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))

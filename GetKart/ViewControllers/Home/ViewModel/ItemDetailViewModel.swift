@@ -10,15 +10,35 @@ import SwiftUI
 
 
 
+
 class ItemDetailViewModel:ObservableObject{
     
     @Published var sellerObj:SellerModel?
     @Published var relatedDataItemArray = [ItemModel]()
+    @Published var itemObj:ItemModel?
     
     init(){
 
     }
+
     
+    func getItemDetail(id:Int){
+        
+        let strUrl = Constant.shared.get_item + "?id=\(id)"
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SingleItemParse) in
+            
+            if obj.code == 200 {
+                
+                if let item  =  obj.data?.first{
+                    self.itemObj = item
+                    self.getSeller(sellerId: item.userID ?? 0)
+                    self.getProductListApi(categoryId: item.categoryID ?? 0)
+                }
+            }
+        }
+    }
+        
     
     func getSeller(sellerId:Int){
         
@@ -43,6 +63,7 @@ class ItemDetailViewModel:ObservableObject{
         
         }
     }
+    
     
     func setItemTotalApi(itemId:Int){
      //   let strUrl = "\(Constant.shared.set_item_total_click)?item_id=\(itemId)"
