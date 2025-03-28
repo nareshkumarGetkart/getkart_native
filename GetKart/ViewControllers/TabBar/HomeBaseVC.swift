@@ -127,10 +127,6 @@ class HomeBaseVC: UITabBarController {
                             }
                             
                             
-                            
-                            
-                            
-                            
                         }else{
                             //self?.delegate?.showError(message: message)
                         }

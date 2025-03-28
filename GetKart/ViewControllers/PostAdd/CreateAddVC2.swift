@@ -369,6 +369,27 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
 
                 if code == 200{
                     
+                    // Create the alert controller
+                    let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
+
+                       // Create the actions
+                    let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default) {
+                           UIAlertAction in
+                           for vc in self.navigationController?.viewControllers ?? [] {
+                               if vc is HomeVC {
+                                   self.navigationController?.popToViewController(vc, animated: true)
+                                   break
+                               }
+                           }
+                       }
+                       
+                       // Add the actions
+                       alertController.addAction(okAction)
+
+                       // Present the controller
+                    self.present(alertController, animated: true, completion: nil)
+                    
+                    
                    
                     
                 }else{

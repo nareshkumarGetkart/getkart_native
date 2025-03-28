@@ -53,6 +53,10 @@ class CreateAddDetailVC: UIViewController {
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
         tblView.register(UINib(nibName: "AddPictureCell", bundle: nil), forCellReuseIdentifier: "AddPictureCell")
+        tblView.register(UINib(nibName: "PictureAddedCell", bundle: nil), forCellReuseIdentifier: "PictureAddedCell")
+        
+        tblView.rowHeight = UITableView.automaticDimension
+        tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
         
         objViewModel = CustomFieldsViewModel()
@@ -63,6 +67,12 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
         params[AddKeys.show_only_to_premium.rawValue] = 0
         
+        params[AddKeys.name.rawValue] = ""
+        params[AddKeys.price.rawValue] = ""
+        params[AddKeys.contact.rawValue] = ""
+        params[AddKeys.video_link.rawValue] = ""
+        params[AddKeys.description.rawValue] = ""
+        
     }
     
     @IBAction func backButtonAction() {
@@ -72,10 +82,10 @@ class CreateAddDetailVC: UIViewController {
     func generateSlug(_ title: String) -> String {
         // Convert to lowercase
         var slug = title.lowercased()
-
+        
         // Replace spaces with dashes
         slug = slug.replacingOccurrences(of: " ", with: "-")
-
+        
         // Remove invalid characters (keep only a-z, 0-9, and dashes)
         slug = slug.replacingOccurrences(of: "[^a-z0-9-]", with: "", options: .regularExpression)
         return slug
@@ -86,7 +96,7 @@ class CreateAddDetailVC: UIViewController {
     @IBAction func nextButtonAction() {
         
         self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
-                                                            
+        
         if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
             vc.dataArray = self.objViewModel?.dataArray ?? []
             vc.params = self.params
@@ -116,6 +126,9 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
@@ -140,19 +153,68 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.tvTextView.tag = indexPath.row
             return cell
         }else if indexPath.row == 3 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "PictureAddedCell") as! PictureAddedCell
             cell.lblTitle.text = "Main Picture(Max 3MB)"
+            
+            var arr:Array<Data> = []
+            if imgData != nil {
+                cell.btnAddPicture.isHidden = true
+                cell.clnCollectionView.isHidden = false
+                arr.append(imgData ?? Data())
+            }else {
+                cell.btnAddPicture.isHidden = false
+                cell.clnCollectionView.isHidden = true
+            }
             cell.btnAddPicture.setTitle("Add Main Picture", for: .normal)
             cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
+            
+            cell.arrImagesData = arr
+            cell.rowValue = indexPath.row
+            cell.pictureAddDelegate = self
+            cell.clnCollectionView.performBatchUpdates({
+                cell.clnCollectionView.reloadData()
+                //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+            }) { _ in
+                // Code to execute after reloadData and layout updates
+                self.tblView.beginUpdates()
+                self.tblView.endUpdates()
+            }
+            
+            cell.selectionStyle = .none
             return cell
         }else if indexPath.row == 4 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
-            cell.lblTitle.text = "Other Pictures(Max 5 Images)"
+           
+            let cell = tableView.dequeueReusableCell(withIdentifier: "PictureAddedCell") as! PictureAddedCell
+            cell.lblTitle.text = "Other Picture(Max 5 images)"
+            
+            cell.arrImagesData = gallery_images
+            
+            if gallery_images.count == 0 {
+                cell.btnAddPicture.isHidden = false
+                cell.clnCollectionView.isHidden = true
+            }else {
+                cell.btnAddPicture.isHidden = true
+                cell.clnCollectionView.isHidden = false
+            }
             cell.btnAddPicture.setTitle("Add Other Pictures", for: .normal)
             cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
+            cell.rowValue = indexPath.row
+            cell.pictureAddDelegate = self
+            
+            cell.clnCollectionView.performBatchUpdates({
+                cell.clnCollectionView.reloadData()
+                cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+            }) { _ in
+                // Code to execute after reloadData and layout updates
+                self.tblView.beginUpdates()
+                self.tblView.endUpdates()
+            }
+            cell.selectionStyle = .none
             return cell
+            
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Price"
@@ -217,31 +279,81 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
 
 // MARK: ImagePicker Delegate
 extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentPickerDelegate {
-
-   
+    
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             if isImgData == true {
+                
                 imgData = pickedImage.jpegData(compressionQuality: 0.0)
                 imgName = "image"
+                let indexPath = IndexPath(row: 3, section: 0)
+                if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                        
+                        
+                    cell.btnAddPicture.isHidden = true
+                    cell.clnCollectionView.isHidden = false
+                        
+                        if cell.arrImagesData.count == 0 {
+                            var arr:Array<Data> = []
+                            arr.append(imgData ?? Data())
+                            cell.arrImagesData = arr
+                            cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
+                        }else {
+                            cell.arrImagesData.removeAll()
+                            var arr:Array<Data> = []
+                            arr.append(imgData ?? Data())
+                            cell.arrImagesData = arr
+                        }
+                    
+                        cell.clnCollectionView.performBatchUpdates({
+                            cell.clnCollectionView.reloadData()
+                            cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                        }) { _ in
+                            // Code to execute after reloadData and layout updates
+                            self.tblView.beginUpdates()
+                            self.tblView.endUpdates()
+                        }
+                }
             }else {
                 gallery_images.append(pickedImage.jpegData(compressionQuality: 0.0) ?? Data())
                 gallery_imageNames.append("gallery_images[]")
+                
+                let indexPath = IndexPath(row: 4, section: 0)
+                if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                    
+                    cell.btnAddPicture.isHidden = true
+                    cell.clnCollectionView.isHidden = false
+                    
+                    cell.arrImagesData = self.gallery_images
+                    cell.clnCollectionView!.insertItems(at: [IndexPath(item: gallery_images.count - 1, section: 0)])
+                    
+                    cell.clnCollectionView.performBatchUpdates({
+                        cell.clnCollectionView.reloadData()
+                        cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                    }) { _ in
+                        // Code to execute after reloadData and layout updates
+                        self.tblView.beginUpdates()
+                        self.tblView.endUpdates()
+                    }
+                    
+                }
             }
             
         }
         dismiss(animated: true, completion: nil)
+        
     }
-
+    
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         // Handle the user canceling the image picker, if needed.
         dismiss(animated: true, completion: nil)
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-    print(urls)
+        print(urls)
         
-      
+        
     }
     
     @objc func addPictureBtnAction(_ sender:UIButtonX){
@@ -256,6 +368,50 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
         self.present(imagePicker, animated: true)
     }
     
-   
-   
+    
+    
+}
+
+extension CreateAddDetailVC: PictureAddedDelegate {
+    func addPictureAction(row:Int) {
+        if row == 3 {
+            isImgData = true
+        }else {
+            isImgData = false
+        }
+        
+        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+        imagePicker.delegate = self
+        self.present(imagePicker, animated: true)
+    }
+    func removePictureAction(row:Int, col:Int) {
+        
+            if row == 3 {
+                self.imgData = nil
+                self.imgName = ""
+            }else {
+                gallery_images.remove(at: col)
+                gallery_imageNames.remove(at: col)
+            }
+            
+            let indexPath = IndexPath(row: row, section: 0)
+            if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                
+                cell.arrImagesData.remove(at: col)
+                print("cell.arrImagesData.count : ", cell.arrImagesData.count)
+                cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
+                
+                cell.clnCollectionView.performBatchUpdates({
+                    cell.clnCollectionView.reloadData()
+                    //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                }) { _ in
+                    // Code to execute after reloadData and layout updates
+                    self.tblView.beginUpdates()
+                    self.tblView.endUpdates()
+                }
+            }
+            
+       
+        
+    }
 }
