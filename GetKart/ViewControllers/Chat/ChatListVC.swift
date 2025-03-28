@@ -78,7 +78,9 @@ class ChatListVC: UIViewController {
     @IBAction func blockedUSerBtnAction(_ sender : UIButton){
         
         let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+        hostingController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(hostingController, animated: true)
+      //  AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
     
 }

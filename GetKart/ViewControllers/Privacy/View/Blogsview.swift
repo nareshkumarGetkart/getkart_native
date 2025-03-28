@@ -29,7 +29,8 @@ struct Blogsview: View {
      
         ScrollView{
             VStack(spacing:0){
-                
+                HStack{Spacer()}
+
                 ForEach(blogsArray) { blog in
                     BlogCell(obj:blog)
                         .onTapGesture {

@@ -11,7 +11,7 @@ class SellingChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     var listArray = [ChatList]()
     var page = 1
-    
+    private var emptyView:EmptyList?
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -19,6 +19,14 @@ class SellingChatVC: UIViewController {
         
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
         NotificationCenter.default.addObserver(self, selector: #selector(self.chatList), name: NSNotification.Name(rawValue: SocketEvents.sellerChatList.rawValue), object: nil)
+        
+        DispatchQueue.main.async{
+            self.emptyView = EmptyList(frame: CGRect(x: 0, y: 0, width:  self.tblView.frame.size.width, height:  self.tblView.frame.size.height))
+            self.tblView.addSubview(self.emptyView!)
+            self.emptyView?.isHidden = true
+            self.emptyView?.lblMsg?.text = "No chat Found"
+            self.emptyView?.imageView?.image = UIImage(named: "no_chat_found")
+        }
         
         getChatList()
 
@@ -31,11 +39,10 @@ class SellingChatVC: UIViewController {
 
     func getChatList(){
         
-//    "type": "seller"  // or buyer
+        //"type": "seller"  // or buyer
         let params = ["page":1,"type":"seller"] as [String : Any]
         
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.sellerChatList.rawValue, params)
-     
     }
 
     
@@ -54,6 +61,11 @@ class SellingChatVC: UIViewController {
             
             self.listArray.append(contentsOf:response.data?.data ?? [])
             self.tblView.reloadData()
+            
+            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+            self.emptyView?.lblMsg?.text = "No chat Found"
+            self.emptyView?.subHeadline?.text = ""
+
         }
     }
 }

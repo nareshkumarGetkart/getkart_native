@@ -12,13 +12,10 @@ import SVGKit
 
 struct ItemDetailView: View {
     
-    
     var navController:UINavigationController?
     
-    //@State var itemObj?:ItemModel?
     var itemId = 0
     @State private var selectedIndex = 0
-    @State var isLiked = false
     @StateObject private var objVM = ItemDetailViewModel()
     @State private var showSheet = false
     @State private var showOfferPopup = false
@@ -77,12 +74,14 @@ struct ItemDetailView: View {
                         
                         
                         Button(action: {
-                            isLiked.toggle()
+                            objVM.addToFavourite()
                         }) {
-                            Image(isLiked ? "like_fill" : "like")
+                            
+                            let isLike = (objVM.itemObj?.isLiked ?? false)
+                            Image( isLike ? "like_fill" : "like")
                                 .resizable()
                                 .frame(width: 30, height: 30)
-                                .foregroundColor(isLiked ? .red : .gray)
+                                .foregroundColor(isLike ? .red : .gray)
                                 .padding()
                         }
                     }

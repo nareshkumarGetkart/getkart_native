@@ -27,8 +27,8 @@ struct NotificationDetailView: View {
             Spacer()
         }.frame(height: 44)
        
-        VStack{
-            
+        VStack(alignment: .leading){
+
             
             HStack{Spacer()}.frame(height: 10)
             AsyncImage(url: URL(string: notification?.image ?? "")) { image in

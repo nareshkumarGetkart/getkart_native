@@ -84,6 +84,17 @@ class HomeViewModel{
     }
     
  
+    func addToFavourite(index:Int){
+        
+//        let params = ["item_id":"\(listArray[index].id ?? 0)"]
+//        
+//        URLhandler.sharedinstance.makeCall(url: Constant.shared.manage_favourite, param: params) { responseObject, error in
+//            
+//            if error == nil {
+//                self.listArray[index].isLiked?.toggle()
+//            }
+//        }
+    }
     
     
 }

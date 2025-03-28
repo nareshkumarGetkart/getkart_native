@@ -32,8 +32,9 @@ struct TransactionHistoryView: View {
         
         
         VStack{
+            
             ScrollView {
-                HStack{  }.frame(height: 5)
+                HStack{ Spacer() }.frame(height: 5)
                 VStack(spacing: 15) {
                     ForEach(transactions) { transaction in
                       

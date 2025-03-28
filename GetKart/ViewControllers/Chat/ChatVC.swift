@@ -181,8 +181,8 @@ class ChatVC: UIViewController {
         
         let block = UIAlertAction(title: "Block", style: .default) { (action) in
             
-            //  self.blockUnblock(type: 1)
-            //self.blockApi(id: self.recieverId, isToBlock: 1)
+            
+            self.blockUnblockUser(isBlock: true)
             
         }
         
@@ -206,6 +206,19 @@ class ChatVC: UIViewController {
         
         self.present(actionSheetAlertController, animated: true, completion: nil)
         
+    }
+    
+    
+    func blockUnblockUser(isBlock:Bool){
+        
+        let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
+        let params = ["blocked_user_id":userId]
+        URLhandler.sharedinstance.makeCall(url: strUrl, param: params) { responseObject, error in
+            
+            if error == nil {
+                
+            }
+        }
     }
     
     func addObservers(){

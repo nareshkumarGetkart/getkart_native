@@ -10,9 +10,8 @@ import SwiftUI
 struct FavoritesView: View {
    
     var  navigation:UINavigationController?
-    @State var page = 1
-   @State var listArray = [ItemModel]()
-
+    @StateObject var objVM = FavoriteViewModel()
+    
     var body: some View {
         HStack {
          
@@ -33,12 +32,13 @@ struct FavoritesView: View {
         
         VStack{
             
-            
+            HStack{Spacer()}
+
             ScrollView {
                 
                 HStack{  }.frame(height: 5)
                 VStack(spacing: 10) {
-                    ForEach(listArray) { item in
+                    ForEach(objVM.listArray) { item in
                         
                         FavoritesCell(itemObj: item).onTapGesture {
                             let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
@@ -54,19 +54,11 @@ struct FavoritesView: View {
             
         }.background(Color(.systemGray6)).onAppear{
             
-            getFavoriteHistory()
+            objVM.getFavoriteHistory()
         }
         
     }
-    
-    func getFavoriteHistory(){
-        let strUrl = Constant.shared.get_favourite_item + "?page=\(page)"
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:FavoriteParse) in
-            if obj.code == 200 {
-                self.listArray = obj.data?.data ?? []
-            }
-        }
-    }
+  
 }
 
 #Preview {
@@ -76,7 +68,7 @@ struct FavoritesView: View {
 
 struct FavoritesCell:View {
     
-    let itemObj:ItemModel
+    @State var itemObj:ItemModel
     var body: some View {
         
         HStack{
@@ -88,7 +80,13 @@ struct FavoritesCell:View {
                         .frame(width: 90)
                         .aspectRatio(contentMode: .fit)
                     
-                }placeholder: { ProgressView().progressViewStyle(.circular) }
+                }placeholder: {
+                    
+                   // ProgressView().progressViewStyle(.circular)
+                    
+                    Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 90)
+                    
+                }
             }
             
            // Image("getkartplaceholder").resizable().frame(width:90).aspectRatio(contentMode: .fit)
@@ -97,11 +95,13 @@ struct FavoritesCell:View {
                     Text("₹ \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.orange)
                     Spacer()
                     Button {
-                        
+                        addToFavourite()
                     } label: {
-                        Image("like").frame(width: 20, height: 20, alignment: .center)
+                        let isLike = (itemObj.isLiked ?? false)
+
+                        Image(isLike ? "like_fill" : "like").frame(width: 20, height: 20, alignment: .center)
                             .foregroundColor(.gray)
-                        //.foregroundColor(likedItems.contains(id) ? .red : .gray)
+                        .foregroundColor(isLike ? .red : .gray)
                             .padding(5)
                             .background(Color.white)
                             .clipShape(Circle())
@@ -130,4 +130,20 @@ struct FavoritesCell:View {
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         
     }
+    
+    
+    func addToFavourite(){
+        
+        let params = ["item_id":"\(itemObj.id ?? 0)"]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.manage_favourite, param: params) { responseObject, error in
+            
+            if error == nil {
+                self.itemObj.isLiked?.toggle()
+            }
+        }
+    }
+  
+   
+
 }

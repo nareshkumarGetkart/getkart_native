@@ -45,7 +45,10 @@ struct SafetyTipsView: View {
                 .padding([.horizontal,.bottom])
                 
                 Button("Continue to offer") {
+
                     presentationMode.wrappedValue.dismiss()
+                    onContinueOfferTap?()
+
 
 
                 }
@@ -66,7 +69,6 @@ struct SafetyTipsView: View {
         }
         
         .onDisappear {
-            onContinueOfferTap?()
         }
     }
     

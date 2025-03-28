@@ -35,7 +35,7 @@ struct NotificationView: View {
         
         
         VStack{
-            
+            HStack{Spacer()}
             
             ScrollView {
                 
@@ -47,8 +47,6 @@ struct NotificationView: View {
                             let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
                             self.navigation?.pushViewController(hostingVC, animated: true)
                             print("horizontal list item tapped \n \(notification.title)")
-                            
-                            
                         }
                     }
                 }

@@ -45,6 +45,7 @@ struct PrivacyView: View {
         
         VStack{
 
+            HStack{Spacer()}
            // if (htmlString?.count ?? 0) > 1{
                 
                 let metaTag = """

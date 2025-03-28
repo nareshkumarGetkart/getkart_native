@@ -263,10 +263,34 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/upload-chat-files"
             
         }
-        
     }
     
     
+    var manage_favourite:String{
+        get{
+            return "\(Constant.shared.baseURL)/manage-favourite"
+        }
+    }
+    
+    
+    var blocked_users:String{
+        get {
+            return "\(Constant.shared.baseURL)/blocked-users"
+        }
+    }
+    
+    var block_user:String{
+        get {
+            return "\(Constant.shared.baseURL)/block-user"
+        }
+    }
+    
+    var unblock_user:String{
+        get {
+            return "\(Constant.shared.baseURL)/unblock-user"
+        }
+    }
+
             
 }
 

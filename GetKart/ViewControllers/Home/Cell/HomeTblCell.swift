@@ -108,6 +108,13 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 cell.lblAddress.text = obj.address
                 cell.lblPrice.text =  "\(obj.price ?? 0)"
                 cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                
+                let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
+                cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
+                
+                cell.btnLike.tag = indexPath.item
+                cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
+
            
             }
 //            else if let obj = listArray?[indexPath.item] as? Featured{
@@ -134,6 +141,28 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         }        
     }
     
+    
+    @objc  func likebtnAction(_ sender : UIButton){
+        
+        if  var obj = (listArray?[sender.tag] as? ItemModel){
+            obj.isLiked?.toggle()
+            listArray?[sender.tag] = obj
+            addToFavourite(itemId:obj.id ?? 0)
+            self.cllctnView.reloadData()
+        }
+    }
+    
+    
+    func addToFavourite(itemId:Int){
+        
+        let params = ["item_id":"\(itemId)"]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.manage_favourite, param: params) { responseObject, error in
+            
+            if error == nil {
+                
+            }
+        }
+    }
 }
 
 

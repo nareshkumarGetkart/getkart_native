@@ -34,6 +34,7 @@ class ItemDetailViewModel:ObservableObject{
                     self.itemObj = item
                     self.getSeller(sellerId: item.userID ?? 0)
                     self.getProductListApi(categoryId: item.categoryID ?? 0)
+                    self.setItemTotalApi()
                 }
             }
         }
@@ -65,12 +66,25 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
-    func setItemTotalApi(itemId:Int){
+    func setItemTotalApi(){
      //   let strUrl = "\(Constant.shared.set_item_total_click)?item_id=\(itemId)"
-        let params = ["item_id":"\(itemId)"]
+        let params = ["item_id":"\(itemObj?.id ?? 0)"]
 
         URLhandler.sharedinstance.makeCall(url: Constant.shared.set_item_total_click, param: params,methodType:.post, showLoader: false) { responseObject, error in
             
+        }
+    }
+    
+    
+    func addToFavourite(){
+        
+        let params = ["item_id":"\(itemObj?.id ?? 0)"]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.manage_favourite, param: params) { responseObject, error in
+            
+            if error == nil {
+                
+                self.itemObj?.isLiked?.toggle()
+            }
         }
     }
 }

@@ -85,7 +85,7 @@ struct ItemModel: Codable,Identifiable {
     let area: Int?
     let isFeature: Bool?
     let totalLikes: Int?
-    let isLiked: Bool?
+    var isLiked: Bool?
     let customFields: [CustomField]?
     let isAlreadyOffered, isAlreadyReported: Bool?
     let isPurchased: Int?

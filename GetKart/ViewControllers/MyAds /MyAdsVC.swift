@@ -21,12 +21,22 @@ class MyAdsVC: UIViewController {
     private  let filters = ["All ads", "Live", "Deactivate", "Under Review","Sold out","Rejected"]
     
     var listArray = [ItemModel]()
-    
+    private var emptyView:EmptyList?
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
+        
+        DispatchQueue.main.async{
+            self.emptyView = EmptyList(frame: CGRect(x: 0, y: 0, width:  self.tblView.frame.size.width, height:  self.tblView.frame.size.height))
+            self.tblView.addSubview(self.emptyView!)
+            self.emptyView?.isHidden = true
+            self.emptyView?.lblMsg?.text = ""
+            self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")
+        }
+        
         addButtonsToScrollView()
     }
     
@@ -127,8 +137,6 @@ class MyAdsVC: UIViewController {
         
         let strUrl = Constant.shared.my_items + "?status=\(apiStatus)?page=\(page)"
         
-        
-    
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
             
             if self.page == 1{
@@ -140,6 +148,11 @@ class MyAdsVC: UIViewController {
                 self.listArray.append(contentsOf: obj.data?.data ?? [])
                 self.tblView.reloadData()
             }
+            
+            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+            self.emptyView?.lblMsg?.text = "No Ads Found"
+            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+
         }
 
     }
