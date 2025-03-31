@@ -65,9 +65,11 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
         params[AddKeys.show_only_to_premium.rawValue] = 0
         
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        
         params[AddKeys.name.rawValue] = ""
         params[AddKeys.price.rawValue] = ""
-        params[AddKeys.contact.rawValue] = ""
+        params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
         params[AddKeys.video_link.rawValue] = ""
         params[AddKeys.description.rawValue] = ""
     }
@@ -92,16 +94,54 @@ class CreateAddDetailVC: UIViewController {
     
     @IBAction func nextButtonAction() {
         
-        self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
+        params[AddKeys.name.rawValue] = (params[AddKeys.name.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        params[AddKeys.price.rawValue] = (params[AddKeys.price.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        print(params)
         
-        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
-            vc.dataArray = self.objViewModel?.dataArray ?? []
-            vc.params = self.params
-            vc.imgData = self.imgData
-            vc.imgName = self.imgName
-            vc.gallery_images = self.gallery_images
-            vc.gallery_imageNames = self.gallery_imageNames
-            self.navigationController?.pushViewController(vc, animated: true)
+        if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
+            let alert = UIAlertController(title: "", message: "Title can not be left blank.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+         
+        }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
+            let alert = UIAlertController(title: "", message: "Description can not be left blank.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+         
+        }else if  imgData == nil{
+            let alert = UIAlertController(title: "", message: "Main image can not be left blank.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+         
+        }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
+            let alert = UIAlertController(title: "", message: "Price can not be left blank.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+         
+        }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
+            let alert = UIAlertController(title: "", message: "Contact can not be left blank.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+         
+        } else {
+            self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
+            if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
+                vc.dataArray = self.objViewModel?.dataArray ?? []
+                vc.params = self.params
+                vc.imgData = self.imgData
+                vc.imgName = self.imgName
+                vc.gallery_images = self.gallery_images
+                vc.gallery_imageNames = self.gallery_imageNames
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
         }
     }
     
@@ -215,6 +255,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Price"
+            cell.txtField.placeholder = "Add Price Here"
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
@@ -225,6 +266,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }else if indexPath.row == 6 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Phone Number"
+            cell.txtField.placeholder = "Enter Phone Number"
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true

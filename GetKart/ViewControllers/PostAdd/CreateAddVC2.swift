@@ -132,6 +132,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             
             cell.lblTitle.text = objCustomField.name ?? ""
+            cell.txtField.placeholder = ""
             cell.txtField.keyboardType = .default
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
@@ -156,6 +157,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.lblTitle.text = objCustomField.name ?? ""
+            cell.txtField.placeholder = ""
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
@@ -203,6 +205,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.lblTitle.text = objCustomField.name ?? ""
+            cell.txtField.placeholder = ""
             if objCustomField.selectedValue == nil {
                 objCustomField.selectedValue = ""
                 dataArray[indexPath.row] = objCustomField

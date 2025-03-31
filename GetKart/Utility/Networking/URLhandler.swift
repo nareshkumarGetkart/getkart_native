@@ -37,7 +37,6 @@ class URLhandler: NSObject{
     func getHeaderFields(isFormData:Bool=false)->HTTPHeaders? {
         
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        print()
         
 
         if objLoggedInUser.token != nil {
