@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FaqView: View {
     @State private var expandedItems: Set<Int> = []
-
+    var navigationController:UINavigationController?
     @State private var faqs = [FAQ]()
     
     var body: some View {
@@ -18,7 +18,7 @@ struct FaqView: View {
             HStack{
                 Button {
                     
-                    AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                    navigationController?.popViewController(animated: true)
                     
                 } label: {
                     Image("arrow_left").renderingMode(.template).foregroundColor(.black)
@@ -76,7 +76,7 @@ struct FaqView: View {
             
         }.onAppear{
             getfaqListApi()
-        }
+        }.navigationBarHidden(true)
     }
         
     func getfaqListApi(){

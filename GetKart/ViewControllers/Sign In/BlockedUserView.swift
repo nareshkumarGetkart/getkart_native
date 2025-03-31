@@ -83,7 +83,7 @@ struct BlockedUserView: View {
                 }else{
                     UnblockUserView(isPresented: $showPopup, bloclkUser: selectedObj).background(.clear)
                 }
-            }
+            }.navigationBarHidden(true)
     }
     
     

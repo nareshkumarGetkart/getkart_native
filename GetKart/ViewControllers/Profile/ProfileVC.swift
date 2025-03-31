@@ -117,8 +117,15 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
         }else{
+                        
             
-            if titleArray[indexPath.row] == "My Boost Ads"{
+            if titleArray[indexPath.row] == "Contact us"{
+                
+                let destVC = UIHostingController(rootView: ContactUsView(navigationController:self.navigationController))
+                destVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destVC, animated: true)
+                
+            }else if titleArray[indexPath.row] == "My Boost Ads"{
                 if isUserLoggedInRequest(){
                     
                 }
@@ -131,55 +138,61 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
             }else if titleArray[indexPath.row] == "FAQs"{
                 
-                let destVC = UIHostingController(rootView: FaqView())
-                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                let destVC = UIHostingController(rootView: FaqView(navigationController: self.navigationController))
+                destVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destVC, animated: true)
                 
             }else if titleArray[indexPath.row] == "Language"{
                 
                 let destVC = UIHostingController(rootView: LanguageView())
-                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
-                
+                destVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destVC, animated: true)
             }else if titleArray[indexPath.row] == "Blogs"{
                 
-                let hostingController = UIHostingController(rootView: Blogsview(title: "Blogs")) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                let hostingController = UIHostingController(rootView: Blogsview(title: "Blogs",navigationController: self.navigationController)) // Wrap in UIHostingController
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
                 
             }else if titleArray[indexPath.row] == "Privacy Policy"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
                 
             }else if titleArray[indexPath.row] == "Refunds & Cancellation policy"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Refunds & Cancellation policy", type: .refundAndCancellationPolicy,htmlString: "") // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
                 
             }else if titleArray[indexPath.row] == "About us"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "About us", type: .aboutUs) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
             }else if titleArray[indexPath.row] == "Terms of Service"{
                 
                 let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of Service", type: .termsAndConditions) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
             }else if titleArray[indexPath.row] == "Notifications"{
                 if isUserLoggedInRequest(){
                     
-                    let hostingController = UIHostingController(rootView: NotificationView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                    let hostingController = UIHostingController(rootView: NotificationView(navigation:self.navigationController)) // Wrap in UIHostingController
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
                 }
                 
             }else if titleArray[indexPath.row] == "Favorites"{
                 
                 if isUserLoggedInRequest(){
-                    let hostingController = UIHostingController(rootView: FavoritesView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                    let hostingController = UIHostingController(rootView: FavoritesView(navigation:self.navigationController)) // Wrap in UIHostingController
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
                 }
                 
             }else if titleArray[indexPath.row] == "Rate us"{
@@ -193,9 +206,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
                 if isUserLoggedInRequest(){
                     
-                    let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                    
+                    let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController)) // Wrap in UIHostingController
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
                 }
             }else if titleArray[indexPath.row] ==  "Delete Account"{
                 let deleteAccountView = UIHostingController(rootView: DeleteAccountView())

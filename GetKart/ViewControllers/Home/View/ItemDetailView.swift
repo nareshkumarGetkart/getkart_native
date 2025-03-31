@@ -19,7 +19,7 @@ struct ItemDetailView: View {
     @StateObject private var objVM = ItemDetailViewModel()
     @State private var showSheet = false
     @State private var showOfferPopup = false
-
+    @State private var showShareSheet = false
     var body: some View {
         
         HStack{
@@ -33,10 +33,25 @@ struct ItemDetailView: View {
             Spacer()
             
             Button {
-                
+                showShareSheet = true
             } label: {
                 Image("share").renderingMode(.template).foregroundColor(.black)
             }.padding(.trailing,10)
+                .actionSheet(isPresented: $showShareSheet) {
+                
+                ActionSheet(title: Text(""), message: nil, buttons: [
+                    
+                    .default(Text("Copy Link"), action: {
+                        
+                    }),
+                    
+                        .default(Text("Share"), action: {
+                            
+                    }),
+                    
+                   .cancel()
+                ])
+            }
             
         }.frame(height: 44)
         Divider()
@@ -126,7 +141,11 @@ struct ItemDetailView: View {
                     }.padding(.vertical,1).padding(.horizontal,5)
                     
                     Divider().padding(.vertical)
-                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "")
+                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "").onTapGesture {
+                        
+                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
+                        self.navController?.pushViewController(hostingController, animated: true)
+                    }
                     
                     Text("Location").font(Font.manrope(.semiBold, size: 16))
                         .font(.headline)
@@ -194,8 +213,8 @@ struct ItemDetailView: View {
                     LazyHGrid(rows: [GridItem(.adaptive(minimum: 150))], spacing: 10){
                         
                         ForEach(objVM.relatedDataItemArray){ item in
-                                                            
-                            ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)
+                            ProductCard(objItem: item)
+                           /* ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)*/
                                 .onTapGesture {
                                     let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
                                     self.navController?.pushViewController(hostingController, animated: true)
@@ -206,7 +225,6 @@ struct ItemDetailView: View {
                 }
             }
             .padding(8)
-            
             
         }.onAppear{
             

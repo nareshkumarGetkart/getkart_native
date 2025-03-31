@@ -299,12 +299,15 @@ class ChatVC: UIViewController {
     
     func uploadFIleToServer(img:UIImage,name:String){
         
+        Themes.sharedInstance.showActivityViewTop(uiView: self.view, position: .mid)
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
             
 //        }
 //        URLhandler.sharedinstance.uploadMedia(fileName: name, param: [:], file: file, url: Constant.shared.upload_chat_files, mimeType: "image/*") { responseObject, error in
-//            
+//
+            Themes.sharedInstance.removeActivityView(uiView: self.view)
+
             if error == nil {
                 let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0

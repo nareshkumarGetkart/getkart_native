@@ -12,6 +12,7 @@ import SwiftUI
 struct BlogDetailView: View {
     var title:String = ""
     @State var obj:BlogsModel?
+    var navigationController:UINavigationController?
 
     var body: some View {
      
@@ -19,7 +20,7 @@ struct BlogDetailView: View {
         HStack{
             Button {
                 
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                navigationController?.popViewController(animated: true)
                 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
@@ -69,7 +70,7 @@ struct BlogDetailView: View {
             
             Spacer()
             
-        }//.padding()
+        }.navigationBarHidden(true)
         
     }
     

@@ -55,8 +55,9 @@ struct SubCategoriesView: View {
                 }
             }
             
-        }
+        }.navigationBarHidden(true)
     }
+                              
      func navigateToPostNew(objsubCategory:Subcategory) {
         if objsubCategory.subcategories?.count == 0 {
             if strCategoryTitle.count == 0 {

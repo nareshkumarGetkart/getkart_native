@@ -10,13 +10,14 @@ import SwiftUI
 struct Blogsview: View {
     var title:String = ""
     @State var blogsArray = [BlogsModel]()
+    var navigationController:UINavigationController?
     
     var body: some View {
         HStack{
             
             Button {
                 
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                navigationController?.popViewController(animated: true)
 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
@@ -35,8 +36,9 @@ struct Blogsview: View {
                     BlogCell(obj:blog)
                         .onTapGesture {
                             
-                            let hostingController = UIHostingController(rootView: BlogDetailView(title: "Blogs",obj:blog)) // Wrap in UIHostingController
-                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                            let hostingController = UIHostingController(rootView: BlogDetailView(title: "Blogs",obj:blog,navigationController:self.navigationController)) // Wrap in UIHostingController
+                            hostingController.hidesBottomBarWhenPushed = true
+                            self.navigationController?.pushViewController(hostingController, animated: true)
                             
                         }
                 }
@@ -47,7 +49,7 @@ struct Blogsview: View {
                     blogslistApi()
                 }
             }
-        }.background(Color(UIColor.systemGroupedBackground))
+        }.background(Color(UIColor.systemGroupedBackground)).navigationBarHidden(true)
     }
     
     func blogslistApi(){

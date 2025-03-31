@@ -31,14 +31,14 @@ struct LanguageView: View {
         VStack(alignment:.leading){
             
             HStack{
-                Image("getkartplaceholder").resizable().frame(width: 60,height: 60).cornerRadius(30)
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 60,height: 60).cornerRadius(30)
                 Text("English").font(Font.manrope(.medium, size: 16)).foregroundColor(.white)
                 Spacer()
-            }.padding().background(Color.orange).cornerRadius(8.0)
+            }.background(Color.orange).cornerRadius(8.0)
             
             Spacer()
 
-        }.padding()
+        }.padding().background(Color(.systemGray6))
     }
 }
 

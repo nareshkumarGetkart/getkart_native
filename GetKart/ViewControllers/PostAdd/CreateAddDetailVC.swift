@@ -47,8 +47,6 @@ class CreateAddDetailVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         tblView.register(UINib(nibName: "AlmostThereCell", bundle: nil), forCellReuseIdentifier: "AlmostThereCell")
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
@@ -72,7 +70,6 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.contact.rawValue] = ""
         params[AddKeys.video_link.rawValue] = ""
         params[AddKeys.description.rawValue] = ""
-        
     }
     
     @IBAction func backButtonAction() {

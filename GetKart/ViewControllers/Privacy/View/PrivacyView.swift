@@ -32,7 +32,7 @@ struct PrivacyView: View {
             
             Button {
                 
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                navigationController?.popViewController(animated: true)
 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
