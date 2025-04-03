@@ -12,7 +12,8 @@ struct BlockedUserView: View {
     var navigationController: UINavigationController?
     @State var listArray = [BlockedUser]()
     @State private var showPopup = false
-    @State var selectedObj:BlockedUser?
+    @State private var selectedIndex: Int?
+
     
     var body: some View {
         HStack{
@@ -31,7 +32,9 @@ struct BlockedUserView: View {
         VStack{
             
             HStack{Spacer()}.frame(height:5)
-            ForEach(listArray) { obj in
+                
+            ForEach(listArray.indices, id: \.self) { index in
+                let obj = listArray[index]
                 
                 HStack{
                     // Spacer()
@@ -46,9 +49,9 @@ struct BlockedUserView: View {
                     Text(obj.name ?? "").foregroundColor(.black).font(Font.manrope(.regular, size: 16.0))
                     Spacer()
                     
-                }.background(.white).cornerRadius(6.0).padding(.horizontal).onTapGesture {
-                    showPopup = true
-                    selectedObj = obj
+                }.background(.white).cornerRadius(6.0).padding(.horizontal).tag(index).onTapGesture {
+                    self.selectedIndex = index
+                    self.showPopup = true
                 }
             }
             
@@ -76,16 +79,39 @@ struct BlockedUserView: View {
                 getBlockedUsers()
             }
             .fullScreenCover(isPresented: $showPopup) {
-                if #available(iOS 16.4, *) {
-                    UnblockUserView(isPresented: $showPopup, bloclkUser: selectedObj).presentationDetents([.large, .large]) // Optional for different heights
-                        .background(.clear) // Remove default background
-                        .presentationBackground(.clear)
-                }else{
-                    UnblockUserView(isPresented: $showPopup, bloclkUser: selectedObj).background(.clear)
-                }
+                
+                let selectedObj = listArray[selectedIndex ?? 0]
+                    if #available(iOS 16.4, *) {
+                        UnblockUserView(isPresented: $showPopup, bloclkUser: selectedObj, unblockUser: {
+                            self.unblockUser()
+
+                        }).presentationDetents([.large, .large]) // Optional for different heights
+                            .background(.clear) // Remove default background
+                            .presentationBackground(.clear)
+                    }else{
+                        UnblockUserView(isPresented: $showPopup, bloclkUser: selectedObj, unblockUser: {
+                            self.unblockUser()
+                        }).background(.clear)
+                    }
             }.navigationBarHidden(true)
     }
     
+    
+    
+    func unblockUser(){
+        
+        let params = ["blocked_user_id":listArray[selectedIndex ?? 0].id ?? 0]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.unblock_user, param: params) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                self.listArray.remove(at: self.selectedIndex ?? 0)
+                AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+            }
+        }
+    }
     
     func getBlockedUsers(){
         

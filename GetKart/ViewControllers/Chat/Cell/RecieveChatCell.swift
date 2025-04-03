@@ -29,7 +29,6 @@ class RecieveChatCell: ChatterCell {
 
 
 
-
 class ChatterCell:UITableViewCell{
     
     @IBOutlet weak var bgview:UIView!

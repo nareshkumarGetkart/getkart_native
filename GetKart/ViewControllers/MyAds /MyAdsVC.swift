@@ -183,8 +183,8 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         let obj = listArray[indexPath.item]
         cell.lblItem.text = obj.name
         cell.lblPrice.text =  "\(obj.price ?? 0)"
-        cell.lblLikeCount.text = "\(obj.totalLikes ?? 0)"
-        cell.lblViewCount.text = "\(obj.clicks ?? 0)"
+        cell.lblLikeCount.text = "Like:\(obj.totalLikes ?? 0)"
+        cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
         cell.btnAdStatus.setTitle((obj.status ?? ""), for: .normal)
         cell.imgVwAds.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         

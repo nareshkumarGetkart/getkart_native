@@ -14,7 +14,7 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     
-    let titleArray =  ["Anonymous","My Boost Ads","Subscription","Transaction History","Language","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Transaction History","Language","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","language","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
       
@@ -81,9 +81,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     
                 }
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
-                
-                
-                
+                                
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
@@ -98,7 +96,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             
             cell.lblTitle.text = titleArray[indexPath.row]
             cell.imgVwIcon.image = UIImage(named: iconArray[indexPath.row])
-            
+            cell.imgVwIcon.setImageTintColor(color: .orange)
             if titleArray[indexPath.row] == "Dark Theme"{
                 cell.imgVwArrow.isHidden = true
                 cell.btnSwitch.isHidden = false
@@ -126,14 +124,21 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 self.navigationController?.pushViewController(destVC, animated: true)
                 
             }else if titleArray[indexPath.row] == "My Boost Ads"{
+              
                 if isUserLoggedInRequest(){
-                    
+                    let destVC = UIHostingController(rootView: MyBoostAdsView(navigation: self.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(destVC, animated: true)
                 }
                 
-            } else if titleArray[indexPath.row] == "Subscription"{
+            } else if titleArray[indexPath.row] == "Buy Packages"{
                 
                 if isUserLoggedInRequest(){
                     
+                    if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
+                        destvc.hidesBottomBarWhenPushed = true
+                        self.navigationController?.pushViewController(destvc, animated: true)
+                    }
                 }
                 
             }else if titleArray[indexPath.row] == "FAQs"{

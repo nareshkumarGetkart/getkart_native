@@ -9,7 +9,11 @@ import SwiftUI
 
 struct UnblockUserView: View {
     @Binding var isPresented: Bool  // Control visibility of the popup
-    @State var bloclkUser:BlockedUser?
+    var bloclkUser:BlockedUser?
+    
+    var unblockUser:()->Void
+
+
     
     var body: some View {
         ZStack {
@@ -42,6 +46,7 @@ struct UnblockUserView: View {
                     Button(action: {
                         // Perform unblock action
                         isPresented = false
+                        unblockUser()
                     }) {
                         Text("Unblock").padding().font(Font.manrope(.regular, size: 15))
                             .frame(maxWidth: .infinity,minHeight: 40,maxHeight: 40)
@@ -63,7 +68,7 @@ struct UnblockUserView: View {
 }
 
 #Preview {
-    UnblockUserView(isPresented: .constant(true), bloclkUser: nil)
+    UnblockUserView(isPresented: .constant(true), bloclkUser: BlockedUser(id: 0, name: "", profile: ""), unblockUser: { })
 }
 
 

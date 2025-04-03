@@ -28,7 +28,8 @@ class ChatVC: UIViewController {
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var imgViewProduct:UIImageView!
     @IBOutlet weak var lblProduct:UILabel!
-    
+    @IBOutlet weak var lblTypingStatus:UILabel!
+
     var item_offer_id:Int = 0
     var page = 1
     @IBOutlet weak var btnThreeDots:UIButton!
@@ -88,7 +89,6 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(voiceRecord), for: .touchDown)
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
-
     }
     
     
@@ -231,6 +231,13 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo), name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.getItemOffer), name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus), name: NSNotification.Name(rawValue: SocketEvents.typing.rawValue), object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.messageAcknowledge), name: NSNotification.Name(rawValue: SocketEvents.messageAcknowledge.rawValue), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus), name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)
 
         
     }
@@ -253,6 +260,10 @@ class ChatVC: UIViewController {
         
         tblView.register(UINib(nibName: "ReciveAudioTableViewCell", bundle: nil), forCellReuseIdentifier: "incomingAudio")
         
+        tblView.register(UINib(nibName: "SendOfferChatCell", bundle: nil), forCellReuseIdentifier: "SendOfferChatCell")
+        
+        tblView.register(UINib(nibName: "RecieveOfferChatCell", bundle: nil), forCellReuseIdentifier: "RecieveOfferChatCell")
+
         
   
     }
@@ -373,6 +384,40 @@ class ChatVC: UIViewController {
     
     
     
+    @objc func messageAcknowledge(notification: Notification) {
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let dataDict = data["data"] as? Dictionary<String,Any>{
+            
+            if (dataDict["code"] as? Int ?? 0) == 200{
+                if let read_at = dataDict["read_at"] as? String{
+                    
+                }
+            }
+        }
+    }
+    
+    
+    @objc func typingStatus(notification: Notification) {
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let dataDict = data["data"] as? Dictionary<String,Any>{
+            
+            let typing = dataDict["typing"] as? Int ?? 0
+            //let dataDict =  payload["sender"] as? String ?? ""
+           // let receiver =  payload["receiver"] as? String ?? ""
+         
+          //  if sender == recieverId {
+                self.lblTypingStatus.isHidden = (typing == 1) ? false : true
+           // }
+            
+        }
+    }
+
     
     @objc func getItemOffer(notification: Notification) {
         
@@ -459,6 +504,7 @@ class ChatVC: UIViewController {
                 let oldCount = self.chatArray.count
                 self.chatArray.removeAll()
                 self.chatArray.append(contentsOf: response.data?.data ?? [])
+                self.chatArray = self.chatArray.reversed()
                 self.chatArray.append(contentsOf: oldChatArray)
                 
                 if chatArray.count > 0 {
@@ -667,22 +713,28 @@ extension ChatVC: GrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: GrowingTextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
        
-//        if text.count > 0{
-//            self.sendtypinStatus(status: true)
-//
-//        }else{
-//            //self.sendtypinStatus(status: false)
-//        }
+        if text.count > 0{
+            self.sendtypinStatus(status: true)
+
+        }else{
+            //self.sendtypinStatus(status: false)
+        }
         return true
     }
     func growingTextViewDidBeginEditing(_ growingTextView: GrowingTextView) {
-       // self.sendtypinStatus(status: true)
+        self.sendtypinStatus(status: true)
     }
    
     func growingTextViewDidEndEditing(_ growingTextView: GrowingTextView) {
-      //  self.sendtypinStatus(status: false)
+       self.sendtypinStatus(status: false)
     }
     
+    
+    func sendtypinStatus(status:Bool){
+        let params = ["receiver_id":userId,"typing":status] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.typing.rawValue, params)
+    }
+
 }
 
 
@@ -793,6 +845,21 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     cell.lblTime.text = dateFormatter.string(from: date)
                    
                 }
+                
+                
+                
+            case "offer": do{
+                
+                cell = tableView.dequeueReusableCell(withIdentifier: "SendOfferChatCell", for: indexPath) as! SendOfferChatCell
+                cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                DispatchQueue.main.async {
+                    cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
+                    cell.bgview.updateConstraints()
+                }
+
+                cell.lblTime.text = dateFormatter.string(from: date)
+               
+            }
                 
             case "file": do{
                 
@@ -919,6 +986,19 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     
                 case "text": do{
                     cell = tableView.dequeueReusableCell(withIdentifier: "RecieveChatCell", for: indexPath) as! RecieveChatCell
+                    
+                    cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                    cell.lblTime.text = dateFormatter.string(from: date)
+
+                    DispatchQueue.main.async {
+                        cell.bgview.roundCorners(corners: [.bottomRight,.topLeft,.topRight], radius: 15.0)
+                        cell.bgview.updateConstraints()
+                    }
+                  
+                }
+                    
+                case "offer": do{
+                    cell = tableView.dequeueReusableCell(withIdentifier: "RecieveOfferChatCell", for: indexPath) as! RecieveOfferChatCell
                     
                     cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
                     cell.lblTime.text = dateFormatter.string(from: date)

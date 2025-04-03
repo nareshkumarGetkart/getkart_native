@@ -14,6 +14,7 @@ class ProfileListTblCell: UITableViewCell {
     @IBOutlet weak var imgVwIcon:UIImageView!
     @IBOutlet weak var bgview:UIView!
     @IBOutlet weak var btnSwitch:UISwitch!
+    @IBOutlet weak var lblSubTitle:UILabel!
 
     
     override func awakeFromNib() {
@@ -21,6 +22,7 @@ class ProfileListTblCell: UITableViewCell {
         // Initialization code
         bgview.layer.cornerRadius = 8.0
         bgview.clipsToBounds = true
+        lblSubTitle.isHidden = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

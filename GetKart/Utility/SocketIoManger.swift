@@ -17,13 +17,14 @@ enum SocketEvents:String,CaseIterable{
     case userInfo = "userInfo"
     case getItemOffer = "getItemOffer"
     case itemOffer = "itemOffer"
-
-    case joinRoom = "joinRoom"
-    case leaveRoom = "leaveRoom"
     case typing = "typing"
     case messageAcknowledge = "messageAcknowledge"
-    case messageDelete = "messageDelete"
     case onlineOfflineStatus = "onlineOfflineStatus"
+
+    //
+    case joinRoom = "joinRoom"
+    case leaveRoom = "leaveRoom"
+    case messageDelete = "messageDelete"
     case complimentMessages = "complimentMessages"
     case blockUnblock = "blockUnblock"
     case unreadNotification = "unreadNotification"

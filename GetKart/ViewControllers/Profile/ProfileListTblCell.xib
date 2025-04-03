@@ -8,6 +8,11 @@
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Inter-Regular.otf">
+            <string>Inter-Regular</string>
+        </array>
+    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -43,12 +48,23 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ag5-yT-USY">
-                                <rect key="frame" x="60" y="10" width="180" height="38"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="bWm-AC-4sy">
+                                <rect key="frame" x="55" y="10" width="185" height="38"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ag5-yT-USY">
+                                        <rect key="frame" x="0.0" y="0.0" width="41.333333333333336" height="23"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2rv-N0-Fh2">
+                                        <rect key="frame" x="0.0" y="24" width="29.666666666666668" height="14"/>
+                                        <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="12"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G5X-QH-lI5" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="260" y="14" width="30" height="30"/>
                                 <subviews>
@@ -82,16 +98,16 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="ag5-yT-USY" secondAttribute="bottom" constant="10" id="2mb-6t-vyE"/>
-                            <constraint firstItem="ag5-yT-USY" firstAttribute="top" secondItem="HbY-lZ-ptQ" secondAttribute="top" constant="10" id="3R9-Gd-Tjr"/>
+                            <constraint firstItem="bWm-AC-4sy" firstAttribute="leading" secondItem="acx-uD-rlv" secondAttribute="trailing" constant="5" id="1VH-kB-0Uo"/>
                             <constraint firstItem="acx-uD-rlv" firstAttribute="centerY" secondItem="HbY-lZ-ptQ" secondAttribute="centerY" id="3f2-Vb-qzL"/>
                             <constraint firstItem="G5X-QH-lI5" firstAttribute="centerY" secondItem="HbY-lZ-ptQ" secondAttribute="centerY" id="9ym-Me-SEh"/>
+                            <constraint firstItem="bWm-AC-4sy" firstAttribute="top" secondItem="HbY-lZ-ptQ" secondAttribute="top" constant="10" id="DRv-jA-nAy"/>
+                            <constraint firstAttribute="bottom" secondItem="bWm-AC-4sy" secondAttribute="bottom" constant="10" id="Eve-dL-age"/>
                             <constraint firstItem="acx-uD-rlv" firstAttribute="leading" secondItem="HbY-lZ-ptQ" secondAttribute="leading" constant="10" id="NFU-Mf-Ogl"/>
                             <constraint firstAttribute="trailing" secondItem="G5X-QH-lI5" secondAttribute="trailing" constant="10" id="QUd-su-Ufm"/>
                             <constraint firstAttribute="trailing" secondItem="jP0-7V-0XR" secondAttribute="trailing" constant="10" id="XvO-Bs-2NW"/>
                             <constraint firstItem="jP0-7V-0XR" firstAttribute="centerY" secondItem="HbY-lZ-ptQ" secondAttribute="centerY" id="Z9u-Nw-JoL"/>
-                            <constraint firstItem="ag5-yT-USY" firstAttribute="leading" secondItem="acx-uD-rlv" secondAttribute="trailing" constant="10" id="sxa-if-ncH"/>
-                            <constraint firstItem="jP0-7V-0XR" firstAttribute="leading" secondItem="ag5-yT-USY" secondAttribute="trailing" constant="5" id="y3T-Gr-jqu"/>
+                            <constraint firstItem="jP0-7V-0XR" firstAttribute="leading" secondItem="bWm-AC-4sy" secondAttribute="trailing" constant="5" id="ty1-Kn-B8J"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -110,6 +126,7 @@
                 <outlet property="btnSwitch" destination="jP0-7V-0XR" id="K8j-W7-Cba"/>
                 <outlet property="imgVwArrow" destination="cFK-LM-llX" id="WfP-Yq-FNo"/>
                 <outlet property="imgVwIcon" destination="w39-7D-eeE" id="wEX-nk-Vh9"/>
+                <outlet property="lblSubTitle" destination="2rv-N0-Fh2" id="obH-jJ-ibL"/>
                 <outlet property="lblTitle" destination="ag5-yT-USY" id="gSn-SN-cXh"/>
             </connections>
             <point key="canvasLocation" x="51.908396946564885" y="26.408450704225352"/>
