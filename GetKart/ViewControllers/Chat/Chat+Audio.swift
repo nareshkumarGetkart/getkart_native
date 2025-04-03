@@ -192,9 +192,9 @@ extension ChatVC:Mp3RecorderDelegate{
             do {
                 try voiceData.write(to: fileURL!)
                 
-                let params = ["type":3]
+                let params =  Dictionary<String, Any>() //["type":3]
                                 
-                URLhandler.sharedinstance.uploadMedia(fileName: assetName, param:  params as [String : AnyObject], file: fileURL!, url:  Constant.shared.upload_chat_files, mimeType: "audio/mpeg") { [weak self] responseObject, error in
+                URLhandler.sharedinstance.uploadMedia(fileName: "audio", param:  params as [String : AnyObject], file: fileURL!, url:  Constant.shared.upload_chat_files, mimeType: "audio/mpeg") { [weak self] responseObject, error in
                     
                     
                     self?.removeFiles(fileUrl: fileURL)

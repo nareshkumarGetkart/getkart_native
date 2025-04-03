@@ -39,7 +39,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return 70.0
+        return 80.0
     }
     
     
@@ -53,7 +53,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
         
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "PackageAdsCell") as! PackageAdsCell
-        cell.bgView.addShadow()
+        cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5, shadowRadius: 10)
         cell.lblOriginalAmt.attributedText = "₹ 1,249".setStrikeText(color: .gray)
 
         return cell

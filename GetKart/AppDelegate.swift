@@ -78,10 +78,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-
+        
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.token != nil {
+            
+            var bgTask: UIBackgroundTaskIdentifier = .invalid
+            bgTask = UIApplication.shared.beginBackgroundTask {
+                // Cleanup when time expires
+                UIApplication.shared.endBackgroundTask(bgTask)
+                bgTask = .invalid
+            }
+            
             SocketIOManager.sharedInstance.socket?.disconnect()
+            print("applicationWillTerminate")
+            
+            UIApplication.shared.endBackgroundTask(bgTask)
+            bgTask = .invalid
         }
     }
     

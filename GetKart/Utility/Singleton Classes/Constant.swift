@@ -291,6 +291,15 @@ final class Constant: NSObject {
         }
     }
 
+    
+    
+    var logout:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/logout"
+        }
+    }
+
+     
             
 }
 

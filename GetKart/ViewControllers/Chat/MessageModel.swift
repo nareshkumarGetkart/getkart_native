@@ -46,7 +46,7 @@ struct MessageClass: Codable {
 
 // MARK: - Datum
 struct MessageModel: Codable {
-    let readAt: String?
+    var readAt: String?
     let id: Int?
     let createdAt, file: String?
     let itemOfferID: Int?
@@ -55,7 +55,7 @@ struct MessageModel: Codable {
     let updatedAt: String?
     let senderID: Int?
     let audio: String?
-   // let receiverID: Int?
+    let receiverID: Int?
    // let userType: String?
     
     enum CodingKeys: String, CodingKey {
@@ -69,7 +69,7 @@ struct MessageModel: Codable {
         case updatedAt = "updated_at"
         case senderID = "sender_id"
         case audio
-        //case receiverID = "receiver_id"
+        case receiverID = "receiver_id"
        // case userType
     }
 }

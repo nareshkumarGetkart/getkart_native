@@ -18,6 +18,9 @@
         <array key="Inter-Regular.otf">
             <string>Inter-Regular</string>
         </array>
+        <array key="Inter-SemiBold.otf">
+            <string>Inter-SemiBold</string>
+        </array>
     </customFonts>
     <scenes>
         <!--ChatVC-->
@@ -72,14 +75,42 @@
                                         </constraints>
                                     </imageView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="jvP-sp-hGi">
-                                        <rect key="frame" x="115" y="53" width="223" height="20.333333333333329"/>
+                                        <rect key="frame" x="115" y="53" width="223" height="20"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LMy-r3-KYs">
-                                                <rect key="frame" x="0.0" y="0.0" width="41.333333333333336" height="20.333333333333332"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d1A-Uk-Ezq">
+                                                <rect key="frame" x="0.0" y="0.0" width="81.333333333333329" height="20"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LMy-r3-KYs">
+                                                        <rect key="frame" x="0.0" y="0.0" width="63.333333333333336" height="20"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hsm-Nk-Acy" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
+                                                        <rect key="frame" x="68.333333333333343" y="6" width="8" height="8"/>
+                                                        <color key="backgroundColor" systemColor="systemGreenColor"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="8" id="jwd-4e-a6Z"/>
+                                                            <constraint firstAttribute="height" constant="8" id="wlY-OO-PdO"/>
+                                                        </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="4"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                    </view>
+                                                </subviews>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                <constraints>
+                                                    <constraint firstItem="hsm-Nk-Acy" firstAttribute="centerY" secondItem="LMy-r3-KYs" secondAttribute="centerY" id="0iI-No-4CE"/>
+                                                    <constraint firstItem="hsm-Nk-Acy" firstAttribute="leading" secondItem="LMy-r3-KYs" secondAttribute="trailing" constant="5" id="KbJ-NP-hos"/>
+                                                    <constraint firstItem="LMy-r3-KYs" firstAttribute="leading" secondItem="d1A-Uk-Ezq" secondAttribute="leading" id="Kmz-CK-ftb"/>
+                                                    <constraint firstAttribute="bottom" secondItem="LMy-r3-KYs" secondAttribute="bottom" id="bXV-MF-LMb"/>
+                                                    <constraint firstItem="LMy-r3-KYs" firstAttribute="top" secondItem="d1A-Uk-Ezq" secondAttribute="top" id="cyX-Sw-FHE"/>
+                                                    <constraint firstAttribute="height" constant="20" id="dMX-hP-m9r"/>
+                                                    <constraint firstAttribute="trailing" secondItem="hsm-Nk-Acy" secondAttribute="trailing" constant="5" id="fQM-r2-88c"/>
+                                                </constraints>
+                                            </view>
                                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Typing..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jLn-OX-HQl">
                                                 <rect key="frame" x="0.0" y="0.0" width="52.333333333333336" height="0.0"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
@@ -206,12 +237,13 @@
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MdW-Za-lZx">
                                                 <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                                <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="40" id="Wh7-B2-YV8"/>
                                                     <constraint firstAttribute="height" constant="40" id="qbq-Bo-xU4"/>
                                                 </constraints>
-                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" backgroundImage="Mic"/>
+                                                <inset key="imageEdgeInsets" minX="8" minY="8" maxX="8" maxY="8"/>
+                                                <state key="normal" backgroundImage="msg_send_icon"/>
                                                 <connections>
                                                     <action selector="sendMessageButtonActionWithSender:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="yWi-HT-x0W"/>
                                                 </connections>
@@ -296,7 +328,10 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bgViewAudioRecord" destination="r1V-43-Wae" id="lkv-jk-Pen"/>
+                        <outlet property="btnAudioRecordStarted" destination="8Y2-8P-ZOB" id="Ga8-m5-uTd"/>
                         <outlet property="btnBack" destination="gTV-yq-Tqh" id="AcW-Wg-nW3"/>
+                        <outlet property="btnImgMicBlink" destination="fHD-hA-ulg" id="aA6-lV-zRc"/>
                         <outlet property="btnMic" destination="dCe-f9-GA2" id="GRD-vJ-ESB"/>
                         <outlet property="btnSend" destination="MdW-Za-lZx" id="stI-Kl-BFU"/>
                         <outlet property="cnstrntHtNavBar" destination="cDc-Jy-N0b" id="Nqn-kr-RbI"/>
@@ -308,6 +343,7 @@
                         <outlet property="lblPrice" destination="u2M-bt-d3N" id="IlJ-Ra-jXp"/>
                         <outlet property="lblProduct" destination="Jxi-7X-XEE" id="EC9-oy-cc7"/>
                         <outlet property="lblTypingStatus" destination="jLn-OX-HQl" id="c8c-NE-hP1"/>
+                        <outlet property="onlineOfflineView" destination="hsm-Nk-Acy" id="yNK-p1-TGg"/>
                         <outlet property="tblView" destination="trq-gm-Gnt" id="0DL-5E-hfM"/>
                         <outlet property="textView" destination="fbm-iP-lWR" id="zgI-WY-whc"/>
                     </connections>
@@ -950,6 +986,7 @@
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="mic" width="24" height="24"/>
         <image name="more" width="24" height="24"/>
+        <image name="msg_send_icon" width="24.333333969116211" height="24.333333969116211"/>
         <image name="pause.fill" catalog="system" width="114" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -962,6 +999,9 @@
         </systemColor>
         <systemColor name="systemGray6Color">
             <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

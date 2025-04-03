@@ -29,6 +29,7 @@ class ChatVC: UIViewController {
     @IBOutlet weak var imgViewProduct:UIImageView!
     @IBOutlet weak var lblProduct:UILabel!
     @IBOutlet weak var lblTypingStatus:UILabel!
+    @IBOutlet weak var onlineOfflineView:UIView!
 
     var item_offer_id:Int = 0
     var page = 1
@@ -36,7 +37,6 @@ class ChatVC: UIViewController {
     @IBOutlet weak var textView: GrowingTextView!
     @IBOutlet weak var inputBarBottomSpace: NSLayoutConstraint!
     @IBOutlet weak var inputBarHeight: NSLayoutConstraint!
-    
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var btnMic:UIButton!
     @IBOutlet weak var btnSend:UIButton!
@@ -68,6 +68,21 @@ class ChatVC: UIViewController {
         self.topRefreshControl.backgroundColor = .clear
         self.tblView.refreshControl = topRefreshControl
         
+        btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
+        btnSend.clipsToBounds = true
+        
+        btnSend.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Configure the button
+        var config = UIButton.Configuration.filled()
+        config.image = UIImage(named:"msg_send_icon")
+        config.title = ""
+        config.imagePlacement = .leading // Position image to the left
+        config.imagePadding = 8 // Space between image and title
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        config.baseBackgroundColor =  UIColor(hexString:"#FF9900")
+        btnSend.configuration = config
+        
         registerTblCell()
         
         imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
@@ -85,10 +100,12 @@ class ChatVC: UIViewController {
         getMessageList()
         self.btnSend.isHidden = true
         self.btnMic.isHidden = false
-
+        
         self.btnMic.addTarget(self, action: #selector(voiceRecord), for: .touchDown)
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
+        
+        // checkOnlineOfflineStatus()
     }
     
     
@@ -209,6 +226,12 @@ class ChatVC: UIViewController {
     }
     
     
+    func checkOnlineOfflineStatus(){
+        let params = ["user_id":userId] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.onlineOfflineStatus.rawValue, params)
+    }
+    
+    
     func blockUnblockUser(isBlock:Bool){
         
         let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
@@ -222,24 +245,34 @@ class ChatVC: UIViewController {
     }
     
     func addObservers(){
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.chatMessages), name: NSNotification.Name(rawValue: SocketEvents.chatMessages.rawValue), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.sendMessage), name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+      
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+       
+        NotificationCenter.default.addObserver(self, selector: #selector(self.chatMessages),
+                                               name: NSNotification.Name(rawValue: SocketEvents.chatMessages.rawValue), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo), name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.sendMessage),
+                                               name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.getItemOffer), name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo),
+                                               name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus), name: NSNotification.Name(rawValue: SocketEvents.typing.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.getItemOffer),
+                                               name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus),
+                                               name: NSNotification.Name(rawValue: SocketEvents.typing.rawValue), object: nil)
         
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.messageAcknowledge), name: NSNotification.Name(rawValue: SocketEvents.messageAcknowledge.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.messageAcknowledge),
+                                               name: NSNotification.Name(rawValue: SocketEvents.messageAcknowledge.rawValue), object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus), name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)
-
-        
+       /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
+                                               name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
     }
     
     //MARK: Other helpful methods
@@ -282,16 +315,24 @@ class ChatVC: UIViewController {
     }
     
     
+    func sendmessageAcknowledge(){
+        let params = ["item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.messageAcknowledge.rawValue, params)
+    }
+    
     func getMessageList(){
         
-        let params = ["page":page,"item_offer_id":item_offer_id] as [String : Any]
+        let params = ["page":page,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatMessages.rawValue, params)
         
     }
     
+    func sendtypinStatus(status:Bool){
+        let params = ["receiver_id":userId,"typing":status,"item_offer_id":item_offer_id] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.typing.rawValue, params)
+    }
     
     func sendMessageList(msg:String,msgType:String){
-        
         
         if msgType == "file"{
             let params = ["message":"","audio":"","file":msg,"item_offer_id":item_offer_id] as [String : Any]
@@ -358,7 +399,7 @@ class ChatVC: UIViewController {
             }
             inputBarBottomSpace.constant = keyboardFrame.height - CGFloat(statusBarHeight) + 10
             self.btnMic.isHidden = true
-            self.btnSend.isHidden = true
+            self.btnSend.isHidden = false
             view.setNeedsLayout()
             view.layoutIfNeeded()
             scrollToBottom(animated: false)
@@ -369,7 +410,7 @@ class ChatVC: UIViewController {
     @objc func keyboardWillHide(_ notification: Notification) {
         inputBarBottomSpace.constant = 0
         self.btnMic.isHidden = false
-        self.btnSend.isHidden = false
+        self.btnSend.isHidden = true
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
@@ -382,9 +423,8 @@ class ChatVC: UIViewController {
         tblView.scrollToRow(at: IndexPath(row: chatArray.count - 1, section: 0), at: .bottom, animated: animated)
     }
     
-    
-    
-    @objc func messageAcknowledge(notification: Notification) {
+   
+    @objc func onlineOfflineStatus(notification: Notification) {
         guard let data = notification.userInfo else{
             return
         }
@@ -392,8 +432,38 @@ class ChatVC: UIViewController {
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
             if (dataDict["code"] as? Int ?? 0) == 200{
+                
+                let userId =  dataDict["userId"] as? Int ?? 0
+                let status =  dataDict["status"] as? Int ?? 0
+               
+                if userId == userId{
+                    self.onlineOfflineView.isHidden = (status == 1) ? false : true
+                }
+                
+            }
+        }
+        
+    }
+    
+    @objc func messageAcknowledge(notification: Notification) {
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+            if (data["code"] as? Int ?? 0) == 200{
+               
+                if let dataDict = data["data"] as? Dictionary<String,Any>{
+
                 if let read_at = dataDict["read_at"] as? String{
-                    
+                  
+                    if chatArray.count > 0 {
+                        for i in 0..<chatArray.count{
+                            chatArray[i].readAt = read_at
+                        }
+                        self.tblView.reloadData()
+                        self.tblView.scrollToRow(at: IndexPath(row: self.chatArray.count-1, section: 0), at: .bottom, animated: true)
+                    }
+
                 }
             }
         }
@@ -408,12 +478,12 @@ class ChatVC: UIViewController {
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
             let typing = dataDict["typing"] as? Int ?? 0
-            //let dataDict =  payload["sender"] as? String ?? ""
-           // let receiver =  payload["receiver"] as? String ?? ""
-         
-          //  if sender == recieverId {
+            let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
+            let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
+            
+            if item_offer_id == item_offer_id {
                 self.lblTypingStatus.isHidden = (typing == 1) ? false : true
-           // }
+            }
             
         }
     }
@@ -428,16 +498,14 @@ class ChatVC: UIViewController {
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
             if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
-                
-                
-                
+                                
                 let name = itemDict["name"] as? String ?? ""
-                let profile = itemDict["profile"] as? String ?? ""
+                let image = itemDict["image"] as? String ?? ""
                 let price = itemDict["price"] as? Int ?? 0
                 self.itemId = itemDict["id"] as? Int ?? 0
                 self.lblProduct.text = name
                 self.lblPrice.text = "\(price)"
-                self.imgViewProduct.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
+                self.imgViewProduct.kf.setImage(with: URL(string: image),placeholder: UIImage(named: "getkartplaceholder"))
             }
             
         }
@@ -458,10 +526,7 @@ class ChatVC: UIViewController {
             self.lblName.text = name
             self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
         }
-        
     }
-    
-    
    
     
     @objc func chatMessages(notification: Notification) {
@@ -519,7 +584,7 @@ class ChatVC: UIViewController {
             if chatArray.count == 0{
                 
                 
-                chatArray.append(MessageModel(readAt: nil, id: nil, createdAt: Date().getISODateFormat(), file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil))
+                chatArray.append(MessageModel(readAt: nil, id: nil, createdAt: Date().getISODateFormat(), file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil))
             }
             
             
@@ -541,12 +606,19 @@ class ChatVC: UIViewController {
         }
         if let response : SendMessageParse = try? SocketParser.convert(data: data) {
             
-            if let obj = response.data {
+            if let obj = response.data ,obj.itemOfferID == item_offer_id {
                 self.chatArray.append(obj)
                 self.tblView.reloadData()
                 self.scrollToBottom(animated: true)
+                
+                
+                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+               
+                if objLoggedInUser.id != (obj.senderID ?? 0) {
+                    
+                    sendmessageAcknowledge()
+                }
             }
-            
         }
     }
     
@@ -603,7 +675,7 @@ class ChatVC: UIViewController {
                         }
                     }
                     if components != 0 {
-                        let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil)
+                        let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: $0.receiverID)
                         orderingArr.append(obj)
                     }
                     
@@ -616,7 +688,7 @@ class ChatVC: UIViewController {
             else
             {
                 
-                let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil)
+                let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil)
                 
                 //   let obj = ChatDetail(createdAt: $0.createdAt, type: 100)
                 orderingArr.append(obj)
@@ -730,11 +802,7 @@ extension ChatVC: GrowingTextViewDelegate {
     }
     
     
-    func sendtypinStatus(status:Bool){
-        let params = ["receiver_id":userId,"typing":status] as [String : Any]
-        SocketIOManager.sharedInstance.emitEvent(SocketEvents.typing.rawValue, params)
-    }
-
+   
 }
 
 
@@ -834,20 +902,18 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
                     }
-//                    if chatObj.messageStatus == 1{
-//                        cell.imgViewSeen.setImageTintColor(color: .gray)
-//                        cell.lblSeen.isHidden = true
-//                    }else if chatObj.messageStatus == 3{
-//                        cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
-//                        cell.lblSeen.isHidden = false
-//                    }
+                    if (chatObj.readAt?.count ?? 0) == 0{
+                        cell.imgViewSeen.setImageTintColor(color: .gray)
+                        cell.lblSeen.isHidden = true
+                    }else{
+                        cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
+                        cell.lblSeen.isHidden = false
+                    }
                     
+
                     cell.lblTime.text = dateFormatter.string(from: date)
-                   
                 }
-                
-                
-                
+                                
             case "offer": do{
                 
                 cell = tableView.dequeueReusableCell(withIdentifier: "SendOfferChatCell", for: indexPath) as! SendOfferChatCell
@@ -871,13 +937,13 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                     cell.bgview.updateConstraints()
                 }
-                /*if chatObj.messageStatus == 1{
+                if (chatObj.readAt?.count ?? 0) == 0{
                     cell.imgViewSeen.setImageTintColor(color: .gray)
                     cell.lblSeen.isHidden = true
-                }else if chatObj.messageStatus == 3{
-                    cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
+                }else{
+                    cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                     cell.lblSeen.isHidden = false
-                }*/
+                }
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.imgView.kf.indicatorType = .activity
                 cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
@@ -893,14 +959,15 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
               //  cell.lblMessage.attributedText = NSAttributedString(string:"")
                 cell.playPauseButton.tag = indexPath.row
                 cell.playPauseButton.addTarget(self, action: #selector(playPauseTapped(sender:)), for: .touchUpInside)
-                /*
-                if chatObj.messageStatus == 1{
+              
+                 if (chatObj.readAt?.count ?? 0) == 0{
                     cell.imgViewSeen.setImageTintColor(color: .gray)
                     cell.lblSeen.isHidden = true
-                }else if chatObj.messageStatus == 3{
-                    cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
+                }else {
+                    cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                     cell.lblSeen.isHidden = false
                 }
+                /*
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.audioDuration.text =  "\(chatObj.mediaDuration ?? 0)"
                 cell.audioSlider.value = Float(chatObj.mediaDuration ?? 0) / 180
@@ -923,7 +990,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.imgViewSeen.setImageTintColor(color: .gray)
                         cell.lblSeen.isHidden = true
                     }else if chatObj.messageStatus == 3{
-                        cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"F11A7B"))
+               cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                         cell.lblSeen.isHidden = false
                     }
                     cell.lblTime.text = dateFormatter.string(from: date)
