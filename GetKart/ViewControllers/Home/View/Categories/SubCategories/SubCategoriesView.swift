@@ -13,6 +13,7 @@ struct SubCategoriesView: View {
     @State  var subcategories: [Subcategory]?
      var navigationController: UINavigationController?
     @State var isNewPost = false
+    @State var isFilter = false
     @State var strTitle = ""
     @State var strCategoryTitle = ""
     @State var category_ids = ""
@@ -65,14 +66,21 @@ struct SubCategoriesView: View {
                 
             }
             let categoryid =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
-            
-            if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
-                vc.objSubCategory = objsubCategory
-                vc.strCategoryTitle = strCategoryTitle
-                vc.strSubCategoryTitle = objsubCategory.name ?? ""
-                vc.category_ids = categoryid
-                
-                self.navigationController?.pushViewController(vc, animated: true)
+            if isFilter == true {
+                for vc in self.navigationController?.viewControllers ?? []{
+                    if vc is FilterVC {
+                        
+                        self.navigationController?.popToViewController(vc, animated: true)
+                    }
+                }
+            }else {
+                if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                    vc.objSubCategory = objsubCategory
+                    vc.strCategoryTitle = strCategoryTitle
+                    vc.strSubCategoryTitle = objsubCategory.name ?? ""
+                    vc.category_ids = categoryid
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
             }
         }else {
             if strCategoryTitle.count == 0 {
@@ -83,7 +91,7 @@ struct SubCategoriesView: View {
                 
             let categoryid =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
             
-            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, isNewPost: true, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_ids: categoryid) // Create SwiftUI view
+            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, isNewPost: self.isNewPost, isFilter: self.isFilter, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_ids: categoryid) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
         }

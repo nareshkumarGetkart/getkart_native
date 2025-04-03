@@ -14,8 +14,12 @@ class CategoriesVC: UIViewController {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var collctionView:UICollectionView!
     @IBOutlet weak var btnBack:UIButton!
-    var isNewPost = false
     
+    @IBOutlet weak var tblView:UITableView!
+
+    
+    var isNewPost = false
+    var isFilter = false
     private var objViewModel:CategoryViewModel?
     
     //MARK: Controller life cycle methods
@@ -23,10 +27,19 @@ class CategoriesVC: UIViewController {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnBack.setImageColor(color: .black)
+        if isFilter == true {
+            collctionView.isHidden = true
+            tblView.isHidden = false
+            tblView.register(UINib(nibName: "CategoriesTVCell", bundle: nil), forCellReuseIdentifier: "CategoriesTVCell")
+            
+        }else {
+            collctionView.isHidden = false
+            tblView.isHidden = true
+            collctionView.register(UINib(nibName: "CategoriesBigCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesBigCell")
+        }
+            objViewModel = CategoryViewModel()
+            objViewModel?.delegate = self
         
-        collctionView.register(UINib(nibName: "CategoriesBigCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesBigCell")
-        objViewModel = CategoryViewModel()
-        objViewModel?.delegate = self
         
     }
     
@@ -46,7 +59,11 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return objViewModel?.listArray?.count ?? 0
+        if isFilter == true {
+            return 0
+        }else {
+            return objViewModel?.listArray?.count ?? 0
+        }
         
     }
     
@@ -112,9 +129,53 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
 }
 
+extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if isFilter == true {
+            return objViewModel?.listArray?.count ?? 0
+        }else {
+            return 0
+        }
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoriesTVCell") as! CategoriesTVCell
+        if let obj = objViewModel?.listArray?[indexPath.item] as? CategoryModel{
+            cell.lblTitle.text = obj.name
+            cell.imgImageView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        }
+       
+        return cell
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if isFilter == true {
+            let objCategory = objViewModel?.listArray?[indexPath.item]
+            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, isNewPost: self.isNewPost, isFilter: self.isFilter, strTitle: objCategory?.name ?? "", category_ids:"\(objCategory?.id ?? 0)") // Create SwiftUI view
+            let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+            navigationController?.pushViewController(hostingController, animated: true)
+        }//
+    }
+    
+   
+}
 
 extension CategoriesVC: RefreshScreen{
     func refreshScreen(){
-        self.collctionView.reloadData()
+        if isFilter == true {
+            tblView.reloadData()
+        }else {
+            self.collctionView.reloadData()
+        }
     }
 }

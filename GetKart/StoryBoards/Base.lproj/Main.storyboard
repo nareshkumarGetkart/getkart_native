@@ -72,16 +72,16 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="RDA-ek-SgE">
-                                        <rect key="frame" x="65" y="43" width="268" height="44"/>
+                                        <rect key="frame" x="65" y="46.333333333333329" width="268" height="37.333333333333329"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jze-jC-YMq">
-                                                <rect key="frame" x="0.0" y="0.0" width="268" height="22"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="268" height="18.666666666666668"/>
                                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="16"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="------" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHG-6H-1mN">
-                                                <rect key="frame" x="0.0" y="22" width="268" height="22"/>
+                                                <rect key="frame" x="0.0" y="18.666666666666664" width="268" height="18.666666666666664"/>
                                                 <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -582,6 +582,14 @@
                                     <outlet property="delegate" destination="j8P-bs-YWD" id="rBo-mm-zDJ"/>
                                 </connections>
                             </collectionView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="LvC-kl-MRA">
+                                <rect key="frame" x="0.0" y="90" width="393" height="728"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="j8P-bs-YWD" id="ggb-eV-MUj"/>
+                                    <outlet property="delegate" destination="j8P-bs-YWD" id="Jvg-1N-wE2"/>
+                                </connections>
+                            </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="9G2-WK-xdf"/>
                         <color key="backgroundColor" systemColor="systemGray6Color"/>
@@ -589,10 +597,14 @@
                             <constraint firstItem="yvy-Sd-oSH" firstAttribute="leading" secondItem="9G2-WK-xdf" secondAttribute="leading" id="0vJ-He-0B3"/>
                             <constraint firstItem="j2d-pJ-qBb" firstAttribute="leading" secondItem="aU1-0E-Arj" secondAttribute="leading" id="2bn-kS-goy"/>
                             <constraint firstItem="j2d-pJ-qBb" firstAttribute="top" secondItem="aU1-0E-Arj" secondAttribute="top" id="3gt-vc-oMS"/>
+                            <constraint firstItem="9G2-WK-xdf" firstAttribute="trailing" secondItem="LvC-kl-MRA" secondAttribute="trailing" id="IsU-JY-7MB"/>
+                            <constraint firstItem="LvC-kl-MRA" firstAttribute="leading" secondItem="9G2-WK-xdf" secondAttribute="leading" id="LSN-RW-8Tl"/>
                             <constraint firstItem="yvy-Sd-oSH" firstAttribute="top" secondItem="j2d-pJ-qBb" secondAttribute="bottom" id="Lmk-wd-gqS"/>
                             <constraint firstItem="j2d-pJ-qBb" firstAttribute="trailing" secondItem="9G2-WK-xdf" secondAttribute="trailing" id="T89-0C-CRW"/>
                             <constraint firstItem="9G2-WK-xdf" firstAttribute="trailing" secondItem="yvy-Sd-oSH" secondAttribute="trailing" id="eow-Cs-AXq"/>
                             <constraint firstItem="9G2-WK-xdf" firstAttribute="bottom" secondItem="yvy-Sd-oSH" secondAttribute="bottom" id="ixD-Hz-d8W"/>
+                            <constraint firstItem="LvC-kl-MRA" firstAttribute="top" secondItem="j2d-pJ-qBb" secondAttribute="bottom" id="n19-Sw-iXa"/>
+                            <constraint firstItem="9G2-WK-xdf" firstAttribute="bottom" secondItem="LvC-kl-MRA" secondAttribute="bottom" id="slJ-i5-D6f"/>
                         </constraints>
                     </view>
                     <connections>
@@ -600,6 +612,7 @@
                         <outlet property="cnstrntHtNavBar" destination="IEM-Uy-egC" id="FSc-qt-lHN"/>
                         <outlet property="collctionView" destination="yvy-Sd-oSH" id="VMX-yc-C1d"/>
                         <outlet property="lblTitle" destination="Dd6-XU-ZMM" id="HhU-CQ-3fN"/>
+                        <outlet property="tblView" destination="LvC-kl-MRA" id="nUY-L5-fsC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="emQ-qt-mDl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -616,10 +629,10 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

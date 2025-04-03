@@ -51,7 +51,11 @@ struct SearchProductView: View {
                     .stroke(Color.gray, lineWidth: 1)
                 }
                 
-                Button(action: { /* Filter action */ }) {
+                Button(action: { /* Filter action */
+                    if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+                        self.navigation?.pushViewController(vc, animated: true)
+                    }
+                }) {
                     ZStack{
                         
                     Image("filter")
