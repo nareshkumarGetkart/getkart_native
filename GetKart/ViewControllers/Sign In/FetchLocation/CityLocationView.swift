@@ -2,6 +2,15 @@
 import Foundation
 import SwiftUI
 
+
+enum LocationPopType{
+    case signUp
+    case filter
+    case home
+    case buyPackage
+    case ceatePost
+}
+
 struct CityLocationView: View {
     var navigationController: UINavigationController?
     @State var arrCities:Array<CityModal> = []
@@ -10,8 +19,11 @@ struct CityLocationView: View {
     var state:StateModal = StateModal()
     @State var pageNo = 1
     @State var totalRecords = 1
-    @State var isNewPost = false
-    @State var isFilterList = false
+   // @State var isNewPost = false
+   // @State var isFilterList = false
+    
+    @State var popTYpe:LocationPopType?
+    
     var body: some View {
         
         
@@ -104,19 +116,22 @@ struct CityLocationView: View {
    }
     
     func citySelected(city:CityModal) {
-        if isNewPost == false && isFilterList == false{
-            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
-        }
+        
         for vc in self.navigationController?.viewControllers ?? [] {
-            if isFilterList == true {
+          
+            if popTYpe == .filter {
+           // if isFilterList == true {
+                
                 if vc.isKind(of: FilterVC.self){
-                    if let vc1 = vc as? FilterVC {
+                    if let vc1 = vc as? FilterVC  {
                         vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
                 }
-            }else  if isNewPost == true {
+            }else  if popTYpe == .ceatePost {
+                
+           // if isNewPost == true {
                 if vc.isKind(of: CreateAddVC2.self){
                     if let vc1 = vc as? CreateAddVC2 {
                         vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
@@ -124,9 +139,25 @@ struct CityLocationView: View {
                         break
                     }
                 }
-            }else if vc.isKind(of: HomeVC.self) == true || vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
-                self.navigationController?.popToViewController(vc, animated: true)
-                break
+            }else if popTYpe == .signUp {
+                // if isNewPost == false && isFilterList == false{
+                
+                if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                    Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            } else  if popTYpe == .home {
+                
+                if vc.isKind(of: HomeVC.self) == true {
+                    if let vc1 = vc as? HomeVC {
+                        
+                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                   
+                }
             }
         }
     }

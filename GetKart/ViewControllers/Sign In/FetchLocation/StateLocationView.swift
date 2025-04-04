@@ -16,8 +16,9 @@ struct StateLocationView: View {
     @State var pageNo = 1
     @State var totalRecords = 1
     var country:CountryModel = CountryModel()
-    @State var isNewPost = false
-    @State var isFilterList = false
+   // @State var isNewPost = false
+    //@State var isFilterList = false
+    @State var popTYpe:LocationPopType?
     var body: some View {
         
         VStack(spacing: 0) {
@@ -118,7 +119,7 @@ struct StateLocationView: View {
     
     func NavigateToCityListing(state:StateModal){
         
-        let vc = UIHostingController(rootView: CityLocationView(navigationController: self.navigationController,country: country, state: state, isNewPost: self.isNewPost, isFilterList: self.isFilterList))
+        let vc = UIHostingController(rootView: CityLocationView(navigationController: self.navigationController,country: country, state: state, popTYpe: self.popTYpe))
            self.navigationController?.pushViewController(vc, animated: true)
            
        

@@ -31,9 +31,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chatBackground" translatesAutoresizingMaskIntoConstraints="NO" id="LiT-9T-mg8">
+                                <rect key="frame" x="0.0" y="149" width="393" height="599"/>
+                            </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="trq-gm-Gnt">
                                 <rect key="frame" x="0.0" y="149" width="393" height="599"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="sectionIndexColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="sectionIndexTrackingBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="dataSource" destination="Y6W-OH-hqX" id="tht-wT-7Au"/>
                                     <outlet property="delegate" destination="Y6W-OH-hqX" id="Jou-Sx-bhP"/>
@@ -319,8 +325,12 @@
                             <constraint firstItem="HiK-G8-l2N" firstAttribute="top" secondItem="lTF-SZ-ppU" secondAttribute="bottom" constant="1" id="NDW-Ni-DfI"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="lTF-SZ-ppU" secondAttribute="trailing" id="RBz-1P-d5f"/>
                             <constraint firstItem="lTF-SZ-ppU" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="Wd6-X9-hmo"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="LiT-9T-mg8" secondAttribute="trailing" id="Xls-9a-0gH"/>
+                            <constraint firstItem="LiT-9T-mg8" firstAttribute="top" secondItem="HiK-G8-l2N" secondAttribute="bottom" id="ais-A4-iIJ"/>
+                            <constraint firstItem="LiT-9T-mg8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="bK5-VJ-glh"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="trq-gm-Gnt" secondAttribute="bottom" id="cbN-vZ-qUB"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="eGe-ba-rgS"/>
+                            <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="LiT-9T-mg8" secondAttribute="bottom" id="mYu-gZ-daC"/>
                             <constraint firstItem="HiK-G8-l2N" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="nx6-9j-Hqu"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="rvf-db-sht"/>
                             <constraint firstItem="trq-gm-Gnt" firstAttribute="top" secondItem="HiK-G8-l2N" secondAttribute="bottom" id="uew-2D-bGO"/>
@@ -982,6 +992,7 @@
         <image name="arrowshape.down.circle" catalog="system" width="128" height="123"/>
         <image name="attachment" width="24" height="24"/>
         <image name="backward" catalog="system" width="128" height="76"/>
+        <image name="chatBackground" width="390" height="844"/>
         <image name="forward" catalog="system" width="128" height="76"/>
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="mic" width="24" height="24"/>
@@ -992,22 +1003,22 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -18,7 +18,6 @@ class HomeVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(self.navigationController?.viewControllers)
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = 200
@@ -44,7 +43,7 @@ class HomeVC: UIViewController {
     
     @IBAction func locationBtnAction(_ sender : UIButton){
         
-        let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController))
+        let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, popTYpe: .home))
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
     
@@ -55,6 +54,19 @@ class HomeVC: UIViewController {
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
 
+    
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+
+        /*
+        self.latitude = latitude
+        self.longitude = longitude
+        self.city = city
+        self.state = state
+        self.country = country
+        */
+        self.tblView.reloadData()
+        
+    }
 }
 
 
@@ -112,6 +124,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
             cell.cnstrntHeightSeeAllView.constant = 0
+            cell.btnSeeAll.setTitle("", for: .normal)
             cell.cellTypes = .categories
             cell.listArray = homeVModel?.categoryObj?.data
             cell.layoutIfNeeded()
@@ -129,8 +142,8 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 //Horizontal && increase width
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.istoIncreaseWidth = true
-
                 cell.cnstrntHeightSeeAllView.constant = 35
+                cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
@@ -149,6 +162,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.collctnView.collectionViewLayout.invalidateLayout()
                 cell.istoIncreaseWidth = false
                 cell.cnstrntHeightSeeAllView.constant = 35
+                cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
@@ -167,6 +181,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
                 cell.istoIncreaseWidth = false
                 cell.cnstrntHeightSeeAllView.constant = 35
+                cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cllctnView.isScrollEnabled = false
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
@@ -185,6 +200,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.cnstrntHeightSeeAllView.constant = 35
+                cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.istoIncreaseWidth = true
                 cell.listArray = obj?.sectionData
@@ -207,6 +223,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
             cell.cnstrntHeightSeeAllView.constant = 0
+            cell.btnSeeAll.setTitle("", for: .normal)
             cell.cllctnView.isScrollEnabled = false
             cell.cellTypes = .product
             cell.listArray = homeVModel?.itemObj?.data
