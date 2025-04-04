@@ -94,6 +94,8 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblDesc.text = obj.item?.name ?? ""
         cell.imgViewProfile.kf.setImage(with:  URL(string: obj.buyer?.profile ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
+        cell.imgViewItem.clipsToBounds = true
 
         return cell
         

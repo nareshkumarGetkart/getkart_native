@@ -139,8 +139,9 @@ struct SellerProfileView: View {
                         ProductCard(objItem: item)
                        // ProductCard(id: item.id ?? 0, imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 10,item.isLiked)
                             .onTapGesture {
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
-                                self.navController?.pushViewController(hostingController, animated: true)
+                                
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:true))
+                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                             }
                     }
                 }.padding(.horizontal,10)

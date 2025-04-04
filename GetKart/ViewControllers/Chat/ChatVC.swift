@@ -70,7 +70,6 @@ class ChatVC: UIViewController {
         
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
         btnSend.clipsToBounds = true
-        
         btnSend.translatesAutoresizingMaskIntoConstraints = false
         
         // Configure the button
@@ -82,6 +81,10 @@ class ChatVC: UIViewController {
         config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         config.baseBackgroundColor =  UIColor(hexString:"#FF9900")
         btnSend.configuration = config
+                
+        imgViewProduct.layer.cornerRadius = imgViewProduct.frame.size.height/2.0
+        imgViewProduct.clipsToBounds = true
+        
         
         registerTblCell()
         

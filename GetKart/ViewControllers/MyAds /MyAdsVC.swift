@@ -195,7 +195,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: listArray[indexPath.item].id ?? 0))
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: listArray[indexPath.item].id ?? 0,isMyProduct:true))
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     

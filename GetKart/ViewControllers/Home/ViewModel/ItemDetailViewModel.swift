@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 
 
-
-
 class ItemDetailViewModel:ObservableObject{
     
     @Published var sellerObj:SellerModel?

@@ -30,7 +30,11 @@ struct MyBoostAdsView: View {
         ScrollView{
             LazyVStack{
                 ForEach(obj.listArray) { item in
-                    BoostAdsCell(itemObj:item)
+                    BoostAdsCell(itemObj:item).onTapGesture {
+                        
+                        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:true))
+                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                    }
                 }
             }
         }.background(Color(.systemGray6))

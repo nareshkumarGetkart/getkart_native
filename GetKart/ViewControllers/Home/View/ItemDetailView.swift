@@ -14,12 +14,14 @@ struct ItemDetailView: View {
     
     var navController:UINavigationController?
     
-    var itemId = 0
+     var itemId = 0
     @State private var selectedIndex = 0
     @StateObject private var objVM = ItemDetailViewModel()
     @State private var showSheet = false
     @State private var showOfferPopup = false
     @State private var showShareSheet = false
+    @State var isMyProduct = false
+    
     var body: some View {
         
         HStack{
@@ -38,20 +40,20 @@ struct ItemDetailView: View {
                 Image("share").renderingMode(.template).foregroundColor(.black)
             }.padding(.trailing,10)
                 .actionSheet(isPresented: $showShareSheet) {
-                
-                ActionSheet(title: Text(""), message: nil, buttons: [
                     
-                    .default(Text("Copy Link"), action: {
+                    ActionSheet(title: Text(""), message: nil, buttons: [
                         
-                    }),
-                    
-                        .default(Text("Share"), action: {
+                        .default(Text("Copy Link"), action: {
                             
-                    }),
-                    
-                   .cancel()
-                ])
-            }
+                        }),
+                        
+                            .default(Text("Share"), action: {
+                                
+                            }),
+                        
+                            .cancel()
+                    ])
+                }
             
         }.frame(height: 44)
         Divider()
@@ -85,7 +87,7 @@ struct ItemDetailView: View {
                             }
                             
                         }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
-                        .frame(height: 200)
+                            .frame(height: 200)
                         
                         
                         Button(action: {
@@ -100,16 +102,55 @@ struct ItemDetailView: View {
                                 .padding()
                         }
                     }
-    
+                    
+                    if isMyProduct{
+                        HStack {
+                            HStack {
+                                Image(systemName: "eye")
+                                Text("0")
+                            }.frame(maxWidth: .infinity,maxHeight:30)
+                            .padding()
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                            Spacer(minLength: 20)
+                            HStack {
+                                Image(systemName: "heart")
+                                Text("0")
+                            }.frame(maxWidth: .infinity,maxHeight:30)
+                            .padding()
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                        }
+                        .padding([.horizontal,.top],5)
+                        .foregroundColor(.gray)
+                    }
                     
                     Text(objVM.itemObj?.name ?? "''").font(Font.manrope(.medium, size: 16))
                         .font(.headline)
                         .padding(.top, 10).padding(5)
                     
-                    Text("\u{20B9}\(objVM.itemObj?.price ?? 0)")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.orange).padding(5).padding(.bottom,10)
+                    HStack{
+                        
+                        Text("\u{20B9}\(objVM.itemObj?.price ?? 0)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange).padding(5).padding(.bottom,10)
+                        
+                        Spacer()
+                        if isMyProduct{
+                            
+                            Text("Approved")
+                                .font(.subheadline)
+                                .foregroundColor(.green).padding(.horizontal)
+                                .frame(height:30)
+                                .background(Color.green.opacity(0.2))
+                                .cornerRadius(15)
+                        }
+                    }
                     
                     
                     HStack{
@@ -120,11 +161,44 @@ struct ItemDetailView: View {
                         Spacer()
                         Text(objVM.itemObj?.expiryDate ?? "")
                     }.padding(5).padding(.bottom,10)
-               
+                    
+                    if isMyProduct{
+                        HStack{
+                            Spacer()
+                            Image("create_add").padding(5)
+                            VStack{
+                                Spacer()
+                                Text("Boost your ad, attract more clients and sell faster")
+                                    .font(.subheadline)
+                                    .padding(.top,10)
+                            
+                                HStack{
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Text("Create Boost Ad").frame(width: 140, height: 40, alignment: .center)
+                                            .foregroundColor(.white)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
+                                    }.padding([.bottom,.leading],10)
+                                    Spacer()
+
+                                }
+                                Spacer()
+
+                            }//.padding()
+                            Spacer()
+
+                        }
+                        .background(Color.yellow.opacity(0.2))
+                        .cornerRadius(10)
+                    }
+                    
+                    
                     let columns = [
                         GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
                         GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
-                       ]
+                    ]
                     LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
                         if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
@@ -133,7 +207,7 @@ struct ItemDetailView: View {
                             }
                         }
                     }
-                  
+                    
                     Divider()
                     VStack(alignment: .leading) {
                         Text("About this item").font(Font.manrope(.semiBold, size: 16))
@@ -160,7 +234,7 @@ struct ItemDetailView: View {
                         .frame(height: 200)
                         .cornerRadius(10)
                         .padding(.bottom)
-                  
+                    
                     VStack(alignment: .leading, spacing: 15) {
                         HStack {
                             Circle()
@@ -170,25 +244,25 @@ struct ItemDetailView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.black)
                         }
-                      
+                        
                         
                         Text("Report this Ad")
                             .font(.subheadline)
                             .foregroundColor(.orange).frame(width: 130, height: 30)
-                           .overlay(
+                            .overlay(
                                 RoundedRectangle(cornerRadius: 15)
                                     .stroke(Color.gray, lineWidth: 0.5)
-                           ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
+                            ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
-                               // if (objVM.itemObj.isAlreadyReported ?? false) == false {
-                                    let destVC = UIHostingController(rootView: ReportAdsView())
-                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                    self.navController?.present(destVC, animated: true, completion: nil)
-//                                }else{
-//                                    print("Already Reported")
-//                                }
+                                // if (objVM.itemObj.isAlreadyReported ?? false) == false {
+                                let destVC = UIHostingController(rootView: ReportAdsView())
+                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                self.navController?.present(destVC, animated: true, completion: nil)
+                                //                                }else{
+                                //                                    print("Already Reported")
+                                //                                }
                             }
                     }  .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -214,7 +288,7 @@ struct ItemDetailView: View {
                         
                         ForEach(objVM.relatedDataItemArray){ item in
                             ProductCard(objItem: item)
-                           /* ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)*/
+                            /* ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)*/
                                 .onTapGesture {
                                     let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
                                     self.navController?.pushViewController(hostingController, animated: true)
@@ -230,13 +304,13 @@ struct ItemDetailView: View {
             
             if objVM.sellerObj == nil {
                 objVM.getItemDetail(id: self.itemId)
-               // objVM.getSeller(sellerId: self.objVM.itemObj?.userID ?? 0)
-               // objVM.getProductListApi(categoryId: self.objVM.itemObj?.categoryID ?? 0)
-               // objVM.setItemTotalApi(itemId: self.objVM.itemObj?.id ?? 0)
+                // objVM.getSeller(sellerId: self.objVM.itemObj?.userID ?? 0)
+                // objVM.getProductListApi(categoryId: self.objVM.itemObj?.categoryID ?? 0)
+                // objVM.setItemTotalApi(itemId: self.objVM.itemObj?.id ?? 0)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.itemOffer.rawValue))) { notification in
-
+            
             guard let data = notification.userInfo else{
                 return
             }
@@ -265,43 +339,66 @@ struct ItemDetailView: View {
         }
         
         
-            .sheet(isPresented: $showSheet ) {
-                if #available(iOS 16.0, *) {
+        .sheet(isPresented: $showSheet ) {
+            if #available(iOS 16.0, *) {
+                SafetyTipsView(onContinueOfferTap: {
+                    print("offer tap")
+                    
+                    self.showOfferPopup = true
+                    
+                    
+                }).transition(.move(edge: .bottom))
+                    .presentationDetents([.medium, .medium]) // Customizable sizes
+                    .presentationDragIndicator(.visible)
+                
+                
+            } else {
+                // Fallback on earlier versions
+                
+                if showSheet {
                     SafetyTipsView(onContinueOfferTap: {
+                        
+                        self.showOfferPopup = true
+                        
+                        
                         print("offer tap")
-                            
-                            self.showOfferPopup = true
-                        
-
                     }).transition(.move(edge: .bottom))
-                        .presentationDetents([.medium, .medium]) // Customizable sizes
-                        .presentationDragIndicator(.visible)
-                    
-                        
-                } else {
-                    // Fallback on earlier versions
-                    
-                    if showSheet {
-                        SafetyTipsView(onContinueOfferTap: {
-                                
-                                self.showOfferPopup = true
-                            
-
-                            print("offer tap")
-                        }).transition(.move(edge: .bottom))
-                            .zIndex(1)
-                    }
-                } // Shows the drag indicator
-            }
-
+                        .zIndex(1)
+                }
+            } // Shows the drag indicator
+        }
+        
         Spacer()
+        
+        
+        if isMyProduct{
+            HStack {
+                Button(action: {}) {
+                    Text("Edit")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                Button(action: {}) {
+                    Text("Sold Out")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+            }
+            .padding()
+        }else{
         Button(action: {
             print("Make an Offer")
             
             if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
                 
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-
+                
                 let offerId =
                 objVM.itemObj?.itemOffers?.first?.id ?? 0
                 let sellerId =
@@ -322,9 +419,9 @@ struct ItemDetailView: View {
                 
             }else{
                 showSheet = true
-
+                
             }
-
+            
         }) {
             
             let str = (objVM.itemObj?.isAlreadyOffered ?? false) == true ? "Chat" : "Make an Offer"
@@ -336,6 +433,7 @@ struct ItemDetailView: View {
                 .cornerRadius(10)
         }
         .padding([.leading,.trailing])
+  
         
         .fullScreenCover(isPresented: $showOfferPopup) {
             if #available(iOS 16.4, *) {
@@ -366,7 +464,7 @@ struct ItemDetailView: View {
                 )
             } // Works in iOS 16+
         }
-     
+        }
     }
     
     
@@ -386,7 +484,7 @@ struct ItemDetailView: View {
 
 
 #Preview {
-    ItemDetailView(navController:nil,itemId:0)
+    ItemDetailView(navController:nil,itemId:0,isMyProduct:false)
 }
 
 
@@ -394,6 +492,7 @@ struct InfoView: View {
     let icon: String
     let text: String
     let value:String
+    
     var body: some View {
         HStack {
             if icon.lowercased().contains(".svg"){
@@ -555,3 +654,5 @@ struct MapView: UIViewRepresentable {
 
     class Coordinator: NSObject, MKMapViewDelegate {}
 }
+
+
