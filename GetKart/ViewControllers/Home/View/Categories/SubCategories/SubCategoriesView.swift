@@ -16,7 +16,9 @@ struct SubCategoriesView: View {
     @State var isFilter = false
     @State var strTitle = ""
     @State var strCategoryTitle = ""
+    @State var  category_id = ""
     @State var category_ids = ""
+    
     var body: some View {
         
         VStack(spacing: 0) {
@@ -65,11 +67,15 @@ struct SubCategoriesView: View {
                 strCategoryTitle = objsubCategory.name ?? ""
                 
             }
-            let categoryid =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
+            let categoryid =  category_ids + "," + "\(objsubCategory.id ?? 0)"
             if isFilter == true {
                 for vc in self.navigationController?.viewControllers ?? []{
                     if vc is FilterVC {
-                        
+                       
+                        (vc as? FilterVC)?.strCategoryTitle = strCategoryTitle
+                        (vc as? FilterVC)?.category_id = self.category_id
+                        (vc as? FilterVC)?.category_ids = category_ids
+                        (vc as? FilterVC)?.fetchCustomFields()
                         self.navigationController?.popToViewController(vc, animated: true)
                     }
                 }

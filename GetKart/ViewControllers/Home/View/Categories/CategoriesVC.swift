@@ -161,7 +161,7 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isFilter == true {
             let objCategory = objViewModel?.listArray?[indexPath.item]
-            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, isNewPost: self.isNewPost, isFilter: self.isFilter, strTitle: objCategory?.name ?? "", category_ids:"\(objCategory?.id ?? 0)") // Create SwiftUI view
+            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, isNewPost: self.isNewPost, isFilter: self.isFilter, strTitle: objCategory?.name ?? "",category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)") // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true)
         }//

@@ -251,6 +251,9 @@
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="arrow_left"/>
+                                        <connections>
+                                            <action selector="backButtonAction:" destination="Okj-ms-m2G" eventType="touchUpInside" id="pjp-eX-rwc"/>
+                                        </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Filters" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cgS-FE-oMs">
                                         <rect key="frame" x="60" y="45" width="243" height="40"/>
@@ -288,24 +291,45 @@
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Yhn-FS-mmp">
-                                <rect key="frame" x="0.0" y="100" width="393" height="688"/>
+                                <rect key="frame" x="0.0" y="100" width="393" height="618"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="Okj-ms-m2G" id="uct-5C-M07"/>
                                     <outlet property="delegate" destination="Okj-ms-m2G" id="Xon-A7-ecZ"/>
                                 </connections>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c48-UI-29A" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="20" y="738" width="353" height="50"/>
+                                <color key="backgroundColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="pe2-aG-dF1"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="18"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Apply Filter"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="applyFilterAction" destination="Okj-ms-m2G" eventType="touchUpInside" id="ADO-si-Toi"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Ge5-OM-1w0"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Yhn-FS-mmp" firstAttribute="leading" secondItem="Ge5-OM-1w0" secondAttribute="leading" id="9fY-C9-bvO"/>
+                            <constraint firstItem="Ge5-OM-1w0" firstAttribute="bottom" secondItem="c48-UI-29A" secondAttribute="bottom" constant="30" id="CcO-NY-LOT"/>
                             <constraint firstItem="zsH-SF-IZu" firstAttribute="leading" secondItem="Vkg-Kw-aYq" secondAttribute="leading" id="D89-8m-F1J"/>
+                            <constraint firstItem="c48-UI-29A" firstAttribute="top" secondItem="Yhn-FS-mmp" secondAttribute="bottom" constant="20" id="FfL-Gc-0Zw"/>
                             <constraint firstItem="Yhn-FS-mmp" firstAttribute="top" secondItem="zsH-SF-IZu" secondAttribute="bottom" constant="10" id="TdI-XH-WuG"/>
                             <constraint firstItem="Ge5-OM-1w0" firstAttribute="trailing" secondItem="zsH-SF-IZu" secondAttribute="trailing" id="YhX-Tv-cKi"/>
-                            <constraint firstItem="Ge5-OM-1w0" firstAttribute="bottom" secondItem="Yhn-FS-mmp" secondAttribute="bottom" constant="30" id="ha0-1M-6nk"/>
+                            <constraint firstItem="c48-UI-29A" firstAttribute="leading" secondItem="Ge5-OM-1w0" secondAttribute="leading" constant="20" id="b5n-LZ-gI5"/>
                             <constraint firstItem="Ge5-OM-1w0" firstAttribute="trailing" secondItem="Yhn-FS-mmp" secondAttribute="trailing" id="iLH-ua-v7U"/>
                             <constraint firstItem="zsH-SF-IZu" firstAttribute="top" secondItem="Vkg-Kw-aYq" secondAttribute="top" id="rTH-4z-829"/>
+                            <constraint firstItem="Ge5-OM-1w0" firstAttribute="trailing" secondItem="c48-UI-29A" secondAttribute="trailing" constant="20" id="yGj-db-Ucq"/>
                         </constraints>
                     </view>
                     <connections>

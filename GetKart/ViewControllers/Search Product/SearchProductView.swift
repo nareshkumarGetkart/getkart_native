@@ -53,6 +53,7 @@ struct SearchProductView: View {
                 
                 Button(action: { /* Filter action */
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+                        vc.delFilterSelected = self
                         self.navigation?.pushViewController(vc, animated: true)
                     }
                 }) {
@@ -86,6 +87,12 @@ struct SearchProductView: View {
             }
         }
 
+    }
+}
+
+extension SearchProductView: FilterSelected{
+    func filterSelectectionDone(dict:Dictionary<String,Any>) {
+        print(dict)
     }
 }
 
