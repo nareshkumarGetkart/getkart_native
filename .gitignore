@@ -60,3 +60,4 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 Pods/
+.DS_Store
