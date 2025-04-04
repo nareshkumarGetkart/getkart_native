@@ -21,6 +21,10 @@ struct SearchProductView: View {
     @State private var searchText = ""
 
     @State var items = [ItemModel]()
+    @State var dictCustomFields:Dictionary<String,Any> = [:]
+    @State var page = 1
+    @State var isDataLoading = false
+    @State var isAtBottom = false
     
     var body: some View {
         VStack{
@@ -84,15 +88,76 @@ struct SearchProductView: View {
 
                     }
                 }.padding([.leading,.trailing],10)
+                
+                // Add a marker at the bottom
+                GeometryReader { geo -> Color in
+                    DispatchQueue.main.async {
+                        let frame = geo.frame(in: .global)
+                        let screenHeight = UIScreen.main.bounds.height
+                        isAtBottom = frame.maxY < screenHeight + 20
+                    }
+                    return Color.clear
+                }
+                .frame(height: 1)
             }
+        }.onAppear {
+            self.getProductListApi()
         }
+        .onChange(of: isAtBottom) { atBottom in
+                    if atBottom {
+                        print("Scrolled to bottom!")
+                        // You can trigger your 'load more' logic here
+                        if isDataLoading == false {
+                            self.getProductListApi()
+                        }
+                    }
+                }
 
     }
+    
+    func getProductListApi(){
+        isDataLoading = true
+        var strUrl = ""
+        if dictCustomFields.keys.count == 0 {
+            strUrl = "\(Constant.shared.get_item)?page=\(page)&sort_by=popular_items"
+        }else {
+            strUrl = "\(Constant.shared.get_item)"
+            
+            for (ind,key) in dictCustomFields.keys.enumerated(){
+                // for ind in 0..<keys.count {
+                //let key = keys[ind] as? String ?? ""
+                if ind == 0 {
+                    strUrl = strUrl + "?\(dictCustomFields[key] ?? "")"
+                }else {
+                    strUrl = strUrl + "&\(dictCustomFields[key] ?? "")"
+                }
+            }
+        }
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
+
+            if self.page == 1{
+                self.items = obj.data?.data ?? []
+
+            }else{
+                self.items.append(contentsOf: (obj.data?.data)!)
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                self.isDataLoading = false
+                self.page = (self.page ?? 0) + 1
+            })
+        }
+    }
+    
 }
 
 extension SearchProductView: FilterSelected{
     func filterSelectectionDone(dict:Dictionary<String,Any>) {
         print(dict)
+        self.page = 1
+        self.dictCustomFields = dict
+        self.getProductListApi()
     }
 }
 

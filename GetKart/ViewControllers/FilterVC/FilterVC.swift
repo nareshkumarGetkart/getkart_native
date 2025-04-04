@@ -172,7 +172,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnArrowDown.isHidden = true
                 }else if indexPath.row == 1 {
                     cell.lblTitle.text = "Category"
-                    cell.imgImageView.image = UIImage(named: "")
+                    cell.imgImageView.image = UIImage(named: "category_icon")
                     if strCategoryTitle.count == 0{
                         let strTitle = "All in Classified"
                         cell.btnTextValue.setTitle(strTitle, for: .normal)
@@ -187,7 +187,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnArrowDown.isHidden = false
                 }else if indexPath.row == 3 {
                     cell.lblTitle.text = "Posted Since"
-                    cell.imgImageView.image = UIImage(named: "")
+                    cell.imgImageView.image = UIImage(named: "since_icon")
                     if posted_since["status"]?.count == 0 {
                         let strTitle = "All time"
                         cell.btnTextValue.setTitle(strTitle, for: .normal)
@@ -213,10 +213,12 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 cell.txtLowerRange.tag = 100
                 cell.txtLowerRange.delegate = self
                 cell.txtLowerRange.text = min_price
+                cell.txtLowerRange.keyboardType = .numberPad
                 
                 cell.txtUpperRange.tag = 101
                 cell.txtUpperRange.delegate = self
                 cell.txtUpperRange.text = max_price
+                cell.txtUpperRange.keyboardType = .numberPad
                 
                 cell.selectionStyle = .none
                 
