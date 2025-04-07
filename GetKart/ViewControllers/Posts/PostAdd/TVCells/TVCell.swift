@@ -13,6 +13,7 @@ class TVCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var tvTextView:UITextView!
     var textViewDoneDelegate:TextViewDoneDelegate!
+    @IBOutlet weak var lblErrorMsg:UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
         tvTextView.layer.borderWidth = 1

@@ -18,6 +18,7 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var btnOption: UIButton!
     @IBOutlet weak var btnOptionBig: UIButton!
     var textFieldDoneDelegate:TextFieldDoneDelegate!
+    @IBOutlet weak var lblErrorMsg:UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

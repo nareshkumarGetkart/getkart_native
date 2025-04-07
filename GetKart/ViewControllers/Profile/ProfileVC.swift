@@ -223,7 +223,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 present(deleteAccountView, animated: true, completion: nil)
                 
             }else if titleArray[indexPath.row] ==  "Logout"{
-                let deleteAccountView = UIHostingController(rootView: LogoutView())
+                let deleteAccountView = UIHostingController(rootView: LogoutView(navigationController: self.navigationController))
                 deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
                 deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
                 deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background

@@ -46,6 +46,7 @@ class CreateAddDetailVC: UIViewController {
     var gallery_images:Array<Data> = []
     var gallery_imageNames:Array<String> = []
     var isImgData = false
+    var showErrorMsg = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,36 +106,43 @@ class CreateAddDetailVC: UIViewController {
         print(params)
         
         if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
-            let alert = UIAlertController(title: "", message: "Title can not be left blank.", preferredStyle: .alert)
+            /*let alert = UIAlertController(title: "", message: "Title can not be left blank.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+             */
+            showErrorMsg = true
          
         }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
-            let alert = UIAlertController(title: "", message: "Description can not be left blank.", preferredStyle: .alert)
-            
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
+//            let alert = UIAlertController(title: "", message: "Description can not be left blank.", preferredStyle: .alert)
+//            
+//            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+//            self.present(alert, animated: true, completion: nil)
+            showErrorMsg = true
          
         }else if  imgData == nil{
             let alert = UIAlertController(title: "", message: "Main image can not be left blank.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            showErrorMsg = true
          
         }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
             let alert = UIAlertController(title: "", message: "Price can not be left blank.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            showErrorMsg = true
          
         }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
-            let alert = UIAlertController(title: "", message: "Contact can not be left blank.", preferredStyle: .alert)
-            
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
+//            let alert = UIAlertController(title: "", message: "Contact can not be left blank.", preferredStyle: .alert)
+//            
+//            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+//            self.present(alert, animated: true, completion: nil)
+            showErrorMsg = true
          
         } else {
+            showErrorMsg = false
             self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
             if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
                 vc.dataArray = self.objViewModel?.dataArray ?? []
@@ -146,6 +154,9 @@ class CreateAddDetailVC: UIViewController {
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }
+        
+            tblView.reloadData()
+        
     }
     
 }
@@ -185,12 +196,39 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.txtField.text = params[AddKeys.name.rawValue] as? String ?? ""
+            if showErrorMsg == true {
+                if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
             return cell
         }else if indexPath.row == 2 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
             cell.lblTitle.text = "Description"
             cell.textViewDoneDelegate = self
             cell.tvTextView.tag = indexPath.row
+            cell.tvTextView.text = params[AddKeys.description.rawValue] as? String ?? ""
+            if showErrorMsg == true {
+                if (params[AddKeys.description.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.tvTextView.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.tvTextView.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.tvTextView.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
             return cell
         }else if indexPath.row == 3 {
             
@@ -265,6 +303,20 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
+            cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
+            if showErrorMsg == true {
+                if (params[AddKeys.price.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
+            
             return cell
         }else if indexPath.row == 6 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -275,6 +327,19 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.txtField.text = params[AddKeys.contact.rawValue] as? String ?? ""
+            if showErrorMsg == true {
+                if (params[AddKeys.contact.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
             return cell
         }else if indexPath.row == 7 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -286,6 +351,19 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.txtField.text = params[AddKeys.video_link.rawValue] as? String ?? ""
+            if showErrorMsg == true {
+                if (params[AddKeys.video_link.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
             
             return cell
         }

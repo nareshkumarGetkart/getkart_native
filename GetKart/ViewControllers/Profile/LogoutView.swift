@@ -10,7 +10,7 @@ import SwiftUI
 struct LogoutView: View {
     
     @Environment(\.presentationMode) var presentationMode
-
+    var navigationController: UINavigationController?
     @State private var showAlert = true
     
     var body: some View {
@@ -41,12 +41,22 @@ struct LogoutView: View {
                     }
                     
                     Button(action: {
-                        /* Delete account action */
+                        
                         
                        // presentationMode.wrappedValue.dismiss()
-//                        RealmManager.shared.deleteUserInfoObjects()
-//                        RealmManager.shared.clearDB()
-//                        AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: false)
+                        RealmManager.shared.deleteUserInfoObjects()
+                        RealmManager.shared.clearDB()
+                        
+                        showAlert = false
+                        presentationMode.wrappedValue.dismiss()
+                        
+                        
+                        //self.navigationController?.popToRootViewController(animated: false)
+                        AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
+                        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                        AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
+                        
+                        
 
                     }) {
                         Text("OK").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()

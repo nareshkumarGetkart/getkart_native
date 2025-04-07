@@ -15,7 +15,7 @@ class RadioTVCell: UITableViewCell {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var clnCollectionView:DynamicHeightCollectionView!
     @IBOutlet weak var clnHeight:NSLayoutConstraint!
-    
+    @IBOutlet weak var lblErrorMsg:UILabel!
     var objData:CustomFields!
     var del:radioCellTappedDelegate!
     var rowValue:Int = 0

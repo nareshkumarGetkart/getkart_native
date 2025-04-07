@@ -18,7 +18,7 @@ class CreateAddVC2: UIViewController {
     var imgName = ""
     var gallery_images:Array<Data> = []
     var gallery_imageNames:Array<String> = []
-    
+    var showErrorMsg = false
     override func viewDidLoad() {
         super.viewDidLoad()
         print(params)
@@ -51,7 +51,21 @@ class CreateAddVC2: UIViewController {
     */
 
     @IBAction func nextButtonAction (){
-        self.fetchCountryListing()
+        showErrorMsg = false
+        for objCustomField in dataArray {
+            if objCustomField.type ?? "" == "textbox" || objCustomField.type ?? "" == "number" || objCustomField.type ?? "" == "dropdown"{
+                if  objCustomField.selectedValue == nil || objCustomField.selectedValue == "" {
+                    showErrorMsg = true
+                }
+            }
+        }
+        
+        if showErrorMsg == true {
+            tblView.reloadData()
+            
+        }else {
+            self.fetchCountryListing()
+        }
     }
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
@@ -146,6 +160,21 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }else {
                 cell.txtField.text = objCustomField.selectedValue
             }
+            
+            if showErrorMsg == true {
+                if objCustomField.selectedValue == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
+            
             cell.selectionStyle = .none
             
             return cell
@@ -170,6 +199,21 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }else {
                 cell.txtField.text = objCustomField.selectedValue
             }
+            
+            if showErrorMsg == true {
+                if objCustomField.selectedValue == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
+            
             cell.selectionStyle = .none
             return cell
         }else if objCustomField.type ?? "" == "radio" || objCustomField.type ?? "" ==  "checkbox"{
@@ -187,7 +231,25 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.del = self
             cell.rowValue = indexPath.row
             
+            
+            
             cell.clnCollectionView.performBatchUpdates({
+                if showErrorMsg == true {
+                    var found = false
+                   for obj in  objCustomField.arrIsSelected {
+                       if obj == true {
+                           found = true
+                           break
+                       }
+                    }
+                    if found == false {
+                        cell.lblErrorMsg.isHidden = false
+                    }else {
+                        cell.lblErrorMsg.isHidden = true
+                    }
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                }
                 cell.clnCollectionView.reloadData()
                 //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
             }) { _ in
@@ -213,6 +275,21 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }else {
                 cell.txtField.text = objCustomField.selectedValue
             }
+            
+            if showErrorMsg == true {
+                if objCustomField.selectedValue == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                }else {
+                    
+                    cell.lblErrorMsg.isHidden = true
+                    cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            }
+            
             cell.btnOptionBig.isHidden = false
             cell.btnOptionBig.tag = indexPath.row
             cell.btnOptionBig.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchDown)
