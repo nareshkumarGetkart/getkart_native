@@ -117,10 +117,14 @@ struct CityLocationView: View {
     
     func citySelected(city:CityModal) {
         
+        if popTYpe != .filter && popTYpe != .ceatePost{
+            
+            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+        }
+        
         for vc in self.navigationController?.viewControllers ?? [] {
           
             if popTYpe == .filter {
-           // if isFilterList == true {
                 
                 if vc.isKind(of: FilterVC.self){
                     if let vc1 = vc as? FilterVC  {
@@ -131,7 +135,6 @@ struct CityLocationView: View {
                 }
             }else  if popTYpe == .ceatePost {
                 
-           // if isNewPost == true {
                 if vc.isKind(of: CreateAddVC2.self){
                     if let vc1 = vc as? CreateAddVC2 {
                         vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
@@ -140,10 +143,9 @@ struct CityLocationView: View {
                     }
                 }
             }else if popTYpe == .signUp {
-                // if isNewPost == false && isFilterList == false{
                 
                 if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
-                    Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+                  
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }

@@ -43,6 +43,7 @@ class HomeVC: UIViewController {
     
     @IBAction func locationBtnAction(_ sender : UIButton){
         
+        
         let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, popTYpe: .home))
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
@@ -57,6 +58,11 @@ class HomeVC: UIViewController {
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
 
+        homeVModel?.page = 1
+        homeVModel?.itemObj?.data = nil
+        self.tblView.reloadData()
+        homeVModel?.getProductListApi()
+
         /*
         self.latitude = latitude
         self.longitude = longitude
@@ -64,7 +70,6 @@ class HomeVC: UIViewController {
         self.state = state
         self.country = country
         */
-        self.tblView.reloadData()
         
     }
 }
@@ -252,6 +257,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         
+        
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
             print("up")
             if scrollView == tblView{
@@ -272,6 +278,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 
     extension HomeVC: RefreshScreen{
     func refreshScreen(){
+        
         self.tblView.invalidateIntrinsicContentSize()
         self.tblView.reloadData()
     }

@@ -14,7 +14,7 @@ struct FavoritesView: View {
     
     var body: some View {
         HStack {
-         
+            
             Button(action: {
                 // Action to go back
                 navigation?.popViewController(animated: true)
@@ -27,13 +27,13 @@ struct FavoritesView: View {
             
             Spacer()
         }.frame(height: 44)
-               
+        
         
         
         VStack{
             
             HStack{Spacer()}
-
+            
             ScrollView {
                 
                 HStack{  }.frame(height: 5)
@@ -49,12 +49,27 @@ struct FavoritesView: View {
                 }
                 .padding(.horizontal, 10)
             }
-
-                
+            
+            
             
         }.background(Color(.systemGray6)).onAppear{
             
             objVM.getFavoriteHistory()
+        }
+        
+        // Load More Indicator
+        if objVM.isDataLoading {
+            HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+        } else {
+            // Trigger loading more when reaching the last row
+            Color.clear
+                .onAppear {
+                    objVM.getFavoriteHistory()
+                }
         }
         
     }

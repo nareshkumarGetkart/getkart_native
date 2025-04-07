@@ -11,6 +11,7 @@ import Foundation
 class FavoriteViewModel :ObservableObject{
     
      var page = 1
+     var isDataLoading = true
     @Published var listArray = [ItemModel]()
     
     init(){
@@ -23,6 +24,11 @@ class FavoriteViewModel :ObservableObject{
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:FavoriteParse) in
             if obj.code == 200 {
                 self.listArray = obj.data?.data ?? []
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                    self.page = self.page + 1
+                    self.isDataLoading = false
+                })
             }
         }
     }

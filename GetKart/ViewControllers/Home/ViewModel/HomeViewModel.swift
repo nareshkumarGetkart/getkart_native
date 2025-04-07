@@ -11,7 +11,7 @@ protocol RefreshScreen:AnyObject{
     func refreshScreen()
 }
 
-class HomeViewModel{
+class HomeViewModel:ObservableObject{
     
     var sliderArray:[SliderModel]?
     var categoryObj:CategoryModelClass?
@@ -19,7 +19,7 @@ class HomeViewModel{
     var featuredObj:[FeaturedClass]?
     weak var delegate:RefreshScreen?
     var page = 1
-    var isDataLoading = true
+    var isDataLoading = false
    
     init(){
         getCategoriesListApi()
@@ -29,8 +29,16 @@ class HomeViewModel{
     
     
     func getProductListApi(){
+        
+        let city = Local.shared.getUserCity()
+        let country = Local.shared.getUserCountry()
+        let state = Local.shared.getUserState()
+
+        if isDataLoading == true{
+            return
+        }
         isDataLoading = true
-        let strUrl = "\(Constant.shared.get_item)?page=\(page)&city=New%20Delhi"
+        let strUrl = "\(Constant.shared.get_item)?page=\(page)&city=\(city)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
 
