@@ -69,8 +69,25 @@ class FilterVC: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
-    @IBAction  func reset(){
+    @IBAction  func resetBtnAction(){
+        latitude = ""
+        longitude = ""
+        city = ""
+        state = ""
+        country = ""
         
+        self.dataArray.removeAll()
+        self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        dictCustomFields.removeAll()
+        strCategoryTitle = ""
+        category_ids = ""
+        category_id = ""
+        min_price = ""
+        max_price = ""
+        
+        posted_since.removeAll()
+        
+        tblView.reloadData()
     }
     
     @IBAction  func applyFilterAction() {
@@ -161,7 +178,10 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 if indexPath.row == 0 {
                     cell.lblTitle.text = "Location"
                     cell.imgImageView.image = UIImage(named: "location_icon")
-                    let strTitle = city + ", " + state + ", " + country
+                    var strTitle = ""
+                    if country.count > 0 {
+                        strTitle = city + ", " + state + ", " + country
+                    }
                     cell.btnTextValue.setTitle(strTitle, for: .normal)
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
