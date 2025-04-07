@@ -32,7 +32,7 @@ struct NotificationDetailView: View {
             
             HStack{Spacer()}.frame(height: 10)
             AsyncImage(url: URL(string: notification?.image ?? "")) { image in
-                image.resizable().aspectRatio(contentMode: .fill)
+                image.resizable().aspectRatio(contentMode: .fit)
                     .frame(width:  UIScreen.main.bounds.width, height: 150)
                 
             }placeholder: {

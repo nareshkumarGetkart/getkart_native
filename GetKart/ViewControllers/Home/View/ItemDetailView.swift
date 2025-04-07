@@ -107,7 +107,7 @@ struct ItemDetailView: View {
                         HStack {
                             HStack {
                                 Image(systemName: "eye")
-                                Text("0")
+                                Text("\(objVM.itemObj?.clicks ?? 0)")
                             }.frame(maxWidth: .infinity,maxHeight:30)
                             .padding()
                             .overlay(
@@ -117,7 +117,7 @@ struct ItemDetailView: View {
                             Spacer(minLength: 20)
                             HStack {
                                 Image(systemName: "heart")
-                                Text("0")
+                                Text("\(objVM.itemObj?.totalLikes ?? 0)")
                             }.frame(maxWidth: .infinity,maxHeight:30)
                             .padding()
                             .overlay(

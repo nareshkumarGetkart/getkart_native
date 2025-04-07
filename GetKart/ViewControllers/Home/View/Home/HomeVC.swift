@@ -54,6 +54,25 @@ class HomeVC: UIViewController {
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
+    
+    @IBAction func micBtnAction(_ sender : UIButton){
+        
+        
+    }
+    
+    @IBAction func filterBtnAction(_ sender : UIButton){
+        
+        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+            vc.delFilterSelected = self
+            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    
+    @IBAction func logoBtnAction(_ sender : UIButton){
+        
+        
+    }
 
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
@@ -73,6 +92,15 @@ class HomeVC: UIViewController {
         
     }
 }
+
+extension HomeVC:FilterSelected{
+        func filterSelectectionDone(dict:Dictionary<String,Any>) {
+            print(dict)
+//            self.page = 1
+//            self.dictCustomFields = dict
+//            self.getProductListApi()
+        }
+    }
 
 
 extension HomeVC:UITableViewDelegate,UITableViewDataSource {
