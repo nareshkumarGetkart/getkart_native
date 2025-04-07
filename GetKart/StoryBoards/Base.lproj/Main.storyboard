@@ -80,17 +80,17 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="RDA-ek-SgE">
-                                        <rect key="frame" x="140" y="41" width="203" height="44"/>
+                                        <rect key="frame" x="140" y="46.333333333333343" width="198" height="38.666666666666657"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jze-jC-YMq">
-                                                <rect key="frame" x="138.33333333333331" y="0.0" width="64.666666666666686" height="22"/>
-                                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="16"/>
+                                                <rect key="frame" x="141.33333333333331" y="0.0" width="56.666666666666657" height="19.333333333333332"/>
+                                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="14"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="------" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHG-6H-1mN">
-                                                <rect key="frame" x="177" y="22" width="26" height="22"/>
-                                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
+                                                <rect key="frame" x="175" y="19.333333333333336" width="23" height="19.333333333333336"/>
+                                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="14"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
@@ -101,7 +101,7 @@
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="fmf-AX-Jov" secondAttribute="bottom" constant="5" id="3xY-dd-ZNi"/>
                                     <constraint firstAttribute="height" constant="90" id="BYc-oE-l85"/>
-                                    <constraint firstItem="d4b-aO-gZX" firstAttribute="leading" secondItem="RDA-ek-SgE" secondAttribute="trailing" id="Idq-9A-0Ue"/>
+                                    <constraint firstItem="d4b-aO-gZX" firstAttribute="leading" secondItem="RDA-ek-SgE" secondAttribute="trailing" constant="5" id="Idq-9A-0Ue"/>
                                     <constraint firstItem="RDA-ek-SgE" firstAttribute="leading" secondItem="fmf-AX-Jov" secondAttribute="trailing" constant="10" id="Jfl-KK-RXZ"/>
                                     <constraint firstAttribute="trailing" secondItem="d4b-aO-gZX" secondAttribute="trailing" constant="10" id="SXk-6n-2fe"/>
                                     <constraint firstAttribute="bottom" secondItem="d4b-aO-gZX" secondAttribute="bottom" constant="5" id="Xnb-Pc-o3A"/>
@@ -148,8 +148,8 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Search any item..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NNJ-4p-daT">
-                                                <rect key="frame" x="55.000000000000007" y="10" width="80.666666666666686" height="30"/>
-                                                <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="10"/>
+                                                <rect key="frame" x="55.000000000000007" y="10" width="112.66666666666669" height="30"/>
+                                                <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
@@ -178,6 +178,12 @@
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="25"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                                <real key="value" value="0.0"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
                                                 <real key="value" value="25"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
@@ -211,6 +217,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnLocation" destination="d4b-aO-gZX" id="Okp-tk-K7j"/>
                         <outlet property="cnstrntHtNavBar" destination="BYc-oE-l85" id="MlM-Bu-NAX"/>
                         <outlet property="lblAddress" destination="WHG-6H-1mN" id="F2s-Oh-MVU"/>
                         <outlet property="tblView" destination="R3F-XL-nmr" id="FtX-PN-OEb"/>

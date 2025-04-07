@@ -13,12 +13,17 @@ class HomeVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
+    @IBOutlet weak var btnLocation:UIButton!
+
     var homeVModel:HomeViewModel?
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
+        btnLocation.layer.cornerRadius = 8.0
+        btnLocation.backgroundColor = .white
+        btnLocation.clipsToBounds = true
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = 200
         registerCells()
@@ -114,7 +119,6 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         if indexPath.section == 2{
             if let obj = homeVModel?.featuredObj?[indexPath.item]{
                 if (obj.style == "style_1") || (obj.style == "style_2") || (obj.style == "style_4"){
-                    
                     return  315
                 }
             }
@@ -304,10 +308,18 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     }
 }
 
+
     extension HomeVC: RefreshScreen{
     func refreshScreen(){
         
-        self.tblView.invalidateIntrinsicContentSize()
-        self.tblView.reloadData()
+        //self.tblView.invalidateIntrinsicContentSize()
+        if ( self.homeVModel?.page ?? 0) > 1{
+            self.tblView.reloadData()
+            tblView.reloadSections(IndexSet(integer: 3), with: .none)
+
+        }else{
+            self.tblView.reloadData()
+
+        }
     }
 }

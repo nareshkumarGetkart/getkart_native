@@ -17,13 +17,14 @@ struct SliderModelParse: Codable {
 
 // MARK: - Datum
 struct SliderModel: Codable {
-    let id: Int
-    let image: String
-    let sequence, thirdPartyLink, createdAt, updatedAt: String
-    let modelType, modelID: JSONNull?
-    let appRedirection: Bool
-    let redirectionType: String
-    let model: JSONNull?
+    let id: Int?
+    let image: String?
+    let sequence, thirdPartyLink, createdAt, updatedAt: String?
+    let modelType:String?
+    let modelID: Int?
+    let appRedirection: Bool?
+    let redirectionType: String?
+    let model: Model?
 
     enum CodingKeys: String, CodingKey {
         case id, image, sequence
@@ -36,3 +37,27 @@ struct SliderModel: Codable {
     }
 }
 
+
+// MARK: - Model
+struct Model: Codable {
+    let id, sequence: Int?
+    let name: String?
+    let image: String?
+    let parentCategoryID: Int?
+    let description: String?
+    let status: Int?
+    let createdAt, updatedAt, slug: String?
+    let subcategoriesCount: Int?
+    let translatedName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, sequence, name, image
+        case parentCategoryID = "parent_category_id"
+        case description, status
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case slug
+        case subcategoriesCount = "subcategories_count"
+        case translatedName = "translated_name"
+    }
+}
