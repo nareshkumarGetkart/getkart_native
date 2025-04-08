@@ -9,6 +9,7 @@ import UIKit
 import IQKeyboardManagerSwift
 import FirebaseCore
 import FirebaseMessaging
+import SwiftUI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -42,8 +43,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
             self.navigationController?.viewControllers = [landingVC]
         }else  {
-            let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-            self.navigationController?.viewControllers = [landingVC]
+            
+            let  isFirstTime = UserDefaults.standard.object(forKey: "isFirstTime") as? Bool ?? true
+            if isFirstTime == true {
+                UserDefaults.standard.set(false, forKey: "isFirstTime")
+                UserDefaults.standard.synchronize()
+                let vc = UIHostingController(rootView: DemoView())
+                self.navigationController?.viewControllers = [vc]
+            }else {
+                let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                self.navigationController?.viewControllers = [landingVC]
+            }
         }
         /*
         let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
@@ -448,5 +458,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
     }
    
+    
 }
 

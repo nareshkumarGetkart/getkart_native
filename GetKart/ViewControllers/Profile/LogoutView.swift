@@ -41,23 +41,8 @@ struct LogoutView: View {
                     }
                     
                     Button(action: {
-                        
-                        
-                       // presentationMode.wrappedValue.dismiss()
-                        RealmManager.shared.deleteUserInfoObjects()
-                        RealmManager.shared.clearDB()
-                        
-                        showAlert = false
-                        presentationMode.wrappedValue.dismiss()
-                        
-                        
-                        //self.navigationController?.popToRootViewController(animated: false)
-                        AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
-                        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-                        AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
-                        
-                        
-
+                        self.LogoutApi()
+                       
                     }) {
                         Text("OK").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()
                             .frame(maxWidth: .infinity,idealHeight:40,maxHeight:40)
@@ -72,6 +57,45 @@ struct LogoutView: View {
             .background(Color.white)
             .cornerRadius(15)
             .padding(.horizontal, 30)
+        }
+    }
+    
+    
+    func LogoutApi(){
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.deleteUser, param: Dictionary(), methodType: .delete,showLoader:true) {  responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    // presentationMode.wrappedValue.dismiss()
+                    RealmManager.shared.deleteUserInfoObjects()
+                    RealmManager.shared.clearDB()
+                    
+                    showAlert = false
+                    presentationMode.wrappedValue.dismiss()
+                    
+                    
+                    //self.navigationController?.popToRootViewController(animated: false)
+                    AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
+                    let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                    AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
+                   
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
         }
     }
     

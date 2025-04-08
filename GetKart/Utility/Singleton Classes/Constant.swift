@@ -306,7 +306,11 @@ final class Constant: NSObject {
         }
     }
     
-            
+    var deleteUser:String{
+        get {
+            return "\(Constant.shared.baseURL)/delete-user"
+        }
+    }
 }
 
 

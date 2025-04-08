@@ -39,8 +39,8 @@ struct DemoView: View {
                     Spacer()
                     Button {
                         
-                        presentationMode.wrappedValue.dismiss()
-
+                        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                        AppDelegate.sharedInstance.navigationController?.pushViewController(landingVC, animated: true)
                        
                     } label: {
                         
@@ -127,7 +127,8 @@ struct DemoView: View {
             
             Button(action: {
                 // Handle sign-in action
-                presentationMode.wrappedValue.dismiss()
+                let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                AppDelegate.sharedInstance.navigationController?.pushViewController(landingVC, animated: true)
 
             }) {
                 Text(pages[currentPage].buttonText)

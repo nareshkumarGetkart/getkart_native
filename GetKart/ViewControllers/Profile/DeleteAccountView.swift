@@ -64,7 +64,8 @@ struct DeleteAccountView: View {
                     Button(action: {
                         /* Delete account action */
                         
-                        presentationMode.wrappedValue.dismiss()
+                       // presentationMode.wrappedValue.dismiss()
+                        self.deleteApi()
 
                     }) {
                         Text("Delete").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()
@@ -80,6 +81,53 @@ struct DeleteAccountView: View {
             .background(Color.white)
             .cornerRadius(15)
             .padding(.horizontal, 20)
+        }
+    }
+    
+    func deleteApi(){
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.deleteUser, param: Dictionary(), methodType: .delete,showLoader:true) {  responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                    RealmManager.shared.deleteUserInfoObjects()
+                    RealmManager.shared.clearDB()
+                    
+                    showAlert = false
+                    presentationMode.wrappedValue.dismiss()
+                    
+                    AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
+                    let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                    AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
+                   
+                    
+                    
+                    let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                           
+                    }))
+                    
+                    AppDelegate.sharedInstance.navigationController?.present(alert, animated: true, completion: nil)
+                    
+                   
+                    
+                }else{
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
         }
     }
     
