@@ -21,6 +21,8 @@ struct DemoView: View {
     
     var body: some View {
         VStack {
+            Spacer()
+
             VStack{
                 HStack{
                     
@@ -141,7 +143,9 @@ struct DemoView: View {
 
                 
             }.padding(.top,50)
-        }
+            Spacer()
+
+        }.navigationBarHidden(true)
     }
 }
 
