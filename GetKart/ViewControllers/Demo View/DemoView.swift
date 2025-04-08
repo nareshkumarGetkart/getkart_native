@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DemoView: View {
-    @Environment(\.presentationMode) var presentationMode
+  //  @Environment(\.presentationMode) var presentationMode
 
     let pages = [
         
@@ -55,12 +55,12 @@ struct DemoView: View {
                 }.padding(.horizontal).padding(.top,15).frame(height:44)
            // }
             
-            Spacer()
+           // Spacer()
             
             Image(pages[currentPage].imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 300).padding()
+               .padding()// .frame(height: 300)
                 
             Text(pages[currentPage].title)
                 .font(.title)
@@ -98,7 +98,10 @@ struct DemoView: View {
                                     currentPage += 1
                                 } else {
                                     // Handle final action (e.g., navigate to home screen)
-                                    presentationMode.wrappedValue.dismiss()
+                                   // presentationMode.wrappedValue.dismiss()
+                                    
+                                    let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+                                    AppDelegate.sharedInstance.navigationController?.pushViewController(landingVC, animated: true)
 
                                 }
                             }) {
