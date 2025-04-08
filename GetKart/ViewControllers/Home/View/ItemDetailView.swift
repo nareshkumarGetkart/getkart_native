@@ -15,7 +15,7 @@ struct ItemDetailView: View {
     var navController:UINavigationController?
     
      var itemId = 0
-    @State private var selectedIndex = 0
+    @State private var selectedIndex:Int?
     @StateObject private var objVM = ItemDetailViewModel()
     @State private var showSheet = false
     @State private var showOfferPopup = false
@@ -63,32 +63,37 @@ struct ItemDetailView: View {
             ScrollView{
                 VStack(alignment: .leading) {
                     ZStack(alignment: .topTrailing) {
-                        
-                        TabView(selection: $selectedIndex) {
-                            
-                            if let arr = objVM.itemObj?.galleryImages as? [GalleryImage]{
+                    
+                        if  (objVM.itemObj?.galleryImages?.count ?? 0) > 0 {
+                            TabView(selection: $selectedIndex) {
                                 
-                                ForEach(0..<arr.count){ index in
+                                if let arr = objVM.itemObj?.galleryImages as? [GalleryImage], arr.count > 0{
                                     
-                                    if  let img = arr[index].image {
-                                        AsyncImage(url: URL(string: img)) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(height: 200)
-                                                .cornerRadius(10)
-                                                .tag(index).onTapGesture {
-                                                    navigateToPager()
-                                                }
-                                            
-                                        }placeholder: { ProgressView().progressViewStyle(.circular) }
+                                    ForEach(0..<arr.count){ index in
+                                        
+                                        if  let img = arr[index].image {
+                                            AsyncImage(url: URL(string: img)) { image in
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(height: 200)
+                                                    .cornerRadius(10)
+                                                    .tag(index).onTapGesture {
+                                                        navigateToPager()
+                                                    }
+                                                
+                                            }placeholder: { ProgressView().progressViewStyle(.circular) }
+                                        }
                                     }
                                 }
-                            }
+                                
+                            }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
+                                .frame(width:widthScreen, height: 200)
                             
-                        }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
-                            .frame(height: 200)
-                        
+                        }else{
+                            Image("getkartplaceholder").frame(height: 200)
+                                .cornerRadius(10)
+                        }
                         
                         Button(action: {
                             objVM.addToFavourite()
@@ -129,13 +134,13 @@ struct ItemDetailView: View {
                         .foregroundColor(.gray)
                     }
                     
-                    Text(objVM.itemObj?.name ?? "''").font(Font.manrope(.medium, size: 16))
+                    Text(objVM.itemObj?.name ?? "").font(Font.manrope(.medium, size: 16))
                         .font(.headline)
                         .padding(.top, 10).padding(5)
                     
                     HStack{
                         
-                        Text("\u{20B9}\(objVM.itemObj?.price ?? 0)")
+                        Text("\(Local.shared.currencySymbol) \(objVM.itemObj?.price ?? 0)")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(Color(hex: "#FF9900")).padding(5).padding(.bottom,10)
@@ -203,7 +208,7 @@ struct ItemDetailView: View {
                         if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
                                                                 
-                                InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : ""))
+                                InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""))
                             }
                         }
                     }
@@ -475,7 +480,7 @@ struct ItemDetailView: View {
     
     func navigateToPager(){
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
-        vc.currentTag = selectedIndex
+        vc.currentTag = selectedIndex ?? 0
         vc.imageArrayUrl = objVM.itemObj?.galleryImages ?? []
         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
     }

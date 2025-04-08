@@ -166,26 +166,26 @@ enum Country: String, Codable {
 }
 
 // MARK: - CustomField
-struct CustomField: Codable,Identifiable {
+struct CustomField: Codable,Identifiable  {
     let id: Int?
     let name: String?
     let type: TypeEnum?
     let image: String?
     let customFieldRequired: Int?
-    let values: [String]?
+    let values: [String?]?
     let minLength, maxLength: Int?
     let status: Int?
-    let value: [String]?
+    let value: [String?]?
     let customFieldValue: CustomFieldValue?
 
     enum CodingKeys: String, CodingKey {
         case id, name, type, image
         case customFieldRequired = "required"
         case values
+        case value
         case minLength = "min_length"
         case maxLength = "max_length"
         case status
-        case value
         case customFieldValue = "custom_field_value"
     }
 }
@@ -193,17 +193,17 @@ struct CustomField: Codable,Identifiable {
 // MARK: - CustomFieldValue
 struct CustomFieldValue: Codable {
     let id, itemID, customFieldID: Int?
-    let value: Value?
-    let createdAt, updatedAt: String?
+       // let value: Value?
+        let createdAt, updatedAt: AtedAt?
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case itemID = "item_id"
-        case customFieldID = "custom_field_id"
-        case value
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
+        enum CodingKeys: String, CodingKey {
+            case id
+            case itemID = "item_id"
+            case customFieldID = "custom_field_id"
+           // case value
+            case createdAt = "created_at"
+            case updatedAt = "updated_at"
+        }
 }
 
 enum AtedAt: String, Codable {

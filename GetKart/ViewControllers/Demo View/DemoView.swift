@@ -21,9 +21,8 @@ struct DemoView: View {
     
     var body: some View {
         VStack {
-            Spacer()
 
-            VStack{
+           // VStack{
                 HStack{
                     
                     Button {
@@ -53,8 +52,8 @@ struct DemoView: View {
                         
                     }.background(Color(hex: "#f6e7e9")).cornerRadius(16.0)
                     
-                }.padding(.horizontal).padding(.top,15)
-            }
+                }.padding(.horizontal).padding(.top,15).frame(height:44)
+           // }
             
             Spacer()
             

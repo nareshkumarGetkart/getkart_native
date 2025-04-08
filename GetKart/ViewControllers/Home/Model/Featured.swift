@@ -21,8 +21,7 @@ struct FeaturedClass: Codable {
     let id: Int?
     let title, slug: String?
     let sequence: Int?
-   // let  value: Int?
-
+    let  value: String?
     let filter, style: String?
     let minPrice, maxPrice: Int?
     let createdAt, updatedAt: String?
@@ -37,7 +36,7 @@ struct FeaturedClass: Codable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case description
-      //  case value
+        case value
         case totalData = "total_data"
         case sectionData = "section_data"
     }
