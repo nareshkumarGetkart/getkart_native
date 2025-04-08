@@ -202,8 +202,8 @@ struct ItemDetailView: View {
                     LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
                         if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
-                                
-                                InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:obj.value?.first ?? "")
+                                                                
+                                InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : ""))
                             }
                         }
                     }
