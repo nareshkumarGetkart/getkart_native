@@ -25,7 +25,7 @@ struct DemoView: View {
            // VStack{
                 HStack{
                     
-                    Button {
+                 /*   Button {
                         
                         let destvC = UIHostingController(rootView: LanguageView())
                         AppDelegate.sharedInstance.navigationController?.pushViewController(destvC, animated: true)
@@ -36,7 +36,7 @@ struct DemoView: View {
                         }
                         Image("arrow_dd").renderingMode(.template).foregroundColor(.orange)
                     }
-                    
+                    */
                     Spacer()
                     Button {
                         

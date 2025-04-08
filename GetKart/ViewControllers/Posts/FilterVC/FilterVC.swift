@@ -36,9 +36,12 @@ class FilterVC: UIViewController {
     var objViewModel:CustomFieldsViewModel?
     
     var delFilterSelected:FilterSelected?
+    
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        cnstrntHtNavBar.constant = self.getNavBarHt
         self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
         
         // Do any additional setup after loading the view.

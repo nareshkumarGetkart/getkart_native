@@ -148,7 +148,7 @@ struct SellerProfileView: View {
                
             }.background(Color(.systemGray6))
             
-        }
+        }.navigationBarHidden(true)
         .onAppear{
             objVM.getSellerProfile(sellerId: userId)
             objVM.getItemListApi(sellerId: userId)

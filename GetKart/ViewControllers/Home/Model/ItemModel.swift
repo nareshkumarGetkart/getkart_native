@@ -192,15 +192,16 @@ struct CustomField: Codable,Identifiable  {
 
 // MARK: - CustomFieldValue
 struct CustomFieldValue: Codable {
+    
     let id, itemID, customFieldID: Int?
-       // let value: Value?
-        let createdAt, updatedAt: AtedAt?
+    let value: Value?
+    let createdAt, updatedAt: String?
 
         enum CodingKeys: String, CodingKey {
             case id
             case itemID = "item_id"
             case customFieldID = "custom_field_id"
-           // case value
+            case value
             case createdAt = "created_at"
             case updatedAt = "updated_at"
         }
@@ -211,16 +212,16 @@ enum AtedAt: String, Codable {
 }
 
 enum Value: Codable {
-    case string(String)
-    case stringArray([String])
+    case string(String?)
+    case stringArray([String?]?)
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let x = try? container.decode([String].self) {
+        if let x = try? container.decode([String?]?.self) {
             self = .stringArray(x)
             return
         }
-        if let x = try? container.decode(String.self) {
+        if let x = try? container.decode(String?.self) {
             self = .string(x)
             return
         }

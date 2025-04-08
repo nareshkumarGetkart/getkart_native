@@ -55,7 +55,7 @@ struct NotificationView: View {
 
                 
             
-        }.background(Color(.systemGray6))
+        }.navigationBarHidden(true).background(Color(.systemGray6))
             .onAppear{
                 if listArray.count == 0{
                     getNoticiationlistApi()

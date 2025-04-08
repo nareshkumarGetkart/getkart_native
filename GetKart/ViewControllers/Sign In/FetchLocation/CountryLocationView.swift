@@ -99,7 +99,7 @@ struct CountryLocationView: View {
             }
             .navigationTitle("Location")
             .navigationBarBackButtonHidden()
-        
+            .navigationBarHidden(true)
     }
     
      func fetchCountryListing(){

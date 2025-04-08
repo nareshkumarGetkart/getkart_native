@@ -49,7 +49,7 @@ struct TransactionHistoryView: View {
                         
         }.padding([.leading,.trailing],10).background(Color(.systemGray6)).onAppear{
             getTransactionHistory()
-        }
+        }.navigationBarHidden(true)
         
     }
     

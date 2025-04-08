@@ -96,7 +96,7 @@ struct ProfileEditView: View {
             .padding()
         }.background(Color(UIColor.systemGroupedBackground)).sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage)
-        }
+        }.navigationBarHidden(true)
         
         
     }

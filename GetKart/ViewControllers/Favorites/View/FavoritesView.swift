@@ -52,7 +52,7 @@ struct FavoritesView: View {
             
             
             
-        }.background(Color(.systemGray6)).onAppear{
+        }.navigationBarHidden(true).background(Color(.systemGray6)).onAppear{
             
             objVM.getFavoriteHistory()
         }

@@ -305,7 +305,7 @@ struct ItemDetailView: View {
             }
             .padding(8)
             
-        }.onAppear{
+        }.navigationBarHidden(true).onAppear{
             
             if objVM.sellerObj == nil {
                 objVM.getItemDetail(id: self.itemId)

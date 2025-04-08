@@ -37,7 +37,7 @@ struct MyBoostAdsView: View {
                     }
                 }
             }
-        }.background(Color(.systemGray6))
+        }.background(Color(.systemGray6)).navigationBarHidden(true)
         
         Spacer()
     }

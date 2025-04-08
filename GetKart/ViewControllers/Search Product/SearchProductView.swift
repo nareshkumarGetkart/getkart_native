@@ -84,7 +84,10 @@ struct SearchProductView: View {
                 VStack(spacing: 10) {
                     ForEach(items) { item in
                        // ItemRow(item: item)
-                        FavoritesCell(itemObj: item)
+                        FavoritesCell(itemObj: item).onTapGesture {
+                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:false))
+                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                        }
 
                     }
                 }.padding([.leading,.trailing],10)
@@ -100,7 +103,7 @@ struct SearchProductView: View {
                 }
                 .frame(height: 1)
             }
-        }.onAppear {
+        }.navigationBarHidden(true).onAppear {
             self.getProductListApi()
         }
         .onChange(of: isAtBottom) { atBottom in

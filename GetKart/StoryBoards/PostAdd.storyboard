@@ -257,7 +257,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Filters" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cgS-FE-oMs">
-                                        <rect key="frame" x="60" y="45" width="243" height="40"/>
+                                        <rect key="frame" x="60" y="45" width="253" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="1N6-f2-tCv"/>
                                         </constraints>
@@ -266,9 +266,9 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TdC-rC-Cbj">
-                                        <rect key="frame" x="308" y="45" width="75" height="40"/>
+                                        <rect key="frame" x="318" y="45" width="65" height="40"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="75" id="Vgl-rN-LVP"/>
+                                            <constraint firstAttribute="width" constant="65" id="Vgl-rN-LVP"/>
                                             <constraint firstAttribute="height" constant="40" id="Wfr-62-Xty"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
@@ -288,14 +288,13 @@
                                     <constraint firstItem="cgS-FE-oMs" firstAttribute="leading" secondItem="89s-sH-Thd" secondAttribute="trailing" constant="5" id="Unu-J2-euQ"/>
                                     <constraint firstAttribute="height" constant="90" id="VS7-a7-bQe"/>
                                     <constraint firstItem="TdC-rC-Cbj" firstAttribute="leading" secondItem="cgS-FE-oMs" secondAttribute="trailing" constant="5" id="bKN-VM-zsM"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="90" id="jup-eI-VsQ"/>
                                     <constraint firstItem="89s-sH-Thd" firstAttribute="leading" secondItem="zsH-SF-IZu" secondAttribute="leading" constant="10" id="oum-1I-Jvh"/>
                                     <constraint firstAttribute="bottom" secondItem="cgS-FE-oMs" secondAttribute="bottom" constant="5" id="v9q-gw-twB"/>
                                     <constraint firstAttribute="trailing" secondItem="TdC-rC-Cbj" secondAttribute="trailing" constant="10" id="xT4-F6-Z6h"/>
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Yhn-FS-mmp">
-                                <rect key="frame" x="0.0" y="100" width="393" height="618"/>
+                                <rect key="frame" x="0.0" y="90" width="393" height="628"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="Okj-ms-m2G" id="uct-5C-M07"/>
@@ -328,7 +327,7 @@
                             <constraint firstItem="Ge5-OM-1w0" firstAttribute="bottom" secondItem="c48-UI-29A" secondAttribute="bottom" constant="30" id="CcO-NY-LOT"/>
                             <constraint firstItem="zsH-SF-IZu" firstAttribute="leading" secondItem="Vkg-Kw-aYq" secondAttribute="leading" id="D89-8m-F1J"/>
                             <constraint firstItem="c48-UI-29A" firstAttribute="top" secondItem="Yhn-FS-mmp" secondAttribute="bottom" constant="20" id="FfL-Gc-0Zw"/>
-                            <constraint firstItem="Yhn-FS-mmp" firstAttribute="top" secondItem="zsH-SF-IZu" secondAttribute="bottom" constant="10" id="TdI-XH-WuG"/>
+                            <constraint firstItem="Yhn-FS-mmp" firstAttribute="top" secondItem="zsH-SF-IZu" secondAttribute="bottom" id="TdI-XH-WuG"/>
                             <constraint firstItem="Ge5-OM-1w0" firstAttribute="trailing" secondItem="zsH-SF-IZu" secondAttribute="trailing" id="YhX-Tv-cKi"/>
                             <constraint firstItem="c48-UI-29A" firstAttribute="leading" secondItem="Ge5-OM-1w0" secondAttribute="leading" constant="20" id="b5n-LZ-gI5"/>
                             <constraint firstItem="Ge5-OM-1w0" firstAttribute="trailing" secondItem="Yhn-FS-mmp" secondAttribute="trailing" id="iLH-ua-v7U"/>
@@ -337,6 +336,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="cnstrntHtNavBar" destination="VS7-a7-bQe" id="cwo-CW-ypk"/>
                         <outlet property="tblView" destination="Yhn-FS-mmp" id="sae-du-h7I"/>
                     </connections>
                 </viewController>

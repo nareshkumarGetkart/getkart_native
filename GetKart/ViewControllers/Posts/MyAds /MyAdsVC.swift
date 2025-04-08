@@ -135,7 +135,7 @@ class MyAdsVC: UIViewController {
     func getAdsListApi(){
         
         
-        let strUrl = Constant.shared.my_items + "?status=\(apiStatus)?page=\(page)"
+        let strUrl = Constant.shared.my_items + "?status=\(apiStatus.trim())&page=\(page)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
             
@@ -186,6 +186,29 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblLikeCount.text = "Like:\(obj.totalLikes ?? 0)"
         cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
         cell.btnAdStatus.setTitle((obj.status ?? ""), for: .normal)
+        switch obj.status ?? ""{
+            
+        case "approved":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            break
+
+        case "rejected":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            break
+            
+        case "inactive":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            break
+        case "sold_out":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            break
+        default:
+            break
+        }
         cell.imgVwAds.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         
         return cell

@@ -98,7 +98,7 @@ struct CityLocationView: View {
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
-    
+        .navigationBarHidden(true)
 }
     
   

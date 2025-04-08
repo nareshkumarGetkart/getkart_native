@@ -80,14 +80,14 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="74" height="24"/>
                                                 <subviews>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="eye" translatesAutoresizingMaskIntoConstraints="NO" id="b1J-HU-BTw">
-                                                        <rect key="frame" x="5" y="4.6666666666666714" width="15" height="15"/>
+                                                        <rect key="frame" x="0.0" y="4.6666666666666714" width="15" height="15"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="15" id="dgp-Fx-mdx"/>
                                                             <constraint firstAttribute="width" constant="15" id="vVN-G8-zOe"/>
                                                         </constraints>
                                                     </imageView>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Views : 0" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pLU-0V-Q0b">
-                                                        <rect key="frame" x="25" y="5" width="44" height="14"/>
+                                                        <rect key="frame" x="20" y="5" width="49" height="14"/>
                                                         <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="11"/>
                                                         <color key="textColor" red="0.50980392159999999" green="0.50980392159999999" blue="0.50980392159999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <nil key="highlightedColor"/>
@@ -96,7 +96,7 @@
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstItem="pLU-0V-Q0b" firstAttribute="top" secondItem="Mp4-pu-18C" secondAttribute="top" constant="5" id="0kA-3F-58N"/>
-                                                    <constraint firstItem="b1J-HU-BTw" firstAttribute="leading" secondItem="Mp4-pu-18C" secondAttribute="leading" constant="5" id="CmI-yt-VKU"/>
+                                                    <constraint firstItem="b1J-HU-BTw" firstAttribute="leading" secondItem="Mp4-pu-18C" secondAttribute="leading" id="CmI-yt-VKU"/>
                                                     <constraint firstAttribute="bottom" secondItem="pLU-0V-Q0b" secondAttribute="bottom" constant="5" id="J9Y-OF-kcD"/>
                                                     <constraint firstAttribute="trailing" secondItem="pLU-0V-Q0b" secondAttribute="trailing" constant="5" id="PAt-dC-iEN"/>
                                                     <constraint firstItem="pLU-0V-Q0b" firstAttribute="leading" secondItem="b1J-HU-BTw" secondAttribute="trailing" constant="5" id="USi-O2-ORG"/>

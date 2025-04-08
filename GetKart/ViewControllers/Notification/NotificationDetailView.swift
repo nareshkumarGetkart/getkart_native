@@ -12,6 +12,7 @@ struct NotificationDetailView: View {
     var notification: NotificationModel?
 
     var body: some View {
+       
         HStack {
          
             Button(action: {
@@ -25,20 +26,23 @@ struct NotificationDetailView: View {
                 .foregroundColor(.black)
             
             Spacer()
-        }.frame(height: 44)
+        }.frame(height: 44).background(Color.white)
        
+
         VStack(alignment: .leading){
+           
+          //  HStack{Spacer()}.frame(height: 10)
 
             
-            HStack{Spacer()}.frame(height: 10)
+            
             AsyncImage(url: URL(string: notification?.image ?? "")) { image in
                 image.resizable().aspectRatio(contentMode: .fit)
-                    .frame(width:  UIScreen.main.bounds.width, height: 150)
+                    .frame(width: UIScreen.main.bounds.width, height: 220)
                 
             }placeholder: {
                 
                 Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill)
-                        .frame(width:  UIScreen.main.bounds.width, height: 150)
+                        .frame(width:  UIScreen.main.bounds.width, height: 220)
 //                ProgressView().progressViewStyle(.circular)
                 
             }
@@ -50,7 +54,7 @@ struct NotificationDetailView: View {
 
             Spacer()
             
-        }
+        }.navigationBarHidden(true)
     }
 }
 

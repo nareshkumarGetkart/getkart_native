@@ -183,7 +183,7 @@ struct EmailSupportView: View {
                .cornerRadius(10).padding(8)
             
             Spacer()
-        }.background(Color(UIColor.systemGray6))
+        }.background(Color(UIColor.systemGray6)).navigationBarHidden(true)
         
        // if(MFMailComposeViewController.canSendMail()) // Disable if Mail is unavailable
             .sheet(isPresented: $showMailView) {

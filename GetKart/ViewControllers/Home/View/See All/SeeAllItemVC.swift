@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class SeeAllItemVC: UIViewController {
     
@@ -77,6 +78,12 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
         
         return cell
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(objViewModel?.listArray?[indexPath.item] as? ItemModel)?.id ?? 0))
+        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {

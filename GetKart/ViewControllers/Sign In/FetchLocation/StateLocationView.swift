@@ -104,6 +104,7 @@ struct StateLocationView: View {
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
+        .navigationBarHidden(true)
     
 }
     

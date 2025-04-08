@@ -212,7 +212,7 @@ struct SignUpView: View {
             }
             .padding()
             Spacer()
-        }
+        }.navigationBarHidden(true)
         
     }
     
