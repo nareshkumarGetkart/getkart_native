@@ -18,6 +18,8 @@ final class Local {
     
  
     var compression = 50
+    var currencySymbol:String = "₹"
+
     
     func saveUserId(userId:String){
         

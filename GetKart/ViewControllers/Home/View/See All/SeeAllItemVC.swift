@@ -29,7 +29,7 @@ class SeeAllItemVC: UIViewController {
 
         if let recieveObj = obj as? FeaturedClass{
             lblTitle.text = recieveObj.title
-            objViewModel = SeeAllViewModel(itemId: recieveObj.id)
+            objViewModel = SeeAllViewModel(itemId: recieveObj.id ?? 0)
             objViewModel?.delegate = self
         }
         
@@ -71,7 +71,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
         if let obj = objViewModel?.listArray?[indexPath.item] as? ItemModel{
             cell.lblItem.text = obj.name
             cell.lblAddress.text = obj.address
-            cell.lblPrice.text =  "\(obj.price ?? 0)"
+            cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
             cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         }
         

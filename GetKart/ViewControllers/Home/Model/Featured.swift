@@ -18,23 +18,26 @@ struct FeaturedParse: Codable {
 
 // MARK: - FeaturedClass
 struct FeaturedClass: Codable {
-    let id: Int
-    let title, slug: String
+    let id: Int?
+    let title, slug: String?
     let sequence: Int?
-    let filter, value, style: String?
+   // let  value: Int?
+
+    let filter, style: String?
     let minPrice, maxPrice: Int?
-    let createdAt, updatedAt: String
+    let createdAt, updatedAt: String?
     let description: String?
     let totalData: Int?
     let sectionData: [ItemModel]?
 
     enum CodingKeys: String, CodingKey {
-        case id, title, slug, sequence, filter, value, style
+        case id, title, slug, sequence, filter, style
         case minPrice = "min_price"
         case maxPrice = "max_price"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
-        case description = "description"
+        case description
+      //  case value
         case totalData = "total_data"
         case sectionData = "section_data"
     }

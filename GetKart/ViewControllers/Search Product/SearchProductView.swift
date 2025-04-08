@@ -189,7 +189,7 @@ struct ItemRow: View {
             VStack(alignment: .leading) {
                 Text(item.price)
                     .font(.headline)
-                    .foregroundColor(.orange)
+                    .foregroundColor(Color(hex: "#FF9900"))
                 Text(item.title)
                     .font(.body)
                     .lineLimit(1)

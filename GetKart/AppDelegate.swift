@@ -23,10 +23,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var notificationType = ""
     var userId = ""
     var roomId = ""
-    
+    var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
+        getSettingsApi()
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
         
@@ -431,6 +432,20 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         Local.shared.removeUserData()
         //DBManager.deleteRecords()
         AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+    }
+    
+    
+    func getSettingsApi(){
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_system_settings) { (obj:SettingsParse) in
+            
+            if (obj.code ?? 0) == 200 {
+                self.settingsModel = obj.data
+                Local.shared.currencySymbol = obj.data?.currencySymbol ?? "₹"
+                
+            }
+            
+        }
     }
    
 }

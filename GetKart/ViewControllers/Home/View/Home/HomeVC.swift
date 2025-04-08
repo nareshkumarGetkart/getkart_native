@@ -116,6 +116,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
         if indexPath.section == 2{
             if let obj = homeVModel?.featuredObj?[indexPath.item]{
                 if (obj.style == "style_1") || (obj.style == "style_2") || (obj.style == "style_4"){
@@ -123,25 +124,27 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 }
             }
         }
+        
         return UITableView.automaticDimension
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        
-        if section == 0{
+        switch section {
+            
+        case 0:
             //Banner
             return (homeVModel?.sliderArray?.count ?? 0) > 0 ? 1 : 0
-
-        }else if section == 1{
+            
+        case 1:
             //Category
             return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 1 : 0
-      
-        }else if section == 2{
-           //Featured
+            
+        case 2:
+            //Featured
             return  (homeVModel?.featuredObj?.count ?? 0) > 0 ? (homeVModel?.featuredObj?.count ?? 0) : 0
             
-        }else{
+        default:
             //Items
             return (homeVModel?.itemObj?.data?.count ?? 0) > 0 ? 1 : 0
         }
@@ -287,9 +290,8 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
        }
 
     
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
-        
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
             print("up")
             if scrollView == tblView{
@@ -297,7 +299,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
         
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 250)
         {
             if scrollView == tblView{
                 if homeVModel?.isDataLoading == false{

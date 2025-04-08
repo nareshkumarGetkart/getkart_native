@@ -69,7 +69,7 @@ struct ProductCard: View {
             VStack(alignment: .leading){
                 Text("\(objItem.price ?? 0)").multilineTextAlignment(.leading).lineLimit(1)
                     .font(.headline)
-                    .foregroundColor(.orange)
+                    .foregroundColor(Color(hex: "#FF9900"))
                 Text(objItem.name ?? "").multilineTextAlignment(.leading).lineLimit(1)
                     .font(.subheadline)
                 Text(objItem.address ?? "").multilineTextAlignment(.leading).lineLimit(1)

@@ -80,7 +80,7 @@ struct ItemModel: Codable,Identifiable {
     let user: User?
     let category: Category?
     let galleryImages: [GalleryImage]?
-    let featuredItems: [JSONAny]?
+   // let featuredItems: [JSONAny]?
     let favourites: [Favourite]?
     let area: Int?
     let isFeature: Bool?
@@ -111,7 +111,7 @@ struct ItemModel: Codable,Identifiable {
         case deletedAt = "deleted_at"
         case user, category
         case galleryImages = "gallery_images"
-        case featuredItems = "featured_items"
+      //  case featuredItems = "featured_items"
         case favourites, area
         case isFeature = "is_feature"
         case totalLikes = "total_likes"
@@ -184,7 +184,8 @@ struct CustomField: Codable,Identifiable {
         case values
         case minLength = "min_length"
         case maxLength = "max_length"
-        case status, value
+        case status
+        case value
         case customFieldValue = "custom_field_value"
     }
 }
@@ -236,6 +237,9 @@ enum Value: Codable {
         }
     }
 }
+
+
+
 
 enum TypeEnum: String, Codable {
     case checkbox = "checkbox"

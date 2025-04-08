@@ -40,7 +40,7 @@ class HomeViewModel:ObservableObject{
         isDataLoading = true
         let strUrl = "\(Constant.shared.get_item)?page=\(page)&city=\(city)"
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
             if self?.page == 1{
                 self?.itemObj = obj.data

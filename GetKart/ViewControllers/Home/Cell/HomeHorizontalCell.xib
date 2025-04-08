@@ -23,10 +23,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eZh-RQ-rte">
-                        <rect key="frame" x="2.6666666666666572" y="5" width="315" height="35"/>
+                        <rect key="frame" x="2.6666666666666572" y="5" width="315" height="33"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nYA-OS-ssX">
-                                <rect key="frame" x="262" y="0.0" width="48" height="35"/>
+                                <rect key="frame" x="262" y="0.0" width="48" height="33"/>
                                 <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="15"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="See All">
@@ -34,7 +34,7 @@
                                 </state>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Products" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2wq-B7-H5I">
-                                <rect key="frame" x="5" y="0.0" width="68.666666666666671" height="35"/>
+                                <rect key="frame" x="5" y="0.0" width="68.666666666666671" height="33"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -48,11 +48,11 @@
                             <constraint firstAttribute="trailing" secondItem="nYA-OS-ssX" secondAttribute="trailing" constant="5" id="X0a-zj-y4w"/>
                             <constraint firstItem="2wq-B7-H5I" firstAttribute="leading" secondItem="eZh-RQ-rte" secondAttribute="leading" constant="5" id="Yxf-cc-QGX"/>
                             <constraint firstItem="2wq-B7-H5I" firstAttribute="top" secondItem="eZh-RQ-rte" secondAttribute="top" id="eR5-fF-tIQ"/>
-                            <constraint firstAttribute="height" constant="35" id="fvt-u3-oRt"/>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="35" id="fvt-u3-oRt"/>
                         </constraints>
                     </view>
                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="XIS-t7-I8F" customClass="DynamicHeightCollectionView" customModule="GetKart" customModuleProvider="target">
-                        <rect key="frame" x="2.6666666666666572" y="45" width="315" height="150"/>
+                        <rect key="frame" x="2.6666666666666572" y="43" width="315" height="152"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="5" minimumInteritemSpacing="5" id="otc-34-CYA">
                             <size key="itemSize" width="0.0" height="0.0"/>

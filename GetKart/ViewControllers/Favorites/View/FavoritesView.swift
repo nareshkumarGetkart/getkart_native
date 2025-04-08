@@ -107,7 +107,7 @@ struct FavoritesCell:View {
            // Image("getkartplaceholder").resizable().frame(width:90).aspectRatio(contentMode: .fit)
             VStack(alignment: .leading, spacing: 5){
                 HStack{
-                    Text("₹ \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.orange)
+                    Text("\(Local.shared.currencySymbol) \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(hex: "#FF9900"))
                     Spacer()
                     Button {
                         addToFavourite()

@@ -138,7 +138,7 @@ struct ItemDetailView: View {
                         Text("\u{20B9}\(objVM.itemObj?.price ?? 0)")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.orange).padding(5).padding(.bottom,10)
+                            .foregroundColor(Color(hex: "#FF9900")).padding(5).padding(.bottom,10)
                         
                         Spacer()
                         if isMyProduct{

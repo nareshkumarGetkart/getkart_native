@@ -74,7 +74,7 @@ struct BoostAdsCell: View {
             
             VStack(alignment:.leading){
                 HStack{
-                    Text("₹ \(itemObj?.price ?? 0)").font(.custom("Manrope-Regular", size: 16.0)).foregroundColor(.orange)
+                    Text("\(Local.shared.currencySymbol) \(itemObj?.price ?? 0)").font(.custom("Manrope-Regular", size: 16.0)).foregroundColor(.orange)
                     Spacer()
                     Button {
                         

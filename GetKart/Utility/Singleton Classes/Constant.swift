@@ -298,8 +298,14 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/logout"
         }
     }
-
-     
+    
+    
+    var get_system_settings:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/get-system-settings"
+        }
+    }
+    
             
 }
 
