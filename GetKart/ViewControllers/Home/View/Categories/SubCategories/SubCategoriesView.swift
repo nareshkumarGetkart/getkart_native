@@ -12,13 +12,15 @@ struct SubCategoriesView: View {
     
     @State  var subcategories: [Subcategory]?
      var navigationController: UINavigationController?
-    @State var isNewPost = false
-    @State var isFilter = false
+    
+    
+    
     @State var strTitle = ""
     @State var strCategoryTitle = ""
     @State var  category_id = ""
     @State var category_ids = ""
     
+    @State var popType:PopType?
     var body: some View {
         
         VStack(spacing: 0) {
@@ -29,7 +31,7 @@ struct SubCategoriesView: View {
                 } label: {
                     Image("arrow_left").renderingMode(.template).foregroundColor(.black)
                 }.frame(width: 40,height: 40)
-                let title = isNewPost == true ? "Ad Listing" : (strTitle)
+                let title = popType == .createPost ? "Ad Listing" : (strTitle)
                 Text("\(title)").font(.custom("Manrope-Bold", size: 20.0))
                     .foregroundColor(.black)
                 Spacer()
@@ -67,24 +69,30 @@ struct SubCategoriesView: View {
                 strCategoryTitle = objsubCategory.name ?? ""
                 
             }
-            let categoryid =  category_ids + "," + "\(objsubCategory.id ?? 0)"
-            if isFilter == true {
+            category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
+            if popType == .buyPackage {
                 for vc in self.navigationController?.viewControllers ?? []{
-                    if vc is FilterVC {
-                       
-                        (vc as? FilterVC)?.strCategoryTitle = strCategoryTitle
-                        (vc as? FilterVC)?.category_id = self.category_id
-                        (vc as? FilterVC)?.category_ids = category_ids
-                        (vc as? FilterVC)?.fetchCustomFields()
+                    if let vc1 = vc as? CategoryPlanVC  {
+                        vc1.saveCategoryInfo(category_id: category_id, category_ids: category_ids)
                         self.navigationController?.popToViewController(vc, animated: true)
                     }
                 }
-            }else {
+            }else if popType == .filter {
+                for vc in self.navigationController?.viewControllers ?? []{
+                    if let vc1 = vc as? FilterVC  {
+                        vc1.strCategoryTitle = strCategoryTitle
+                        vc1.category_id = self.category_id
+                        vc1.category_ids = category_ids
+                        vc1.fetchCustomFields()
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                    }
+                }
+            }else if popType == .createPost {
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
                     vc.objSubCategory = objsubCategory
                     vc.strCategoryTitle = strCategoryTitle
                     vc.strSubCategoryTitle = objsubCategory.name ?? ""
-                    vc.category_ids = categoryid
+                    vc.category_ids = category_ids
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             }
@@ -95,9 +103,9 @@ struct SubCategoriesView: View {
                 strCategoryTitle =  ">" + (objsubCategory.name ?? "")
             }
                 
-            let categoryid =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
+            category_ids =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
             
-            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, isNewPost: self.isNewPost, isFilter: self.isFilter, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_ids: categoryid) // Create SwiftUI view
+            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_id:self.category_id, category_ids: category_ids, popType: self.popType) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
         }

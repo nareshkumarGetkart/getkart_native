@@ -126,7 +126,7 @@ class FilterVC: UIViewController {
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popTYpe: .filter))
+           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popType: .filter))
            self.navigationController?.pushViewController(vc, animated: true)
        }
    }
@@ -145,7 +145,7 @@ class FilterVC: UIViewController {
     
     @objc func showCategoriesVC(){
         if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-            destVC.isFilter = true
+            destVC.popType = .filter
             AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
         }
     }

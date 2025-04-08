@@ -3,12 +3,12 @@ import Foundation
 import SwiftUI
 
 
-enum LocationPopType{
+enum PopType{
     case signUp
     case filter
     case home
     case buyPackage
-    case ceatePost
+    case createPost
 }
 
 struct CityLocationView: View {
@@ -22,7 +22,7 @@ struct CityLocationView: View {
    // @State var isNewPost = false
    // @State var isFilterList = false
     
-    @State var popTYpe:LocationPopType?
+    @State var popType:PopType?
     
     var body: some View {
         
@@ -117,39 +117,46 @@ struct CityLocationView: View {
     
     func citySelected(city:CityModal) {
         
-        if popTYpe != .filter && popTYpe != .ceatePost{
+        if popType == .home || popType == .signUp{
             
             Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {
           
-            if popTYpe == .filter {
+            if popType == .buyPackage {
                 
-                if vc.isKind(of: FilterVC.self){
+                    if let vc1 = vc as? CategoryPlanVC  {
+                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .filter {
+                
                     if let vc1 = vc as? FilterVC  {
                         vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
-                }
-            }else  if popTYpe == .ceatePost {
                 
-                if vc.isKind(of: CreateAddVC2.self){
+            }else  if popType == .createPost {
+                
+               
                     if let vc1 = vc as? CreateAddVC2 {
                         vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
-                }
-            }else if popTYpe == .signUp {
+                
+            }else if popType == .signUp {
                 
                 if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
                   
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
-            } else  if popTYpe == .home {
+            } else  if popType == .home {
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {

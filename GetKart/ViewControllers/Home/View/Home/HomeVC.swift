@@ -49,7 +49,7 @@ class HomeVC: UIViewController {
     @IBAction func locationBtnAction(_ sender : UIButton){
         
         
-        let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, popTYpe: .home))
+        let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, popType: .home))
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
     

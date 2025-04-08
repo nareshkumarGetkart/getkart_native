@@ -12,7 +12,7 @@ struct CountryLocationView: View {
     @Environment(\.presentationMode) var presentationMode
     var navigationController: UINavigationController?
     @State var arrCountries:Array<CountryModel> = []
-    @State var popTYpe:LocationPopType?
+    @State var popType:PopType?
     var body: some View {
         
             VStack(spacing: 0) {
@@ -110,7 +110,7 @@ struct CountryLocationView: View {
     
     func navigateToStateListing(country:CountryModel){
        
-        let vc = UIHostingController(rootView: StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country, popTYpe: self.popTYpe))
+        let vc = UIHostingController(rootView: StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country, popType: self.popType))
            self.navigationController?.pushViewController(vc, animated: true)
            
        

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import SwiftUI
 class CategoryPlanVC: UIViewController {
 
     
@@ -18,7 +18,21 @@ class CategoryPlanVC: UIViewController {
     
      let titleArray =  ["Category","Location"]
      let iconArray =  ["category","location_icon_orange"]
+    
+    var latitude:String = ""
+    var longitude:String = ""
+    var city:String = ""
+    var state:String = ""
+    var country:String = ""
        
+    
+    var objSubCategory:Subcategory?
+    var strCategoryTitle = ""
+    var strSubCategoryTitle = ""
+    var category_ids = ""
+    var category_id = ""
+    
+    
      //MARK: Controller life cycle methods
      override func viewDidLoad() {
          super.viewDidLoad()
@@ -34,6 +48,42 @@ class CategoryPlanVC: UIViewController {
     @IBAction func backButtonAction(_ sender : UIButton){
         self.navigationController?.popViewController(animated: true)
     }
+    
+    
+    func fetchCountryListing(){
+       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+            let arrCountry = obj.data?.data ?? []
+           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popType: .buyPackage))
+           self.navigationController?.pushViewController(vc, animated: true)
+       }
+   }
+    
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+
+        self.latitude = latitude
+        self.longitude = longitude
+        self.city = city
+        self.state = state
+        self.country = country
+        self.tblView.reloadData()
+        if self.country.count > 0 && self.category_id.count > 0 {
+            btnShowPackage.isEnabled = true
+            btnShowPackage.backgroundColor = .orange
+            btnShowPackage.setTitleColor(.white, for: .normal)
+        }
+        
+    }
+    func saveCategoryInfo(category_id:String, category_ids:String ) {
+        self.category_id = category_id
+        self.category_ids = category_ids
+        
+        if self.country.count > 0 && self.category_id.count > 0 {
+            btnShowPackage.isEnabled = true
+            btnShowPackage.backgroundColor = .orange
+            btnShowPackage.setTitleColor(.white, for: .normal)
+        }
+    }
+    
     
     @IBAction func showPackageButtonAction(_ sender : UIButton){
 
@@ -74,6 +124,19 @@ extension CategoryPlanVC: UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        if titleArray[indexPath.row] == "Category" {
+            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                destVC.hidesBottomBarWhenPushed = true
+                destVC.popType = .buyPackage
+                self.navigationController?.pushViewController(destVC, animated: true)
+                
+            }
+        }else if titleArray[indexPath.row] == "Location" {
+            self.fetchCountryListing()
+        }
     }
+    
+    
 }
       
