@@ -107,10 +107,7 @@ struct DeleteAccountView: View {
                     showAlert = false
                     presentationMode.wrappedValue.dismiss()
                     
-                    AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
-                    let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-                    AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
-                   
+                    AppDelegate.sharedInstance.showLoginScreen()
                     
                     
                     let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
