@@ -85,10 +85,7 @@ struct LogoutView: View {
                     presentationMode.wrappedValue.dismiss()
                     
                     
-                    //self.navigationController?.popToRootViewController(animated: false)
-                    AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
-                    let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-                    AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
+                    AppDelegate.sharedInstance.showLoginScreen()
                    
                     
                 }else{

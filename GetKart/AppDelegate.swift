@@ -445,6 +445,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
     }
     
+    func showLoginScreen(){
+        AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
+        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+        AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
+    }
     
     func getSettingsApi(){
         
