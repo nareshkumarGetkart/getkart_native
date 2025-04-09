@@ -20,13 +20,13 @@ class CategoriesVC: UIViewController {
     
     var popType:PopType?
     private var objViewModel:CategoryViewModel?
-    
+     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnBack.setImageColor(color: .black)
-        if popType == .filter {
+        if popType == .filter || popType == .buyPackage {
             collctionView.isHidden = true
             tblView.isHidden = false
             tblView.register(UINib(nibName: "CategoriesTVCell", bundle: nil), forCellReuseIdentifier: "CategoriesTVCell")
@@ -58,7 +58,7 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if popType == .filter {
+        if popType == .filter  || popType == .buyPackage{
             return 0
         }else {
             return objViewModel?.listArray?.count ?? 0
@@ -99,12 +99,17 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        if popType == .buyPackage{
+            
+            
+        }else{
         //if popType == .createPost {
             let objCategory = objViewModel?.listArray?[indexPath.item]
         let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
-        //}
+        }
     }
     
 //    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -133,7 +138,7 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
         return 1
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if popType == .filter {
+        if popType == .filter || popType == .buyPackage {
             return objViewModel?.listArray?.count ?? 0
         }else {
             return 0
@@ -158,7 +163,19 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if popType == .filter {
+        
+        if popType == .buyPackage {
+            let objCategory = objViewModel?.listArray?[indexPath.item]
+            
+            for vc in self.navigationController?.viewControllers ?? []{
+                if let vc1 = vc as? CategoryPlanVC  {
+                    vc1.saveCategoryInfo(category_id: objCategory?.id ?? 0, categoryName: objCategory?.name ?? "")
+                    self.navigationController?.popToViewController(vc, animated: true)
+                }
+            }
+            
+        }else if popType == .filter {
+             
             let objCategory = objViewModel?.listArray?[indexPath.item]
         let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "", category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
@@ -171,7 +188,7 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
 
 extension CategoriesVC: RefreshScreen{
     func refreshScreen(){
-        if popType == .filter {
+        if popType == .filter || popType == .buyPackage {
             tblView.reloadData()
         }else {
             self.collctionView.reloadData()

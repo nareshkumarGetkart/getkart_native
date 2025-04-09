@@ -311,6 +311,15 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/delete-user"
         }
     }
+    
+    
+    var get_package:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/get-package"
+        }
+    }
+    
+    
 }
 
 

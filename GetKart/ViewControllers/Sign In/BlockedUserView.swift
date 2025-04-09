@@ -71,9 +71,7 @@ struct BlockedUserView: View {
             }else{
                 Spacer()
             }
-            
-            
-            
+                        
         }.background(Color(UIColor.systemGray6))
             .onAppear{
                 getBlockedUsers()

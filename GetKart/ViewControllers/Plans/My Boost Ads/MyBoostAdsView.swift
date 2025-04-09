@@ -10,7 +10,7 @@ import SwiftUI
 struct MyBoostAdsView: View {
     var navigation:UINavigationController?
     @StateObject var obj = MyAdsViewModel()
-   
+    
     var body: some View {
         HStack {
             
@@ -27,19 +27,39 @@ struct MyBoostAdsView: View {
             Spacer()
         }.frame(height: 44)
         
-        ScrollView{
-            LazyVStack{
-                ForEach(obj.listArray) { item in
-                    BoostAdsCell(itemObj:item).onTapGesture {
-                        
-                        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:true))
-                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        VStack{
+            
+            
+            if obj.listArray.count == 0 {
+                
+                HStack{
+                    Spacer()
+                    VStack(spacing: 30){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                        Spacer()
                     }
+                    Spacer()
+                }
+            }else{
+                ScrollView{
+                    LazyVStack{
+                        ForEach(obj.listArray) { item in
+                            BoostAdsCell(itemObj:item).onTapGesture {
+                                
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:true))
+                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                            }
+                        }
+                    }
+                    Spacer()
                 }
             }
-        }.background(Color(.systemGray6)).navigationBarHidden(true)
+        }
+        .background(Color(.systemGray6)).navigationBarHidden(true)
         
-        Spacer()
+        
     }
 }
 

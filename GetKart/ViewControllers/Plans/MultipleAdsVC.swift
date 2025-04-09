@@ -15,11 +15,13 @@ class MultipleAdsVC: UIViewController {
     @IBOutlet weak var lblSubTitle:UILabel!
     @IBOutlet weak var tblView:UITableView!
     
+    var planListArray = [PlanModel]()
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         tblView.register(UINib(nibName: "PackageAdsCell", bundle: nil), forCellReuseIdentifier: "PackageAdsCell")
-
+        lblHeader.text = planListArray.first?.name ?? ""
     }
     
     //MARK: UIbutton Action Methods
@@ -45,7 +47,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return 7
+        return planListArray.count
     }
     
     
@@ -53,9 +55,13 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
         
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "PackageAdsCell") as! PackageAdsCell
-        cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5, shadowRadius: 10)
-        cell.lblOriginalAmt.attributedText = "₹ 1,249".setStrikeText(color: .gray)
-
+        
+        let obj = planListArray[indexPath.row]
+       // cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5)
+        cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)".setStrikeText(color: .gray)
+        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
+        cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
+        cell.lblNumberOfAds.text = "\(obj.itemLimit ?? "") Ad"
         return cell
     }
     

@@ -87,13 +87,9 @@ class HomeVC: UIViewController {
         self.tblView.reloadData()
         homeVModel?.getProductListApi()
 
-        /*
-        self.latitude = latitude
-        self.longitude = longitude
-        self.city = city
-        self.state = state
-        self.country = country
-        */
+        let locStr = city + ", " + state + ", " + country
+        self.btnLocation.setTitle(locStr, for: .normal)
+       
         
     }
 }
@@ -101,9 +97,16 @@ class HomeVC: UIViewController {
 extension HomeVC:FilterSelected{
         func filterSelectectionDone(dict:Dictionary<String,Any>) {
             print(dict)
-//            self.page = 1
-//            self.dictCustomFields = dict
-//            self.getProductListApi()
+
+            homeVModel?.page = 1
+            homeVModel?.itemObj?.data = nil
+            self.tblView.reloadData()
+            homeVModel?.getProductListApi()
+            
+            if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
+                let locStr = city + ", " + state + ", " + country
+                self.btnLocation.setTitle(locStr, for: .normal)
+            }
         }
     }
 

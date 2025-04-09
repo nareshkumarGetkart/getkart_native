@@ -206,6 +206,7 @@ Boost Combo</string>
             <connections>
                 <outlet property="bgViewMain" destination="s4v-aE-YuW" id="dy4-eS-Iug"/>
                 <outlet property="btnViewPlans" destination="HFP-0V-Fdf" id="pFr-YG-ueD"/>
+                <outlet property="imgVwIcon" destination="AXa-nc-GAF" id="L7f-Fd-vFN"/>
                 <outlet property="lblAmount" destination="5VJ-qA-yXQ" id="bDD-6t-7gR"/>
                 <outlet property="lblFeatures" destination="RcC-zj-eL2" id="dp8-VW-BLm"/>
                 <outlet property="lblOriginalAmount" destination="XdD-yX-Uog" id="ABq-Ei-zSK"/>

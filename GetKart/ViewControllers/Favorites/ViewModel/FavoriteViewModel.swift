@@ -20,10 +20,11 @@ class FavoriteViewModel :ObservableObject{
     
     
     func getFavoriteHistory(){
+        isDataLoading = true
         let strUrl = Constant.shared.get_favourite_item + "?page=\(page)"
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:FavoriteParse) in
             if obj.code == 200 {
-                self.listArray = obj.data?.data ?? []
+                self.listArray.append(contentsOf: obj.data?.data ?? [])
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                     self.page = self.page + 1

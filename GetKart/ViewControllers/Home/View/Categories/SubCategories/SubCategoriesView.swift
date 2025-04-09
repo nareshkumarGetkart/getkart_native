@@ -70,14 +70,7 @@ struct SubCategoriesView: View {
                 
             }
             category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
-            if popType == .buyPackage {
-                for vc in self.navigationController?.viewControllers ?? []{
-                    if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.saveCategoryInfo(category_id: category_id, category_ids: category_ids)
-                        self.navigationController?.popToViewController(vc, animated: true)
-                    }
-                }
-            }else if popType == .filter {
+           if popType == .filter {
                 for vc in self.navigationController?.viewControllers ?? []{
                     if let vc1 = vc as? FilterVC  {
                         vc1.strCategoryTitle = strCategoryTitle

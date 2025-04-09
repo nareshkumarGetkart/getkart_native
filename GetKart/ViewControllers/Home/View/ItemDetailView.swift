@@ -59,7 +59,6 @@ struct ItemDetailView: View {
         Divider()
         Spacer()
         VStack{
-            
             ScrollView{
                 VStack(alignment: .leading) {
                     ZStack(alignment: .topTrailing) {
@@ -75,9 +74,9 @@ struct ItemDetailView: View {
                                             AsyncImage(url: URL(string: img)) { image in
                                                 image
                                                     .resizable()
-                                                    .scaledToFill()
+                                                    //.aspectRatio(contentMode: .fit)
                                                     .frame(height: 200)
-                                                    .cornerRadius(10)
+                                                    .cornerRadius(10).padding(.horizontal,5)
                                                     .tag(index).onTapGesture {
                                                         navigateToPager()
                                                     }
@@ -88,10 +87,10 @@ struct ItemDetailView: View {
                                 }
                                 
                             }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
-                                .frame(width:widthScreen, height: 200)
+                                .frame(width:widthScreen-20, height: 200)
                             
                         }else{
-                            Image("getkartplaceholder").frame(height: 200)
+                            Image("getkartplaceholder").frame(width:widthScreen-20,height: 200)
                                 .cornerRadius(10)
                         }
                         
@@ -135,22 +134,20 @@ struct ItemDetailView: View {
                     }
                     
                     Text(objVM.itemObj?.name ?? "").font(Font.manrope(.medium, size: 16))
-                        .font(.headline)
+                        .font(Font.manrope(.medium, size: 16))
                         .padding(.top, 10).padding(5)
                     
                     HStack{
                         
                         Text("\(Local.shared.currencySymbol) \(objVM.itemObj?.price ?? 0)")
-                            .font(.title)
-                            .fontWeight(.bold)
+                            .font(Font.manrope(.medium, size: 16))
                             .foregroundColor(Color(hex: "#FF9900")).padding(5).padding(.bottom,10)
                         
                         Spacer()
                         if isMyProduct{
                             
                             Text("Approved")
-                                .font(.subheadline)
-                                .foregroundColor(.green).padding(.horizontal)
+                                .font(Font.manrope(.medium, size: 15))                               .foregroundColor(.green).padding(.horizontal)
                                 .frame(height:30)
                                 .background(Color.green.opacity(0.2))
                                 .cornerRadius(15)
@@ -204,6 +201,7 @@ struct ItemDetailView: View {
                         GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
                         GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
                     ]
+                    
                     LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
                         if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
@@ -216,10 +214,10 @@ struct ItemDetailView: View {
                     Divider()
                     VStack(alignment: .leading) {
                         Text("About this item").font(Font.manrope(.semiBold, size: 16))
-                        Text(objVM.itemObj?.description ?? "")
-                    }.padding(.vertical,1).padding(.horizontal,5)
+                        Text(objVM.itemObj?.description ?? "").font(Font.manrope(.regular, size: 15)).foregroundColor(.gray)
+                    }.padding(.vertical,1)
                     
-                    Divider().padding(.vertical)
+                    Divider()//.padding(.vertical)
                     SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "").onTapGesture {
                         
                         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
@@ -227,8 +225,7 @@ struct ItemDetailView: View {
                     }
                     
                     Text("Location").font(Font.manrope(.semiBold, size: 16))
-                        .font(.headline)
-                    
+                     
                     HStack{
                         Image("location_icon").renderingMode(.template).foregroundColor(.orange)
                         Text(objVM.itemObj?.address ?? "")
@@ -238,7 +235,12 @@ struct ItemDetailView: View {
                     MapView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0,address: objVM.itemObj?.address ?? "")
                         .frame(height: 200)
                         .cornerRadius(10)
-                        .padding(.bottom)
+                        .padding(.bottom).onTapGesture {
+                            
+                            let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
+                            let hostingController = UIHostingController(rootView: swiftUIview)
+                            self.navController?.pushViewController(hostingController, animated: true)
+                        }
                     
                     VStack(alignment: .leading, spacing: 15) {
                         HStack {
@@ -259,17 +261,18 @@ struct ItemDetailView: View {
                                     .stroke(Color.gray, lineWidth: 0.5)
                             ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
-                                // if (objVM.itemObj.isAlreadyReported ?? false) == false {
-                                let destVC = UIHostingController(rootView: ReportAdsView())
-                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                self.navController?.present(destVC, animated: true, completion: nil)
-                                //                                }else{
-                                //                                    print("Already Reported")
-                                //                                }
+                              //  if (objVM.itemObj.isAlreadyReported ?? false) == false {
+                                    let destVC = UIHostingController(rootView: ReportAdsView())
+                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                    self.navController?.present(destVC, animated: true, completion: nil)
+                               
+//                                }else{
+//                                    print("Already Reported")
+//                                }
                             }
-                    }  .padding()
+                    }.padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -278,7 +281,7 @@ struct ItemDetailView: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                         .padding(.top, 5)
                     
-                }
+                }.padding(.horizontal)
                 Spacer()
                 
                 HStack{
@@ -293,7 +296,7 @@ struct ItemDetailView: View {
                         
                         ForEach(objVM.relatedDataItemArray){ item in
                             ProductCard(objItem: item)
-                            /* ProductCard(imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 15)*/
+                           
                                 .onTapGesture {
                                     let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
                                     self.navController?.pushViewController(hostingController, animated: true)
@@ -303,15 +306,12 @@ struct ItemDetailView: View {
                     .padding([.leading,.trailing,.bottom])
                 }
             }
-            .padding(8)
+           // .padding(8)
             
         }.navigationBarHidden(true).onAppear{
             
             if objVM.sellerObj == nil {
                 objVM.getItemDetail(id: self.itemId)
-                // objVM.getSeller(sellerId: self.objVM.itemObj?.userID ?? 0)
-                // objVM.getProductListApi(categoryId: self.objVM.itemObj?.categoryID ?? 0)
-                // objVM.setItemTotalApi(itemId: self.objVM.itemObj?.id ?? 0)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.itemOffer.rawValue))) { notification in
@@ -325,7 +325,6 @@ struct ItemDetailView: View {
                 let id = dataDict["id"] as? Int ?? 0
                 let buyer_id = dataDict["buyer_id"] as? Int ?? 0
                 let seller_id = dataDict["seller_id"] as? Int ?? 0
-                
                 
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 var userId = 0
@@ -638,11 +637,11 @@ struct MapView: UIViewRepresentable {
         let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
         mapView.setRegion(region, animated: true)
 
-        // 📌 Add marker (annotation)
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = location
-        annotation.title = address
-        mapView.addAnnotation(annotation)
+//        // 📌 Add marker (annotation)
+//        let annotation = MKPointAnnotation()
+//        annotation.coordinate = location
+//        annotation.title = address
+//        mapView.addAnnotation(annotation)
 
         return mapView
     }
@@ -651,6 +650,11 @@ struct MapView: UIViewRepresentable {
         let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
         mapView.setRegion(region, animated: true)
+        
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = location
+        annotation.title = address
+        mapView.addAnnotation(annotation)
     }
 
     func makeCoordinator() -> Coordinator {

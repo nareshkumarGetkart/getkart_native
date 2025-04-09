@@ -24,13 +24,9 @@ class CategoryPlanVC: UIViewController {
     var city:String = ""
     var state:String = ""
     var country:String = ""
-       
-    
-    var objSubCategory:Subcategory?
-    var strCategoryTitle = ""
-    var strSubCategoryTitle = ""
-    var category_ids = ""
-    var category_id = ""
+ 
+    var categoryName = ""
+    var category_id = 0
     
     
      //MARK: Controller life cycle methods
@@ -66,18 +62,18 @@ class CategoryPlanVC: UIViewController {
         self.state = state
         self.country = country
         self.tblView.reloadData()
-        if self.country.count > 0 && self.category_id.count > 0 {
+        if self.country.count > 0 && self.category_id > 0 {
             btnShowPackage.isEnabled = true
             btnShowPackage.backgroundColor = .orange
             btnShowPackage.setTitleColor(.white, for: .normal)
         }
         
     }
-    func saveCategoryInfo(category_id:String, category_ids:String ) {
+    func saveCategoryInfo(category_id:Int, categoryName:String ) {
         self.category_id = category_id
-        self.category_ids = category_ids
+        self.categoryName = categoryName
         
-        if self.country.count > 0 && self.category_id.count > 0 {
+        if self.country.count > 0 && self.category_id > 0 {
             btnShowPackage.isEnabled = true
             btnShowPackage.backgroundColor = .orange
             btnShowPackage.setTitleColor(.white, for: .normal)
@@ -89,6 +85,10 @@ class CategoryPlanVC: UIViewController {
 
         if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
             destvc.hidesBottomBarWhenPushed = true
+            destvc.categoryId = category_id
+            destvc.categoryName = categoryName
+            destvc.city = city
+
             self.navigationController?.pushViewController(destvc, animated: true)
         }
     }
@@ -125,13 +125,13 @@ extension CategoryPlanVC: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if titleArray[indexPath.row] == "Category" {
+        if titleArray[indexPath.row] == "Category" {            
             if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-                destVC.hidesBottomBarWhenPushed = true
                 destVC.popType = .buyPackage
+                destVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destVC, animated: true)
-                
             }
+            
         }else if titleArray[indexPath.row] == "Location" {
             self.fetchCountryListing()
         }

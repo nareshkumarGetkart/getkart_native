@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesView: View {
-   
+    
     var  navigation:UINavigationController?
     @StateObject var objVM = FavoriteViewModel()
     
@@ -29,7 +29,6 @@ struct FavoritesView: View {
         }.frame(height: 44)
         
         
-        
         VStack{
             
             HStack{Spacer()}
@@ -37,14 +36,25 @@ struct FavoritesView: View {
             ScrollView {
                 
                 HStack{  }.frame(height: 5)
-                VStack(spacing: 10) {
+                LazyVStack(spacing: 10) {
                     ForEach(objVM.listArray) { item in
                         
-                        FavoritesCell(itemObj: item).onTapGesture {
-                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
-                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                        }
-                        
+                        FavoritesCell(itemObj: item)
+                            .onTapGesture {
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
+                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                            }
+                            .onAppear{
+                                
+                                if let obj = objVM.listArray.last {
+                                    
+                                    if obj.id == item.id {
+                                        if !objVM.isDataLoading {
+                                            objVM.getFavoriteHistory()
+                                        }
+                                    }
+                                }
+                            }
                     }
                 }
                 .padding(.horizontal, 10)
@@ -52,29 +62,16 @@ struct FavoritesView: View {
             
             
             
-        }.navigationBarHidden(true).background(Color(.systemGray6)).onAppear{
-            
-            objVM.getFavoriteHistory()
-        }
-        
-        // Load More Indicator
-        if objVM.isDataLoading {
-            HStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-            }
-        } else {
-            // Trigger loading more when reaching the last row
-            Color.clear
-                .onAppear {
+        }.navigationBarHidden(true).background(Color(.systemGray6))
+            .onAppear{
+                
+                if objVM.listArray.count == 0 {
                     objVM.getFavoriteHistory()
                 }
-        }
-        
+            }
     }
-  
 }
+
 
 #Preview {
     FavoritesView()
