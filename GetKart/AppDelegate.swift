@@ -27,17 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         getSettingsApi()
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
-        
         self.window = UIWindow(frame: UIScreen.main.bounds)
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
-        
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        print()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
             let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
