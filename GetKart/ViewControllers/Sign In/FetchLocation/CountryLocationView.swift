@@ -33,17 +33,28 @@ struct CountryLocationView: View {
                 
                 // MARK: - Search Bar
                 HStack {
-                    TextField("Search Country", text: $searchText)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .padding(.horizontal, 8)
-                        .frame(height: 36)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .onChange(of: searchText) { newValue in
-                            print(newValue)
-                            searchCountry(strCountry:newValue)
+                    HStack {
+                        Image("search").resizable().frame(width: 20,height: 20)
+                        TextField("Search Country", text: $searchText)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .padding(.horizontal, 8)
+                            .frame(height: 36)
+                            //.background(Color(.systemGray6))
+                            //.cornerRadius(8)
+                            .onChange(of: searchText) { newValue in
+                                print(newValue)
+                                searchCountry(strCountry:newValue)
+                            }
+                        
+                        if searchText.count > 0 {
+                            Button("Clear") {
+                                searchText = ""
+                            }.foregroundColor(.black)
                         }
-                    
+                    }.background(Color.white).padding().frame(height: 45).overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                        }
                     // Icon button on the right (for settings or any other action)
                     Button(action: {
                         // Action for icon button
@@ -77,20 +88,24 @@ struct CountryLocationView: View {
                     
                     
                 }.padding(.top, 8)
-                HStack {
-                    Button(action: {
-                        // Enable location action
-                    }) {
-                        Text("Enable Location")
-                            .font(Font.manrope(.medium, size: 15))
-                            .foregroundColor(.black)
-                    }.padding(.leading, 20)
-                        .padding(.top, 5)
-                    Spacer()
+                if self.locationManager.checkForLocationAccess() == false {
+                    HStack {
+                        Button(action: {
+                            // Enable location action
+                        }) {
+                            Text("Enable Location")
+                                .font(Font.manrope(.medium, size: 15))
+                                .foregroundColor(.black)
+                        }.padding(.leading, 20)
+                            .padding(.top, 5)
+                        
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    
+                    Divider()
                 }
-                .padding()
-                
-                Divider()
                 
                 // MARK: - List of Countries
                 ScrollView{
@@ -130,7 +145,7 @@ struct CountryLocationView: View {
         locationManager.delegate = self
         locationManager.checkLocationAuthorization()
         
-        if let coordinate = locationManager.lastKnownLocation {
+        /*if let coordinate = locationManager.lastKnownLocation {
             print("Latitude: \(coordinate.latitude)")
             print("Longitude: \(coordinate.longitude)")
             print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
@@ -141,7 +156,7 @@ struct CountryLocationView: View {
             
         } else {
             print("Unknown Location")
-        }
+        }*/
         
     }
     

@@ -415,7 +415,12 @@ class URLhandler: NSObject{
                 }else if let dict = value as? Dictionary<String,Any> {
                     var str = "{"
                     for (key1, value1) in dict {
-                    str = str + "\"\(key1)\":[\"\(value1)\"],"
+                        if let data1 = value1 as? Data {
+                            multipartFormData.append(data1, withName: key1, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
+                        }else {
+                            str = str + "\"\(key1)\":[\"\(value1)\"],"
+                        }
+                        
                     }
                     //remove , from last
                     str = String(str.dropLast())

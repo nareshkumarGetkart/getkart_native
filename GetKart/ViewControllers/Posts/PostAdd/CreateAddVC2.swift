@@ -309,6 +309,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.btnAddPicture.setTitle("+ Add File", for: .normal)
+            cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
             return cell
         }

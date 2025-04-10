@@ -53,6 +53,37 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         }
     }
     
+    func checkForLocationAccess()->Bool {
+        
+        manager.delegate = self
+        manager.startUpdatingLocation()
+        
+        switch manager.authorizationStatus {
+        case .notDetermined://The user choose allow or denny your app to get the location yet
+            return false
+            
+        case .restricted://The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
+            print("Location restricted")
+            return false
+            
+        case .denied://The user dennied your app to get location or disabled the services location or the phone is in airplane mode
+            print("Location denied")
+            return false
+            
+        case .authorizedAlways://This authorization allows you to use all location services and receive location events whether or not your app is in use.
+            print("Location authorizedAlways")
+            return true
+            
+        case .authorizedWhenInUse://This authorization allows you to use all location services and receive location events only when your app is in use
+            print("Location authorized when in use")
+            return true
+        @unknown default:
+            print("Location service disabled")
+            return false
+        
+        }
+    }
+    
     func updateStateCity(){
         // Create Location
         let location = CLLocation(latitude: lastKnownLocation?.latitude ?? 0.0, longitude:  lastKnownLocation?.longitude ?? 0.0)

@@ -43,18 +43,29 @@ struct CityLocationView: View {
             
             // MARK: - Search Bar
             HStack {
-                
-                TextField("Search State", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding(.horizontal, 8)
-                    .frame(height: 36)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .onChange(of: searchText) { newValue in
-                        print(newValue)
-                        pageNo = 1
-                        self.fetchCityListing()
+                HStack {
+                    Image("search").resizable().frame(width: 20,height: 20)
+                    TextField("Search City", text: $searchText)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .padding(.horizontal, 8)
+                        .frame(height: 36)
+                    //.background(Color(.systemGray6))
+                    //.cornerRadius(8)
+                        .onChange(of: searchText) { newValue in
+                            print(newValue)
+                            pageNo = 1
+                            self.fetchCityListing()
+                        }
+                    if searchText.count > 0 {
+                        Button("Clear") {
+                            searchText = ""
+                        }.foregroundColor(.black)
                     }
+                }.background(Color.white).padding().frame(height: 45).overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray, lineWidth: 1)
+                }
+                
                 // Icon button on the right (for settings or any other action)
                 Button(action: {
                     // Action for icon button
