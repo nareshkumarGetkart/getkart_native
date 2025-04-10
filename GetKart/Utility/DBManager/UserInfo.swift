@@ -31,6 +31,7 @@ struct UserInfo {
     var token:String?
     init(){ }
     init(dict:Dictionary<String, Any>, token:String){
+        
         self.address = dict["address"] as? String ?? ""
         self.country_code = dict["country_code"] as? String ?? ""
         self.created_at = dict["created_at"] as? String ?? ""

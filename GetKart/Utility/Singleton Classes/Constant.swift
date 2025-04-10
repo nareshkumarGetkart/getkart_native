@@ -320,6 +320,16 @@ final class Constant: NSObject {
     }
     
     
+    
+    var update_profile:String{
+        get {
+            return "\(Constant.shared.baseURL)/update-profile"
+        }
+    }
+    
+    
+    
+    
 }
 
 

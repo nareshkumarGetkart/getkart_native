@@ -96,7 +96,9 @@ struct ProfileEditView: View {
             .padding()
         }.background(Color(UIColor.systemGroupedBackground)).sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage)
-        }.navigationBarHidden(true)
+        }.navigationBarHidden(true).onAppear{
+            getUserProfileApi()
+        }
         
         
     }
@@ -107,9 +109,69 @@ struct ProfileEditView: View {
                 print("Please fill all the fields.")
             } else {
                 print("Form Submitted!")
+                updateProfile()
             }
         }
+    
+    func getUserProfileApi(){
+            
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
+        let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+            
+            ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
+                
+                if obj.data != nil {
+                    
+                    self.fullName = obj.data?.seller?.name ?? ""
+                    self.email = obj.data?.seller?.email ?? ""
+                    self.phoneNumber = obj.data?.seller?.mobile ?? ""
+                    self.address = obj.data?.seller?.address ?? ""
+                    self.isNotificationsEnabled = ((obj.data?.seller?.notification) != nil)
+                    self.isContactInfoVisible = ((obj.data?.seller?.mobileVisibility) != 0)
+                    if  let url = URL(string:obj.data?.seller?.profile ?? ""){
+                        if let data = try? Data(contentsOf: url)
+                        {
+                            self.selectedImage = UIImage(data: data)
+                        }
+                    }
+                }
+            }
+        }
+    
+    
+    
+    func updateProfile(){
+        
+        
+        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotificationsEnabled,"personalDetail":isContactInfoVisible] as [String : Any]
+        
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
+            
+            if error == nil{
+                
+                
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if code == 200{
+                    
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        RealmManager.shared.updateUserData(dict: data)
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["OK"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
+                            AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
+    }
 }
+
 
 #Preview {
     ProfileEditView()

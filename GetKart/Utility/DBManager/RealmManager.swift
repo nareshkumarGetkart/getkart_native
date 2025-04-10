@@ -45,6 +45,27 @@ class RealmManager: ObservableObject {
         }
     }
     
+    
+    
+    func updateUserData(dict:Dictionary<String, Any>){
+        
+        let realm = try! Realm()
+        
+        // Find the object you want to update
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: dict["id"] as? Int ?? 0) {
+            try! realm.write {
+                user.name = dict["name"] as? String ?? ""
+                user.email = dict["email"] as? String ?? ""
+                user.profile = dict["profile"] as? String ?? ""
+                user.address = dict["address"] as? String ?? ""
+                user.mobileVisibility = dict["mobileVisibility"] as? Int ?? 0
+                user.notification = dict["notification"] as? Int ?? 0
+            }
+        }
+        
+    }
+    
+    
     func fetchLoggedInUserInfo()->UserInfo {
         
         if let allUsers = localRealm?.objects(DBUserInfo.self){

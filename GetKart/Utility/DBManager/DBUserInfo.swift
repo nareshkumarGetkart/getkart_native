@@ -9,6 +9,7 @@ import Foundation
 import RealmSwift
 
 class DBUserInfo: Object {
+    @Persisted(primaryKey: true) var id:Int?
     @Persisted var address:String?
     @Persisted var country_code:String?
     @Persisted var created_at:String?
@@ -18,7 +19,6 @@ class DBUserInfo: Object {
     @Persisted var email_verified_at:String?
     @Persisted var fcm_id:String?
     @Persisted var firebase_id:String?
-    @Persisted var id:Int?
     @Persisted var is_verified:Int?
     @Persisted var mobile:String?
     
@@ -26,14 +26,13 @@ class DBUserInfo: Object {
     @Persisted var name:String?
     @Persisted var notification:Int?
     @Persisted var profile:String?
-    
     @Persisted var roles  = RealmSwift.List<DBUserRoles>()
-    
     @Persisted var updated_at: String?
     @Persisted var show_personal_details:Int?
     @Persisted var type:String?
     @Persisted var token:String?
     override init(){ }
+   
     init(userInfo:UserInfo) {
         super.init()
         self.address = userInfo.address
@@ -43,27 +42,23 @@ class DBUserInfo: Object {
         self.email = userInfo.email
         self.email_verified_at = userInfo.email_verified_at
         self.fcm_id = userInfo.fcm_id
-        
-        firebase_id = userInfo.firebase_id
-        id = userInfo.id
-        is_verified = userInfo.is_verified
-        mobile = userInfo.mobile
-        mobileVisibility = userInfo.mobileVisibility
-        name = userInfo.name
-        notification = userInfo.notification
-        profile = userInfo.profile
+        self.firebase_id = userInfo.firebase_id
+        self.id = userInfo.id
+        self.is_verified = userInfo.is_verified
+        self.mobile = userInfo.mobile
+        self.mobileVisibility = userInfo.mobileVisibility
+        self.name = userInfo.name
+        self.notification = userInfo.notification
+        self.profile = userInfo.profile
         
         for rl in userInfo.roles ?? [] {
-            roles.append(DBUserRoles(role: rl))
+            self.roles.append(DBUserRoles(role: rl))
         }
-       
-        show_personal_details = userInfo.show_personal_details
-        type = userInfo.type
-        updated_at = userInfo.updated_at
-        
+        self.show_personal_details = userInfo.show_personal_details
+        self.type = userInfo.type
+        self.updated_at = userInfo.updated_at
         self.token = userInfo.token
     }
-    
 }
 
 
