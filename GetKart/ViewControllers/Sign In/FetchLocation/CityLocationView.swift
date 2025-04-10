@@ -43,13 +43,18 @@ struct CityLocationView: View {
             
             // MARK: - Search Bar
             HStack {
+                
                 TextField("Search State", text: $searchText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .padding(.horizontal, 8)
                     .frame(height: 36)
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
-                
+                    .onChange(of: searchText) { newValue in
+                        print(newValue)
+                        pageNo = 1
+                        self.fetchCityListing()
+                    }
                 // Icon button on the right (for settings or any other action)
                 Button(action: {
                     // Action for icon button
@@ -73,7 +78,9 @@ struct CityLocationView: View {
             ScrollView{
                 LazyVStack {
                     ForEach(arrCities) { city in
-                        CountryRow(strTitle:city.name ?? "").frame(height: 40)
+                        CountryRow(strTitle:city.name ?? "")
+                            .frame(height: 40)
+                            .padding(.horizontal)
                             .onAppear{
                                 if  let index = arrCities.firstIndex(where: { $0.id == city.id }) {
                                     if index == arrCities.count - 1{
@@ -90,7 +97,7 @@ struct CityLocationView: View {
                         Divider()
                     }
                 }
-            }
+            }.searchable(text: $searchText)
             
             Spacer()
         }.onAppear{
@@ -104,7 +111,7 @@ struct CityLocationView: View {
   
     
     func fetchCityListing(){
-        let url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNo)"
+        let url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNo)&search=\(searchText)"
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:CityParse) in
             
             pageNo = pageNo + 1

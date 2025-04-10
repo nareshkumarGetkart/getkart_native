@@ -12,7 +12,9 @@ struct CountryLocationView: View {
     @Environment(\.presentationMode) var presentationMode
     var navigationController: UINavigationController?
     @State var arrCountries:Array<CountryModel> = []
+    @State var arrSearchedCountries:Array<CountryModel> = []
     @State var popType:PopType?
+    var locationManager = LocationManager()
     var body: some View {
         
             VStack(spacing: 0) {
@@ -37,6 +39,10 @@ struct CountryLocationView: View {
                         .frame(height: 36)
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
+                        .onChange(of: searchText) { newValue in
+                            print(newValue)
+                            searchCountry(strCountry:newValue)
+                        }
                     
                     // Icon button on the right (for settings or any other action)
                     Button(action: {
@@ -55,14 +61,19 @@ struct CountryLocationView: View {
                 
                 // MARK: - Current Location Row
                 HStack {
-                    Image(systemName: "location.fill")
-                        .foregroundColor(.orange)
-                    
-                    Text("Use Current Location")
-                        .font(Font.manrope(.medium, size: 15))
-                        .foregroundColor(.orange)
-                    
-                    Spacer()
+                       
+                      Button(action: {
+                          // Enable location action
+                          findMyLocationAction()
+                      }) {
+                          Image(systemName: "location.fill")
+                              .foregroundColor(.orange)
+                          Text("Use Current Location")
+                              .font(Font.manrope(.medium, size: 15))
+                              .foregroundColor(.orange)
+                      }.padding(.leading, 20)
+                          .padding(.top, 5)
+                      Spacer()
                     
                     
                 }.padding(.top, 8)
@@ -83,13 +94,26 @@ struct CountryLocationView: View {
                 
                 // MARK: - List of Countries
                 ScrollView{
-                    ForEach(arrCountries) { country in
-                        CountryRow(strTitle:country.name ?? "").frame(height: 40)
-                            .onTapGesture{
-                                
-                                self.navigateToStateListing(country: country)
-                            }
-                        Divider()
+                    if searchText.count == 0 {
+                        ForEach(arrCountries) { country in
+                            CountryRow(strTitle:country.name ?? "")
+                                .frame(height: 40).padding(.horizontal)
+                                .onTapGesture{
+                                    self.navigateToStateListing(country: country)
+                                }
+                            Divider()
+                        }
+                        
+                    }else {
+                        ForEach(arrSearchedCountries) { country in
+                            CountryRow(strTitle:country.name ?? "")
+                                .frame(height: 40).padding(.horizontal)
+                                .onTapGesture{
+                                    
+                                    self.navigateToStateListing(country: country)
+                                }
+                            Divider()
+                        }
                     }
                 }
                 
@@ -100,6 +124,37 @@ struct CountryLocationView: View {
             .navigationTitle("Location")
             .navigationBarBackButtonHidden()
             .navigationBarHidden(true)
+    }
+    
+    func findMyLocationAction(){
+        locationManager.delegate = self
+        locationManager.checkLocationAuthorization()
+        
+        if let coordinate = locationManager.lastKnownLocation {
+            print("Latitude: \(coordinate.latitude)")
+            print("Longitude: \(coordinate.longitude)")
+            print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
+            
+            locationManager.delegate = nil
+            self.locationSelected()
+            
+            
+        } else {
+            print("Unknown Location")
+        }
+        
+    }
+    
+    func searchCountry(strCountry:String){
+        arrSearchedCountries.removeAll()
+        for country in arrCountries {
+            let countryName = country.name ?? ""
+            if let range = countryName.range(of: strCountry, options:.caseInsensitive) {
+                print(range)
+                arrSearchedCountries.append(country)
+            }
+        }
+        
     }
     
      func fetchCountryListing(){
@@ -115,6 +170,60 @@ struct CountryLocationView: View {
            
        
    }
+    
+    func locationSelected() {
+        
+        
+        
+        for vc in self.navigationController?.viewControllers ?? [] {
+          
+            if popType == .buyPackage {
+                
+                    if let vc1 = vc as? CategoryPlanVC  {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city ?? "", state:locationManager.state ?? "", country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .filter {
+                
+                    if let vc1 = vc as? FilterVC  {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else  if popType == .createPost {
+                
+               
+                    if let vc1 = vc as? CreateAddVC2 {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .signUp {
+                
+                if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                  
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            } else  if popType == .home {
+                
+                if vc.isKind(of: HomeVC.self) == true {
+                    if let vc1 = vc as? HomeVC {
+                        vc1.savePostLocation(latitude:"\(locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                   
+                }
+            }
+        }
+    }
+    
 }
 
 
@@ -126,8 +235,9 @@ struct CountryRow: View {
             Text("\(strTitle)")
                 .font(Font.manrope(.medium, size: 15))
             Spacer()
-            Image(systemName: "")
+            Image("arrow_right")
                 .foregroundColor(.orange)
+                .padding(.trailing, 10)
         }.padding(.leading, 30)
         
     }
@@ -136,4 +246,30 @@ struct CountryRow: View {
 #Preview {
     CountryRow()
 }
+
+
+extension CountryLocationView :LocationAutorizationUpdated {
+    func locationAuthorizationUpdate() {
+        if locationManager.manager.authorizationStatus == .authorizedAlways  ||  locationManager.manager.authorizationStatus == .authorizedWhenInUse {
+            if let coordinate = locationManager.lastKnownLocation {
+                print("Latitude: \(coordinate.latitude)")
+                print("Longitude: \(coordinate.longitude)")
+                
+                if popType == .home || popType == .signUp{
+                    
+                    Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country, timezone: locationManager.timezone)
+                }
+                    
+                    print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
+                    
+                    locationManager.delegate = nil
+                    self.locationSelected()
+                    
+                    
+                } else {
+                    print("Unknown Location")
+                }
+            }
+        }
+    }
 

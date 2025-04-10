@@ -20,6 +20,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     var state = ""
     var country = ""
     var timezone = ""
+    var latitude :Double = 0.0
+    var longitude :Double = 0.0
     
     func checkLocationAuthorization() {
         
@@ -69,7 +71,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                         self.city = addressDict["City"] as? String ?? ""
                         self.state = addressDict["State"] as? String ?? ""
                         self.country = addressDict["Country"] as? String ?? ""
-                        Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
+                        self.latitude = location.coordinate.latitude
+                        self.longitude = location.coordinate.longitude
+                        //Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
                         self.delegate?.locationAuthorizationUpdate()
                     }
                 }

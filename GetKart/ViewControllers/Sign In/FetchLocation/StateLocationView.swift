@@ -43,7 +43,11 @@ struct StateLocationView: View {
                     .frame(height: 36)
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
-                
+                    .onChange(of: searchText) { newValue in
+                        print(newValue)
+                        pageNo = 1
+                        self.fetchStateListing()
+                    }
                 // Icon button on the right (for settings or any other action)
                 Button(action: {
                     // Action for icon button
@@ -71,7 +75,9 @@ struct StateLocationView: View {
                 LazyVStack {
                     ForEach(arrStates, id:\.id) { state in
                         
-                        CountryRow(strTitle:state.name ?? "").frame(height: 40)
+                        CountryRow(strTitle:state.name ?? "")
+                            .frame(height: 40)
+                            .padding(.horizontal)
                         
                             .onAppear{
                                 if  let index = arrStates.firstIndex(where: { $0.id == state.id }) {
@@ -109,8 +115,11 @@ struct StateLocationView: View {
 }
     
     func fetchStateListing(){
-        let url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)"
+        let url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search=\(searchText)"
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:StateParse) in
+           if self.pageNo == 1 {
+               self.arrStates.removeAll()
+           }
            self.totalRecords = obj.data?.total ?? 0
            self.pageNo = pageNo + 1
            self.arrStates.append(contentsOf: obj.data?.data ?? [])
