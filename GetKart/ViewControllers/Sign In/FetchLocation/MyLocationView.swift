@@ -119,6 +119,8 @@ extension MyLocationView :LocationAutorizationUpdated {
             if let coordinate = locationManager.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")
                 print("Longitude: \(coordinate.longitude)")
+                Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country, timezone: locationManager.timezone)
+                
                 print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
                 
                 locationManager.delegate = nil
