@@ -320,6 +320,18 @@ final class Constant: NSObject {
     }
     
     
+    var paymentIntent:String{
+        get {
+            return "\(Constant.shared.baseURL)/payment-intent"
+        }
+    }
+    
+    
+    var getPaymentSettings:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-payment-settings"
+        }
+    }
     
     var update_profile:String{
         get {
@@ -333,6 +345,7 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/get-package-banner"
         }
     }
+    
     
     
 }
