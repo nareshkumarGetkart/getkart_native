@@ -127,6 +127,7 @@ struct ProfileEditView: View {
             } else {
                 // Fallback on earlier versions
                 
+                
                 OTPPopup(
                     showOTPPopup: $showOTPPopup,
                     otp: "44334",
@@ -134,7 +135,7 @@ struct ProfileEditView: View {
                         // print("OTP Entered: \(otp)")
                         // Call your verification logic here
                     }
-                )
+                ).background(Color.clear)
             } // Works in iOS 16+
         }
         
@@ -313,7 +314,6 @@ struct ProfileEditView_Previews: PreviewProvider {
 
 
 
-import SwiftUI
 
 struct OTPPopup: View {
     @Binding var showOTPPopup: Bool
@@ -332,7 +332,7 @@ struct OTPPopup: View {
                         .font(.title2)
                         .bold()
 
-                    TextField("6-digit code", text: $otp).frame(minHeight: 40)
+                    TextField("6-digit code", text: $otp).multilineTextAlignment(.center).frame(minHeight: 45)
                         .keyboardType(.numberPad)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal)
@@ -344,10 +344,10 @@ struct OTPPopup: View {
                         Text("Verify")
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
-                           // .padding()
+                            .padding()
                             .background(Color.orange)
                             .foregroundColor(.white)
-                            .cornerRadius(12)
+                            .cornerRadius(12)//.frame(minHeight: 40)
                     }
                     .padding(.horizontal)
 

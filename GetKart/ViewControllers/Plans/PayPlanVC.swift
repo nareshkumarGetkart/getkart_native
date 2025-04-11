@@ -1,102 +1,58 @@
 //
-//  MultipleAdsVC.swift
+//  PayPlanVC.swift
 //  GetKart
 //
-//  Created by Radheshyam Yadav on 01/04/25.
+//  Created by Radheshyam Yadav on 11/04/25.
 //
 
 import UIKit
 import FittedSheets
 import PhonePePayment
 
-class MultipleAdsVC: UIViewController {
+class PayPlanVC: UIViewController {
     
-    @IBOutlet weak var lblHeader:UILabel!
-    @IBOutlet weak var lblTitle:UILabel!
-    @IBOutlet weak var lblSubTitle:UILabel!
-    @IBOutlet weak var tblView:UITableView!
+    private var merchantId = ""
+    private var api_key = ""
+    private var phonePeAppId = ""
+    private var ppPayment = PPPayment()
+    var planObj:PlanModel?
     
-    var planListArray = [PlanModel]()
-    var selectedIndex = -1
-    var callbackSelectedPlans: ((_ selPlanObj: PlanModel) -> Void)?
+    @IBOutlet weak var lblPrice:UILabel!
+    @IBOutlet weak var btnPay:UIButton!
 
+    //MARK: COntroller life cycle methods
     
-    //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        tblView.register(UINib(nibName: "PackageAdsCell", bundle: nil), forCellReuseIdentifier: "PackageAdsCell")
-        lblHeader.text = planListArray.first?.name ?? ""
+        btnPay.layer.cornerRadius = 8.0
+        btnPay.clipsToBounds = true
+        lblPrice.text = "\(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)"
+        btnPay.setTitle("\(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)", for: .normal)
+        self.getPaymentSettings()
     }
     
     //MARK: UIbutton Action Methods
     @IBAction func closeBtnAction(_ sender:UIButton){
-     
-        if self.sheetViewController?.options.useInlineMode == true {
-            self.sheetViewController?.attemptDismiss(animated: true)
-        } else {
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-}
-
-
-extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
-    
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
-        return 70.0
-    }
-    
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        return planListArray.count
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PackageAdsCell") as! PackageAdsCell
-        
-        let obj = planListArray[indexPath.row]
-       // cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5)
-        cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)".setStrikeText(color: .gray)
-        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-        cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
-        cell.lblNumberOfAds.text = "\(obj.itemLimit ?? "") Ad"
-        
-        if selectedIndex == indexPath.row{
-            cell.bgView.layer.borderColor = UIColor(hexString: "#FF9900").cgColor
-        }else{
-            cell.bgView.layer.borderColor = UIColor.gray.cgColor
-        }
-        
-        return cell
-    }
-    
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        selectedIndex = indexPath.row
-        self.tblView.reloadData()
         
         if self.sheetViewController?.options.useInlineMode == true {
             self.sheetViewController?.attemptDismiss(animated: true)
         } else {
             self.dismiss(animated: true, completion: nil)
         }
-        callbackSelectedPlans?(planListArray[indexPath.row])
-
-        // self.createPhonePayOrder(package_id: obj.id ?? 0)
     }
-    /*
+    
+    
+    @IBAction func payBtnAction(_ sender:UIButton){
+        
+      
+        self.createPhonePayOrder(package_id: planObj?.id ?? 0)
+    }
+    
     func getPaymentSettings(){
         let params:Dictionary<String, Any> = [:]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.getPaymentSettings, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
             
-        
+            
             if(error != nil)
             {
                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
@@ -107,7 +63,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-
+                
                 if status == 200{
                     
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
@@ -123,13 +79,13 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
                             
                             if devEnvironment == .live {
                                 self?.ppPayment = PPPayment(environment: .production,
-                                                          flowId: flowId,
-                                                       merchantId: self?.merchantId ?? "",
-                                                       enableLogging: false)
+                                                            flowId: flowId,
+                                                            merchantId: self?.merchantId ?? "",
+                                                            enableLogging: false)
                             }else {
                                 self?.ppPayment = PPPayment(environment: .sandbox,
-                                                          flowId: flowId,
-                                                      merchantId: self?.merchantId ?? "", enableLogging: true)
+                                                            flowId: flowId,
+                                                            merchantId: self?.merchantId ?? "", enableLogging: true)
                             }
                             
                         }
@@ -150,7 +106,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
         let params:Dictionary<String, Any> = ["package_id":package_id,"payment_method":"PhonePe", "platform_type":"app"]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.paymentIntent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
-        
+            
             if(error != nil)
             {
                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
@@ -161,7 +117,7 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-
+                
                 if status == 200{
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
                         if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
@@ -169,10 +125,13 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
                                 let orderId = payment_gateway_response["orderId"] as? String ?? ""
                                 let token  = payment_gateway_response["token"] as? String ?? ""
                                 self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                
+                               
+                                
                             }
                         }
                     }
-                   
+                    
                     
                 }else{
                     //self?.delegate?.showError(message: message)
@@ -190,9 +149,18 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
                                     token: token,
                                     appSchema: appSchema,
                                     on: self) { _, state in
-                    print(state)
+            print(state)
+            
+            AlertView.sharedManager.presentAlertWith(title: "", msg: "\(state)" as NSString, buttonTitles: ["ok"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
+                
+            }
+            if self.sheetViewController?.options.useInlineMode == true {
+                self.sheetViewController?.attemptDismiss(animated: true)
+            } else {
+                self.dismiss(animated: true, completion: nil)
+            }
         }
     }
-    */
+    
+    
 }
-      

@@ -14,7 +14,8 @@ protocol FilterSelected{
 
 class FilterVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
-    
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+   
     var latitude:String = ""
     var longitude:String = ""
     var city:String = ""
@@ -32,13 +33,11 @@ class FilterVC: UIViewController {
     
     var arrPostedSinceDict:Array<Dictionary<String,String>> = [["status": "All Time", "value": "all-time"], ["status": "Today", "value": "today"], ["status": "Within 1 week", "value": "within-1-week"], ["status": "Within 2 week", "value": "within-2-week"], ["status": "Within 1 month", "value": "within-1-month"], ["status": "Within 3 month", "value": "within-3-month"]]
     var posted_since:Dictionary<String,String> = [:]
-    
     var objViewModel:CustomFieldsViewModel?
-    
     var delFilterSelected:FilterSelected?
-    
-    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+   
 
+    //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt

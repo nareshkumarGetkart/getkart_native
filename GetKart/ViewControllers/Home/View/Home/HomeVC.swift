@@ -67,10 +67,14 @@ class HomeVC: UIViewController {
     
     @IBAction func filterBtnAction(_ sender : UIButton){
         
-        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
-            vc.delFilterSelected = self
-            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-        }
+        
+        let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController,navigateToFilterScreen: true))
+        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: false)
+        
+//        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+//            vc.delFilterSelected = self
+//            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+//        }
     }
     
     
@@ -84,11 +88,12 @@ class HomeVC: UIViewController {
 
         homeVModel?.page = 1
         homeVModel?.itemObj?.data = nil
+        homeVModel?.featuredObj = nil
         self.tblView.reloadData()
         homeVModel?.getProductListApi()
-
+        homeVModel?.getFeaturedListApi()
         let locStr = city + ", " + state + ", " + country
-        self.btnLocation.setTitle(locStr, for: .normal)
+        self.lblAddress.text = locStr
        
         
     }
@@ -105,7 +110,7 @@ extension HomeVC:FilterSelected{
             
             if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
                 let locStr = city + ", " + state + ", " + country
-                self.btnLocation.setTitle(locStr, for: .normal)
+                self.lblAddress.text = locStr
             }
         }
     }

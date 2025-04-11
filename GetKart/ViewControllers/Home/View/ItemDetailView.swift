@@ -620,23 +620,8 @@ struct SellerInfoView: View {
                 }.padding(.leading)
             }
         }
-       // .padding(.vertical)
     }
 }
-
-//struct MapView: View {
-//    let lat:Double
-//    let long:Double
-//
-//    var body: some View {
-//        Map(coordinateRegion: .constant(MKCoordinateRegion(
-//            center: CLLocationCoordinate2D(latitude: lat, longitude: long),
-//            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-//        )))
-//    }
-//}
-
-
 
 
 
@@ -658,11 +643,6 @@ struct MapView: UIViewRepresentable {
         let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
         mapView.setRegion(region, animated: true)
 
-//        // 📌 Add marker (annotation)
-//        let annotation = MKPointAnnotation()
-//        annotation.coordinate = location
-//        annotation.title = address
-//        mapView.addAnnotation(annotation)
 
         return mapView
     }

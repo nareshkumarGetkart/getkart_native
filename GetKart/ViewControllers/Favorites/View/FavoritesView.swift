@@ -31,30 +31,44 @@ struct FavoritesView: View {
         
         VStack{
             
-            HStack{Spacer()}
-            
-            ScrollView {
+            if objVM.listArray.count == 0 {
                 
-                HStack{  }.frame(height: 5)
-                LazyVStack(spacing: 10) {
-                    ForEach(objVM.listArray) { item in
-                        
-                        FavoritesCell(itemObj: item)
-                            .onTapGesture {
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
-                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                            }
-                            .onAppear{
-                                
-                                if let obj = objVM.listArray.last {
+                HStack{
+                    Spacer()
+                    VStack(spacing: 30){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }else{
+                HStack{Spacer()}
+                
+                ScrollView {
+                    
+                    HStack{  }.frame(height: 5)
+                    LazyVStack(spacing: 10) {
+                        ForEach(objVM.listArray) { item in
+                            
+                            FavoritesCell(itemObj: item)
+                                .onTapGesture {
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0))
+                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                                }
+                                .onAppear{
                                     
-                                    if obj.id == item.id {
-                                        if !objVM.isDataLoading {
-                                            objVM.getFavoriteHistory()
+                                    if let obj = objVM.listArray.last {
+                                        
+                                        if obj.id == item.id {
+                                            if !objVM.isDataLoading {
+                                                objVM.getFavoriteHistory()
+                                            }
                                         }
                                     }
                                 }
-                            }
+                        }
                     }
                 }
                 .padding(.horizontal, 10)

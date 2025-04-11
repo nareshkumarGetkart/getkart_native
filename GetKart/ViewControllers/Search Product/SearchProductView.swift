@@ -17,15 +17,15 @@ import SwiftUI
 struct SearchProductView: View {
     
     var navigation:UINavigationController?
-    
     @State private var searchText = ""
-
     @State var items = [ItemModel]()
     @State var dictCustomFields:Dictionary<String,Any> = [:]
     @State var page = 1
     @State var isDataLoading = false
     @State var isAtBottom = false
     
+    @State var navigateToFilterScreen = false
+
     var body: some View {
         VStack{
         HStack {
@@ -104,6 +104,14 @@ struct SearchProductView: View {
                 .frame(height: 1)
             }
         }.navigationBarHidden(true).onAppear {
+            
+            if (navigateToFilterScreen){
+                if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+                    vc.delFilterSelected = self
+                    self.navigation?.pushViewController(vc, animated: false)
+                }
+                navigateToFilterScreen = false
+            }
             self.getProductListApi()
         }
         .onChange(of: isAtBottom) { atBottom in

@@ -150,17 +150,23 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         
         let controller = StoryBoard.chat.instantiateViewController(identifier: "MultipleAdsVC")
         as! MultipleAdsVC
+        controller.callbackSelectedPlans  = { [weak self](selectedObj) -> Void in
+            print("callback")
+            print(selectedObj.id ?? 0)
+            self?.presentPayView(planObj: selectedObj)
+        }
+    
         controller.planListArray = planListArray[sender.tag]
         let useInlineMode = view != nil
         controller.title = ""
         controller.navigationController?.navigationBar.isHidden = true
         let nav = UINavigationController(rootViewController: controller)
-        var fixedSize = 0.7
+        var fixedSize = 0.55
         if UIDevice().hasNotch{
-            fixedSize = 0.6
+            fixedSize = 0.55
         }else{
             if UIScreen.main.bounds.size.height <= 700 {
-                fixedSize = 0.75
+                fixedSize = 0.70
             }
         }
         nav.navigationBar.isHidden = true
@@ -172,7 +178,42 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
             options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
         sheet.allowGestureThroughOverlay = false
         // sheet.dismissOnOverlayTap = false
-        sheet.cornerRadius = 25
+        sheet.cornerRadius = 20
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+    }
+    
+    
+    func presentPayView(planObj:PlanModel){
+        
+        let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
+        as! PayPlanVC
+        controller.planObj = planObj
+        let useInlineMode = view != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        var fixedSize = 0.2
+        if UIDevice().hasNotch{
+            fixedSize = 0.2
+        }else{
+            if UIScreen.main.bounds.size.height <= 700 {
+                fixedSize = 0.3
+            }
+        }
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.percent(Float(fixedSize)),.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
+        sheet.allowGestureThroughOverlay = false
+        // sheet.dismissOnOverlayTap = false
+        sheet.cornerRadius = 15
         if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
             sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
         } else {
