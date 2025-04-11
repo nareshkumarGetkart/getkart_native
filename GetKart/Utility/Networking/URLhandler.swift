@@ -268,7 +268,7 @@ class URLhandler: NSObject{
         }
     }
           
-    func uploadMedia(fileName : String,  param : [String:AnyObject] , file : URL?, url:String, mimeType:String, completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
+    func uploadMedia(fileName : String,fileKey:String,  param : [String:AnyObject] , file : URL?, url:String, mimeType:String, completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
         
         if isConnectedToNetwork() == true {
             
@@ -280,7 +280,7 @@ class URLhandler: NSObject{
             AF.upload(multipartFormData: { (multipartFormData) in
                 
                 if let fileUrl = file{
-                    multipartFormData.append(fileUrl, withName: "media", fileName: fileName, mimeType: "\(mimeType)")
+                    multipartFormData.append(fileUrl, withName: fileKey, fileName: fileName, mimeType: "\(mimeType)")
                 }
                 for (key, value) in param {
                     multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)

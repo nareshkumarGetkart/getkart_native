@@ -135,7 +135,7 @@ extension ChatVC:Mp3RecorderDelegate{
         self.btnAudioRecordStarted.isHidden = !self.btnAudioRecordStarted.isHidden
         self.btnAudioRecordStarted.setTitle(" 00:00 < Slide to cancel", for: .normal)
         isbeginVoiceRecord = !isbeginVoiceRecord
-       let _ = self.textView.resignFirstResponder()
+        let _ = self.textView.resignFirstResponder()
         self.btnAudioRecordStarted.isHighlighted = false
         BlinkAnimation()
         self.beginRecordVoice()
@@ -182,7 +182,7 @@ extension ChatVC:Mp3RecorderDelegate{
     
     func uploadMp3Audio(voiceData: Data){
         
-        let assetName:String = "\(Local.shared.getUserId())-\(Date().timeIntervalSince1970).mp3"
+        let assetName:String = "\(Int(Date().timeIntervalSince1970)).mp3"
         
         var fileURL:URL?
         do {
@@ -194,11 +194,11 @@ extension ChatVC:Mp3RecorderDelegate{
                 
                 let params =  Dictionary<String, Any>() //["type":3]
                                 
-                URLhandler.sharedinstance.uploadMedia(fileName: "audio", param:  params as [String : AnyObject], file: fileURL!, url:  Constant.shared.upload_chat_files, mimeType: "audio/mpeg") { [weak self] responseObject, error in
-                    
-                    
-                    self?.removeFiles(fileUrl: fileURL)
+                URLhandler.sharedinstance.uploadMedia(fileName: assetName, fileKey: "audio", param:  params as [String : AnyObject], file: fileURL!, url:  Constant.shared.upload_chat_files, mimeType: "audio/mpeg") { [weak self] responseObject, error in
+                                      
 
+                  //  self?.removeFiles(fileUrl: fileURL)
+                    
                     if(error != nil)
                     {
                         //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)

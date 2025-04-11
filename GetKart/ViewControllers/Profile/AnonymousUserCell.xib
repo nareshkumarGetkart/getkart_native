@@ -32,7 +32,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4jh-lf-5Qy">
                                 <rect key="frame" x="0.0" y="0.0" width="310" height="100"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete_illustrator" translatesAutoresizingMaskIntoConstraints="NO" id="hdO-nu-wLd">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete_illustrator" translatesAutoresizingMaskIntoConstraints="NO" id="hdO-nu-wLd">
                                         <rect key="frame" x="10" y="15" width="70" height="70"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="70" id="VJy-2F-P1q"/>

@@ -33,7 +33,7 @@ struct MakeAnOfferView: View {
                 
                 Divider()
                 
-                Text("Seller's Price \(sellerPrice)")
+                Text("Seller's Price \(Local.shared.currencySymbol) \(sellerPrice)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 

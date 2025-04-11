@@ -21,7 +21,7 @@ struct ItemDetailView: View {
     @State private var showOfferPopup = false
     @State private var showShareSheet = false
     @State var isMyProduct = false
-    
+
     var body: some View {
         
         HStack{
@@ -106,8 +106,15 @@ struct ItemDetailView: View {
                                 .padding()
                         }
                     }
-                    
-                    if isMyProduct{
+
+
+                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                    let isFeatured = objVM.itemObj?.isFeature ?? false
+                    let loggedInUserId = objLoggedInUser.id ?? 0
+                    let itemUserId = objVM.itemObj?.userID ?? 0
+
+                    if loggedInUserId == itemUserId {
+
                         HStack {
                             HStack {
                                 Image(systemName: "eye")
@@ -145,15 +152,13 @@ struct ItemDetailView: View {
                         
                         Spacer()
                         if isMyProduct{
-                            
-                            Text("Approved")
+                            Text(objVM.itemObj?.status ?? "")
                                 .font(Font.manrope(.medium, size: 15))                               .foregroundColor(.green).padding(.horizontal)
                                 .frame(height:30)
                                 .background(Color.green.opacity(0.2))
                                 .cornerRadius(15)
                         }
                     }
-                    
                     
                     HStack{
                         HStack{
@@ -164,7 +169,19 @@ struct ItemDetailView: View {
                         Text(objVM.itemObj?.expiryDate ?? "")
                     }.padding(5).padding(.bottom,10)
                     
-                    if isMyProduct{
+//                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//
+//                    if ((objVM.itemObj?.isFeature ?? 0) == 0) && ((objLoggedInUser.id ?? 0) == (objVM.itemObj?.userID ?? 0)) {
+
+                    
+//                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//                    let isFeatured = objVM.itemObj?.isFeature ?? false
+//                    let loggedInUserId = objLoggedInUser.id ?? 0
+//                    let itemUserId = objVM.itemObj?.userID ?? 0
+                    
+                 if !isFeatured && (loggedInUserId == itemUserId) {
+
+                   // if isMyProduct{
                         HStack{
                             Spacer()
                             Image("create_add").padding(5)
@@ -242,44 +259,48 @@ struct ItemDetailView: View {
                             self.navController?.pushViewController(hostingController, animated: true)
                         }
                     
-                    VStack(alignment: .leading, spacing: 15) {
-                        HStack {
-                            Circle()
-                                .frame(width: 8, height: 8)
-                                .foregroundColor(.red)
-                            Text("Did you find any problem?").font(Font.manrope(.semiBold, size: 16))
+                    
+                    if (loggedInUserId != itemUserId) {
+                        VStack(alignment: .leading, spacing: 15) {
+                            HStack {
+                                Circle()
+                                    .frame(width: 8, height: 8)
+                                    .foregroundColor(.red)
+                                Text("Did you find any problem?").font(Font.manrope(.semiBold, size: 16))
+                                    .font(.subheadline)
+                                    .foregroundColor(.black)
+                            }
+                            
+                            
+                            Text("Report this Ad")
                                 .font(.subheadline)
-                                .foregroundColor(.black)
-                        }
-                        
-                        
-                        Text("Report this Ad")
-                            .font(.subheadline)
-                            .foregroundColor(.orange).frame(width: 130, height: 30)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.gray, lineWidth: 0.5)
-                            ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
-                            .onTapGesture {
-                              //  if (objVM.itemObj.isAlreadyReported ?? false) == false {
+                                .foregroundColor(.orange).frame(width: 130, height: 30)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color.gray, lineWidth: 0.5)
+                                ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
+                                .onTapGesture {
+                                    //  if (objVM.itemObj.isAlreadyReported ?? false) == false {
                                     let destVC = UIHostingController(rootView: ReportAdsView())
                                     destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
                                     destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
                                     destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
                                     self.navController?.present(destVC, animated: true, completion: nil)
-                               
-//                                }else{
-//                                    print("Already Reported")
-//                                }
-                            }
-                    }.padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
-                        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                        .padding(.top, 5)
+                                    
+                                    //                                }else{
+                                    //                                    print("Already Reported")
+                                    //                                }
+                                }
+                        }.padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray, lineWidth: 0.5)
+                            )
+                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .padding(.top, 5)
+                        
+                    }
                     
                 }.padding(.horizontal)
                 Spacer()

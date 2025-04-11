@@ -108,6 +108,7 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
         
+        
         // checkOnlineOfflineStatus()
     }
     
@@ -357,10 +358,7 @@ class ChatVC: UIViewController {
         Themes.sharedInstance.showActivityViewTop(uiView: self.view, position: .mid)
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
-            
-//        }
-//        URLhandler.sharedinstance.uploadMedia(fileName: name, param: [:], file: file, url: Constant.shared.upload_chat_files, mimeType: "image/*") { responseObject, error in
-//
+
             Themes.sharedInstance.removeActivityView(uiView: self.view)
 
             if error == nil {
@@ -507,7 +505,7 @@ class ChatVC: UIViewController {
                 let price = itemDict["price"] as? Int ?? 0
                 self.itemId = itemDict["id"] as? Int ?? 0
                 self.lblProduct.text = name
-                self.lblPrice.text = "\(price)"
+                self.lblPrice.text = "\(Local.shared.currencySymbol) \(price)"
                 self.imgViewProduct.kf.setImage(with: URL(string: image),placeholder: UIImage(named: "getkartplaceholder"))
             }
             

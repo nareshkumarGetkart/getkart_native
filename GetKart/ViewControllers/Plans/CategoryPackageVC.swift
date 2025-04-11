@@ -16,7 +16,6 @@ class CategoryPackageVC: UIViewController {
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var lblSelectedLoc:UILabel!
     @IBOutlet weak var lblSelectedCategory:UILabel!
-    
     @IBOutlet weak var collectionViewBanner:UICollectionView!
 
     var categoryId = 0
