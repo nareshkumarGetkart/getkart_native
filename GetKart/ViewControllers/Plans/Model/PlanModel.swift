@@ -53,3 +53,14 @@ enum TypePlanEnum: String, Codable {
     case itemListing = "item_listing"
     case itemListingAutoboost = "item_listing_autoboost"
 }
+
+
+
+
+
+struct PlanBanner: Codable {
+    let error: Bool?
+    let message: String?
+    let data: [String]?
+    let code: Int?
+}

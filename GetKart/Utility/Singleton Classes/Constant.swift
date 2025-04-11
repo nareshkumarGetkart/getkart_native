@@ -328,6 +328,11 @@ final class Constant: NSObject {
     }
     
     
+    var get_package_banner:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/get-package-banner"
+        }
+    }
     
     
 }

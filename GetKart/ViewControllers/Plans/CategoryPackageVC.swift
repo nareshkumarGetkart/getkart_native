@@ -16,21 +16,26 @@ class CategoryPackageVC: UIViewController {
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var lblSelectedLoc:UILabel!
     @IBOutlet weak var lblSelectedCategory:UILabel!
+    
+    @IBOutlet weak var collectionViewBanner:UICollectionView!
 
     var categoryId = 0
     var categoryName = ""
     var city = ""
     
     var planListArray = [[PlanModel]]()
-
+    var bannerArray = [String]()
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "PackageCell", bundle: nil), forCellReuseIdentifier: "PackageCell")
+        collectionViewBanner.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
+
         self.lblSelectedCategory.text = "Category: \(categoryName)"
         self.lblSelectedLoc.text = "Location: \(city)"
-
+        getPackagesBannersApi()
         getPackagesApi()
     }
    
@@ -48,7 +53,7 @@ class CategoryPackageVC: UIViewController {
     
     func getPackagesApi(){
         
-        let strURL = Constant.shared.get_package // + "?category_id=\(categoryId)&city=\(city)"
+        let strURL = Constant.shared.get_package + "?category_id=\(categoryId)&city=\(city)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURL) { (obj:Plan) in
             
@@ -58,6 +63,47 @@ class CategoryPackageVC: UIViewController {
             }
         }
     }
+    
+    func getPackagesBannersApi(){
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_package_banner) { (obj:PlanBanner) in
+            
+            if obj.code == 200 {
+                self.bannerArray.append(contentsOf: obj.data ?? [])
+                self.collectionViewBanner.reloadData()
+            }
+        }
+    }
+    
+    
+}
+
+extension CategoryPackageVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
+    
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return bannerArray.count
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: self.collectionViewBanner.frame.size.width, height: 175)
+        
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BannerCell", for: indexPath) as! BannerCell
+        cell.imgVwBanner.kf.setImage(with:  URL(string: bannerArray[indexPath.item]) , placeholder:UIImage(named: "getkartplaceholder"))
+        
+        return cell
+        
+    }
+    
 }
 
 extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{

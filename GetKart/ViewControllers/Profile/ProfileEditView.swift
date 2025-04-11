@@ -17,7 +17,8 @@ struct ProfileEditView: View {
         @State private var isContactInfoVisible: Bool = false
         @State private var selectedImage: UIImage? = nil
         @State private var showingImagePicker: Bool = false
- 
+        @State private var showOTPPopup = false
+
     
     var body: some View {
         HStack{
@@ -72,6 +73,18 @@ struct ProfileEditView: View {
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
+                HStack{
+                    Spacer()
+                    Button(action: {
+                        showOTPPopup = true
+                    }) {
+                        Text("Verify")
+                            .underline() .foregroundColor(Color.orange).padding(.horizontal)
+                    }
+                }.frame(height:15)
+                
+                
+                
                 CustomTextField(title: "Address", text: $address)
                 
                 // Toggle Switches
@@ -99,7 +112,45 @@ struct ProfileEditView: View {
         }.navigationBarHidden(true).onAppear{
             getUserProfileApi()
         }
+        .fullScreenCover(isPresented: $showOTPPopup) {
+            if #available(iOS 16.4, *) {
+                OTPPopup(
+                    showOTPPopup: $showOTPPopup,
+                    otp: "44334",
+                    onVerify: {
+                        // print("OTP Entered: \(otp)")
+                        // Call your verification logic here
+                    }
+                ).presentationDetents([.large, .large]) // Optional for different heights
+                    .background(.clear) // Remove default background
+                    .presentationBackground(.clear)
+            } else {
+                // Fallback on earlier versions
+                
+                OTPPopup(
+                    showOTPPopup: $showOTPPopup,
+                    otp: "44334",
+                    onVerify: {
+                        // print("OTP Entered: \(otp)")
+                        // Call your verification logic here
+                    }
+                )
+            } // Works in iOS 16+
+        }
         
+        
+        /*.sheet(isPresented: $showOTPPopup) {
+            // Centered OTP Popup
+                      OTPPopup(
+                        showOTPPopup: $showOTPPopup,
+                          otp: "44334",
+                          onVerify: {
+                             // print("OTP Entered: \(otp)")
+                              // Call your verification logic here
+                          }
+                      )
+        }
+        */
         
     }
     
@@ -257,5 +308,62 @@ struct ImagePicker: UIViewControllerRepresentable {
 struct ProfileEditView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileEditView()
+    }
+}
+
+
+
+import SwiftUI
+
+struct OTPPopup: View {
+    @Binding var showOTPPopup: Bool
+    @State var otp: String
+    var onVerify: () -> Void
+
+    var body: some View {
+        if showOTPPopup {
+            ZStack {
+                // Dimmed background
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 20) {
+                    Text("Enter OTP")
+                        .font(.title2)
+                        .bold()
+
+                    TextField("6-digit code", text: $otp).frame(minHeight: 40)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal)
+
+                    Button(action: {
+                        onVerify()
+                        showOTPPopup = false
+                    }) {
+                        Text("Verify")
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
+                           // .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                    .padding(.horizontal)
+
+                    Button("Cancel") {
+                        showOTPPopup = false
+                    }
+                    .foregroundColor(.gray)
+                }
+                .padding()
+                .background(Color(UIColor.systemBackground))
+                .cornerRadius(20)
+                .padding(.horizontal, 30)
+                .shadow(radius: 20)
+            }
+            .transition(.opacity)
+           // .animation(.easeInOut, value: isVisible)
+        }
     }
 }
