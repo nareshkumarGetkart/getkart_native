@@ -61,7 +61,8 @@ struct CountryLocationView: View {
                 // Icon button on the right (for settings or any other action)
                 Button(action: {
                     // Action for icon button
-                    
+                    let vc = UIHostingController(rootView: SelectLocationRangeView(navigationController: self.navigationController, popType: self.popType))
+                                            self.navigationController?.pushViewController(vc, animated: true)
                 }) {
                     Image("symbolShareLocation")
                         .foregroundColor(.gray)
