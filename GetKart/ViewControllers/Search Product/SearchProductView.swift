@@ -108,11 +108,13 @@ struct SearchProductView: View {
             if (navigateToFilterScreen){
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
                     vc.delFilterSelected = self
+                    vc.isPushedFromHome = navigateToFilterScreen
                     self.navigation?.pushViewController(vc, animated: false)
                 }
                 navigateToFilterScreen = false
+            }else{
+                self.getProductListApi()
             }
-            self.getProductListApi()
         }
         .onChange(of: isAtBottom) { atBottom in
                     if atBottom {
@@ -156,7 +158,7 @@ struct SearchProductView: View {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 self.isDataLoading = false
-                self.page = (self.page ?? 0) + 1
+                self.page = (self.page) + 1
             })
         }
     }

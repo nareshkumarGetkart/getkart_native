@@ -28,7 +28,8 @@ enum AddKeys: String{
 class CreateAddDetailVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnBack:UIButton!
-    
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+
     var objCategory: CategoryModel?
     var objSubCategory:Subcategory?
     
@@ -50,7 +51,7 @@ class CreateAddDetailVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "AlmostThereCell", bundle: nil), forCellReuseIdentifier: "AlmostThereCell")
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")

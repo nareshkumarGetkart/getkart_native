@@ -49,7 +49,7 @@ class CategoryPlanVC: UIViewController {
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popType: .buyPackage))
+           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .buyPackage, navigationController: self.navigationController))
            self.navigationController?.pushViewController(vc, animated: true)
        }
    }

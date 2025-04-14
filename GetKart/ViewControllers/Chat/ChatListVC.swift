@@ -72,6 +72,9 @@ class ChatListVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        //if pageMenu?.currentPageIndex == 0{
+            pageMenu?.controllerArray[pageMenu?.currentPageIndex ?? 0].viewWillAppear(true)
+       // }
         
     }
     

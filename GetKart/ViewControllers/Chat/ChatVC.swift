@@ -59,6 +59,10 @@ class ChatVC: UIViewController {
     var userId = 0
     var itemId = 0
     
+    
+    var typingTimer: Timer?
+    var isTyping = false
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +131,7 @@ class ChatVC: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        typingTimer?.invalidate()
     }
     
     //MARK: Pull Down refresh
@@ -619,6 +624,8 @@ class ChatVC: UIViewController {
                     
                     sendmessageAcknowledge()
                 }
+                
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
             }
         }
     }
@@ -786,20 +793,44 @@ extension ChatVC: GrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: GrowingTextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
        
-        if text.count > 0{
+        
+        
+              if !isTyping {
+                    isTyping = true
+                  self.sendtypinStatus(status: true)
+                }
+                resetTypingTimer()
+        
+       /* if text.count > 0{
             self.sendtypinStatus(status: true)
 
         }else{
             //self.sendtypinStatus(status: false)
         }
+        */
         return true
     }
+    
+    func resetTypingTimer() {
+         typingTimer?.invalidate()
+         typingTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: false) { [weak self] _ in
+             self?.userStoppedTyping()
+         }
+     }
+
+     func userStoppedTyping() {
+         if isTyping {
+             isTyping = false
+             self.sendtypinStatus(status: false)
+         }
+     }
+
     func growingTextViewDidBeginEditing(_ growingTextView: GrowingTextView) {
-        self.sendtypinStatus(status: true)
+      //  self.sendtypinStatus(status: true)
     }
    
     func growingTextViewDidEndEditing(_ growingTextView: GrowingTextView) {
-       self.sendtypinStatus(status: false)
+      // self.sendtypinStatus(status: false)
     }
     
     

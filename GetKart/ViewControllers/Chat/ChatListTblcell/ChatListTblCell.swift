@@ -14,6 +14,8 @@ class ChatListTblCell: UITableViewCell {
     @IBOutlet weak var lblDesc:UILabel!
     @IBOutlet weak var bgView:UIView!
     @IBOutlet weak var imgViewItem:UIImageView!
+    @IBOutlet weak var lblLastMessage:UILabel!
+    @IBOutlet weak var lblDot:UILabel!
 
 
     override func awakeFromNib() {
@@ -24,6 +26,9 @@ class ChatListTblCell: UITableViewCell {
         
         imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
         imgViewProfile.clipsToBounds = true
+        
+        lblDot.layer.cornerRadius = lblDot.frame.size.height/2.0
+        lblDot.clipsToBounds = true
         
         
     }

@@ -8,140 +8,148 @@
 import SwiftUI
 
 struct CountryLocationView: View {
+    
     @State private var searchText = ""
     @Environment(\.presentationMode) var presentationMode
-    var navigationController: UINavigationController?
     @State var arrCountries:Array<CountryModel> = []
     @State var arrSearchedCountries:Array<CountryModel> = []
     @State var popType:PopType?
     var locationManager = LocationManager()
+    var navigationController: UINavigationController?
+
     var body: some View {
         
-            VStack(spacing: 0) {
-                HStack{
-                    
-                    Button {
-                        self.navigationController?.popViewController(animated: true)
-                    } label: {
-                        Image("arrow_left").renderingMode(.template).foregroundColor(.black)
-                    }.frame(width: 40,height: 40)
-                    
-                    Text("Location").font(.custom("Manrope-Bold", size: 20.0))
-                        .foregroundColor(.black)
-                    Spacer()
-                }.frame(height:44).background(Color.white)
+        VStack(spacing: 0) {
+            HStack{
                 
-                // MARK: - Search Bar
+                Button {
+                    self.navigationController?.popViewController(animated: true)
+                } label: {
+                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                }.frame(width: 40,height: 40)
+                
+                Text("Location")
+                    .font(Font.manrope(.bold, size: 20.0))
+                    .foregroundColor(.black)
+                Spacer()
+            }.frame(height:44).background(Color.white)
+            
+            // MARK: - Search Bar
+            HStack {
                 HStack {
-                    HStack {
-                        Image("search").resizable().frame(width: 20,height: 20)
-                        TextField("Search Country", text: $searchText)
-                            .textFieldStyle(PlainTextFieldStyle())
-                            .padding(.horizontal, 8)
-                            .frame(height: 36)
-                            //.background(Color(.systemGray6))
-                            //.cornerRadius(8)
-                            .onChange(of: searchText) { newValue in
-                                print(newValue)
-                                searchCountry(strCountry:newValue)
-                            }
-                        
-                        if searchText.count > 0 {
-                            Button("Clear") {
-                                searchText = ""
-                            }.foregroundColor(.black)
+                    Image("search").resizable().frame(width: 20,height: 20)
+                    TextField("Search Country", text: $searchText)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .padding(.horizontal, 8)
+                        .frame(height: 36)
+                    //.background(Color(.systemGray6))
+                    //.cornerRadius(8)
+                        .onChange(of: searchText) { newValue in
+                            print(newValue)
+                            searchCountry(strCountry:newValue)
                         }
-                    }.background(Color.white).padding().frame(height: 45).overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray, lineWidth: 1)
-                        }
-                    // Icon button on the right (for settings or any other action)
-                    Button(action: {
-                        // Action for icon button
-                        
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(.gray)
-                            .padding(.leading, 8)
+                    
+                    if searchText.count > 0 {
+                        Button("Clear") {
+                            searchText = ""
+                        }.foregroundColor(.black)
                     }
+                }.background(Color.white).padding().frame(height: 45).overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray, lineWidth: 1)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+                // Icon button on the right (for settings or any other action)
+                Button(action: {
+                    // Action for icon button
+                    
+                }) {
+                    Image("symbolShareLocation")
+                        .foregroundColor(.gray)
+                        .frame(width: 40,height:40)
+                            .foregroundColor(.orange)
+                            .background(Color(UIColor.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .padding(.leading, 8)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            
+            Divider()
+            
+            // MARK: - Current Location Row
+            HStack {
+                
+                Button(action: {
+                    // Enable location action
+                    findMyLocationAction()
+                }) {
+                    Image("currentLocation")
+                        .foregroundColor(.orange)
+                    Text("Use Current Location")
+                        .font(Font.manrope(.medium, size: 15))
+                        .foregroundColor(.orange)
+                }.padding(.leading, 20)
+                    .padding(.top, 5)
+                Spacer()
+                
+                
+            }.padding(.top, 8)
+            if self.locationManager.checkForLocationAccess() == false {
+                HStack {
+                    Button(action: {
+                        // Enable location action
+                    }) {
+                        Text("Enable Location")
+                            .font(Font.manrope(.medium, size: 15))
+                            .foregroundColor(.black)
+                    }.padding(.leading, 20)
+                        .padding(.top, 5)
+                    
+                    
+                    Spacer()
+                }
+                .padding()
                 
                 Divider()
-                
-                // MARK: - Current Location Row
-                HStack {
-                       
-                      Button(action: {
-                          // Enable location action
-                          findMyLocationAction()
-                      }) {
-                          Image(systemName: "location.fill")
-                              .foregroundColor(.orange)
-                          Text("Use Current Location")
-                              .font(Font.manrope(.medium, size: 15))
-                              .foregroundColor(.orange)
-                      }.padding(.leading, 20)
-                          .padding(.top, 5)
-                      Spacer()
-                    
-                    
-                }.padding(.top, 8)
-                if self.locationManager.checkForLocationAccess() == false {
-                    HStack {
-                        Button(action: {
-                            // Enable location action
-                        }) {
-                            Text("Enable Location")
-                                .font(Font.manrope(.medium, size: 15))
-                                .foregroundColor(.black)
-                        }.padding(.leading, 20)
-                            .padding(.top, 5)
-                        
-                        
-                        Spacer()
-                    }
-                    .padding()
-                    
-                    Divider()
-                }
-                
-                // MARK: - List of Countries
-                ScrollView{
-                    if searchText.count == 0 {
-                        ForEach(arrCountries) { country in
-                            CountryRow(strTitle:country.name ?? "")
-                                .frame(height: 40).padding(.horizontal)
-                                .onTapGesture{
-                                    self.navigateToStateListing(country: country)
-                                }
-                            Divider()
-                        }
-                        
-                    }else {
-                        ForEach(arrSearchedCountries) { country in
-                            CountryRow(strTitle:country.name ?? "")
-                                .frame(height: 40).padding(.horizontal)
-                                .onTapGesture{
-                                    
-                                    self.navigateToStateListing(country: country)
-                                }
-                            Divider()
-                        }
-                    }
-                }
-                
-                Spacer()
-            }.onAppear{
-                fetchCountryListing()
             }
-            .navigationTitle("Location")
-            .navigationBarBackButtonHidden()
-            .navigationBarHidden(true)
+            
+            // MARK: - List of Countries
+            ScrollView{
+                if searchText.count == 0 {
+                    ForEach(arrCountries) { country in
+                        CountryRow(strTitle:country.name ?? "")
+                            .frame(height: 40)//.padding(.horizontal)
+                            .onTapGesture{
+                                self.navigateToStateListing(country: country)
+                            }
+                        Divider()
+                    }
+                    
+                }else {
+                    ForEach(arrSearchedCountries) { country in
+                        CountryRow(strTitle:country.name ?? "")
+                            .frame(height: 40)//.padding(.horizontal)
+                            .onTapGesture{
+                                
+                                self.navigateToStateListing(country: country)
+                            }
+                        Divider()
+                    }
+                }
+            }
+            
+            Spacer()
+        }.onAppear{
+            fetchCountryListing()
+        }
+        .navigationTitle("Location")
+        .navigationBarBackButtonHidden()
+        .navigationBarHidden(true)
     }
     
     func findMyLocationAction(){
+        
         locationManager.delegate = self
         locationManager.checkLocationAuthorization()
         
@@ -187,9 +195,7 @@ struct CountryLocationView: View {
    }
     
     func locationSelected() {
-        
-        
-        
+                
         for vc in self.navigationController?.viewControllers ?? [] {
           
             if popType == .buyPackage {
@@ -250,18 +256,20 @@ struct CountryRow: View {
             Text("\(strTitle)")
                 .font(Font.manrope(.medium, size: 15))
             Spacer()
-            Image("arrow_right")
+            Image("arrow_right").frame(width: 30,height:30)
                 .foregroundColor(.orange)
-                .padding(.trailing, 10)
-        }.padding(.leading, 30)
+                .background(Color(UIColor.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+        }.padding(.horizontal,10)
         
     }
 }
 
-#Preview {
-    CountryRow()
-}
-
+//#Preview {
+//    CountryRow()
+//}
+//
 
 extension CountryLocationView :LocationAutorizationUpdated {
     func locationAuthorizationUpdate() {

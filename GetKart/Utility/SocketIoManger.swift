@@ -20,6 +20,9 @@ enum SocketEvents:String,CaseIterable{
     case typing = "typing"
     case messageAcknowledge = "messageAcknowledge"
     case onlineOfflineStatus = "onlineOfflineStatus"
+    case updateChatList = "updateChatList"
+
+    
 
     //
     case joinRoom = "joinRoom"
@@ -160,6 +163,16 @@ final class SocketIOManager: NSObject {
         }
         
         
+        
+        socket?.on(SocketEvents.updateChatList.rawValue) { data, ack in
+            if let responseDict = data[0] as? NSDictionary{
+                if ISDEBUG == true {
+                    print("\(SocketEvents.updateChatList.rawValue) responseDict =>\(responseDict)")
+                    
+                }
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.updateChatList.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
+            }
+        }
         
         socket?.on(SocketEvents.itemOffer.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{

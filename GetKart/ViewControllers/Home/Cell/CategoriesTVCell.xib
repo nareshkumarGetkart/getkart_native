@@ -11,7 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CategoriesTVCell" rowHeight="52" id="KGk-i7-Jjw" customClass="CategoriesTVCell" customModule="GetKart" customModuleProvider="target">
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="CategoriesTVCell" rowHeight="52" id="KGk-i7-Jjw" customClass="CategoriesTVCell" customModule="GetKart" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="52"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
@@ -33,31 +33,56 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="jRS-DB-BNg"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3fa-Y2-gn6">
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OvO-te-SkY" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="280" y="10" width="30" height="30"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3fa-Y2-gn6">
+                                        <rect key="frame" x="5" y="5" width="20" height="20"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="arrow_right">
+                                            <attributedString key="attributedTitle"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemGray6Color"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="YpW-XC-BXK"/>
-                                    <constraint firstAttribute="width" constant="30" id="agO-ZI-G0v"/>
+                                    <constraint firstAttribute="trailing" secondItem="3fa-Y2-gn6" secondAttribute="trailing" constant="5" id="7dD-ZU-udq"/>
+                                    <constraint firstItem="3fa-Y2-gn6" firstAttribute="top" secondItem="OvO-te-SkY" secondAttribute="top" constant="5" id="GLf-Cr-3Z6"/>
+                                    <constraint firstAttribute="height" constant="30" id="fOa-xP-Th4"/>
+                                    <constraint firstAttribute="width" constant="30" id="ola-cy-arI"/>
+                                    <constraint firstAttribute="bottom" secondItem="3fa-Y2-gn6" secondAttribute="bottom" constant="5" id="sSm-cd-cz7"/>
+                                    <constraint firstItem="3fa-Y2-gn6" firstAttribute="leading" secondItem="OvO-te-SkY" secondAttribute="leading" constant="5" id="uwv-Uo-DUK"/>
                                 </constraints>
-                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" image="arrow_right">
-                                    <attributedString key="attributedTitle"/>
-                                </state>
-                            </button>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="7"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kcc-XT-MeR">
+                                <rect key="frame" x="0.0" y="49" width="320" height="1"/>
+                                <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="upF-Ws-1nS"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="3fa-Y2-gn6" secondAttribute="trailing" constant="10" id="A5d-Hd-rnb"/>
+                            <constraint firstAttribute="trailing" secondItem="kcc-XT-MeR" secondAttribute="trailing" id="41q-x0-oBm"/>
                             <constraint firstItem="5dR-MQ-CvC" firstAttribute="centerY" secondItem="c8Q-Tm-kwv" secondAttribute="centerY" id="Bxx-cq-pC2"/>
                             <constraint firstAttribute="height" constant="50" id="Mke-6a-KC3"/>
                             <constraint firstItem="Mte-bv-j1V" firstAttribute="leading" secondItem="5dR-MQ-CvC" secondAttribute="trailing" constant="5" id="Ne6-vW-wZg"/>
-                            <constraint firstItem="3fa-Y2-gn6" firstAttribute="centerY" secondItem="Mte-bv-j1V" secondAttribute="centerY" constant="1.5" id="Nfr-6W-qT4"/>
+                            <constraint firstItem="OvO-te-SkY" firstAttribute="leading" secondItem="Mte-bv-j1V" secondAttribute="trailing" constant="7" id="Nfr-a7-GNE"/>
+                            <constraint firstItem="OvO-te-SkY" firstAttribute="centerY" secondItem="c8Q-Tm-kwv" secondAttribute="centerY" id="adk-1a-MSL"/>
+                            <constraint firstAttribute="bottom" secondItem="kcc-XT-MeR" secondAttribute="bottom" id="cgO-pQ-HUQ"/>
                             <constraint firstItem="Mte-bv-j1V" firstAttribute="centerY" secondItem="5dR-MQ-CvC" secondAttribute="centerY" constant="-1.6666666666666643" id="dZ3-eg-HGg"/>
-                            <constraint firstAttribute="trailing" secondItem="Mte-bv-j1V" secondAttribute="trailing" constant="47" id="okJ-uz-mXg"/>
+                            <constraint firstAttribute="trailing" secondItem="OvO-te-SkY" secondAttribute="trailing" constant="10" id="e4z-55-wHa"/>
+                            <constraint firstItem="kcc-XT-MeR" firstAttribute="leading" secondItem="c8Q-Tm-kwv" secondAttribute="leading" id="eTv-hD-obg"/>
                             <constraint firstItem="5dR-MQ-CvC" firstAttribute="leading" secondItem="c8Q-Tm-kwv" secondAttribute="leading" constant="10" id="t5V-6j-aoO"/>
                         </constraints>
                     </view>
@@ -80,8 +105,14 @@
     </objects>
     <resources>
         <image name="arrow_right" width="9" height="15.333333015441895"/>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray6Color">
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

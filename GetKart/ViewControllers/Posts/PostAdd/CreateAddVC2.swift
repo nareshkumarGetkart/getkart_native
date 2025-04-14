@@ -9,6 +9,8 @@ import UIKit
 import SwiftUI
 class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
+    @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+
     var dataArray:[CustomFields] = []
     var params:Dictionary<String,Any> = [:]
     var dictCustomFields:Dictionary<String,Any> = [:]
@@ -21,6 +23,7 @@ class CreateAddVC2: UIViewController {
     var showErrorMsg = false
     override func viewDidLoad() {
         super.viewDidLoad()
+        cnstrntHtNavBar.constant = self.getNavBarHt
         print(params)
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
@@ -67,10 +70,12 @@ class CreateAddVC2: UIViewController {
             self.fetchCountryListing()
         }
     }
+    
+    
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popType: .createPost))
+           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .createPost, navigationController: self.navigationController))
            self.navigationController?.pushViewController(vc, animated: true)
            
        }

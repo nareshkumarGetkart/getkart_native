@@ -67,14 +67,14 @@ struct CityLocationView: View {
                 }
                 
                 // Icon button on the right (for settings or any other action)
-                Button(action: {
+             /*   Button(action: {
                     // Action for icon button
                     
                 }) {
                     Image(systemName: "gearshape.fill")
                         .foregroundColor(.gray)
                         .padding(.leading, 8)
-                }
+                }*/
             }
             .padding(.horizontal)
             .padding(.vertical, 8)

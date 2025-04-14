@@ -18,11 +18,18 @@ class DropDownVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tblView.register(UINib(nibName: "DropDownTVCell", bundle: nil), forCellReuseIdentifier: "DropDownTVCell")
-        
+        tblView.layer.cornerRadius = 10.0
+        tblView.clipsToBounds = true
         // Do any additional setup after loading the view.
+        
+       // self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tappedView)))
     }
     
 
+//    @objc  func tappedView(){
+//        self.dismiss(animated: true, completion: nil)
+//
+//    }
     /*
     // MARK: - Navigation
 

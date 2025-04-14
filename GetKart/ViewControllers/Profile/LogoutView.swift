@@ -62,7 +62,8 @@ struct LogoutView: View {
     
     
     func LogoutApi(){
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.deleteUser, param: Dictionary(), methodType: .delete,showLoader:true) {  responseObject, error in
+        let strUrl =  Constant.shared.logout + "?fcm_id=\(Local.shared.getFCMToken())"
+        URLhandler.sharedinstance.makeCall(url:strUrl , param: Dictionary(), methodType: .post,showLoader:true) {  responseObject, error in
             
         
             if(error != nil)
@@ -80,14 +81,10 @@ struct LogoutView: View {
                     // presentationMode.wrappedValue.dismiss()
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
-                    
                     showAlert = false
                     presentationMode.wrappedValue.dismiss()
-                    
-                    
                     AppDelegate.sharedInstance.showLoginScreen()
                    
-                    
                 }else{
                     //self?.delegate?.showError(message: message)
                 }

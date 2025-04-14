@@ -11,7 +11,17 @@ class SellingChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     var listArray = [ChatList]()
     var page = 1
+    var isDataLoading = false
     private var emptyView:EmptyList?
+    
+    private  lazy var topRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+                                    #selector(handlePullDownRefresh(_:)),
+                                 for: .valueChanged)
+        refreshControl.tintColor = UIColor.systemYellow
+        return refreshControl
+    }()
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -20,6 +30,9 @@ class SellingChatVC: UIViewController {
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
         NotificationCenter.default.addObserver(self, selector: #selector(self.chatList), name: NSNotification.Name(rawValue: SocketEvents.sellerChatList.rawValue), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.updateChatList), name: NSNotification.Name(rawValue: SocketEvents.updateChatList.rawValue), object: nil)
+
+        tblView.refreshControl = topRefreshControl
         DispatchQueue.main.async{
             self.emptyView = EmptyList(frame: CGRect(x: 0, y: 0, width:  self.tblView.frame.size.width, height:  self.tblView.frame.size.height))
             self.tblView.addSubview(self.emptyView!)
@@ -28,13 +41,20 @@ class SellingChatVC: UIViewController {
             self.emptyView?.imageView?.image = UIImage(named: "no_chat_found")
         }
         
-        getChatList()
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+       // getChatList()
 
     }
-  
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE == true{
+            self.page = 1
+            getChatList()
 
+        }
+        
     }
 
     func getChatList(){
@@ -46,10 +66,62 @@ class SellingChatVC: UIViewController {
     }
 
     
+    
+    //MARK: Pull Down refresh
+    @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
+        if !isDataLoading {
+            isDataLoading = true
+            page = 1
+            self.getChatList()
+        }
+        refreshControl.endRefreshing()
+    }
+    
+    
     //MARK: Observers
     
-    @objc func chatList(notification: Notification) {
+    
+    @objc func updateChatList(notification: Notification) {
         
+        
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let response : ParseUpdatedChat = try? SocketParser.convert(data: data) {
+            
+            if response.type?.lowercased() == "seller"{
+                
+                var isFound = false
+                for (index,chat) in listArray.enumerated(){
+                    
+                    if chat.id == response.data?.id{
+                        isFound = true
+                        if let data = response.data{
+                            listArray[index] = data
+                        }
+                        break
+                    }
+                }
+                
+                if !isFound{
+                    if let data = response.data{
+                        
+                        listArray.insert(data, at: 0)
+                    }
+                }
+                
+                self.tblView.reloadData()
+                
+            }
+        }
+    }
+    
+    
+    @objc func chatList(notification: Notification) {
+       
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = false
+
         guard let data = notification.userInfo else{
             return
         }
@@ -61,12 +133,13 @@ class SellingChatVC: UIViewController {
             
             self.listArray.append(contentsOf:response.data?.data ?? [])
             self.tblView.reloadData()
-            
             self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
             self.emptyView?.lblMsg?.text = "No chat Found"
             self.emptyView?.subHeadline?.text = ""
-
+            self.page = self.page + 1
         }
+        self.isDataLoading = false
+        
     }
 }
 
@@ -96,15 +169,41 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
         cell.imgViewItem.clipsToBounds = true
+        
+        
+        cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
+
+        if (obj.lastMessage?.message?.count ?? 0) > 0 {
+            cell.lblLastMessage.isHidden = false
+            
+            if obj.lastMessage?.audio?.count ?? 0 > 0 {
+                cell.lblLastMessage.text = "📢"
+            }else if obj.lastMessage?.file?.count ?? 0 > 0{
+                cell.lblLastMessage.text = "📝"
+            }
+        }else{
+            cell.lblLastMessage.isHidden = true
+        }
+        
+        if (obj.readAt?.count ?? 0) == 0 && (obj.chatCount ?? 0 > 0){
+            cell.lblDot.isHidden = false
+        }else{
+            cell.lblDot.isHidden = true
+        }
+        
 
         return cell
         
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        listArray[indexPath.item].readAt = listArray[indexPath.item].updatedAt
+        self.tblView.reloadData()
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].buyerID ?? 0
+        
         AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
     }
     

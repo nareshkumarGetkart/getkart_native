@@ -7,6 +7,16 @@
 
 import Foundation
 
+
+
+struct ParseUpdatedChat:Codable{
+    let code: Int?
+    let message: String?
+    let data: ChatList?
+    let error: Bool?
+    let type:String?
+}
+
 // MARK: - Buyer
 struct BuyerChatParse: Codable {
     
@@ -44,6 +54,35 @@ struct BuyerChatClass: Codable {
     }
 }
 
+
+struct LastMessage:Codable{
+    var readAt: String?
+   // let id: Int?
+    let createdAt, file: String?
+    let itemOfferID: Int?
+    let message: String?
+    let messageType: String?
+    let updatedAt: String?
+    //let senderID: Int?
+    let audio: String?
+   // let receiverID: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case readAt = "read_at"
+       // case id
+        case createdAt = "created_at"
+        case file
+        case itemOfferID = "item_offer_id"
+        case message
+        case messageType = "message_type"
+        case updatedAt = "updated_at"
+       // case senderID = "sender_id"
+        case audio
+       // case receiverID = "receiver_id"
+    }
+}
+
+
 // MARK: - Datum
 struct ChatList: Codable {
     let id, buyerID: Int?
@@ -58,7 +97,10 @@ struct ChatList: Codable {
     let sellerID: Int?
     let seller: BuyerClass?
     let chat: [Chat]?
-
+    var lastMessage:LastMessage?
+    let chatCount:Int?
+    var readAt:String?
+    
     enum CodingKeys: String, CodingKey {
         case id
         case buyerID = "buyer_id"
@@ -71,6 +113,10 @@ struct ChatList: Codable {
         case userBlocked = "user_blocked"
         case sellerID = "seller_id"
         case seller, chat
+        case lastMessage = "last_message"
+        case chatCount = "chat_count"
+        case readAt = "read_at"
+
     }
 }
 

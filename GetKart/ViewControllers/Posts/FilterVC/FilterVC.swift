@@ -15,7 +15,8 @@ protocol FilterSelected{
 class FilterVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
-   
+    @IBOutlet weak var btnBack:UIButton!
+
     var latitude:String = ""
     var longitude:String = ""
     var city:String = ""
@@ -30,7 +31,7 @@ class FilterVC: UIViewController {
     var category_id = ""
     var min_price = ""
     var max_price = ""
-    
+    var isPushedFromHome = false
     var arrPostedSinceDict:Array<Dictionary<String,String>> = [["status": "All Time", "value": "all-time"], ["status": "Today", "value": "today"], ["status": "Within 1 week", "value": "within-1-week"], ["status": "Within 2 week", "value": "within-2-week"], ["status": "Within 1 month", "value": "within-1-month"], ["status": "Within 3 month", "value": "within-3-month"]]
     var posted_since:Dictionary<String,String> = [:]
     var objViewModel:CustomFieldsViewModel?
@@ -42,7 +43,7 @@ class FilterVC: UIViewController {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
-        
+        btnBack.setImageColor(color: .black)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
         
@@ -68,7 +69,13 @@ class FilterVC: UIViewController {
     
     //MARK: UIButton Action Methods
     @IBAction  func backButtonAction(_ sender : UIButton){
-        self.navigationController?.popViewController(animated: true)
+        
+        if isPushedFromHome{
+            self.navigationController?.popToRootViewController(animated: true)
+
+        }else{
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @IBAction  func resetBtnAction(){
@@ -128,7 +135,7 @@ class FilterVC: UIViewController {
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(navigationController: self.navigationController, arrCountries: arrCountry, popType: .filter))
+           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .filter, navigationController: self.navigationController))
            self.navigationController?.pushViewController(vc, animated: true)
        }
    }

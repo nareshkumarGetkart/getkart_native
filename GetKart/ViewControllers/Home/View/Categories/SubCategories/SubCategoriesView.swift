@@ -12,9 +12,6 @@ struct SubCategoriesView: View {
     
     @State  var subcategories: [Subcategory]?
      var navigationController: UINavigationController?
-    
-    
-    
     @State var strTitle = ""
     @State var strCategoryTitle = ""
     @State var  category_id = ""
@@ -115,8 +112,10 @@ struct CategoryCellView: View {
         HStack {
             Text(subCategory?.name ?? "").padding()
             Spacer()
-            Image("arrow_right").renderingMode(.template).foregroundColor(.black)
-                .padding([.trailing],30)
+            Image("arrow_right").renderingMode(.template).foregroundColor(.black).background(Color(UIColor.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+            //.padding(.leading, 8)
+               .padding([.trailing],30)
         }
     }
 }
