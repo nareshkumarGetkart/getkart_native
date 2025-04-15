@@ -120,7 +120,7 @@ class ChatVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         IQKeyboardManager.shared.isEnabled = false
-        // self.getUserInfo()
+         self.getUserInfo()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -242,15 +242,17 @@ class ChatVC: UIViewController {
     
     
     func blockUnblockUser(isBlock:Bool){
+        let strBlockStatus = isBlock ? "block" : "unblock"
+        let params = ["blocked_user_id":userId,"action":strBlockStatus] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.blockUnblock.rawValue, params)
         
-        let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
-        let params = ["blocked_user_id":userId]
+      /*  let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
         URLhandler.sharedinstance.makeCall(url: strUrl, param: params) { responseObject, error in
             
             if error == nil {
                 
             }
-        }
+        }*/
     }
     
     func addObservers(){
@@ -280,6 +282,8 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.messageAcknowledge),
                                                name: NSNotification.Name(rawValue: SocketEvents.messageAcknowledge.rawValue), object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(self.blockUnblock), name: NSNotification.Name(rawValue:SocketEvents.blockUnblock.rawValue), object: nil)
+        
        /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
                                                name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
     }
@@ -430,6 +434,14 @@ class ChatVC: UIViewController {
     }
     
    
+    @objc func blockUnblock(notification: Notification) {
+       
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+    }
+    
     @objc func onlineOfflineStatus(notification: Notification) {
         guard let data = notification.userInfo else{
             return

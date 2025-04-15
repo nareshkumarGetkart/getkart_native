@@ -103,19 +103,17 @@ struct FavoritesCell:View {
                 AsyncImage(url: URL(string: img)) { image in
                     image
                         .resizable()
-                        .frame(width: 90)
+                        .frame(width: 110)
                         .aspectRatio(contentMode: .fit)
+                        .cornerRadius(10, corners: [.topRight, .bottomRight])                      
                     
                 }placeholder: {
                     
-                   // ProgressView().progressViewStyle(.circular)
-                    
-                    Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 90)
+                    Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 110)
                     
                 }
             }
             
-           // Image("getkartplaceholder").resizable().frame(width:90).aspectRatio(contentMode: .fit)
             VStack(alignment: .leading, spacing: 5){
                 HStack{
                     Text("\(Local.shared.currencySymbol) \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(hex: "#FF9900"))
@@ -132,22 +130,23 @@ struct FavoritesCell:View {
                             .background(Color.white)
                             .clipShape(Circle())
                             .shadow(radius: 3)
+                            .padding(.trailing)
                     }
                     
                     
                 }
-                Text(itemObj.name ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black).padding(.bottom,10)
+                Text(itemObj.name ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black).padding(.bottom,10).padding(.trailing)
                 
                 HStack{
                     Image("location_icon").resizable().frame(width: 15, height: 15).foregroundColor(.gray)
-                    Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray)
+                    Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
                     Spacer()
                 }
                 
             }
             
         }.frame(height: 110)
-            .padding()
+           // .padding()
             .background(Color.white).cornerRadius(15)
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
@@ -172,4 +171,27 @@ struct FavoritesCell:View {
   
    
 
+}
+
+
+
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
 }

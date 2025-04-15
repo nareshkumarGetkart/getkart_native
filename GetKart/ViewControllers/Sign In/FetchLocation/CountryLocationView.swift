@@ -20,6 +20,7 @@ struct CountryLocationView: View {
     var body: some View {
         
         VStack(spacing: 0) {
+            
             HStack{
                 
                 Button {
@@ -37,13 +38,12 @@ struct CountryLocationView: View {
             // MARK: - Search Bar
             HStack {
                 HStack {
-                    Image("search").resizable().frame(width: 20,height: 20)
+                    Image("search").resizable().frame(width: 20,height: 20).padding(.leading,10)
                     TextField("Search Country", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
-                        .padding(.horizontal, 8)
-                        .frame(height: 36)
-                    //.background(Color(.systemGray6))
-                    //.cornerRadius(8)
+                        .padding(.horizontal, 5)
+                        .frame(height: 45)
+
                         .onChange(of: searchText) { newValue in
                             print(newValue)
                             searchCountry(strCountry:newValue)
@@ -54,7 +54,7 @@ struct CountryLocationView: View {
                             searchText = ""
                         }.foregroundColor(.black)
                     }
-                }.background(Color.white).padding().frame(height: 45).overlay {
+                }.background(Color.white).frame(height: 45).overlay {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.gray, lineWidth: 1)
                 }
@@ -62,13 +62,13 @@ struct CountryLocationView: View {
                 Button(action: {
                     // Action for icon button
                     let vc = UIHostingController(rootView: SelectLocationRangeView(navigationController: self.navigationController, popType: self.popType))
-                                            self.navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                 }) {
                     Image("symbolShareLocation")
                         .foregroundColor(.gray)
                         .frame(width: 40,height:40)
                             .foregroundColor(.orange)
-                            .background(Color(UIColor.systemGray6))
+                            .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                         .padding(.leading, 8)
                 }
@@ -141,7 +141,7 @@ struct CountryLocationView: View {
             }
             
             Spacer()
-        }.onAppear{
+        }.background(Color(UIColor.systemGray6)).onAppear{
             fetchCountryListing()
         }
         .navigationTitle("Location")
@@ -263,6 +263,7 @@ struct CountryRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
         }.padding(.horizontal,10)
+       .contentShape(Rectangle())
         
     }
 }

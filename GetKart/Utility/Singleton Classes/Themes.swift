@@ -23,7 +23,7 @@ final class Themes: NSObject {
      }
      var is_CHAT_NEW_SEND_OR_RECIEVE = true
      var isLikeSwipePopUp = 0
-    
+     let themeColor = UIColor(hexString: "#FF9900")
      var spinnerView:MMMaterialDesignSpinner!
      var spinner:UIView!
      var progressView : UIView!

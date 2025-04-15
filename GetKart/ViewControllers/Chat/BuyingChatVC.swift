@@ -102,7 +102,9 @@ class BuyingChatVC: UIViewController {
                     if chat.id == response.data?.id{
                         isFound = true
                         if let data = response.data{
-                            listArray[index] = data
+                            listArray.remove(at: index)
+                            listArray.insert(data, at: 0)
+                           // listArray[index] = data
                         }
                         break
                     }

@@ -100,13 +100,27 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        if popType == .buyPackage{
+        
+        if popType == .categoriesSeeAll{
+            let objCategory = objViewModel?.listArray?[indexPath.item]
+
+            if objCategory?.subcategories?.count ?? 0 > 0{
+                let objCategory = objViewModel?.listArray?[indexPath.item]
+                let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                navigationController?.pushViewController(hostingController, animated: true)
+            }else{
+                let vc = UIHostingController(rootView: SearchWithSortView(navigationController:self.navigationController,categroryId: objCategory?.id ?? 0, categoryName: objCategory?.name ?? ""))
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+            
+        }else if popType == .buyPackage{
             
             
         }else{
         //if popType == .createPost {
             let objCategory = objViewModel?.listArray?[indexPath.item]
-        let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
+          let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
         }
@@ -177,7 +191,7 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
         }else if popType == .filter {
              
             let objCategory = objViewModel?.listArray?[indexPath.item]
-        let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "", category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
+            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "", category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true)
         }

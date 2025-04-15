@@ -23,7 +23,6 @@ struct SearchProductView: View {
     @State var page = 1
     @State var isDataLoading = false
     @State var isAtBottom = false
-    
     @State var navigateToFilterScreen = false
 
     var body: some View {
@@ -45,17 +44,17 @@ struct SearchProductView: View {
             
             HStack {
                 HStack{
-                    Image("search").resizable().frame(width: 20,height: 20)
+                    Image("search").resizable().frame(width: 20,height: 20).padding(.leading,10)
                     TextField("Search any item...", text: $searchText).tint(.orange)
                         .frame(height: 45)
-                        .background(Color.white)
-//                        .cornerRadius(10)
-                }.background(Color.white).padding().frame(height: 45).overlay {
+                        .background(Color.white).padding(.trailing,10).tint(Color(hex: "#FF9900"))
+                }.background(Color.white).frame(height: 45).overlay {
                     RoundedRectangle(cornerRadius: 8)
                     .stroke(Color.gray, lineWidth: 1)
                 }
                 
-                Button(action: { /* Filter action */
+                Button(action: {
+                    /* Filter action */
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
                         vc.delFilterSelected = self
                         self.navigation?.pushViewController(vc, animated: true)
@@ -68,7 +67,7 @@ struct SearchProductView: View {
                     }.frame(width: 50,height: 45).overlay {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.gray, lineWidth: 1)
-                    }
+                    }.background(Color.white)
                 }.padding(.leading,10)
             }.padding(.leading,10)
             .padding(.horizontal,10)
@@ -103,7 +102,7 @@ struct SearchProductView: View {
                 }
                 .frame(height: 1)
             }
-        }.navigationBarHidden(true).onAppear {
+        }.background(Color(UIColor.systemGray6)).navigationBarHidden(true).onAppear {
             
             if (navigateToFilterScreen){
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {

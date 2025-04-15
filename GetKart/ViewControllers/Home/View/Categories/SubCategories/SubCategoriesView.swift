@@ -47,6 +47,7 @@ struct SubCategoriesView: View {
                 
                 LazyVStack {
                     ForEach(subcategories ?? []) { objsubCategory in
+                        
                         CategoryCellView(subCategory: objsubCategory)
                             .frame(height: 40)
                             .onTapGesture{
@@ -62,11 +63,22 @@ struct SubCategoriesView: View {
                               
      func navigateToPostNew(objsubCategory:Subcategory) {
         if objsubCategory.subcategories?.count == 0 {
+            
+            
+            if popType == .categoriesSeeAll{
+                let vc = UIHostingController(rootView: SearchWithSortView(navigationController:self.navigationController,categroryId: objsubCategory.id ?? 0, categoryName: objsubCategory.name ?? ""))
+                self.navigationController?.pushViewController(vc, animated: true)
+                
+                return
+            }
+            
             if strCategoryTitle.count == 0 {
                 strCategoryTitle = objsubCategory.name ?? ""
                 
             }
             category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
+            
+            
            if popType == .filter {
                 for vc in self.navigationController?.viewControllers ?? []{
                     if let vc1 = vc as? FilterVC  {
@@ -117,5 +129,6 @@ struct CategoryCellView: View {
             //.padding(.leading, 8)
                .padding([.trailing],30)
         }
+        .contentShape(Rectangle())
     }
 }

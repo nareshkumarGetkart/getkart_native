@@ -46,10 +46,10 @@
                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                     </textView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="y0d-3q-kUf">
-                        <rect key="frame" x="10" y="185" width="300" height="16.333333333333343"/>
+                        <rect key="frame" x="10" y="185" width="300" height="19.333333333333343"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="field must not be empty" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mqq-Zf-IYy">
-                                <rect key="frame" x="0.0" y="0.0" width="300" height="16.333333333333332"/>
+                                <rect key="frame" x="0.0" y="0.0" width="300" height="19.333333333333332"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="CgX-Mj-ojE"/>
                                 </constraints>
@@ -75,6 +75,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="lblErrorMsg" destination="mqq-Zf-IYy" id="llQ-Nh-9Js"/>
                 <outlet property="lblTitle" destination="l9x-Wf-IKN" id="joH-3f-CIB"/>

@@ -21,15 +21,14 @@ enum SocketEvents:String,CaseIterable{
     case messageAcknowledge = "messageAcknowledge"
     case onlineOfflineStatus = "onlineOfflineStatus"
     case updateChatList = "updateChatList"
+    case blockUnblock = "blockUnblock"
 
-    
 
     //
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
     case messageDelete = "messageDelete"
     case complimentMessages = "complimentMessages"
-    case blockUnblock = "blockUnblock"
     case unreadNotification = "unreadNotification"
     case socketConnected = "socketConnected"
     case singleMessageDelete = "singleMessageDelete"

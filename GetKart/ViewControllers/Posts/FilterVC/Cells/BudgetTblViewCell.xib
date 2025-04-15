@@ -11,10 +11,10 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="BudgetTblViewCell" rowHeight="102" id="KGk-i7-Jjw" customClass="BudgetTblViewCell" customModule="GetKart" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="102"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="107"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="102"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="107"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BFd-4g-wRi">
@@ -32,19 +32,23 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Min" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9XP-kf-9mo">
-                        <rect key="frame" x="10" y="45" width="145" height="40"/>
+                        <rect key="frame" x="10" y="45" width="145" height="50"/>
+                        <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="40" id="B5E-fd-nVR"/>
+                            <constraint firstAttribute="height" constant="50" id="B5E-fd-nVR"/>
                         </constraints>
                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <textInputTraits key="textInputTraits"/>
                     </textField>
                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Max" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uiU-zr-HR3">
-                        <rect key="frame" x="165" y="45" width="145" height="40"/>
+                        <rect key="frame" x="165" y="45" width="145" height="50"/>
+                        <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="40" id="u2F-vd-tOh"/>
+                            <constraint firstAttribute="height" constant="50" id="u2F-vd-tOh"/>
                         </constraints>
                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <textInputTraits key="textInputTraits"/>
                     </textField>
                 </subviews>
@@ -54,11 +58,8 @@
                     <constraint firstItem="BFd-4g-wRi" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="JnH-kn-nLE"/>
                     <constraint firstAttribute="trailing" secondItem="BFd-4g-wRi" secondAttribute="trailing" constant="10" id="Nc3-0w-wKk"/>
                     <constraint firstAttribute="bottom" secondItem="9XP-kf-9mo" secondAttribute="bottom" constant="10" id="Sy5-BS-hBA"/>
-                    <constraint firstItem="9XP-kf-9mo" firstAttribute="top" secondItem="BFd-4g-wRi" secondAttribute="bottom" constant="10" id="X3v-xh-AUT"/>
                     <constraint firstAttribute="trailing" secondItem="uiU-zr-HR3" secondAttribute="trailing" constant="10" id="aVU-8k-Zh3"/>
                     <constraint firstItem="uiU-zr-HR3" firstAttribute="firstBaseline" secondItem="9XP-kf-9mo" secondAttribute="firstBaseline" id="dvY-jM-WlT"/>
-                    <constraint firstItem="uiU-zr-HR3" firstAttribute="height" secondItem="9XP-kf-9mo" secondAttribute="height" id="edd-3G-C6t"/>
-                    <constraint firstItem="uiU-zr-HR3" firstAttribute="leading" secondItem="9XP-kf-9mo" secondAttribute="trailing" constant="10" id="fOS-H0-7B1"/>
                     <constraint firstItem="BFd-4g-wRi" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="j49-SD-7NC"/>
                     <constraint firstItem="9XP-kf-9mo" firstAttribute="top" secondItem="BFd-4g-wRi" secondAttribute="bottom" constant="10" id="sI9-6H-Nhn"/>
                     <constraint firstAttribute="bottom" secondItem="uiU-zr-HR3" secondAttribute="bottom" constant="10" id="tBH-RA-jIT"/>
@@ -66,6 +67,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="lblTitle" destination="BFd-4g-wRi" id="PHZ-4F-cdC"/>
                 <outlet property="txtLowerRange" destination="9XP-kf-9mo" id="Ssc-cp-kgC"/>

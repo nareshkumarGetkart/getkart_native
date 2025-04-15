@@ -46,6 +46,7 @@
                     </stackView>
                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Add Title Here" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1XG-g0-ha2" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                         <rect key="frame" x="10" y="40" width="300" height="50"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="50" id="LGk-yt-cJc"/>
                         </constraints>
@@ -124,6 +125,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="btnOption" destination="6YH-he-5Kb" id="Xsb-Pp-JVv"/>
                 <outlet property="btnOptionBig" destination="Xrd-qQ-I5q" id="cDS-Eh-K3Y"/>
@@ -138,7 +140,7 @@
     <resources>
         <image name="arrow_dd" width="15.333333015441895" height="9"/>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

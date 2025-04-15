@@ -49,12 +49,13 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MoterCycle and Scooters" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mbg-VL-Eyc">
-                        <rect key="frame" x="120" y="43.666666666666664" width="172" height="17.666666666666664"/>
+                        <rect key="frame" x="119.99999999999999" y="42.333333333333336" width="174.66666666666663" height="20.666666666666664"/>
                         <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
                         <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="IS8-8T-gGE" firstAttribute="top" secondItem="Vcp-HU-Mhh" secondAttribute="bottom" constant="5" id="8ym-f7-zuu"/>
                     <constraint firstItem="mbg-VL-Eyc" firstAttribute="centerY" secondItem="IS8-8T-gGE" secondAttribute="centerY" id="Dn1-Ty-Rer"/>
@@ -68,6 +69,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="lblCategory" destination="IS8-8T-gGE" id="7u1-QZ-kVa"/>
                 <outlet property="lblSubCategory" destination="mbg-VL-Eyc" id="n1K-55-bOu"/>

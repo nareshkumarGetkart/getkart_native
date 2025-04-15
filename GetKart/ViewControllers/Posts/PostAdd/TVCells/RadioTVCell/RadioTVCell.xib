@@ -64,7 +64,7 @@
                         <rect key="frame" x="10" y="89" width="300" height="0.0"/>
                         <subviews>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Selecting this is required." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kf2-1T-FJN">
-                                <rect key="frame" x="0.0" y="0.0" width="157.66666666666666" height="20.333333333333332"/>
+                                <rect key="frame" x="0.0" y="0.0" width="163" height="20.333333333333332"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20.329999999999998" id="0gj-Jg-Uvi"/>
                                 </constraints>
@@ -75,6 +75,7 @@
                         </subviews>
                     </stackView>
                 </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="T50-ep-Z9X" firstAttribute="centerY" secondItem="4s2-uw-Abf" secondAttribute="centerY" id="1ID-tk-eYc"/>
                     <constraint firstItem="h9q-cg-JlC" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="bottom" constant="10" id="1Z0-7Q-eaW"/>
@@ -91,6 +92,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="clnCollectionView" destination="h9q-cg-JlC" id="KdR-CZ-64d"/>
                 <outlet property="clnHeight" destination="TzG-Oa-JBJ" id="RNQ-FF-WaQ"/>

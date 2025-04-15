@@ -9,6 +9,7 @@ enum PopType{
     case home
     case buyPackage
     case createPost
+    case categoriesSeeAll
 }
 
 struct CityLocationView: View {

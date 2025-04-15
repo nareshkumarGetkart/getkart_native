@@ -103,6 +103,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="btnArrowDown" destination="jFo-pX-GLa" id="e49-ly-zJZ"/>
                 <outlet property="btnTextValue" destination="ZIr-Vh-PkY" id="fcp-v6-0CQ"/>

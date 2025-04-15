@@ -211,6 +211,12 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         }
         cell.imgVwAds.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         
+        DispatchQueue.main.async {
+            cell.imgVwAds.roundCorners([.topRight,.bottomRight], radius: 10)
+
+        }
+
+        
         return cell
         
         
@@ -224,3 +230,18 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
 }
 
+
+
+
+extension UIImageView {
+    func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
+        let path = UIBezierPath(
+            roundedRect: self.bounds,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        let mask = CAShapeLayer()
+        mask.path = path.cgPath
+        self.layer.mask = mask
+    }
+}

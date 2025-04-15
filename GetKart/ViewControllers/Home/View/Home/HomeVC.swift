@@ -49,6 +49,7 @@ class HomeVC: UIViewController {
     @IBAction func locationBtnAction(_ sender : UIButton){
         
         
+     
         let vc = UIHostingController(rootView: CountryLocationView(popType: .home, navigationController: self.navigationController))
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
@@ -71,10 +72,6 @@ class HomeVC: UIViewController {
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController,navigateToFilterScreen: true))
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: false)
         
-//        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
-//            vc.delFilterSelected = self
-//            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-//        }
     }
     
     
