@@ -148,7 +148,6 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if cellTypes == .categories{
-            let obj = listArray?[indexPath.item] as? CategoryModel
             
             if (listArray?.count ?? 0) == indexPath.item{
                 
@@ -156,8 +155,12 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     destVC.popType = .categoriesSeeAll
                     AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
                 }
-                
-            }else if obj?.subcategories?.count ?? 0 > 0 {
+                return
+            }
+            
+            let obj = listArray?[indexPath.item] as? CategoryModel
+
+            if obj?.subcategories?.count ?? 0 > 0 {
                 
                 let swiftUIView = SubCategoriesView(subcategories: obj?.subcategories, navigationController:  AppDelegate.sharedInstance.navigationController, strTitle: obj?.name ?? "",category_id:"\(obj?.id ?? 0)", category_ids:"\(obj?.id ?? 0)", popType: .categoriesSeeAll) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
