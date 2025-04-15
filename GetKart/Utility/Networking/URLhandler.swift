@@ -415,7 +415,15 @@ class URLhandler: NSObject{
                 }else if let dict = value as? Dictionary<String,Any> {
                     var str = "{"
                     for (key1, value1) in dict {
-                        if let data1 = value1 as? Data {
+                        if let dictCustom = value1 as? Dictionary<String,Any> {
+                            for (keyCustom, valueCustom) in dictCustom {
+                                if let dataCustom = valueCustom as? Data {
+                                    let nameKey = "\(key1)[\(keyCustom)]"
+                                    multipartFormData.append(dataCustom, withName: nameKey, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
+                                }
+                            }
+                            
+                        }else if let data1 = value1 as? Data {
                             multipartFormData.append(data1, withName: key1, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
                         }else {
                             str = str + "\"\(key1)\":[\"\(value1)\"],"

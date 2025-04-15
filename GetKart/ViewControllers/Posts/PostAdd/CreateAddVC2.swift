@@ -21,6 +21,7 @@ class CreateAddVC2: UIViewController {
     var gallery_images:Array<Data> = []
     var gallery_imageNames:Array<String> = []
     var showErrorMsg = false
+    var customFieldFiles :Dictionary<String,Any> = [:]
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
@@ -408,7 +409,10 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
                 let data = pickedImage.jpegData(compressionQuality: 0.0)
                 imgName = "image"
             let objCustomField = self.dataArray[tag]
-            dictCustomFields["\(objCustomField.id ?? 0)"] = data
+            
+           // dictCustomFields["\(objCustomField.id ?? 0)"] = data
+            customFieldFiles["\(objCustomField.id ?? 0)"] = data
+            self.dictCustomFields["custom_field_files"] = customFieldFiles
            
         }
         dismiss(animated: true, completion: nil)
