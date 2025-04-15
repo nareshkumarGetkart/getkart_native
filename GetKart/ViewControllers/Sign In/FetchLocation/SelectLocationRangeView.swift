@@ -26,7 +26,8 @@ struct SelectLocationRangeView: View {
     @State private var selectedCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     
     @State private var range: Double = 1.0
-    
+    @State private var range1: Double = 1000.0
+    @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
     var body: some View {
         HStack{
             
@@ -50,11 +51,9 @@ struct SelectLocationRangeView: View {
                 HStack{
                     
                     if selectedCoordinate.latitude != 0.0 {
-                        TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo )
-                        //.edgesIgnoringSafeArea(.all)
-                        
-                    }else {
-                        TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo )
+                        TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo, range:$range1, circle: $circle)
+                    } else {
+                        TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo, range:$range1, circle: $circle)
                     }
                     
                 }
@@ -86,7 +85,14 @@ struct SelectLocationRangeView: View {
                 Text("Select area range")
                     .font(.subheadline)
                 
-                Slider(value: $range, in: 1...100, step: 1)
+                Slider(value: $range, in: 1...100, step: 1){ editing in
+                    print("+++++",editing)
+                    if editing == false {
+                       // circle = MKCircle(center: selectedCoordinate, radius: (range * 1000) as CLLocationDistance)
+                        //selectedCoordinate = selectedCoordinate
+                        range1 = range * 1000
+                    }
+                }
                 
                 HStack {
                     Text("1 Km")
@@ -101,7 +107,11 @@ struct SelectLocationRangeView: View {
             // Buttons
             HStack(spacing: 16) {
                 Button("Reset") {
-                    range = 1
+                    mapRegion.center = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                    locationInfo = ""
+                    selectedCoordinate = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                    range = 1.0
+                    range1 = 1000.0
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -112,6 +122,7 @@ struct SelectLocationRangeView: View {
                 
                 Button("Apply") {
                     // Do something with selectedCoordinate & range
+                    locationSelected()
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -129,6 +140,58 @@ struct SelectLocationRangeView: View {
         }
     }
     
+ 
+    
+    func locationSelected() {
+                
+        for vc in self.navigationController?.viewControllers ?? [] {
+          
+            if popType == .buyPackage {
+                
+                    if let vc1 = vc as? CategoryPlanVC  {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city ?? "", state:locationManager.state ?? "", country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .filter {
+                
+                    if let vc1 = vc as? FilterVC  {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else  if popType == .createPost {
+                
+               
+                    if let vc1 = vc as? CreateAddVC2 {
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .signUp {
+                
+                if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                  
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            } else  if popType == .home {
+                
+                if vc.isKind(of: HomeVC.self) == true {
+                    if let vc1 = vc as? HomeVC {
+                        vc1.savePostLocation(latitude:"\(locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                   
+                }
+            }
+        }
+    }
     
     
 }
@@ -154,6 +217,7 @@ extension SelectLocationRangeView :LocationAutorizationUpdated {
                 mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 
                 locationInfo = Local.shared.getUserCity() + "," + Local.shared.getUserState() + "," + Local.shared.getUserCountry()
+                circle = MKCircle(center: locationManager.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), radius: (range1) as CLLocationDistance)
                 
                 selectedCoordinate = locationManager.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
                 
@@ -178,13 +242,13 @@ struct TapMapView: UIViewRepresentable {
     @Binding var coordinate: CLLocationCoordinate2D
     @Binding var mapRegion: MKCoordinateRegion
     @Binding var locationInfo:String
+    @Binding var range: Double
     var annotation = MKPointAnnotation()
     
-    var circle = MKCircle()
-    
-    
+    @Binding var circle:  MKCircle
+    let mapView = MKMapView()
     func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
+       
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.mapTapped(_:)))
         mapView.addGestureRecognizer(tapGesture)
         mapView.delegate = context.coordinator
@@ -195,7 +259,8 @@ struct TapMapView: UIViewRepresentable {
         
         if coordinate.latitude != 0.0 {
             self.updateStateCity()
-            
+            mapView.removeOverlay(circle)
+            mapView.addOverlay(circle)
         }
         return mapView
     }
@@ -203,18 +268,13 @@ struct TapMapView: UIViewRepresentable {
     func updateUIView(_ uiView: MKMapView, context: Context) {
         // You can update region or annotations here if needed
         
-        //annotation.coordinate = coordinate
-        
-        //uiView.region.center = coordinate
-        
-        // uiView.removeAnnotations(annotation)
-        //uiView.addAnnotation(annotation)
-        if coordinate.latitude != 0.0 {
-            self.updateStateCity()
-             //let circle = MKCircle(center: coordinate, radius: 10000 as CLLocationDistance)
-            //uiView.addOverlay(circle)
-        }
-        
+       
+        /*if coordinate.latitude != 0.0 {
+            mapView.removeOverlay(circle)
+            circle = MKCircle(center: coordinate, radius: (range) as CLLocationDistance )
+            mapView.addOverlay(circle)
+
+        }*/
         
     }
     
@@ -241,8 +301,13 @@ struct TapMapView: UIViewRepresentable {
             mapView.addAnnotation(parent.annotation)
             mapView.delegate = self
             
-            parent.circle = MKCircle(center: coordinate, radius: 10000 as CLLocationDistance)
-            mapView.addOverlay(parent.circle)
+            
+            self.parent.mapView.removeOverlay(self.parent.circle)
+            self.parent.circle = MKCircle(center: coordinate, radius: (self.parent.range) as CLLocationDistance)
+            self.parent.mapView.addOverlay(self.parent.circle)
+            
+            
+            parent.updateStateCity()
             
         }
         
