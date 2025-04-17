@@ -66,7 +66,7 @@ struct SubCategoriesView: View {
             
             
             if popType == .categoriesSeeAll{
-                let vc = UIHostingController(rootView: SearchWithSortView(navigationController:self.navigationController,categroryId: objsubCategory.id ?? 0, categoryName: objsubCategory.name ?? ""))
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objsubCategory.id ?? 0, navigationController:self.navigationController, categoryName: objsubCategory.name ?? ""))
                 self.navigationController?.pushViewController(vc, animated: true)
                 
                 return

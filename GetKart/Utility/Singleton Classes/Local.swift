@@ -110,8 +110,8 @@ final class Local {
         UserDefaults.standard.synchronize()
         AppDelegate.sharedInstance.sharedProfileID = ""
         AppDelegate.sharedInstance.notificationType = ""
-        AppDelegate.sharedInstance.userId = ""
-        AppDelegate.sharedInstance.roomId = ""
+        AppDelegate.sharedInstance.userId = 0
+        AppDelegate.sharedInstance.roomId = 0
     }
     
 }

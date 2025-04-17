@@ -41,6 +41,9 @@ class HomeBaseVC: UITabBarController {
         setupMiddleButton()
 
         
+        AppDelegate.sharedInstance.navigateToNotificationType()
+        Constant.shared.isLaunchFirstTime = 0
+        
         // Do any additional setup after loading the view.
     }
     

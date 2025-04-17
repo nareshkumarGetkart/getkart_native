@@ -171,7 +171,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
         cell.imgViewItem.clipsToBounds = true
-
+       
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 
         if (obj.lastMessage?.message?.count ?? 0) > 0 {
@@ -192,6 +192,9 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
             cell.lblDot.isHidden = true
         }
         
+        cell.btnOption.tag = indexPath.row
+        cell.btnOption.addTarget(self, action: #selector(optionBtnAction(_ : )), for: .touchUpInside)
+        
         return cell
         
         
@@ -204,6 +207,25 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].sellerID ?? 0
         AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+    }
+    
+  
+    @objc func optionBtnAction(_ sender : UIButton){
+        
+        let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        actionSheetAlertController.addAction(cancelActionButton)
+     
+        
+        let deleteChat = UIAlertAction(title: "Delete Chat", style: .default) { (action) in
+            
+            
+        }
+        
+        actionSheetAlertController.addAction(deleteChat)
+       
+        self.present(actionSheetAlertController, animated: true, completion: nil)
     }
     
 }

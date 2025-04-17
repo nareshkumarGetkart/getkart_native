@@ -5,12 +5,6 @@
 //  Created by Radheshyam Yadav on 25/02/25.
 //
 
-/*
- Item(image: "ipad_mini", price: "\u{20B9}12000.0", title: "Ipad mini 5th generation 64gb", location: "Delhi, Delhi, India"),
- Item(image: "samsung_tab", price: "\u{20B9}12000.0", title: "SAMSUNG GALAXY TAB 3 T211 TABLET", location: "Mayur Vihar, New Delhi, Delhi, India"),
- Item(image: "oppo_f23", price: "\u{20B9}12000.0", title: "OPPO f23 5G. 8+256", location: "Kundli, Sonipat, Haryana, India"),
- Item(image: "samsung_a9", price: "\u{20B9}12000.0", title: "Samsung a9 4&64 storage", location: "Sector 122, Noida, Uttar Pradesh, India")
- */
 
 import SwiftUI
 
@@ -38,7 +32,6 @@ struct SearchProductView: View {
             }
             Text("Search").font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)
-            
             Spacer()
         }.frame(height: 44).padding(.horizontal)
             
@@ -48,6 +41,13 @@ struct SearchProductView: View {
                     TextField("Search any item...", text: $searchText).tint(.orange)
                         .frame(height: 45)
                         .background(Color.white).padding(.trailing,10).tint(Color(hex: "#FF9900"))
+                        .submitLabel(.search)
+                        .onSubmit {
+                       
+                            self.page = 1
+                            self.getProductListApi(searchTxt: searchText)
+
+                        }
                 }.background(Color.white).frame(height: 45).overlay {
                     RoundedRectangle(cornerRadius: 8)
                     .stroke(Color.gray, lineWidth: 1)
@@ -77,7 +77,6 @@ struct SearchProductView: View {
                 .padding(.horizontal)
                 .padding(.top, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-       
      
             ScrollView {
                 VStack(spacing: 10) {
@@ -112,7 +111,7 @@ struct SearchProductView: View {
                 }
                 navigateToFilterScreen = false
             }else{
-                self.getProductListApi()
+                self.getProductListApi(searchTxt: searchText)
             }
         }
         .onChange(of: isAtBottom) { atBottom in
@@ -120,14 +119,14 @@ struct SearchProductView: View {
                         print("Scrolled to bottom!")
                         // You can trigger your 'load more' logic here
                         if isDataLoading == false {
-                            self.getProductListApi()
+                            self.getProductListApi(searchTxt: searchText)
                         }
                     }
                 }
 
     }
     
-    func getProductListApi(){
+    func getProductListApi(searchTxt:String){
         isDataLoading = true
         var strUrl = ""
         if dictCustomFields.keys.count == 0 {
@@ -146,6 +145,10 @@ struct SearchProductView: View {
             }
         }
         
+        
+        if searchTxt.count > 0{
+            strUrl.append("&search=\(searchTxt)")
+        }
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
 
             if self.page == 1{
@@ -169,7 +172,7 @@ extension SearchProductView: FilterSelected{
         print(dict)
         self.page = 1
         self.dictCustomFields = dict
-        self.getProductListApi()
+        self.getProductListApi(searchTxt: searchText)
     }
 }
 

@@ -194,7 +194,9 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
             cell.lblDot.isHidden = true
         }
         
-
+        cell.btnOption.tag = indexPath.row
+        cell.btnOption.addTarget(self, action: #selector(optionBtnAction(_ : )), for: .touchUpInside)
+        
         return cell
         
     }
@@ -209,6 +211,25 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         
         AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
     }
+    
+    
+      @objc func optionBtnAction(_ sender : UIButton){
+          
+          let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+          
+          let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+          actionSheetAlertController.addAction(cancelActionButton)
+       
+          
+          let deleteChat = UIAlertAction(title: "Delete Chat", style: .default) { (action) in
+              
+              
+          }
+          
+          actionSheetAlertController.addAction(deleteChat)
+         
+          self.present(actionSheetAlertController, animated: true, completion: nil)
+      }
     
     
 }

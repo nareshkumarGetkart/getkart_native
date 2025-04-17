@@ -397,6 +397,9 @@ struct ItemDetailView: View {
         
         
         if isMyProduct{
+            
+           
+            
             HStack {
                 Button(action: {}) {
                     Text("Edit")
@@ -406,8 +409,25 @@ struct ItemDetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                Button(action: {}) {
-                    Text("Sold Out")
+                Button(action: {
+                    
+                }) {
+                    
+                    var strTitle = "Sold Out"
+                    
+                  /*  if (objVM.itemObj?.status ?? "") == "approved" {
+                        strTitle = "Sold Out"
+                   
+                    }else if (objVM.itemObj?.status ?? "") == "sold_out" {
+                        
+                        strTitle = "Remove"
+                        
+                    }else if (objVM.itemObj?.status ?? "") == "underreview"{
+                        
+                        strTitle = "Remove"
+                    }
+                    */
+                    Text(strTitle)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray)

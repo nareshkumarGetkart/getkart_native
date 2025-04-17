@@ -85,40 +85,64 @@ struct TransactionRow: View {
     var body: some View {
         HStack {
             
-            HStack{
+            
+            AsyncImage(url: URL(string: "")) { img in
                 
-            }.frame(width: 3,height: 40).background(Color.orange).cornerRadius(5)
-            VStack(alignment: .leading, spacing: 5) {
-                Text(transaction.paymentGateway?.capitalized ?? "")
-                    .font(.caption)
-                    .padding(5)
-                    .background(Color.orange.opacity(0.2))
-                    .cornerRadius(5)
+                img.resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).cornerRadius(6)
+            } placeholder: {
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).cornerRadius(6)
+            }
+
+//            HStack{
+//                
+//            }.frame(width: 3,height: 40).background(Color.orange).cornerRadius(5)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                
+                Text("Banner Promotions")
+                    .font(Font.manrope(.medium, size: 16))
+                    .foregroundColor(.black)
+                
+                Text("Purchased from \(transaction.paymentGateway?.capitalized ?? "")" )
+                    .font(Font.manrope(.regular, size: 16))
+                    .foregroundColor(.black)
+
+//                    .padding(5)
+//                    .background(Color.orange.opacity(0.2))
+//                    .cornerRadius(5)
+                Button(action: {
+                    UIPasteboard.general.string = transaction.orderID
+                    AlertView.sharedManager.showToast(message: "Copied successfully")
+
+                }) {
+                    Text("Transaction ID").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                    Image("ic_baseline-content-copy").frame(width: 10, height: 10, alignment: .center)
+                        .foregroundColor(.gray).padding(.leading,10)
+                }
+                
                 Text(transaction.orderID ?? "")
-                    .font(.body)
+                    .font(Font.manrope(.regular, size: 13))
                     .foregroundColor(.black)
             }.padding(5)
             Spacer()
             
-            Button(action: {
-                UIPasteboard.general.string = transaction.orderID
-                AlertView.sharedManager.showToast(message: "Copied successfully")
+           
 
-            }) {
-                Image(systemName: "doc.on.doc")
-                    .foregroundColor(.gray)
-            }
-            
-            Spacer()
-
-            VStack{
+            VStack(alignment: .trailing){
                 
-                Text("\(transaction.amount ?? 0)")
+                Text("\(Local.shared.currencySymbol) \(transaction.amount ?? 0)")
                     .font(.headline)
                     .foregroundColor(.orange).padding(.trailing,10)
                 
                 Text(transaction.paymentStatus ?? "")
                     .foregroundColor(.gray).padding(.trailing,10)
+                
+                Text("17 sept 2023")
+                    .foregroundColor(.gray).padding(.trailing,10)
+                
+                Text("11:00 AM")
+                    .foregroundColor(.gray).padding(.trailing,10)
+                
             }
         }
         .padding([.top,.bottom],10)

@@ -22,8 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var navigationController: UINavigationController?
     var sharedProfileID = ""
     var notificationType = ""
-    var userId = ""
-    var roomId = ""
+    var userId = 0
+    var roomId = 0
     var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -234,135 +234,50 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     func  navigateToNotificationType() {
         print("didReceive")
        
-        /*switch notificationType{
+        switch notificationType{
             
-        case "messages","gifts":
+        case "chat":
             if let destVc = self.navigationController?.topViewController as? ChatVC{
                 
-                if destVc.senderId == userId{
+                if destVc.userId == userId{
                     
                 }else{
                     
                     AppDelegate.sharedInstance.navigationController?.popViewController(animated: false)
                     let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                    vc.recieverId = userId
-                    vc.senderId = Local.shared.getUserId()
-                    vc.roomId = roomId
+                      vc.userId = userId
+                    vc.item_offer_id = roomId
                     AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                 }
             }else{
                     let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                    vc.recieverId = self.userId
-                    vc.senderId = Local.shared.getUserId()
-                    vc.roomId = self.roomId
+                    vc.userId = self.userId
+                    vc.item_offer_id = self.roomId
                     AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                 
             }
             
-        case "likes":
-            do {
-                    AppDelegate.sharedInstance.needToRefreshLikedYou()
-                    let destVC:LikesYouVC = StoryBoard.main.instantiateViewController(withIdentifier: "LikesYouVC") as! LikesYouVC
-                    destVC.isToHideBackButton = false
-                    destVC.isToRefreshList = true
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
-            }
-        case "profileVisitors":
-            do {
-                    
-                    let destVC:NotificationListVC = StoryBoard.chat.instantiateViewController(withIdentifier: "NotificationListVC") as! NotificationListVC
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
-                
-            }
-            
-        case "match":
-            do{
-                    for vc in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
-                        
-                        if let destVC = vc as? HomeBaseVC {
-                            destVC.selectedIndex = 1
-                            destVC.setSelectedImages(index: 1)
-                            if let  navVC = destVC.viewControllers?[1] {
-                                for vc in navVC.navigationController?.viewControllers ?? [] {
-                                    if vc is HomeBaseVC{
-                                        destVC.navigationController?.popToViewController(vc, animated: true)
-                                    }
-                                }
-                            }
-                            
-                        }
-                    }
-            }
-        case "userImageReject":
-            do {
-                
-                if let destVc = self.navigationController?.topViewController as? ProfileEditVC{
-                    destVc.getCompleteProfile()
-                }else{
-                        
-                        if let destVC:ProfileEditVC = StoryBoard.settings.instantiateViewController(withIdentifier: "ProfileEditVC") as? ProfileEditVC{
-                            AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
-                        }
-                    
-                }
-            }
-            break
-            
-        case "verifyGesture","boost","Premium","PremiumPlus":
-            do {
-                    
-                    for vc in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
-                        if let destVC = vc as? HomeBaseVC {
-                            destVC.setSelectedImages(index: 4)
-                            if let  navVC = destVC.viewControllers?[4] {
-                                for vc in navVC.navigationController?.viewControllers ?? [] {
-                                    if vc is HomeBaseVC{
-                                        if let  navVC = destVC.viewControllers?[4] {
-                                            destVC.navigationController?.popToViewController(vc, animated: true)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            break
-            
-        case "verifyDocument":
-            do {
-                    
-                    for vc in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
-                        if let destVC = vc as? HomeBaseVC {
-                            destVC.setSelectedImages(index: 4)
-                            if let  navVC = destVC.viewControllers?[4] {
-                                for vc in navVC.navigationController?.viewControllers ?? [] {
-                                    if vc is HomeBaseVC{
-                                        if let  navVC = destVC.viewControllers?[4] {
-                                            destVC.navigationController?.popToViewController(vc, animated: true)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            break
+       
         default:
             break
-        }*/
+        }
     }
 
     func userNotificationCenter(_ a: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if Local.shared.getUserId().count == 0 {
+      
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
+        if objLoggedInUser.id == nil {
             
         }else{
             //checkSocketStatus()
             print("didReceive")
             print("NOTIFICATION TAPPED === \(response.notification.request.content.userInfo)")
             
-            notificationType =  response.notification.request.content.userInfo["notificationType"] as? String ?? ""
-            userId =  response.notification.request.content.userInfo["userId"] as? String ?? ""
-            roomId =  response.notification.request.content.userInfo["roomId"] as? String ?? ""
+            notificationType =  response.notification.request.content.userInfo["type"] as? String ?? ""
+            userId =  Int(response.notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
+            roomId = Int(response.notification.request.content.userInfo["item_offer_id"] as? String ?? "0") ?? 0
             
             print("notificationType == \(notificationType)")
             print("userId == \(userId)")
@@ -390,12 +305,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         
         print(notification.request.content)
         let  notificationType =  notification.request.content.userInfo["notificationType"] as? String ?? ""
-        let  userId =  notification.request.content.userInfo["userId"] as? String ?? ""
+        let  userId =  notification.request.content.userInfo["userId"] as? Int ?? 0
         
-      /*  if notificationType == "messages" ||  notificationType == "gifts"{
+        if notificationType == "messages" {
             if let destVc = self.navigationController?.topViewController as? ChatVC{
                 
-                if destVc.recieverId == userId{
+                if destVc.userId == userId{
                     
                 }else{
                     //completionHandler( [.alert,.sound,.badge])
@@ -406,22 +321,21 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 }
                 
             }else{
-                self.playSound()
+               // self.playSound()
                 completionHandler([.banner, .list, .sound])
 
                // completionHandler( [.alert,.sound,.badge])
 
             }
         } else{
-            self.playSound()
+           // self.playSound()
            // completionHandler( [.alert,.sound,.badge])
             completionHandler([.banner, .list, .sound])
-
             
         }
-        */
-        
     }
+    
+    
     @available(iOS 10.0, *)
     func userNotificationCenter(center: UNUserNotificationCenter, willPresentNotification notification: UNNotification, withCompletionHandler completionHandler: (UNNotificationPresentationOptions) -> Void)
     {

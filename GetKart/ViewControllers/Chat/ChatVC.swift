@@ -40,7 +40,11 @@ class ChatVC: UIViewController {
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var btnMic:UIButton!
     @IBOutlet weak var btnSend:UIButton!
-    
+    @IBOutlet weak var btnAttachment:UIButton!
+
+    @IBOutlet weak var blockedView:UIViewX!
+    @IBOutlet weak var lblBlockedMsg:UILabel!
+
    lazy private var imagePicker = UIImagePickerController()
 
     var chatArray = [MessageModel]()
@@ -63,6 +67,9 @@ class ChatVC: UIViewController {
     var typingTimer: Timer?
     var isTyping = false
     
+    var youBlockedByUser = ""
+    var youBlockedUser = ""
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,6 +82,8 @@ class ChatVC: UIViewController {
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
         btnSend.clipsToBounds = true
         btnSend.translatesAutoresizingMaskIntoConstraints = false
+        
+        blockedView.isHidden = true
         
         // Configure the button
         var config = UIButton.Configuration.filled()
@@ -207,33 +216,54 @@ class ChatVC: UIViewController {
         
         let block = UIAlertAction(title: "Block", style: .default) { (action) in
             
-            
             self.blockUnblockUser(isBlock: true)
             
         }
         
-       // let unblock = UIAlertAction(title: "Unblock", style: .default) { (action) in
-            // self.blockApi(id: self.recieverId, isToBlock: 0)
-            //  self.blockUnblock(type: 0)
+        let unblock = UIAlertAction(title: "Unblock", style: .default) { (action) in
+            self.blockUnblockUser(isBlock: false)
+
             
-       // }
+        }
+        
+        //actionSheetAlertController.addAction(report)
         
         
-        
-        
-        //  actionSheetAlertController.addAction(report)
-        
-        //        if userBlockedByYou == 1 {
-        //            actionSheetAlertController.addAction(unblock)
-        //
-        //        }else{
-        actionSheetAlertController.addAction(block)
-        //  }
-        
+        if youBlockedUser.count > 0  {
+            actionSheetAlertController.addAction(unblock)
+
+        }else{
+            actionSheetAlertController.addAction(block)
+        }
+  
         self.present(actionSheetAlertController, animated: true, completion: nil)
         
     }
     
+    
+    func updateUserBlockStatus(){
+        
+        self.btnMic.isUserInteractionEnabled = false
+        self.btnSend.isUserInteractionEnabled = false
+        self.textView.isUserInteractionEnabled = false
+        self.btnAttachment.isUserInteractionEnabled = false
+        
+        if youBlockedUser.count > 0{
+            blockedView.isHidden = false
+            lblBlockedMsg.text = "You have blocked this user."
+        }else  if youBlockedByUser.count > 0{
+            blockedView.isHidden = false
+            lblBlockedMsg.text = "User has blocked you."
+
+        }else{
+             blockedView.isHidden = true
+            self.btnMic.isUserInteractionEnabled = true
+            self.btnSend.isUserInteractionEnabled = true
+            self.textView.isUserInteractionEnabled = true
+            self.btnAttachment.isUserInteractionEnabled = true
+
+        }
+    }
     
     func checkOnlineOfflineStatus(){
         let params = ["user_id":userId] as [String : Any]
@@ -435,12 +465,31 @@ class ChatVC: UIViewController {
     
    
     @objc func blockUnblock(notification: Notification) {
-       
+        
         guard let data = notification.userInfo else{
             return
         }
-        
+
+        if (data["code"] as? Int ?? 0) == 200{
+            let  message = data["message"] as? String ?? ""
+           
+            if  let  dataDict = data["data"] as? Dictionary<String,Any>{
+                let blocked_user_id = dataDict["blocked_user_id"] as? Int ?? 0
+                let action = dataDict["action"] as? String ?? ""
+
+                if blocked_user_id == userId{
+                    youBlockedUser = (action == "block") ? "You have blocked this user." : ""
+                }else{
+                    
+                    youBlockedByUser = (action == "block") ? "User has blocked you." : ""
+                }
+            }
+
+            AlertView.sharedManager.showToast(message: message)
+            updateUserBlockStatus()
+        }
     }
+    
     
     @objc func onlineOfflineStatus(notification: Notification) {
         guard let data = notification.userInfo else{
@@ -499,7 +548,7 @@ class ChatVC: UIViewController {
             let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
             let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
             
-            if item_offer_id == item_offer_id {
+            if self.item_offer_id == item_offer_id {
                 self.lblTypingStatus.isHidden = (typing == 1) ? false : true
             }
             
@@ -540,9 +589,11 @@ class ChatVC: UIViewController {
             
             let name = dataDict["name"] as? String ?? ""
             let profile = dataDict["profile"] as? String ?? ""
-
             self.lblName.text = name
             self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
+            self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
+            self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
+            updateUserBlockStatus()
         }
     }
    

@@ -54,7 +54,8 @@ class ChatListVC: UIViewController {
             .unselectedMenuItemLabelColor(.darkGray),
             .menuHeight(40),
             .selectionIndicatorHeight(2),
-            .menuItemFont(UIFont.Manrope.medium(size: 16).font)
+            .menuItemFont(UIFont.Manrope.medium(size: 16).font),
+            
         ]
         
         // Initialize page menu with controller array, frame, and optional parameters
@@ -62,9 +63,6 @@ class ChatListVC: UIViewController {
         pageMenu?.delegate = self
         pageMenu?.menuScrollView.isScrollEnabled = false
         pageMenu?.controllerScrollView.isScrollEnabled = false
-        // Lastly add page menu as subview of base view controller view
-        // or use pageMenu controller in you view hierachy as desired
-        pageMenu?.viewBackgroundColor = .clear
         self.view.addSubview(pageMenu!.view)
     }
     

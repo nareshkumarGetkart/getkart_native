@@ -16,6 +16,7 @@ class ChatListTblCell: UITableViewCell {
     @IBOutlet weak var imgViewItem:UIImageView!
     @IBOutlet weak var lblLastMessage:UILabel!
     @IBOutlet weak var lblDot:UILabel!
+    @IBOutlet weak var btnOption:UIButton!
 
 
     override func awakeFromNib() {

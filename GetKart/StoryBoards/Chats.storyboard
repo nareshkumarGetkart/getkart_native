@@ -312,16 +312,37 @@
                                     <constraint firstItem="r1V-43-Wae" firstAttribute="top" secondItem="Keo-uy-IIU" secondAttribute="top" id="qBT-Qi-rg4"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lh1-jd-OsJ" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="718" width="393" height="30"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Stg-b6-sCa">
+                                        <rect key="frame" x="5" y="1" width="383" height="28"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="Stg-b6-sCa" secondAttribute="bottom" constant="1" id="F1J-Yc-RNt"/>
+                                    <constraint firstItem="Stg-b6-sCa" firstAttribute="leading" secondItem="lh1-jd-OsJ" secondAttribute="leading" constant="5" id="NkK-9w-UU4"/>
+                                    <constraint firstAttribute="trailing" secondItem="Stg-b6-sCa" secondAttribute="trailing" constant="5" id="bXY-ea-lKg"/>
+                                    <constraint firstItem="Stg-b6-sCa" firstAttribute="top" secondItem="lh1-jd-OsJ" secondAttribute="top" constant="1" id="cd4-Uz-4fe"/>
+                                    <constraint firstAttribute="height" constant="30" id="gmt-yV-JRw"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <constraints>
+                            <constraint firstItem="lh1-jd-OsJ" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="117-Gw-4f4"/>
+                            <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="lh1-jd-OsJ" secondAttribute="bottom" id="1L1-bX-8Ao"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="Keo-uy-IIU" secondAttribute="bottom" id="3AM-Ao-yCF"/>
                             <constraint firstAttribute="trailing" secondItem="HiK-G8-l2N" secondAttribute="trailing" id="5Z3-eJ-pbu"/>
                             <constraint firstItem="trq-gm-Gnt" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="Apw-JU-oKn"/>
                             <constraint firstItem="lTF-SZ-ppU" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="LbQ-Td-Ovt"/>
                             <constraint firstItem="HiK-G8-l2N" firstAttribute="top" secondItem="lTF-SZ-ppU" secondAttribute="bottom" constant="1" id="NDW-Ni-DfI"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="lTF-SZ-ppU" secondAttribute="trailing" id="RBz-1P-d5f"/>
+                            <constraint firstItem="lh1-jd-OsJ" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="SBu-qq-8ve"/>
                             <constraint firstItem="lTF-SZ-ppU" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="Wd6-X9-hmo"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="LiT-9T-mg8" secondAttribute="trailing" id="Xls-9a-0gH"/>
                             <constraint firstItem="LiT-9T-mg8" firstAttribute="top" secondItem="HiK-G8-l2N" secondAttribute="bottom" id="ais-A4-iIJ"/>
@@ -337,6 +358,8 @@
                     </view>
                     <connections>
                         <outlet property="bgViewAudioRecord" destination="r1V-43-Wae" id="lkv-jk-Pen"/>
+                        <outlet property="blockedView" destination="lh1-jd-OsJ" id="dIW-8z-lcB"/>
+                        <outlet property="btnAttachment" destination="sWY-q5-abv" id="5cK-Dq-xBC"/>
                         <outlet property="btnAudioRecordStarted" destination="8Y2-8P-ZOB" id="Ga8-m5-uTd"/>
                         <outlet property="btnBack" destination="gTV-yq-Tqh" id="AcW-Wg-nW3"/>
                         <outlet property="btnImgMicBlink" destination="fHD-hA-ulg" id="aA6-lV-zRc"/>
@@ -347,6 +370,7 @@
                         <outlet property="imgViewProfile" destination="DWg-6U-3G1" id="Dng-5Y-OsI"/>
                         <outlet property="inputBarBottomSpace" destination="3AM-Ao-yCF" id="LcJ-MZ-mCt"/>
                         <outlet property="inputBarHeight" destination="7oJ-kb-5nx" id="kjd-2f-0bo"/>
+                        <outlet property="lblBlockedMsg" destination="Stg-b6-sCa" id="Rut-hy-ksu"/>
                         <outlet property="lblName" destination="LMy-r3-KYs" id="6ub-Oq-qw7"/>
                         <outlet property="lblPrice" destination="u2M-bt-d3N" id="IlJ-Ra-jXp"/>
                         <outlet property="lblProduct" destination="Jxi-7X-XEE" id="EC9-oy-cc7"/>
@@ -358,7 +382,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="792" y="-79"/>
+            <point key="canvasLocation" x="791.60305343511448" y="-79.577464788732399"/>
         </scene>
         <!--AudioPlayerVC-->
         <scene sceneID="lG4-OY-psj">

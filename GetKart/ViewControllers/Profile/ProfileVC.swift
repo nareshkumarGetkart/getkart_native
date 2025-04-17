@@ -14,7 +14,7 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Transaction History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
       
@@ -207,7 +207,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             }else if titleArray[indexPath.row] == "Share this App"{
                 ShareMedia.shareMediafrom(type: .appShare, mediaId: "", controller: self)
                 
-            }else if titleArray[indexPath.row] ==  "Transaction History"{
+            }else if titleArray[indexPath.row] ==  "Order History"{
                 
                 if isUserLoggedInRequest(){
                     

@@ -69,8 +69,9 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if cellTypes == .categories{
             return (listArray?.count ?? 0) > 0 ?  (listArray?.count ?? 0) + 1 : 0
-       }
+        }else{
             return listArray?.count ?? 0
+        }
     }
     
     
@@ -79,8 +80,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
         if cellTypes == .categories{
             return CGSize(width: self.collctnView.bounds.size.width/3.0 - 35, height: 130)
         }else{
-            
-        
+                
             let widthCell = (istoIncreaseWidth) ? (self.collctnView.bounds.size.width/2.0 + 20.0) : (self.collctnView.bounds.size.width/2.0 - 2.5)
 
             return CGSize(width: widthCell , height: 260)
@@ -167,7 +167,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
             }else{
                 
-                let vc = UIHostingController(rootView: SearchWithSortView(navigationController:AppDelegate.sharedInstance.navigationController,categroryId: obj?.id ?? 0, categoryName: obj?.name ?? ""))
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:AppDelegate.sharedInstance.navigationController, categoryName: obj?.name ?? ""))
                 AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
             }
         }else if cellTypes == .product{
