@@ -10,7 +10,6 @@ import MapKit
 
 struct SelectLocationRangeView: View {
     var navigationController: UINavigationController?
-    // @State var mapRegion = MKCoordinateRegion()
     
     @State var mapRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0),
@@ -149,7 +148,7 @@ struct SelectLocationRangeView: View {
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city ?? "", state:locationManager.state ?? "", country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -165,11 +164,12 @@ struct SelectLocationRangeView: View {
             }else  if popType == .createPost {
                 
                
-                    if let vc1 = vc as? CreateAddVC2 {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
-                        self.navigationController?.popToViewController(vc1, animated: true)
-                        break
-                    }
+                /*if vc.isKind(of: UIHostingController<ConfirmLocationCreateAdd>.self) == true{
+                   
+                        vc.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(self.locationManager.longitude)",  city:self.locationManager.city ?? "", state:self.locationManager.state ?? "", country:self.locationManager.country ?? "")
+                        self.navigationController?.popToViewController(vc, animated: true)
+                }*/
+                break
                 
             }else if popType == .signUp {
                 
@@ -341,10 +341,18 @@ struct TapMapView: UIViewRepresentable {
                     
                     if let addressDict = (placemarks.first?.addressDictionary as? NSDictionary){
                         print(addressDict)
-                        //self.locationManager.timezone =  (placemarks.first as? CLPlacemark)?.timeZone?.identifier ?? ""
+                        let timezone =  (placemarks.first as? CLPlacemark)?.timeZone?.identifier ?? ""
                         let city = addressDict["City"] as? String ?? ""
                         let state = addressDict["State"] as? String ?? ""
                         let country = addressDict["Country"] as? String ?? ""
+                        
+                        LocationManager.sharedInstance.city = city
+                        LocationManager.sharedInstance.state = state
+                        LocationManager.sharedInstance.country = country
+                        LocationManager.sharedInstance.timezone = timezone
+                        LocationManager.sharedInstance.latitude = coordinate.latitude
+                        LocationManager.sharedInstance.longitude = coordinate.longitude
+                        LocationManager.sharedInstance.lastKnownLocation = coordinate
                         
                         locationInfo = city + "," + state + "," + country
                     }

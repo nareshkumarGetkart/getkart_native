@@ -162,11 +162,11 @@ struct CityLocationView: View {
             }else  if popType == .createPost {
                 
                
-                    if let vc1 = vc as? CreateAddVC2 {
-                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
-                        self.navigationController?.popToViewController(vc1, animated: true)
-                        break
-                    }
+                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                    vc1.rootView.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
                 
             }else if popType == .signUp {
                 

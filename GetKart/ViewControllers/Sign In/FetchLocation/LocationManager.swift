@@ -11,6 +11,7 @@ protocol LocationAutorizationUpdated {
     func locationAuthorizationUpdate()
 }
 final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
+    static var sharedInstance = LocationManager()
     
     @Published var lastKnownLocation: CLLocationCoordinate2D?
     var manager = CLLocationManager()
@@ -83,6 +84,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         
         }
     }
+    
+    
+    
     
     func updateStateCity(){
         // Create Location

@@ -218,8 +218,9 @@ struct CountryLocationView: View {
             }else  if popType == .createPost {
                 
                
-                    if let vc1 = vc as? CreateAddVC2 {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                    
+                    vc1.rootView.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }

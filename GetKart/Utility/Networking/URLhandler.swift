@@ -464,7 +464,6 @@ class URLhandler: NSObject{
                     completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
                 }
             }else{
-                
                 completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
             }
         }
