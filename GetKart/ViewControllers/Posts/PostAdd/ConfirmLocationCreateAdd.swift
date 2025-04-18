@@ -12,14 +12,13 @@ import MapKit
 struct ConfirmLocationCreateAdd: View {
     
     
-    var imgData:Data?
-    var imgName = ""
-    var gallery_images:Array<Data> = []
-    var gallery_imageNames:Array<String> = []
-    @State var isChanged = false
-    var navigationController: UINavigationController?
+    @State var imgData:Data?
+    @State var imgName = ""
+    @State var gallery_images:Array<Data> = []
+    @State var gallery_imageNames:Array<String> = []
+     var navigationController: UINavigationController?
     @State var popType:PopType?
-     var params:Dictionary<String,Any> = [:]
+    @State var params:Dictionary<String,Any> = [:]
     
     
     
@@ -38,7 +37,6 @@ struct ConfirmLocationCreateAdd: View {
     var body: some View {
             
             HStack{
-                
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
@@ -87,7 +85,6 @@ struct ConfirmLocationCreateAdd: View {
             }.frame(height: 50)
             
             Button(action: {
-                isChanged = true
              postNowAction()
             }) {
                 Text("Post Now")
@@ -118,7 +115,7 @@ struct ConfirmLocationCreateAdd: View {
        }
    }
     
-    mutating func postNowAction(){
+     func postNowAction(){
         if selectedCoordinate.latitude != 0 {
             self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
         }
@@ -127,7 +124,7 @@ struct ConfirmLocationCreateAdd: View {
     
    
     
-    mutating func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
         params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
         params[AddKeys.latitude.rawValue] = latitude
         params[AddKeys.longitude.rawValue] = longitude
