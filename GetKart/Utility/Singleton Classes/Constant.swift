@@ -313,6 +313,11 @@ final class Constant: NSObject {
         }
     }
     
+    var delete_item:String{
+        get {
+            return "\(Constant.shared.baseURL)/delete-item"
+        }
+    }
     
     var logout:String{
         get {

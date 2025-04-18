@@ -473,6 +473,7 @@ struct ItemDetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+                
                 Button(action: {
                     
                     

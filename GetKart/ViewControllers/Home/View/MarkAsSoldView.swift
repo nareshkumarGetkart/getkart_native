@@ -111,6 +111,8 @@ struct MarkAsSoldView: View {
             // None of above
             Button("None of above") {
                 selectedUserId = nil
+                showConfirmDialog = true
+
             }
             .padding()
             .foregroundColor(.black)
@@ -123,24 +125,27 @@ struct MarkAsSoldView: View {
             )
             .padding(.horizontal)
 
-            // Mark As Sold Out
-            Button("Mark As Sold Out") {
-                showConfirmDialog = true
+            if listArray.count > 0{
+                // Mark As Sold Out
+                Button("Mark As Sold Out") {
+                    showConfirmDialog = true
+                }
+                .disabled(selectedUserId == nil)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(selectedUserId == nil ? Color.gray : Color.orange)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+                .padding(.horizontal)
             }
-            .disabled(selectedUserId == nil)
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(selectedUserId == nil ? Color.gray : Color.orange)
-            .foregroundColor(.white)
-            .cornerRadius(12)
-            .padding(.horizontal)
+            
         }.navigationBarHidden(true)
         .confirmationDialog("Confirm Sold Out",
                             isPresented: $showConfirmDialog,
                             titleVisibility: .visible) {
             Button("Confirm", role: .destructive) {
                 // Confirm logic
-                self.updateStatusToSold(soldTo: selectedUserId ?? 0)
+                self.updateStatusToSold()
 
             }
             Button("Cancel", role: .cancel) {}
@@ -150,9 +155,13 @@ struct MarkAsSoldView: View {
     }
     
     
-    func updateStatusToSold(soldTo:Int){
+    func updateStatusToSold(){
         
-        let params = ["status":"sold out","item_id":(itemId ?? 0),"sold_to":soldTo] as [String : Any]
+        
+        var params = ["status":"sold out","item_id":(itemId ?? 0)] as [String : Any]
+        if  let id = selectedUserId {
+            params = ["status":"sold out","item_id":(itemId ?? 0),"sold_to":id]
+        }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.update_item_status, param: params,methodType: .post) {  responseObject, error in
             
