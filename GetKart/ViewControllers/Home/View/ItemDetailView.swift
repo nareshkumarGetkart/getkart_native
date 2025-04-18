@@ -313,16 +313,21 @@ struct ItemDetailView: View {
                                         .stroke(Color.gray, lineWidth: 0.5)
                                 ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                                 .onTapGesture {
-                                    //  if (objVM.itemObj.isAlreadyReported ?? false) == false {
-                                    let destVC = UIHostingController(rootView: ReportAdsView())
-                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                    self.navController?.present(destVC, animated: true, completion: nil)
-                                    
-                                    //                                }else{
-                                    //                                    print("Already Reported")
-                                    //                                }
+                                  
+                                    let isReported = objVM.itemObj?.isAlreadyReported ?? false
+                                   
+                                    if isReported {
+                                     
+                                    }else{
+                                        print("Already Reported")
+                                        
+                                        let destVC = UIHostingController(rootView: ReportAdsView())
+                                        destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                        destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                        destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                        self.navController?.present(destVC, animated: true, completion: nil)
+                                        
+                                    }
                                 }
                         }.padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -761,6 +766,7 @@ struct SellerInfoView: View {
 import MapKit
 
 struct MapView: UIViewRepresentable {
+    
     let latitude: Double
     let longitude: Double
     let address: String

@@ -307,6 +307,12 @@ final class Constant: NSObject {
     }
 
     
+    var update_item_status:String{
+        get {
+            return "\(Constant.shared.baseURL)/update-item-status"
+        }
+    }
+    
     
     var logout:String{
         get {

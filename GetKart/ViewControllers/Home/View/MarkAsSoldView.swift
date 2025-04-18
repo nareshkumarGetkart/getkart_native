@@ -140,6 +140,8 @@ struct MarkAsSoldView: View {
                             titleVisibility: .visible) {
             Button("Confirm", role: .destructive) {
                 // Confirm logic
+                self.updateStatusToSold(soldTo: selectedUserId ?? 0)
+
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -147,6 +149,32 @@ struct MarkAsSoldView: View {
         }
     }
     
+    
+    func updateStatusToSold(soldTo:Int){
+        
+        let params = ["status":"sold out","item_id":(itemId ?? 0),"sold_to":soldTo] as [String : Any]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.update_item_status, param: params,methodType: .post) {  responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    navController?.popToRootViewController(animated: true)
+                }
+                
+            }
+        }
+    }
     
     func getUsers(){
         let strUrl = Constant.shared.item_buyer_list + "?item_id=\(itemId ?? 0)"

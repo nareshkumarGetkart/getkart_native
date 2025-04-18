@@ -73,7 +73,7 @@ struct ItemModel: Codable,Identifiable {
     let country: String?
     let areaID: String?
     let userID: Int?
-    let soldTo: String?
+    let soldTo: Int?
     let categoryID: Int?
     let allCategoryIDS, expiryDate, createdAt, updatedAt: String?
     let deletedAt: String?
