@@ -8,13 +8,12 @@
 import Foundation
 class CustomFieldsViewModel{
     
-    var dataArray:[CustomFields]?
+    var dataArray:[CustomField]?
     weak var delegate:RefreshScreen?
     var page = 1
     var isDataLoading = true
    
     init(){
-       
     }
        
     
@@ -35,12 +34,12 @@ class CustomFieldsViewModel{
 struct CustomFieldsParse: Codable {
     var error: Bool?
     var message: String?
-    var data: [CustomFields]?
+    var data: [CustomField]?
     var code: Int?
 }
 
 // MARK: - Datum
-struct CustomFields: Codable {
+/*struct CustomFields: Codable {
     var id: Int?
     var name, type: String?
     var image: String?
@@ -61,5 +60,5 @@ struct CustomFields: Codable {
         case maxLength = "max_length"
         case status
     }
-}
+}*/
 

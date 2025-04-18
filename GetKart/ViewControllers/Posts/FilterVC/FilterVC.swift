@@ -23,7 +23,7 @@ class FilterVC: UIViewController {
     var state:String = ""
     var country:String = ""
     
-    var dataArray:[CustomFields] = []
+    var dataArray:[CustomField] = []
     var dictCustomFields:Dictionary<String,Any> = [:]
     
     var strCategoryTitle = ""
@@ -42,7 +42,12 @@ class FilterVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-        self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        for ind in 0..<4 {
+            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+            self.dataArray.append(obj)
+        }
+        
+       // self.dataArray.append(contentsOf: [CustomField(),CustomField(),CustomField(),CustomField()])
         btnBack.setImageColor(color: .black)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
@@ -86,7 +91,11 @@ class FilterVC: UIViewController {
         country = ""
         
         self.dataArray.removeAll()
-        self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        for ind in 0..<4 {
+            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+            self.dataArray.append(obj)
+        }
+        //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
         dictCustomFields.removeAll()
         strCategoryTitle = ""
         category_ids = ""
@@ -256,7 +265,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         }else {
             
             var objCustomField = dataArray[indexPath.row]
-            if objCustomField.type ?? "" == "radio" || objCustomField.type ?? "" ==  "checkbox"{
+            if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
                 if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
                     
@@ -282,7 +291,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 
                 cell.selectionStyle = .none
                 return cell
-            }else if objCustomField.type ?? "" == "dropdown" {
+            }else if objCustomField.type  == .dropdown {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
                 cell.imgView.isHidden = false
                 //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
@@ -328,7 +337,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
             objCustomField.arrIsSelected[clnCell] = true
             dictCustomFields["custom_fields[\(objCustomField.id ?? 0)]"] =  "[\(objCustomField.values?[clnCell] ?? "")]"
         }
-        if objCustomField.type == "radio" {
+        if objCustomField.type == .radio {
             for ind in 0..<objCustomField.arrIsSelected.count {
                 if ind != clnCell {
                     objCustomField.arrIsSelected[ind] = false
@@ -417,9 +426,15 @@ extension FilterVC:RefreshScreen {
     func refreshScreen() {
         print(self.objViewModel?.dataArray)
         self.dataArray.removeAll()
-        self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        
+        //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        for ind in 0..<4 {
+            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+            self.dataArray.append(obj)
+        }
+        
         for objCustomField in self.objViewModel?.dataArray ?? [] {
-            if objCustomField.type ?? "" == "radio" || objCustomField.type ?? "" ==  "checkbox" || objCustomField.type ?? "" == "dropdown"{
+            if objCustomField.type == .radio || objCustomField.type  ==  .checkbox || objCustomField.type  == .dropdown{
                 self.dataArray.append(objCustomField)
             }
         }

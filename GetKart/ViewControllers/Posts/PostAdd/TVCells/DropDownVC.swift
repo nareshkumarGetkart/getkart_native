@@ -11,7 +11,7 @@ protocol DropDownSelectionDelegate {
 }
 class DropDownVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
-    var dataArray:[String] = []
+    var dataArray:[String?] = []
     var dropDownRowIndex = 0
     var selectionDelegate:DropDownSelectionDelegate!
     

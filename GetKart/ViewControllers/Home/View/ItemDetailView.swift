@@ -455,13 +455,16 @@ struct ItemDetailView: View {
         if loggedInUserId == itemUserId {
 
         
-       // if isMyProduct{
             
            
             
             HStack {
                 Button(action: {
-                    
+                    if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                        vc.itemObj = objVM.itemObj
+                        vc.popType = .editPost
+                        self.navController?.pushViewController(vc, animated: true)
+                    }
                 }) {
                     Text("Edit")
                         .frame(maxWidth: .infinity)

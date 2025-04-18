@@ -9,6 +9,7 @@ enum PopType{
     case home
     case buyPackage
     case createPost
+    case editPost
     case categoriesSeeAll
 }
 

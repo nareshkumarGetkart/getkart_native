@@ -16,8 +16,8 @@ class RadioTVCell: UITableViewCell {
     @IBOutlet weak var clnCollectionView:DynamicHeightCollectionView!
     @IBOutlet weak var clnHeight:NSLayoutConstraint!
     @IBOutlet weak var lblErrorMsg:UILabel!
-    var objData:CustomFields!
-    var del:radioCellTappedDelegate!
+    var objData:CustomField?
+    var del:radioCellTappedDelegate?
     var rowValue:Int = 0
     
     override func awakeFromNib() {
@@ -73,17 +73,17 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return objData.values?.count ?? 0
+        return objData?.values?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if objData.type == "checkbox" {
+        if objData?.type == .checkbox {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
-            cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
+            cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-            if objData.arrIsSelected[indexPath.item] == true {
+            if objData?.arrIsSelected[indexPath.item] == true {
                 cell.imgSelect.image = UIImage.init(systemName: "checkmark")
                 cell.imgSelect.setImageTintColor(color: UIColor.systemOrange)
                 cell.btnValue.setTitleColor(.orange, for: .normal)
@@ -98,10 +98,10 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             return cell
         }else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
-            cell.btnValue.setTitle(objData.values?[indexPath.item] ?? "", for: .normal)
+            cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-            if objData.arrIsSelected[indexPath.item] == true {
+            if objData?.arrIsSelected[indexPath.item] == true {
                 cell.btnValue.setTitleColor(.orange, for: .normal)
                 cell.backView.borderColor = UIColor.orange
             }else {

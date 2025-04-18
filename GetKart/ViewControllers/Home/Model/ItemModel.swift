@@ -178,6 +178,10 @@ struct CustomField: Codable,Identifiable  {
     let value: [String?]?
     let customFieldValue: CustomFieldValue?
 
+    var arrIsSelected:Array<Bool> = Array()
+    //value inserted by user
+    var selectedValue:String?
+    
     enum CodingKeys: String, CodingKey {
         case id, name, type, image
         case customFieldRequired = "required"
@@ -188,6 +192,22 @@ struct CustomField: Codable,Identifiable  {
         case status
         case customFieldValue = "custom_field_value"
     }
+    init(id: Int?, name: String?, type: TypeEnum?, image: String?, customFieldRequired: Int?, values: [String?]?, minLength: Int?, maxLength: Int?, status: Int?, value: [String?]?, customFieldValue: CustomFieldValue?, arrIsSelected: Array<Bool>, selectedValue: String? = nil) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.image = image
+        self.customFieldRequired = customFieldRequired
+        self.values = values
+        self.minLength = minLength
+        self.maxLength = maxLength
+        self.status = status
+        self.value = value
+        self.customFieldValue = customFieldValue
+        self.arrIsSelected = arrIsSelected
+        self.selectedValue = selectedValue
+    }
+  
 }
 
 // MARK: - CustomFieldValue

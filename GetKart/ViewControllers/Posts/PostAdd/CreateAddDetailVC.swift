@@ -48,6 +48,10 @@ class CreateAddDetailVC: UIViewController {
     var gallery_imageNames:Array<String> = []
     var isImgData = false
     var showErrorMsg = false
+   
+    var popType:PopType? = .createPost
+    
+     var itemObj:ItemModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,22 +65,42 @@ class CreateAddDetailVC: UIViewController {
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
+        if popType == .createPost {
+            objViewModel = CustomFieldsViewModel()
+            objViewModel?.delegate = self
+            objViewModel?.getCustomFieldsListApi(category_ids: category_ids)
+            
+            params[AddKeys.all_category_ids.rawValue] = category_ids
+            params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
+            params[AddKeys.show_only_to_premium.rawValue] = 0
+            
+            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+            
+            params[AddKeys.name.rawValue] = ""
+            params[AddKeys.price.rawValue] = ""
+            params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
+            params[AddKeys.video_link.rawValue] = ""
+            params[AddKeys.description.rawValue] = ""
+        }else {
+            
+            
+            objViewModel = CustomFieldsViewModel()
+            objViewModel?.dataArray =  self.itemObj?.customFields
+            
+            params[AddKeys.all_category_ids.rawValue] = self.itemObj?.allCategoryIDS
+            params[AddKeys.category_id.rawValue] = self.itemObj?.categoryID ?? 0
+            params[AddKeys.show_only_to_premium.rawValue] = self.itemObj?.showOnlyToPremium ?? 0
+            
+            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+            
+            params[AddKeys.name.rawValue] = self.itemObj?.name ?? ""
+            params[AddKeys.price.rawValue] = "\(self.itemObj?.price ?? 0)"
+            params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
+            params[AddKeys.video_link.rawValue] = self.itemObj?.videoLink ?? ""
+            params[AddKeys.description.rawValue] = self.itemObj?.description ?? ""
+            
+        }
         
-        objViewModel = CustomFieldsViewModel()
-        objViewModel?.delegate = self
-        objViewModel?.getCustomFieldsListApi(category_ids: category_ids)
-        
-        params[AddKeys.all_category_ids.rawValue] = category_ids
-        params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
-        params[AddKeys.show_only_to_premium.rawValue] = 0
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        
-        params[AddKeys.name.rawValue] = ""
-        params[AddKeys.price.rawValue] = ""
-        params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
-        params[AddKeys.video_link.rawValue] = ""
-        params[AddKeys.description.rawValue] = ""
     }
     
     @IBAction func backButtonAction() {
@@ -152,6 +176,7 @@ class CreateAddDetailVC: UIViewController {
                 vc.imgName = self.imgName
                 vc.gallery_images = self.gallery_images
                 vc.gallery_imageNames = self.gallery_imageNames
+                vc.popType = self.popType
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }

@@ -11,7 +11,7 @@ class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
 
-    var dataArray:[CustomFields] = []
+    var dataArray:[CustomField] = []
     var params:Dictionary<String,Any> = [:]
     var dictCustomFields:Dictionary<String,Any> = [:]
     lazy var imagePicker = UIImagePickerController()
@@ -22,6 +22,7 @@ class CreateAddVC2: UIViewController {
     var gallery_imageNames:Array<String> = []
     var showErrorMsg = false
     var customFieldFiles :Dictionary<String,Any> = [:]
+    @State var popType:PopType? = .createPost
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
@@ -57,7 +58,7 @@ class CreateAddVC2: UIViewController {
     @IBAction func nextButtonAction (){
         showErrorMsg = false
         for objCustomField in dataArray {
-            if objCustomField.type ?? "" == "textbox" || objCustomField.type ?? "" == "number" || objCustomField.type ?? "" == "dropdown"{
+            if objCustomField.type  == .textbox || objCustomField.type  == .number || objCustomField.type  == .dropdown{
                 if  objCustomField.selectedValue == nil || objCustomField.selectedValue == "" {
                     showErrorMsg = true
                 }
@@ -68,7 +69,7 @@ class CreateAddVC2: UIViewController {
             tblView.reloadData()
         }else {
             params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
-            let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: .createPost, params: self.params))
+            let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -99,7 +100,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         
         var objCustomField = dataArray[indexPath.row]
         
-        if objCustomField.type ?? "" == "textbox" {
+        if objCustomField.type  == .textbox {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
             //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
@@ -141,7 +142,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             return cell
             
             
-        }else if objCustomField.type ?? "" == "number" {
+        }else if objCustomField.type  == .number {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
             //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
@@ -177,7 +178,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             cell.selectionStyle = .none
             return cell
-        }else if objCustomField.type ?? "" == "radio" || objCustomField.type ?? "" ==  "checkbox"{
+        }else if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
             if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
                 
@@ -222,7 +223,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             cell.selectionStyle = .none
             return cell
-        }else if objCustomField.type ?? "" == "dropdown" {
+        }else if objCustomField.type  == .dropdown {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
             //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
@@ -262,7 +263,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.selectionStyle = .none
             
             return cell
-        }else  if objCustomField.type ?? "" == "fileinput" {
+        }else  if objCustomField.type  == .fileinput {
             /*
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
             cell.imgView.isHidden = true
@@ -326,7 +327,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             objCustomField.arrIsSelected[clnCell] = true
             dictCustomFields["\(objCustomField.id ?? 0)"] =  objCustomField.values?[clnCell] ?? ""
         }
-        if objCustomField.type == "radio" {
+        if objCustomField.type == .radio {
             for ind in 0..<objCustomField.arrIsSelected.count {
                 if ind != clnCell {
                     objCustomField.arrIsSelected[ind] = false
