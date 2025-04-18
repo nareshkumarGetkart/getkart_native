@@ -9,7 +9,7 @@ import SwiftUI
 
 struct UnblockUserView: View {
     @Binding var isPresented: Bool  // Control visibility of the popup
-    var bloclkUser:BlockedUser?
+    var bloclkUser:UserModel?
     
     var unblockUser:()->Void
 
@@ -68,7 +68,7 @@ struct UnblockUserView: View {
 }
 
 #Preview {
-    UnblockUserView(isPresented: .constant(true), bloclkUser: BlockedUser(id: 0, name: "", profile: ""), unblockUser: { })
+    UnblockUserView(isPresented: .constant(true), bloclkUser: UserModel(id: 0, name: "", profile: ""), unblockUser: { })
 }
 
 

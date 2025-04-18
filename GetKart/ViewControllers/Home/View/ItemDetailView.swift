@@ -465,7 +465,12 @@ struct ItemDetailView: View {
                     
                     if (objVM.itemObj?.status ?? "") == "approved"  || (objVM.itemObj?.status ?? "") == "sold_out" {
                     
-                        let hostingController = UIHostingController(rootView: MarkAsSoldView(navController: self.navController))
+                        var markAsSold = MarkAsSoldView(navController: self.navController)
+                        markAsSold.productTitle = objVM.itemObj?.name ?? ""
+                        markAsSold.price = objVM.itemObj?.price ?? 0
+                        markAsSold.productImg = objVM.itemObj?.image ?? ""
+
+                        let hostingController = UIHostingController(rootView: markAsSold)
                         self.navController?.pushViewController(hostingController, animated: true)
                    
                     }else{

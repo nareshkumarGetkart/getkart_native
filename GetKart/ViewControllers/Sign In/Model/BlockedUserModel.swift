@@ -9,15 +9,15 @@ import Foundation
 
 
 // MARK: - Blocked
-struct BlockedParse: Codable {
+struct UserParse: Codable {
     let error: Bool?
     let message: String?
-    let data: [BlockedUser]?
+    let data: [UserModel]?
     let code: Int?
 }
 
 // MARK: - Datum
-struct BlockedUser: Codable,Identifiable {
+struct UserModel: Codable,Identifiable {
     let id: Int?
     let name: String?
     let profile: String?

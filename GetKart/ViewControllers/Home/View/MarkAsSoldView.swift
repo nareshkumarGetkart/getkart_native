@@ -9,11 +9,12 @@ import SwiftUI
 
 struct MarkAsSoldView: View {
     
-    @State private var selectedUserId: String? = nil
+    @State private var selectedUserId: Int? = nil
     @State private var showConfirmDialog = false
-    @State var users = [Users]()
-    let productTitle = "Motorola C 55"
-    let price = "₹2000.0"
+    @State var listArray = [UserModel]()
+    var productTitle:String?
+    var price:Int?
+    var productImg:String?
     var navController:UINavigationController?
     
     
@@ -38,19 +39,31 @@ struct MarkAsSoldView: View {
             }
             .padding()
             .onAppear{
-                self.users.append(Users(id: "", name: "Rahul", image: nil))
+                self.getUsers()
             }
 
             // Product Info
             HStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 40, height: 40)
-                    .overlay(Image(systemName: "photo")) // Replace with actual image
-                Text(productTitle)
+                
+                if let image = productImg {
+                    AsyncImage(url: URL(string: image)) { img in
+                        img.resizable()
+                            .frame(width: 36, height: 36)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        
+                    }
+
+                } else {
+                    Circle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: 40, height: 40)
+                        .overlay(Image("getkartplaceholder")) // Replace with actual image
+                }
+                Text(productTitle ?? "")
                     .font(.body)
                 Spacer()
-                Text(price)
+                Text("\(Local.shared.currencySymbol) \(price ?? 0)")
                     .fontWeight(.bold)
             }
             .padding(.horizontal)
@@ -58,13 +71,19 @@ struct MarkAsSoldView: View {
             Divider()
 
             // User List
-            List(users) { user in
+            List(listArray) { user in
                 HStack {
-                    if let image = user.image {
-                        Image(uiImage: image)
-                            .resizable()
-                            .frame(width: 36, height: 36)
-                            .clipShape(Circle())
+                    
+                    
+                    if let image = user.profile {
+                        AsyncImage(url: URL(string: image)) { img in
+                            img.resizable()
+                                .frame(width: 36, height: 36)
+                                .clipShape(Circle())
+                        } placeholder: {
+                            
+                        }
+
                     } else {
                         Circle()
                             .fill(Color.orange)
@@ -72,7 +91,7 @@ struct MarkAsSoldView: View {
                             .overlay(Image(systemName: "person.fill").foregroundColor(.white))
                     }
 
-                    Text(user.name)
+                    Text(user.name ?? "")
                         .padding(.leading, 8)
 
                     Spacer()
@@ -126,6 +145,18 @@ struct MarkAsSoldView: View {
             Text("After marking this ad as sold out, you can’t undo or change its status.")
         }
     }
+    
+    
+    func getUsers(){
+        
+        ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.blocked_users, param: nil,httpMethod: .get) { (obj:UserParse) in
+            
+            if obj.code == 200{
+                self.listArray = obj.data ?? []
+            }
+        }
+    }
+
 }
 
 #Preview {
@@ -136,9 +167,3 @@ struct MarkAsSoldView: View {
 
 
 
-// MARK: - User Model
-struct Users: Identifiable {
-    let id: String
-    let name: String
-    let image: UIImage? // Optional image
-}

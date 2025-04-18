@@ -10,7 +10,7 @@ import SwiftUI
 struct BlockedUserView: View {
     
     var navigationController: UINavigationController?
-    @State var listArray = [BlockedUser]()
+    @State var listArray = [UserModel]()
     @State private var showPopup = false
     @State private var selectedIndex: Int?
 
@@ -113,7 +113,7 @@ struct BlockedUserView: View {
     
     func getBlockedUsers(){
         
-        ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.blocked_users, param: nil,httpMethod: .get) { (obj:BlockedParse) in
+        ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.blocked_users, param: nil,httpMethod: .get) { (obj:UserParse) in
             
             if obj.code == 200{
                 self.listArray = obj.data ?? []
