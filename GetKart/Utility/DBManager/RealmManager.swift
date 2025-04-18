@@ -58,6 +58,8 @@ class RealmManager: ObservableObject {
                 user.email = dict["email"] as? String ?? ""
                 user.profile = dict["profile"] as? String ?? ""
                 user.address = dict["address"] as? String ?? ""
+                user.mobile = dict["mobile"] as? String ?? ""
+                user.country_code = dict["country_code"] as? String ?? ""
                 user.mobileVisibility = dict["mobileVisibility"] as? Int ?? 0
                 user.notification = dict["notification"] as? Int ?? 0
             }

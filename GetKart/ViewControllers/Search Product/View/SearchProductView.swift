@@ -83,7 +83,7 @@ struct SearchProductView: View {
                     ForEach(items) { item in
                        // ItemRow(item: item)
                         FavoritesCell(itemObj: item).onTapGesture {
-                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:false))
+                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:false))
                             AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                         }
 

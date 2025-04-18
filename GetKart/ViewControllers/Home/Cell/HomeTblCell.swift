@@ -136,7 +136,11 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
    
         if cellTypes == .product{
             
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0))
+            
+            let detailView = ItemDetailView(navController: AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel))
+            
+            let hostingController = UIHostingController(rootView:detailView )
+            
             AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
         }        
     }

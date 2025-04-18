@@ -14,7 +14,8 @@ class ItemDetailViewModel:ObservableObject{
     @Published var sellerObj:SellerModel?
     @Published var relatedDataItemArray = [ItemModel]()
     @Published var itemObj:ItemModel?
-    
+    var isMyProduct = false
+   
     init(){
 
     }
@@ -24,19 +25,27 @@ class ItemDetailViewModel:ObservableObject{
         
         let strUrl = Constant.shared.get_item + "?id=\(id)"
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SingleItemParse) in
+        if isMyProduct == false{
             
-            if obj.code == 200 {
+            ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SingleItemParse) in
                 
-                if let item  =  obj.data?.first{
-                    self.itemObj = item
-                    self.getSeller(sellerId: item.userID ?? 0)
-                    self.getProductListApi(categoryId: item.categoryID ?? 0)
-                    self.setItemTotalApi()
+                if obj.code == 200 {
+                    
+                    if let item  =  obj.data?.first{
+                        self.itemObj = item
+                        self.getSeller(sellerId: item.userID ?? 0)
+                        self.getProductListApi(categoryId: item.categoryID ?? 0)
+                        self.setItemTotalApi()
+                    }
                 }
             }
+        }else{
+            
         }
     }
+    
+    
+    
         
     
     func getSeller(sellerId:Int){

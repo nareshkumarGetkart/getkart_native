@@ -67,6 +67,14 @@ final class Constant: NSObject {
             return  "\(Constant.shared.baseURL)/verify-mobile-otp"
         }
     }
+    
+    
+    var mobile_verify_update:String{
+        get {
+            return  "\(Constant.shared.baseURL)/mobile-verify-update"
+        }
+    }
+    
     var userSignupUrl:String{
         get {
             return "\(Constant.shared.baseURL)/user-signup"

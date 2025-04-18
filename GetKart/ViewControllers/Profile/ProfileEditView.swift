@@ -7,18 +7,21 @@
 
 import SwiftUI
 
+
 struct ProfileEditView: View {
     
-        @State private var fullName: String = ""
-        @State private var email: String = ""
-        @State private var phoneNumber: String = ""
-        @State private var address: String = ""
-        @State private var isNotificationsEnabled: Bool = true
-        @State private var isContactInfoVisible: Bool = false
-        @State private var selectedImage: UIImage? = nil
-        @State private var showingImagePicker: Bool = false
-        @State private var showOTPPopup = false
-
+    @State private var fullName: String = ""
+    @State private var email: String = ""
+    @State private var phoneNumber: String = ""
+    @State private var address: String = ""
+    @State private var isNotificationsEnabled: Bool = true
+    @State private var isContactInfoVisible: Bool = false
+    @State private var selectedImage: UIImage? = nil
+    @State private var showingImagePicker: Bool = false
+    @State private var showOTPPopup = false
+    @State private var isMobileVerified = false
+    
+    @State var isDataLoading = false
     
     var body: some View {
         HStack{
@@ -33,7 +36,6 @@ struct ProfileEditView: View {
                 .foregroundColor(.black)
             Spacer()
         }.frame(height:44).background()
-        
         
         ScrollView {
             VStack(spacing: 20) {
@@ -55,7 +57,7 @@ struct ProfileEditView: View {
                     
                     Button(action: { showingImagePicker.toggle() }) {
                         Image("edit").resizable().frame(width: 15, height: 15).aspectRatio(contentMode: .fit)
-                          
+                        
                     }.frame(width: 30,height: 30).background(Color.orange).cornerRadius(15)
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
@@ -63,7 +65,7 @@ struct ProfileEditView: View {
                         )
                     
                         .offset(x: 35, y: 38)
-                      //  .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    //  .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                 }
                 .sheet(isPresented: $showingImagePicker) {
                     ImagePicker(selectedImage: $selectedImage)
@@ -73,28 +75,33 @@ struct ProfileEditView: View {
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
-                HStack{
-                    Spacer()
-                    Button(action: {
-                        showOTPPopup = true
-                    }) {
-                        Text("Verify")
-                            .underline() .foregroundColor(Color.orange).padding(.horizontal)
-                    }
-                }.frame(height:15)
+                    .disabled(isMobileVerified)
                 
-                
+                if !isMobileVerified{
+                    HStack{
+                        Spacer()
+                        Button(action: {
+                            sendOTPApi(countryCode: "+91")
+                            showOTPPopup = true
+                        }) {
+                            Text("Verify")
+                                .underline() .foregroundColor(Color.orange).padding(.horizontal)
+                        }
+                    }.frame(height:15)
+                    
+                }
                 
                 CustomTextField(title: "Address", text: $address)
                 
                 // Toggle Switches
                 ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
                 ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
-                
+               
                 
                 // Update Button
                 Button(action: {
                     validateForm()
+                    
                 }) {
                     Text("Update Profile")
                         .font(.headline)
@@ -105,8 +112,18 @@ struct ProfileEditView: View {
                         .cornerRadius(12)
                 }
                 .padding(.top, 10)
+                
+                if isDataLoading{
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(1.5)
+                        .tint(.orange)
+                        .padding(.bottom)
+                }
             }
             .padding()
+            
+            
         }.background(Color(UIColor.systemGroupedBackground)).sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage)
         }.navigationBarHidden(true).onAppear{
@@ -116,9 +133,10 @@ struct ProfileEditView: View {
             if #available(iOS 16.4, *) {
                 OTPPopup(
                     showOTPPopup: $showOTPPopup,
-                    otp: "44334",
-                    onVerify: {
-                        // print("OTP Entered: \(otp)")
+                    otp: "",
+                    onVerify: {code in
+                        verifyMobileOTPApi(otp: code)
+                        print("OTP Entered: \(code)")
                         // Call your verification logic here
                     }
                 ).presentationDetents([.large, .large]) // Optional for different heights
@@ -130,9 +148,11 @@ struct ProfileEditView: View {
                 
                 OTPPopup(
                     showOTPPopup: $showOTPPopup,
-                    otp: "44334",
-                    onVerify: {
-                        // print("OTP Entered: \(otp)")
+                    otp: "",
+                    onVerify: {code in
+                         print("OTP Entered: \(code)")
+                        verifyMobileOTPApi(otp: code)
+
                         // Call your verification logic here
                     }
                 ).background(Color.clear)
@@ -141,64 +161,106 @@ struct ProfileEditView: View {
         
         
         /*.sheet(isPresented: $showOTPPopup) {
-            // Centered OTP Popup
-                      OTPPopup(
-                        showOTPPopup: $showOTPPopup,
-                          otp: "44334",
-                          onVerify: {
-                             // print("OTP Entered: \(otp)")
-                              // Call your verification logic here
-                          }
-                      )
-        }
-        */
+         // Centered OTP Popup
+         OTPPopup(
+         showOTPPopup: $showOTPPopup,
+         otp: "44334",
+         onVerify: {
+         // print("OTP Entered: \(otp)")
+         // Call your verification logic here
+         }
+         )
+         }
+         */
         
     }
     
+    
+    
     // Form Validation
-        private func validateForm() {
-            if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
-                print("Please fill all the fields.")
-            } else {
-                print("Form Submitted!")
-                updateProfile()
+    private func validateForm() {
+        if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
+            print("Please fill all the fields.")
+        } else {
+            print("Form Submitted!")
+            updateProfile()
+        }
+    }
+    
+    
+    func verifyMobileOTPApi(otp:String){
+        
+        var params = ["mobile": phoneNumber, "countryCode":"+91", "otp":otp] as [String : Any]
+        
+        
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.mobile_verify_update, param: params, methodType: .post,showLoader:true) {  responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    isMobileVerified = true
+                }else{
+
+                }
+                
             }
         }
-    
+    }
     func getUserProfileApi(){
-            
+        
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-
+        
         let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
             
-            ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
+            if obj.data != nil {
                 
-                if obj.data != nil {
-                    
-                    self.fullName = obj.data?.seller?.name ?? ""
-                    self.email = obj.data?.seller?.email ?? ""
-                    self.phoneNumber = obj.data?.seller?.mobile ?? ""
-                    self.address = obj.data?.seller?.address ?? ""
-                    self.isNotificationsEnabled = ((obj.data?.seller?.notification) != nil)
-                    self.isContactInfoVisible = ((obj.data?.seller?.mobileVisibility) != 0)
-                    if  let url = URL(string:obj.data?.seller?.profile ?? ""){
+                self.fullName = obj.data?.seller?.name ?? ""
+                self.email = obj.data?.seller?.email ?? ""
+                self.phoneNumber = obj.data?.seller?.mobile ?? ""
+                self.address = obj.data?.seller?.address ?? ""
+                self.isNotificationsEnabled = ((obj.data?.seller?.notification ?? 0) == 0) ? false : true
+                self.isContactInfoVisible = ((obj.data?.seller?.mobileVisibility ?? 0) == 0) ? false : true
+                
+                if  let url = URL(string:obj.data?.seller?.profile ?? ""){
+                    DispatchQueue.global().async {
                         if let data = try? Data(contentsOf: url)
                         {
                             self.selectedImage = UIImage(data: data)
                         }
                     }
                 }
+                self.isMobileVerified = (self.phoneNumber.count > 0) ? true : false
             }
         }
+    }
     
     
     
     func updateProfile(){
         
+        self.isDataLoading = true
         
-        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotificationsEnabled,"personalDetail":isContactInfoVisible] as [String : Any]
+        let isNotification =  isNotificationsEnabled == false ? 0 : 1
+        let isContact =  isContactInfoVisible == false ? 0 : 1
+
+        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotification,"personalDetail":isContact] as [String : Any]
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
+            
+            self.isDataLoading = false
             
             if error == nil{
                 
@@ -219,6 +281,35 @@ struct ProfileEditView: View {
                     }
                     
                 }
+            }
+        }
+    }
+    
+    
+    func sendOTPApi(countryCode:String){
+        
+        let params = ["mobile": phoneNumber, "countryCode":"\(countryCode)"] as [String : Any]
+              
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) { responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+ 
+                }else{
+
+                }
+                
             }
         }
     }
@@ -258,8 +349,15 @@ struct ToggleField: View {
     @Binding var isOn: Bool
     
     var body: some View {
-        HStack {
+        
+        VStack(alignment: .leading) {
             Text(title)
+                .font(.body)
+                .foregroundColor(.black)
+            
+        HStack {
+            let str = isOn ? "Enabled" : "Disabled"
+            Text(str)
                 .font(.footnote)
                 .foregroundColor(.gray)
             Spacer()
@@ -270,6 +368,7 @@ struct ToggleField: View {
         .background(Color.white)
         .cornerRadius(10)
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+    }
     }
 }
 
@@ -318,7 +417,7 @@ struct ProfileEditView_Previews: PreviewProvider {
 struct OTPPopup: View {
     @Binding var showOTPPopup: Bool
     @State var otp: String
-    var onVerify: () -> Void
+    var onVerify: (_ otp:String) -> Void
 
     var body: some View {
         if showOTPPopup {
@@ -332,13 +431,20 @@ struct OTPPopup: View {
                         .font(.title2)
                         .bold()
 
-                    TextField("6-digit code", text: $otp).multilineTextAlignment(.center).frame(minHeight: 45)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
+                    TextField("Enter OTP", text: $otp).tint(.orange)
+                        .multilineTextAlignment(.center)
+                            .keyboardType(.numberPad)
+                            .padding(.horizontal)
+                            .frame(height: 40) // Set your desired height here
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                            .padding(.horizontal)
+                
 
                     Button(action: {
-                        onVerify()
+                        onVerify(otp)
                         showOTPPopup = false
                     }) {
                         Text("Verify")

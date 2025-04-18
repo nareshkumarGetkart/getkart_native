@@ -16,11 +16,35 @@ struct ItemDetailView: View {
     
      var itemId = 0
     @State private var selectedIndex:Int?
-    @StateObject private var objVM = ItemDetailViewModel()
+    @StateObject  var objVM:ItemDetailViewModel
     @State private var showSheet = false
     @State private var showOfferPopup = false
     @State private var showShareSheet = false
     @State var isMyProduct = false
+    
+    init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false) {
+        self.navController = navController
+        self.itemId = itemId
+       // self.selectedIndex = selectedIndex
+        
+        let viewModel = ItemDetailViewModel()
+        viewModel.itemObj = itemObj
+
+        if let img = itemObj?.image {
+            let new = GalleryImage(id:10, image: img, itemID: itemObj?.id)
+            viewModel.itemObj?.galleryImages?.insert(new, at: 0)
+        }
+        
+        _objVM = StateObject(wrappedValue: viewModel)
+        
+        
+        
+        //self.objVM.itemObj = itemObj
+      //  self.showSheet = showSheet
+//        self.showOfferPopup = showOfferPopup
+//        self.showShareSheet = showShareSheet
+        self.isMyProduct = isMyProduct
+    }
 
     var body: some View {
         
@@ -119,8 +143,8 @@ struct ItemDetailView: View {
                             HStack {
                                 Image(systemName: "eye")
                                 Text("\(objVM.itemObj?.clicks ?? 0)")
-                            }.frame(maxWidth: .infinity,maxHeight:30)
-                            .padding()
+                            }.padding()
+                            .frame(maxWidth: .infinity,maxHeight:40)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray, lineWidth: 1)
@@ -129,8 +153,9 @@ struct ItemDetailView: View {
                             HStack {
                                 Image(systemName: "heart")
                                 Text("\(objVM.itemObj?.totalLikes ?? 0)")
-                            }.frame(maxWidth: .infinity,maxHeight:30)
+                            }
                             .padding()
+                            .frame(maxWidth: .infinity,maxHeight:40)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray, lineWidth: 1)
@@ -151,7 +176,10 @@ struct ItemDetailView: View {
                             .foregroundColor(Color(hex: "#FF9900")).padding(5).padding(.bottom,10)
                         
                         Spacer()
-                        if isMyProduct{
+                        if loggedInUserId == itemUserId {
+
+                      //  if isMyProduct{
+                            
                             Text(objVM.itemObj?.status ?? "")
                                 .font(Font.manrope(.medium, size: 15))                               .foregroundColor(.green).padding(.horizontal)
                                 .frame(height:30)
@@ -179,7 +207,7 @@ struct ItemDetailView: View {
 //                    let loggedInUserId = objLoggedInUser.id ?? 0
 //                    let itemUserId = objVM.itemObj?.userID ?? 0
                     
-                 if !isFeatured && (loggedInUserId == itemUserId) {
+                    if !isFeatured && (loggedInUserId == itemUserId) && objVM.itemObj?.status == "approved"{
 
                    // if isMyProduct{
                         HStack{
@@ -319,7 +347,7 @@ struct ItemDetailView: View {
                             ProductCard(objItem: item)
                            
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0))
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0,itemObj: item))
                                     self.navController?.pushViewController(hostingController, animated: true)
                                 }
                         }
@@ -331,9 +359,22 @@ struct ItemDetailView: View {
             
         }.navigationBarHidden(true).onAppear{
             
-            if objVM.sellerObj == nil {
+            
+            if objVM.itemObj == nil{
                 objVM.getItemDetail(id: self.itemId)
+
+            }else{
+                if objVM.sellerObj == nil {
+                    self.objVM.getSeller(sellerId:objVM.itemObj?.userID ?? 0)
+                    self.objVM.getProductListApi(categoryId: objVM.itemObj?.categoryID ?? 0)
+                    self.objVM.setItemTotalApi()
+                }
             }
+                
+//              
+//            if objVM.sellerObj == nil {
+//                objVM.getItemDetail(id: self.itemId)
+//            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.itemOffer.rawValue))) { notification in
             
@@ -396,12 +437,22 @@ struct ItemDetailView: View {
         Spacer()
         
         
-        if isMyProduct{
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+      //  let isFeatured = objVM.itemObj?.isFeature ?? false
+        let loggedInUserId = objLoggedInUser.id ?? 0
+        let itemUserId = objVM.itemObj?.userID ?? 0
+        
+        if loggedInUserId == itemUserId {
+
+        
+       // if isMyProduct{
             
            
             
             HStack {
-                Button(action: {}) {
+                Button(action: {
+                    
+                }) {
                     Text("Edit")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -411,9 +462,19 @@ struct ItemDetailView: View {
                 }
                 Button(action: {
                     
+                    
+                    if (objVM.itemObj?.status ?? "") == "approved"  || (objVM.itemObj?.status ?? "") == "sold_out" {
+                    
+                        let hostingController = UIHostingController(rootView: MarkAsSoldView(navController: self.navController))
+                        self.navController?.pushViewController(hostingController, animated: true)
+                   
+                    }else{
+                   
+                    }
+                    
                 }) {
                     
-                    var strTitle = "Sold Out"
+                    //var strTitle = "Sold Out"
                     
                   /*  if (objVM.itemObj?.status ?? "") == "approved" {
                         strTitle = "Sold Out"
@@ -427,7 +488,7 @@ struct ItemDetailView: View {
                         strTitle = "Remove"
                     }
                     */
-                    Text(strTitle)
+                    Text(getButtonTitle())
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray)
@@ -513,6 +574,29 @@ struct ItemDetailView: View {
     }
     
     
+    
+    func getButtonTitle() -> String{
+       
+        var strTitle = ""
+       //enum('review', 'approved', 'rejected', 'sold out')
+        if (objVM.itemObj?.status ?? "") == "approved" {
+            strTitle = "Sold Out"
+            
+        }else if (objVM.itemObj?.status ?? "") == "sold out" {
+            
+            strTitle = "Remove"
+            
+        }else if (objVM.itemObj?.status ?? "") == "review"{
+            
+            strTitle = "Remove"
+        }else if (objVM.itemObj?.status ?? "") == "rejected"{
+            
+            strTitle = "Remove"
+        }
+        
+        return strTitle
+    }
+    
     func callOfferSocket(amount:String){
         let params = ["item_id":(objVM.itemObj?.id ?? 0), "amount":amount] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.itemOffer.rawValue, params)
@@ -529,7 +613,7 @@ struct ItemDetailView: View {
 
 
 #Preview {
-    ItemDetailView(navController:nil,itemId:0,isMyProduct:false)
+    ItemDetailView(navController:nil,itemId:0, itemObj: nil,isMyProduct:false)
 }
 
 

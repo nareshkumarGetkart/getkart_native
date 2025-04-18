@@ -41,9 +41,17 @@ struct UserVerifyView: View {
                     .padding(.top, 20)
                 
                 // Description
-                Text("For your security and to meet regulatory standards, we need to verify your identity.\n**It will only take 2 minutes.**")
+                Text("Increase trust and attract more buyers by verifying now")
                     .font(.body)
                     .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+                    .padding(.top, 5)
+                
+                
+                Text("It will only take 2 minutes")
+                    .font(.body)
+                    .foregroundColor(.black)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
                     .padding(.top, 5)

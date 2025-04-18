@@ -79,7 +79,7 @@ struct ItemModel: Codable,Identifiable {
     let deletedAt: String?
     let user: User?
     let category: Category?
-    let galleryImages: [GalleryImage]?
+    var galleryImages: [GalleryImage]?
    // let featuredItems: [JSONAny]?
     let favourites: [Favourite]?
     let area: Int?

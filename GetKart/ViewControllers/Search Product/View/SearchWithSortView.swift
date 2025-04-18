@@ -74,10 +74,21 @@ struct SearchWithSortView: View {
                 if isGridView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                         ForEach(objVM.items, id: \.id) { item in
+                            
                             ProductCard(objItem: item)
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:false))
-                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                                    
+                                    
+                                    let itemId = item.id ?? 0
+                                    
+                                    self.pushToDetailScreen(id: itemId, item: item)
+                                    /*    let destView = ItemDetailView(navController: nil,
+                                                                  itemId:itemId,
+                                                                  isMyProduct:false,
+                                                                  itemObj:nil)
+                                  let hostingVC = UIHostingController(rootView:destView)
+                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingVC, animated: true)*/
+                                    
                                 }
                                 .onAppear {
                                     let lastItem = objVM.items.last
@@ -99,8 +110,14 @@ struct SearchWithSortView: View {
                             FavoritesCell(itemObj: item)
                                 .padding(.horizontal)
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0,isMyProduct:false))
-                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                                    
+                                  let itemId =  item.id ?? 0
+                                    self.pushToDetailScreen(id: itemId, item: item)
+
+                                    /*   let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,isMyProduct:false,itemObj: item)
+                                    let hostController = UIHostingController(rootView: destView)
+                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
+                                    */
                                 }.onAppear {
                                     let lastItem = objVM.items.last
                                     let isLastItem = lastItem?.id == item.id
@@ -162,6 +179,13 @@ struct SearchWithSortView: View {
                     // Fallback on earlier versions
                 }
             }
+    }
+    
+    func pushToDetailScreen(id:Int,item:ItemModel){
+        let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,itemObj: item, isMyProduct:false)
+         let hostController = UIHostingController(rootView: destView)
+         AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
+         
     }
 }
 

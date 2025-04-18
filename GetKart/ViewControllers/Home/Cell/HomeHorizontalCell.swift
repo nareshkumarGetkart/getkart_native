@@ -172,7 +172,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             }
         }else if cellTypes == .product{
             
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0))
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel)))
             AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
         }
     }

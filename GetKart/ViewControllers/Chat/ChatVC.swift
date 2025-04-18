@@ -162,7 +162,7 @@ class ChatVC: UIViewController {
     
     @IBAction func productBtnAction(sender : UIButton){
         
-        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId))
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil))
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     
@@ -813,7 +813,10 @@ class ChatVC: UIViewController {
         var date:Date!
         if(timestamp > 0)
         {
-            date  = Date(timeIntervalSince1970: TimeInterval((timestamp)/1000))
+//            date  = Date(timeIntervalSince1970: TimeInterval((timestamp)/1000))
+            
+            date  = Date(timeIntervalSince1970: TimeInterval((timestamp)))
+
             let dateFormatter = DateFormatter()
             dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
             //dateFormatter.timeZone = NSTimeZone.local //Edit

@@ -15,6 +15,7 @@ enum SocialMediaLoginType{
 }
 
 class LoginVC: UIViewController {
+  
     @IBOutlet weak var scrScrollView:UIScrollView!
     @IBOutlet weak var txtEmailPhone:UITextFieldX!
     @IBOutlet weak var btnCountryCode:UIButton!
@@ -39,16 +40,11 @@ class LoginVC: UIViewController {
         txtEmailPhone.text = ""
         txtEmailPhone.leftPadding = 10
         self.fetChAndSetInitialCodeFromLocale()
-        
-        
-
-
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)
-        
-
     }
     
     func fetChAndSetInitialCodeFromLocale(){
@@ -62,6 +58,7 @@ class LoginVC: UIViewController {
             }
         }
     }
+
     
     @IBAction func countruCodeButton(_ sender : UIButton){
         
@@ -96,6 +93,7 @@ class LoginVC: UIViewController {
             btnCountryCode.isHidden = true
         }
     }
+    
     @IBAction func skipButtonAction() {
         if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
             self.navigationController?.pushViewController(vc, animated: true)
@@ -125,6 +123,7 @@ class LoginVC: UIViewController {
             self.btnContinueLogin.backgroundColor = UIColor.orange
         }
     }
+    
     
     func sendOTPApi(){
         
@@ -280,9 +279,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
         
     
     @IBAction func loginWithAppleButton(_ sender : UIButton){
-        
-        
-        
+                
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         let request = appleIDProvider.createRequest()
         request.requestedScopes = [.fullName, .email]
@@ -302,9 +299,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
-            
-            
-            
+                        
             // Create an account in your system.
             let socialUser = appleIDCredential.user
             let socialFullName = appleIDCredential.fullName?.givenName ?? ""
@@ -314,7 +309,6 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             
             // For the purpose of this demo app, show the Apple ID credential information in the `ResultViewController`.
             //self.showResultViewController(userIdentifier: userIdentifier, fullName: fullName, email: email)
-            
                       
             socialEmail = socialEmails
             socialName = socialFullName
@@ -323,7 +317,6 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             
             self.signInUsingGmailorAppleApi()
             //self.loginWithSocialID()
-            
             
         case let passwordCredential as ASPasswordCredential:
             
