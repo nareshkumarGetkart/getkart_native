@@ -149,32 +149,26 @@ struct ConfirmLocationCreateAdd: View {
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
-               
-
+                
                 if code == 200{
                     
-                    // Create the alert controller
-                    let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
-
-                       // Create the actions
-                    let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default) {
-                           UIAlertAction in
-                           for vc in self.navigationController?.viewControllers ?? [] {
-                               if vc is HomeVC {
-                                   self.navigationController?.popToViewController(vc, animated: true)
-                                   break
-                               }
-                           }
-                       }
-                       
-                       // Add the actions
-                       alertController.addAction(okAction)
-
-                       // Present the controller
-                    self.navigationController?.present(alertController, animated: true, completion: nil)
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+                        do {
+                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                            if let itemObj = item.data?.first {
+                                let vc = UIHostingController(rootView: AddPostSuccessView( navigationController: self.navigationController, itemObj: itemObj ))
+                                self.navigationController?.pushViewController(vc, animated: true)
+                            }
+                        }catch {
+                            
+                        }
+                        
+                    } else {
+                        print("Something is wrong while converting dictionary to JSON data.")
+                        
+                    }
                     
                     
-                   
                     
                 }else{
                     //self?.delegate?.showError(message: message)
