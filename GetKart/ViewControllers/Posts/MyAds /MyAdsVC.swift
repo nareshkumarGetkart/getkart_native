@@ -135,7 +135,7 @@ class MyAdsVC: UIViewController {
     func getAdsListApi(){
         
         
-        let strUrl = Constant.shared.my_items + "?status=\(apiStatus.trim())&page=\(page)"
+        let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
             
@@ -185,7 +185,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
         cell.lblLikeCount.text = "Like:\(obj.totalLikes ?? 0)"
         cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
-        cell.btnAdStatus.setTitle((obj.status ?? ""), for: .normal)
+        cell.btnAdStatus.setTitle((obj.status ?? "").capitalized, for: .normal)
         switch obj.status ?? ""{
             
         case "approved":
@@ -194,17 +194,24 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             break
 
         case "rejected":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
             break
             
         case "inactive":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
+        case "review":
             cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
             cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            cell.btnAdStatus.setTitle(("Under review"), for: .normal)
+
             break
-        case "sold_out":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            
+        case "sold out":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#ffbb34"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#fff8eb")
             break
         default:
             break

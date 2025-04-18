@@ -16,7 +16,8 @@ struct MarkAsSoldView: View {
     var price:Int?
     var productImg:String?
     var navController:UINavigationController?
-    
+    var itemId:Int?
+
     
     var body: some View {
         
@@ -98,7 +99,7 @@ struct MarkAsSoldView: View {
 
                     Image(systemName: selectedUserId == user.id ? "largecircle.fill.circle" : "circle")
                         .foregroundColor(.gray)
-                }
+                }.frame(height:40)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     selectedUserId = user.id
@@ -148,8 +149,8 @@ struct MarkAsSoldView: View {
     
     
     func getUsers(){
-        
-        ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.blocked_users, param: nil,httpMethod: .get) { (obj:UserParse) in
+        let strUrl = Constant.shared.item_buyer_list + "?item_id=\(itemId ?? 0)"
+        ApiHandler.sharedInstance.makePostGenericData(url: strUrl, param: nil,httpMethod: .get) { (obj:UserParse) in
             
             if obj.code == 200{
                 self.listArray = obj.data ?? []

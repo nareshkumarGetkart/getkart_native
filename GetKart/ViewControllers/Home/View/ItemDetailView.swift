@@ -180,10 +180,15 @@ struct ItemDetailView: View {
 
                       //  if isMyProduct{
                             
-                            Text(objVM.itemObj?.status ?? "")
-                                .font(Font.manrope(.medium, size: 15))                               .foregroundColor(.green).padding(.horizontal)
-                                .frame(height:30)
-                                .background(Color.green.opacity(0.2))
+                            let status = objVM.itemObj?.status ?? ""
+                            let (bgColor, titleColor, displayStatus) = statusColors(for: status)
+
+                            Text(displayStatus)
+                                .font(Font.manrope(.medium, size: 15))
+                                .foregroundColor(titleColor)
+                                .padding(.horizontal)
+                                .frame(height: 30)
+                                .background(bgColor)
                                 .cornerRadius(15)
                         }
                     }
@@ -469,7 +474,7 @@ struct ItemDetailView: View {
                         markAsSold.productTitle = objVM.itemObj?.name ?? ""
                         markAsSold.price = objVM.itemObj?.price ?? 0
                         markAsSold.productImg = objVM.itemObj?.image ?? ""
-
+                        markAsSold.itemId = objVM.itemObj?.id ?? 0
                         let hostingController = UIHostingController(rootView: markAsSold)
                         self.navController?.pushViewController(hostingController, animated: true)
                    
@@ -614,6 +619,21 @@ struct ItemDetailView: View {
         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
     }
 
+    
+    func statusColors(for status: String) -> (Color, Color, String) {
+        switch status {
+        case "approved":
+            return (Color(hexString: "#e5f7e7"), Color(hexString: "#32b983"), status)
+        case "rejected", "inactive":
+            return (Color(hexString: "#ffe5e6"), Color(hexString: "#fe0002"), status)
+        case "review":
+            return (Color(hexString: "#e6eef5"), Color(hexString: "#3e4c63"), "Under review")
+        case "sold out":
+            return (Color(hexString: "#fff8eb"), Color(hexString: "#ffbb34"), status)
+        default:
+            return (.clear, .black, status)
+        }
+    }
 }
 
 

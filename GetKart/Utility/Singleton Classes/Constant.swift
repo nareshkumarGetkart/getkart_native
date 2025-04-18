@@ -287,6 +287,13 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var item_buyer_list:String{
+        get {
+            return "\(Constant.shared.baseURL)/item-buyer-list"
+        }
+    }
+    
     var block_user:String{
         get {
             return "\(Constant.shared.baseURL)/block-user"
