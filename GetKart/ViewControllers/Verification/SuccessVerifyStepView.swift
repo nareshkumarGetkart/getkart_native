@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct SuccessVerifyStepView: View {
+    var navigation:UINavigationController?
+
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
             Image("verification_success")
                 .resizable()
-                .frame(width: 100, height: 100)
-                .foregroundColor(.orange)
+                .scaledToFit()
+                .frame(height: 210)
+            
 
             Text("Thank you!")
                 .font(.largeTitle)
@@ -27,7 +30,10 @@ struct SuccessVerifyStepView: View {
 
             Spacer()
 
-            Button(action: {}) {
+            Button(action: {
+                
+                navigation?.popToRootViewController(animated: true)
+            }) {
                 Text("Back to home")
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -38,6 +44,8 @@ struct SuccessVerifyStepView: View {
             .padding()
         }
         .padding()
+        .navigationBarHidden(true)
+        .background(Color(UIColor.white))
     }
 }
 

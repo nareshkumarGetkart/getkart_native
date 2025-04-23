@@ -10,7 +10,8 @@ import SwiftUI
 struct UserVerifyStep2: View{
     
     var navigation:UINavigationController?
-    
+    var businessName:String?
+
     var body: some View {
         
         // Top Navigation Bar
@@ -33,17 +34,16 @@ struct UserVerifyStep2: View{
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text("Identity Verification")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.manrope(.bold, size: 18))
                     Spacer()
                     Text("Step 2 of 3")
                         .foregroundColor(.gray)
                 }
                 
                 // Progress Bar
-                ProgressView(value: 0.5)
+                ProgressView(value: 0.4)
                     .progressViewStyle(LinearProgressViewStyle(tint: .black))
-            }.padding(.top,30)
+            }.padding(.top,15)
             .padding(.horizontal, 20)
             
             VStack(alignment: .leading){
@@ -70,7 +70,10 @@ struct UserVerifyStep2: View{
 
             Button(action: {
                 // Continue action
-                let hostVC = UIHostingController(rootView: TakeSelfieView(navigation:navigation))
+                
+                var swidtUIView = TakeSelfieView(navigation:navigation)
+                swidtUIView.businessName = businessName
+                let hostVC = UIHostingController(rootView: swidtUIView)
 
                 self.navigation?.pushViewController(hostVC, animated: true)
             }) {

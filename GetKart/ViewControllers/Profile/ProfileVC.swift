@@ -284,8 +284,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     @objc func getVerified(){
         
-        let hostingController = UIHostingController(rootView: UserVerifyView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        let hostingController = UIHostingController(rootView: UserVerifyView(navigation:self.navigationController)) // Wrap in UIHostingController
+        hostingController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
 }
 

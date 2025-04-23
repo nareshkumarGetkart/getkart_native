@@ -67,7 +67,7 @@ struct TransactionHistoryPreview: View {
             .cornerRadius(10)
 
             .background(Color(.systemGray6))
-        }
+        }.navigationBarHidden(true)
         .padding(.top)
     }
 

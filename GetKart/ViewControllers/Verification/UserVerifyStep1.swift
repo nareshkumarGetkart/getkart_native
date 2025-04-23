@@ -16,40 +16,46 @@ struct UserVerifyStep1: View {
     @State private var phoneNumber: String = ""
     @State private var email: String = ""
     @State private var businessName: String = ""
-
+    @State private var apiGetsCalled = false
+    
     var body: some View {
         // Top Navigation Bar
         HStack {
             Button(action: {
                 // Action to go back
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                self.navigation?.popViewController(animated: true)
             }) {
                 Image("arrow_left").renderingMode(.template)
                     .foregroundColor(.black).padding()
             }
             Spacer()
         }.frame(height: 44)
-       
+            .onAppear{
+                if !apiGetsCalled{
+                    getUserProfileApi()
+                    apiGetsCalled = true
+                }
+            }
         
         
         VStack {
-           
+            ScrollView{
+            
             // Title with Progress Indicator
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text("User Information")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.manrope(.bold, size: 18))
                     Spacer()
                     Text("Step 1 of 3")
                         .foregroundColor(.gray)
                 }
                 
                 // Progress Bar
-                ProgressView(value: 0.5)
+                ProgressView(value: 0.2)
                     .progressViewStyle(LinearProgressViewStyle(tint: .black))
-            }.padding(.top,30)
-            .padding(.horizontal, 20)
+            }.padding(.top,15)
+                .padding(.horizontal, 20)
             
             // Personal Information Section
             VStack(alignment: .leading, spacing: 5) {
@@ -64,7 +70,7 @@ struct UserVerifyStep1: View {
             .padding(.top, 10)
             
             // Input Fields
-            VStack(spacing: 15) {
+            VStack(spacing: 10) {
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Business Name", text: $businessName)
                 CustomTextField(title: "Address", text: $address)
@@ -73,15 +79,15 @@ struct UserVerifyStep1: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 10)
+            .padding(.bottom,15)
             
             Spacer()
             
             // Continue Button
             Button(action: {
                 // Continue action
-                let hostVC = UIHostingController(rootView: UserVerifyStep2(navigation:navigation))
-
-                self.navigation?.pushViewController(hostVC, animated: true)
+                validateForm()
+          
             }) {
                 Text("Continue")
                     .font(.headline)
@@ -92,8 +98,9 @@ struct UserVerifyStep1: View {
                     .cornerRadius(10)
             }
             .padding(.horizontal, 20)
+                
             
-            // Skip for Later Button
+          /*  // Skip for Later Button
             Button(action: {
                 // Skip action
                 for controller in navigation?.viewControllers ?? []{
@@ -110,11 +117,47 @@ struct UserVerifyStep1: View {
                     .underline()
             }
             .padding(.top, 10)
-            .padding(.bottom, 30)
+            .padding(.bottom, 30)*/
+        }
         }.navigationBarBackButtonHidden(true)
         .background(Color(UIColor.systemGray6)) // Light gray background
         .navigationBarTitleDisplayMode(.inline).navigationBarHidden(true).edgesIgnoringSafeArea(.top)
 
+    }
+    
+    // Form Validation
+    private func validateForm() {
+        if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty || businessName.isEmpty {
+            print("Please fill all the fields.")
+        } else {
+            print("Form Submitted!")
+            var swidtUIView = UserVerifyStep2(navigation:navigation)
+            swidtUIView.businessName = businessName
+            let hostVC = UIHostingController(rootView: swidtUIView)
+            self.navigation?.pushViewController(hostVC, animated: true)
+        }
+    }
+    
+    
+    func getUserProfileApi(){
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        
+        let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
+            
+            if obj.data != nil {
+                
+                self.fullName = obj.data?.seller?.name ?? ""
+                self.email = obj.data?.seller?.email ?? ""
+                self.phoneNumber = obj.data?.seller?.mobile ?? ""
+                self.address = obj.data?.seller?.address ?? ""
+           //     self.businessName = obj.data?.seller?.businessName ?? ""
+
+               
+            }
+        }
     }
 }
 
@@ -132,7 +175,7 @@ struct CustomTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
-                .font(.body)
+                .font(.manrope(.regular, size: 15))
                 .foregroundColor(.black)
             TextField("", text: $text)
                 .padding()

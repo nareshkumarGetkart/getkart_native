@@ -258,7 +258,7 @@ struct ItemDetailView: View {
                         if let arr = objVM.itemObj?.customFields{
                             ForEach(arr){obj in
                                                                 
-                                InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""))
+                            InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""))
                             }
                         }
                     }

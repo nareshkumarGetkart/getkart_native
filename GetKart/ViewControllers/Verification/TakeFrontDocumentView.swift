@@ -8,8 +8,141 @@
 import SwiftUI
 
 struct TakeFrontDocumentView: View {
+    @State private var showCapturedImage = false
+    @State private var capturedFrontImage: UIImage?
+    var navigation:UINavigationController?
+    var businessName:String?
+    var capturedSelfieImage:UIImage?
+
+  //  @State private var coordinator: CameraView.CameraCoordinator?
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        // Top Navigation Bar
+        HStack {
+            Button(action: {
+                // Action to go back
+                navigation?.popViewController(animated: true)
+            }) {
+                Image("arrow_left").renderingMode(.template)
+                    .foregroundColor(.black).padding()
+            }
+            Spacer()
+        }.frame(height: 44)
+        
+        VStack {
+            
+            
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Text("Submit the front of your ID Proof")
+                        .font(.manrope(.bold, size: 18))
+                    Spacer()
+                    Text("Step 3 of 3")
+                        .foregroundColor(.gray)
+                }
+                
+                // Progress Bar
+                ProgressView(value: 0.8)
+                    .progressViewStyle(LinearProgressViewStyle(tint: .black))
+                
+                Text("Secure verification, no data sharing")
+                    .font(.manrope(.medium, size: 18))
+                    .padding(.top,7)
+           
+            }.padding(.top,15)
+            .padding(.horizontal, 20)
+            
+            Text("Take a clear photo of the front side of your ID. Only Aadhaar Card, Driving License, Voter ID, or Passport will be accepted")
+                .font(.manrope(.regular, size: 14))
+                .multilineTextAlignment(.leading)
+                .padding()
+                
+
+            
+            if let image = capturedFrontImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity) // allows it to stretch to full width
+                    .frame(height: 350)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                
+                Spacer()
+                HStack {
+                    Button("Re-take") {
+                        capturedFrontImage = nil
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.clear)
+                    .foregroundColor(.orange)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.orange, lineWidth: 1)
+                    }
+                    
+                    Button("Next") {
+                        // Navigate to next screen
+                        var swidtUIView = TakeBackDocumentView(navigation:navigation)
+                        swidtUIView.businessName = businessName
+                        swidtUIView.frontImage = capturedFrontImage
+                        swidtUIView.selfieImage = capturedSelfieImage
+                        let hostVC = UIHostingController(rootView: swidtUIView)
+                        self.navigation?.pushViewController(hostVC, animated: true)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    //.padding(.horizontal)
+                }
+                .padding()
+                
+            } else {
+                ZStack {
+                    CameraView(capturedImage: $capturedFrontImage, onImageCaptured: {
+                        
+                    }, isFrontCamera: false)
+                    .frame(height: 350)
+                    .cornerRadius(12)
+                    VStack {
+                        Spacer()
+                        
+                        Text("Place the front side of the ID Proof inside this box")
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(hex: "#FFB546"))
+                            .foregroundColor(.white)
+                            .font(.manrope(.regular, size: 14))
+                            .clipShape(
+                                RoundedCorner(radius: 12, corners: [.bottomLeft, .bottomRight])
+                            )
+                    }
+                }.frame(height: 350)
+                 .padding(.horizontal)
+                
+                Spacer()
+                
+                Button("Capture") {
+                 
+                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
+                    
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.orange)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+
+        }
+        .navigationBarHidden(true)
+        .background(Color(UIColor.systemGray6))
     }
 }
 
@@ -19,6 +152,47 @@ struct TakeFrontDocumentView: View {
 
 
 /*
+ 
+ struct IDCaptureStepView: View {
+     var body: some View {
+         VStack {
+             Text("Submit the front of your ID Proof")
+                 .font(.title2.bold())
+                 .padding(.top)
+
+             ProgressView(value: 3, total: 3)
+                 .padding()
+
+             Text("Secure verification, no data sharing")
+                 .font(.subheadline)
+
+             Image("aadhaar_sample") // Replace with actual camera or placeholder
+                 .resizable()
+                 .scaledToFit()
+                 .frame(height: 220)
+                 .cornerRadius(12)
+
+             Text("Take a clear photo of the front side of your ID...")
+                 .font(.caption)
+                 .multilineTextAlignment(.center)
+                 .padding()
+
+             HStack {
+                 Button("Re-take") {
+                     // Logic
+                 }
+                 .buttonStyle(.bordered)
+
+                 Button("Next") {
+                     // Logic
+                 }
+                 .buttonStyle(.borderedProminent)
+             }
+             .padding()
+         }
+     }
+ }
+
  import SwiftUI
 
  struct IdentityVerificationView: View {

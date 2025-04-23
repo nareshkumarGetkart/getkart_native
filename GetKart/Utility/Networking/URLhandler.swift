@@ -479,6 +479,135 @@ class URLhandler: NSObject{
     
    
     
+    
+    
+    
+    
+    
+    func uploadArrayOfImagesWithParameters(mediaArray : [UIImage],mediaKeyArray:[String],mediaName:String, url:String, params:Dictionary<String, Any> ,method:HTTPMethod = .post, showLoader:Bool = true, completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
+        if isConnectedToNetwork() == true {
+            if showLoader{
+                if  let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view  {
+                    Themes.sharedInstance.activityView(uiView:  topView)
+                }
+            }
+            
+            if ISDEBUG{
+                print(url)
+                print(params)
+            }
+            
+            AF.upload(multipartFormData: { (multipartFormData) in
+                
+                var i = 0
+                for img in mediaArray {
+                    
+                    var keyStr = ""
+                    if mediaKeyArray.count > i {
+                        keyStr = "\(mediaName)[\(mediaKeyArray[i])]"
+                    }
+                    if let data = img.jpegData(compressionQuality: 1.0) {
+                        multipartFormData.append(data, withName: keyStr, fileName: "\(mediaName).jpeg", mimeType: "image/jpeg")
+                    }
+                    i = i + 1
+                    
+                }
+                
+                for (key, value) in params {
+                    
+                    if value is Array<Dictionary<String,String>> {
+                        
+                        if let array = value as? Array<Dictionary<String,String>> {
+                            var index = 0
+                            for item in array {
+                                
+                                if let dimDict = item as? Dictionary<String,Any> {
+                                    let height = dimDict["height"] as? String ?? "0"
+                                    let width = dimDict["width"] as? String ?? "0"
+                                    
+                                    multipartFormData.append(height.data(using: String.Encoding.utf8)!, withName: "\(key)[\(index)][height]")
+                                    multipartFormData.append(width.data(using: String.Encoding.utf8)!, withName: "\(key)[\(index)][width]")
+                                }
+                                index = index + 1
+                            }
+                        }
+                        
+                    }else if let arr = value as? Array<String>{
+                        
+                        let count : Int  = arr.count
+                        
+                        for i in 0  ..< count
+                        {
+                            let valueObj = arr[i]
+                            let keyObj = key + "[" + String(i) + "]"
+                            multipartFormData.append(valueObj.data(using: String.Encoding.utf8)!, withName: keyObj)
+                        }
+                        
+                    }else if let dict = value as? Dictionary<String,Any>{
+                        
+                        print("dict==\(dict)")
+                        print("dict.values==\(dict.values)")
+                        print("dict.keys==\(dict.keys)")
+                        
+                        let mainKey = key
+                        for (key, value) in dict
+                        {
+                            
+                            multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: "\(mainKey)[\(key)]")
+                        }
+                        
+                    } else {
+                        multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
+                    }
+                    
+                }
+                
+            },to: url, usingThreshold: UInt64.init(), method: method, headers: self.getHeaderFields(isFormData:true))
+            .uploadProgress(queue: .main, closure: { (progress) in
+                
+                
+            })
+            .response{ response in
+              
+                DispatchQueue.main.async {
+                    
+                    Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
+                }
+                
+//                if response.response?.statusCode == 404{
+//                     AppDelegate.sharedInstance.logoutFromApp()
+//                     return
+//                 }
+                
+                if response.error == nil{
+                    do{
+                        self.respDictionary = try JSONSerialization.jsonObject(
+                            with: response.value!!,
+                            options: JSONSerialization.ReadingOptions.mutableContainers
+                        ) as? NSDictionary
+                        
+                        if ISDEBUG == true {
+                            print("URL: \(url)\n Response received: ",self.respDictionary ?? [:])
+                        }
+                        
+                        completionHandler(self.respDictionary as NSDictionary?, response.error as NSError? )
+                        
+                    }catch let error{
+                        completionHandler(self.respDictionary as NSDictionary?, error as NSError? )
+                    }
+                    
+                }else{
+                    completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                    
+                }
+            }
+        }else {
+           // AlertView.sharedManager.showToast(message: "No Network Connection")
+          //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+
+        }
+    }
+    
 }
                     
                     
