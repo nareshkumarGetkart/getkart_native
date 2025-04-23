@@ -60,6 +60,7 @@ extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource,
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PictureAddedCVCell", for: indexPath) as! PictureAddedCVCell
         cell.btnRemove.tag = indexPath.item
+        print("indexPath.item:\(indexPath.item)")
         cell.btnRemove.addTarget(self, action: #selector(removePictureBtnAction(_:)), for: .touchUpInside)
         
         cell.btnAddImage.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)

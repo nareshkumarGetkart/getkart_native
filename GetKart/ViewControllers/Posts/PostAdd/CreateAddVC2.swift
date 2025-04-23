@@ -23,6 +23,7 @@ class CreateAddVC2: UIViewController {
     var gallery_imageNames:Array<String> = []
     var showErrorMsg = false
     var customFieldFiles :Dictionary<String,Any> = [:]
+    var customFieldFilesEditPost :Dictionary<String,Any> = [:]
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
     override func viewDidLoad() {
@@ -53,6 +54,7 @@ class CreateAddVC2: UIViewController {
                         
                         //let objCustomField = self.dataArray[]
                         self.customFieldFiles["\(obj.id ?? 0)"] = data
+                        self.customFieldFilesEditPost["\(obj.id ?? 0)"] = data
                         self.dictCustomFields["custom_field_files"] = self.customFieldFiles
                         DispatchQueue.main.async(execute: {
                             let indexPath = IndexPath(row: ind, section: 0)
@@ -139,6 +141,27 @@ class CreateAddVC2: UIViewController {
                     }
                 }
             }
+            
+            //remove field if image is not updated
+            var customFieldFilesNew :Dictionary<String,Any> = [:]
+            for (key, value) in self.customFieldFiles{
+                var found = false
+                let data = value as? Data ?? Data()
+                for (key1, value1) in self.customFieldFilesEditPost {
+                    let data1 = value1 as? Data ?? Data()
+                    if key == key1 && data == data1  {
+                        found = true
+                        break
+                    }
+                }
+                if found == false {
+                    customFieldFilesNew[key] = value
+                }
+            }
+            self.dictCustomFields["custom_field_files"] = customFieldFilesNew
+            //only  updated images
+           
+            
             
             params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
             

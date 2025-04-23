@@ -390,8 +390,9 @@ class URLhandler: NSObject{
         AF.upload(multipartFormData: { (multipartFormData) in
             
             
-            
-            multipartFormData.append(imageData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+            if imageData.count > 0 {
+                multipartFormData.append(imageData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+            }
            
 
             

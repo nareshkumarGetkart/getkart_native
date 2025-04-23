@@ -43,9 +43,11 @@ class CreateAddDetailVC: UIViewController {
     lazy var imagePicker = UIImagePickerController()
     
     var imgData:Data?
-    var imgName = ""
+    var imgDataEditPost:Data?
+    var imgName = "image"
     var gallery_images:Array<Data> = []
     var gallery_imageNames:Array<String> = []
+    var delete_item_image_id:String = ""
     var isImgData = false
     var showErrorMsg = false
    
@@ -81,8 +83,6 @@ class CreateAddDetailVC: UIViewController {
             params[AddKeys.video_link.rawValue] = ""
             params[AddKeys.description.rawValue] = ""
         }else {
-            
-            
             objViewModel = CustomFieldsViewModel()
             objViewModel?.dataArray =  self.itemObj?.customFields
             
@@ -111,11 +111,12 @@ class CreateAddDetailVC: UIViewController {
             let task = URLSession.shared.dataTask(with: url) { data, response, error in
                 guard let data = data, error == nil else { return }
                 
-                /*DispatchQueue.main.async { /// execute on main thread
-                    self.imageView.image = UIImage(data: data)
-                }*/
+                
+                
                 self.imgData = data
-                self.imgName = url.lastPathComponent
+                self.imgDataEditPost = data
+                
+                
                 DispatchQueue.main.async(execute: {
                     
                 
@@ -167,11 +168,12 @@ class CreateAddDetailVC: UIViewController {
                     let task = URLSession.shared.dataTask(with: url) { data, response, error in
                         guard let data = data, error == nil else { return }
                         
-                        /*DispatchQueue.main.async { /// execute on main thread
-                         self.imageView.image = UIImage(data: data)
-                         }*/
                         self.gallery_images.append(data)
                         self.gallery_imageNames.append("gallery_images[]")
+                        self.itemObj?.galleryImages?[index].imgData = data
+                        
+                        
+                        
                         DispatchQueue.main.async(execute: {
                             let indexPath = IndexPath(row: 4, section: 0)
                             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
@@ -228,6 +230,9 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if delete_item_image_id.count > 0 {
+            params["delete_item_image_id"] = delete_item_image_id.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         print(params)
         
         if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
@@ -272,10 +277,35 @@ class CreateAddDetailVC: UIViewController {
             if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
                 vc.dataArray = self.objViewModel?.dataArray ?? []
                 vc.params = self.params
-                vc.imgData = self.imgData
-                vc.imgName = self.imgName
-                vc.gallery_images = self.gallery_images
-                vc.gallery_imageNames = self.gallery_imageNames
+                if popType == .createPost {
+                    vc.imgData = self.imgData
+                    vc.imgName = self.imgName
+                    vc.gallery_images = self.gallery_images
+                    vc.gallery_imageNames = self.gallery_imageNames
+                }else {
+                    
+                    if self.imgDataEditPost != imgData {
+                        vc.imgData = self.imgData
+                        vc.imgName = self.imgName
+                    }
+                    for ind in 0..<self.gallery_images.count{
+                       let data = self.gallery_images[ind]
+                        var found = false
+                        for index in 0..<(self.itemObj?.galleryImages?.count ?? 0){
+                            if let obj = self.itemObj?.galleryImages?[index] {
+                                
+                                if obj.imgData == data {
+                                    found = true
+                                }
+                            }
+                        }
+                        if found == false {
+                            vc.gallery_images.append(data)
+                            vc.gallery_imageNames.append(self.gallery_imageNames[ind])
+                        }
+                    }
+                }
+                
                 vc.popType = self.popType
                 vc.itemObj = self.itemObj
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -569,6 +599,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
             }else {
                 gallery_images.append(pickedImage.jpegData(compressionQuality: 0.0) ?? Data())
                 gallery_imageNames.append("gallery_images[]")
+               
                 
                 let indexPath = IndexPath(row: 4, section: 0)
                 if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
@@ -636,42 +667,46 @@ extension CreateAddDetailVC: PictureAddedDelegate {
         self.present(imagePicker, animated: true)
     }
     func removePictureAction(row:Int, col:Int) {
-        
-        if row == 3 {
-            self.imgData = nil
-            self.imgName = ""
-            
-        }else {
-            gallery_images.remove(at: col)
-            gallery_imageNames.remove(at: col)
-            
-        }
-            
-            let indexPath = IndexPath(row: row, section: 0)
+           let indexPath = IndexPath(row: row, section: 0)
             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                
-                
-                
-                
-                cell.arrImagesData.remove(at: col)
-                print("cell.arrImagesData.count : ", cell.arrImagesData.count)
-                cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
-                
-                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                cell.clnCollectionView.performBatchUpdates({
+                    cell.arrImagesData.remove(at: col)
+                    if row == 3 {
+                        self.imgData = nil
+                        self.imgName = ""
+                        
+                    }else {
+                        if self.popType == .editPost {
+                            let data = gallery_images[col]
+                            for obj in self.itemObj?.galleryImages ?? []{
+                                if obj.imgData == data {
+                                    if self.delete_item_image_id.count == 0 {
+                                        self.delete_item_image_id = "\(obj.id ?? 0)"
+                                    }else {
+                                        self.delete_item_image_id = self.delete_item_image_id + ",\(obj.id ?? 0)"
+                                    }
+                                }
+                            }
+                            print("delete_item_image_id: ",delete_item_image_id)
+                        }
+                        
+                        
+                        gallery_images.remove(at: col)
+                        gallery_imageNames.remove(at: col)
+                        cell.arrImagesData = gallery_images
+                    }
+                    print("cell.arrImagesData.count : ", cell.arrImagesData.count)
+                    cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
                     cell.clnCollectionView.reloadData()
-                    cell.clnCollectionView.layoutIfNeeded()
-
-                
-                    self.tblView.beginUpdates()
-                    self.tblView.endUpdates()
-                    
-                    self.tblView.reloadRows(at: [indexPath], with: .automatic)
+                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
                    
-               
-            
+                }) { _ in
+                    // Code to execute after reloadData and layout updates
+                    cell.clnCollectionView.reloadItems(at: cell.clnCollectionView.indexPathsForVisibleItems)
+                    self.tblView.reloadData()
+                }
             }
         
-        self.tblView.reloadRows(at: [indexPath], with: .automatic)
             
        
         

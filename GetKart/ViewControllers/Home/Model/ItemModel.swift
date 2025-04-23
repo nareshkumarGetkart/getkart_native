@@ -291,10 +291,12 @@ struct GalleryImage: Codable {
     let id: Int?
     let image: String?
     let itemID: Int?
+    var imgData:Data?
 
     enum CodingKeys: String, CodingKey {
         case id, image
         case itemID = "item_id"
+        case imgData
     }
 }
 
