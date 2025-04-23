@@ -72,11 +72,12 @@ struct AddPostSuccessView: View {
             // NavigationLink(destination: HomeView(), isActive: $navigateToHome) {
             Button(action: {
                 for vc in self.navigationController?.viewControllers ?? [] {
-                    if vc is HomeVC {
+                    if vc is HomeVC  || vc is ChatListVC  || vc is MyAdsVC  || vc is ProfileVC{
                         self.navigationController?.popToViewController(vc, animated: true)
                         break
                     }
                 }
+                
             }) {
                 Text("Back to home")
                     .foregroundColor(.black)

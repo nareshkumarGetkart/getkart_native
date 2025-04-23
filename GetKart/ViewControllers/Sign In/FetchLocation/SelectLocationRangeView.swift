@@ -28,23 +28,23 @@ struct SelectLocationRangeView: View {
     @State private var range1: Double = 1000.0
     @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
     var body: some View {
-        HStack{
-            
-            Button {
-                self.navigationController?.popViewController(animated: true)
-            } label: {
-                Image("arrow_left").renderingMode(.template).foregroundColor(.black)
-            }.frame(width: 40,height: 40)
-            
-            Text(" Select Location").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
-            
-            Spacer()
-        }.frame(height:44).background(Color.white)
+       
         
         
         VStack(spacing: 0) {
            
+            HStack{
+                Button {
+                    self.navigationController?.popViewController(animated: true)
+                } label: {
+                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                }.frame(width: 40,height: 40)
+                
+                Text(" Select Location").font(.custom("Manrope-Bold", size: 20.0))
+                    .foregroundColor(.black)
+                Spacer()
+            }.frame(height:44).background(Color.white)
+            
             ZStack {
                 
                 HStack{
@@ -156,7 +156,7 @@ struct SelectLocationRangeView: View {
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, range: self.range1)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }

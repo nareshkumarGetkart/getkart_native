@@ -83,7 +83,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-            if objData?.arrIsSelected[indexPath.item] == true {
+            if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
                 cell.imgSelect.image = UIImage.init(systemName: "checkmark")
                 cell.imgSelect.setImageTintColor(color: UIColor.systemOrange)
                 cell.btnValue.setTitleColor(.orange, for: .normal)
@@ -101,7 +101,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-            if objData?.arrIsSelected[indexPath.item] == true {
+            if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
                 cell.btnValue.setTitleColor(.orange, for: .normal)
                 cell.backView.borderColor = UIColor.orange
             }else {

@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import MapKit
 class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -22,7 +23,8 @@ class CreateAddVC2: UIViewController {
     var gallery_imageNames:Array<String> = []
     var showErrorMsg = false
     var customFieldFiles :Dictionary<String,Any> = [:]
-    @State var popType:PopType? = .createPost
+    var popType:PopType? = .createPost
+    var itemObj:ItemModel?
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
@@ -36,6 +38,67 @@ class CreateAddVC2: UIViewController {
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
         // Do any additional setup after loading the view.
+        if popType == .editPost {
+            self.downloadCustomFieldFiles()
+        }
+    }
+    
+    func downloadCustomFieldFiles(){
+        for ind in 0..<dataArray.count {
+            let obj = dataArray[ind]
+            if obj.type == .fileinput {
+                if let url = URL(string: obj.image ?? "") {
+                    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                        guard let data = data, error == nil else { return }
+                        
+                        //let objCustomField = self.dataArray[]
+                        self.customFieldFiles["\(obj.id ?? 0)"] = data
+                        self.dictCustomFields["custom_field_files"] = self.customFieldFiles
+                        DispatchQueue.main.async(execute: {
+                            let indexPath = IndexPath(row: ind, section: 0)
+                            if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                                
+                                
+                                cell.btnAddPicture.isHidden = true
+                                cell.clnCollectionView.isHidden = false
+                                
+                                if cell.arrImagesData.count == 0 {
+                                    var arr:Array<Data> = []
+                                    arr.append(self.imgData ?? Data())
+                                    cell.arrImagesData = arr
+                                    cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
+                                }else {
+                                    cell.arrImagesData.removeAll()
+                                    var arr:Array<Data> = []
+                                    arr.append(self.imgData ?? Data())
+                                    cell.arrImagesData = arr
+                                }
+                                
+                                cell.clnCollectionView.performBatchUpdates({
+                                    cell.clnCollectionView.reloadData()
+                                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                                }) { _ in
+                                    // Code to execute after reloadData and layout updates
+                                    self.tblView.beginUpdates()
+                                    self.tblView.endUpdates()
+                                }
+                            }
+                        })
+                        
+                    }
+                    
+                    task.resume()
+                }
+            }else {
+                if let arr = obj.value as? Array<String> {
+                    dictCustomFields["\(obj.id ?? 0)"] = arr
+                }else  {
+                    dictCustomFields["\(obj.id ?? 0)"] = Array<String>()
+                }
+            }
+        }
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -59,7 +122,7 @@ class CreateAddVC2: UIViewController {
         showErrorMsg = false
         for objCustomField in dataArray {
             if objCustomField.type  == .textbox || objCustomField.type  == .number || objCustomField.type  == .dropdown{
-                if  objCustomField.selectedValue == nil || objCustomField.selectedValue == "" {
+                if  objCustomField.value?.count == 0 {
                     showErrorMsg = true
                 }
             }
@@ -68,9 +131,39 @@ class CreateAddVC2: UIViewController {
         if showErrorMsg == true {
             tblView.reloadData()
         }else {
+            for ind in 0..<self.dataArray.count {
+                let objCustomField = self.dataArray[ind]
+                if objCustomField.type != .fileinput {
+                    if let arr = objCustomField.value as? Array<String> {
+                        dictCustomFields["\(objCustomField.id ?? 0)"] = arr
+                    }
+                }
+            }
+            
             params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
-            let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
-            self.navigationController?.pushViewController(vc, animated: true)
+            
+            if popType == .createPost {
+                let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                self.navigationController?.pushViewController(vc, animated: true)
+            }else {
+                
+                let lat = itemObj?.latitude ?? 0.0
+                let lon = itemObj?.longitude ?? 0.0
+                let mapRegion = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                )
+                
+                
+                let selectedCoordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                
+//                 let range1: Double = 0.0
+//                let circle = MKCircle(center: CLLocationCoordinate2D(latitude: lat, longitude: lon), radius: 0.0 as CLLocationDistance)
+                
+                let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params, mapRegion:mapRegion, selectedCoordinate:selectedCoordinate))//,range1: range1, circle:circle))
+                self.navigationController?.pushViewController(vc, animated: true)
+                
+            }
         }
     }
     
@@ -115,12 +208,20 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
-            if objCustomField.selectedValue == nil {
+           /* if objCustomField.selectedValue == nil {
                 objCustomField.selectedValue = ""
                 dataArray[indexPath.row] = objCustomField
                 cell.txtField.text = ""
             }else {
                 cell.txtField.text = objCustomField.selectedValue
+            }*/
+            
+             if  objCustomField.value?.count ?? 0 > 0 {
+                    cell.txtField.text = objCustomField.value?.first ?? ""
+            }else {
+                objCustomField.value = Array<String>()
+                    cell.txtField.text = ""
+                dataArray[indexPath.row] = objCustomField
             }
             
             if showErrorMsg == true {
@@ -154,13 +255,23 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
-            if objCustomField.selectedValue == nil {
+            
+            /*if objCustomField.selectedValue == nil {
                 objCustomField.selectedValue = ""
                 dataArray[indexPath.row] = objCustomField
                 cell.txtField.text = ""
             }else {
                 cell.txtField.text = objCustomField.selectedValue
-            }
+            }*/
+            
+            if  objCustomField.value?.count ?? 0 > 0 {
+                   cell.txtField.text = objCustomField.value?.first ?? ""
+           }else {
+                   cell.txtField.text = ""
+               objCustomField.value = Array<String>()
+               dataArray[indexPath.row] = objCustomField
+           }
+            
             
             if showErrorMsg == true {
                 if objCustomField.selectedValue == "" {
@@ -180,14 +291,18 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             return cell
         }else if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
-            if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
+           /* if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
                 
                 objCustomField.arrIsSelected.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
+                dataArray[indexPath.row] = objCustomField
+            }*/
+            
+            if objCustomField.value == nil {
+                objCustomField.value = Array<String>()
                 dataArray[indexPath.row] = objCustomField
             }
             cell.lblTitle.text = objCustomField.name ?? ""
             
-            //cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
             cell.objData = objCustomField
             cell.del = self
@@ -198,11 +313,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.clnCollectionView.performBatchUpdates({
                 if showErrorMsg == true {
                     var found = false
-                   for obj in  objCustomField.arrIsSelected {
-                       if obj == true {
-                           found = true
-                           break
-                       }
+                    for obj in objCustomField.values ?? [] {
+                        if ((objCustomField.value?.contains(obj)) != nil) {
+                            found = true
+                            break
+                        }
                     }
                     if found == false {
                         cell.lblErrorMsg.isHidden = false
@@ -226,17 +341,17 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }else if objCustomField.type  == .dropdown {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.placeholder = ""
-            if objCustomField.selectedValue == nil {
-                objCustomField.selectedValue = ""
-                dataArray[indexPath.row] = objCustomField
-                cell.txtField.text = ""
-            }else {
-                cell.txtField.text = objCustomField.selectedValue
-            }
+            
+            if  objCustomField.value?.count ?? 0 > 0 {
+                   cell.txtField.text = objCustomField.value?.first ?? ""
+           }else {
+                   cell.txtField.text = ""
+               objCustomField.value = Array<String>()
+               dataArray[indexPath.row] = objCustomField
+           }
             
             if showErrorMsg == true {
                 if objCustomField.selectedValue == "" {
@@ -264,18 +379,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             return cell
         }else  if objCustomField.type  == .fileinput {
-            /*
-            let cell = tableView.dequeueReusableCell(withIdentifier: "AddPictureCell") as! AddPictureCell
-            cell.imgView.isHidden = true
-            //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
-            cell.lblTitle.text = objCustomField.name ?? ""
-            cell.lblTitle.text = objCustomField.name ?? ""
-            cell.btnAddPicture.setTitle("+ Add File", for: .normal)
-            cell.btnAddPicture.tag = indexPath.row
-            cell.btnAddPicture.addTarget(self, action: #selector(uploadPictureBtnAction(_:)), for: .touchDown)
-            return cell
-             */
+            
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "PictureAddedCell") as! PictureAddedCell
             cell.lblTitle.text = objCustomField.name ?? ""
@@ -320,20 +424,31 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         print(self.dataArray[row])
         
         var objCustomField = self.dataArray[row]
-        if objCustomField.arrIsSelected[clnCell] == true {
-            objCustomField.arrIsSelected[clnCell] = false
-            dictCustomFields.removeValue(forKey: "\(objCustomField.id ?? 0)")
-        }else {
-            objCustomField.arrIsSelected[clnCell] = true
-            dictCustomFields["\(objCustomField.id ?? 0)"] =  objCustomField.values?[clnCell] ?? ""
-        }
+        
         if objCustomField.type == .radio {
-            for ind in 0..<objCustomField.arrIsSelected.count {
-                if ind != clnCell {
-                    objCustomField.arrIsSelected[ind] = false
+            objCustomField.value?.removeAll()
+            if let str = objCustomField.values?[clnCell] as? String {
+                objCustomField.value?.append(str)
+            }
+            
+           
+
+        }else if objCustomField.type == .checkbox {
+            if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
+                if let index = objCustomField.value?.firstIndex{$0 == objCustomField.values?[clnCell]} {
+                    objCustomField.value?.remove(at: index)
+                }else {
+                    if let str = objCustomField.values?[clnCell] as? String{
+                        objCustomField.value?.append(str)
+                    }
+                }
+            }else {
+                if let str = objCustomField.values?[clnCell] as? String{
+                    objCustomField.value?.append(str)
                 }
             }
         }
+        
         dataArray[row] = objCustomField
         
         let indexPath = IndexPath(row: row, section: 0)
@@ -342,7 +457,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.objData = objCustomField
             cell.clnCollectionView.reloadData()
         }
-            
     }
     
     @objc func dropDownnAction(_ sender:UIButton) {
@@ -368,10 +482,12 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         print(dropDownRowIndex, selectedRow)
         
         var objCustomField = self.dataArray[dropDownRowIndex]
-        objCustomField.selectedValue = objCustomField.values?[selectedRow] ?? ""
+        if objCustomField.value?.count ?? 0 > 0 {
+            objCustomField.value?[0] = objCustomField.values?[selectedRow] ?? ""
+        }else {
+            objCustomField.value?.append(objCustomField.values?[selectedRow] ?? "")
+        }
         dataArray[dropDownRowIndex] = objCustomField
-        //tblView.reloadData()
-        dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.name ?? ""
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
         
@@ -379,8 +495,12 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
     
     func textFieldEditingDone(selectedRow:Int, strText:String) {
         var objCustomField = self.dataArray[selectedRow]
-        objCustomField.selectedValue = strText
-        dictCustomFields["\(objCustomField.id ?? 0)"] = strText
+        if objCustomField.value?.count ?? 0 > 0 {
+            objCustomField.value?[0] = strText
+        }else {
+            objCustomField.value?.append(strText)
+        }
+        print(objCustomField.value)
         dataArray[selectedRow] = objCustomField
         
     }
@@ -390,23 +510,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
 
 // MARK: ImagePicker Delegate
 extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentPickerDelegate {
-
-   
-   /* func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let pickedImage = info[.originalImage] as? UIImage {
-            print(picker.navigationBar.tag)
-            let tag = picker.navigationBar.tag
-                let data = pickedImage.jpegData(compressionQuality: 0.0)
-                imgName = "image"
-            let objCustomField = self.dataArray[tag]
-            customFieldFiles["\(objCustomField.id ?? 0)"] = data
-            self.dictCustomFields["custom_field_files"] = customFieldFiles
-           
-        }
-        dismiss(animated: true, completion: nil)
-        tblView.reload()
-    }*/
-    
+ 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             
@@ -488,6 +592,7 @@ extension CreateAddVC2: PictureAddedDelegate {
     func addPictureAction(row:Int) {
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
+        imagePicker.navigationBar.tag = row
         self.present(imagePicker, animated: true)
     }
     func removePictureAction(row:Int, col:Int) {
@@ -496,8 +601,11 @@ extension CreateAddVC2: PictureAddedDelegate {
             
             let indexPath = IndexPath(row: row, section: 0)
             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                
                 cell.arrImagesData.remove(at: col)
+                
+                let objCustomField = dataArray[row]
+                customFieldFiles.removeValue(forKey: "\(objCustomField.id ?? 0)")
+                
                 print("cell.arrImagesData.count : ", cell.arrImagesData.count)
                 cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
                 

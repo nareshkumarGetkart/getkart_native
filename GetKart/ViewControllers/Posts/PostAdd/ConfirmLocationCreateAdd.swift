@@ -29,9 +29,9 @@ struct ConfirmLocationCreateAdd: View {
     )
     
     @State var locationInfo = ""
-    @State private var selectedCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+    @State  var selectedCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     
-    @State private var range1: Double = 0.0
+    @State  var range1: Double = 0.0
     @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
     
     var body: some View {
@@ -138,9 +138,12 @@ struct ConfirmLocationCreateAdd: View {
     }
     
     func uploadFIleToServer(){
-        let url = Constant.shared.add_itemURL
-       
         
+        var url = Constant.shared.add_itemURL
+       
+        if popType == .editPost {
+            url = Constant.shared.update_itemURL
+        }
         
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: imgData ?? Data(), imageName: imgName, imagesData: gallery_images, imageNames: gallery_imageNames, url: url, params: self.params, completionHandler: { responseObject, error in
 

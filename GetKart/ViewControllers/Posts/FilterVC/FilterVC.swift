@@ -22,7 +22,7 @@ class FilterVC: UIViewController {
     var city:String = ""
     var state:String = ""
     var country:String = ""
-    
+    var radius:Double = 0.0
     var dataArray:[CustomField] = []
     var dictCustomFields:Dictionary<String,Any> = [:]
     
@@ -116,7 +116,9 @@ class FilterVC: UIViewController {
         dictCustomFields["city"] = city
         dictCustomFields["state"] = self.state
         dictCustomFields["country"] = self.country
-        //dictCustomFields["radius"] = s
+        if radius != 0{
+            dictCustomFields["radius"] = radius
+        }
         
         dictCustomFields["longitude"] = self.longitude
         dictCustomFields["latitude"] = self.latitude
@@ -149,14 +151,14 @@ class FilterVC: UIViewController {
        }
    }
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double = 0.0) {
 
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
         self.state = state
         self.country = country
-        
+        self.radius = range
         self.tblView.reloadData()
         
     }

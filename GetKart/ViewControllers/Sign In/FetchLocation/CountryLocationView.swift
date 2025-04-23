@@ -58,19 +58,22 @@ struct CountryLocationView: View {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.gray, lineWidth: 1)
                 }
-                // Icon button on the right (for settings or any other action)
-                Button(action: {
-                    // Action for icon button
-                    let vc = UIHostingController(rootView: SelectLocationRangeView(navigationController: self.navigationController, popType: self.popType))
-                    self.navigationController?.pushViewController(vc, animated: true)
-                }) {
-                    Image("symbolShareLocation")
-                        .foregroundColor(.gray)
-                        .frame(width: 40,height:40)
+                
+                if popType == .filter {
+                    // Icon button on the right (for settings or any other action)
+                    Button(action: {
+                        // Action for icon button
+                        let vc = UIHostingController(rootView: SelectLocationRangeView(navigationController: self.navigationController, popType: self.popType))
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }) {
+                        Image("symbolShareLocation")
+                            .foregroundColor(.gray)
+                            .frame(width: 40,height:40)
                             .foregroundColor(.orange)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .padding(.leading, 8)
+                            .padding(.leading, 8)
+                    }
                 }
             }
             .padding(.horizontal)

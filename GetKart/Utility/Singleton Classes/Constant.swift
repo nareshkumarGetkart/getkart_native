@@ -256,6 +256,13 @@ final class Constant: NSObject {
         
     }
 
+    var update_itemURL:String{
+        get{
+            return "\(Constant.shared.baseURL)/update-item"
+            
+        }
+        
+    }
     
     var my_items:String{
         get{

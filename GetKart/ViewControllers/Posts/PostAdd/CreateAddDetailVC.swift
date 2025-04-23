@@ -59,7 +59,6 @@ class CreateAddDetailVC: UIViewController {
         tblView.register(UINib(nibName: "AlmostThereCell", bundle: nil), forCellReuseIdentifier: "AlmostThereCell")
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
-        tblView.register(UINib(nibName: "AddPictureCell", bundle: nil), forCellReuseIdentifier: "AddPictureCell")
         tblView.register(UINib(nibName: "PictureAddedCell", bundle: nil), forCellReuseIdentifier: "PictureAddedCell")
         
         tblView.rowHeight = UITableView.automaticDimension
@@ -98,11 +97,112 @@ class CreateAddDetailVC: UIViewController {
             params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
             params[AddKeys.video_link.rawValue] = self.itemObj?.videoLink ?? ""
             params[AddKeys.description.rawValue] = self.itemObj?.description ?? ""
+            params["id"] = "\(self.itemObj?.id ?? 0)"
+            
+            self.downloadImgData()
             
         }
         
     }
     
+    func downloadImgData(){
+        //get the data for main image
+        if let url = URL(string: self.itemObj?.image ?? "") {
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                guard let data = data, error == nil else { return }
+                
+                /*DispatchQueue.main.async { /// execute on main thread
+                    self.imageView.image = UIImage(data: data)
+                }*/
+                self.imgData = data
+                self.imgName = url.lastPathComponent
+                DispatchQueue.main.async(execute: {
+                    
+                
+                let indexPath = IndexPath(row: 3, section: 0)
+                if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                        
+                        
+                    cell.btnAddPicture.isHidden = true
+                    cell.clnCollectionView.isHidden = false
+                        
+                        if cell.arrImagesData.count == 0 {
+                            var arr:Array<Data> = []
+                            arr.append(self.imgData ?? Data())
+                            cell.arrImagesData = arr
+                            cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
+                        }else {
+                            cell.arrImagesData.removeAll()
+                            var arr:Array<Data> = []
+                            arr.append(self.imgData ?? Data())
+                            cell.arrImagesData = arr
+                        }
+                    
+                        cell.clnCollectionView.performBatchUpdates({
+                            cell.clnCollectionView.reloadData()
+                            cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                        }) { _ in
+                            // Code to execute after reloadData and layout updates
+                            self.tblView.beginUpdates()
+                            self.tblView.endUpdates()
+                            if self.itemObj?.galleryImages?.count ?? 0 > 0 {
+                                self.downloadGalleryImages(index: 0)
+                            }
+                        }
+                }
+                })
+            }
+            
+            task.resume()
+        }
+        
+        
+    }
+    
+    func downloadGalleryImages(index:Int) {
+        //get the data for gallery images
+        if index < self.itemObj?.galleryImages?.count ?? 0 {
+            if let obj = self.itemObj?.galleryImages?[index] {
+                if let url = URL(string: obj.image ?? "") {
+                    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                        guard let data = data, error == nil else { return }
+                        
+                        /*DispatchQueue.main.async { /// execute on main thread
+                         self.imageView.image = UIImage(data: data)
+                         }*/
+                        self.gallery_images.append(data)
+                        self.gallery_imageNames.append("gallery_images[]")
+                        DispatchQueue.main.async(execute: {
+                            let indexPath = IndexPath(row: 4, section: 0)
+                            if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                                
+                                cell.btnAddPicture.isHidden = true
+                                cell.clnCollectionView.isHidden = false
+                                
+                                cell.arrImagesData = self.gallery_images
+                                cell.clnCollectionView!.insertItems(at: [IndexPath(item: self.gallery_images.count - 1, section: 0)])
+                                
+                                cell.clnCollectionView.performBatchUpdates({
+                                    cell.clnCollectionView.reloadData()
+                                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                                }) { _ in
+                                    // Code to execute after reloadData and layout updates
+                                    self.tblView.beginUpdates()
+                                    self.tblView.endUpdates()
+                                }
+                                
+                                if index < (self.itemObj?.galleryImages?.count ?? 0) - 1{
+                                    self.downloadGalleryImages(index: index + 1)
+                                }
+                            }
+                        })
+                        
+                    }
+                    task.resume()
+                }
+            }
+        }
+    }
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
@@ -177,6 +277,7 @@ class CreateAddDetailVC: UIViewController {
                 vc.gallery_images = self.gallery_images
                 vc.gallery_imageNames = self.gallery_imageNames
                 vc.popType = self.popType
+                vc.itemObj = self.itemObj
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }
@@ -536,30 +637,41 @@ extension CreateAddDetailVC: PictureAddedDelegate {
     }
     func removePictureAction(row:Int, col:Int) {
         
-            if row == 3 {
-                self.imgData = nil
-                self.imgName = ""
-            }else {
-                gallery_images.remove(at: col)
-                gallery_imageNames.remove(at: col)
-            }
+        if row == 3 {
+            self.imgData = nil
+            self.imgName = ""
+            
+        }else {
+            gallery_images.remove(at: col)
+            gallery_imageNames.remove(at: col)
+            
+        }
             
             let indexPath = IndexPath(row: row, section: 0)
             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                
+                
+                
                 
                 cell.arrImagesData.remove(at: col)
                 print("cell.arrImagesData.count : ", cell.arrImagesData.count)
                 cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
                 
-                cell.clnCollectionView.performBatchUpdates({
+                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
                     cell.clnCollectionView.reloadData()
-                    //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                }) { _ in
-                    // Code to execute after reloadData and layout updates
+                    cell.clnCollectionView.layoutIfNeeded()
+
+                
                     self.tblView.beginUpdates()
                     self.tblView.endUpdates()
-                }
+                    
+                    self.tblView.reloadRows(at: [indexPath], with: .automatic)
+                   
+               
+            
             }
+        
+        self.tblView.reloadRows(at: [indexPath], with: .automatic)
             
        
         

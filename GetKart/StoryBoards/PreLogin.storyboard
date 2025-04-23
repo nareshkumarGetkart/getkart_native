@@ -88,13 +88,13 @@
                                                 </attributedString>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email/Phone" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ktA-yF-Crl" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Phone" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ktA-yF-Crl" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                                                 <rect key="frame" x="20" y="200" width="353" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="50" id="UVQ-OZ-Tvu"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="phonePad"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="number" keyPath="leftPadding">
                                                         <real key="value" value="10"/>
@@ -113,7 +113,7 @@
                                                     <outlet property="delegate" destination="Y6W-OH-hqX" id="ffP-LB-cTI"/>
                                                 </connections>
                                             </textField>
-                                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4uV-9E-7wK">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4uV-9E-7wK">
                                                 <rect key="frame" x="30" y="200" width="40" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="40" id="dGZ-YI-27u"/>
@@ -155,7 +155,7 @@
                                                     <action selector="continueLoginAction" destination="Y6W-OH-hqX" eventType="touchUpInside" id="s3Q-QO-FIo"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Don't have an account?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUl-5v-A1s">
+                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Don't have an account?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUl-5v-A1s">
                                                 <rect key="frame" x="86.666666666666686" y="400" width="160" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="160" id="7tM-6c-jMj"/>
@@ -165,7 +165,7 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1F-hp-sqY">
+                                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1F-hp-sqY">
                                                 <rect key="frame" x="246.66666666666663" y="392.66666666666669" width="54" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="vQs-Uv-56b"/>
@@ -186,7 +186,7 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Enx-gb-iGq">
-                                                <rect key="frame" x="146.66666666666666" y="450" width="100" height="20"/>
+                                                <rect key="frame" x="146.66666666666666" y="420" width="100" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="20" id="TxE-mc-0Kn"/>
                                                     <constraint firstAttribute="width" constant="100" id="V6D-3o-3Ks"/>
@@ -202,7 +202,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4yY-HR-9Oh" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="480" width="353" height="50"/>
+                                                <rect key="frame" x="20" y="450" width="353" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="50" id="aIc-En-QRe"/>
                                                 </constraints>
@@ -233,7 +233,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I6l-UZ-S1h" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="550" width="353" height="50"/>
+                                                <rect key="frame" x="20" y="520" width="353" height="50"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="50" id="yL7-gi-7K9"/>
                                                 </constraints>
@@ -274,7 +274,7 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please enter valid Email/Phone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KaI-xU-3NX">
+                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please enter valid Phone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KaI-xU-3NX">
                                                 <rect key="frame" x="20" y="255" width="293" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="20" id="QwV-0T-ENw"/>
@@ -303,7 +303,7 @@
                                             <constraint firstItem="Exy-UI-u0O" firstAttribute="leading" secondItem="R0V-28-wdQ" secondAttribute="leading" constant="20" id="QNm-iI-5wo"/>
                                             <constraint firstItem="C1F-hp-sqY" firstAttribute="leading" secondItem="CUl-5v-A1s" secondAttribute="trailing" id="R2E-sW-cPi"/>
                                             <constraint firstItem="I6l-UZ-S1h" firstAttribute="leading" secondItem="R0V-28-wdQ" secondAttribute="leading" constant="20" id="V4f-QL-M5u"/>
-                                            <constraint firstItem="Enx-gb-iGq" firstAttribute="top" secondItem="CUl-5v-A1s" secondAttribute="bottom" constant="30" id="WHt-pA-KR0"/>
+                                            <constraint firstItem="Enx-gb-iGq" firstAttribute="top" secondItem="CUl-5v-A1s" secondAttribute="bottom" id="WHt-pA-KR0"/>
                                             <constraint firstItem="Exy-UI-u0O" firstAttribute="top" secondItem="ktA-yF-Crl" secondAttribute="bottom" constant="50" id="ZAF-Ip-6oc"/>
                                             <constraint firstAttribute="trailing" secondItem="g01-wb-F04" secondAttribute="trailing" constant="20" id="Zay-gw-OAm"/>
                                             <constraint firstItem="C1F-hp-sqY" firstAttribute="centerY" secondItem="CUl-5v-A1s" secondAttribute="centerY" id="c4L-R4-vku"/>
@@ -709,7 +709,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

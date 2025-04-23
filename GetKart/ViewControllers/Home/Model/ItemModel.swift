@@ -175,7 +175,7 @@ struct CustomField: Codable,Identifiable  {
     let values: [String?]?
     let minLength, maxLength: Int?
     let status: Int?
-    let value: [String?]?
+    var value: [String?]?
     let customFieldValue: CustomFieldValue?
 
     var arrIsSelected:Array<Bool> = Array()

@@ -38,7 +38,7 @@ class LoginVC: UIViewController {
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
         txtEmailPhone.text = ""
-        txtEmailPhone.leftPadding = 10
+        txtEmailPhone.leftPadding = 50
         self.fetChAndSetInitialCodeFromLocale()
     }
     
@@ -77,21 +77,20 @@ class LoginVC: UIViewController {
     
     @objc func changedCharacters(textField: UITextField){
         guard let input = textField.text else { return }
-        // do with your text whatever you want
-        print(input)
+       // print(input)
         if txtEmailPhone.text?.count ?? 0 > 50 {
             lblCharCount.text = "50/50"
         }else {
             lblCharCount.text = "\(txtEmailPhone.text?.count ?? 0)/50"
         }
         
-        if input.isNumeric == true {
+        /*if input.isNumeric == true {
             txtEmailPhone.leftPadding = 50
             btnCountryCode.isHidden = false
         }else {
             txtEmailPhone.leftPadding = 10
             btnCountryCode.isHidden = true
-        }
+        }*/
     }
     
     @IBAction func skipButtonAction() {
@@ -147,12 +146,6 @@ class LoginVC: UIViewController {
 
                 if status == 200{
                     
-                    /*if let payload =  result["payload"] as? Dictionary<String,Any>{
-                        
-                        self?.uid = payload["uid"] as? String ?? ""
-                        
-                        self?.delegate?.navigateToNextScreen(message: message)
-                    }*/
                     let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
                     vc.countryCode = self?.countryCode ?? ""
                     vc.mobile =  self?.txtEmailPhone.text ?? ""
