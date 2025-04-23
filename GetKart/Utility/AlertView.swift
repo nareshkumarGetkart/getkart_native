@@ -60,8 +60,8 @@ class AlertView: NSObject {
     func showToast(message : String, font: UIFont = UIFont.Manrope.regular(size: 14).font) {
 
         if let controller = AppDelegate.sharedInstance.navigationController?.topViewController{
-            let toastLabel = UILabel(frame: CGRect(x: 50, y: controller.view.frame.size.height - 200, width: controller.view.frame.size.width - 100, height: 35))
-        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+            let toastLabel = UILabel(frame: CGRect(x: 50, y: controller.view.frame.size.height - 150, width: controller.view.frame.size.width - 100, height: 35))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.9)
         toastLabel.textColor = UIColor.white
         toastLabel.font = font
         toastLabel.textAlignment = .center;
@@ -71,7 +71,7 @@ class AlertView: NSObject {
         toastLabel.clipsToBounds  =  true
         
             controller.view.addSubview(toastLabel)
-            UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+            UIView.animate(withDuration: 4.0, delay: 0.8, options: .curveEaseOut, animations: {
                 toastLabel.alpha = 0.0
             }, completion: {(isCompleted) in
                 toastLabel.removeFromSuperview()

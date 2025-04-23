@@ -130,7 +130,7 @@ final class Constant: NSObject {
     }
     var get_seller:String{
         get{
-            return "\(Constant.shared.baseURL)/get-seller"
+            return "\(Constant.shared.baseURL)/v1/get-seller"
             
         }
     }
@@ -234,7 +234,7 @@ final class Constant: NSObject {
     
     var payment_transactions:String{
         get{
-            return "\(Constant.shared.baseURL)/payment-transactions"
+            return "\(Constant.shared.baseURL)/v1/payment-transactions"
             
         }
     }
@@ -378,6 +378,44 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/get-package-banner"
         }
     }
+    
+    
+    var order_update:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/order-update"
+        }
+    }
+    
+    
+    var get_following:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-following"
+        }
+    }
+    
+    
+    
+    var get_followers:String{
+        get {
+            return "\(Constant.shared.baseURL)/get-followers"
+        }
+    }
+    
+    var follow_unfollow:String{
+        get{
+            return "\(Constant.shared.baseURL)/follow-unfollow"
+
+        }
+    }
+    
+    
+    var make_item_featured:String{
+        get{
+            return "\(Constant.shared.baseURL)/make-item-featured"
+
+        }
+    }
+    
     
     
     

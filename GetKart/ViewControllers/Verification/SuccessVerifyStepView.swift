@@ -11,7 +11,7 @@ struct SuccessVerifyStepView: View {
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
-            Image(systemName: "checkmark.seal.fill")
+            Image("verification_success")
                 .resizable()
                 .frame(width: 100, height: 100)
                 .foregroundColor(.orange)

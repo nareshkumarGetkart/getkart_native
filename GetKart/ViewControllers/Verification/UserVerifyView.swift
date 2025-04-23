@@ -29,20 +29,19 @@ struct UserVerifyView: View {
                 Spacer()
                 
                 // Illustration (Replace with actual asset)
-                Image("verification") // Add image to Assets.xcassets
+                Image("user_verification") // Add image to Assets.xcassets
                     .resizable()
                     .scaledToFit()
                     .frame(height: 200)
                 
                 // Title
                 Text("User Verification")
-                    .font(.title)
-                    .fontWeight(.bold)
+                    .font(.manrope(.medium, size: 22))
                     .padding(.top, 20)
                 
                 // Description
                 Text("Increase trust and attract more buyers by verifying now")
-                    .font(.body)
+                    .font(.manrope(.regular, size: 15))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
@@ -55,7 +54,7 @@ struct UserVerifyView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
                     .padding(.top, 5)
-                
+
                 Spacer()
                 
                 // Start Verification Button

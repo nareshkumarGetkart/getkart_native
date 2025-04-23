@@ -17,6 +17,8 @@ class PayPlanVC: UIViewController {
     private var ppPayment = PPPayment()
     var planObj:PlanModel?
     
+    var paymentIntentId = ""
+    
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var btnPay:UIButton!
 
@@ -27,7 +29,7 @@ class PayPlanVC: UIViewController {
         btnPay.layer.cornerRadius = 8.0
         btnPay.clipsToBounds = true
         lblPrice.text = "\(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)"
-        btnPay.setTitle("\(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)", for: .normal)
+        btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)", for: .normal)
         self.getPaymentSettings()
     }
     
@@ -101,6 +103,33 @@ class PayPlanVC: UIViewController {
         }
     }
     
+    
+    func updateOrderApi(){
+        let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId]
+
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post) { responseObject, error in
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                }
+            }
+        }
+        
+    }
+    
+    
+    
     func createPhonePayOrder(package_id:Int){
         
         let params:Dictionary<String, Any> = ["package_id":package_id,"payment_method":"PhonePe", "platform_type":"app"]
@@ -121,6 +150,10 @@ class PayPlanVC: UIViewController {
                 if status == 200{
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
                         if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                          
+                                
                             if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
                                 let orderId = payment_gateway_response["orderId"] as? String ?? ""
                                 let token  = payment_gateway_response["token"] as? String ?? ""
@@ -149,6 +182,8 @@ class PayPlanVC: UIViewController {
                                     token: token,
                                     appSchema: appSchema,
                                     on: self) { _, state in
+            
+            self.updateOrderApi()
             print(state)
             
             AlertView.sharedManager.presentAlertWith(title: "", msg: "\(state)" as NSString, buttonTitles: ["ok"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
@@ -161,6 +196,8 @@ class PayPlanVC: UIViewController {
             }
         }
     }
+    
+    
     
     
 }

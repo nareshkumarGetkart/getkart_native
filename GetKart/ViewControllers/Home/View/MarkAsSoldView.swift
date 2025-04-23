@@ -17,7 +17,7 @@ struct MarkAsSoldView: View {
     var productImg:String?
     var navController:UINavigationController?
     var itemId:Int?
-
+    
     
     var body: some View {
         
@@ -29,20 +29,20 @@ struct MarkAsSoldView: View {
                     navController?.popViewController(animated: true)
                 }) {
                     Image("arrow_left").renderingMode(.template).foregroundColor(.black)
-
+                    
                 }
-
+                
                 Text("Who bought?")
                     .font(.headline)
                     .padding(.leading, 4)
-
+                
                 Spacer()
             }
             .padding()
             .onAppear{
                 self.getUsers()
             }
-
+            
             // Product Info
             HStack {
                 
@@ -54,7 +54,7 @@ struct MarkAsSoldView: View {
                     } placeholder: {
                         
                     }
-
+                    
                 } else {
                     Circle()
                         .fill(Color.gray.opacity(0.2))
@@ -68,9 +68,9 @@ struct MarkAsSoldView: View {
                     .fontWeight(.bold)
             }
             .padding(.horizontal)
-
+            
             Divider()
-
+            
             // User List
             List(listArray) { user in
                 HStack {
@@ -84,35 +84,35 @@ struct MarkAsSoldView: View {
                         } placeholder: {
                             
                         }
-
+                        
                     } else {
                         Circle()
                             .fill(Color.orange)
                             .frame(width: 36, height: 36)
                             .overlay(Image(systemName: "person.fill").foregroundColor(.white))
                     }
-
+                    
                     Text(user.name ?? "")
                         .padding(.leading, 8)
-
+                    
                     Spacer()
-
+                    
                     Image(systemName: selectedUserId == user.id ? "largecircle.fill.circle" : "circle")
                         .foregroundColor(.gray)
                 }.frame(height:40)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    selectedUserId = user.id
-                }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedUserId = user.id
+                    }
             }
-
+            
             Spacer()
-
+            
             // None of above
             Button("None of above") {
                 selectedUserId = nil
                 showConfirmDialog = true
-
+                
             }
             .padding()
             .foregroundColor(.black)
@@ -124,7 +124,7 @@ struct MarkAsSoldView: View {
                     .stroke(Color.gray.opacity(0.5))
             )
             .padding(.horizontal)
-
+            
             if listArray.count > 0{
                 // Mark As Sold Out
                 Button("Mark As Sold Out") {
@@ -140,23 +140,22 @@ struct MarkAsSoldView: View {
             }
             
         }.navigationBarHidden(true)
-        .confirmationDialog("Confirm Sold Out",
-                            isPresented: $showConfirmDialog,
-                            titleVisibility: .visible) {
-            Button("Confirm", role: .destructive) {
-                // Confirm logic
-                self.updateStatusToSold()
-
+            .confirmationDialog("Confirm Sold Out",
+                                isPresented: $showConfirmDialog,
+                                titleVisibility: .visible) {
+                Button("Confirm", role: .destructive) {
+                    // Confirm logic
+                    self.updateStatusToSold()
+                    
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("After marking this ad as sold out, you can’t undo or change its status.")
             }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("After marking this ad as sold out, you can’t undo or change its status.")
-        }
     }
     
     
     func updateStatusToSold(){
-        
         
         var params = ["status":"sold out","item_id":(itemId ?? 0)] as [String : Any]
         if  let id = selectedUserId {
@@ -177,13 +176,13 @@ struct MarkAsSoldView: View {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
+                    AlertView.sharedManager.showToast(message: message)
                     navController?.popToRootViewController(animated: true)
                 }
-                
             }
         }
     }
+    
     
     func getUsers(){
         let strUrl = Constant.shared.item_buyer_list + "?item_id=\(itemId ?? 0)"
@@ -194,7 +193,7 @@ struct MarkAsSoldView: View {
             }
         }
     }
-
+    
 }
 
 #Preview {

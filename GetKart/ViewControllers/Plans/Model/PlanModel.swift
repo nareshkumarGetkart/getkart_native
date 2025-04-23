@@ -21,7 +21,8 @@ struct PlanModel: Codable {
     let id: Int?
     let name: String?
     let tier: Int?
-    let finalPrice, discountInPercentage, price: Int?
+    let finalPrice:Double?
+    let discountInPercentage, price: Int?
     let duration, itemLimit: String?
     let type: TypePlanEnum?
     let icon: String?
@@ -53,7 +54,6 @@ enum TypePlanEnum: String, Codable {
     case itemListing = "item_listing"
     case itemListingAutoboost = "item_listing_autoboost"
 }
-
 
 
 

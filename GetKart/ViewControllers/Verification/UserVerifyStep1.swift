@@ -15,6 +15,7 @@ struct UserVerifyStep1: View {
     @State private var address: String = ""
     @State private var phoneNumber: String = ""
     @State private var email: String = ""
+    @State private var businessName: String = ""
 
     var body: some View {
         // Top Navigation Bar
@@ -36,11 +37,11 @@ struct UserVerifyStep1: View {
             // Title with Progress Indicator
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
-                    Text("User Verification")
+                    Text("User Information")
                         .font(.title)
                         .fontWeight(.bold)
                     Spacer()
-                    Text("Step 1 of 2")
+                    Text("Step 1 of 3")
                         .foregroundColor(.gray)
                 }
                 
@@ -52,10 +53,10 @@ struct UserVerifyStep1: View {
             
             // Personal Information Section
             VStack(alignment: .leading, spacing: 5) {
-                Text("Personal Information")
+                Text("Enter Your Details")
                     .font(.headline)
                     .fontWeight(.bold)
-                Text("Please provide your accurate information")
+                Text("Submit accurate information for verification")
                     .font(.body)
                     .foregroundColor(.gray)
             }
@@ -65,6 +66,7 @@ struct UserVerifyStep1: View {
             // Input Fields
             VStack(spacing: 15) {
                 CustomTextField(title: "Full Name", text: $fullName)
+                CustomTextField(title: "Business Name", text: $businessName)
                 CustomTextField(title: "Address", text: $address)
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)

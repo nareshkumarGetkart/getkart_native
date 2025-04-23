@@ -14,7 +14,6 @@ struct SellerProfileView: View {
     @ObservedObject private var objVM = ProfileViewModel()
     @State var showShareSheet = false
     @State var showOptionSheet = false
-
     
     var body: some View {
         VStack {
@@ -54,12 +53,13 @@ struct SellerProfileView: View {
                             
                                 .default(Text("Share"), action: {
                                     
-                            }),
+                                }),
                             
-                           .cancel()
+                                .cancel()
                         ])
                     }
-                    
+                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                    if objLoggedInUser.id != nil {
                     Button(action: {
                         // Handle more options
                         showOptionSheet = true
@@ -69,15 +69,23 @@ struct SellerProfileView: View {
                             .foregroundColor(.black)
                     } .actionSheet(isPresented: $showOptionSheet) {
                         
+                        
                         ActionSheet(title: Text(""), message: nil, buttons: [
-
-                            .default(Text("Block"), action: {
+                            
+                            
+                            .default(Text((((objVM.sellerObj?.isBlock ?? 0) == 1) ? "Unblock" : "Block")), action: {
                                 
+                                if (objVM.sellerObj?.isBlock ?? 0) == 1{
+                                    self.objVM.unblockUser()
+                                }else{
+                                    self.objVM.blockUser()
+                                }
                             }),
-                           
-                            .cancel()
+                            
+                                .cancel()
                         ])
                     }
+                }
                 }
             }.frame(height: 44).padding(.horizontal, 10)
           //  .padding()
@@ -95,15 +103,22 @@ struct SellerProfileView: View {
                         .frame(width: 80, height: 80)
                         .cornerRadius(40)
                 }
-
-               
+                
+                
                 Text(objVM.sellerObj?.name ?? "")
                     .font(.custom("Manrope-Medium", size: 16.0))
                 Spacer()
+                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                if objLoggedInUser.id != nil {
                 Button(action: {
                     // Handle follow action
+                    let follow = (objVM.sellerObj?.isFollowing ?? false) ? false : true
+                    
+                    objVM.followUnfollowUserApi(isFollow: follow)
                 }) {
-                    Text("Follow").font(.custom("Manrope-Medium", size: 16.0))
+                    
+                    let strText = (objVM.sellerObj?.isFollowing ?? false) ? "Unfollow" : "Follow"
+                    Text(strText).font(.custom("Manrope-Medium", size: 16.0))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 8)
                         .background(Color.orange)
@@ -111,6 +126,7 @@ struct SellerProfileView: View {
                         .cornerRadius(20)
                         .font(.headline)
                 }
+            }
             }
             .padding(.horizontal, 10)
             
@@ -121,11 +137,24 @@ struct SellerProfileView: View {
                 
                 Divider().frame(width: 1,height: 40).background(.gray)
 
-                statView(value: "\(objVM.sellerObj?.followersCount ?? 0)", label: "Followers")
+                statView(value: "\(objVM.sellerObj?.followersCount ?? 0)", label: "Followers").onTapGesture {
+                   
+                    if (objVM.sellerObj?.followersCount ?? 0) > 0{
+                        let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: true,userId: userId))
+                        self.navController?.pushViewController(hostVC, animated: true)
+                    }
+                }
                 
                 Divider().frame(width: 1,height: 40).background(.gray)
                 
-                statView(value: "\(objVM.sellerObj?.followingCount ?? 0)", label: "Following")
+                statView(value: "\(objVM.sellerObj?.followingCount ?? 0)", label: "Following").onTapGesture {
+                  
+                    if (objVM.sellerObj?.followingCount ?? 0) > 0{
+                        
+                        let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: false,userId: userId))
+                        self.navController?.pushViewController(hostVC, animated: true)
+                    }
+                }
            
             }.padding(.vertical, 10)
             

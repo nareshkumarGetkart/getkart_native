@@ -22,7 +22,8 @@ class MyAdsVC: UIViewController {
     
     var listArray = [ItemModel]()
     private var emptyView:EmptyList?
-
+    var isClicked = false
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +41,13 @@ class MyAdsVC: UIViewController {
         addButtonsToScrollView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if isClicked{
+            isClicked = false
+            getAdsListApi()
+        }
+    }
     
     func addButtonsToScrollView(){
             
@@ -231,6 +239,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        isClicked = true
         let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true))
         
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)

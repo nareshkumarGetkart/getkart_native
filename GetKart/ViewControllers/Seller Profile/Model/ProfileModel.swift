@@ -39,9 +39,10 @@ struct Seller: Codable {
     let deletedAt: String?
     let countryCode: String?
     let showPersonalDetails, isVerified: Int?
-    let isFollowing: Bool?
+    var isFollowing: Bool?
     let averageRating: String?
     let followersCount, followingCount, items: Int?
+    var isBlock: Int?
 
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, mobileVisibility
@@ -60,6 +61,7 @@ struct Seller: Codable {
         case isFollowing
         case averageRating = "average_rating"
         case followersCount, followingCount, items
+        case isBlock
     }
 }
 

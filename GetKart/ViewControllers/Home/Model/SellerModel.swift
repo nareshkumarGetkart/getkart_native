@@ -64,7 +64,7 @@ struct SellerModel: Codable,Identifiable {
     let deletedAt: String?
     let countryCode: String?
     let showPersonalDetails, isVerified: Int?
-    let isFollowing: Bool?
+    var isFollowing: Bool?
     let averageRating: String?
     let followersCount, followingCount, items: Int?
 
