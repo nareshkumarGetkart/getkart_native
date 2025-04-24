@@ -71,11 +71,12 @@ struct ItemDetailView: View {
                     ActionSheet(title: Text(""), message: nil, buttons: [
                         
                         .default(Text("Copy Link"), action: {
-                            
+                            UIPasteboard.general.string = ShareMedia.itemUrl + "\(objVM.itemObj?.id ?? 0)"
+
                         }),
                         
                             .default(Text("Share"), action: {
-                                
+                                ShareMedia.shareMediafrom(type: .item, mediaId: "\(objVM.itemObj?.id ?? 0)", controller: (self.navController?.topViewController)!)
                             }),
                         
                             .cancel()

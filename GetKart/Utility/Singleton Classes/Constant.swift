@@ -512,7 +512,7 @@ extension UIFont{
 
 enum MediaShareType{
     
-   
+    case item
     case profile
     case appShare
    
@@ -521,33 +521,42 @@ enum MediaShareType{
 
 class ShareMedia{
     
+    static var profileUrl = "https://dl.getkart.com/profile/"
+    static var itemUrl = "https://dl.getkart.com/item/"
+
+  
+    
     static func shareMediafrom(type:MediaShareType,mediaId:String,controller:UIViewController){
         
-        //var baseUrl = "https://www.pickzon.com"
-        var baseUrl = "https://pzdl.pickzon.com"
-        
+        var baseUrl =  "https://dl.getkart.com"
+      
         if type == .profile{
-            baseUrl = "\(baseUrl)/profile/\(mediaId)"
             
+            baseUrl = "\(baseUrl)/profile/\(mediaId)"
+            print("Deep link ==\(baseUrl)")
+            let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
+            let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
+            activityController.excludedActivityTypes = excludedActivities
+            controller.present(activityController, animated: true)
+            
+        }else if type == .item{
+            
+            baseUrl = "\(baseUrl)/item/\(mediaId)"
             
             print("Deep link ==\(baseUrl)")
             let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
-            
             let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
             activityController.excludedActivityTypes = excludedActivities
             controller.present(activityController, animated: true)
             
         }else if type == .appShare{
             
-             baseUrl = "Getkart \n https://apps.apple.com/in/app/getkart-buy-sell/id1488570846 \n\n Buy and Sell Easily."
+            baseUrl = "Getkart \n https://apps.apple.com/in/app/getkart-buy-sell/id1488570846 \n\n Buy and Sell Easily."
             let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
-            
             let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
             activityController.excludedActivityTypes = excludedActivities
             controller.present(activityController, animated: true)
-            
         }
-        
     }
 }
     class ActionExtensionBlockerItem: NSObject, UIActivityItemSource {

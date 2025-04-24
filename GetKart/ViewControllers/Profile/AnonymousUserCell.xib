@@ -50,21 +50,21 @@
                                         <state key="normal" image="pencil"/>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="ITh-oJ-7ya">
-                                        <rect key="frame" x="90" y="11.666666666666671" width="210" height="76.999999999999986"/>
+                                        <rect key="frame" x="90" y="11.666666666666671" width="210" height="77"/>
                                         <subviews>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="agt-9I-fye">
-                                                <rect key="frame" x="0.0" y="-18" width="70" height="18"/>
+                                                <rect key="frame" x="0.0" y="-18" width="65" height="18"/>
                                                 <subviews>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.seal.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m7S-vL-bT0">
-                                                        <rect key="frame" x="5" y="0.66666666666666607" width="15" height="16.333333333333336"/>
+                                                        <rect key="frame" x="0.0" y="-0.66666666666666785" width="18" height="19.333333333333336"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="15" id="O3d-rT-7M7"/>
-                                                            <constraint firstAttribute="height" constant="15" id="TKC-Q6-q0R"/>
+                                                            <constraint firstAttribute="width" constant="18" id="O3d-rT-7M7"/>
+                                                            <constraint firstAttribute="height" constant="18" id="TKC-Q6-q0R"/>
                                                         </constraints>
                                                     </imageView>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="VERIFIED" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wNG-7D-EVE">
-                                                        <rect key="frame" x="22.666666666666675" y="1" width="46.333333333333343" height="16"/>
-                                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="10"/>
+                                                        <rect key="frame" x="20.666666666666675" y="1" width="43.333333333333343" height="16"/>
+                                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="11"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
@@ -72,13 +72,13 @@
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="bottom" secondItem="wNG-7D-EVE" secondAttribute="bottom" constant="1" id="0a7-Ob-RyZ"/>
-                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="top" secondItem="agt-9I-fye" secondAttribute="top" constant="1.5" id="A4W-BZ-LfA"/>
+                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="top" secondItem="agt-9I-fye" secondAttribute="top" id="A4W-BZ-LfA"/>
                                                     <constraint firstAttribute="height" constant="18" id="LzL-EO-BZJ"/>
                                                     <constraint firstItem="wNG-7D-EVE" firstAttribute="top" secondItem="agt-9I-fye" secondAttribute="top" constant="1" id="TDx-4I-AfX"/>
                                                     <constraint firstAttribute="trailing" secondItem="wNG-7D-EVE" secondAttribute="trailing" constant="1" id="VKo-ep-GgI"/>
                                                     <constraint firstItem="wNG-7D-EVE" firstAttribute="leading" secondItem="m7S-vL-bT0" secondAttribute="trailing" constant="2.5" id="WxW-bo-JMe"/>
-                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="leading" secondItem="agt-9I-fye" secondAttribute="leading" constant="5" id="bFb-QA-2jw"/>
-                                                    <constraint firstAttribute="width" constant="70" id="u4w-8r-2NI"/>
+                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="leading" secondItem="agt-9I-fye" secondAttribute="leading" id="bFb-QA-2jw"/>
+                                                    <constraint firstAttribute="width" constant="65" id="u4w-8r-2NI"/>
                                                 </constraints>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NkV-Zq-Hpb">

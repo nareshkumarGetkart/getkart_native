@@ -49,10 +49,12 @@ struct SellerProfileView: View {
                             
                             .default(Text("Copy Link"), action: {
                                 
+                               UIPasteboard.general.string = ShareMedia.profileUrl + "\(userId)"
+
                             }),
                             
                                 .default(Text("Share"), action: {
-                                    
+                                    ShareMedia.shareMediafrom(type: .profile, mediaId: "\(userId)", controller: (navController?.topViewController!)!)
                                 }),
                             
                                 .cancel()

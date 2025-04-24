@@ -103,7 +103,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblStatus.isHidden = true
                 cell.btnResubmit.isHidden = true
 
-                if (objLoggedInUser.is_verified ?? 0) == 1{
+                if (objLoggedInUser.is_verified ?? 0) == 1 || verifiSttaus.lowercased() == "approved"{
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = false
                     

@@ -55,6 +55,8 @@ class HomeVC: UIViewController {
     
     @IBAction func searchBtnAction(_ sender : UIButton){
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
+        hostingController.hidesBottomBarWhenPushed = true
+
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
@@ -67,6 +69,8 @@ class HomeVC: UIViewController {
         
         
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
+        hostingController.hidesBottomBarWhenPushed = true
+
         self.navigationController?.pushViewController(hostingController, animated: false)
         
     }
@@ -160,7 +164,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.collctnView.reloadData()
             cell.updateConstraints()
             return cell
-            
+           
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
             cell.cnstrntHeightSeeAllView.constant = 0
