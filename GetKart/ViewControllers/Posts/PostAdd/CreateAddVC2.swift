@@ -123,11 +123,10 @@ class CreateAddVC2: UIViewController {
     @IBAction func nextButtonAction (){
         showErrorMsg = false
         for objCustomField in dataArray {
-            if objCustomField.type  == .textbox || objCustomField.type  == .number || objCustomField.type  == .dropdown{
-                if  objCustomField.value?.count == 0 {
+            if objCustomField.customFieldRequired == 1 && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
                     showErrorMsg = true
                 }
-            }
+           
         }
         
         if showErrorMsg == true {
@@ -199,9 +198,47 @@ class CreateAddVC2: UIViewController {
         }
     }
     
+    func isValidInput(objCustomField:CustomField)->Bool{
+        if objCustomField.customFieldRequired == 1 {
+            if objCustomField.type == .fileinput {
+                if let imgData =  customFieldFiles["\(objCustomField.id ?? 0)"] as? Data {
+                    if imgData.count == 0 {
+                        return false
+                    }
+                }
+            }else if objCustomField.type  == .dropdown || objCustomField.type  == .checkbox || objCustomField.type  == .radio{
+                if objCustomField.value?.count == 0{
+                    return false
+                }
+                
+            }else  if (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count > objCustomField.maxLength ?? 0) {
+                return false
+            }
+            
+        }
+        return true
+    }
     
-    
-    
+    func showErrorMessage(objCustomField:CustomField)->String{
+        var errorMsg = ""
+        if objCustomField.customFieldRequired == 1 {
+            if objCustomField.type  == .fileinput {
+                errorMsg = "Allowed file types: PNG, JPG, JPEG, SVG, PDF"
+            }else if objCustomField.type  == .dropdown || objCustomField.type  == .checkbox || objCustomField.type  == .radio{
+                errorMsg = "Selecting this is required"
+            }else if objCustomField.type  == .textbox || objCustomField.type  == .number {
+                if objCustomField.value?.count == 0 {
+                    errorMsg = "Field must not be empty."
+                } else if (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 {
+                    errorMsg = "Field minimum length is \(objCustomField.minLength ?? 0) characters."
+                    
+                } else if (objCustomField.value?.first as? String ?? "").count ?? 0 > objCustomField.maxLength ?? 0 {
+                    errorMsg = "Field maximum length is \(objCustomField.maxLength ?? 0) characters."
+                }
+            }
+        }
+        return errorMsg
+    }
     
     
 }
@@ -240,35 +277,25 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
-           /* if objCustomField.selectedValue == nil {
-                objCustomField.selectedValue = ""
-                dataArray[indexPath.row] = objCustomField
-                cell.txtField.text = ""
-            }else {
-                cell.txtField.text = objCustomField.selectedValue
-            }*/
-            
-             if  objCustomField.value?.count ?? 0 > 0 {
+            if  objCustomField.value?.count ?? 0 > 0 {
                     cell.txtField.text = objCustomField.value?.first ?? ""
             }else {
                 objCustomField.value = Array<String>()
                     cell.txtField.text = ""
                 dataArray[indexPath.row] = objCustomField
             }
-            
+                 
             if showErrorMsg == true {
-                if objCustomField.selectedValue == "" {
+                if isValidInput(objCustomField: objCustomField) == false {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
                 }else {
-                    
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
-            }else {
-                cell.lblErrorMsg.isHidden = true
-                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
+            
             
             cell.selectionStyle = .none
             
@@ -288,13 +315,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
-            /*if objCustomField.selectedValue == nil {
-                objCustomField.selectedValue = ""
-                dataArray[indexPath.row] = objCustomField
-                cell.txtField.text = ""
-            }else {
-                cell.txtField.text = objCustomField.selectedValue
-            }*/
+            
             
             if  objCustomField.value?.count ?? 0 > 0 {
                    cell.txtField.text = objCustomField.value?.first ?? ""
@@ -305,29 +326,24 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
            }
             
             
+            
+            
             if showErrorMsg == true {
-                if objCustomField.selectedValue == "" {
+                if isValidInput(objCustomField: objCustomField) == false {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
                 }else {
-                    
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
-            }else {
-                cell.lblErrorMsg.isHidden = true
-                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
             
             cell.selectionStyle = .none
             return cell
         }else if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
-           /* if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
-                
-                objCustomField.arrIsSelected.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
-                dataArray[indexPath.row] = objCustomField
-            }*/
+           
             
             if objCustomField.value == nil {
                 objCustomField.value = Array<String>()
@@ -340,25 +356,18 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.del = self
             cell.rowValue = indexPath.row
             
-            
-            
-            cell.clnCollectionView.performBatchUpdates({
-                if showErrorMsg == true {
-                    var found = false
-                    for obj in objCustomField.values ?? [] {
-                        if ((objCustomField.value?.contains(obj)) != nil) {
-                            found = true
-                            break
-                        }
-                    }
-                    if found == false {
-                        cell.lblErrorMsg.isHidden = false
-                    }else {
-                        cell.lblErrorMsg.isHidden = true
-                    }
+            if showErrorMsg == true {
+                if isValidInput(objCustomField: objCustomField) == false {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
                 }else {
                     cell.lblErrorMsg.isHidden = true
                 }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+            }
+            
+            cell.clnCollectionView.performBatchUpdates({
                 cell.clnCollectionView.reloadData()
                 //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
             }) { _ in
@@ -386,11 +395,12 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
            }
             
             if showErrorMsg == true {
-                if objCustomField.selectedValue == "" {
+                if isValidInput(objCustomField: objCustomField) == false {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
-                }else {
+                    cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
                     
+                }else {
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
@@ -439,6 +449,21 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 // Code to execute after reloadData and layout updates
                 self.tblView.beginUpdates()
                 self.tblView.endUpdates()
+            }
+            
+            if showErrorMsg == true {
+                if isValidInput(objCustomField: objCustomField) == false {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.btnAddPicture.borderColor = UIColor.red
+                    cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
+                    
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.btnAddPicture.borderColor = UIColor.lightGray
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.btnAddPicture.borderColor = UIColor.lightGray
             }
             
             cell.selectionStyle = .none

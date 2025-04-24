@@ -251,17 +251,19 @@ class CreateAddDetailVC: UIViewController {
             showErrorMsg = true
          
         }else if  imgData == nil{
-            let alert = UIAlertController(title: "", message: "Main image can not be left blank.", preferredStyle: .alert)
+            /*let alert = UIAlertController(title: "", message: "Main image can not be left blank.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+             */
             showErrorMsg = true
          
         }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
-            let alert = UIAlertController(title: "", message: "Price can not be left blank.", preferredStyle: .alert)
+            /*let alert = UIAlertController(title: "", message: "Price can not be left blank.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+             */
             showErrorMsg = true
          
         }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
@@ -427,6 +429,19 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 self.tblView.beginUpdates()
                 self.tblView.endUpdates()
             }
+            if showErrorMsg == true {
+                if imgData == nil {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.lblErrorMsg.text = "Item main image is required."
+                    cell.btnAddPicture.borderColor = UIColor.red
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.btnAddPicture.borderColor  = UIColor.lightGray
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.btnAddPicture.borderColor  = UIColor.lightGray
+            }
             
             cell.selectionStyle = .none
             return cell
@@ -458,6 +473,20 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 self.tblView.beginUpdates()
                 self.tblView.endUpdates()
             }
+            
+            /*if showErrorMsg == true {
+                if gallery_images.count == 0 {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.btnAddPicture.borderColor = UIColor.red
+                }else {
+                    cell.lblErrorMsg.isHidden = true
+                    cell.btnAddPicture.borderColor  = UIColor.lightGray
+                }
+            }else {
+                cell.lblErrorMsg.isHidden = true
+                cell.btnAddPicture.borderColor  = UIColor.lightGray
+            }
+            */
             cell.selectionStyle = .none
             return cell
             
