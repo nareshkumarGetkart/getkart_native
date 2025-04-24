@@ -142,33 +142,42 @@ class CreateAddVC2: UIViewController {
                 }
             }
             
-            //remove field if image is not updated
-            var customFieldFilesNew :Dictionary<String,Any> = [:]
-            for (key, value) in self.customFieldFiles{
-                var found = false
-                let data = value as? Data ?? Data()
-                for (key1, value1) in self.customFieldFilesEditPost {
-                    let data1 = value1 as? Data ?? Data()
-                    if key == key1 && data == data1  {
-                        found = true
-                        break
-                    }
-                }
-                if found == false {
-                    customFieldFilesNew[key] = value
-                }
-            }
-            self.dictCustomFields["custom_field_files"] = customFieldFilesNew
-            //only  updated images
-           
-            
-            
-            params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
-            
             if popType == .createPost {
+                if customFieldFiles.count > 0 {
+                    self.dictCustomFields["custom_field_files"] = customFieldFiles
+                }else {
+                    self.dictCustomFields.removeValue(forKey: "custom_field_files")
+                }
+                params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
+                
                 let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                 self.navigationController?.pushViewController(vc, animated: true)
             }else {
+                
+                //remove field if image is not updated
+                var customFieldFilesNew :Dictionary<String,Any> = [:]
+                for (key, value) in self.customFieldFiles{
+                    var found = false
+                    let data = value as? Data ?? Data()
+                    for (key1, value1) in self.customFieldFilesEditPost {
+                        let data1 = value1 as? Data ?? Data()
+                        if key == key1 && data == data1  {
+                            found = true
+                            break
+                        }
+                    }
+                    if found == false {
+                        customFieldFilesNew[key] = value
+                    }
+                }
+                
+                if customFieldFilesNew.count > 0 {
+                    self.dictCustomFields["custom_field_files"] = customFieldFilesNew
+                }else {
+                    self.dictCustomFields.removeValue(forKey: "custom_field_files")
+                }
+                params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
+                //only  updated images
                 
                 let lat = itemObj?.latitude ?? 0.0
                 let lon = itemObj?.longitude ?? 0.0

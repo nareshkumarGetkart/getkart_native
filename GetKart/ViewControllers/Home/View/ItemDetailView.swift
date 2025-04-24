@@ -33,10 +33,10 @@ struct ItemDetailView: View {
         let viewModel = ItemDetailViewModel()
         viewModel.itemObj = itemObj
 
-        if let img = itemObj?.image {
+        /*if let img = itemObj?.image {
             let new = GalleryImage(id:10, image: img, itemID: itemObj?.id)
             viewModel.itemObj?.galleryImages?.insert(new, at: 0)
-        }
+        }*/
         
         _objVM = StateObject(wrappedValue: viewModel)
         

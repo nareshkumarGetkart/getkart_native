@@ -193,8 +193,10 @@ class CreateAddDetailVC: UIViewController {
                                     self.tblView.endUpdates()
                                 }
                                 
-                                if index < (self.itemObj?.galleryImages?.count ?? 0) - 1{
-                                    self.downloadGalleryImages(index: index + 1)
+                                let index1 = index + 1
+                                if index1 < (self.itemObj?.galleryImages?.count ?? 0) {
+                                    
+                                    self.downloadGalleryImages(index:index1 )
                                 }
                             }
                         })
@@ -230,9 +232,7 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        if delete_item_image_id.count > 0 {
-            params["delete_item_image_id"] = delete_item_image_id.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
+        
         print(params)
         
         if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
@@ -284,10 +284,16 @@ class CreateAddDetailVC: UIViewController {
                     vc.gallery_imageNames = self.gallery_imageNames
                 }else {
                     
+                    if delete_item_image_id.count > 0 {
+                        params["delete_item_image_id"] = delete_item_image_id.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                    
                     if self.imgDataEditPost != imgData {
                         vc.imgData = self.imgData
                         vc.imgName = self.imgName
                     }
+                    
+                    //send only images that is updated by user
                     for ind in 0..<self.gallery_images.count{
                        let data = self.gallery_images[ind]
                         var found = false
@@ -296,6 +302,7 @@ class CreateAddDetailVC: UIViewController {
                                 
                                 if obj.imgData == data {
                                     found = true
+                                    break
                                 }
                             }
                         }
