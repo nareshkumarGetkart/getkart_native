@@ -24,7 +24,7 @@ class BuyingChatVC: UIViewController {
         return refreshControl
     }()
     
-    
+    var navController: UINavigationController? 
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -206,7 +206,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].sellerID ?? 0
-        self.navigationController?.pushViewController(destVC, animated: true)
+        self.navController?.pushViewController(destVC, animated: true)
     }
     
   

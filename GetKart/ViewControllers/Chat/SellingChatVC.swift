@@ -22,6 +22,7 @@ class SellingChatVC: UIViewController {
         refreshControl.tintColor = UIColor.systemYellow
         return refreshControl
     }()
+    var navController: UINavigationController? 
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -208,7 +209,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].buyerID ?? 0
-        self.navigationController?.pushViewController(destVC, animated: true)
+        self.navController?.pushViewController(destVC, animated: true)
     }
     
     

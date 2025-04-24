@@ -34,10 +34,12 @@ class ChatListVC: UIViewController {
         
         let peopleVC = StoryBoard.main.instantiateViewController(withIdentifier: "BuyingChatVC") as! BuyingChatVC
         peopleVC.title = "Buying"
+        peopleVC.navController = self.navigationController
         controllerArray.append(peopleVC)
         
         let premiumVC =  StoryBoard.main.instantiateViewController(withIdentifier: "SellingChatVC") as! SellingChatVC
         premiumVC.title = "Selling"
+        premiumVC.navController = self.navigationController
         controllerArray.append(premiumVC)
         
         // Customize page menu to your liking (optional) or use default settings by sending nil for 'options' in the init
