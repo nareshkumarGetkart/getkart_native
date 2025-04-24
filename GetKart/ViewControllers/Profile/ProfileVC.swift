@@ -18,6 +18,9 @@ class ProfileVC: UIViewController {
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
       
+    var verifiRejectedReason:String = ""
+    var verifiSttaus:String = ""
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +35,31 @@ class ProfileVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         self.tblView.reloadData()
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+            getVerificationStatusApi()
+        }
     }
+    
+    
+    func getVerificationStatusApi(){
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.verification_request, param: nil,methodType: .get) { responseObject, error in
+            
+            if error == nil{
+                
+                if let result = responseObject{
+                    
+                    if let data = result["data"] as? Dictionary<String, Any>{
+                        self.verifiRejectedReason = data["rejection_reason"] as? String ?? ""
+                        self.verifiSttaus = data["status"] as? String ?? ""
+                        self.tblView.reloadData()
 
+                    }
+                }
+                
+            }
+        }
+    }
 }
 
 
@@ -74,11 +100,31 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""))
                 cell.lblName.text =  objLoggedInUser.name ?? ""
                 cell.lblEmail.text =  objLoggedInUser.email ?? ""
+                cell.lblStatus.isHidden = true
+                cell.btnResubmit.isHidden = true
+
                 if (objLoggedInUser.is_verified ?? 0) == 1{
                     cell.btnGetVerifiedBadge.isHidden = true
+                    cell.bgViewVerified.isHidden = false
+                    
                 }else{
                     cell.btnGetVerifiedBadge.isHidden = false
-                    
+                    cell.bgViewVerified.isHidden = true
+                }
+                
+                if verifiSttaus.lowercased() == "pending"{
+                    cell.lblStatus.text = verifiSttaus.capitalized
+                    cell.lblStatus.backgroundColor = Themes.sharedInstance.themeColor
+                    cell.lblStatus.isHidden = false
+                    cell.btnResubmit.isHidden = true
+                    cell.btnGetVerifiedBadge.isHidden = true
+
+                }else if verifiSttaus.lowercased() == "rejected"{
+                    cell.lblStatus.text = verifiSttaus.capitalized
+                    cell.lblStatus.backgroundColor = UIColor.red
+                    cell.lblStatus.isHidden = false
+                    cell.btnResubmit.isHidden = false
+                    cell.btnGetVerifiedBadge.isHidden = true
                 }
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
                                 

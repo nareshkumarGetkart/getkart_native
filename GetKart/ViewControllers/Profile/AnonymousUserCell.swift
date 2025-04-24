@@ -19,10 +19,24 @@ class AnonymousUserCell: UITableViewCell {
     @IBOutlet weak var btnPencil:UIButton!
     @IBOutlet weak var imgVwProfile:UIImageView!
     @IBOutlet weak var btnGetVerifiedBadge:UIButton!
+        
+    @IBOutlet weak var btnResubmit:UIButton!
+    @IBOutlet weak var lblStatus:UILabel!
+    @IBOutlet weak var bgViewVerified:UIView!
+
+    
+
 
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        btnResubmit.layer.cornerRadius = 5.0
+        btnResubmit.clipsToBounds = true
+        
+        lblStatus.layer.cornerRadius = 5.0
+        lblStatus.clipsToBounds = true
+        
         btnGetVerifiedBadge.layer.cornerRadius = 5.0
         btnGetVerifiedBadge.clipsToBounds = true
         

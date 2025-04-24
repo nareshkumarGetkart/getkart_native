@@ -50,8 +50,37 @@
                                         <state key="normal" image="pencil"/>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="ITh-oJ-7ya">
-                                        <rect key="frame" x="90" y="14" width="210" height="72"/>
+                                        <rect key="frame" x="90" y="11.666666666666671" width="210" height="76.999999999999986"/>
                                         <subviews>
+                                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="agt-9I-fye">
+                                                <rect key="frame" x="0.0" y="-18" width="70" height="18"/>
+                                                <subviews>
+                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.seal.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m7S-vL-bT0">
+                                                        <rect key="frame" x="5" y="0.66666666666666607" width="15" height="16.333333333333336"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="15" id="O3d-rT-7M7"/>
+                                                            <constraint firstAttribute="height" constant="15" id="TKC-Q6-q0R"/>
+                                                        </constraints>
+                                                    </imageView>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="VERIFIED" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wNG-7D-EVE">
+                                                        <rect key="frame" x="22.666666666666675" y="1" width="46.333333333333343" height="16"/>
+                                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="10"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="bottom" secondItem="wNG-7D-EVE" secondAttribute="bottom" constant="1" id="0a7-Ob-RyZ"/>
+                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="top" secondItem="agt-9I-fye" secondAttribute="top" constant="1.5" id="A4W-BZ-LfA"/>
+                                                    <constraint firstAttribute="height" constant="18" id="LzL-EO-BZJ"/>
+                                                    <constraint firstItem="wNG-7D-EVE" firstAttribute="top" secondItem="agt-9I-fye" secondAttribute="top" constant="1" id="TDx-4I-AfX"/>
+                                                    <constraint firstAttribute="trailing" secondItem="wNG-7D-EVE" secondAttribute="trailing" constant="1" id="VKo-ep-GgI"/>
+                                                    <constraint firstItem="wNG-7D-EVE" firstAttribute="leading" secondItem="m7S-vL-bT0" secondAttribute="trailing" constant="2.5" id="WxW-bo-JMe"/>
+                                                    <constraint firstItem="m7S-vL-bT0" firstAttribute="leading" secondItem="agt-9I-fye" secondAttribute="leading" constant="5" id="bFb-QA-2jw"/>
+                                                    <constraint firstAttribute="width" constant="70" id="u4w-8r-2NI"/>
+                                                </constraints>
+                                            </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NkV-Zq-Hpb">
                                                 <rect key="frame" x="0.0" y="0.0" width="73" height="20"/>
                                                 <constraints>
@@ -81,6 +110,33 @@
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Get Verified Badge"/>
                                             </button>
+                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="9zc-fn-uqZ">
+                                                <rect key="frame" x="0.0" y="77" width="0.0" height="0.0"/>
+                                                <subviews>
+                                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rejected" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UBm-6C-9Vg">
+                                                        <rect key="frame" x="0.0" y="0.0" width="85" height="24"/>
+                                                        <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="24" id="KEJ-Up-ORQ"/>
+                                                            <constraint firstAttribute="width" constant="85" id="eKz-z1-Fqz"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7fg-4C-Gg2">
+                                                        <rect key="frame" x="0.0" y="0.0" width="85" height="24"/>
+                                                        <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="24" id="4EH-Ym-MZf"/>
+                                                            <constraint firstAttribute="width" constant="85" id="D49-XZ-hKW"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                        <state key="normal" title="Resubmit"/>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
                                         </subviews>
                                     </stackView>
                                 </subviews>
@@ -179,22 +235,26 @@
             <connections>
                 <outlet property="bgViewAnonymousUser" destination="Rx9-fn-NgR" id="49N-jq-3io"/>
                 <outlet property="bgViewLoggedInUser" destination="4jh-lf-5Qy" id="hi8-Xs-IQO"/>
+                <outlet property="bgViewVerified" destination="agt-9I-fye" id="aCA-Ta-Tum"/>
                 <outlet property="btnGetVerifiedBadge" destination="2ti-Mv-uIU" id="Dr9-6P-GBU"/>
                 <outlet property="btnLogin" destination="6gw-zu-0Cc" id="H82-1E-lCZ"/>
                 <outlet property="btnPencil" destination="TQv-7M-ksk" id="lSx-P8-pig"/>
+                <outlet property="btnResubmit" destination="7fg-4C-Gg2" id="Xzv-qP-Gs1"/>
                 <outlet property="imgVwProfile" destination="hdO-nu-wLd" id="vgj-LG-3m1"/>
                 <outlet property="lblEmail" destination="NLx-cz-HLM" id="9mh-Bk-LrY"/>
                 <outlet property="lblName" destination="NkV-Zq-Hpb" id="2yx-uX-9WG"/>
+                <outlet property="lblStatus" destination="UBm-6C-9Vg" id="172-DX-Nav"/>
             </connections>
             <point key="canvasLocation" x="116.03053435114504" y="23.239436619718312"/>
         </tableViewCell>
     </objects>
     <resources>
+        <image name="checkmark.seal.fill" catalog="system" width="128" height="124"/>
         <image name="delete_illustrator" width="255" height="255"/>
         <image name="no_data_found_illustrator" width="255" height="255"/>
         <image name="pencil" width="25" height="25"/>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

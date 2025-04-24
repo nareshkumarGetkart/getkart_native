@@ -425,6 +425,15 @@ final class Constant: NSObject {
     }
     
     
+    var verification_request:String{
+        get{
+            return "\(Constant.shared.baseURL)/verification-request"
+
+        }
+    }
+    
+    
+    
     
     
 }
