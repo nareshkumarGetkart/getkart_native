@@ -140,7 +140,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             let detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel))
             
             let hostingController = UIHostingController(rootView:detailView )
-            
+            hostingController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(hostingController, animated: true)
         }
     }

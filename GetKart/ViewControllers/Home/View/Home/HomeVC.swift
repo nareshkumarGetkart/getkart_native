@@ -292,6 +292,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
           let sectionObj =  homeVModel?.featuredObj?[tag]
            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
                destVC.obj = sectionObj
+               destVC.hidesBottomBarWhenPushed = true
                self.navigationController?.pushViewController(destVC, animated: true)
            }
        }

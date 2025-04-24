@@ -150,6 +150,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 
                 if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
                     destVC.popType = .categoriesSeeAll
+                    destVC.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }
                 return
@@ -161,15 +162,18 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 
                 let swiftUIView = SubCategoriesView(subcategories: obj?.subcategories, navigationController:  self.navigationController, strTitle: obj?.name ?? "",category_id:"\(obj?.id ?? 0)", category_ids:"\(obj?.id ?? 0)", popType: .categoriesSeeAll) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }else{
                 
                 let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? ""))
+                vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }else if cellTypes == .product{
             
             let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel)))
+            hostingController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(hostingController, animated: true)
         }
     }

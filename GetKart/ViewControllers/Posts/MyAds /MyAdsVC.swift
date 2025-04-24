@@ -241,7 +241,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         
         isClicked = true
         let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true))
-        
+        hostingController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
