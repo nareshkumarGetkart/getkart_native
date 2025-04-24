@@ -126,6 +126,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.btnResubmit.isHidden = false
                     cell.btnGetVerifiedBadge.isHidden = true
                 }
+                cell.btnResubmit.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
+                cell.lblStatus.isUserInteractionEnabled = true
+                cell.lblStatus.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(statusTapped)))
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
                                 
             }else{
@@ -279,6 +282,11 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
+    @objc func statusTapped(){
+        if verifiRejectedReason.count > 0{
+            AlertView.sharedManager.displayMessageWithAlert(title: "Rejected Reason", msg: verifiRejectedReason)
+        }
+    }
     
     func isUserLoggedInRequest() -> Bool {
         
