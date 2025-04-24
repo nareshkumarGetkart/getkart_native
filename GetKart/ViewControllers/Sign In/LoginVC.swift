@@ -15,7 +15,7 @@ enum SocialMediaLoginType{
 }
 
 class LoginVC: UIViewController {
-  
+    
     @IBOutlet weak var scrScrollView:UIScrollView!
     @IBOutlet weak var txtEmailPhone:UITextFieldX!
     @IBOutlet weak var btnCountryCode:UIButton!
@@ -30,9 +30,7 @@ class LoginVC: UIViewController {
     var socialEmail:String = ""
     var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
     
-    
     //MARK: Controller life cycle methods
-   
     override func viewDidLoad() {
         super.viewDidLoad()
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
@@ -58,12 +56,12 @@ class LoginVC: UIViewController {
             }
         }
     }
-
+    
     
     @IBAction func countruCodeButton(_ sender : UIButton){
         
         if let destVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "MobileCodeVC") as? MobileCodeVC{
-           
+            
             destVC.selectedCountryCallBack = { countryDic in
                 print(countryDic)
                 
@@ -77,7 +75,7 @@ class LoginVC: UIViewController {
     
     @objc func changedCharacters(textField: UITextField){
         guard let input = textField.text else { return }
-       // print(input)
+        // print(input)
         if txtEmailPhone.text?.count ?? 0 > 50 {
             lblCharCount.text = "50/50"
         }else {
@@ -85,12 +83,12 @@ class LoginVC: UIViewController {
         }
         
         /*if input.isNumeric == true {
-            txtEmailPhone.leftPadding = 50
-            btnCountryCode.isHidden = false
-        }else {
-            txtEmailPhone.leftPadding = 10
-            btnCountryCode.isHidden = true
-        }*/
+         txtEmailPhone.leftPadding = 50
+         btnCountryCode.isHidden = false
+         }else {
+         txtEmailPhone.leftPadding = 10
+         btnCountryCode.isHidden = true
+         }*/
     }
     
     @IBAction func skipButtonAction() {
@@ -112,7 +110,7 @@ class LoginVC: UIViewController {
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
             /*let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
-            self.navigationController?.pushViewController(vc, animated: true)
+             self.navigationController?.pushViewController(vc, animated: true)
              */
             self.sendOTPApi()
             
@@ -129,10 +127,10 @@ class LoginVC: UIViewController {
         var params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)"] as [String : Any]
         
         
-      
+        
         URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
-        
+            
             if(error != nil)
             {
                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
@@ -143,7 +141,7 @@ class LoginVC: UIViewController {
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-
+                
                 if status == 200{
                     
                     let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
@@ -166,7 +164,7 @@ class LoginVC: UIViewController {
         let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
         navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
-
+    
     
     @IBAction func termsAndCondition(_ sender : UIButton){
         
@@ -181,16 +179,11 @@ class LoginVC: UIViewController {
         let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
         navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
-
-    
-    
 }
+
 
 extension LoginVC:UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        
-        
-        
         return true
     }
 }
@@ -202,13 +195,13 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                 print("Error: ",error?.localizedDescription)
                 return }
             guard let signInResult = signInResult else { return }
-
+            
             let user = signInResult.user
             
             let gmailUserID = user.userID
             let emailAddress = user.profile?.email
             let fullName = user.profile?.name
-           // let givenName = user.profile?.givenName
+            // let givenName = user.profile?.givenName
             //let familyName = user.profile?.familyName
             //let profilePicUrl = user.profile?.imageURL(withDimension: 320)
             
@@ -216,12 +209,12 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             self.socialName = fullName ?? ""
             self.socialId = gmailUserID ?? ""
             self.loginType = .gmail
-           
-            self.signInUsingGmailorAppleApi()
             
+            self.signInUsingGmailorAppleApi()
         }
         
     }
+    
     
     
     func signInUsingGmailorAppleApi(){

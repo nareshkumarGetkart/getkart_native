@@ -29,7 +29,6 @@ struct MyBoostAdsView: View {
         
         VStack{
             
-            
             if obj.listArray.count == 0 {
                 
                 HStack{
@@ -44,13 +43,17 @@ struct MyBoostAdsView: View {
                 }
             }else{
                 ScrollView{
+                    HStack{Spacer()}.frame(height: 10)
+
                     LazyVStack{
                         ForEach(obj.listArray) { item in
-                            BoostAdsCell(itemObj:item).onTapGesture {
-                                
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
-                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-                            }
+                            BoostAdsCell(itemObj:item)
+                                .onTapGesture {
+                                    
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
+                                    hostingController.hidesBottomBarWhenPushed = true
+                                    self.navigation?.pushViewController(hostingController, animated: true)
+                                }
                         }
                     }
                     Spacer()
@@ -103,19 +106,23 @@ struct BoostAdsCell: View {
                     }.padding()
                 }
                 
-                Text("Residential floor").font(.custom("Manrope-Regular", size: 14.0)).multilineTextAlignment(.leading)
+                Text("Residential floor")
+                    .font(.custom("Manrope-Regular", size: 14.0))
+                    .multilineTextAlignment(.leading)
                 HStack{
-                    Image("location_icon").renderingMode(.template)
+                    Image("location_icon")
+                        .renderingMode(.template)
                         .foregroundColor(Color.gray)
                     Text(itemObj?.address ?? "" ).font(.custom("Manrope-Regular", size: 12.0)).foregroundColor(Color.gray)
                 }.padding(.bottom,15)
             }
-        }.background(Color.white).cornerRadius(10)
+        }.background(Color.white)
+            .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.gray, lineWidth: 0.5)
             )
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-            .padding(8)
+            .padding(.horizontal,8)
     }
 }

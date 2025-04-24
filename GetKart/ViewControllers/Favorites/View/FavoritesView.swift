@@ -44,11 +44,11 @@ struct FavoritesView: View {
                     Spacer()
                 }
             }else{
-                HStack{Spacer()}
                 
                 ScrollView {
                     
-                    HStack{  }.frame(height: 5)
+                    HStack{ Spacer() }.frame(height: 10)
+                    
                     LazyVStack(spacing: 10) {
                         ForEach(objVM.listArray) { item in
                             
@@ -147,7 +147,7 @@ struct FavoritesCell:View {
                 
             }
             
-        }.frame(height: 110)
+        }.frame(height: 115)
            // .padding()
             .background(Color.white).cornerRadius(15)
             .overlay(
