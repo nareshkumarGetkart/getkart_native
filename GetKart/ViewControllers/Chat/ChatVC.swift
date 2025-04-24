@@ -62,7 +62,7 @@ class ChatVC: UIViewController {
     var isDataLoading = true
     var userId = 0
     var itemId = 0
-    
+    var slug = ""
     
     var typingTimer: Timer?
     var isTyping = false
@@ -162,7 +162,7 @@ class ChatVC: UIViewController {
     
     @IBAction func productBtnAction(sender : UIButton){
         
-        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil))
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil, slug: slug))
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     

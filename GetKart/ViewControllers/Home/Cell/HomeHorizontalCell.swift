@@ -171,8 +171,8 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }else if cellTypes == .product{
-            
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel)))
+
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug))
             hostingController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(hostingController, animated: true)
         }

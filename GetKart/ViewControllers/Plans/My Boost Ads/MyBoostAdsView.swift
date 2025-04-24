@@ -48,7 +48,7 @@ struct MyBoostAdsView: View {
                         ForEach(obj.listArray) { item in
                             BoostAdsCell(itemObj:item).onTapGesture {
                                 
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true))
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
                                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                             }
                         }

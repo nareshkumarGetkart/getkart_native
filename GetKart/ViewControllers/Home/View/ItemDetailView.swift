@@ -15,6 +15,7 @@ struct ItemDetailView: View {
     var navController:UINavigationController?
     
      var itemId = 0
+     var slug = ""
     @State private var selectedIndex:Int?
     @StateObject  var objVM:ItemDetailViewModel
     @State private var showSheet = false
@@ -25,27 +26,24 @@ struct ItemDetailView: View {
     
  
     
-    init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false) {
+    init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false,slug:String?) {
         self.navController = navController
         self.itemId = itemId
+        self.slug = slug ?? ""
        // self.selectedIndex = selectedIndex
         
         let viewModel = ItemDetailViewModel()
         viewModel.itemObj = itemObj
 
-        /*if let img = itemObj?.image {
+        viewModel.galleryImgArray = itemObj?.galleryImages ?? []
+        
+        if let img = itemObj?.image {
             let new = GalleryImage(id:10, image: img, itemID: itemObj?.id)
-            viewModel.itemObj?.galleryImages?.insert(new, at: 0)
-        }*/
+            viewModel.galleryImgArray.insert(new, at: 0)
+        }
         
         _objVM = StateObject(wrappedValue: viewModel)
-        
-        
-        
-        //self.objVM.itemObj = itemObj
-      //  self.showSheet = showSheet
-//        self.showOfferPopup = showOfferPopup
-//        self.showShareSheet = showShareSheet
+    
         self.isMyProduct = isMyProduct
     }
 
@@ -91,14 +89,14 @@ struct ItemDetailView: View {
                 VStack(alignment: .leading) {
                     ZStack(alignment: .topTrailing) {
                     
-                        if  (objVM.itemObj?.galleryImages?.count ?? 0) > 0 {
+                        if  (objVM.galleryImgArray.count ?? 0) > 0 {
                             TabView(selection: $selectedIndex) {
                                 
-                                if let arr = objVM.itemObj?.galleryImages as? [GalleryImage], arr.count > 0{
+                                if objVM.galleryImgArray.count > 0{
                                     
-                                    ForEach(0..<arr.count){ index in
+                                    ForEach(0..<objVM.galleryImgArray.count){ index in
                                         
-                                        if  let img = arr[index].image {
+                                        if  let img = objVM.galleryImgArray[index].image {
                                             AsyncImage(url: URL(string: img)) { image in
                                                 image
                                                     .resizable()
@@ -361,7 +359,7 @@ struct ItemDetailView: View {
                             ProductCard(objItem: item)
                            
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0,itemObj: item))
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navController, itemId:item.id ?? 0,itemObj: item, slug: item.slug))
                                     self.navController?.pushViewController(hostingController, animated: true)
                                 }
                         }
@@ -376,7 +374,7 @@ struct ItemDetailView: View {
             
             
             if objVM.itemObj == nil{
-                objVM.getItemDetail(id: self.itemId)
+                objVM.getItemDetail(id: self.itemId,slug:self.slug)
 
             }else{
                 if objVM.sellerObj == nil {
@@ -638,7 +636,7 @@ struct ItemDetailView: View {
     func navigateToPager(){
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex ?? 0
-        vc.imageArrayUrl = objVM.itemObj?.galleryImages ?? []
+        vc.imageArrayUrl = objVM.galleryImgArray
         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
     }
 
@@ -662,7 +660,7 @@ struct ItemDetailView: View {
 
 
 #Preview {
-    ItemDetailView(navController:nil,itemId:0, itemObj: nil,isMyProduct:false)
+    ItemDetailView(navController:nil,itemId:0, itemObj: nil,isMyProduct:false, slug: "")
 }
 
 

@@ -137,7 +137,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         if cellTypes == .product{
             
             
-            let detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel))
+            let detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug)
             
             let hostingController = UIHostingController(rootView:detailView )
             hostingController.hidesBottomBarWhenPushed = true

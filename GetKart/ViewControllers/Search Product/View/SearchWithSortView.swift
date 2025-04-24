@@ -182,10 +182,9 @@ struct SearchWithSortView: View {
     }
     
     func pushToDetailScreen(id:Int,item:ItemModel){
-        let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,itemObj: item, isMyProduct:false)
+        let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
          let hostController = UIHostingController(rootView: destView)
          AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
-         
     }
 }
 

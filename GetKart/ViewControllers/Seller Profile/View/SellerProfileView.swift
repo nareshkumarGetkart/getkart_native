@@ -171,7 +171,7 @@ struct SellerProfileView: View {
                        // ProductCard(id: item.id ?? 0, imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 10,item.isLiked)
                             .onTapGesture {
                                 
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true))
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
                                 AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                             }
                     }

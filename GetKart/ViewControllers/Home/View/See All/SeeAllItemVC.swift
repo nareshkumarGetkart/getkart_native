@@ -82,7 +82,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(objViewModel?.listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: objViewModel?.listArray?[indexPath.item]))
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(objViewModel?.listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: objViewModel?.listArray?[indexPath.item], slug: objViewModel?.listArray?[indexPath.item].slug))
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     

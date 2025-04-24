@@ -53,7 +53,7 @@
                                         <rect key="frame" x="90" y="11.666666666666671" width="210" height="77"/>
                                         <subviews>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="agt-9I-fye">
-                                                <rect key="frame" x="0.0" y="-18" width="65" height="18"/>
+                                                <rect key="frame" x="0.0" y="-18" width="70" height="18"/>
                                                 <subviews>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.seal.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m7S-vL-bT0">
                                                         <rect key="frame" x="0.0" y="-0.66666666666666785" width="18" height="19.333333333333336"/>
@@ -63,7 +63,7 @@
                                                         </constraints>
                                                     </imageView>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="VERIFIED" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wNG-7D-EVE">
-                                                        <rect key="frame" x="20.666666666666675" y="1" width="43.333333333333343" height="16"/>
+                                                        <rect key="frame" x="20.666666666666675" y="1" width="48.333333333333343" height="16"/>
                                                         <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="11"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -78,7 +78,7 @@
                                                     <constraint firstAttribute="trailing" secondItem="wNG-7D-EVE" secondAttribute="trailing" constant="1" id="VKo-ep-GgI"/>
                                                     <constraint firstItem="wNG-7D-EVE" firstAttribute="leading" secondItem="m7S-vL-bT0" secondAttribute="trailing" constant="2.5" id="WxW-bo-JMe"/>
                                                     <constraint firstItem="m7S-vL-bT0" firstAttribute="leading" secondItem="agt-9I-fye" secondAttribute="leading" id="bFb-QA-2jw"/>
-                                                    <constraint firstAttribute="width" constant="65" id="u4w-8r-2NI"/>
+                                                    <constraint firstAttribute="width" constant="70" id="u4w-8r-2NI"/>
                                                 </constraints>
                                             </view>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NkV-Zq-Hpb">

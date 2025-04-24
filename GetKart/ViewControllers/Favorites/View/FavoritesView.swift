@@ -55,7 +55,7 @@ struct FavoritesView: View {
                             FavoritesCell(itemObj: item)
                                 .onTapGesture {
                                     
-                                    let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0,itemObj: item)
+                                    let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
                                     let hostingController = UIHostingController(rootView:destView )
                                     AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                                 }

@@ -52,7 +52,7 @@ struct AddPostSuccessView: View {
             // Preview Ad Button
             // NavigationLink(destination: PreviewAdView(), isActive: $navigateToPreview) {
             Button(action: {
-                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemObj?.id ?? 0, itemObj: itemObj))
+                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemObj?.id ?? 0, itemObj: itemObj, slug: itemObj?.slug))
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }) {
                 Text("Preview Ad")

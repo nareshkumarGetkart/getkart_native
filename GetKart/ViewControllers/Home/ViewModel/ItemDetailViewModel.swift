@@ -11,6 +11,7 @@ import SwiftUI
 
 class ItemDetailViewModel:ObservableObject{
     
+    @Published var galleryImgArray = [GalleryImage]()
     @Published var sellerObj:SellerModel?
     @Published var relatedDataItemArray = [ItemModel]()
     @Published var itemObj:ItemModel?
@@ -21,10 +22,12 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
-    func getItemDetail(id:Int){
+    func getItemDetail(id:Int,slug:String){
         
-        let strUrl = Constant.shared.get_item + "?id=\(id)"
-        
+        var strUrl = Constant.shared.get_item + "?id=\(id)"
+        if slug.count > 0{
+            strUrl = Constant.shared.get_item + "?slug=\(slug)"
+        }
         if isMyProduct == false{
             
             ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SingleItemParse) in
@@ -33,6 +36,11 @@ class ItemDetailViewModel:ObservableObject{
                     
                     if let item  =  obj.data?.first{
                         self.itemObj = item
+                        self.galleryImgArray = item.galleryImages ?? []
+                        if let img = self.itemObj?.image {
+                            let new = GalleryImage(id:10, image: img, itemID: self.itemObj?.id)
+                            self.galleryImgArray.insert(new, at: 0)
+                        }
                         self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0)
                         self.setItemTotalApi()
