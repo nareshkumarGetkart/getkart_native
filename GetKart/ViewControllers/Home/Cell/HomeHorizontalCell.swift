@@ -15,7 +15,8 @@ class HomeHorizontalCell: UITableViewCell {
     @IBOutlet weak var btnSeeAll:UIButton!
     @IBOutlet weak var bgViewSeeAll:UIView!
     @IBOutlet weak var cnstrntHeightSeeAllView:NSLayoutConstraint!
-
+    var navigationController: UINavigationController?
+    
     var cellTypes:CellType?{
         didSet{
             if cnstrntHeightSeeAllView.constant == 0{
@@ -149,7 +150,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 
                 if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
                     destVC.popType = .categoriesSeeAll
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                    self.navigationController?.pushViewController(destVC, animated: true)
                 }
                 return
             }
@@ -158,18 +159,18 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
 
             if obj?.subcategories?.count ?? 0 > 0 {
                 
-                let swiftUIView = SubCategoriesView(subcategories: obj?.subcategories, navigationController:  AppDelegate.sharedInstance.navigationController, strTitle: obj?.name ?? "",category_id:"\(obj?.id ?? 0)", category_ids:"\(obj?.id ?? 0)", popType: .categoriesSeeAll) // Create SwiftUI view
+                let swiftUIView = SubCategoriesView(subcategories: obj?.subcategories, navigationController:  self.navigationController, strTitle: obj?.name ?? "",category_id:"\(obj?.id ?? 0)", category_ids:"\(obj?.id ?? 0)", popType: .categoriesSeeAll) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                self.navigationController?.pushViewController(hostingController, animated: true)
             }else{
                 
-                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:AppDelegate.sharedInstance.navigationController, categoryName: obj?.name ?? ""))
-                AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? ""))
+                self.navigationController?.pushViewController(vc, animated: true)
             }
         }else if cellTypes == .product{
             
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel)))
-            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel)))
+            self.navigationController?.pushViewController(hostingController, animated: true)
         }
     }
   

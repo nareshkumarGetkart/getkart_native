@@ -53,7 +53,7 @@ struct ItemDetailView: View {
         
         HStack{
             Button {
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                self.navController?.popViewController(animated: true)
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
                 

@@ -33,7 +33,7 @@ class HomeTblCell: UITableViewCell {
     var cellTypes:CellType?
     var listArray:[Any]?
     var istoIncreaseWidth = false
-    
+    var navigationController: UINavigationController?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -137,12 +137,12 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         if cellTypes == .product{
             
             
-            let detailView = ItemDetailView(navController: AppDelegate.sharedInstance.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel))
+            let detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel))
             
             let hostingController = UIHostingController(rootView:detailView )
             
-            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
-        }        
+            self.navigationController?.pushViewController(hostingController, animated: true)
+        }
     }
     
     

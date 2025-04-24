@@ -47,18 +47,15 @@ class HomeVC: UIViewController {
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
-        
-        
-     
-        let vc = UIHostingController(rootView: CountryLocationView(popType: .home, navigationController: self.navigationController))
+           let vc = UIHostingController(rootView: CountryLocationView(popType: .home, navigationController: self.navigationController))
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
     
 }
     
     @IBAction func searchBtnAction(_ sender : UIButton){
-        let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController)) // Wrap in UIHostingController
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     @IBAction func micBtnAction(_ sender : UIButton){
@@ -69,8 +66,8 @@ class HomeVC: UIViewController {
     @IBAction func filterBtnAction(_ sender : UIButton){
         
         
-        let hostingController = UIHostingController(rootView: SearchProductView(navigation:AppDelegate.sharedInstance.navigationController,navigateToFilterScreen: true))
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: false)
+        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
+        self.navigationController?.pushViewController(hostingController, animated: false)
         
     }
     
@@ -91,8 +88,6 @@ class HomeVC: UIViewController {
         homeVModel?.getFeaturedListApi()
         let locStr = city + ", " + state + ", " + country
         self.lblAddress.text = locStr
-       
-        
     }
 }
 
@@ -177,7 +172,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.collctnView.updateConstraints()
             cell.collctnView.reloadData()
             cell.updateConstraints()
-
+            cell.navigationController = self.navigationController
             return cell
             
         }else if indexPath.section == 2{
@@ -198,6 +193,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.collctnView.reloadData()
                 cell.btnSeeAll.tag = indexPath.section + indexPath.row
                 cell.btnSeeAll.addTarget(self, action: #selector(selectedSeeAll(_ :)), for: .touchUpInside)
+                cell.navigationController = self.navigationController
                 return cell
                 
             }else if (obj?.style == "style_2"){
@@ -218,6 +214,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.collctnView.reloadData()
                 cell.btnSeeAll.tag = indexPath.section + indexPath.row
                 cell.btnSeeAll.addTarget(self, action: #selector(selectedSeeAll(_ :)), for: .touchUpInside)
+                cell.navigationController = self.navigationController
                 return cell
                 
             }else if (obj?.style == "style_3"){
@@ -238,6 +235,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.updateConstraints()
                 cell.btnSeeAll.tag = indexPath.section + indexPath.row
                 cell.btnSeeAll.addTarget(self, action: #selector(selectedSeeAll(_ :)), for: .touchUpInside)
+                cell.navigationController = self.navigationController
                 return cell
                 
             }else if (obj?.style == "style_4"){
@@ -257,7 +255,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.collctnView.reloadData()
                 cell.btnSeeAll.tag = indexPath.section + indexPath.row
                 cell.btnSeeAll.addTarget(self, action: #selector(selectedSeeAll(_ :)), for: .touchUpInside)
-
+                cell.navigationController = self.navigationController
                 return cell
                 
             }
@@ -276,7 +274,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.cllctnView.updateConstraints()
             cell.cllctnView.reloadData()
             cell.updateConstraints()
-
+            cell.navigationController = self.navigationController
             return cell
         }
     }
@@ -290,7 +288,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
           let sectionObj =  homeVModel?.featuredObj?[tag]
            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
                destVC.obj = sectionObj
-               AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+               self.navigationController?.pushViewController(destVC, animated: true)
            }
        }
 
