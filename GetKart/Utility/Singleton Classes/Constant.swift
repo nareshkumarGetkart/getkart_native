@@ -521,18 +521,20 @@ enum MediaShareType{
 
 class ShareMedia{
     
-    static var profileUrl = "https://dl.getkart.com/profile/"
-    static var itemUrl = "https://dl.getkart.com/item/"
+    static var profileUrl = "https://getkart.com/seller/"
+    static var itemUrl = "https://getkart.com/product-details/"
 
+    
+    
   
     
     static func shareMediafrom(type:MediaShareType,mediaId:String,controller:UIViewController){
         
-        var baseUrl =  "https://dl.getkart.com"
+        var baseUrl =  "https://getkart.com"
       
         if type == .profile{
             
-            baseUrl = "\(baseUrl)/profile/\(mediaId)"
+            baseUrl = "\(baseUrl)/seller/\(mediaId)"
             print("Deep link ==\(baseUrl)")
             let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
             let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
@@ -541,7 +543,9 @@ class ShareMedia{
             
         }else if type == .item{
             
-            baseUrl = "\(baseUrl)/item/\(mediaId)"
+            baseUrl = "\(baseUrl)/product-details/\(mediaId)?share=true"
+            
+
             
             print("Deep link ==\(baseUrl)")
             let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
