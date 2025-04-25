@@ -123,9 +123,23 @@ class CreateAddVC2: UIViewController {
     @IBAction func nextButtonAction (){
         showErrorMsg = false
         for objCustomField in dataArray {
-            if objCustomField.customFieldRequired == 1 && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
+            if objCustomField.customFieldRequired == 1{
+                if objCustomField.type == .fileinput  {
+                    let imgData =  customFieldFiles["\(objCustomField.id ?? 0)"] as? Data
+                    if imgData == nil {
+                        showErrorMsg = true
+                        break
+                    }
+                    
+                }else if (objCustomField.type == .checkbox ||  objCustomField.type == .radio || objCustomField.type == .dropdown) &&  objCustomField.value?.count == 0 {
                     showErrorMsg = true
-                }
+                    break
+                    
+                }else if (objCustomField.type == .textbox ||  objCustomField.type == .number) && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
+                showErrorMsg = true
+                break
+            }
+            }
            
         }
         
@@ -199,22 +213,19 @@ class CreateAddVC2: UIViewController {
     }
     
     func isValidInput(objCustomField:CustomField)->Bool{
-        if objCustomField.customFieldRequired == 1 {
-            if objCustomField.type == .fileinput {
-                if let imgData =  customFieldFiles["\(objCustomField.id ?? 0)"] as? Data {
-                    if imgData.count == 0 {
-                        return false
-                    }
-                }
-            }else if objCustomField.type  == .dropdown || objCustomField.type  == .checkbox || objCustomField.type  == .radio{
-                if objCustomField.value?.count == 0{
+        if objCustomField.customFieldRequired == 1{
+            if objCustomField.type == .fileinput  {
+                let imgData =  customFieldFiles["\(objCustomField.id ?? 0)"] as? Data
+                if imgData == nil {
                     return false
                 }
                 
-            }else  if (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count > objCustomField.maxLength ?? 0) {
+            }else if (objCustomField.type == .checkbox ||  objCustomField.type == .radio || objCustomField.type == .dropdown) &&  objCustomField.value?.count == 0 {
+                return false
+                
+            }else if (objCustomField.type == .textbox ||  objCustomField.type == .number) && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
                 return false
             }
-            
         }
         return true
     }
