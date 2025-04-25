@@ -23,7 +23,10 @@ struct ItemDetailView: View {
     @State private var showShareSheet = false
     @State var isMyProduct = false
     @State private var showConfirmDialog = false
-
+    // Declare callback function variable
+    var returnValue: ((_ value: ItemModel?)->())?
+    
+    
     init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false,slug:String?) {
         self.navController = navController
         self.itemId = itemId
@@ -638,6 +641,7 @@ struct ItemDetailView: View {
     private var headerBar: some View {
         HStack {
             Button {
+                returnValue?(objVM.itemObj)
                 self.navController?.popViewController(animated: true)
             } label: {
                 Image("arrow_left").renderingMode(.template)

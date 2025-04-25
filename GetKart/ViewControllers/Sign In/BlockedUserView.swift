@@ -41,10 +41,14 @@ struct BlockedUserView: View {
                     AsyncImage(url: URL(string: obj.profile ?? "")) { image in
                         image
                             .resizable()
-                            .frame(width: 60,height: 60).cornerRadius(30)
                             .aspectRatio(contentMode: .fit)
+                            .frame(width: 60,height: 60)
+                            .cornerRadius(30)
+                            .aspectRatio(contentMode: .fit).padding(8)
                         
-                    }placeholder: { Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 60,height: 60).cornerRadius(30)}
+                    }placeholder: { Image("getkartplaceholder")
+                        .resizable().aspectRatio(contentMode: .fit)
+                        .frame(width: 60,height: 60).cornerRadius(30).padding(8)}
                     
                     Text(obj.name ?? "").foregroundColor(.black).font(Font.manrope(.regular, size: 16.0))
                     Spacer()

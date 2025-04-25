@@ -55,7 +55,16 @@ struct FavoritesView: View {
                             FavoritesCell(itemObj: item)
                                 .onTapGesture {
                                     
-                                    let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
+                                    var destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
+                                    
+                                  destView.returnValue = { value in
+                                      /*  let index = objVM.listArray.firstIndex { existObj in
+                                            existObj.id == value.id
+                                        }
+                                        objVM.listArray[index]  = value
+                                  */
+                                   }
+                                 
                                     let hostingController = UIHostingController(rootView:destView )
                                     AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
                                 }
