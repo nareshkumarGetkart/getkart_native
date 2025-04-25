@@ -55,33 +55,7 @@ struct ItemDetailView: View {
                 ZStack(alignment: .topTrailing) {
                     
                     if  (objVM.galleryImgArray.count) > 0 {
-                        
-                      /*  TabView(selection: $selectedIndex) {
-                            
-                            if objVM.galleryImgArray.count > 0{
-                                
-                                ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
-                                    
-                                    if  let img = objVM.galleryImgArray[index].image {
-                                        AsyncImage(url: URL(string: img)) { image in
-                                            image
-                                                .resizable()
-                                            //.aspectRatio(contentMode: .fit)
-                                                .frame(height: 200)
-                                                .cornerRadius(10).padding(.horizontal,5)
-                                                .tag(index).onTapGesture {
-                                                    navigateToPager()
-                                                }
-                                            
-                                        }placeholder: { ProgressView().progressViewStyle(.circular) }
-                                    }
-                                }
-                            }
-                            
-                        }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .always)).tint(.orange).cornerRadius(10)
-                            .frame(width:widthScreen-20, height: 200)
-                        */
-                        
+                      
                         VStack(spacing: 10) {
                             TabView(selection: $selectedIndex) {
                                 ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
@@ -294,20 +268,6 @@ struct ItemDetailView: View {
                         self.navController?.pushViewController(hostingController, animated: true)
                     } .frame(height: 200)
                         .cornerRadius(10)
-                    
-                 /*   MapView(latitude: lat, longitude: lon, address: objVM.itemObj?.address ?? "")
-                        .frame(height: 200)
-                        .cornerRadius(10)
-                        .gesture(DragGesture())
-                        .padding(.bottom)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            
-                            let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
-                            let hostingController = UIHostingController(rootView: swiftUIview)
-                            self.navController?.pushViewController(hostingController, animated: true)
-                        }// Prevent scroll hijack
-                    */
                 }
                 
                 

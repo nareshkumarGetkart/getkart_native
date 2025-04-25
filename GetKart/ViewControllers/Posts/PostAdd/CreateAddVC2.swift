@@ -488,8 +488,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 objCustomField.value?.append(str)
             }
             
-           
-
         }else if objCustomField.type == .checkbox {
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
                 if let index = objCustomField.value?.firstIndex{$0 == objCustomField.values?[clnCell]} {

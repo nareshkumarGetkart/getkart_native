@@ -549,7 +549,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.txtField.text = params[AddKeys.video_link.rawValue] as? String ?? ""
-            if showErrorMsg == true {
+           /* if showErrorMsg == true {
                 if (params[AddKeys.video_link.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
@@ -561,7 +561,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 cell.lblErrorMsg.isHidden = true
                 cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
-            
+            */
             return cell
         }
         return UITableViewCell()

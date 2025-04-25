@@ -87,7 +87,7 @@ struct ConfirmLocationCreateAdd: View {
             Button(action: {
              postNowAction()
             }) {
-                Text("Post Now")
+                Text(popType == .createPost ? "Post Now" : "Update")
                     .foregroundColor(.white)
                     .font(.system(size: 16, weight: .bold))
                     .frame(maxWidth: .infinity)

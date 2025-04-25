@@ -81,6 +81,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
         if objData?.type == .checkbox {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
+            print("CheckBox objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
@@ -99,6 +100,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
         }else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
+            print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
