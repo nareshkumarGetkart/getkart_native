@@ -37,12 +37,14 @@ class LoginVC: UIViewController {
         txtEmailPhone.maxLength = 50
         txtEmailPhone.text = ""
         txtEmailPhone.leftPadding = 50
+        txtEmailPhone.delegate = self
         self.fetChAndSetInitialCodeFromLocale()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)
+        
     }
     
     func fetChAndSetInitialCodeFromLocale(){
@@ -80,6 +82,12 @@ class LoginVC: UIViewController {
             lblCharCount.text = "50/50"
         }else {
             lblCharCount.text = "\(txtEmailPhone.text?.count ?? 0)/50"
+        }
+        
+        if  txtEmailPhone.text!.hasPrefix( self.countryCode) == true {
+            if txtEmailPhone.text!.count >  self.countryCode.count {
+                txtEmailPhone.text  = String(txtEmailPhone.text!.dropFirst( self.countryCode.count).trimmingCharacters(in: .whitespacesAndNewlines))
+            }
         }
         
         /*if input.isNumeric == true {
@@ -124,11 +132,10 @@ class LoginVC: UIViewController {
     
     func sendOTPApi(){
         
-        var params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)"] as [String : Any]
+        let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)"] as [String : Any]
         
         
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
             
             
             if(error != nil)
@@ -183,12 +190,31 @@ class LoginVC: UIViewController {
 
 
 extension LoginVC:UITextFieldDelegate {
+   
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        // Current text in the text field
+          let currentText = textField.text ?? ""
+          
+          // Construct the new text after applying the replacement
+          if let stringRange = Range(range, in: currentText) {
+              let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+              
+              if updatedText.count <  5{
+                  self.btnContinueLogin.backgroundColor = UIColor.gray
+
+              }else{
+                  self.btnContinueLogin.backgroundColor = UIColor.orange
+
+              }
+          }
+        
         return true
     }
 }
 
 extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+   
     @IBAction func loginWithGoogleButton(_ sender : UIButton){
         GIDSignIn.sharedInstance.signIn(withPresenting: self) { signInResult, error in
             guard error == nil else {

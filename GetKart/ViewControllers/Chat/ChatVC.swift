@@ -111,7 +111,7 @@ class ChatVC: UIViewController {
         textView.maxNumberOfLines = 5
         textView.delegate = self
         addObservers()
-        getUserInfo()
+       // getUserInfo()
         getItemOfferId()
         getMessageList()
         self.btnSend.isHidden = true

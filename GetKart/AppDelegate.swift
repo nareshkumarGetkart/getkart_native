@@ -105,6 +105,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
+        print(" UIApplication, continue userActivity")
+        
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
+            
+            let myUrl: String? = userActivity.webpageURL?.absoluteString
+            let urlArray = myUrl?.components(separatedBy: "/")
+          
+            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+            if objLoggedInUser.token != nil {
+                
+                if myUrl?.range(of: "/seller/") != nil {
+                    
+                    let userId = urlArray?.last ?? ""
+                    //https://getkart.com/seller/213619
+                   // self.sharedProfileID = userId
+                    if Constant.shared.isLaunchFirstTime == 0{
+                        // self.showsharedProfileInfo()
+                    }else{
+                        
+                    }
+                    let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0))
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                    
+                }else  if myUrl?.range(of: "/product-details/") != nil {
+                    
+                    let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
+                    
+                   // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
+                    
+                    //self.sharedProfileID = userId
+                    if Constant.shared.isLaunchFirstTime == 0{
+                        // self.showsharedProfileInfo()
+                    }else{
+                        
+                    }
+                    
+                    let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
+                    let hostingController = UIHostingController(rootView:siftUIview)
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                }
+
+            }
+        }else{
+            
+        }
+        return true
+    }
     
     func checkSocketStatus(){
         

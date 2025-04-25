@@ -13,14 +13,22 @@ class OTPViewController: UIViewController {
     @IBOutlet weak var txtOtp:UITextFieldX!
     var countryCode = ""
     var mobile = ""
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         lblMobileNo.text = countryCode + mobile
         // Do any additional setup after loading the view.
     }
     
+    
     @IBAction func changeAction(){
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @IBAction func skipBtnAction(){
+        if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     @IBAction func signInAction(){

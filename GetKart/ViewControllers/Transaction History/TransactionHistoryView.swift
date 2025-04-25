@@ -32,23 +32,36 @@ struct TransactionHistoryView: View {
         
         
         VStack{
-            
-            ScrollView {
-                HStack{ Spacer() }.frame(height: 5)
-                VStack(spacing: 15) {
-                    ForEach(transactions, id:\.id) { transaction in
-                      
-                        TransactionRow(transaction: transaction).background(Color.white)
-                            .cornerRadius(10)
-                            .shadow(radius: 2).onTapGesture {
-                                let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transaction, navController: self.navigation))
-                                self.navigation?.pushViewController(hostView, animated: true)
-                            }
+            if transactions.count == 0 {
+                
+                HStack{
+                    Spacer()
+                    VStack(spacing: 30){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }else{
+                
+                ScrollView {
+                    HStack{ Spacer() }.frame(height: 5)
+                    VStack(spacing: 15) {
+                        ForEach(transactions, id:\.id) { transaction in
+                            
+                            TransactionRow(transaction: transaction).background(Color.white)
+                                .cornerRadius(10)
+                                .shadow(radius: 2).onTapGesture {
+                                    let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transaction, navController: self.navigation))
+                                    self.navigation?.pushViewController(hostView, animated: true)
+                                }
+                        }
                     }
                 }
+                Spacer()
             }
-            
-            Spacer()
                         
         }.padding([.leading,.trailing],10).background(Color(.systemGray6)).onAppear{
             getTransactionHistory()

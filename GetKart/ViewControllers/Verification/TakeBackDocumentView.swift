@@ -94,10 +94,13 @@ struct TakeBackDocumentView: View {
                     }
                     
                     Button("Next") {
+                        
                         if let img1 = frontImage{
                             
                             if let img2 = capturedBackImage{
-                                
+                                if  let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view  {
+                                    Themes.sharedInstance.activityView(uiView:  topView)
+                                }
                                 if let mergeimg = mergeImages(img1, img2){
                                     
                                     if let selfie = selfieImage{
@@ -164,6 +167,10 @@ struct TakeBackDocumentView: View {
     }
     
     func mergeImages(_ firstImage: UIImage, _ secondImage: UIImage) -> UIImage? {
+//        
+//         let view =  self.navigation?.topViewController?.view ?? UIView()
+//        Themes.sharedInstance.activityView(uiView: view)
+        
         let size = CGSize(
             width: max(firstImage.size.width, secondImage.size.width),
             height: firstImage.size.height + secondImage.size.height
@@ -181,7 +188,7 @@ struct TakeBackDocumentView: View {
 
         let mergedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-
+     //   Themes.sharedInstance.removeActivityView(uiView: view)
         return mergedImage
     }
 

@@ -93,55 +93,65 @@ class HomeBaseVC: UITabBarController {
     }
     
     
-        @objc func middleButtonTapped() {
-            print("Middle button tapped!")
-            // Handle action (e.g., present a modal view)
-            if isUserLoggedInRequest(){
+    @objc func middleButtonTapped() {
+        print("Middle button tapped!")
+        // Handle action (e.g., present a modal view)
+        if isUserLoggedInRequest(){
+            
+            
+            let url = Constant.shared.getLimits + "?package_type=item_listing"
+            
+            URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
                 
-               
-                let url = Constant.shared.getLimits + "?package_type=item_listing"
                 
-                URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
+                if(error != nil)
+                {
+                    //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                    print(error ?? "defaultValue")
                     
-                
-                    if(error != nil)
-                    {
-                        //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
-                        print(error ?? "defaultValue")
+                }else{
+                    
+                    let result = responseObject! as NSDictionary
+                    let status = result["code"] as? Int ?? 0
+                    let message = result["message"] as? String ?? ""
+                    
+                    if status == 200{
                         
-                    }else{
                         
-                        let result = responseObject! as NSDictionary
-                        let status = result["code"] as? Int ?? 0
-                        let message = result["message"] as? String ?? ""
-
-                        if status == 200{
-                            
-                            
-                            if let selectedVC =  self?.selectedViewController as? UINavigationController {
-                                print(selectedVC)
-                                if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-                                    destVC.hidesBottomBarWhenPushed = true
-                                    destVC.popType = .createPost
-                                    selectedVC.pushViewController(destVC, animated: true)
-                                    
-                                }
+                        if let selectedVC =  self?.selectedViewController as? UINavigationController {
+                            print(selectedVC)
+                            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                                destVC.hidesBottomBarWhenPushed = true
+                                destVC.popType = .createPost
+                                selectedVC.pushViewController(destVC, animated: true)
                                 
                             }
                             
-                            
-                        }else{
-                            //self?.delegate?.showError(message: message)
                         }
                         
+                        
+                    }else{
+                        
+                        AlertView.sharedManager.presentAlertWith(title: "No Package Available", msg: "Please subscribe to any packages to use this functionality", buttonTitles: ["Cancel","Subscribe"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
+                            
+                            if index == 1{
+                                if let selectedVC =  self?.selectedViewController as? UINavigationController {
+                                    
+                                    if  let destVC = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
+                                        destVC.hidesBottomBarWhenPushed = true
+                                        selectedVC.pushViewController(destVC, animated: true)
+                                    }
+                                }
+                            }
+                        }
                     }
+                    
                 }
-               
-                
-                
             }
-          
+            
         }
+        
+    }
     
     
     

@@ -189,6 +189,8 @@ class ItemDetailViewModel:ObservableObject{
         }
     }
     
+
+    
 }
 
 

@@ -96,7 +96,7 @@ class URLhandler: NSObject{
                     if  let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
                         
                         print("------",topView)
-                        Themes.sharedInstance.activityView(uiView:  topView)
+                        Themes.sharedInstance.activityView(uiView: topView)
                         
                     }
                 }
@@ -145,7 +145,6 @@ class URLhandler: NSObject{
         }else {
             //AlertView.sharedManager.showToast(message: "No Network Connection")
             //(AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
-
         }
     }
     
@@ -507,7 +506,11 @@ class URLhandler: NSObject{
                     if mediaKeyArray.count > i {
                         keyStr = "\(mediaName)[\(mediaKeyArray[i])]"
                     }
-                    if let data = img.jpegData(compressionQuality: 1.0) {
+                    print(keyStr)
+                    
+                    if let data = img.wxCompress().jpegData(compressionQuality: 1.0) {
+
+                   // if let data = img.jpegData(compressionQuality: 0.7) {
                         multipartFormData.append(data, withName: keyStr, fileName: "\(mediaName).jpeg", mimeType: "image/jpeg")
                     }
                     i = i + 1

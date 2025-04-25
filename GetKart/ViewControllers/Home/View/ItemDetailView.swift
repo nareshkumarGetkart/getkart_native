@@ -9,6 +9,7 @@ import SwiftUI
 import MapKit
 import Foundation
 import SVGKit
+import MessageUI
 
 struct ItemDetailView: View {
     
@@ -22,7 +23,7 @@ struct ItemDetailView: View {
     @State private var showShareSheet = false
     @State var isMyProduct = false
     @State private var showConfirmDialog = false
-        
+
     init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false,slug:String?) {
         self.navController = navController
         self.itemId = itemId
@@ -244,7 +245,7 @@ struct ItemDetailView: View {
                // }.padding(.vertical,1)
                 
                 Divider()
-                 SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "")
+                SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "")
                     .onTapGesture {
                     
                     let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
@@ -726,7 +727,9 @@ struct SellerInfoView: View {
     let name: String
     let email: String
     let image: String
-    
+    let mobile: String
+    @State private var showMessageView = false
+
     var body: some View {
         VStack(alignment: .leading) {
             
@@ -761,6 +764,7 @@ struct SellerInfoView: View {
                 
                 HStack{
                     Button {
+                        showMessageView = true
                         
                     } label: {
                         Image("message").renderingMode(.template).foregroundColor(.orange)
@@ -771,7 +775,7 @@ struct SellerInfoView: View {
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
 
                     Button {
-                        
+                        callToSellerMobileNumber()
                     } label: {
                         Image("call").renderingMode(.template).foregroundColor(.orange)
                     }.frame(width: 40,height: 40).overlay(
@@ -788,6 +792,24 @@ struct SellerInfoView: View {
                     }.frame(width: 20,height: 20)
 
                 }.padding(.leading)
+            }
+        }.sheet(isPresented: $showMessageView) {
+            if MFMessageComposeViewController.canSendText() {
+                MessageView(recipients: [mobile], body: "")
+            } else {
+                Text("This device can't send SMS.")
+            }
+        }
+    }
+
+    
+    
+    func callToSellerMobileNumber(){
+        if let url = URL(string: "tel://\(mobile)"), UIApplication.shared.canOpenURL(url) {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url)
+            } else {
+                UIApplication.shared.openURL(url)
             }
         }
     }
@@ -837,4 +859,41 @@ struct PinnedMapView: View {
 struct MapPinItem: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
+}
+
+
+
+
+struct MessageView: UIViewControllerRepresentable {
+    @Environment(\.presentationMode) var presentation
+    var recipients: [String]
+    var body: String
+
+    class Coordinator: NSObject, MFMessageComposeViewControllerDelegate {
+        var parent: MessageView
+
+        init(_ parent: MessageView) {
+            self.parent = parent
+        }
+
+        func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+            controller.dismiss(animated: true) {
+                self.parent.presentation.wrappedValue.dismiss()
+            }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(self)
+    }
+
+    func makeUIViewController(context: Context) -> MFMessageComposeViewController {
+        let vc = MFMessageComposeViewController()
+        vc.messageComposeDelegate = context.coordinator
+        vc.recipients = recipients
+        vc.body = body
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: MFMessageComposeViewController, context: Context) {}
 }
