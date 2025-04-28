@@ -238,7 +238,6 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             
             self.signInUsingGmailorAppleApi()
         }
-        
     }
     
     

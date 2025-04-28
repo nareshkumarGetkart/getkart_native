@@ -106,7 +106,6 @@ struct SellerProfileView: View {
                         .cornerRadius(40)
                 }
                 
-                
                 Text(objVM.sellerObj?.name ?? "")
                     .font(.custom("Manrope-Medium", size: 16.0))
                 Spacer()
@@ -168,21 +167,34 @@ struct SellerProfileView: View {
                     ForEach(objVM.itemArray) { item in
                         
                         ProductCard(objItem: item)
-                       // ProductCard(id: item.id ?? 0, imageName: item.image ?? "", price: "₹\(item.price ?? 0)", title:item.name ?? "", location: item.address ?? "").frame(width: widthScreen/2.0 - 10,item.isLiked)
-                            .onTapGesture {
+                           
+                            .onAppear {
                                 
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
-                                AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                                if let lastItem = objVM.itemArray.last, lastItem.id == item.id, !objVM.isDataLoading {
+                                    objVM.getItemListApi(sellerId: userId)
+                                }
+                            }
+                            .onTapGesture {
+                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
+                                self.navController?.pushViewController(hostingController, animated: true)
                             }
                     }
                 }.padding(.horizontal,10)
-               
+                
+                if objVM.isDataLoading {
+                    ProgressView()
+                    .padding()
+                }
+                
             }.background(Color(.systemGray6))
+           
             
         }.navigationBarHidden(true)
         .onAppear{
-            objVM.getSellerProfile(sellerId: userId)
-            objVM.getItemListApi(sellerId: userId)
+            if objVM.itemArray.count == 0{
+                objVM.getSellerProfile(sellerId: userId)
+                objVM.getItemListApi(sellerId: userId)
+            }
         }
         
     

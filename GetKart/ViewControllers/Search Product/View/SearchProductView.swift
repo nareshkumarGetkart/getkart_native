@@ -83,8 +83,8 @@ struct SearchProductView: View {
                     ForEach(items) { item in
                        // ItemRow(item: item)
                         FavoritesCell(itemObj: item).onTapGesture {
-                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:false, slug: item.slug))
-                            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:false, slug: item.slug))
+                            self.navigation?.pushViewController(hostingController, animated: true)
                         }
 
                     }
@@ -100,8 +100,18 @@ struct SearchProductView: View {
                     return Color.clear
                 }
                 .frame(height: 1)
+                
+                if isDataLoading {
+                    ProgressView()
+                    .padding()
+                }
             }
-        }.background(Color(UIColor.systemGray6)).navigationBarHidden(true).onAppear {
+            
+            
+
+        }.background(Color(UIColor.systemGray6))
+            .navigationBarHidden(true)
+            .onAppear {
             
             if (navigateToFilterScreen){
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
@@ -115,14 +125,14 @@ struct SearchProductView: View {
             }
         }
         .onChange(of: isAtBottom) { atBottom in
-                    if atBottom {
-                        print("Scrolled to bottom!")
-                        // You can trigger your 'load more' logic here
-                        if isDataLoading == false {
-                            self.getProductListApi(searchTxt: searchText)
-                        }
-                    }
+            if atBottom {
+                print("Scrolled to bottom!")
+                // You can trigger your 'load more' logic here
+                if isDataLoading == false {
+                    self.getProductListApi(searchTxt: searchText)
                 }
+            }
+        }
 
     }
     
@@ -149,7 +159,7 @@ struct SearchProductView: View {
         if searchTxt.count > 0{
             strUrl.append("&search=\(searchTxt)")
         }
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:ItemParse) in
 
             if self.page == 1{
                 self.items = obj.data?.data ?? []
@@ -158,7 +168,7 @@ struct SearchProductView: View {
                 self.items.append(contentsOf: (obj.data?.data)!)
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                 self.isDataLoading = false
                 self.page = (self.page) + 1
             })

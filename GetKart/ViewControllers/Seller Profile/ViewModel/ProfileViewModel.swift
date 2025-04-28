@@ -6,28 +6,60 @@
 //
 
 import Foundation
+import SwiftUICore
 
 
 class ProfileViewModel:ObservableObject{
     
     @Published var sellerObj:Seller?
     @Published var itemArray = [ItemModel]()
-    var isDataLoading = true
+    @Published var isDataLoading = false
     var page = 1
-    
+    var canLoadMorePages = true
+
     init(){
         
     }
     
+
+    
+    func loadMoreContentIfNeeded(currentItem item: ItemModel?) {
+//        guard let item = item else {
+//            getItemListApi(sellerId:sellerObj?.id ?? 0)
+//            return
+//        }
+//        
+
+        let thresholdIndex = itemArray.index(itemArray.endIndex, offsetBy: -1)
+        if  item?.id == thresholdIndex {
+
+//        if itemArray.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
+            getItemListApi(sellerId:sellerObj?.id ?? 0)
+        }
+    }
+    
+    
+    
     func getItemListApi(sellerId:Int){
+        
+        guard !isDataLoading && canLoadMorePages else { return }
+
         isDataLoading = true
         
-        let strUrl = "\(Constant.shared.get_item)?user_id=\(sellerId)?page=\(page)"
+        let strUrl = "\(Constant.shared.get_item)?user_id=\(sellerId)&page=\(page)"
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
-            self?.isDataLoading = false
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
             if (obj.code ?? 0) == 200 {
-                self?.itemArray = obj.data?.data ?? []
+                self?.itemArray.append(contentsOf: obj.data?.data ?? [])
+               
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self?.page += 1
+                    self?.isDataLoading = false
+                    self?.canLoadMorePages = (obj.data?.data ?? []).count > 0
+               }
+            }else{
+                self?.isDataLoading = false
+                self?.canLoadMorePages = false
             }
         }
     }
@@ -94,5 +126,14 @@ class ProfileViewModel:ObservableObject{
                 AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
             }
         }
+    }
+}
+
+
+struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
