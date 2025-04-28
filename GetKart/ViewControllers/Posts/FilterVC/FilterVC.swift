@@ -16,7 +16,7 @@ class FilterVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var btnBack:UIButton!
-
+    
     var latitude:String = ""
     var longitude:String = ""
     var city:String = ""
@@ -36,8 +36,8 @@ class FilterVC: UIViewController {
     var posted_since:Dictionary<String,String> = [:]
     var objViewModel:CustomFieldsViewModel?
     var delFilterSelected:FilterSelected?
-   
-
+    
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +47,7 @@ class FilterVC: UIViewController {
             self.dataArray.append(obj)
         }
         
-       // self.dataArray.append(contentsOf: [CustomField(),CustomField(),CustomField(),CustomField()])
+        // self.dataArray.append(contentsOf: [CustomField(),CustomField(),CustomField(),CustomField()])
         btnBack.setImageColor(color: .black)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
@@ -70,14 +70,14 @@ class FilterVC: UIViewController {
     deinit{
         print("dinit called")
     }
-
+    
     
     //MARK: UIButton Action Methods
     @IBAction  func backButtonAction(_ sender : UIButton){
         
         if isPushedFromHome{
             self.navigationController?.popToRootViewController(animated: true)
-
+            
         }else{
             self.navigationController?.popViewController(animated: true)
         }
@@ -128,6 +128,7 @@ class FilterVC: UIViewController {
         
     }
     
+    
     @objc func selectLocationAction (_ sender:UIButton){
         if sender.tag == 0 {
             self.fetchCountryListing()
@@ -144,15 +145,15 @@ class FilterVC: UIViewController {
     
     
     func fetchCountryListing(){
-       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .filter, navigationController: self.navigationController))
-           self.navigationController?.pushViewController(vc, animated: true)
-       }
-   }
+            let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .filter, navigationController: self.navigationController))
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double = 0.0) {
-
+        
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
@@ -166,10 +167,10 @@ class FilterVC: UIViewController {
     @objc func showCategoriesVC(){
         if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
             destVC.popType = .filter
-            AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+            self.navigationController?.pushViewController(destVC, animated: true)
         }
     }
-
+    
 }
 
 extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDelegate, DropDownSelectionDelegate, TextFieldDoneDelegate {

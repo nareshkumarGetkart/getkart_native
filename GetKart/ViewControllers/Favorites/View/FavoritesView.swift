@@ -13,36 +13,15 @@ struct FavoritesView: View {
     @StateObject var objVM = FavoriteViewModel()
     
     var body: some View {
-        HStack {
-            
-            Button(action: {
-                // Action to go back
-                navigation?.popViewController(animated: true)
-            }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
-            }
-            Text("Favorites").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
-            
-            Spacer()
-        }.frame(height: 44)
         
+        HeaderView(navigation:navigation).frame(height: 44)
         
         VStack{
             
             if objVM.listArray.count == 0 {
+            
+                NoDataView()
                 
-                HStack{
-                    Spacer()
-                    VStack(spacing: 30){
-                        Spacer()
-                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
-                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
-                        Spacer()
-                    }
-                    Spacer()
-                }
             }else{
                 
                 ScrollView {
@@ -55,28 +34,20 @@ struct FavoritesView: View {
                             FavoritesCell(itemObj: item)
                                 .onTapGesture {
                                     
-                                    var destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
-                                    
-                                  destView.returnValue = { value in
-                                      /*  let index = objVM.listArray.firstIndex { existObj in
-                                            existObj.id == value.id
+                                   var destView = ItemDetailView(navController:  self.navigation, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
+                                    destView.returnValue = { value in
+                                        if let obj = value {
+                                            updateItemInList(obj)
                                         }
-                                        objVM.listArray[index]  = value
-                                  */
-                                   }
-                                 
+                                    }
                                     let hostingController = UIHostingController(rootView:destView )
-                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+                                    self.navigation?.pushViewController(hostingController, animated: true)
+                                  
                                 }
                                 .onAppear{
                                     
-                                    if let obj = objVM.listArray.last {
-                                        
-                                        if obj.id == item.id {
-                                            if !objVM.isDataLoading {
-                                                objVM.getFavoriteHistory()
-                                            }
-                                        }
+                                    if let lastItem = objVM.listArray.last, lastItem.id == item.id, !objVM.isDataLoading {
+                                        objVM.getFavoriteHistory()
                                     }
                                 }
                         }
@@ -95,6 +66,13 @@ struct FavoritesView: View {
                 }
             }
     }
+    
+    private func updateItemInList(_ value: ItemModel) {
+        if let index = objVM.listArray.firstIndex(where: { $0.id == value.id }) {
+            objVM.listArray.remove(at: index)
+        }
+    }
+
 }
 
 
@@ -204,5 +182,40 @@ struct RoundedCorner: Shape {
             cornerRadii: CGSize(width: radius, height: radius)
         )
         return Path(path.cgPath)
+    }
+}
+
+struct NoDataView: View {
+    var body: some View {
+        HStack{
+            Spacer()
+            VStack(spacing: 30){
+                Spacer()
+                Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                Spacer()
+            }
+            Spacer()
+        }
+    }
+}
+
+struct HeaderView: View {
+   var navigation:UINavigationController?
+    var body: some View {
+        HStack{
+            
+            Button(action: {
+                // Action to go back
+                navigation?.popViewController(animated: true)
+            }) {
+                Image("arrow_left").renderingMode(.template)
+                    .foregroundColor(.black).padding()
+            }
+            Text("Favorites").font(.custom("Manrope-Bold", size: 20.0))
+                .foregroundColor(.black)
+            
+            Spacer()
+        }
     }
 }

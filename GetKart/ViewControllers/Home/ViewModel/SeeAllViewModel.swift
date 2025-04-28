@@ -26,7 +26,7 @@ class SeeAllViewModel{
        // let params = ["featured_section_id":self.itemId,"page":page,"_total_api_calls":1] as [String : Any]
         
         
-        let strUrl = "\(Constant.shared.get_item)?featured_section_id=\(self.itemId)?page=\(page)?_total_api_calls=1"
+        let strUrl = "\(Constant.shared.get_item)?featured_section_id=\(self.itemId)&page=\(page)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
         

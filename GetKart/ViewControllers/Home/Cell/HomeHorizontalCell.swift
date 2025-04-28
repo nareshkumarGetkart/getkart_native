@@ -23,15 +23,15 @@ class HomeHorizontalCell: UITableViewCell {
                 btnSeeAll.setTitle("", for: .normal)
             }else{
                 btnSeeAll.setTitle("See All", for: .normal)
-
+                
             }
         }
     }
     weak var delegateUpdate: CollectionTableViewCellDelegate?
     var istoIncreaseWidth = false
-
+    
     var listArray:[Any]?
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -40,22 +40,20 @@ class HomeHorizontalCell: UITableViewCell {
         self.collctnView.delegate = self
         self.collctnView.dataSource = self
     }
-
- 
     
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
     }
     
     override func layoutSubviews() {
-            super.layoutSubviews()
-            DispatchQueue.main.async {
-               // self.delegateUpdate?.didUpdateCollectionViewHeight()
-            }
+        super.layoutSubviews()
+        DispatchQueue.main.async {
+            // self.delegateUpdate?.didUpdateCollectionViewHeight()
         }
+    }
     
 }
 

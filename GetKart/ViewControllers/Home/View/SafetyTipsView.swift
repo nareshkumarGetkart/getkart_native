@@ -49,8 +49,6 @@ struct SafetyTipsView: View {
                     presentationMode.wrappedValue.dismiss()
                     onContinueOfferTap?()
 
-
-
                 }
                 .frame(maxWidth: .infinity)
                 .padding()

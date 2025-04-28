@@ -120,7 +120,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
+        if indexPath.section == 1{
+            return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 135 : 0
+        }
         if indexPath.section == 2{
             if let obj = homeVModel?.featuredObj?[indexPath.item]{
                 if (obj.style == "style_1") || (obj.style == "style_2") || (obj.style == "style_4"){
@@ -307,7 +309,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
         
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 250)
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 300)
         {
             if scrollView == tblView{
                 if homeVModel?.isDataLoading == false{
@@ -325,7 +327,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         //self.tblView.invalidateIntrinsicContentSize()
         if ( self.homeVModel?.page ?? 0) > 1{
             self.tblView.reloadData()
-            tblView.reloadSections(IndexSet(integer: 3), with: .none)
+            //tblView.reloadSections(IndexSet(integer: 3), with: .none)
 
         }else{
             self.tblView.reloadData()

@@ -98,7 +98,7 @@ class ItemDetailViewModel:ObservableObject{
             
             if error == nil {
                 
-                self.itemObj?.isLiked?.toggle()
+                self.itemObj?.isLiked = !(self.itemObj?.isLiked ?? false)
             }
         }
     }
@@ -148,11 +148,10 @@ class ItemDetailViewModel:ObservableObject{
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
-                if status == 200{
-                    
+                if status == 200 {
+                    self.itemObj?.isFeature = true
                     nav?.popToRootViewController(animated: true)
                     AlertView.sharedManager.showToast(message: message)
-
                 }
             }
         }

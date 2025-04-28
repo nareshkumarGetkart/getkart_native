@@ -83,13 +83,13 @@ struct ItemModel: Codable,Identifiable {
    // let featuredItems: [JSONAny]?
     let favourites: [Favourite]?
     let area: Int?
-    let isFeature: Bool?
+    var isFeature: Bool?
     let totalLikes: Int?
     var isLiked: Bool?
     let customFields: [CustomField]?
-    let isAlreadyOffered, isAlreadyReported: Bool?
+    var isAlreadyOffered, isAlreadyReported: Bool?
     let isPurchased: Int?
-    let itemOffers:[ItemOffers]?
+    var itemOffers:[ItemOffers]?
     
     enum CodingKeys: String, CodingKey {
         case id, name, slug, description, price, image

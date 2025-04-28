@@ -137,8 +137,13 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         if cellTypes == .product{
             
             
-            let detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug)
-            
+            var detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug)
+            detailView.returnValue = { value in
+               if let obj = value{
+                   self.listArray?[indexPath.item] = obj
+                   self.cllctnView.reloadItems(at: [indexPath])
+               }
+           }
             let hostingController = UIHostingController(rootView:detailView )
             hostingController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(hostingController, animated: true)

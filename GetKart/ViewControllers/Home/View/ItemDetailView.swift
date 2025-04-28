@@ -55,7 +55,7 @@ struct ItemDetailView: View {
         Divider()
    
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading) {
+            LazyVStack(alignment: .leading) {
                 ZStack(alignment: .topTrailing) {
                     
                     if  (objVM.galleryImgArray.count) > 0 {
@@ -319,11 +319,8 @@ struct ItemDetailView: View {
                         )
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                         .padding(.top, 5)
-                    
                 }
-                
-                
-                
+           
                 HStack{
                     
                     Text("Related Ads").foregroundColor(.black).font(Font.manrope(.semiBold, size: 16))
@@ -336,23 +333,27 @@ struct ItemDetailView: View {
                         ForEach(objVM.relatedDataItemArray) { item in
                             ProductCard(objItem: item)
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(
-                                        rootView: ItemDetailView(
-                                            navController: self.navController,
-                                            itemId: item.id ?? 0,
-                                            itemObj: item,
-                                            slug: item.slug
-                                        )
+                                    var swiftUIview = ItemDetailView(
+                                        navController: self.navController,
+                                        itemId: item.id ?? 0,
+                                        itemObj: item,
+                                        slug: item.slug
                                     )
+                                    swiftUIview.returnValue = { value in
+                                        if let obj = value {
+                                            updateItemInList(obj)
+                                        }
+                                    }
+                                    let hostingController = UIHostingController(rootView:swiftUIview)
                                     self.navController?.pushViewController(hostingController, animated: true)
                                 }
                         }
                     }
                    .padding([.bottom])
                 }
-            }.padding(.horizontal)
+            }.padding(.vertical).padding(.horizontal)
+               
         }
-
         .navigationBarHidden(true)
         .onAppear{
             
@@ -387,16 +388,29 @@ struct ItemDetailView: View {
                 }else if (objLoggedInUser.id ?? 0) == seller_id{
                     userId = buyer_id
                 }
+                objVM.itemObj?.isAlreadyOffered = true
+                objVM.itemObj?.itemOffers = [ ItemOffers(amount: objVM.itemObj?.price, buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
                 
                 let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                 destVC.item_offer_id = id
                 destVC.userId = userId
-                AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                self.navController?.pushViewController(destVC, animated: true)
                 
             }
         }
         
-        .sheet(isPresented: $showSheet ) {
+        .sheet(isPresented: $showSheet) {
+            // Always present the same view
+            SafetyTipsView(onContinueOfferTap: {
+                print("offer tap")
+                self.showOfferPopup = true
+            })
+            // Apply detents and drag indicator only if iOS 16+
+            .modifier(PresentationModifier())
+        }
+
+        
+      /*  .sheet(isPresented: $showSheet ) {
             if #available(iOS 16.0, *) {
                 SafetyTipsView(onContinueOfferTap: {
                     print("offer tap")
@@ -412,20 +426,19 @@ struct ItemDetailView: View {
             } else {
                 // Fallback on earlier versions
                 
-                if showSheet {
+               // if showSheet {
                     SafetyTipsView(onContinueOfferTap: {
                         
                         self.showOfferPopup = true
                         
-                        
                         print("offer tap")
                     }).transition(.move(edge: .bottom))
-                        .zIndex(1)
-                }
+                    .zIndex(1)
+              //  }
             } // Shows the drag indicator
         }
         
-        
+        */
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         let loggedInUserId = objLoggedInUser.id ?? 0
         let itemUserId = objVM.itemObj?.userID ?? 0
@@ -531,7 +544,7 @@ struct ItemDetailView: View {
                     let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                     destVC.item_offer_id = offerId
                     destVC.userId = userId
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                    self.navController?.pushViewController(destVC, animated: true)
                     
                 }else{
                     showSheet = true
@@ -616,7 +629,7 @@ struct ItemDetailView: View {
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex ?? 0
         vc.imageArrayUrl = objVM.galleryImgArray
-        AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true )
+        self.navController?.pushViewController(vc, animated: true )
     }
     
     
@@ -675,6 +688,12 @@ struct ItemDetailView: View {
         .frame(height: 44)
     }
 
+    private func updateItemInList(_ value: ItemModel) {
+        if let index = $objVM.relatedDataItemArray.firstIndex(where: { $0.id == value.id }) {
+            objVM.relatedDataItemArray[index] = value
+        }
+    }
+    
 }
 
 
@@ -859,6 +878,19 @@ struct PinnedMapView: View {
         }
     }
 }
+
+struct PresentationModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        } else {
+            content // No special presentation on iOS 15
+        }
+    }
+}
+
 
 struct MapPinItem: Identifiable {
     let id = UUID()
