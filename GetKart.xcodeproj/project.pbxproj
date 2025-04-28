@@ -10,6 +10,7 @@
 		3DD94E8A219D44CBC3AA72EA /* Pods_GetKart_GetKartUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB4D58A109A701922F4D0C8B /* Pods_GetKart_GetKartUITests.framework */; };
 		6AE453B1F127079F0F4AD085 /* Pods_GetKartTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10AF66AABABDE70EC7A62259 /* Pods_GetKartTests.framework */; };
 		85FE66C9649FF7422A0B18A6 /* Pods_GetKart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31AF086879086023C131EF0C /* Pods_GetKart.framework */; };
+		F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0B996062DBF51DD003335EB /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		B92DA463BB18958E7F69DDBD /* Pods-GetKartTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKartTests.debug.xcconfig"; path = "Target Support Files/Pods-GetKartTests/Pods-GetKartTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CB4D58A109A701922F4D0C8B /* Pods_GetKart_GetKartUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKart_GetKartUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D657BBB643C746512145FC9F /* Pods-GetKart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart.release.xcconfig"; path = "Target Support Files/Pods-GetKart/Pods-GetKart.release.xcconfig"; sourceTree = "<group>"; };
+		F0B996062DBF51DD003335EB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F0EA7EE72D65D9CF0026815A /* GetKart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GetKart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0EA7EFD2D65D9D40026815A /* GetKartTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GetKartTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0EA7F072D65D9D40026815A /* GetKartUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GetKartUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */,
 				85FE66C9649FF7422A0B18A6 /* Pods_GetKart.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,6 +110,7 @@
 		210FA789654A04C183C245F4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F0B996062DBF51DD003335EB /* StoreKit.framework */,
 				31AF086879086023C131EF0C /* Pods_GetKart.framework */,
 				CB4D58A109A701922F4D0C8B /* Pods_GetKart_GetKartUITests.framework */,
 				10AF66AABABDE70EC7A62259 /* Pods_GetKartTests.framework */,

@@ -387,6 +387,13 @@ final class Constant: NSObject {
     }
     
     
+    
+    var in_app_purchase:String{
+        get {
+            return "\(Constant.shared.baseURL)/in-app-purchase"
+        }
+    }
+    
     var get_following:String{
         get {
             return "\(Constant.shared.baseURL)/get-following"
