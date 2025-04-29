@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct StateLocationView: View {
+struct StateLocationView: View, LocationSelectedDelegate {
     var navigationController: UINavigationController?
     @State var arrStates:Array<StateModal> = []
     var strTitle:String = ""
@@ -19,6 +19,7 @@ struct StateLocationView: View {
    // @State var isNewPost = false
     //@State var isFilterList = false
     @State var popType:PopType?
+    var delLocationSelected:LocationSelectedDelegate!
     var body: some View {
         
         VStack(spacing: 0) {
@@ -91,6 +92,22 @@ struct StateLocationView: View {
             
             // MARK: - List of Countries
             ScrollView{
+                if popType == .filter {
+                    CountryRow(strTitle:"All in \(country.name ?? "")")
+                        .frame(height: 40)
+                        .padding(.horizontal)
+                        .onTapGesture{
+                            self.allStatesSelected()
+                        }
+                }else {
+                    CountryRow(strTitle:"Choose State")
+                        .frame(height: 40)
+                        .padding(.horizontal)
+                        .onTapGesture{
+                        }
+                }
+                Divider()
+                
                 
                 //ForEach(0..<arrStates.count){ index in
                 //let state = arrStates[index]
@@ -149,13 +166,73 @@ struct StateLocationView: View {
        }
    }
     
-    func NavigateToCityListing(state:StateModal){
+    
+    func allStatesSelected() {
         
-        let vc = UIHostingController(rootView: CityLocationView(navigationController: self.navigationController,country: country, state: state, popType: self.popType))
+        if popType == .home || popType == .signUp{
+            
+            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? ""  , timezone: "")
+        }
+        
+        for vc in self.navigationController?.viewControllers ?? [] {
+          
+            if popType == .buyPackage {
+                
+                    if let vc1 = vc as? CategoryPlanVC  {
+                        delLocationSelected?.savePostLocation(latitude:"", longitude:"",  city:"", state:"", country:self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else if popType == .filter {
+                
+                    if let vc1 = vc as? FilterVC  {
+                        delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city: "", state: "", country: self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                
+            }else  if popType == .createPost {
+                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                    delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: self.country.name ?? "")
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+                
+            }else if popType == .signUp {
+                
+                if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            } else  if popType == .home {
+                
+                if vc.isKind(of: HomeVC.self) == true {
+                    if let vc1 = vc as? HomeVC {
+                        
+                        delLocationSelected?.savePostLocation(latitude: "", longitude:"",  city:"", state: "", country: self.country.name ?? "")
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                   
+                }
+            }
+        }
+    }
+    
+    func NavigateToCityListing(state:StateModal){
+        var rootView = CityLocationView(navigationController: self.navigationController,country: country, state: state, popType: self.popType)
+        rootView.delLocationSelected = self
+        let vc = UIHostingController(rootView: rootView)
            self.navigationController?.pushViewController(vc, animated: true)
            
        
    }
+    
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+        delLocationSelected?.savePostLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
+    }
+    
 }
 
 

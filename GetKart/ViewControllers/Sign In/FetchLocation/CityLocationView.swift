@@ -25,6 +25,7 @@ struct CityLocationView: View {
    // @State var isFilterList = false
     
     @State var popType:PopType?
+    var delLocationSelected:LocationSelectedDelegate!
     
     var body: some View {
         
@@ -90,6 +91,25 @@ struct CityLocationView: View {
             // MARK: - List of Countries
             ScrollView{
                 LazyVStack {
+                    if popType == .filter {
+                        CountryRow(strTitle:"All in \(state.name ?? "")")
+                            .frame(height: 40)
+                            .padding(.horizontal)
+                        
+                            .onTapGesture{
+                                
+                                self.citySelected(city: CityModal())
+                            }
+                    }else {
+                        CountryRow(strTitle:"Choose City")
+                            .frame(height: 40)
+                            .padding(.horizontal)
+                        
+                            .onTapGesture{
+                            }
+                    }
+                    Divider()
+                    
                     ForEach(arrCities) { city in
                         CountryRow(strTitle:city.name ?? "")
                             .frame(height: 40)
@@ -134,11 +154,11 @@ struct CityLocationView: View {
            
        }
    }
+   
     
     func citySelected(city:CityModal) {
         
         if popType == .home || popType == .signUp{
-            
             Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
         }
         
@@ -147,7 +167,7 @@ struct CityLocationView: View {
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        delLocationSelected?.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -155,7 +175,7 @@ struct CityLocationView: View {
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        delLocationSelected?.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -164,7 +184,7 @@ struct CityLocationView: View {
                 
                
                 if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
-                    vc1.rootView.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                    delLocationSelected?.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
@@ -181,7 +201,7 @@ struct CityLocationView: View {
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
                         
-                        vc1.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                        delLocationSelected?.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }

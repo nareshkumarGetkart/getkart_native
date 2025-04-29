@@ -157,6 +157,7 @@ class LoginVC: UIViewController {
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }else{
                     //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.showToast(message: message)
                 }
                 
             }

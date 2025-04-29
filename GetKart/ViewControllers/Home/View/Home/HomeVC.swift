@@ -8,7 +8,7 @@
 import UIKit
 import SwiftUI
 
-class HomeVC: UIViewController {
+class HomeVC: UIViewController, LocationSelectedDelegate {
    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
@@ -47,7 +47,9 @@ class HomeVC: UIViewController {
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
-           let vc = UIHostingController(rootView: CountryLocationView(popType: .home, navigationController: self.navigationController))
+        var rootView = CountryLocationView(popType: .home, navigationController: self.navigationController)
+        rootView.delLocationSelected = self
+           let vc = UIHostingController(rootView:rootView)
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
     

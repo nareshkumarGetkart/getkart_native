@@ -16,7 +16,7 @@ struct SelectLocationRangeView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
-    @State  var locationManager = LocationManager()
+    //@State  var locationManager = LocationManager()
     @State var popType:PopType?
     
     
@@ -27,6 +27,7 @@ struct SelectLocationRangeView: View {
     @State private var range: Double = 1.0
     @State private var range1: Double = 1000.0
     @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
+    var delLocationSelected:LocationSelectedDelegate!
     var body: some View {
        
         
@@ -134,8 +135,8 @@ struct SelectLocationRangeView: View {
             Spacer()
         }.onAppear{
             
-            locationManager.delegate = self
-            locationManager.checkLocationAuthorization()
+            LocationManager.sharedInstance.delegate = self
+            LocationManager.sharedInstance.checkLocationAuthorization()
         }
     }
     
@@ -148,7 +149,7 @@ struct SelectLocationRangeView: View {
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -156,7 +157,7 @@ struct SelectLocationRangeView: View {
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, range: self.range1)
+                        delLocationSelected?.savePostLocationWithRange(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country, range: self.range1)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -164,11 +165,11 @@ struct SelectLocationRangeView: View {
             }else  if popType == .createPost {
                 
                
-                /*if vc.isKind(of: UIHostingController<ConfirmLocationCreateAdd>.self) == true{
+                if vc.isKind(of: UIHostingController<ConfirmLocationCreateAdd>.self) == true{
                    
-                        vc.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(self.locationManager.longitude)",  city:self.locationManager.city ?? "", state:self.locationManager.state ?? "", country:self.locationManager.country ?? "")
+                    delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
                         self.navigationController?.popToViewController(vc, animated: true)
-                }*/
+                }
                 break
                 
             }else if popType == .signUp {
@@ -182,7 +183,7 @@ struct SelectLocationRangeView: View {
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
-                        vc1.savePostLocation(latitude:"\(locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
                         
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
@@ -199,27 +200,27 @@ struct SelectLocationRangeView: View {
 
 extension SelectLocationRangeView :LocationAutorizationUpdated {
     func locationAuthorizationUpdate() {
-        if locationManager.manager.authorizationStatus == .authorizedAlways  ||  locationManager.manager.authorizationStatus == .authorizedWhenInUse {
-            if let coordinate = locationManager.lastKnownLocation {
+        if LocationManager.sharedInstance.manager.authorizationStatus == .authorizedAlways  ||  LocationManager.sharedInstance.manager.authorizationStatus == .authorizedWhenInUse {
+            if let coordinate = LocationManager.sharedInstance.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")
                 print("Longitude: \(coordinate.longitude)")
                 
                 if popType == .home || popType == .signUp{
                     
-                    Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country, timezone: locationManager.timezone)
+                    Local.shared.saveUserLocation(city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country, timezone: LocationManager.sharedInstance.timezone)
                 }
                 
                 print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
                 
-                locationManager.delegate = nil
+                LocationManager.sharedInstance.delegate = nil
                 
-                mapRegion.center =  locationManager.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                mapRegion.center =  LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
                 mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 
                 locationInfo = Local.shared.getUserCity() + "," + Local.shared.getUserState() + "," + Local.shared.getUserCountry()
-                circle = MKCircle(center: locationManager.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), radius: (range1) as CLLocationDistance)
+                circle = MKCircle(center: LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), radius: (range1) as CLLocationDistance)
                 
-                selectedCoordinate = locationManager.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                selectedCoordinate = LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
                 
                 
             } else {

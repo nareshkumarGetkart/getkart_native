@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MapKit
 
-struct ConfirmLocationCreateAdd: View {
+struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     
     
     @State var imgData:Data?
@@ -109,7 +109,9 @@ struct ConfirmLocationCreateAdd: View {
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .createPost, navigationController: self.navigationController))
+           var rootView = CountryLocationView(arrCountries: arrCountry, popType: .createPost, navigationController: self.navigationController)
+           rootView.delLocationSelected = self
+           let vc = UIHostingController(rootView:rootView)
            self.navigationController?.pushViewController(vc, animated: true)
            
        }
@@ -125,16 +127,16 @@ struct ConfirmLocationCreateAdd: View {
    
     
      func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
-        params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
-        params[AddKeys.latitude.rawValue] = latitude
-        params[AddKeys.longitude.rawValue] = longitude
-        params[AddKeys.country.rawValue] = country
-        params[AddKeys.city.rawValue] = city
-        params[AddKeys.state.rawValue] = state
         
-       
-            self.uploadFIleToServer()
+             self.params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
+             self.params[AddKeys.latitude.rawValue] = latitude
+             self.params[AddKeys.longitude.rawValue] = longitude
+             self.params[AddKeys.country.rawValue] = country
+             self.params[AddKeys.city.rawValue] = city
+             self.params[AddKeys.state.rawValue] = state
         
+              self.uploadFIleToServer()
+         
     }
     
     func uploadFIleToServer(){

@@ -7,7 +7,7 @@
 
 import UIKit
 import SwiftUI
-class CategoryPlanVC: UIViewController {
+class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
 
     
      @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -49,7 +49,9 @@ class CategoryPlanVC: UIViewController {
     func fetchCountryListing(){
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-           let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .buyPackage, navigationController: self.navigationController))
+           var rootView = CountryLocationView(arrCountries: arrCountry, popType: .buyPackage, navigationController: self.navigationController)
+           rootView.delLocationSelected = self
+           let vc = UIHostingController(rootView:rootView )
            self.navigationController?.pushViewController(vc, animated: true)
        }
    }

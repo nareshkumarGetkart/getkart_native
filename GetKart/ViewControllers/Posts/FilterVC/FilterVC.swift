@@ -12,7 +12,7 @@ protocol FilterSelected{
     func filterSelectectionDone(dict:Dictionary<String,Any>)
 }
 
-class FilterVC: UIViewController {
+class FilterVC: UIViewController, LocationSelectedDelegate {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var btnBack:UIButton!
@@ -147,12 +147,14 @@ class FilterVC: UIViewController {
     func fetchCountryListing(){
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
             let arrCountry = obj.data?.data ?? []
-            let vc = UIHostingController(rootView: CountryLocationView(arrCountries: arrCountry, popType: .filter, navigationController: self.navigationController))
+            var rootView = CountryLocationView(arrCountries: arrCountry, popType: .filter, navigationController: self.navigationController)
+            rootView.delLocationSelected = self
+            let vc = UIHostingController(rootView:rootView )
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double = 0.0) {
+    func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double = 0.0) {
         
         self.latitude = latitude
         self.longitude = longitude
@@ -160,6 +162,17 @@ class FilterVC: UIViewController {
         self.state = state
         self.country = country
         self.radius = range
+        self.tblView.reloadData()
+        
+    }
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+        
+        self.latitude = latitude
+        self.longitude = longitude
+        self.city = city
+        self.state = state
+        self.country = country
+        //self.radius = range
         self.tblView.reloadData()
         
     }
