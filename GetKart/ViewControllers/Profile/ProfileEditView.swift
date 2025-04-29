@@ -21,12 +21,13 @@ struct ProfileEditView: View {
     @State private var showOTPPopup = false
     @State private var isMobileVerified = false
     @State var isDataLoading = false
+    var navigationController:UINavigationController?
     
     var body: some View {
         HStack{
             
             Button {
-                AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                navigationController?.popViewController(animated: true)
                 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(.black)
@@ -80,8 +81,10 @@ struct ProfileEditView: View {
                     HStack{
                         Spacer()
                         Button(action: {
-                            sendOTPApi(countryCode: "+91")
-                            showOTPPopup = true
+                            if phoneNumber.count > 5{
+                                sendOTPApi(countryCode: "+91")
+                                showOTPPopup = true
+                            }
                         }) {
                             Text("Verify")
                                 .underline() .foregroundColor(Color.orange).padding(.horizontal)
@@ -280,7 +283,7 @@ struct ProfileEditView: View {
                         
                         RealmManager.shared.updateUserData(dict: data)
                         AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["OK"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
-                            AppDelegate.sharedInstance.navigationController?.popViewController(animated: true)
+                            navigationController?.popViewController(animated: true)
                         }
                         
                     }

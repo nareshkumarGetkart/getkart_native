@@ -590,13 +590,14 @@ class ChatVC: UIViewController {
             let name = dataDict["name"] as? String ?? ""
             let profile = dataDict["profile"] as? String ?? ""
             self.lblName.text = name
-            self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "getkartplaceholder"))
+            self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "user-circle"))
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
             self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
             updateUserBlockStatus()
         }
     }
    
+
     
     @objc func chatMessages(notification: Notification) {
         

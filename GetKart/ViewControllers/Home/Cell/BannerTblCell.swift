@@ -15,6 +15,7 @@ class BannerTblCell: UITableViewCell {
     var timer:Timer? = nil
     var navigationController:UINavigationController?
     private  var x = 0
+    @IBOutlet weak var pageControl:UIPageControl!
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -23,7 +24,11 @@ class BannerTblCell: UITableViewCell {
         collctnView.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
         self.collctnView.delegate = self
         self.collctnView.dataSource = self
+        pageControl.currentPage = 0
+        pageControl.pageIndicatorTintColor = .lightGray
+        pageControl.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor
         startTimer()
+
         
     }
     
@@ -69,16 +74,32 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+       
+        pageControl.numberOfPages = listArray?.count ?? 0
+
         return listArray?.count ?? 0
         
     }
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collctnView.frame.size.width, height: 190)
+        return CGSize(width: self.collctnView.frame.size.width, height: 200)
         
     }
     
+  // Update pageControl when scrolling ends
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+            let pageWidth = scrollView.frame.width
+            let currentPage = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth)
+            pageControl.currentPage = currentPage
+        }
+        
+        // (Optional) Update pageControl when programmatic scroll happens (e.g., auto-scroll)
+        func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+            let pageWidth = scrollView.frame.width
+            let currentPage = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth)
+            pageControl.currentPage = currentPage
+        }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BannerCell", for: indexPath) as! BannerCell

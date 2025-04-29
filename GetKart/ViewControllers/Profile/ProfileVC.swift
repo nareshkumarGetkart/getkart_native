@@ -337,15 +337,38 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     @objc func editProfileBtnACtion(){
-        let destVC = UIHostingController(rootView: ProfileEditView())
-        AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+        let destVC = UIHostingController(rootView: ProfileEditView(navigationController:self.navigationController))
+        destVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(destVC, animated: true)
     }
     
     @objc func getVerified(){
         
-        let hostingController = UIHostingController(rootView: UserVerifyView(navigation:self.navigationController)) // Wrap in UIHostingController
-        hostingController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(hostingController, animated: true)
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+            if (objLoggedInUser.email?.count ?? 0) == 0 || (objLoggedInUser.mobile?.count ?? 0) == 0  || (objLoggedInUser.name?.count ?? 0) == 0 {
+                
+                AlertView.sharedManager.presentAlertWith(title: "", msg: "Complete your profile to apply verification request.", buttonTitles: ["Cancel","OK"], onController: self) { title, index in
+                    
+                    if index == 1{
+                        let destVC = UIHostingController(rootView: ProfileEditView(navigationController:self.navigationController))
+                        destVC.hidesBottomBarWhenPushed = true
+
+                        self.navigationController?.pushViewController(destVC, animated: true)
+                    }
+                }
+                
+            }else{
+               
+                let hostingController = UIHostingController(rootView: UserVerifyView(navigation:self.navigationController)) // Wrap in UIHostingController
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
+                
+            
+        }
+            
+      
     }
 }
 

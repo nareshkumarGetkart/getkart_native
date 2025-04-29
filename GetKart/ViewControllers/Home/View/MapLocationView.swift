@@ -38,7 +38,7 @@ struct MapLocationView: View {
 
                 }
             }
-        }
+        }.navigationBarHidden(true)
     }
 }
 

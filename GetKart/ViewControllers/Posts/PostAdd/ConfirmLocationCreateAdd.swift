@@ -98,7 +98,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
             }
             
             
-        }.onAppear{
+        }.navigationBarHidden(true).onAppear{
             
             LocationManager.sharedInstance.delegate = self
             LocationManager.sharedInstance.checkLocationAuthorization()

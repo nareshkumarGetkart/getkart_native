@@ -86,7 +86,7 @@ struct AddPostSuccessView: View {
             //}
             
             Spacer()
-        }
+        }.navigationBarHidden(true)
         .padding()
         .background(Color(.systemBackground))
         .onAppear {

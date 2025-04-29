@@ -45,7 +45,14 @@ class HomeBaseVC: UITabBarController {
         Constant.shared.isLaunchFirstTime = 0
         
         // Do any additional setup after loading the view.
+        
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupDoubleTapGesture()
+    }
+
     
     func setupMiddleButton() {
             let buttonSize: CGFloat = 60
@@ -203,6 +210,38 @@ class HomeBaseVC: UITabBarController {
 
 extension HomeBaseVC: UITabBarControllerDelegate {
     //MARK: Delegate
+    
+    
+    private func setupDoubleTapGesture() {
+        guard let items = tabBar.items else { return }
+
+            let tabBarButtons = tabBar.subviews
+                .filter { $0 is UIControl && $0.isUserInteractionEnabled }
+                .sorted(by: { $0.frame.origin.x < $1.frame.origin.x }) // Sort by position
+
+            for (index, button) in tabBarButtons.enumerated() {
+                if index == 2 { continue } // Skip dummy middle tab
+
+                if index == 0 {
+                    button.gestureRecognizers?.removeAll()
+                    
+                    let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+                    doubleTap.numberOfTapsRequired = 2
+                    button.addGestureRecognizer(doubleTap)
+                    button.tag = index
+                }
+            }
+       }
+        
+    @objc private func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        guard let index = gesture.view?.tag else { return }
+        
+        if index == selectedIndex,
+           let nav = viewControllers?[index] as? UINavigationController,
+           let homeVC = nav.topViewController as? HomeVC {
+            homeVC.scrollToTop()
+        }
+    }
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         

@@ -44,6 +44,16 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
     
     
+    func scrollToTop() {
+        DispatchQueue.main.async {
+            // scroll code here
+            let topIndex = IndexPath(row: 0, section: 0)
+            if self.tblView?.numberOfRows(inSection: 0) ?? 0 > 0 {
+                self.tblView?.scrollToRow(at: topIndex, at: .top, animated: true)
+            }
+        }
+    }
+    
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){

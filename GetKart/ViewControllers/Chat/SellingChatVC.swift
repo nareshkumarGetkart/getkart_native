@@ -148,6 +148,7 @@ class SellingChatVC: UIViewController {
 }
 
 
+
 extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
     
     
@@ -169,8 +170,8 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         let obj = listArray[indexPath.item]
         cell.lblName.text = obj.buyer?.name ?? ""
         cell.lblDesc.text = obj.item?.name ?? ""
-        cell.imgViewProfile.kf.setImage(with:  URL(string: obj.buyer?.profile ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-        cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        cell.imgViewProfile.kf.setImage(with:  URL(string: obj.buyer?.profile ?? "") , placeholder:ImageName.userPlaceHolder)
+        cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder: ImageName.getKartplaceHolder)
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
         cell.imgViewItem.clipsToBounds = true
         

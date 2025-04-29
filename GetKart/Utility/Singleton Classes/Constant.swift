@@ -605,45 +605,9 @@ enum NotificationKeys:String,CaseIterable{
 
 
 
-enum AppAssets {
-    
-    enum Icons: String {
-        case home
-        case settings
-        case profile
-        case search
-        
-        var image: UIImage {
-            guard let img = UIImage(named: self.rawValue) else {
-                fatalError("Image '\(self.rawValue)' not found in Assets!")
-            }
-            return img
-        }
-    }
-    
-    enum Placeholders: String {
-        case user = "user-circle"
-        case product
-        case emptyState
-        
-        var image: UIImage {
-            guard let img = UIImage(named: self.rawValue) else {
-                fatalError("Placeholder '\(self.rawValue)' not found in Assets!")
-            }
-            return img
-        }
-    }
-    
-    enum Backgrounds: String {
-        case loginBackground
-        case homeBackground
-        
-        var image: UIImage {
-            guard let img = UIImage(named: self.rawValue) else {
-                fatalError("Background '\(self.rawValue)' not found in Assets!")
-            }
-            return img
-        }
-    }
+
+enum ImageName {
+    static let userPlaceHolder = UIImage(named: "user-circle")
+    static let getKartplaceHolder = UIImage(named: "getkartplaceholder")
 }
 
