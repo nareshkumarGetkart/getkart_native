@@ -382,7 +382,7 @@ class URLhandler: NSObject{
     
         if isConnectedToNetwork() == true {
             if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
-                Themes.sharedInstance.showActivityViewTop(uiView:  topView, position: loaderPos)
+                Themes.sharedInstance.showActivityViewTop(uiView:  topView, position: .mid)
             }
             
             if ISDEBUG{
