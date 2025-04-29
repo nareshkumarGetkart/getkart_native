@@ -136,7 +136,7 @@ class PayPlanVC: UIViewController {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
+                    self.callbackPaymentSuccess?(true)
                 }
             }
         }

@@ -250,10 +250,8 @@ final class Constant: NSObject {
     
     var add_itemURL:String{
         get{
-            return "\(Constant.shared.baseURL)/add-item"
-            
+            return "\(Constant.shared.baseURL)/v1/add-item"
         }
-        
     }
 
     var update_itemURL:String{
