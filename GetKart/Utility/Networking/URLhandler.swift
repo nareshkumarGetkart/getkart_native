@@ -270,7 +270,6 @@ class URLhandler: NSObject{
     func uploadMedia(fileName : String,fileKey:String,  param : [String:AnyObject] , file : URL?, url:String, mimeType:String, completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
         
         if isConnectedToNetwork() == true {
-            
             if ISDEBUG == true {
                 print("URL:\n ",url,param)
                 print("file:\n ",file)
@@ -331,49 +330,58 @@ class URLhandler: NSObject{
     
     func uploadImageWithParameters(profileImg : UIImage,imageName:String, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
     
-        
-        if ISDEBUG{
-            print(url)
-            print(params)
-        }
-        //let param = [String:AnyObject]()
-        AF.upload(multipartFormData: { (multipartFormData) in
-            
-            if let data = profileImg.jpegData(compressionQuality: 0.3) {
-                
-                multipartFormData.append(data, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
-            }else {
-                
+        if isConnectedToNetwork() == true {
+            if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
+                Themes.sharedInstance.showActivityViewTop(uiView:  topView, position: .mid)
             }
             
-
-            for (key, value) in params {
-                multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
+            if ISDEBUG{
+                print(url)
+                print(params)
             }
-            print("\nmultipartFormData= \(multipartFormData)")
-        
-        },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
-        .uploadProgress(queue: .main, closure: { (progress) in
-           
-        })
-        .response{ response in
-            if response.error == nil{
-                do{
-                    self.respDictionary = try JSONSerialization.jsonObject(
-                        with: response.value!!,
-                        options: JSONSerialization.ReadingOptions.mutableContainers
-                    ) as? NSDictionary
+            //let param = [String:AnyObject]()
+            AF.upload(multipartFormData: { (multipartFormData) in
+                
+                if let data = profileImg.jpegData(compressionQuality: 0.3) {
                     
-                    if ISDEBUG == true {
-                        print("\(url) Response received: ",self.respDictionary)
+                    multipartFormData.append(data, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+                }else {
+                    
+                }
+                
+                
+                for (key, value) in params {
+                    multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key)
+                }
+                print("\nmultipartFormData= \(multipartFormData)")
+                
+            },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
+            .uploadProgress(queue: .main, closure: { (progress) in
+                
+            })
+            .response{ response in
+                DispatchQueue.main.async {
+                    
+                    Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
+                }
+                if response.error == nil{
+                    do{
+                        self.respDictionary = try JSONSerialization.jsonObject(
+                            with: response.value!!,
+                            options: JSONSerialization.ReadingOptions.mutableContainers
+                        ) as? NSDictionary
+                        
+                        if ISDEBUG == true {
+                            print("\(url) Response received: ",self.respDictionary)
+                        }
+                        completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                    }catch let error{
+                        completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
                     }
-                    completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
-                }catch let error{
+                }else{
+                    
                     completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
                 }
-            }else{
-                
-                completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
             }
         }
     }
