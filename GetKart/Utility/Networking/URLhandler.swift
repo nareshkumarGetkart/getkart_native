@@ -380,96 +380,101 @@ class URLhandler: NSObject{
     
     func uploadImageArrayWithParameters(imageData:Data, imageName:String, imagesData : Array<Data>, imageNames:Array<String>, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
     
-        
-        if ISDEBUG{
-            print(url)
-            print(params)
-        }
-        //let param = [String:AnyObject]()
-        AF.upload(multipartFormData: { (multipartFormData) in
-            
-            
-            if imageData.count > 0 {
-                multipartFormData.append(imageData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+        if isConnectedToNetwork() == true {
+            if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
+                Themes.sharedInstance.showActivityViewTop(uiView:  topView, position: loaderPos)
             }
-           
-
             
-           
-            for ind in 0..<imagesData.count {
-                let data = imagesData[ind]
-                let name = imageNames[ind]
-                multipartFormData.append(data, withName: name, fileName: "file\(ind).jpeg", mimeType: "image/jpeg")
+            if ISDEBUG{
+                print(url)
+                print(params)
             }
-              
-            
-            for (key, value) in params {
-                if let data = value as? Data {
-                    multipartFormData.append(data, withName: key, fileName: "\(key).jpeg", mimeType: "image/jpeg")
-                }else if let arr = value as? Array<String> {
-                    for i in 0  ..< arr.count {
-                        let valueObj = arr[i] as! String
-                        let keyObj = key as! String + "[" + String(i) + "]"
-                        multipartFormData.append(valueObj.data(using: String.Encoding.utf8)!, withName: keyObj)
-                    }
-                }else if let dict = value as? Dictionary<String,Any> {
-                    var str = "{"
-                    for (key1, value1) in dict {
-                        if let dictCustom = value1 as? Dictionary<String,Any> {
-                            for (keyCustom, valueCustom) in dictCustom {
-                                print(valueCustom)
-                                if let dataCustom = valueCustom as? Data {
-                                    let nameKey = "\(key1)[\(keyCustom)]"
-                                    multipartFormData.append(dataCustom, withName: nameKey, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
-                                }
-                            }
-                            
-                        }else if let data1 = value1 as? Data {
-                            multipartFormData.append(data1, withName: key1, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
-                        }else if let arr = value1 as? Array<String> {
-                            str = str + "\"\(key1)\":\(value1),"
-                            print("String", arr)
-                            
-                        }else {
-                            str = str + "\"\(key1)\":[\"\(value1)\"],"
-                        }
-                        
-                    }
-                    //remove , from last
-                    str = String(str.dropLast())
-                    
-                    str = str + "}"
-                    print(str)
-                    multipartFormData.append("\(str)".data(using: String.Encoding.utf8)!, withName: key as! String)
-                    
-                } else {
-                    multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key as! String)
+            //let param = [String:AnyObject]()
+            AF.upload(multipartFormData: { (multipartFormData) in
+                
+                
+                if imageData.count > 0 {
+                    multipartFormData.append(imageData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
                 }
                 
-            }
-               print("\nmultipartFormData= \(multipartFormData)")
-        
-        },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
-        .uploadProgress(queue: .main, closure: { (progress) in
-           
-        })
-        .response{ response in
-            if response.error == nil{
-                do{
-                    self.respDictionary = try JSONSerialization.jsonObject(
-                        with: response.value!!,
-                        options: JSONSerialization.ReadingOptions.mutableContainers
-                    ) as? NSDictionary
-                    
-                    if ISDEBUG == true {
-                        print("\(url) Response received: ",self.respDictionary)
+                
+                
+                
+                for ind in 0..<imagesData.count {
+                    let data = imagesData[ind]
+                    let name = imageNames[ind]
+                    multipartFormData.append(data, withName: name, fileName: "file\(ind).jpeg", mimeType: "image/jpeg")
+                }
+                
+                
+                for (key, value) in params {
+                    if let data = value as? Data {
+                        multipartFormData.append(data, withName: key, fileName: "\(key).jpeg", mimeType: "image/jpeg")
+                    }else if let arr = value as? Array<String> {
+                        for i in 0  ..< arr.count {
+                            let valueObj = arr[i] as! String
+                            let keyObj = key as! String + "[" + String(i) + "]"
+                            multipartFormData.append(valueObj.data(using: String.Encoding.utf8)!, withName: keyObj)
+                        }
+                    }else if let dict = value as? Dictionary<String,Any> {
+                        var str = "{"
+                        for (key1, value1) in dict {
+                            if let dictCustom = value1 as? Dictionary<String,Any> {
+                                for (keyCustom, valueCustom) in dictCustom {
+                                    print(valueCustom)
+                                    if let dataCustom = valueCustom as? Data {
+                                        let nameKey = "\(key1)[\(keyCustom)]"
+                                        multipartFormData.append(dataCustom, withName: nameKey, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
+                                    }
+                                }
+                                
+                            }else if let data1 = value1 as? Data {
+                                multipartFormData.append(data1, withName: key1, fileName: "\(key1).jpeg", mimeType: "image/jpeg")
+                            }else if let arr = value1 as? Array<String> {
+                                str = str + "\"\(key1)\":\(value1),"
+                                print("String", arr)
+                                
+                            }else {
+                                str = str + "\"\(key1)\":[\"\(value1)\"],"
+                            }
+                            
+                        }
+                        //remove , from last
+                        str = String(str.dropLast())
+                        
+                        str = str + "}"
+                        print(str)
+                        multipartFormData.append("\(str)".data(using: String.Encoding.utf8)!, withName: key as! String)
+                        
+                    } else {
+                        multipartFormData.append("\(value)".data(using: String.Encoding.utf8)!, withName: key as! String)
                     }
-                    completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
-                }catch let error{
+                    
+                }
+                print("\nmultipartFormData= \(multipartFormData)")
+                
+            },to: url, usingThreshold: UInt64.init(), method: .post, headers: self.getHeaderFields())
+            .uploadProgress(queue: .main, closure: { (progress) in
+                
+            })
+            .response{ response in
+                if response.error == nil{
+                    do{
+                        self.respDictionary = try JSONSerialization.jsonObject(
+                            with: response.value!!,
+                            options: JSONSerialization.ReadingOptions.mutableContainers
+                        ) as? NSDictionary
+                        
+                        if ISDEBUG == true {
+                            print("\(url) Response received: ",self.respDictionary)
+                        }
+                        completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                    }catch let error{
+                        completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
+                    }
+                }else{
                     completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
                 }
-            }else{
-                completionHandler(self.respDictionary as NSDictionary?, response.error as NSError?)
             }
         }
     }

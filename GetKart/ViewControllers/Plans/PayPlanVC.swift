@@ -118,7 +118,6 @@ class PayPlanVC: UIViewController {
     }
     
     
-    
     func updateOrderApi(){
         let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId]
         
