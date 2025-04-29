@@ -458,6 +458,12 @@ class URLhandler: NSObject{
                 
             })
             .response{ response in
+                DispatchQueue.main.async {
+                    
+                    Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
+                }
+                
+                
                 if response.error == nil{
                     do{
                         self.respDictionary = try JSONSerialization.jsonObject(
