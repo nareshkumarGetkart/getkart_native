@@ -14,7 +14,8 @@ class BannerTblCell: UITableViewCell {
     var listArray:[SliderModel]?
     var timer:Timer? = nil
     var navigationController:UINavigationController?
-    
+    private  var x = 0
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -43,7 +44,6 @@ class BannerTblCell: UITableViewCell {
         timer =  Timer.scheduledTimer(timeInterval: 2.5, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
 
-  private  var x = 0
 
     @objc func scrollAutomatically(_ timer1: Timer) {
         
@@ -75,7 +75,7 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collctnView.bounds.size.width, height: 190)
+        return CGSize(width: self.collctnView.frame.size.width, height: 190)
         
     }
     
@@ -94,8 +94,7 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
         navigateToScreen(index: indexPath.item, sliderObj: listArray?[indexPath.item])
     }
     
- 
-    
+
 }
 
 
