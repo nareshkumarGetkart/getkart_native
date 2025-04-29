@@ -7,7 +7,7 @@
 
 import UIKit
 import FittedSheets
-
+import SwiftUI
 
 class CategoryPackageVC: UIViewController {
     
@@ -17,7 +17,7 @@ class CategoryPackageVC: UIViewController {
     @IBOutlet weak var lblSelectedLoc:UILabel!
     @IBOutlet weak var lblSelectedCategory:UILabel!
     @IBOutlet weak var collectionViewBanner:UICollectionView!
-
+    
     var categoryId = 0
     var categoryName = ""
     var city = ""
@@ -28,6 +28,7 @@ class CategoryPackageVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        btnBack.setImageColor(color: .black)
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "PackageCell", bundle: nil), forCellReuseIdentifier: "PackageCell")
         collectionViewBanner.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
@@ -192,6 +193,24 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
         as! PayPlanVC
         controller.planObj = planObj
+        
+        controller.callbackPaymentSuccess = { [weak self](isSuccess) -> Void in
+            
+            if controller.sheetViewController?.options.useInlineMode == true {
+                controller.sheetViewController?.attemptDismiss(animated: true)
+            } else {
+                controller.dismiss(animated: true, completion: nil)
+            }
+            
+            if isSuccess == true {
+                let vc = UIHostingController(rootView: PlanBoughtSuccessView(navigationController: self?.navigationController))
+                vc.modalPresentationStyle = .overFullScreen // Full-screen modal
+                vc.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                self?.present(vc, animated: true, completion: nil)
+            }
+        }
+        
         let useInlineMode = view != nil
         controller.title = ""
         controller.navigationController?.navigationBar.isHidden = true

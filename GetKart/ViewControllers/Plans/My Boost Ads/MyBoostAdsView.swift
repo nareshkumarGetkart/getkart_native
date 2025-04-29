@@ -50,7 +50,7 @@ struct MyBoostAdsView: View {
                             BoostAdsCell(itemObj:item)
                                 .onTapGesture {
                                     
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
                                     hostingController.hidesBottomBarWhenPushed = true
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }

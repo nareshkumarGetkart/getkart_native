@@ -188,7 +188,6 @@ struct SelectLocationRangeView: View {
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
-                   
                 }
             }
         }

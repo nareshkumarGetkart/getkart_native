@@ -17,6 +17,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
 
     
      let titleArray =  ["Category","Location"]
+    var subTitleArrray = ["",""]
      let iconArray =  ["category","location_icon_orange"]
     
     var latitude:String = ""
@@ -32,6 +33,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
      //MARK: Controller life cycle methods
      override func viewDidLoad() {
          super.viewDidLoad()
+         btnBack.setImageColor(color: .black)
          cnstrntHtNavBar.constant = self.getNavBarHt
          // Do any additional setup after loading the view.
          tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
@@ -63,6 +65,10 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
         self.city = city
         self.state = state
         self.country = country
+        
+        
+        subTitleArrray[1] = city + ", " + state + ", " + country
+        
         self.tblView.reloadData()
         if self.country.count > 0 && self.category_id > 0 {
             btnShowPackage.isEnabled = true
@@ -74,6 +80,8 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
     func saveCategoryInfo(category_id:Int, categoryName:String ) {
         self.category_id = category_id
         self.categoryName = categoryName
+        subTitleArrray[0] = categoryName
+        self.tblView.reloadData()
         
         if self.country.count > 0 && self.category_id > 0 {
             btnShowPackage.isEnabled = true
@@ -118,6 +126,12 @@ extension CategoryPlanVC: UITableViewDelegate,UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProfileListTblCell") as! ProfileListTblCell
         
         cell.lblTitle.text = titleArray[indexPath.row]
+        cell.lblSubTitle.text = subTitleArrray[indexPath.row]
+        if subTitleArrray[indexPath.row] == "" {
+            cell.lblSubTitle.isHidden = true
+        }else {
+            cell.lblSubTitle.isHidden = false
+        }
         cell.imgVwIcon.image = UIImage(named: iconArray[indexPath.row])
         cell.imgVwArrow.isHidden = false
         cell.btnSwitch.isHidden = true

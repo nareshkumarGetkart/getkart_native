@@ -9,7 +9,7 @@ import UIKit
 import FittedSheets
 import PhonePePayment
 import StoreKit
-
+import SwiftUI
 class PayPlanVC: UIViewController {
     
     private var merchantId = ""
@@ -24,6 +24,8 @@ class PayPlanVC: UIViewController {
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var btnPay:UIButton!
     var InAppReceipt = ""
+    
+    var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     
     //MARK: COntroller life cycle methods
     
@@ -237,7 +239,7 @@ extension PayPlanVC {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
+                    self.callbackPaymentSuccess?(true)
                 }
             }
         }

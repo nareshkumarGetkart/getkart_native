@@ -695,7 +695,12 @@ extension CreateAddDetailVC: PictureAddedDelegate {
         if row == 3 {
             isImgData = true
         }else {
-            isImgData = false
+            
+            if gallery_images.count < 5 {
+                isImgData = false
+            }else {
+                return
+            }
         }
         
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
