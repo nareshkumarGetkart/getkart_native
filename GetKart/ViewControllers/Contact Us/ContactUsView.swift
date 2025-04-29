@@ -51,7 +51,7 @@ struct ContactUsView: View {
             .padding(.top, 5)
             
             Spacer()
-        }.padding().background(Color(UIColor.systemGray6))
+        }.padding().background(Color(UIColor.systemGray6)).navigationBarHidden(true)
             .fullScreenCover(isPresented: $showEmailView) {
                 EmailSupportView()
             }
@@ -183,7 +183,8 @@ struct EmailSupportView: View {
                .cornerRadius(10).padding(8)
             
             Spacer()
-        }.background(Color(UIColor.systemGray6)).navigationBarHidden(true)
+        }.background(Color(UIColor.systemGray6))
+            .navigationBarHidden(true)
         
        // if(MFMailComposeViewController.canSendMail()) // Disable if Mail is unavailable
             .sheet(isPresented: $showMailView) {

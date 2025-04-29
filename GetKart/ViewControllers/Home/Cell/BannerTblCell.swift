@@ -6,13 +6,15 @@
 //
 
 import UIKit
+import SwiftUI
 
 class BannerTblCell: UITableViewCell {
     
     @IBOutlet weak var collctnView:UICollectionView!
     var listArray:[SliderModel]?
     var timer:Timer? = nil
-
+    var navigationController:UINavigationController?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -38,7 +40,7 @@ class BannerTblCell: UITableViewCell {
     
     func startTimer() {
 
-        timer =  Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        timer =  Timer.scheduledTimer(timeInterval: 2.5, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
 
   private  var x = 0
@@ -88,9 +90,130 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
         
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        navigateToScreen(index: indexPath.item, sliderObj: listArray?[indexPath.item])
+    }
+    
+ 
+    
 }
 
 
+extension BannerTblCell{
+
+func navigateToScreen(index:Int, sliderObj:SliderModel?){
+    
+    if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "AdsListing"{
+        
+        if isUserLoggedInRequest() {
+            if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
+                destvc.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destvc, animated: true)
+            }
+        }
+        
+    }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "BoostAdsListing"{
+        
+        if isUserLoggedInRequest() {
+            if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
+                destvc.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destvc, animated: true)
+            }
+        }
+    }else if (sliderObj?.thirdPartyLink?.count ?? 0) > 0{
+        
+        guard let url = URL(string: sliderObj?.thirdPartyLink ?? "") else {
+            print("Invalid URL")
+            return
+        }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("Cannot open URL")
+        }
+    }else if sliderObj?.modelType?.contains("Category") == true {
+
+        
+        if (sliderObj?.model?.subcategoriesCount ?? 0) > 0{
+            
+            getCategoriesListApi(sliderObj: sliderObj)
+            
+        }else{
+            let vc = UIHostingController(rootView: SearchWithSortView(categroryId: sliderObj?.modelID ?? 0, navigationController:self.navigationController, categoryName:  sliderObj?.model?.name ?? ""))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }else{
+        
+        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:sliderObj?.model?.id ?? 0, itemObj: nil, slug: sliderObj?.model?.slug ?? ""))
+        hostingController.hidesBottomBarWhenPushed = true
+
+        self.navigationController?.pushViewController(hostingController, animated: true)
+    }
+    
+    
+}
+
+    
+    
+    func getCategoriesListApi(sliderObj:SliderModel?){
+      
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_categories) { (obj:CategoryParse) in
+            
+            var subCatArray = [Subcategory]()
+            
+            if obj.data != nil {
+                
+                for obj in obj.data?.data ?? []{
+                    
+                    if obj.id == sliderObj?.modelID {
+                        subCatArray = obj.subcategories ?? []
+                        break
+                    }
+                }
+                
+                DispatchQueue.main.async(execute: {
+                    let catIds = ["\(sliderObj?.model?.parentCategoryID ?? 0)","\(sliderObj?.modelID ?? 0)"].joined(separator: ",")
+                    
+                    let swiftUIView = SubCategoriesView(subcategories: subCatArray, navigationController:  self.navigationController, strTitle: sliderObj?.model?.name ?? "",category_id:"\(sliderObj?.modelID ?? 0)", category_ids:catIds, popType: .categoriesSeeAll) // Create SwiftUI view
+                    let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                })
+
+            }
+        }
+    }
+
+    
+func isUserLoggedInRequest() -> Bool {
+    
+    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+    if objLoggedInUser.id != nil {
+        
+        return true
+        
+        
+    }else{
+        let logiView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
+            //Login
+            AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+            
+        }))
+        logiView.modalPresentationStyle = .overFullScreen // Full-screen modal
+        logiView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+        logiView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+        navigationController?.topViewController?.present(logiView, animated: true, completion: nil)
+        
+        return false
+    }
+}
+
+
+    
+}
 
 
 

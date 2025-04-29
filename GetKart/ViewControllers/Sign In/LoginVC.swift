@@ -9,6 +9,8 @@ import GoogleSignInSwift
 import AuthenticationServices
 import GoogleSignIn
 import SwiftUI
+import FirebaseAuth
+import FirebaseCore
 
 enum SocialMediaLoginType{
     case gmail, apple
@@ -39,6 +41,8 @@ class LoginVC: UIViewController {
         txtEmailPhone.leftPadding = 50
         txtEmailPhone.delegate = self
         self.fetChAndSetInitialCodeFromLocale()
+        
+     
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -190,6 +194,10 @@ class LoginVC: UIViewController {
 }
 
 
+
+
+
+
 extension LoginVC:UITextFieldDelegate {
    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -217,7 +225,11 @@ extension LoginVC:UITextFieldDelegate {
 extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
    
     @IBAction func loginWithGoogleButton(_ sender : UIButton){
-        GIDSignIn.sharedInstance.signIn(withPresenting: self) { signInResult, error in
+        
+       // GIDSignIn.sharedInstance.signIn(withPresenting: self)
+        signInWithGoogle()
+        
+      /*  GIDSignIn.sharedInstance.signIn(withPresenting: self) { signInResult, error in
             guard error == nil else {
                 print("Error: ",error?.localizedDescription)
                 return }
@@ -238,9 +250,69 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             self.loginType = .gmail
             
             self.signInUsingGmailorAppleApi()
+        }*/
+        
+        
+    }
+
+
+    func signInWithGoogle() {
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            print("Missing client ID.")
+            return
+        }
+        
+        let config = GIDConfiguration(clientID: clientID)
+//        guard let presentingVC = UIApplication.shared.windows.first?.rootViewController else {
+//            print("No presenting view controller.")
+//            return
+//        }
+        
+        GIDSignIn.sharedInstance.configuration = config
+        
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { result, error in
+            if let error = error {
+                print("Google Sign-In error: \(error.localizedDescription)")
+                return
+            }
+            
+            if let user = result?.user {
+                
+                let gmailUserID = user.userID
+                let emailAddress = user.profile?.email
+                let fullName = user.profile?.name
+                // let givenName = user.profile?.givenName
+                //let familyName = user.profile?.familyName
+                //let profilePicUrl = user.profile?.imageURL(withDimension: 320)
+                
+                self.socialEmail = emailAddress ?? ""
+                self.socialName = fullName ?? ""
+                self.socialId = gmailUserID ?? ""
+                self.loginType = .gmail
+                
+              
+                
+                let idToken = user.idToken?.tokenString ?? ""
+                let accessToken = user.accessToken.tokenString
+                let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                               accessToken: accessToken)
+                
+                Auth.auth().signIn(with: credential) { authResult, error in
+                    if let error = error {
+                        print("Firebase Sign-In error: \(error.localizedDescription)")
+                        return
+                    }
+                    
+                    // Success!
+                    print("User is signed in with Firebase: \(authResult?.user.uid ?? "")")
+                    self.socialId = authResult?.user.uid ?? ""
+                    self.signInUsingGmailorAppleApi()
+
+                }
+            }
         }
     }
-    
+
     
     
     func signInUsingGmailorAppleApi(){

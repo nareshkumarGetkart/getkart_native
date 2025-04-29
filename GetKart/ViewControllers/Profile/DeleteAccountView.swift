@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct DeleteAccountView: View {
     
@@ -100,9 +101,13 @@ struct DeleteAccountView: View {
                 let message = result["message"] as? String ?? ""
 
                 if status == 200{
-                    
+                    self.deleteUser()
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
+                    
+                    SocketIOManager.sharedInstance.socket?.disconnect()
+                    SocketIOManager.sharedInstance.socket = nil
+                    SocketIOManager.sharedInstance.manager = nil
                     
                     showAlert = false
                     presentationMode.wrappedValue.dismiss()
@@ -125,6 +130,21 @@ struct DeleteAccountView: View {
                 }
                 
             }
+        }
+    }
+    
+
+    func deleteUser() {
+        if let user = Auth.auth().currentUser {
+            user.delete { error in
+                if let error = error {
+                    print("Failed to delete user: \(error.localizedDescription)")
+                } else {
+                    print("User account deleted successfully.")
+                }
+            }
+        } else {
+            print("No user is signed in.")
         }
     }
     

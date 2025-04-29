@@ -20,7 +20,6 @@ struct ProfileEditView: View {
     @State private var showingImagePicker: Bool = false
     @State private var showOTPPopup = false
     @State private var isMobileVerified = false
-    
     @State var isDataLoading = false
     
     var body: some View {
@@ -181,6 +180,12 @@ struct ProfileEditView: View {
     private func validateForm() {
         if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
             print("Please fill all the fields.")
+        }else if !fullName.isValidName() || fullName.lowercased() == "guest user" {
+            AlertView.sharedManager.showToast(message: "Please enter valid name")
+            
+        }else if !email.isValidEmail(){
+            AlertView.sharedManager.showToast(message: "Please enter valid email")
+
         } else {
             print("Form Submitted!")
             updateProfile()

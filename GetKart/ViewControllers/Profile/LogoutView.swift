@@ -79,6 +79,10 @@ struct LogoutView: View {
 
                 if status == 200{
                     // presentationMode.wrappedValue.dismiss()
+                    SocketIOManager.sharedInstance.socket?.disconnect()
+                    SocketIOManager.sharedInstance.socket = nil
+                    SocketIOManager.sharedInstance.manager = nil
+                    
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
                     showAlert = false

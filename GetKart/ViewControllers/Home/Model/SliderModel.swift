@@ -45,7 +45,7 @@ struct Model: Codable {
     let image: String?
     let parentCategoryID: Int?
     let description: String?
-    let status: Int?
+    let status: String?
     let createdAt, updatedAt, slug: String?
     let subcategoriesCount: Int?
     let translatedName: String?

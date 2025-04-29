@@ -166,7 +166,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1F-hp-sqY">
-                                                <rect key="frame" x="246.66666666666663" y="352.66666666666669" width="54" height="35"/>
+                                                <rect key="frame" x="246.66666666666663" y="352.66666666666669" width="53" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="vQs-Uv-56b"/>
                                                 </constraints>
@@ -334,7 +334,7 @@
                                 <viewLayoutGuide key="frameLayoutGuide" id="XM6-Wk-2wO"/>
                             </scrollView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="By signing up/Loggin in , you agree to our" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PdW-0T-Yqc">
-                                <rect key="frame" x="56.333333333333343" y="767" width="280.66666666666663" height="20"/>
+                                <rect key="frame" x="55.666666666666657" y="767" width="281.66666666666674" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="8hY-5w-Udh"/>
                                 </constraints>
@@ -358,7 +358,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XLF-Sh-Gfw" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                <rect key="frame" x="66.666666666666671" y="802" width="110.00000000000001" height="20"/>
+                                <rect key="frame" x="63.666666666666657" y="802" width="113" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="bKV-un-pMi"/>
                                 </constraints>
@@ -372,7 +372,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WE-xX-bHq" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                <rect key="frame" x="216.66666666666663" y="797" width="94" height="30"/>
+                                <rect key="frame" x="216.66666666666663" y="795.66666666666663" width="94" height="33"/>
                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Privacy Policy">
@@ -509,17 +509,21 @@
                                         <real key="value" value="10"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <outlet property="delegate" destination="8xO-7t-Z1v" id="18K-pm-Vkg"/>
+                                </connections>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VUm-rN-r8h">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VUm-rN-r8h">
                                 <rect key="frame" x="254" y="314" width="119" height="35"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="119" id="X29-Dx-2N2"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="119" id="X29-Dx-2N2"/>
                                     <constraint firstAttribute="height" constant="35" id="X37-xb-Ifh"/>
                                 </constraints>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Resend OTP">
-                                    <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </buttonConfiguration>
+                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Resend OTP">
+                                    <color key="titleColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                </state>
                                 <connections>
                                     <action selector="reSendOTPApi" destination="8xO-7t-Z1v" eventType="touchUpInside" id="cZq-zT-fWo"/>
                                 </connections>
@@ -572,6 +576,8 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnResendOtp" destination="VUm-rN-r8h" id="YNq-2Q-yEh"/>
+                        <outlet property="btnSignIn" destination="Dav-M3-6uI" id="bv8-AU-v2w"/>
                         <outlet property="lblMobileNo" destination="nKq-cq-Dtt" id="2I6-h8-zAx"/>
                         <outlet property="txtOtp" destination="1Il-XP-MZp" id="GEQ-MP-aA4"/>
                     </connections>

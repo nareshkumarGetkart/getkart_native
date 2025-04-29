@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import StoreKit
+import Kingfisher
 
 class ProfileVC: UIViewController {
    
@@ -97,11 +98,15 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.bgViewAnonymousUser.isHidden = true
                 cell.bgViewLoggedInUser.isHidden = false
                 cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
-                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""))
+                
+                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+
                 cell.lblName.text =  objLoggedInUser.name ?? ""
                 cell.lblEmail.text =  objLoggedInUser.email ?? ""
                 cell.lblStatus.isHidden = true
                 cell.btnResubmit.isHidden = true
+                cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
+                
 
                 if (objLoggedInUser.is_verified ?? 0) == 1 || verifiSttaus.lowercased() == "approved"{
                     cell.btnGetVerifiedBadge.isHidden = true

@@ -167,6 +167,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.collctnView.updateConstraints()
             cell.collctnView.reloadData()
             cell.updateConstraints()
+            cell.navigationController = self.navigationController
             return cell
            
         } else if indexPath.section == 1 {
