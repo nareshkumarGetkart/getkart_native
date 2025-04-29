@@ -136,6 +136,14 @@ class PayPlanVC: UIViewController {
                 
                 if status == 200{
                     self.callbackPaymentSuccess?(true)
+                    if self.sheetViewController?.options.useInlineMode == true {
+                        self.sheetViewController?.attemptDismiss(animated: true)
+                    } else {
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+                    //self?.delegate?.showError(message: message)
                 }
             }
         }
@@ -177,6 +185,7 @@ class PayPlanVC: UIViewController {
                     
                     
                 }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
                     //self?.delegate?.showError(message: message)
                 }
                 
@@ -199,7 +208,7 @@ class PayPlanVC: UIViewController {
             
             self.updateOrderApi()
             print(state)
-            
+         /*
             AlertView.sharedManager.presentAlertWith(title: "", msg: "\(state)" as NSString, buttonTitles: ["ok"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
                 
             }
@@ -208,6 +217,7 @@ class PayPlanVC: UIViewController {
             } else {
                 self.dismiss(animated: true, completion: nil)
             }
+            */
         }
     }
     

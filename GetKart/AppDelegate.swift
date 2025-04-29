@@ -294,18 +294,27 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     
                     AppDelegate.sharedInstance.navigationController?.popViewController(animated: false)
                     let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                      vc.userId = userId
+                    vc.userId = userId
                     vc.item_offer_id = roomId
+                    vc.hidesBottomBarWhenPushed = true
                     AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                 }
             }else{
-                    let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                    vc.userId = self.userId
-                    vc.item_offer_id = self.roomId
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+                let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                vc.userId = self.userId
+                vc.item_offer_id = self.roomId
+                vc.hidesBottomBarWhenPushed = true
+                AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                 
             }
+        case "payment":
             
+           do {
+                
+                let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController)) 
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
        
         default:
             break
