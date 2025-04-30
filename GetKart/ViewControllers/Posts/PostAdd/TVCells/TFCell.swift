@@ -36,13 +36,11 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
         }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-            print("TextField did end editing method called\(textField.text!)")
         textFieldDoneDelegate?.textFieldEditingDone(selectedRow: txtField.tag, strText: textField.text ?? "")
         }
     
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            print("While entering the characters this method gets called")
             return true;
         }
 }

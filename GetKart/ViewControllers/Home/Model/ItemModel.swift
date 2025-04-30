@@ -178,9 +178,7 @@ struct CustomField: Codable,Identifiable  {
     var value: [String?]?
     let customFieldValue: CustomFieldValue?
 
-    var arrIsSelected:Array<Bool> = Array()
-    //value inserted by user
-    var selectedValue:String?
+   
     
     enum CodingKeys: String, CodingKey {
         case id, name, type, image
@@ -204,8 +202,6 @@ struct CustomField: Codable,Identifiable  {
         self.status = status
         self.value = value
         self.customFieldValue = customFieldValue
-        self.arrIsSelected = arrIsSelected
-        self.selectedValue = selectedValue
     }
   
 }

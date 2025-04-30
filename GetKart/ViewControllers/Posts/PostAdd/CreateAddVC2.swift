@@ -354,8 +354,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             return cell
         }else if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
             let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
-           
-            
             if objCustomField.value == nil {
                 objCustomField.value = Array<String>()
                 dataArray[indexPath.row] = objCustomField
