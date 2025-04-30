@@ -363,7 +363,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.lblTitle.text = objCustomField.name ?? ""
             
             cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
-            cell.objData = objCustomField
             cell.del = self
             cell.rowValue = indexPath.row
             
@@ -377,17 +376,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }else {
                 cell.lblErrorMsg.isHidden = true
             }
-            
-            cell.clnCollectionView.performBatchUpdates({
-                cell.clnCollectionView.reloadData()
-                //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-            }) { _ in
-                // Code to execute after reloadData and layout updates
-                print("CollectionView finished updating!")
-                self.tblView.beginUpdates()
-                self.tblView.endUpdates()
-            }
-            
+
+            cell.configure(with: objCustomField)
             cell.selectionStyle = .none
             return cell
         }else if objCustomField.type  == .dropdown {
@@ -450,17 +440,13 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
             
-            cell.arrImagesData = arr
+            
             cell.rowValue = indexPath.row
             cell.pictureAddDelegate = self
-            cell.clnCollectionView.performBatchUpdates({
-                cell.clnCollectionView.reloadData()
-                //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-            }) { _ in
-                // Code to execute after reloadData and layout updates
-                self.tblView.beginUpdates()
-                self.tblView.endUpdates()
-            }
+            //cell.arrImagesData = arr
+            cell.configure(with: arr)
+            
+            
             
             if showErrorMsg == true {
                 if isValidInput(objCustomField: objCustomField) == false {
@@ -591,8 +577,6 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
             
                 let indexPath = IndexPath(row: tag, section: 0)
                 if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                        
-                        
                     cell.btnAddPicture.isHidden = true
                     cell.clnCollectionView.isHidden = false
                         

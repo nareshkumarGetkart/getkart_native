@@ -418,17 +418,10 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
             
-            cell.arrImagesData = arr
+            
             cell.rowValue = indexPath.row
             cell.pictureAddDelegate = self
-            cell.clnCollectionView.performBatchUpdates({
-                cell.clnCollectionView.reloadData()
-                //cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-            }) { _ in
-                // Code to execute after reloadData and layout updates
-                self.tblView.beginUpdates()
-                self.tblView.endUpdates()
-            }
+            cell.configure(with: arr)
             if showErrorMsg == true {
                 if imgData == nil {
                     cell.lblErrorMsg.isHidden = false
@@ -449,10 +442,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
            
             let cell = tableView.dequeueReusableCell(withIdentifier: "PictureAddedCell") as! PictureAddedCell
             cell.lblTitle.text = "Other Picture(Max 5 images)"
-            
-            cell.arrImagesData = gallery_images
-            
-            if gallery_images.count == 0 {
+             if gallery_images.count == 0 {
                 cell.btnAddPicture.isHidden = false
                 cell.clnCollectionView.isHidden = true
             }else {
@@ -464,15 +454,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
             cell.rowValue = indexPath.row
             cell.pictureAddDelegate = self
-            
-            cell.clnCollectionView.performBatchUpdates({
-                cell.clnCollectionView.reloadData()
-                cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-            }) { _ in
-                // Code to execute after reloadData and layout updates
-                self.tblView.beginUpdates()
-                self.tblView.endUpdates()
-            }
+
+            cell.configure(with: gallery_images)
             
             /*if showErrorMsg == true {
                 if gallery_images.count == 0 {
@@ -659,6 +642,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
             }
             
         }
+        
         dismiss(animated: true, completion: nil)
         
     }

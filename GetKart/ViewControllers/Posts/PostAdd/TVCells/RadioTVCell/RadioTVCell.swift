@@ -42,7 +42,10 @@ class RadioTVCell: UITableViewCell {
         self.clnCollectionView.layoutIfNeeded()
     }
     
-    
+    func configure(with obj:CustomField?) {
+        self.objData = obj
+        self.clnCollectionView.reloadData()
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -80,6 +83,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
         
         if objData?.type == .checkbox {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
+            cell.btnValue.setTitle("", for: .normal)
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             print("CheckBox objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
@@ -97,8 +101,10 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             }
             
             return cell
-        }else {
+        }else if objData?.type == .radio {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
+            cell.btnValue.setTitle("", for: .normal)
+            
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
             print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
@@ -113,6 +119,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             
             return cell
         }
+        return UICollectionViewCell()
     }
     
  

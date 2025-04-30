@@ -43,6 +43,19 @@ class PictureAddedCell: UITableViewCell {
         self.clnCollectionView.collectionViewLayout.invalidateLayout()
         self.clnCollectionView.layoutIfNeeded()
     }
+    
+    func configure(with arrData:Array<Data>) {
+        self.arrImagesData = arrData
+        self.clnCollectionView.reloadData()
+    }
+    
+    func insertItem(_ itemData: Data, at index: Int) {
+            guard index <= arrImagesData.count else { return }
+        arrImagesData.insert(itemData, at: index)
+        clnCollectionView.performBatchUpdates({
+            clnCollectionView.insertItems(at: [IndexPath(item: index, section: 0)])
+            }, completion: nil)
+        }
 }
 
 extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
