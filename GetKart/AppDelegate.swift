@@ -10,6 +10,7 @@ import IQKeyboardManagerSwift
 import FirebaseCore
 import FirebaseMessaging
 import SwiftUI
+import Kingfisher
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
+        setupKingfisherSettings()
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
@@ -65,6 +67,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         registerForRemoteNotification(application: application)
         
         return true
+    }
+    
+    //MARK: Other helpfule Methods
+    fileprivate func setupKingfisherSettings() {
+       
+        // Limit memory cache size to 300 MB.
+        KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1
+
+        // Limit memory cache to hold 150 images at most.
+        KingfisherManager.shared.cache.memoryStorage.config.countLimit = 150
+        
+        // Limit disk cache size to 1 GB.
+        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024
+      
+        // Check memory clean up every 30 seconds.
+        KingfisherManager.shared.cache.memoryStorage.config.cleanInterval = 5
+        
+        // ImageCache.default.diskStorage.config.expiration = .days(5)
+        KingfisherManager.shared.cache.cleanExpiredMemoryCache()
+        KingfisherManager.shared.cache.cleanExpiredDiskCache()
+        
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
