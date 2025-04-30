@@ -585,7 +585,8 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
         if let pickedImage = info[.originalImage] as? UIImage {
             if isImgData == true {
                 
-                imgData = pickedImage.jpegData(compressionQuality: 0.0)
+               // imgData = pickedImage.jpegData(compressionQuality: 0.0)
+                imgData = pickedImage.wxCompress().jpegData(compressionQuality: 1.0)
                 imgName = "image"
                 let indexPath = IndexPath(row: 3, section: 0)
                 if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
@@ -616,7 +617,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                         }
                 }
             }else {
-                gallery_images.append(pickedImage.jpegData(compressionQuality: 0.0) ?? Data())
+                gallery_images.append(pickedImage.wxCompress().jpegData(compressionQuality: 0.0) ?? Data())
                 gallery_imageNames.append("gallery_images[]")
                
                 

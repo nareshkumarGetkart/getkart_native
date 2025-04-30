@@ -565,7 +565,7 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
         if let pickedImage = info[.originalImage] as? UIImage {
             
                 
-            let imgData = pickedImage.jpegData(compressionQuality: 0.0)
+            let imgData = pickedImage.wxCompress().jpegData(compressionQuality: 0.0)
                 imgName = "image"
             let tag = picker.navigationBar.tag
             

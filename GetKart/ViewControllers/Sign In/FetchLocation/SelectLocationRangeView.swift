@@ -354,7 +354,23 @@ struct TapMapView: UIViewRepresentable {
                         LocationManager.sharedInstance.longitude = coordinate.longitude
                         LocationManager.sharedInstance.lastKnownLocation = coordinate
                         
-                        locationInfo = city + "," + state + "," + country
+                        
+                        var address = ""
+                        if city.count > 0 {
+                            address = city
+                        }
+                        
+                        if state.count > 0 {
+                            address =  address.count > 0 ? (address + ", " + state) : state
+                        }
+                        
+                        if country.count > 0 {
+                            address =  address.count > 0 ? (address + ", " + country) : country
+                        }
+                        
+                        locationInfo = address
+                        
+                        
                     }
                 }
             }
