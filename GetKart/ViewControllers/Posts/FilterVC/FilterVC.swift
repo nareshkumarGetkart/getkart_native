@@ -213,10 +213,23 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.lblTitle.text = "Location"
                     cell.imgImageView.image = UIImage(named: "location_icon")
                     var strTitle = ""
-                    if country.count > 0 {
-                        strTitle = city + ", " + state + ", " + country
+                    
+                    var address = ""
+                    if city.count > 0 {
+                        address = city
                     }
-                    cell.btnTextValue.setTitle(strTitle, for: .normal)
+                    
+                    if state.count > 0 {
+                        address =  address.count > 0 ? (address + ", " + state) : state
+                    }
+                    
+                    if country.count > 0 {
+                        address =  address.count > 0 ? (address + ", " + country) : country
+                    }
+                    
+                    
+                    
+                    cell.btnTextValue.setTitle(address, for: .normal)
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnTextValue.addTarget(self, action: #selector(selectLocationAction(_:)), for: .touchUpInside)
@@ -282,32 +295,6 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
             
             var objCustomField = dataArray[indexPath.row]
             if objCustomField.type  == .radio || objCustomField.type  ==  .checkbox{
-                /*let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
-                if objCustomField.values?.count ?? 0 != objCustomField.arrIsSelected.count  {
-                    
-                    objCustomField.arrIsSelected.append(contentsOf:repeatElement(false, count: (objCustomField.values?.count ?? 0)))
-                    dataArray[indexPath.row] = objCustomField
-                }
-                cell.lblTitle.text = objCustomField.name ?? ""
-                
-                //cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-                cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
-                
-                cell.del = self
-                cell.rowValue = indexPath.row
-                //cell.objData = objCustomField
-                cell.configure(with: objCustomField)
-                cell.clnCollectionView.performBatchUpdates({
-                    cell.clnCollectionView.reloadData()
-                }) { _ in
-                    // Code to execute after reloadData and layout updates
-                    print("CollectionView finished updating!")
-                    self.tblView.beginUpdates()
-                    self.tblView.endUpdates()
-                }
-                
-                cell.selectionStyle = .none
-                return cell*/
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "RadioTVCell") as! RadioTVCell
                 if objCustomField.value == nil {
@@ -325,31 +312,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 return cell
                 
             }else if objCustomField.type  == .dropdown {
-                /*let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
-                cell.imgView.isHidden = false
-                //cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-                cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
-                cell.lblTitle.text = objCustomField.name ?? ""
-                cell.txtField.placeholder = ""
-                if objCustomField.selectedValue == nil {
-                    objCustomField.selectedValue = ""
-                    dataArray[indexPath.row] = objCustomField
-                    cell.txtField.text = ""
-                }else {
-                    cell.txtField.text = objCustomField.selectedValue
-                }
-                cell.btnOptionBig.isHidden = false
-                cell.btnOptionBig.tag = indexPath.row
-                cell.btnOptionBig.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchDown)
                 
-                
-                cell.btnOption.isHidden = false
-                cell.btnOption.tag = indexPath.row
-                cell.btnOption.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)
-                cell.selectionStyle = .none
-                
-                return cell
-                 */
                 let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
                 cell.imgView.isHidden = false
                 cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
@@ -360,7 +323,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                        cell.txtField.text = objCustomField.value?.first ?? ""
                }else {
                        cell.txtField.text = ""
-                   objCustomField.value = Array<String>()
+                   objCustomField.value = Array<String?>()
                    dataArray[indexPath.row] = objCustomField
                }
                 
@@ -460,34 +423,23 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
     
   
     
-   /* func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
+   
+    
+    func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
         print(dropDownRowIndex, selectedRow)
         if dropDownRowIndex == 3 {
             posted_since = arrPostedSinceDict[selectedRow]
         }else {
             var objCustomField = self.dataArray[dropDownRowIndex]
-            objCustomField.selectedValue = objCustomField.values?[selectedRow] ?? ""
+            if objCustomField.value?.count ?? 0 > 0 {
+                objCustomField.value?[0] = objCustomField.values?[selectedRow] ?? ""
+                dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[selectedRow] ?? ""
+            }else {
+                objCustomField.value?.append(objCustomField.values?[selectedRow] ?? "")
+                dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[selectedRow] ?? ""
+            }
             dataArray[dropDownRowIndex] = objCustomField
-            //tblView.reloadData()
-            dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.name ?? ""
         }
-        
-        let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
-        tblView.reloadRows(at: [indexPath], with: .automatic)
-        
-    }*/
-    
-    func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
-        print(dropDownRowIndex, selectedRow)
-        
-        var objCustomField = self.dataArray[dropDownRowIndex]
-        if objCustomField.value?.count ?? 0 > 0 {
-            objCustomField.value?[0] = objCustomField.values?[selectedRow] ?? ""
-        }else {
-            objCustomField.value?.append(objCustomField.values?[selectedRow] ?? "")
-            dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[selectedRow] ?? ""
-        }
-        dataArray[dropDownRowIndex] = objCustomField
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
         
