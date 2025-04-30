@@ -198,7 +198,7 @@ struct ProfileEditView: View {
     
     func verifyMobileOTPApi(otp:String){
         
-        var params = ["mobile": phoneNumber, "countryCode":"+91", "otp":otp] as [String : Any]
+        let params = ["mobile": phoneNumber, "countryCode":"+91", "otp":otp] as [String : Any]
         
         
       

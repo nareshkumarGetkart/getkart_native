@@ -69,68 +69,83 @@ struct SearchWithSortView: View {
             }.frame(height:50).background(Color.white)
                 .padding(.top,1)
             
-            // Listings
-            ScrollView {
-                if isGridView {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        ForEach(objVM.items, id: \.id) { item in
-                            
-                            ProductCard(objItem: item)
-                                .onTapGesture {
-                                    
-                                    
-                                    let itemId = item.id ?? 0
-                                    
-                                    self.pushToDetailScreen(id: itemId, item: item)
-                                    /*    let destView = ItemDetailView(navController: nil,
-                                                                  itemId:itemId,
-                                                                  isMyProduct:false,
-                                                                  itemObj:nil)
-                                  let hostingVC = UIHostingController(rootView:destView)
-                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostingVC, animated: true)*/
-                                    
-                                }
-                                .onAppear {
-                                    let lastItem = objVM.items.last
-                                    let isLastItem = lastItem?.id == item.id
-                                    let isNotLoading = !objVM.isDataLoading
-                                    if isLastItem && isNotLoading {
-                                        objVM.getSearchItemApi(srchTxt: srchTxt)
-                                    }
-                                }
-                            
-                        }
+            if objVM.items.count == 0 {
+                HStack{
+                    Spacer()
+                    VStack(spacing: 20){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
+                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+                        Spacer()
                     }
-                    .padding(.horizontal,10)
-                    
-                } else {
-                    LazyVStack(spacing: 10) {
-                        ForEach(objVM.items, id: \.id) {
-                            item in
-                            FavoritesCell(itemObj: item)
-                                .padding(.horizontal)
-                                .onTapGesture {
-                                    
-                                  let itemId =  item.id ?? 0
-                                    self.pushToDetailScreen(id: itemId, item: item)
-
-                                    /*   let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,isMyProduct:false,itemObj: item)
-                                    let hostController = UIHostingController(rootView: destView)
-                                    AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
-                                    */
-                                }.onAppear {
-                                    let lastItem = objVM.items.last
-                                    let isLastItem = lastItem?.id == item.id
-                                    let isNotLoading = !objVM.isDataLoading
-                                    if isLastItem && isNotLoading {
-                                        objVM.getSearchItemApi(srchTxt: srchTxt)
+                    Spacer()
+                }
+            }else{
+                // Listings
+                ScrollView {
+                    if isGridView {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach(objVM.items, id: \.id) { item in
+                                
+                                ProductCard(objItem: item)
+                                    .onTapGesture {
+                                        
+                                        
+                                        let itemId = item.id ?? 0
+                                        
+                                        self.pushToDetailScreen(id: itemId, item: item)
+                                        /*    let destView = ItemDetailView(navController: nil,
+                                                                      itemId:itemId,
+                                                                      isMyProduct:false,
+                                                                      itemObj:nil)
+                                      let hostingVC = UIHostingController(rootView:destView)
+                                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingVC, animated: true)*/
+                                        
                                     }
-                                }
+                                    .onAppear {
+                                        let lastItem = objVM.items.last
+                                        let isLastItem = lastItem?.id == item.id
+                                        let isNotLoading = !objVM.isDataLoading
+                                        if isLastItem && isNotLoading {
+                                            objVM.getSearchItemApi(srchTxt: srchTxt)
+                                        }
+                                    }
+                                
+                            }
+                        }
+                        .padding(.horizontal,10)
+                        
+                    } else {
+                        LazyVStack(spacing: 10) {
+                            ForEach(objVM.items, id: \.id) {
+                                item in
+                                FavoritesCell(itemObj: item)
+                                    .padding(.horizontal)
+                                    .onTapGesture {
+                                        
+                                      let itemId =  item.id ?? 0
+                                        self.pushToDetailScreen(id: itemId, item: item)
+
+                                        /*   let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,isMyProduct:false,itemObj: item)
+                                        let hostController = UIHostingController(rootView: destView)
+                                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
+                                        */
+                                    }.onAppear {
+                                        let lastItem = objVM.items.last
+                                        let isLastItem = lastItem?.id == item.id
+                                        let isNotLoading = !objVM.isDataLoading
+                                        if isLastItem && isNotLoading {
+                                            objVM.getSearchItemApi(srchTxt: srchTxt)
+                                        }
+                                    }
+                            }
                         }
                     }
                 }
+                
             }
-            
+           
             Spacer()
             // Bottom bar
             HStack {

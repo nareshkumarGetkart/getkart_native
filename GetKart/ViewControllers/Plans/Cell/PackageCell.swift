@@ -18,6 +18,7 @@ class PackageCell: UITableViewCell {
     @IBOutlet weak var btnViewPlans:UIButton!
     @IBOutlet weak var lblFeatures:UILabel!
     @IBOutlet weak var bgViewMain:UIViewX!
+    @IBOutlet weak var imgVwPercentageOffIcon:UIImageView!
 
 
     

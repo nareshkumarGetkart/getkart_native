@@ -20,7 +20,7 @@ struct LoginRequiredView: View {
                 VStack(alignment: .leading,spacing: 10){
                     HStack{
                         VStack(alignment: .leading,spacing: 5){
-                            Text("Login is required to access this boost").font(Font.manrope(.medium, size: 17)).foregroundColor(.black)
+                            Text("Login is required to access").font(Font.manrope(.medium, size: 17)).foregroundColor(.black)
                             Text("Tap on login to authorize").font(Font.manrope(.regular, size: 14)).foregroundColor(.black).padding(.bottom,10)
                             
                             Button {

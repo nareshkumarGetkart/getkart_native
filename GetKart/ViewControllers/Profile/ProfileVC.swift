@@ -178,8 +178,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 self.navigationController?.pushViewController(destVC, animated: true)
                 
             }else if titleArray[indexPath.row] == "My Boost Ads"{
-              
-                if isUserLoggedInRequest(){
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     let destVC = UIHostingController(rootView: MyBoostAdsView(navigation: self.navigationController))
                     destVC.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destVC, animated: true)
@@ -187,7 +187,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
             } else if titleArray[indexPath.row] == "Buy Packages"{
                 
-                if isUserLoggedInRequest(){
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
                     if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
                         destvc.hidesBottomBarWhenPushed = true
@@ -239,7 +239,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }else if titleArray[indexPath.row] == "Notifications"{
-                if isUserLoggedInRequest(){
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
                     let hostingController = UIHostingController(rootView: NotificationView(navigation:self.navigationController)) // Wrap in UIHostingController
                     hostingController.hidesBottomBarWhenPushed = true
@@ -248,7 +248,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
             }else if titleArray[indexPath.row] == "Favorites"{
                 
-                if isUserLoggedInRequest(){
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     let hostingController = UIHostingController(rootView: FavoritesView(navigation:self.navigationController)) // Wrap in UIHostingController
                     hostingController.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(hostingController, animated: true)
@@ -263,7 +263,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
             }else if titleArray[indexPath.row] ==  "Order History"{
                 
-                if isUserLoggedInRequest(){
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
                     let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController)) // Wrap in UIHostingController
                     hostingController.hidesBottomBarWhenPushed = true
@@ -293,7 +293,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         }
     }
     
-    func isUserLoggedInRequest() -> Bool {
+ /*   func isUserLoggedInRequest() -> Bool {
         
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
@@ -315,7 +315,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             return false
         }
     }
-    
+    */
     
     func rateApp() {
         if #available(iOS 10.3, *) {

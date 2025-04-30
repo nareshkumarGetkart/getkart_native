@@ -433,5 +433,29 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     }
    
     
+    func isUserLoggedInRequest() -> Bool {
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if objLoggedInUser.id != nil {
+            
+            return true
+            
+            
+        }else{
+            let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
+                //Login
+                AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+                
+            }))
+            deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+            deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+            deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+            self.navigationController?.present(deleteAccountView, animated: true, completion: nil)
+            
+            return false
+        }
+    }
+    
+    
 }
 

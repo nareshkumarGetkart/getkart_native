@@ -38,7 +38,19 @@ class HomeViewModel:ObservableObject{
             return
         }
         isDataLoading = true
-        let strUrl = "\(Constant.shared.get_item)?page=\(page)&city=\(city)"
+        var strUrl = "\(Constant.shared.get_item)?page=\(page)"
+        
+        if city.count > 0{
+            strUrl.append("&city=\(city)")
+        }
+        
+        if state.count > 0{
+            strUrl.append("&state=\(state)")
+        }
+        
+        if country.count > 0{
+            strUrl.append("&country=\(country)")
+        }
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
@@ -59,7 +71,25 @@ class HomeViewModel:ObservableObject{
     
     func getFeaturedListApi(){
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_featured_section) {[weak self] (obj:FeaturedParse) in
+        let city = Local.shared.getUserCity()
+        let country = Local.shared.getUserCountry()
+        let state = Local.shared.getUserState()
+
+        var strUrl = "\(Constant.shared.get_featured_section)"
+
+        if city.count > 0{
+            strUrl.append("&city=\(city)")
+        }
+        
+        if state.count > 0{
+            strUrl.append("&state=\(state)")
+        }
+        
+        if country.count > 0{
+            strUrl.append("&country=\(country)")
+        }
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
             
             self?.featuredObj = obj.data
             self?.delegate?.refreshScreen()

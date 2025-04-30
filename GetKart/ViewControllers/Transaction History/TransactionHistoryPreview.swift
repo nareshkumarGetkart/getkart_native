@@ -16,8 +16,8 @@ struct TransactionHistoryPreview: View {
         VStack(spacing: 0) {
             navigationHeader()
             
-            ScrollView {
-                VStack(spacing: 16) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 10) {
                  
                     VStack{
                         
@@ -32,14 +32,15 @@ struct TransactionHistoryPreview: View {
                         
                         Text("Successfully paid \(Local.shared.currencySymbol) \(String(format: "%.2f", transaction?.paymentTransaction?.amount ?? 0.0))")
                             .foregroundColor(.gray)
+                            .font(Font.manrope(.regular, size: 16.0))
+
                         
                         HStack{ }.frame(height:10)
                     }
                     
                     HStack{
                         Text("Payment methods")
-                        .font(.title3)
-                        .bold()
+                            .font(Font.manrope(.bold, size: 16.0))
                         Spacer()
                     }
 
@@ -47,7 +48,7 @@ struct TransactionHistoryPreview: View {
                     
                     Button(action: {}) {
                         Text("Total Cost \(Local.shared.currencySymbol) \(String(format: "%.2f", transaction?.paymentTransaction?.amount ?? 0.0))")
-                            .bold()
+                            .font(Font.manrope(.bold, size: 18.0))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -65,8 +66,8 @@ struct TransactionHistoryPreview: View {
             
             .padding([.horizontal,.top],10)
             .cornerRadius(10)
-
             .background(Color(.systemGray6))
+            
         }.navigationBarHidden(true)
         .padding(.top)
     }
@@ -76,20 +77,22 @@ struct TransactionHistoryPreview: View {
     private func detailRow(title: String, value: String, isCopyable: Bool = false) -> some View {
         HStack {
             Text(title)
+                .font(Font.manrope(.medium, size: 16.0))
                 .foregroundColor(.gray)
             Spacer()
             HStack(spacing: 4) {
-                Text(value)
-                    .bold()
+               
                 if isCopyable {
-                    
+                  
                     Image("ic_baseline-content-copy")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundColor(.gray).onTapGesture {
                             UIPasteboard.general.string = transaction?.paymentTransaction?.orderID ?? ""
                             AlertView.sharedManager.showToast(message: "Copied successfully")
                         }
                 }
+                Text(value).multilineTextAlignment(.trailing)
+                    .font(Font.manrope(.semiBold, size: 16.0))
             }
         }
     }
@@ -161,11 +164,16 @@ private func detailsCard() -> some View {
         let date = Date(timeIntervalSince1970: TimeInterval(convertTimestamp(isoDateString: transaction?.paymentTransaction?.createdAt ?? "")))
 
         detailRow(title: "Name", value: "\(transaction?.package?.name ?? "")")
-        detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") Days")
+        detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") Ads")
+       // detailRow(title: "Bought pack", value: "\(transaction?.package?.duration ?? "") Days")
+
         detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
         detailRow(title: "Date", value: getConvertedDateFromDate(date: date))
         detailRow(title: "Purchase from", value: "\(transaction?.paymentTransaction?.paymentGateway?.capitalized ?? "")")
-        detailRow(title: "Package validity", value: "\(transaction?.totalLimit ?? 0) days")
+//        detailRow(title: "Package validity", value: "\(transaction?.totalLimit ?? 0) days")
+        
+        detailRow(title: "Package validity", value: "\(transaction?.package?.duration ?? "") days")
+
         
         if (transaction?.remainingDays ?? "") ==  "0" {
             HStack {
@@ -198,6 +206,10 @@ private func detailsCard() -> some View {
     .padding()
     .background(Color.white)
     .cornerRadius(16)
+    .overlay(
+        RoundedRectangle(cornerRadius: 16)
+            .stroke(Color(hex:"#DADADA"), lineWidth: 0.5)
+    )
     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     //.padding(.horizontal)
 }

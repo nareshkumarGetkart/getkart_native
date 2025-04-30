@@ -79,12 +79,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     @IBAction func filterBtnAction(_ sender : UIButton){
         
-        
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
         hostingController.hidesBottomBarWhenPushed = true
-
         self.navigationController?.pushViewController(hostingController, animated: false)
-        
     }
     
     
@@ -108,20 +105,22 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
 }
 
 extension HomeVC:FilterSelected{
-        func filterSelectectionDone(dict:Dictionary<String,Any>) {
-            print(dict)
-
-            homeVModel?.page = 1
-            homeVModel?.itemObj?.data = nil
-            self.tblView.reloadData()
-            homeVModel?.getProductListApi()
-            
-            if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
-                let locStr = city + ", " + state + ", " + country
-                self.lblAddress.text = locStr
-            }
+    
+    
+    func filterSelectectionDone(dict:Dictionary<String,Any>) {
+        print(dict)
+        
+        homeVModel?.page = 1
+        homeVModel?.itemObj?.data = nil
+        self.tblView.reloadData()
+        homeVModel?.getProductListApi()
+        
+        if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
+            let locStr = city + ", " + state + ", " + country
+            self.lblAddress.text = locStr
         }
     }
+}
 
 
 extension HomeVC:UITableViewDelegate,UITableViewDataSource {

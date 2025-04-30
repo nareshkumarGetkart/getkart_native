@@ -21,19 +21,19 @@ struct SearchProductView: View {
 
     var body: some View {
         VStack{
-        HStack {
-         
-            Button(action: {
-                // Action to go back
-                navigation?.popViewController(animated: true)
-            }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding(5)
-            }
-            Text("Search").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
-            Spacer()
-        }.frame(height: 44).padding(.horizontal)
+            HStack {
+                
+                Button(action: {
+                    // Action to go back
+                    navigation?.popViewController(animated: true)
+                }) {
+                    Image("arrow_left").renderingMode(.template)
+                        .foregroundColor(.black).padding(5)
+                }
+                Text("Search").font(.custom("Manrope-Bold", size: 20.0))
+                    .foregroundColor(.black)
+                Spacer()
+            }.frame(height: 44).padding(.horizontal)
             
             HStack {
                 HStack{
@@ -43,14 +43,14 @@ struct SearchProductView: View {
                         .background(Color.white).padding(.trailing,10).tint(Color(hex: "#FF9900"))
                         .submitLabel(.search)
                         .onSubmit {
-                       
+                            
                             self.page = 1
                             self.getProductListApi(searchTxt: searchText)
-
+                            
                         }
                 }.background(Color.white).frame(height: 45).overlay {
                     RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray, lineWidth: 1)
+                        .stroke(Color.gray, lineWidth: 1)
                 }
                 
                 Button(action: {
@@ -62,7 +62,7 @@ struct SearchProductView: View {
                 }) {
                     ZStack{
                         
-                    Image("filter")
+                        Image("filter")
                             .foregroundColor(.orange)
                     }.frame(width: 50,height: 45).overlay {
                         RoundedRectangle(cornerRadius: 8)
@@ -70,23 +70,38 @@ struct SearchProductView: View {
                     }.background(Color.white)
                 }.padding(.leading,10)
             }.padding(.leading,10)
-            .padding(.horizontal,10)
+                .padding(.horizontal,10)
             
             Text("Searched Items")
                 .font(.headline)
                 .padding(.horizontal)
                 .padding(.top, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-     
+          
+            if items.count == 0 {
+                HStack{
+                    Spacer()
+                    VStack(spacing: 20){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
+                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }else{
+                
+                
             ScrollView {
                 VStack(spacing: 10) {
                     ForEach(items) { item in
-                       // ItemRow(item: item)
+                        // ItemRow(item: item)
                         FavoritesCell(itemObj: item).onTapGesture {
                             let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:false, slug: item.slug))
                             self.navigation?.pushViewController(hostingController, animated: true)
                         }
-
+                        
                     }
                 }.padding([.leading,.trailing],10)
                 
@@ -103,11 +118,11 @@ struct SearchProductView: View {
                 
                 if isDataLoading {
                     ProgressView()
-                    .padding()
+                        .padding()
                 }
             }
             
-            
+        }
 
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
@@ -139,18 +154,23 @@ struct SearchProductView: View {
     func getProductListApi(searchTxt:String){
         isDataLoading = true
         var strUrl = ""
+      
         if dictCustomFields.keys.count == 0 {
             strUrl = "\(Constant.shared.get_item)?page=\(page)&sort_by=popular_items"
         }else {
-            strUrl = "\(Constant.shared.get_item)"
+            strUrl = "\(Constant.shared.get_item)?page=\(page)"
             
             for (ind,key) in dictCustomFields.keys.enumerated(){
                 // for ind in 0..<keys.count {
                 //let key = keys[ind] as? String ?? ""
-                if ind == 0 {
-                    strUrl = strUrl + "?\(dictCustomFields[key] ?? "")"
-                }else {
-                    strUrl = strUrl + "&\(dictCustomFields[key] ?? "")"
+//                if ind == 0 {
+//                    strUrl = strUrl + "?\(dictCustomFields[key] ?? "")"
+//                }else {
+                  //  strUrl = strUrl + "&\(dictCustomFields[key] ?? "")"
+               // }
+                if let value = dictCustomFields[key]{
+                   
+                    strUrl += "&\(key)=\(value)"
                 }
             }
         }
@@ -159,6 +179,7 @@ struct SearchProductView: View {
         if searchTxt.count > 0{
             strUrl.append("&search=\(searchTxt)")
         }
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:ItemParse) in
 
             if self.page == 1{

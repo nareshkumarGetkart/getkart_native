@@ -45,7 +45,7 @@ class ChatVC: UIViewController {
     @IBOutlet weak var blockedView:UIViewX!
     @IBOutlet weak var lblBlockedMsg:UILabel!
 
-   lazy private var imagePicker = UIImagePickerController()
+    lazy private var imagePicker = UIImagePickerController()
 
     var chatArray = [MessageModel]()
     

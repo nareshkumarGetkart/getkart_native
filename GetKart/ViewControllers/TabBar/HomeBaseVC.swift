@@ -59,7 +59,7 @@ class HomeBaseVC: UITabBarController {
             let buttonRadius: CGFloat = buttonSize / 2
             
             // Configure button appearance
-            middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -20, width: buttonSize, height: buttonSize)
+            middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -25, width: buttonSize, height: buttonSize)
             middleButton.layer.cornerRadius = buttonRadius
             middleButton.backgroundColor = .clear
             middleButton.setImage(UIImage(named: "plus_button"), for: .normal)
@@ -76,34 +76,12 @@ class HomeBaseVC: UITabBarController {
             tabBar.bringSubviewToFront(middleButton)
         }
 
-    
-    func isUserLoggedInRequest() -> Bool {
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.id != nil {
-          
-            return true
-            
-        }else{
-            
-            let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
-                //Login
-                AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
-                
-            }))
-            deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
-            deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
-            deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-            present(deleteAccountView, animated: true, completion: nil)
-            return false
-        }
-    }
-    
+
     
     @objc func middleButtonTapped() {
         print("Middle button tapped!")
         // Handle action (e.g., present a modal view)
-        if isUserLoggedInRequest(){
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
             
             
             let url = Constant.shared.getLimits + "?package_type=item_listing"
@@ -133,10 +111,7 @@ class HomeBaseVC: UITabBarController {
                                 selectedVC.pushViewController(destVC, animated: true)
                                 
                             }
-                            
                         }
-                        
-                        
                     }else{
                         
                         AlertView.sharedManager.presentAlertWith(title: "No Package Available", msg: "Please subscribe to any packages to use this functionality", buttonTitles: ["Cancel","Subscribe"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
@@ -157,7 +132,6 @@ class HomeBaseVC: UITabBarController {
             }
             
         }
-        
     }
     
     
@@ -247,7 +221,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         
         if let index = viewControllers?.firstIndex(of: viewController), index == 1 || index == 3 {
             
-            if isUserLoggedInRequest() == false {
+            if AppDelegate.sharedInstance.isUserLoggedInRequest() == false {
                 return false
             }
         }
@@ -262,24 +236,8 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController,
                           didSelect viewController: UIViewController) {
         
-//        tabBar.items?.forEach { item in
-//                   if let selectedVC = viewControllers?.first(where: { $0.tabBarItem == item }) {
-//                       item.image = selectedVC == viewController ? item.selectedImage?.withRenderingMode(.alwaysOriginal) : item.image?.withRenderingMode(.alwaysOriginal)
-//                   }
-//               }
         
-//        guard let items = self.tabBar.items else {
-//            return
-//        }
-//        
-//        let images = ["home","chat","","myads","profile"]
-//        
-//        for x in 0..<items.count-1 {
-//            items[x].image = UIImage(named:images[x])?.withRenderingMode(.alwaysOriginal)
-//        }
-        
-        
-        switch tabBarController.selectedIndex{
+     /*   switch tabBarController.selectedIndex{
             
         case 0:
             break
@@ -303,7 +261,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         default:
             break
             
-        }
+        }*/
         
     }
 }

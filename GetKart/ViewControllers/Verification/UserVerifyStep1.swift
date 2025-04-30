@@ -71,11 +71,11 @@ struct UserVerifyStep1: View {
             
             // Input Fields
             VStack(spacing: 10) {
-                CustomTextField(title: "Full Name", text: $fullName)
+                CustomTextField(title: "Full Name", text: $fullName).disabled(true)
                 CustomTextField(title: "Business Name", text: $businessName)
-                CustomTextField(title: "Address", text: $address)
-                CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
-                CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
+                CustomTextField(title: "Address", text: $address).disabled(true)
+                CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad).disabled(true)
+                CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress).disabled(true)
             }
             .padding(.horizontal, 20)
             .padding(.top, 10)

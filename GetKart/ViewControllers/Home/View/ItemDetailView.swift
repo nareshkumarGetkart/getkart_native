@@ -67,6 +67,7 @@ struct ItemDetailView: View {
                                         AsyncImage(url: URL(string: img)) { image in
                                             image
                                                 .resizable()
+                                                .aspectRatio(contentMode: .fit)
                                                 .frame(height: 200)
                                                 .cornerRadius(10)
                                                 .padding(.horizontal, 5)
@@ -524,31 +525,36 @@ struct ItemDetailView: View {
             Button(action: {
                 print("Make an Offer")
                 
-                if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
-                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                     
-                    let offerId =
-                    objVM.itemObj?.itemOffers?.first?.id ?? 0
-                    let sellerId =
-                    objVM.itemObj?.itemOffers?.first?.sellerID ?? 0
-                    let buyerId =
-                    objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
-                    var userId = 0
-                    if sellerId == objLoggedInUser.id{
-                        userId = buyerId
+                    
+                    if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
+                        
+                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                        
+                        let offerId =
+                        objVM.itemObj?.itemOffers?.first?.id ?? 0
+                        let sellerId =
+                        objVM.itemObj?.itemOffers?.first?.sellerID ?? 0
+                        let buyerId =
+                        objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
+                        var userId = 0
+                        if sellerId == objLoggedInUser.id{
+                            userId = buyerId
+                        }else{
+                            userId = sellerId
+                        }
+                        
+                        let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                        destVC.item_offer_id = offerId
+                        destVC.userId = userId
+                        self.navController?.pushViewController(destVC, animated: true)
+                        
                     }else{
-                        userId = sellerId
+                        showSheet = true
+                        
                     }
-                    
-                    let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                    destVC.item_offer_id = offerId
-                    destVC.userId = userId
-                    self.navController?.pushViewController(destVC, animated: true)
-                    
-                }else{
-                    showSheet = true
-                    
                 }
                 
             }) {

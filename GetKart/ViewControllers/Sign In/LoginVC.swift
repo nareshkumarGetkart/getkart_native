@@ -121,9 +121,7 @@ class LoginVC: UIViewController {
             self.navigationController?.pushViewController(vc, animated: true)
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
-            /*let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
-             self.navigationController?.pushViewController(vc, animated: true)
-             */
+           
             self.sendOTPApi()
             
         }else {

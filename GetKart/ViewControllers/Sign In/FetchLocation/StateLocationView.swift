@@ -65,7 +65,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                     if searchText.count > 0 {
                         Button("Clear") {
                             searchText = ""
-                        }.foregroundColor(.black)
+                        }.padding(.horizontal).foregroundColor(.black)
                     }
                 }.background(Color.white).padding().frame(height: 45).overlay {
                         RoundedRectangle(cornerRadius: 8)

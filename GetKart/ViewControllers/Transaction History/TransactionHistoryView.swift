@@ -10,9 +10,10 @@ import SwiftUI
 struct TransactionHistoryView: View {
     
     var  navigation:UINavigationController?
-   
+    @State private var page = 1
     @State var transactions = [TransactionModel]()
-        
+    @State private var isDataLoading = false
+
     var body: some View {
         HStack {
          
@@ -53,7 +54,16 @@ struct TransactionHistoryView: View {
                             
                             TransactionRow(transaction: transaction).background(Color.white)
                                 .cornerRadius(10)
-                                .shadow(radius: 2).onTapGesture {
+                                .shadow(radius: 2)
+                                .onAppear{
+                                    
+                                    let lastId = transactions.last?.id  ?? 0
+                                    let existingId = transaction.id ?? 0
+                                    if (lastId == existingId) && (isDataLoading == false){
+                                        getTransactionHistory()
+                                    }
+                                }
+                                .onTapGesture {
                                     let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transaction, navController: self.navigation))
                                     self.navigation?.pushViewController(hostView, animated: true)
                                 }
@@ -63,16 +73,29 @@ struct TransactionHistoryView: View {
                 Spacer()
             }
                         
-        }.padding([.leading,.trailing],10).background(Color(.systemGray6)).onAppear{
-            getTransactionHistory()
+        }.padding([.leading,.trailing],10).background(Color(.systemGray6))
+            .onAppear{
+                if transactions.count == 0{
+                    getTransactionHistory()
+
+                }
         }.navigationBarHidden(true)
         
     }
     
     func getTransactionHistory(){
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.payment_transactions) { (obj:TransactionParse) in
+        if isDataLoading{
+            return
+        }
+        isDataLoading = true
+        let strURl = "\(Constant.shared.payment_transactions)?page=\(page)"
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strURl) { (obj:TransactionParse) in
             if obj.code == 200 {
-                self.transactions = obj.data?.data ?? []
+                    self.transactions.append(contentsOf: obj.data?.data ?? [])
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    self.page += 1
+                    self.isDataLoading = false
+                })
             }
         }
     }
@@ -101,7 +124,6 @@ struct TransactionRow: View {
     var body: some View {
         HStack {
             
-            
             AsyncImage(url: URL(string: transaction.package?.icon ?? "")) { img in
                 
                 img.resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).background(Color(hex: "#FEF6E9")).cornerRadius(6)
@@ -109,10 +131,6 @@ struct TransactionRow: View {
                 Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).background(Color(hex: "#FEF6E9")).cornerRadius(6)
             }
 
-//            HStack{
-//                
-//            }.frame(width: 3,height: 40).background(Color.orange).cornerRadius(5)
-            
             VStack(alignment: .leading, spacing: 2) {
                 
                 Text(transaction.package?.name ?? "")
@@ -123,9 +141,6 @@ struct TransactionRow: View {
                     .font(Font.manrope(.regular, size: 16))
                     .foregroundColor(.black)
 
-//                    .padding(5)
-//                    .background(Color.orange.opacity(0.2))
-//                    .cornerRadius(5)
                 Button(action: {
                     UIPasteboard.general.string = transaction.paymentTransaction?.orderID
                     AlertView.sharedManager.showToast(message: "Copied successfully")
@@ -150,11 +165,6 @@ struct TransactionRow: View {
                 Text("\(Local.shared.currencySymbol) \( String(format: "%.2f", transaction.paymentTransaction?.amount ?? 0.0))")
                     .font(.headline)
                     .foregroundColor(.black).padding(.trailing,10)
-//                
-//                Text()
-//                    .foregroundColor(.gray).padding(.trailing,10)
-//                
-                
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
