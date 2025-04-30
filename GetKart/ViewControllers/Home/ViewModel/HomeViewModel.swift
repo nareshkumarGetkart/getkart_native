@@ -9,6 +9,20 @@ import Foundation
 
 protocol RefreshScreen:AnyObject{
     func refreshScreen()
+    func refreshFeaturedsList()
+    func refreshBannerList()
+    func refreshCategoriesList()
+    func newItemRecieve(newItemArray:[Any]?)
+
+
+}
+
+extension RefreshScreen{
+    func refreshFeaturedsList(){}
+    func refreshBannerList(){}
+    func refreshCategoriesList(){}
+    func newItemRecieve(newItemArray:[Any]?){}
+
 }
 
 class HomeViewModel:ObservableObject{
@@ -56,11 +70,12 @@ class HomeViewModel:ObservableObject{
 
             if self?.page == 1{
                 self?.itemObj = obj.data
+                self?.delegate?.refreshScreen()
 
             }else{
-                self?.itemObj?.data?.append(contentsOf: (obj.data?.data)!)
+                self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
+              //  self?.itemObj?.data?.append(contentsOf: (obj.data?.data)!)
             }
-            self?.delegate?.refreshScreen()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 self?.isDataLoading = false
                 self?.page = (self?.page ?? 0) + 1
@@ -78,21 +93,36 @@ class HomeViewModel:ObservableObject{
         var strUrl = "\(Constant.shared.get_featured_section)"
 
         if city.count > 0{
-            strUrl.append("&city=\(city)")
+            if !strUrl.contains("?"){
+                strUrl.append("?city=\(city)")
+            }else{
+                strUrl.append("&city=\(city)")
+
+            }
         }
         
         if state.count > 0{
-            strUrl.append("&state=\(state)")
+            if !strUrl.contains("?"){
+                strUrl.append("?state=\(state)")
+            }else{
+                strUrl.append("&state=\(state)")
+
+            }
         }
         
         if country.count > 0{
-            strUrl.append("&country=\(country)")
+            if !strUrl.contains("?"){
+                strUrl.append("?country=\(country)")
+
+            }else{
+                strUrl.append("&country=\(country)")
+            }
         }
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
             
             self?.featuredObj = obj.data
-            self?.delegate?.refreshScreen()
+            self?.delegate?.refreshFeaturedsList()
         }
     }
     
@@ -104,7 +134,7 @@ class HomeViewModel:ObservableObject{
             
             if obj.data != nil {
                 self?.sliderArray = obj.data
-                self?.delegate?.refreshScreen()
+                self?.delegate?.refreshBannerList()
             }
         }
     }
@@ -116,7 +146,7 @@ class HomeViewModel:ObservableObject{
             
             if obj.data != nil {
                 self?.categoryObj = obj.data
-                self?.delegate?.refreshScreen()
+                self?.delegate?.refreshCategoriesList()
             }
         }
     }

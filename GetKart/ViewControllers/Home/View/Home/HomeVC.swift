@@ -333,17 +333,67 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 }
 
 
-    extension HomeVC: RefreshScreen{
+extension HomeVC: RefreshScreen{
+    
+    
+    func refreshFeaturedsList(){
+        tblView.reloadSections(IndexSet(integer: 2), with: .none)
+        
+    }
+    func refreshBannerList(){
+        
+        tblView.reloadSections(IndexSet(integer: 0), with: .none)
+        
+    }
+    func refreshCategoriesList(){
+        
+        tblView.reloadSections(IndexSet(integer: 1), with: .none)
+        
+    }
+    
+    
+    
     func refreshScreen(){
         
+    //    self.tblView.reloadData()
+
+       // tblView.reloadSections(IndexSet(integer: 3), with: .none)
+        
         //self.tblView.invalidateIntrinsicContentSize()
-        if ( self.homeVModel?.page ?? 0) > 1{
-            self.tblView.reloadData()
-            //tblView.reloadSections(IndexSet(integer: 3), with: .none)
-
-        }else{
-            self.tblView.reloadData()
-
+        /*  if ( self.homeVModel?.page ?? 0) > 1{
+         self.tblView.reloadData()
+         //tblView.reloadSections(IndexSet(integer: 3), with: .none)
+         
+         }else{
+         self.tblView.reloadData()
+         
+         }*/
+    }
+    
+    func newItemRecieve(newItemArray:[Any]?){
+        
+        // var index = (self.homeVModel?.itemObj?.data?.count ?? 0)
+        for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
+            
+            if let obj = newItemArray?[index1] as? ItemModel{
+                
+                self.tblView.performBatchUpdates {
+                    
+                    self.homeVModel?.itemObj?.data?.append(obj)
+                    
+                    
+                    
+                    if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: 3)) as? HomeTblCell {
+                        
+                        let indexPath = IndexPath(row: (self.homeVModel?.itemObj?.data?.count ?? 0) - 1, section: 0)
+                        cell.listArray =  self.homeVModel?.itemObj?.data
+                        cell.cllctnView?.insertItems(at: [indexPath])
+                    }
+                }
+                
+            }
+            //  index = index + 1
         }
+        
     }
 }

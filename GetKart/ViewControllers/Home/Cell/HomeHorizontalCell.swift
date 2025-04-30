@@ -125,7 +125,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     cell.lblItem.text = obj.name
                     cell.lblAddress.text = obj.address
                     cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-                    cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                    cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"), options: [.cacheOriginalImage])
                     let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
                     cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
                     cell.btnLike.tag = indexPath.item
