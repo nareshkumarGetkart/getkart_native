@@ -68,18 +68,21 @@ class HomeViewModel:ObservableObject{
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
-            if self?.page == 1{
-                self?.itemObj = obj.data
-                self?.delegate?.refreshScreen()
-
-            }else{
-                self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
-              //  self?.itemObj?.data?.append(contentsOf: (obj.data?.data)!)
+            if obj.code == 200 {
+                
+                if self?.page == 1{
+                    self?.itemObj = obj.data
+                    self?.delegate?.refreshScreen()
+                    
+                }else{
+                    self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
+                    //  self?.itemObj?.data?.append(contentsOf: (obj.data?.data)!)
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                    self?.isDataLoading = false
+                    self?.page = (self?.page ?? 0) + 1
+                })
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                self?.isDataLoading = false
-                self?.page = (self?.page ?? 0) + 1
-            })
         }
     }
     
@@ -121,8 +124,11 @@ class HomeViewModel:ObservableObject{
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
             
-            self?.featuredObj = obj.data
-            self?.delegate?.refreshFeaturedsList()
+            if obj.code == 200 {
+                
+                self?.featuredObj = obj.data
+                self?.delegate?.refreshFeaturedsList()
+            }
         }
     }
     
@@ -132,7 +138,7 @@ class HomeViewModel:ObservableObject{
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_slider) {[weak self] (obj:SliderModelParse) in
             
-            if obj.data != nil {
+            if obj.code == 200 {
                 self?.sliderArray = obj.data
                 self?.delegate?.refreshBannerList()
             }
@@ -144,7 +150,7 @@ class HomeViewModel:ObservableObject{
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_categories) {[weak self] (obj:CategoryParse) in
             
-            if obj.data != nil {
+            if obj.code == 200 {
                 self?.categoryObj = obj.data
                 self?.delegate?.refreshCategoriesList()
             }

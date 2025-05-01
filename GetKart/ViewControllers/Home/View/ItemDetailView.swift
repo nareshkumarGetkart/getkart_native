@@ -331,8 +331,8 @@ struct ItemDetailView: View {
                 
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHGrid(rows: [GridItem(.adaptive(minimum: 150))], spacing: 10) {
-                        ForEach(objVM.relatedDataItemArray) { item in
-                            ProductCard(objItem: item)
+                        ForEach($objVM.relatedDataItemArray) { $item in
+                            ProductCard(objItem: $item)
                                 .onTapGesture {
                                     var swiftUIview = ItemDetailView(
                                         navController: self.navController,

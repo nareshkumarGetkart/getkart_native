@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct LogoutView: View {
     
@@ -79,6 +80,8 @@ struct LogoutView: View {
 
                 if status == 200{
                     // presentationMode.wrappedValue.dismiss()
+                    ImageCache.default.clearDiskCache()
+                    ImageCache.default.clearMemoryCache()
                     SocketIOManager.sharedInstance.socket?.disconnect()
                     SocketIOManager.sharedInstance.socket = nil
                     SocketIOManager.sharedInstance.manager = nil

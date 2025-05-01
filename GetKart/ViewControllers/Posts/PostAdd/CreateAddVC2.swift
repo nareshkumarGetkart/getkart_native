@@ -618,35 +618,69 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
     }
     
     @objc func addPictureBtnAction(_ sender:UIButtonX){
-        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
-        imagePicker.delegate = self
-        imagePicker.navigationBar.tag = sender.tag
-        self.present(imagePicker, animated: true)
+        
+        /*
+         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+         imagePicker.delegate = self
+         imagePicker.navigationBar.tag = sender.tag
+         self.present(imagePicker, animated: true)
+         */
+        showImagePickerOptions(tag: sender.tag)
     }
      
     
-    
-    
-    
-    
-    
-    
+    @objc func showImagePickerOptions(tag:Int) {
+        let actionSheet = UIAlertController(title: "Choose Image Source", message: nil, preferredStyle: .actionSheet)
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+                self.openImagePicker(sourceType: .camera, tag: tag)
+            }))
+        }
 
-   
+        actionSheet.addAction(UIAlertAction(title: "Photo Library", style: .default, handler: { _ in
+            self.openImagePicker(sourceType: .photoLibrary, tag: tag)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+        // For iPad: prevent crash
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+
+        present(actionSheet, animated: true)
+    }
+    
+    func openImagePicker(sourceType: UIImagePickerController.SourceType,tag:Int) {
+        
+        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+        imagePicker.delegate = self
+        imagePicker.sourceType = sourceType
+        imagePicker.navigationBar.tag = tag
+        imagePicker.allowsEditing = false
+        self.present(imagePicker, animated: true)
+    }
 }
 
 
 extension CreateAddVC2: PictureAddedDelegate {
+    
     func addPictureAction(row:Int) {
+        showImagePickerOptions(tag: row)
+        /*
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
         imagePicker.navigationBar.tag = row
         self.present(imagePicker, animated: true)
+         */
     }
+    
+    
     func removePictureAction(row:Int, col:Int) {
-        
-            
-            
+                    
             let indexPath = IndexPath(row: row, section: 0)
             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
                 cell.arrImagesData.remove(at: col)
@@ -671,3 +705,4 @@ extension CreateAddVC2: PictureAddedDelegate {
         
     }
 }
+

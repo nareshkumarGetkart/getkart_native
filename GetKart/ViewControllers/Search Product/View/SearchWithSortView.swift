@@ -85,10 +85,12 @@ struct SearchWithSortView: View {
                 // Listings
                 ScrollView {
                     if isGridView {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                            ForEach(objVM.items, id: \.id) { item in
+                        
+                        gridView .padding(.horizontal,10)
+                       /* LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach($objVM.items, id: \.id) { $item in
                                 
-                                ProductCard(objItem: item)
+                                ProductCard(objItem: $item)
                                     .onTapGesture {
                                         
                                         
@@ -115,12 +117,12 @@ struct SearchWithSortView: View {
                             }
                         }
                         .padding(.horizontal,10)
-                        
+                        */
                     } else {
-                        LazyVStack(spacing: 10) {
-                            ForEach(objVM.items, id: \.id) {
-                                item in
-                                FavoritesCell(itemObj: item)
+                      /*  LazyVStack(spacing: 10) {
+                            ForEach($objVM.items, id: \.id) {
+                                $item in
+                                FavoritesCell(itemObj: $item)
                                     .padding(.horizontal)
                                     .onTapGesture {
                                         
@@ -141,6 +143,8 @@ struct SearchWithSortView: View {
                                     }
                             }
                         }
+                        */
+                        listView
                     }
                 }
                 
@@ -180,7 +184,8 @@ struct SearchWithSortView: View {
                 }.tint(.black)
             }.frame(height: 50)
                 .background(Color.white.shadow(radius: 2))
-        }.background(Color(UIColor.systemGray6)).navigationBarHidden(true)
+        }.background(Color(UIColor.systemGray6))
+            .navigationBarHidden(true)
             .sheet(isPresented: $showSortSheet) {
                 if #available(iOS 16.0, *) {
                     SortSheetView(isPresented: $showSortSheet, selectedSort: $selectedSortBy, onSortSelected: {selected  in
@@ -201,7 +206,52 @@ struct SearchWithSortView: View {
          let hostController = UIHostingController(rootView: destView)
          AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
     }
+    
+    private var gridView: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            ForEach($objVM.items, id: \.id) { $item in
+                ProductCard(objItem: $item)
+                    .onTapGesture {
+                        let itemId = item.id ?? 0
+                        self.pushToDetailScreen(id: itemId, item: item)
+                    }
+                    .onAppear {
+                        checkIfLastItem(item)
+                    }
+            }
+        }
+        .padding(.horizontal, 10)
+    }
+
+    private var listView: some View {
+        LazyVStack(spacing: 10) {
+            ForEach($objVM.items, id: \.id) { $item in
+                FavoritesCell(itemObj: $item)
+                    .padding(.horizontal)
+                    .onTapGesture {
+                        let itemId = item.id ?? 0
+                        self.pushToDetailScreen(id: itemId, item: item)
+                    }
+                    .onAppear {
+                        checkIfLastItem(item)
+                    }
+            }
+        }
+    }
+    
+    private func checkIfLastItem(_ item: ItemModel) {
+        let lastItem = objVM.items.last
+        let isLastItem = lastItem?.id == item.id
+        let isNotLoading = !objVM.isDataLoading
+        if isLastItem && isNotLoading {
+            objVM.getSearchItemApi(srchTxt: srchTxt)
+        }
+    }
+
+
 }
+
+
 
 
 extension SearchWithSortView: FilterSelected{

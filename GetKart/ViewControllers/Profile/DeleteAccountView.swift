@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import Kingfisher
 
 struct DeleteAccountView: View {
     
@@ -104,7 +105,8 @@ struct DeleteAccountView: View {
                     self.deleteUser()
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
-                    
+                    ImageCache.default.clearDiskCache()
+                    ImageCache.default.clearMemoryCache()
                     SocketIOManager.sharedInstance.socket?.disconnect()
                     SocketIOManager.sharedInstance.socket = nil
                     SocketIOManager.sharedInstance.manager = nil

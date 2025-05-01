@@ -164,9 +164,9 @@ struct SellerProfileView: View {
                 HStack{Spacer()}.frame(height: 5)
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     
-                    ForEach(objVM.itemArray) { item in
+                    ForEach($objVM.itemArray) { $item in
                         
-                        ProductCard(objItem: item)
+                        ProductCard(objItem: $item)
                            
                             .onAppear {
                                 

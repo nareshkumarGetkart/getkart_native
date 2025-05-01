@@ -33,12 +33,13 @@ class SeeAllViewModel{
        // ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.get_item, param: params,httpMethod:.post) {[weak self] (obj:ItemParse) in
 
             if self?.page == 1{
-                self?.listArray = obj.data?.data
+                self?.listArray = Array<ItemModel>()
+               // self?.listArray = obj.data?.data
 
             }else{
-                self?.listArray?.append(contentsOf: (obj.data?.data)!)
+               // self?.listArray?.append(contentsOf: (obj.data?.data)!)
             }
-            self?.delegate?.refreshScreen()
+            self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 self?.isDataLoading = false
                 self?.page = (self?.page ?? 0) + 1

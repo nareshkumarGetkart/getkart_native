@@ -62,10 +62,31 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
         
         let obj = planListArray[indexPath.row]
        // cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5)
-        cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)".setStrikeText(color: .gray)
-        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-        cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
+     //   cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)".setStrikeText(color: .gray)
+        // cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
+
+        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)"
         cell.lblNumberOfAds.text = "\(obj.itemLimit ?? "") Ad"
+        
+        
+        
+        if (obj.discountInPercentage ?? 0) == 0{
+            cell.lblDiscountPercentage.text = ""
+            cell.lblDiscountPercentage.isHidden = true
+        }else{
+            cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
+            cell.lblDiscountPercentage.isHidden = false
+        }
+        
+        if (obj.finalPrice ?? 0) == Double(obj.price ?? 0){
+            cell.lblOriginalAmt.attributedText = NSAttributedString(string: "")
+
+        }else{
+            
+            cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.price ?? 0)".setStrikeText(color: .gray)
+
+        }
+        
         
         if selectedIndex == indexPath.row{
             cell.bgView.layer.borderColor = UIColor(hexString: "#FF9900").cgColor

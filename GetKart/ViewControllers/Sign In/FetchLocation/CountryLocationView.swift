@@ -81,26 +81,33 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             .padding(.horizontal)
             .padding(.vertical, 8)
             
-            Divider()
+           // Divider()
             
             // MARK: - Current Location Row
-            HStack {
-                
-                Button(action: {
-                    // Enable location action
-                    findMyLocationAction()
-                }) {
-                    Image("currentLocation")
-                        .foregroundColor(.orange)
-                    Text("Use Current Location")
-                        .font(Font.manrope(.medium, size: 15))
-                        .foregroundColor(.orange)
-                }.padding(.leading, 20)
-                    .padding(.top, 5)
-                Spacer()
-                
-                
-            }.padding(.top, 8)
+            VStack(alignment:.leading){
+                HStack {
+                    
+                    Button(action: {
+                        // Enable location action
+                        findMyLocationAction()
+                    }) {
+                        
+                        Image("currentLocation")
+                            .foregroundColor(.orange)
+                        Text("Use Current Location")
+                            .font(Font.manrope(.medium, size: 15))
+                            .foregroundColor(.orange)
+                    }.padding(.leading, 20)
+                    
+                    Spacer()
+                }
+            Text("Show here current location").padding(.leading,50)
+                    .font(Font.manrope(.regular, size: 14))
+                    .foregroundColor(.black)
+            }.padding(.top, 10)
+        
+            Divider().padding([.top,.bottom],10)
+
             if self.locationManager.checkForLocationAccess() == false {
                 HStack {
                     Button(action: {

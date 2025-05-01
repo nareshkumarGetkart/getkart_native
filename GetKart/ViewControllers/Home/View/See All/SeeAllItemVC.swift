@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Kingfisher
 
 class SeeAllItemVC: UIViewController {
     
@@ -73,7 +74,14 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             cell.lblItem.text = obj.name
             cell.lblAddress.text = obj.address
             cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-            cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            //  cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            
+            let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
+            
+            cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"), options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale)
+            ])
         }
         
         return cell
@@ -93,8 +101,8 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
         AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
             print("up")
             if scrollView == collctionView{
@@ -119,4 +127,23 @@ extension SeeAllItemVC: RefreshScreen{
     func refreshScreen(){
         self.collctionView.reloadData()
     }
+    
+    func newItemRecieve(newItemArray:[Any]?){
+        if (newItemArray?.count ?? 0) == 0{
+            
+        }else{
+       
+            for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
+            
+            if let obj = newItemArray?[index1] as? ItemModel{
+                
+                self.objViewModel?.listArray?.append(obj)
+                let indexPath = IndexPath(row: (self.objViewModel?.listArray?.count ?? 0) - 1, section: 0)
+                self.collctionView?.insertItems(at: [indexPath])
+            }
+        }
+    }
+        
+    }
+
 }

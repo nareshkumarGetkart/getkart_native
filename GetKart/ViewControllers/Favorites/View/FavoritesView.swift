@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct FavoritesView: View {
     
-    var  navigation:UINavigationController?
+    var navigation:UINavigationController?
     @StateObject var objVM = FavoriteViewModel()
     
     var body: some View {
@@ -29,9 +30,9 @@ struct FavoritesView: View {
                     HStack{ Spacer() }.frame(height: 10)
                     
                     LazyVStack(spacing: 10) {
-                        ForEach(objVM.listArray) { item in
-                            
-                            FavoritesCell(itemObj: item)
+                        ForEach($objVM.listArray) { $item in
+
+                            FavoritesCell(itemObj: $item)
                                 .onTapGesture {
                                     
                                    var destView = ItemDetailView(navController:  self.navigation, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
@@ -55,9 +56,7 @@ struct FavoritesView: View {
                 }
                 .padding(.horizontal, 10)
             }
-            
-            
-            
+                        
         }.navigationBarHidden(true).background(Color(.systemGray6))
             .onAppear{
                 
@@ -83,24 +82,27 @@ struct FavoritesView: View {
 
 struct FavoritesCell:View {
     
-    @State var itemObj:ItemModel
+    @Binding var itemObj:ItemModel
     var body: some View {
         
         HStack{
             
             if  let img = itemObj.image {
-                AsyncImage(url: URL(string: img)) { image in
-                    image
-                        .resizable()
-                        .frame(width: 110)
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(10, corners: [.topRight, .bottomRight])                      
-                    
-                }placeholder: {
-                    
-                    Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width: 110)
-                    
-                }
+                
+                KFImage(URL(string: img))
+                    .placeholder {
+                        Image("getkartplaceholder")
+                            .resizable().aspectRatio(contentMode: .fit).frame(width: 110)
+                    }
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+                                                                height: widthScreen / 2.0 - 15))
+                    )
+                    .resizable()
+                    .frame(width: 110)
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(10, corners: [.topRight, .bottomRight])
+                
             }
             
             VStack(alignment: .leading, spacing: 5){

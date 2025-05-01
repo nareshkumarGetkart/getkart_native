@@ -95,9 +95,11 @@ struct SearchProductView: View {
                 
             ScrollView {
                 VStack(spacing: 10) {
-                    ForEach(items) { item in
+                    
+                    
+                    ForEach($items) { $item in
                         // ItemRow(item: item)
-                        FavoritesCell(itemObj: item).onTapGesture {
+                        FavoritesCell(itemObj: $item).onTapGesture {
                             let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:false, slug: item.slug))
                             self.navigation?.pushViewController(hostingController, animated: true)
                         }

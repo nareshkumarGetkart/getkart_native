@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -84,7 +84,7 @@ final class Constant: NSObject {
     
     var get_slider:String{
         get {
-            return "\(Constant.shared.baseURL)/get-slider"
+            return "\(Constant.shared.baseURL)/v1/get-slider"
         }
     }
     
@@ -104,7 +104,7 @@ final class Constant: NSObject {
     
     var get_featured_section:String{
         get{
-            return "\(Constant.shared.baseURL)/get-featured-section"
+            return "\(Constant.shared.baseURL)/v1/get-featured-section"
             
         }
     }

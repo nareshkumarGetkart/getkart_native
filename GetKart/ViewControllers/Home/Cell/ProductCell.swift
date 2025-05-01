@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class ProductCell: UICollectionViewCell {
     
@@ -31,6 +32,12 @@ class ProductCell: UICollectionViewCell {
         btnLike.addShadow(shadowRadius: 5.0)
         
         
+    }
+   
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imgViewitem.kf.cancelDownloadTask()
+        imgViewitem.image = nil
     }
 
 }

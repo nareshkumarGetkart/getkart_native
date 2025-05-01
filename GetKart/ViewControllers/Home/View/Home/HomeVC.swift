@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Kingfisher
 
 class HomeVC: UIViewController, LocationSelectedDelegate {
    
@@ -14,9 +15,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
     @IBOutlet weak var btnLocation:UIButton!
-
     var homeVModel:HomeViewModel?
-    
+   
+    @IBOutlet weak var loaderBgView:UIView!
+    @IBOutlet weak var cnstrntLoaderHt:NSLayoutConstraint!
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +40,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         self.lblAddress.text = "\(Local.shared.getUserCity()), \(Local.shared.getUserState()), \(Local.shared.getUserCountry())"
         
     }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Clear caches, release unnecessary memory
+        ImageCache.default.clearMemoryCache()
+
+    }
+
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
@@ -321,7 +332,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
         
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 300)
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 400)
         {
             if scrollView == tblView{
                 if homeVModel?.isDataLoading == false{
@@ -337,17 +348,19 @@ extension HomeVC: RefreshScreen{
     
     
     func refreshFeaturedsList(){
-        tblView.reloadSections(IndexSet(integer: 2), with: .none)
+       // self.tblView.reloadData()
+       // tblView.reloadRows(at: [IndexPath(row: 0, section: 2)], with: .none)
+       tblView.reloadSections(IndexSet(integer: 2), with: .none)
         
     }
     func refreshBannerList(){
-        
+       // self.tblView.reloadData()
         tblView.reloadSections(IndexSet(integer: 0), with: .none)
         
     }
     func refreshCategoriesList(){
-        
-        tblView.reloadSections(IndexSet(integer: 1), with: .none)
+        //self.tblView.reloadData()
+       tblView.reloadSections(IndexSet(integer: 1), with: .none)
         
     }
     
@@ -355,7 +368,7 @@ extension HomeVC: RefreshScreen{
     
     func refreshScreen(){
         
-    //    self.tblView.reloadData()
+        self.tblView.reloadData()
 
        // tblView.reloadSections(IndexSet(integer: 3), with: .none)
         
@@ -372,16 +385,17 @@ extension HomeVC: RefreshScreen{
     
     func newItemRecieve(newItemArray:[Any]?){
         
-        // var index = (self.homeVModel?.itemObj?.data?.count ?? 0)
-        for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
+        if (newItemArray?.count ?? 0) == 0{
+            
+        }else{
+       
+            for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
             
             if let obj = newItemArray?[index1] as? ItemModel{
                 
                 self.tblView.performBatchUpdates {
                     
                     self.homeVModel?.itemObj?.data?.append(obj)
-                    
-                    
                     
                     if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: 3)) as? HomeTblCell {
                         
@@ -392,8 +406,8 @@ extension HomeVC: RefreshScreen{
                 }
                 
             }
-            //  index = index + 1
         }
+    }
         
     }
 }

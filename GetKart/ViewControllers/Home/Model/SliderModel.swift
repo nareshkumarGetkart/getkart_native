@@ -45,7 +45,7 @@ struct Model: Codable {
     let image: String?
     let parentCategoryID: Int?
     let description: String?
-    let status: String?
+   // let status: String?
     let createdAt, updatedAt, slug: String?
     let subcategoriesCount: Int?
     let translatedName: String?
@@ -53,7 +53,7 @@ struct Model: Codable {
     enum CodingKeys: String, CodingKey {
         case id, sequence, name, image
         case parentCategoryID = "parent_category_id"
-        case description, status
+        case description //, status
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case slug

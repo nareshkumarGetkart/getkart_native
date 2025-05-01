@@ -51,10 +51,8 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         btnBack.setImageColor(color: .black)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
-        
         tblView.register(UINib(nibName: "BudgetTblViewCell", bundle: nil), forCellReuseIdentifier: "BudgetTblViewCell")
         tblView.register(UINib(nibName: "imgWithBtnViewCell", bundle: nil), forCellReuseIdentifier: "imgWithBtnViewCell")
-        
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         
         tblView.rowHeight = UITableView.automaticDimension
@@ -125,7 +123,6 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         
         delFilterSelected?.filterSelectectionDone(dict: dictCustomFields)
         self.navigationController?.popViewController(animated: true)
-        
     }
     
     

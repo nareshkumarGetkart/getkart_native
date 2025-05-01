@@ -6,20 +6,44 @@
 //
 
 import SwiftUI
-
+import Kingfisher
 
 
 struct ProductCard: View {
 
-    @State var objItem:ItemModel
+    @Binding var objItem:ItemModel
     
     var body: some View {
         
         VStack(alignment: .leading) {
 
             ZStack(alignment: .topTrailing) {
+            
+           
+                KFImage(URL(string: objItem.image ?? ""))
+                    .placeholder {
+                        Image("getkartplaceholder")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(10)
+                            .padding(.bottom, 10)
+                    }
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+                                                                height: widthScreen / 2.0 - 15))
+                    )
+                    .fade(duration: 0.25)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(10)
+                    .padding(.bottom, 10)
+
                 
-                AsyncImage(url: URL(string: objItem.image ?? "")) { image in
+              /*  AsyncImage(url: URL(string: objItem.image ?? "")) { image in
                     image
                         .resizable()
                         .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
@@ -34,7 +58,7 @@ struct ProductCard: View {
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(10).padding(.bottom,10)
                 }
-                
+                */
                 
                 Button( action: {
                     
