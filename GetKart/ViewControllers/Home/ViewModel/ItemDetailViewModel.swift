@@ -22,7 +22,7 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
-    func getItemDetail(id:Int,slug:String){
+    func getItemDetail(id:Int,slug:String,nav:UINavigationController?){
         
         var strUrl = Constant.shared.get_item + "?id=\(id)"
         if slug.count > 0{
@@ -44,6 +44,12 @@ class ItemDetailViewModel:ObservableObject{
                         self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0)
                         self.setItemTotalApi()
+                    }
+                }else{
+                    AlertView.sharedManager.presentAlertWith(title: "", msg: (obj.message ?? "") as NSString, buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in
+                        
+                        nav?.popViewController(animated: true)
+                        
                     }
                 }
             }
@@ -189,6 +195,34 @@ class ItemDetailViewModel:ObservableObject{
     }
     
 
+    
+    
+    func updateItemStatus(nav:UINavigationController?){
+        
+        let params = ["status":"inactive","item_id":(itemObj?.id ?? 0)] as [String : Any]
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.update_item_status, param: params,methodType: .post) {  responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    AlertView.sharedManager.showToast(message: message)
+                    nav?.popToRootViewController(animated: true)
+                }
+            }
+        }
+    }
+    
     
 }
 

@@ -86,7 +86,7 @@ struct SearchWithSortView: View {
                 ScrollView {
                     if isGridView {
                         
-                        gridView .padding(.horizontal,10)
+                        gridView //.padding(.horizontal,10)
                        /* LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                             ForEach($objVM.items, id: \.id) { $item in
                                 

@@ -21,6 +21,9 @@ struct ItemDetailView: View {
     @State private var showSheet = false
     @State private var showOfferPopup = false
     @State private var showShareSheet = false
+    @State private var showMoreOptionSheet = false
+    @State private var showConfirmDeactvatePopup = false
+
     @State var isMyProduct = false
     @State private var showConfirmDialog = false
     // Declare callback function variable
@@ -326,7 +329,7 @@ struct ItemDetailView: View {
                     
                     Text("Related Ads").foregroundColor(.black).font(Font.manrope(.semiBold, size: 16))
                     Spacer()
-               
+                    
                 }//.padding(.horizontal)
                 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -359,7 +362,7 @@ struct ItemDetailView: View {
         .onAppear{
             
             if objVM.itemObj == nil{
-                objVM.getItemDetail(id: self.itemId,slug:self.slug)
+                objVM.getItemDetail(id: self.itemId,slug:self.slug,nav: self.navController)
                 
             }else{
                 if objVM.sellerObj == nil {
@@ -675,6 +678,7 @@ struct ItemDetailView: View {
                 Image("share").renderingMode(.template)
                     .foregroundColor(.black)
             }.padding(.trailing, 10)
+            
             .actionSheet(isPresented: $showShareSheet) {
                 ActionSheet(
                     title: Text(""),
@@ -690,6 +694,62 @@ struct ItemDetailView: View {
                     ]
                 )
             }
+            
+            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
+            if objVM.sellerObj?.id == objLoggedInUser.id  && objVM.itemObj?.status == "approved"{
+                
+                Button {
+                    showMoreOptionSheet = true
+                } label: {
+                    Image("more").renderingMode(.template)
+                        .foregroundColor(.black)
+                }.padding(.trailing, 10)
+                    .actionSheet(isPresented: $showMoreOptionSheet) {
+                        ActionSheet(
+                            title: Text(""),
+                            message: nil,
+                            buttons: [
+                                .default(Text("Deactivate"), action: {
+                                    showConfirmDeactvatePopup = true
+                                }),
+                                .default(Text("Remove"), action: {
+                                    showConfirmDialog = true
+
+                                }),
+                                .cancel()
+                            ]
+                        )
+                    }
+                    .confirmationDialog("Confirm Remove",
+                                        isPresented: $showConfirmDialog,
+                                        titleVisibility: .visible) {
+                        Button("Confirm", role: .destructive) {
+                            // Confirm logic
+                            self.objVM.deleteItemApi(nav: navController)
+                            
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("After removing, ads will be deleted.")
+                    }
+                
+                
+                    .confirmationDialog("Confirm Deactivate",
+                                        isPresented: $showConfirmDeactvatePopup,
+                                        titleVisibility: .visible) {
+                        Button("Confirm", role: .destructive) {
+                            // Confirm logic
+                            self.objVM.updateItemStatus(nav: navController)
+                            
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("After deactivate, ads will be inactive.")
+                    }
+                
+            }
+            
         }
         .frame(height: 44)
     }
@@ -843,11 +903,6 @@ struct SellerInfoView: View {
         }
     }
 }
-
-
-
-
-
 
 
 
