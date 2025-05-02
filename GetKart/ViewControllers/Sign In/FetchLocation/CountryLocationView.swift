@@ -34,7 +34,8 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     .foregroundColor(.black)
                 Spacer()
             }.frame(height:44).background(Color.white)
-            
+           
+            /*
             // MARK: - Search Bar
             HStack {
                 HStack {
@@ -80,7 +81,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            
+            */
            // Divider()
             
             // MARK: - Current Location Row
@@ -169,7 +170,8 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }
             
             Spacer()
-        }.background(Color(UIColor.systemGray6)).onAppear{
+        }//.background(Color(UIColor.systemGray6))
+            .onAppear{
             fetchCountryListing()
         }
         .navigationTitle("Location")
@@ -340,6 +342,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
 
 struct CountryRow: View {
     var strTitle: String = "India"
+    
     var body: some View {
         HStack {
             Text("\(strTitle)")

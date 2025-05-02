@@ -139,6 +139,11 @@ class MyAdsVC: UIViewController {
     }
 
     
+    func refreshMyAds(){
+        page = 1
+        apiStatus = ""
+        getAdsListApi()
+    }
     //Api methods
     func getAdsListApi(){
         

@@ -47,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 UserDefaults.standard.set(false, forKey: "isFirstTime")
                 UserDefaults.standard.synchronize()
                 let vc = UIHostingController(rootView: DemoView())
-            vc.view.setNeedsUpdateConstraints()
+                vc.view.setNeedsUpdateConstraints()
                 self.navigationController?.viewControllers = [vc]
            }else {
                 let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
@@ -337,6 +337,26 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController)) 
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
+            }
+            
+        case "item-update":
+            do{
+                
+                
+                for controller in self.navigationController?.viewControllers ?? []{
+                    
+                    if let destvc =  controller as? HomeBaseVC{
+                        
+                        destvc.selectedIndex = 3
+                        
+                        // Notify the 3rd view controller to refresh
+                        if let nav = destvc.viewControllers?[3] as? UINavigationController,
+                           let thirdVC = nav.viewControllers.first as? MyAdsVC {
+                            thirdVC.refreshMyAds()
+                        }
+                    }
+                }
+            
             }
        
         default:

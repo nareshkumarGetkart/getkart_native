@@ -57,11 +57,37 @@ struct DemoView: View {
             
            // Spacer()
             
+            TabView(selection: $currentPage) {
+                OnboardingPageView(
+                                   imageName: "onbo_a",
+                                   title: "Click Photo",
+                                   subtitle: "Take a photo of the product you want to let go of."
+                               )
+                               .tag(0)
+
+                OnboardingPageView(
+                                   imageName: "onbo_b",
+                                   title: "Upload Info",
+                                   subtitle: "Add details about the product you’re selling."
+                               )
+                               .tag(1)
+
+                OnboardingPageView(
+                                   imageName: "onbo_c",
+                                   title: "Sell It",
+                                   subtitle: "Sell it to a buyer easily!"
+                               )
+                               .tag(2)
+                
+            } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                .animation(.easeInOut, value: currentPage)
+                .indexViewStyle(.page(backgroundDisplayMode: .interactive))
+/*
             Image(pages[currentPage].imageName)
                 .resizable()
                 .scaledToFit()
                .padding()// .frame(height: 300)
-                
+               .tag(0)
             Text(pages[currentPage].title)
                 .font(.title)
                 .fontWeight(.bold)
@@ -73,7 +99,7 @@ struct DemoView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
                 .padding(.top, 10)
-            
+            */
             Spacer()
             
             HStack(spacing: 8) {
@@ -180,5 +206,34 @@ struct CurvedShape: Shape {
         path.closeSubpath()
      
         return path
+    }
+}
+
+
+struct OnboardingPageView: View {
+    var imageName: String
+    var title: String
+    var subtitle: String
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(imageName) // Replace with your asset name
+                .resizable()
+                .scaledToFit()
+                //.frame(height: 250)
+
+            Text(title)
+                .font(.title)
+                .bold()
+
+            Text(subtitle)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+
+            Spacer()
+        }
+        .padding(.top)
     }
 }
