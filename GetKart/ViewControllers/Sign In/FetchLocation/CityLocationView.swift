@@ -91,7 +91,7 @@ struct CityLocationView: View {
             // MARK: - List of Countries
             ScrollView{
                 LazyVStack {
-                    if popType == .filter {
+                    if popType == .filter || popType == .home{
                         CountryRow(strTitle:"All in \(state.name ?? "")")
                             .frame(height: 40)
                             .padding(.horizontal)

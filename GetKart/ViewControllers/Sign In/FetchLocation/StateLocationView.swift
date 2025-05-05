@@ -92,7 +92,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
             
             // MARK: - List of Countries
             ScrollView{
-                if popType == .filter {
+                if popType == .filter  || popType == .home{
                     CountryRow(strTitle:"All in \(country.name ?? "")")
                         .frame(height: 40)
                         .padding(.horizontal)
