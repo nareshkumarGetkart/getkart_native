@@ -44,6 +44,14 @@ class ItemDetailViewModel:ObservableObject{
                         self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0)
                         self.setItemTotalApi()
+                    }else{
+                        
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: "Item not available", buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in
+                            
+                            nav?.popViewController(animated: true)
+                            
+                        }
+
                     }
                 }else{
                     AlertView.sharedManager.presentAlertWith(title: "", msg: (obj.message ?? "") as NSString, buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in

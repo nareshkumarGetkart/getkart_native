@@ -453,7 +453,7 @@ struct ItemDetailView: View {
         
         if loggedInUserId == itemUserId {
             
-            if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||  ((objVM.itemObj?.status ?? "") == "review"){
+            if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||  ((objVM.itemObj?.status ?? "") == "review")  || ((objVM.itemObj?.status ?? "") == "inactive"){
                 
                 Button(action: {
                     showConfirmDialog = true
@@ -679,29 +679,32 @@ struct ItemDetailView: View {
 
             Spacer()
 
-            Button {
-                showShareSheet = true
-            } label: {
-                Image("share").renderingMode(.template)
-                    .foregroundColor(.black)
-            }.padding(.trailing, 10)
-            
-            .actionSheet(isPresented: $showShareSheet) {
-                ActionSheet(
-                    title: Text(""),
-                    message: nil,
-                    buttons: [
-                        .default(Text("Copy Link"), action: {
-                            UIPasteboard.general.string = ShareMedia.itemUrl + "\(objVM.itemObj?.slug ?? "")?share=true"
-                        }),
-                        .default(Text("Share"), action: {
-                            ShareMedia.shareMediafrom(type: .item, mediaId: "\(objVM.itemObj?.slug ?? "")", controller: (self.navController?.topViewController)!)
-                        }),
-                        .cancel()
-                    ]
-                )
+            if (objVM.itemObj?.status ?? "") == "approved"{
+                
+                Button {
+                    showShareSheet = true
+                } label: {
+                    Image("share").renderingMode(.template)
+                        .foregroundColor(.black)
+                }.padding(.trailing, 10)
+                
+                    .actionSheet(isPresented: $showShareSheet) {
+                        ActionSheet(
+                            title: Text(""),
+                            message: nil,
+                            buttons: [
+                                .default(Text("Copy Link"), action: {
+                                    UIPasteboard.general.string = ShareMedia.itemUrl + "\(objVM.itemObj?.slug ?? "")?share=true"
+                                }),
+                                .default(Text("Share"), action: {
+                                    ShareMedia.shareMediafrom(type: .item, mediaId: "\(objVM.itemObj?.slug ?? "")", controller: (self.navController?.topViewController)!)
+                                }),
+                                .cancel()
+                            ]
+                        )
+                    }
             }
-            
+                            
             let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
             if objVM.sellerObj?.id == objLoggedInUser.id  && objVM.itemObj?.status == "approved"{
