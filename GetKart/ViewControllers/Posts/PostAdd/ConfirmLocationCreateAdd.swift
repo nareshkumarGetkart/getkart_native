@@ -183,7 +183,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     
                     
                 }else{
-                    //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.showToast(message: message)
                 }
             }
         })

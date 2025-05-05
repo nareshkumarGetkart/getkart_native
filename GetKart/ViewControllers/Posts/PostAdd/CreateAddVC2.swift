@@ -379,6 +379,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             //Adjust the table cell height as per contents
             cell.clnCollectionView.performBatchUpdates({
+                
             }) { _ in
                 // Code to execute after reloadData and layout updates
                 self.tblView.beginUpdates()

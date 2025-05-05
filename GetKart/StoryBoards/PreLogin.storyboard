@@ -161,7 +161,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1F-hp-sqY">
-                                                <rect key="frame" x="246.66666666666663" y="352.66666666666669" width="53" height="35"/>
+                                                <rect key="frame" x="246.66666666666663" y="352.66666666666669" width="54" height="35"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="35" id="vQs-Uv-56b"/>
                                                 </constraints>
@@ -259,7 +259,7 @@
                                                     <action selector="loginWithAppleButton:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="f1g-Gd-oKV"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0/50" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g01-wb-F04">
+                                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0/50" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g01-wb-F04">
                                                 <rect key="frame" x="323" y="255" width="50" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="50" id="qDm-Ij-U1y"/>
@@ -338,10 +338,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="0zT-DF-g9s">
-                                <rect key="frame" x="73" y="802" width="247" height="20"/>
+                                <rect key="frame" x="74.666666666666686" y="802" width="244" height="20"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XLF-Sh-Gfw" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="113" height="20"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="110" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="bKV-un-pMi"/>
                                         </constraints>
@@ -355,7 +355,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jht-0Z-gcz">
-                                        <rect key="frame" x="118" y="0.0" width="30" height="20"/>
+                                        <rect key="frame" x="115" y="0.0" width="30" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="eJV-Ue-4bD"/>
                                             <constraint firstAttribute="width" constant="30" id="xnD-kq-dQZ"/>
@@ -370,7 +370,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WE-xX-bHq" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
-                                        <rect key="frame" x="153" y="0.0" width="94" height="20"/>
+                                        <rect key="frame" x="150" y="0.0" width="94" height="20"/>
                                         <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Privacy Policy">
@@ -449,7 +449,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nKq-cq-Dtt">
-                                <rect key="frame" x="20" y="204" width="126" height="30"/>
+                                <rect key="frame" x="20.000000000000007" y="204" width="123.66666666666669" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="eAT-gE-Jf8"/>
                                 </constraints>
@@ -464,7 +464,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T9F-k9-AU1">
-                                <rect key="frame" x="146" y="201.66666666666666" width="85" height="35"/>
+                                <rect key="frame" x="143.66666666666666" y="201.66666666666666" width="85" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="85" id="QjV-MW-YZJ"/>
                                     <constraint firstAttribute="height" constant="35" id="Tgm-dh-BfF"/>
@@ -588,7 +588,7 @@
                                 <rect key="frame" x="0.0" y="179" width="393" height="673"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iDe-Lt-3FD">
-                                        <rect key="frame" x="20" y="20" width="143" height="40"/>
+                                        <rect key="frame" x="20" y="20" width="137" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="JDo-eZ-vku"/>
                                         </constraints>

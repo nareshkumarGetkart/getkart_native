@@ -82,11 +82,11 @@ class LoginVC: UIViewController {
     @objc func changedCharacters(textField: UITextField){
         guard let input = textField.text else { return }
         // print(input)
-        if txtEmailPhone.text?.count ?? 0 > 50 {
+        /*if txtEmailPhone.text?.count ?? 0 > 50 {
             lblCharCount.text = "50/50"
         }else {
             lblCharCount.text = "\(txtEmailPhone.text?.count ?? 0)/50"
-        }
+        }*/
         
         if  txtEmailPhone.text!.hasPrefix( self.countryCode) == true {
             if txtEmailPhone.text!.count >  self.countryCode.count {
@@ -116,7 +116,7 @@ class LoginVC: UIViewController {
         lblError.isHidden = true
         self.btnContinueLogin.backgroundColor = UIColor(hexString: "555357", alpha: 1.0)
         
-        if txtEmailPhone.text?.isValidEmail() == true {
+          if txtEmailPhone.text?.isValidEmail() == true {
             let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
             self.navigationController?.pushViewController(vc, animated: true)
             
@@ -158,8 +158,11 @@ class LoginVC: UIViewController {
                     vc.mobile =  self?.txtEmailPhone.text ?? ""
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }else{
-                    //self?.delegate?.showError(message: message)
                     AlertView.sharedManager.showToast(message: message)
+                    
+                    self?.txtEmailPhone.layer.borderColor = UIColor.red.cgColor
+                    self?.lblError.isHidden = false
+                    self?.btnContinueLogin.backgroundColor = UIColor.orange
                 }
                 
             }
