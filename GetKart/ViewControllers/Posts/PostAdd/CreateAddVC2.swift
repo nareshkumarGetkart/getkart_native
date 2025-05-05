@@ -376,7 +376,18 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
 
             cell.configure(with: objCustomField)
+            
+            //Adjust the table cell height as per contents
+            cell.clnCollectionView.performBatchUpdates({
+            }) { _ in
+                // Code to execute after reloadData and layout updates
+                self.tblView.beginUpdates()
+                self.tblView.endUpdates()
+            }
+            
             cell.selectionStyle = .none
+            
+            
             return cell
         }else if objCustomField.type  == .dropdown {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -411,7 +422,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = false
             cell.btnOptionBig.tag = indexPath.row
             cell.btnOptionBig.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchDown)
-
             
             cell.btnOption.isHidden = false
             cell.btnOption.tag = indexPath.row
