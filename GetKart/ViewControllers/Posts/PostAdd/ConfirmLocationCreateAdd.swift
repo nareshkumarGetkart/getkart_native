@@ -121,6 +121,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
         if selectedCoordinate.latitude != 0 {
             self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
         }
+        
     }
            
     
@@ -134,7 +135,13 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
              self.params[AddKeys.country.rawValue] = country
              self.params[AddKeys.city.rawValue] = city
              self.params[AddKeys.state.rawValue] = state
-        
+         
+//         if self.selectedCoordinate.latitude != Double(latitude) {
+//             self.selectedCoordinate.latitude = Double(latitude) ?? 0.0
+//             self.selectedCoordinate.longitude = Double(longitude) ?? 0.0
+//             self.mapRegion.center = self.selectedCoordinate
+//             self.circle  = MKCircle(center: self.selectedCoordinate, radius: range1)
+//         }
               self.uploadFIleToServer()
          
     }
