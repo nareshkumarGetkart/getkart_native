@@ -5,7 +5,8 @@
 
 import UIKit
 import Kingfisher
-
+import SwiftUI
+import Photos
 
 class ZoomImageViewController: UIViewController {
     
@@ -42,12 +43,19 @@ class ZoomImageViewController: UIViewController {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+     
         // Dispose of any resources that can be recreated.
     }
     
     
     @IBAction func downloadBtnAction(_ sender: UIButton) {
-       // self.downloadAllMedia(urlArray: [imageArrayUrl[currentTag].image ?? ""])
+        
+        if let url = URL(string: imageArrayUrl[pager.currentPage].image ?? ""){
+            self.downloadAndSaveToPhotos(url: url)
+        }
+        
+        // self.downloadAllMedia(urlArray: [imageArrayUrl[currentTag].image ?? ""])
+        
     }
    
     @IBAction func btnBackAction(_ sender: UIButton) {
@@ -171,6 +179,33 @@ class ZoomImageViewController: UIViewController {
 
 //MARK:- UIScrollView
 extension ZoomImageViewController : UIScrollViewDelegate {
+    
+   
+    func downloadAndSaveToPhotos(url: URL) {
+        
+        Themes.sharedInstance.activityView(uiView: self.view)
+        URLSession.shared.dataTask(with: url) { data, response, error in
+           
+            DispatchQueue.main.async{
+                Themes.sharedInstance.removeActivityView(uiView: self.view)
+
+                guard let data = data, let image = UIImage(data: data) else { return }
+
+                PHPhotoLibrary.requestAuthorization { status in
+                    if status == .authorized {
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                        AlertView.sharedManager.showToast(message: "Downloaded successfully")
+                    } else {
+                        print("Permission denied to access photo library")
+                    }
+                }
+                
+            }
+         
+        }.resume()
+    }
+    
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.tag == 888888{
             let pageWidth: CGFloat = self.parentZoomingScrollView.frame.size.width

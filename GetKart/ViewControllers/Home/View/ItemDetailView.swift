@@ -70,7 +70,8 @@ struct ItemDetailView: View {
                                         AsyncImage(url: URL(string: img)) { image in
                                             image
                                                 .resizable()
-                                                .aspectRatio(contentMode: .fit)
+                                               // .aspectRatio(contentMode: .fit)
+                                                .aspectRatio(contentMode: .fill)
                                                 .frame(height: 200)
                                                 .cornerRadius(10)
                                                 .padding(.horizontal, 5)

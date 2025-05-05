@@ -78,7 +78,7 @@ struct LogoutView: View {
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
 
-                if status == 200{
+             //   if status == 200{
                     // presentationMode.wrappedValue.dismiss()
                     ImageCache.default.clearDiskCache()
                     ImageCache.default.clearMemoryCache()
@@ -92,9 +92,9 @@ struct LogoutView: View {
                     presentationMode.wrappedValue.dismiss()
                     AppDelegate.sharedInstance.showLoginScreen()
                    
-                }else{
-                    //self?.delegate?.showError(message: message)
-                }
+//                }else{
+//                    //self?.delegate?.showError(message: message)
+//                }
                 
             }
         }
