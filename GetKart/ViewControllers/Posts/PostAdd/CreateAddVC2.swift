@@ -226,6 +226,15 @@ class CreateAddVC2: UIViewController {
             }else if (objCustomField.type == .textbox ||  objCustomField.type == .number) && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
                 return false
             }
+        }else  if objCustomField.type  == .textbox || objCustomField.type  == .number {
+            if (objCustomField.value?.first as? String ?? "").count > 0{
+                
+                if (objCustomField.value?.first as? String ?? "").count < objCustomField.minLength ?? 0 {
+                    return false
+                }else  if (objCustomField.value?.first as? String ?? "").count > objCustomField.maxLength ?? 0 {
+                    return false
+                }
+            }
         }
         return true
     }
@@ -236,15 +245,26 @@ class CreateAddVC2: UIViewController {
             if objCustomField.type  == .fileinput {
                 errorMsg = "Allowed file types: PNG, JPG, JPEG, SVG, PDF"
             }else if objCustomField.type  == .dropdown || objCustomField.type  == .checkbox || objCustomField.type  == .radio{
-                errorMsg = "Selecting this is required"
+                errorMsg = "Selecting \(objCustomField.name ?? "") is required"
             }else if objCustomField.type  == .textbox || objCustomField.type  == .number {
                 if objCustomField.value?.count == 0 {
-                    errorMsg = "Field must not be empty."
+                    errorMsg = "\(objCustomField.name ?? "") must not be empty."
                 } else if (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 {
-                    errorMsg = "Field minimum length is \(objCustomField.minLength ?? 0) characters."
+                    errorMsg = "\(objCustomField.name ?? "") minimum length is \(objCustomField.minLength ?? 0) characters."
                     
-                } else if (objCustomField.value?.first as? String ?? "").count ?? 0 > objCustomField.maxLength ?? 0 {
-                    errorMsg = "Field maximum length is \(objCustomField.maxLength ?? 0) characters."
+                } else if (objCustomField.value?.first as? String ?? "").count > objCustomField.maxLength ?? 0 {
+                    errorMsg = "\(objCustomField.name ?? "") maximum length is \(objCustomField.maxLength ?? 0) characters."
+                }
+            }
+        }else if objCustomField.type  == .textbox || objCustomField.type  == .number {
+            
+            if (objCustomField.value?.first as? String ?? "").count > 0 {
+                
+                if  (objCustomField.value?.first as? String ?? "").count < objCustomField.minLength ?? 0  {
+                    errorMsg = "\(objCustomField.name ?? "") minimum length is \(objCustomField.minLength ?? 0) characters."
+                }else if  (objCustomField.value?.first as? String ?? "").count > objCustomField.maxLength ?? 0{
+                    
+                    errorMsg = "\(objCustomField.name ?? "") maximum length is \(objCustomField.maxLength ?? 0) characters."
                 }
             }
         }

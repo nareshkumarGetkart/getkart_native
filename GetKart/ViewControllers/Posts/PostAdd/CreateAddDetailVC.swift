@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 enum AddKeys: String{
     case name
@@ -276,7 +277,11 @@ class CreateAddDetailVC: UIViewController {
         } else {
             showErrorMsg = false
             self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
-            if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
+            if self.objViewModel?.dataArray?.count == 0 {
+                   let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                self.navigationController?.pushViewController(vc, animated: true)
+                
+            }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
                 vc.dataArray = self.objViewModel?.dataArray ?? []
                 vc.params = self.params
                 if popType == .createPost {
