@@ -37,7 +37,23 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.lblAddress.text = "\(Local.shared.getUserCity()), \(Local.shared.getUserState()), \(Local.shared.getUserCountry())"
+        
+        let city = Local.shared.getUserCity()
+        let state = Local.shared.getUserState()
+        let country = Local.shared.getUserCountry()
+        var locStr = city
+        if state.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + state : state
+        }
+        if country.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + country : country
+        }
+        
+        if locStr.count == 0 {
+            locStr = "All Countries"
+        }
+        
+        self.lblAddress.text = locStr
         
     }
     
@@ -110,7 +126,19 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         self.tblView.reloadData()
         homeVModel?.getProductListApi()
         homeVModel?.getFeaturedListApi()
-        let locStr = city + ", " + state + ", " + country
+        var locStr = city
+        
+        if state.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + state : state
+        }
+        
+        if country.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + country : country
+        }
+        
+        if locStr.count == 0 {
+            locStr = "All Countries"
+        }
         self.lblAddress.text = locStr
     }
 }
@@ -127,7 +155,18 @@ extension HomeVC:FilterSelected{
         homeVModel?.getProductListApi()
         
         if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
-            let locStr = city + ", " + state + ", " + country
+            var locStr = city
+            if state.count > 0 {
+                locStr =  locStr.count > 0 ? locStr + ", " + state : state
+            }
+            
+            if country.count > 0 {
+                locStr =  locStr.count > 0 ? locStr + ", " + country : country
+            }
+            
+            if locStr.count == 0 {
+                locStr = "All Countries"
+            }
             self.lblAddress.text = locStr
         }
     }
