@@ -10,21 +10,22 @@ import Photos
 
 class ZoomImageViewController: UIViewController {
     
-    @IBOutlet weak var closeBtn: UIButton!
+    @IBOutlet weak var btnBack: UIButton!
     @IBOutlet weak var parentZoomingScrollView : UIScrollView!
     @IBOutlet weak var pager:UIPageControl!
-    var childZoomingScrollView :UIScrollView!
+    @IBOutlet weak var btnDownload: UIButton!
+    private var childZoomingScrollView :UIScrollView!
     var currentTag:NSInteger = 0
     var imageArrayUrl:Array = [GalleryImage]()
-    var imageZoom : UIImageView!
-    var imageColor:UIColor = .black
-    @IBOutlet weak var btnDownload: UIButton!
-
+    private  var imageZoom : UIImageView!
+    private var imageColor:UIColor = .black
+    
     //MARK: Controller life cycle methods
     override func loadView() {
         super.loadView()
         self.navigationController?.isNavigationBarHidden = true
         self.view.backgroundColor = imageColor
+        btnBack.setImageColor(color: .black)
     }
     
     override func viewDidLoad() {
@@ -43,7 +44,7 @@ class ZoomImageViewController: UIViewController {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-     
+        
         // Dispose of any resources that can be recreated.
     }
     
@@ -57,7 +58,7 @@ class ZoomImageViewController: UIViewController {
         // self.downloadAllMedia(urlArray: [imageArrayUrl[currentTag].image ?? ""])
         
     }
-   
+    
     @IBAction func btnBackAction(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
@@ -112,7 +113,7 @@ class ZoomImageViewController: UIViewController {
             imageZoom.contentMode = .scaleAspectFit
             self.view.backgroundColor = .darkGray
             imageZoom.kf.setImage(with: URL(string: imageArrayUrl[i].image ?? ""), options: nil, progressBlock: nil) { response in
-               // self.view.backgroundColor = self.imageZoom.image?.getAverageColour
+                // self.view.backgroundColor = self.imageZoom.image?.getAverageColour
             }
             
             
@@ -148,7 +149,7 @@ class ZoomImageViewController: UIViewController {
         pager.currentPage = tappedIndex
         pager.isHighlighted = true
         pager.pageIndicatorTintColor = UIColor.black
-        pager.currentPageIndicatorTintColor = UIColor.red
+        pager.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor // UIColor.red
         
         let newPosition = SCREEN_WIDTH * CGFloat(self.pager.currentPage)
         let toVisible = CGRect(x: CGFloat(newPosition), y: CGFloat(70), width: CGFloat(SCREEN_WIDTH), height: CGFloat(SCREEN_HEIGHT - 120))

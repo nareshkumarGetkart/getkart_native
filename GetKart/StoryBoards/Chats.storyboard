@@ -584,6 +584,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnBack" destination="Mph-gQ-OCa" id="iaC-BL-tZT"/>
                         <outlet property="btnDownload" destination="Lhk-eE-lgs" id="3t6-7e-Yce"/>
                         <outlet property="pager" destination="KvR-lc-4wj" id="7Fl-7t-Tno"/>
                         <outlet property="parentZoomingScrollView" destination="nZA-NE-opY" id="dZm-xa-UHl"/>

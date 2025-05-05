@@ -349,14 +349,41 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                         
                         destvc.selectedIndex = 3
                         
-                        // Notify the 3rd view controller to refresh
-                        if let nav = destvc.viewControllers?[3] as? UINavigationController,
-                           let thirdVC = nav.viewControllers.first as? MyAdsVC {
-                            thirdVC.refreshMyAds()
+                        
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                          
+                            navController.popToRootViewController(animated: false)
+
+                            // Notify the 3rd view controller to refresh
+                            if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
+                                thirdVC.refreshMyAds()
+                            }
                         }
                     }
                 }
             
+            }
+            
+            
+        case "verifcation-request-update":
+            do{
+                for controller in self.navigationController?.viewControllers ?? []{
+                    
+                    if let destvc =  controller as? HomeBaseVC{
+                        
+                        destvc.selectedIndex = 4
+                        
+                        // Notify the 3rd view controller to refresh
+                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+                           if let thirdVC = navController.viewControllers.first as? ProfileVC {
+                                
+                                thirdVC.getVerificationStatusApi()
+                                
+                            }
+                        }
+                    }
+                }
             }
        
         default:

@@ -157,8 +157,8 @@ class HomeViewModel:ObservableObject{
         }
     }
     
- 
-    func addToFavourite(index:Int){
+ /*
+  //  func addToFavourite(index:Int){
         
 //        let params = ["item_id":"\(listArray[index].id ?? 0)"]
 //        
@@ -168,7 +168,9 @@ class HomeViewModel:ObservableObject{
 //                self.listArray[index].isLiked?.toggle()
 //            }
 //        }
-    }
+ //   }
+    
+    */
     
     
 }

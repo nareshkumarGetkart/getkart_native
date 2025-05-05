@@ -182,7 +182,9 @@ struct ProfileEditView: View {
     // Form Validation
     private func validateForm() {
         if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
-            print("Please fill all the fields.")
+           
+            AlertView.sharedManager.showToast(message: "Please fill all the fields.")
+
         }else if !fullName.isValidName() || fullName.lowercased() == "guest user" {
             AlertView.sharedManager.showToast(message: "Please enter valid name")
             
@@ -190,7 +192,6 @@ struct ProfileEditView: View {
             AlertView.sharedManager.showToast(message: "Please enter valid email")
 
         } else {
-            print("Form Submitted!")
             updateProfile()
         }
     }
@@ -288,6 +289,8 @@ struct ProfileEditView: View {
                         
                     }
                     
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
                 }
             }
         }
@@ -315,6 +318,7 @@ struct ProfileEditView: View {
                 if status == 200{
  
                 }else{
+                    AlertView.sharedManager.showToast(message: message)
 
                 }
                 
