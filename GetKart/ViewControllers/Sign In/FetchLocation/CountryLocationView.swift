@@ -17,6 +17,8 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     var locationManager = LocationManager()
     var navigationController: UINavigationController?
     var delLocationSelected:LocationSelectedDelegate!
+    @State var isFirstTime = true
+    @State var strCurrentLocagtion = "Show here current location"
     var body: some View {
         
         VStack(spacing: 0) {
@@ -102,7 +104,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     
                     Spacer()
                 }
-            Text("Show here current location").padding(.leading,50)
+            Text(strCurrentLocagtion).padding(.leading,50)
                     .font(Font.manrope(.regular, size: 14))
                     .foregroundColor(.black)
             }.padding(.top, 10)
@@ -137,13 +139,13 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                             self.allCountrySelected()
                         }
                     Divider()
-                }else {
+                }/*else {
                     CountryRow(strTitle:"Choose Country")
                         .frame(height: 40)//.padding(.horizontal)
                         .onTapGesture{
                         }
                     Divider()
-                }
+                }*/
                 
                 if searchText.count == 0 {
                     ForEach(arrCountries) { country in
@@ -173,6 +175,9 @@ struct CountryLocationView: View, LocationSelectedDelegate{
         }//.background(Color(UIColor.systemGray6))
             .onAppear{
             fetchCountryListing()
+                if isFirstTime == true {
+                    findMyLocationAction()
+                }
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
@@ -379,7 +384,20 @@ extension CountryLocationView :LocationAutorizationUpdated {
                     print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
                     
                     locationManager.delegate = nil
+                if isFirstTime == false {
                     self.locationSelected()
+                }else {
+                    self.isFirstTime = false
+                    strCurrentLocagtion = locationManager.city
+                    if locationManager.state.count > 0 {
+                        strCurrentLocagtion =  strCurrentLocagtion.count > 0 ? strCurrentLocagtion + ", " + locationManager.state : locationManager.state
+                    }
+                    
+                    if locationManager.country.count > 0 {
+                        strCurrentLocagtion =  strCurrentLocagtion.count > 0 ? strCurrentLocagtion + ", " + locationManager.country : locationManager.country
+                    }
+                    
+                }
                     
                     
                 } else {
