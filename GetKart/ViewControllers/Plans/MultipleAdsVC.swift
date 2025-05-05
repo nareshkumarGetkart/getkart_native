@@ -26,6 +26,7 @@ class MultipleAdsVC: UIViewController {
         super.viewDidLoad()
         tblView.register(UINib(nibName: "PackageAdsCell", bundle: nil), forCellReuseIdentifier: "PackageAdsCell")
         lblHeader.text = planListArray.first?.name ?? ""
+        lblSubTitle.text = planListArray.first?.title ?? ""
     }
     
     //MARK: UIbutton Action Methods

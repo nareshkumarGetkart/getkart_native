@@ -83,7 +83,6 @@ struct ProfileEditView: View {
                         Button(action: {
                             if phoneNumber.count > 5{
                                 sendOTPApi(countryCode: "+91")
-                                showOTPPopup = true
                             }
                         }) {
                             Text("Verify")
@@ -316,7 +315,8 @@ struct ProfileEditView: View {
                 let message = result["message"] as? String ?? ""
 
                 if status == 200{
- 
+                    self.showOTPPopup = true
+
                 }else{
                     AlertView.sharedManager.showToast(message: message)
 

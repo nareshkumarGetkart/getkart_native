@@ -92,14 +92,18 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
     
     
     @IBAction func showPackageButtonAction(_ sender : UIButton){
-
-        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
-            destvc.hidesBottomBarWhenPushed = true
-            destvc.categoryId = category_id
-            destvc.categoryName = categoryName
-            destvc.city = city
-
-            self.navigationController?.pushViewController(destvc, animated: true)
+        
+        
+        if self.country.count > 0 && self.category_id > 0 {
+            
+            if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                destvc.hidesBottomBarWhenPushed = true
+                destvc.categoryId = category_id
+                destvc.categoryName = categoryName
+                destvc.city = city
+                
+                self.navigationController?.pushViewController(destvc, animated: true)
+            }
         }
     }
      

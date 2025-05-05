@@ -143,6 +143,7 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         }
         
        
+        cell.lblSubtitle.text = obj.title ?? ""
         cell.lblFeatures.text = obj.description ?? ""
         cell.imgVwIcon.kf.setImage(with: URL(string:obj.icon ?? ""))
         cell.bgViewMain.layer.cornerRadius = 8.0

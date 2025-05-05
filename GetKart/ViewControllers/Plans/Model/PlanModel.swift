@@ -22,6 +22,7 @@ struct PlanModel: Codable {
     let name: String?
     let tier: Int?
     let finalPrice: String?
+    let title: String?
     let discountInPercentage, price: String?
     let duration, itemLimit: String?
     let type: TypePlanEnum?
@@ -46,6 +47,7 @@ struct PlanModel: Codable {
         case categories
         case isActive = "is_active"
         case purchaseAllow
+        case title
     }
 
     init(from decoder: Decoder) throws {
@@ -103,6 +105,8 @@ struct PlanModel: Codable {
         categories = try? container.decode(String.self, forKey: .categories)
         isActive = try? container.decode(Bool.self, forKey: .isActive)
         purchaseAllow = try? container.decode(Bool.self, forKey: .purchaseAllow)
+                title = try? container.decode(String.self, forKey: .title)
+
     }
 }
 
