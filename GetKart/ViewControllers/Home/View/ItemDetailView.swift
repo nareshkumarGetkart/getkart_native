@@ -76,7 +76,12 @@ struct ItemDetailView: View {
                                                 .cornerRadius(10)
                                                 .padding(.horizontal, 5)
                                         } placeholder: {
-                                            ProgressView().progressViewStyle(.circular)
+                                            Image("getkartplaceholder")
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(height: 200)
+                                                .cornerRadius(10)
+                                                .padding(.horizontal, 5)
+//                                            ProgressView().progressViewStyle(.circular)
                                         }
                                         .tag(index)
                                         .onTapGesture {
