@@ -82,6 +82,7 @@ struct ProfileEditView: View {
                         Spacer()
                         Button(action: {
                             if phoneNumber.count > 5{
+                                UIApplication.shared.endEditing()
                                 sendOTPApi(countryCode: "+91")
                             }
                         }) {
@@ -101,6 +102,8 @@ struct ProfileEditView: View {
                 
                 // Update Button
                 Button(action: {
+                    UIApplication.shared.endEditing()
+
                     validateForm()
                     
                 }) {
@@ -483,5 +486,14 @@ struct OTPPopup: View {
             .transition(.opacity)
            // .animation(.easeInOut, value: isVisible)
         }
+    }
+}
+
+
+import SwiftUI
+
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
