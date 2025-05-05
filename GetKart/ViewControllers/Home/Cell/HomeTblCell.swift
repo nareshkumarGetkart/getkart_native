@@ -157,12 +157,14 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
     
     
     @objc  func likebtnAction(_ sender : UIButton){
-        
-        if  var obj = (listArray?[sender.tag] as? ItemModel){
-            obj.isLiked?.toggle()
-            listArray?[sender.tag] = obj
-            addToFavourite(itemId:obj.id ?? 0)
-            self.cllctnView.reloadData()
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            if  var obj = (listArray?[sender.tag] as? ItemModel){
+                obj.isLiked?.toggle()
+                listArray?[sender.tag] = obj
+                addToFavourite(itemId:obj.id ?? 0)
+                self.cllctnView.reloadData()
+            }
         }
     }
     

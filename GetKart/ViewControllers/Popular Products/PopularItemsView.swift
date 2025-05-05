@@ -75,11 +75,12 @@ struct ProductCard: View {
                             .background(Color.white)
                             .clipShape(Circle())
                             .shadow(radius: 3).simultaneousGesture(TapGesture().onEnded {
-                                
-                                var obj = objItem
-                                obj.isLiked = !(obj.isLiked ?? false)
-                                objItem = obj
-                                addToFavourite(itemId: objItem.id ?? 0)
+                                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                    var obj = objItem
+                                    obj.isLiked = !(obj.isLiked ?? false)
+                                    objItem = obj
+                                    addToFavourite(itemId: objItem.id ?? 0)
+                                }
                            
                             })
                     }

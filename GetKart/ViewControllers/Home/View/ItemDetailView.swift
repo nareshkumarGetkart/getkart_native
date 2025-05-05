@@ -113,7 +113,10 @@ struct ItemDetailView: View {
                         
                         Spacer()
                         Button(action: {
-                            objVM.addToFavourite()
+                            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                
+                                objVM.addToFavourite()
+                            }
                         }) {
                             
                             let isLike = (objVM.itemObj?.isLiked ?? false)

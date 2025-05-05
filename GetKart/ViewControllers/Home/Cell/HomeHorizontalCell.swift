@@ -197,13 +197,15 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     }
   
     @objc  func likebtnAction(_ sender : UIButton){
-        
-        if  var obj = (listArray?[sender.tag] as? ItemModel){
-            obj.isLiked?.toggle()
-            listArray?[sender.tag] = obj
-            self.collctnView.reloadData()
-
-            addToFavourite(itemId:obj.id ?? 0)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            if  var obj = (listArray?[sender.tag] as? ItemModel){
+                obj.isLiked?.toggle()
+                listArray?[sender.tag] = obj
+                self.collctnView.reloadData()
+                
+                addToFavourite(itemId:obj.id ?? 0)
+            }
         }
     }
     
