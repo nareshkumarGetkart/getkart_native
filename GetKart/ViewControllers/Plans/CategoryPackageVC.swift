@@ -130,22 +130,19 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         
         let obj = planListArray[indexPath.section][indexPath.row]
         cell.lblTitle.text = obj.name
-        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)"
-        if (obj.discountInPercentage ?? 0) == 0{
+        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? "0")"
+        if (obj.discountInPercentage ?? "0") == "0"{
             cell.lblPercentOff.text = ""
             cell.imgVwPercentageOffIcon.isHidden = true
-        }else{
-            cell.lblPercentOff.text = "\(obj.discountInPercentage ?? 0) % off"
-            cell.imgVwPercentageOffIcon.isHidden = false
-        }
-        
-        if (obj.finalPrice ?? 0) == Double(obj.price ?? 0){
             cell.lblOriginalAmount.attributedText = NSAttributedString(string: "")
 
         }else{
-            cell.lblOriginalAmount.attributedText = "\(Local.shared.currencySymbol) \(obj.price ?? 0)".setStrikeText(color: .gray)
-
+            cell.lblPercentOff.text = "\(obj.discountInPercentage ?? "0") % off"
+            cell.imgVwPercentageOffIcon.isHidden = false
+            cell.lblOriginalAmount.attributedText = "\(Local.shared.currencySymbol) \(obj.price ?? "0")".setStrikeText(color: .gray)
         }
+        
+       
         cell.lblFeatures.text = obj.description ?? ""
         cell.imgVwIcon.kf.setImage(with: URL(string:obj.icon ?? ""))
         cell.bgViewMain.layer.cornerRadius = 8.0

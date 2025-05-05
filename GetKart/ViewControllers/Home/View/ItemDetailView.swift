@@ -613,7 +613,7 @@ struct ItemDetailView: View {
     func getButtonTitle() -> String{
         
         var strTitle = ""
-        //enum('review', 'approved', 'rejected', 'sold out')
+        //enum('review', 'approved', 'rejected', 'sold out','inactive')
         if (objVM.itemObj?.status ?? "") == "approved" {
             strTitle = "Sold Out"
             
@@ -627,7 +627,10 @@ struct ItemDetailView: View {
         }else if (objVM.itemObj?.status ?? "") == "rejected"{
             
             strTitle = "Remove"
-        }
+        }else if (objVM.itemObj?.status ?? "") == "inactive"{
+            
+            strTitle = "Remove"
+        }        
         
         return strTitle
     }

@@ -34,6 +34,7 @@ class HomeTblCell: UITableViewCell {
     var listArray:[Any]?
     var istoIncreaseWidth = false
     var navigationController: UINavigationController?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -163,7 +164,8 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 obj.isLiked?.toggle()
                 listArray?[sender.tag] = obj
                 addToFavourite(itemId:obj.id ?? 0)
-                self.cllctnView.reloadData()
+                self.cllctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
+                
             }
         }
     }

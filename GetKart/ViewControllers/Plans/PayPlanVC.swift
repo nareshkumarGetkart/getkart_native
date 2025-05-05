@@ -33,8 +33,8 @@ class PayPlanVC: UIViewController {
         super.viewDidLoad()
         btnPay.layer.cornerRadius = 8.0
         btnPay.clipsToBounds = true
-        lblPrice.text = "Total \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)"
-        btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? 0)", for: .normal)
+        lblPrice.text = "Total \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")"
+        btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
         self.getPaymentSettings()
     }
     

@@ -202,8 +202,8 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             if  var obj = (listArray?[sender.tag] as? ItemModel){
                 obj.isLiked?.toggle()
                 listArray?[sender.tag] = obj
-                self.collctnView.reloadData()
-                
+                self.collctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
+
                 addToFavourite(itemId:obj.id ?? 0)
             }
         }
