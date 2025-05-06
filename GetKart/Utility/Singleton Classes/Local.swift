@@ -68,12 +68,16 @@ final class Local {
         return ""
     }
     
-    func saveUserLocation(city:String, state:String, country:String, timezone:String ) {
+    func saveUserLocation(city:String, state:String, country:String, latitude:String, longitude:String, timezone:String ) {
         
         UserDefaults.standard.setValue(city, forKey: LocalKeys.city.rawValue)
         UserDefaults.standard.setValue(state, forKey: LocalKeys.state.rawValue)
         UserDefaults.standard.setValue(country, forKey: LocalKeys.country.rawValue)
+        UserDefaults.standard.setValue(latitude, forKey: LocalKeys.latitude.rawValue)
+        UserDefaults.standard.setValue(longitude, forKey: LocalKeys.longitude.rawValue)
         UserDefaults.standard.setValue(timezone, forKey: LocalKeys.timezone.rawValue)
+        
+        
         UserDefaults.standard.synchronize()
     }
     
@@ -89,6 +93,17 @@ final class Local {
         
         return UserDefaults.standard.value(forKey: LocalKeys.country.rawValue) as? String ?? ""
     }
+    
+    func getUserLatitude() -> String{
+        
+        return UserDefaults.standard.value(forKey: LocalKeys.latitude.rawValue) as? String ?? ""
+    }
+    
+    func getUserLongitude() -> String{
+        
+        return UserDefaults.standard.value(forKey: LocalKeys.longitude.rawValue) as? String ?? ""
+    }
+    
     func getUserTimeZone() -> String{
         
         return UserDefaults.standard.value(forKey: LocalKeys.timezone.rawValue) as? String ?? ""
@@ -126,6 +141,8 @@ enum LocalKeys:String,CaseIterable{
     case state = "state"
     case country = "country"
     case timezone = "timezone"
+    case latitude = "latitude"
+    case longitude = "longitude"
 }
 
 

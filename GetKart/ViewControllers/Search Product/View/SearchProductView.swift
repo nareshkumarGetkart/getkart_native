@@ -18,7 +18,8 @@ struct SearchProductView: View {
     @State var isDataLoading = false
     @State var isAtBottom = false
     @State var navigateToFilterScreen = false
-
+    @State var dataArray:Array<CustomField> = Array()
+    @State var strCategoryTitle = ""
     var body: some View {
         VStack{
             HStack {
@@ -56,6 +57,9 @@ struct SearchProductView: View {
                 Button(action: {
                     /* Filter action */
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
+                        vc.dataArray = self.dataArray
+                        vc.dictCustomFields = self.dictCustomFields
+                        vc.strCategoryTitle = self.strCategoryTitle
                         vc.delFilterSelected = self
                         self.navigation?.pushViewController(vc, animated: true)
                     }
@@ -201,10 +205,12 @@ struct SearchProductView: View {
 }
 
 extension SearchProductView: FilterSelected{
-    func filterSelectectionDone(dict:Dictionary<String,Any>) {
+    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
         print(dict)
         self.page = 1
         self.dictCustomFields = dict
+        self.dataArray = dataArray
+        self.strCategoryTitle = strCategoryTitle
         self.getProductListApi(searchTxt: searchText)
     }
 }

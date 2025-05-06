@@ -206,7 +206,7 @@ extension SelectLocationRangeView :LocationAutorizationUpdated {
                 
                 if popType == .home || popType == .signUp{
                     
-                    Local.shared.saveUserLocation(city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country, timezone: LocationManager.sharedInstance.timezone)
+                    Local.shared.saveUserLocation(city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country, latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", timezone: LocationManager.sharedInstance.timezone)
                 }
                 
                 print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())

@@ -255,7 +255,7 @@ struct SearchWithSortView: View {
 
 
 extension SearchWithSortView: FilterSelected{
-    func filterSelectectionDone(dict:Dictionary<String,Any>) {
+    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
         print(dict)
         self.objVM.page = 1
         self.objVM.dictCustomFields = dict

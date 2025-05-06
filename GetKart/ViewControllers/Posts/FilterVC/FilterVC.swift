@@ -9,7 +9,7 @@ import UIKit
 import SwiftUI
 
 protocol FilterSelected{
-    func filterSelectectionDone(dict:Dictionary<String,Any>)
+    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String)
 }
 
 class FilterVC: UIViewController, LocationSelectedDelegate {
@@ -42,12 +42,41 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-        for ind in 0..<4 {
-            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
-            self.dataArray.append(obj)
+        if self.dataArray.count == 0 {
+            for ind in 0..<4 {
+                let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+                self.dataArray.append(obj)
+            }
+            
+            city = Local.shared.getUserCity()
+            self.state = Local.shared.getUserState()
+            self.country = Local.shared.getUserCountry()
+            self.latitude = Local.shared.getUserLatitude()
+            self.longitude = Local.shared.getUserLongitude()
+            
+            
+        }else {
+            max_price = dictCustomFields["max_price"] as? String ?? ""
+            min_price = dictCustomFields["min_price"] as? String ?? ""
+            category_id = dictCustomFields["category_id"] as? String ?? ""
+            
+            for obj in arrPostedSinceDict {
+                if obj["value"] == dictCustomFields["posted_since"]  as? String ?? "" {
+                    posted_since = obj
+                    break
+                }
+            }
+            //posted_since["value"] = dictCustomFields["posted_since"]  as? String ?? ""
+            
+            city = dictCustomFields["city"] as? String ?? ""
+            self.state = dictCustomFields["state"] as? String ?? ""
+            self.country = dictCustomFields["country"] as? String ?? ""
+            radius = dictCustomFields["radius"] as? Double ?? 0.0
+            self.latitude = dictCustomFields["latitude"] as? String ?? ""
+            self.longitude = dictCustomFields["longitude"] as? String ?? ""
+            
         }
         
-        // self.dataArray.append(contentsOf: [CustomField(),CustomField(),CustomField(),CustomField()])
         btnBack.setImageColor(color: .black)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
@@ -93,7 +122,6 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
             let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
             self.dataArray.append(obj)
         }
-        //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
         dictCustomFields.removeAll()
         strCategoryTitle = ""
         category_ids = ""
@@ -121,7 +149,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         dictCustomFields["longitude"] = self.longitude
         dictCustomFields["latitude"] = self.latitude
         
-        delFilterSelected?.filterSelectectionDone(dict: dictCustomFields)
+        delFilterSelected?.filterSelectectionDone(dict: dictCustomFields, dataArray:self.dataArray, strCategoryTitle: self.strCategoryTitle)
         self.navigationController?.popViewController(animated: true)
     }
     

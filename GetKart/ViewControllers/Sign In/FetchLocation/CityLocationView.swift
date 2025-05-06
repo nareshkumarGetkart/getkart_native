@@ -159,7 +159,7 @@ struct CityLocationView: View {
     func citySelected(city:CityModal) {
         
         if popType == .home || popType == .signUp{
-            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", timezone: "")
+            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", latitude:city.latitude ?? "", longitude:city.longitude ?? "", timezone: "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {

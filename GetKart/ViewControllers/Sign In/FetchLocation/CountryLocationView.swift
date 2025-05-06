@@ -233,7 +233,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
         
         if popType == .home || popType == .signUp{
             
-            Local.shared.saveUserLocation(city: "", state:  "", country:  "", timezone: "")
+            Local.shared.saveUserLocation(city: "", state:  "", country: "", latitude: "",longitude: "", timezone: "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {
@@ -378,7 +378,7 @@ extension CountryLocationView :LocationAutorizationUpdated {
                 
                 if popType == .home || popType == .signUp{
                     
-                    Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country, timezone: locationManager.timezone)
+                    Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country,latitude: "\(locationManager.latitude)", longitude: "\(locationManager.longitude)", timezone: locationManager.timezone)
                 }
                     
                     print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())

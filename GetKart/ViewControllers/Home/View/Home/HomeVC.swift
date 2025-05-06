@@ -146,7 +146,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
 extension HomeVC:FilterSelected{
     
     
-    func filterSelectectionDone(dict:Dictionary<String,Any>) {
+    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
         print(dict)
         
         homeVModel?.page = 1

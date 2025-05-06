@@ -54,10 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 self.navigationController?.viewControllers = [landingVC]
             }
         }
-        /*
-        let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-        self.navigationController?.viewControllers = [landingVC]
-        */
+        
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
         
@@ -516,7 +513,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
                 //Login
                 AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
-                
             }))
             deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
             deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect

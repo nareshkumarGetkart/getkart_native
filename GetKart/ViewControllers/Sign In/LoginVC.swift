@@ -35,6 +35,11 @@ class LoginVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if self.navigationController?.viewControllers.count ?? 0 > 1 {
+            self.navigationController?.viewControllers.remove(at: 0)
+        }
+        
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
         txtEmailPhone.text = ""
