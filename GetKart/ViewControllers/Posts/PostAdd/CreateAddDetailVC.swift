@@ -677,13 +677,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
         }else {
             isImgData = false
         }
-        /*
-        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
-        imagePicker.delegate = self
-        self.present(imagePicker, animated: true)
-        */
         showImagePickerOptions(tag: sender.tag)
-        
     }
     
     
@@ -731,18 +725,15 @@ extension CreateAddDetailVC: PictureAddedDelegate {
         if row == 3 {
             isImgData = true
         }else {
-            
             if gallery_images.count < 5 {
                 isImgData = false
             }else {
-                return
+                if gallery_images.count == 5 {
+                    AlertView.sharedManager.showToast(message: "Max 5 images are allowed to upload.")
+                    return
+                }
             }
         }
-        /*
-        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
-        imagePicker.delegate = self
-        self.present(imagePicker, animated: true)
-        */
         showImagePickerOptions(tag: row)
 
     }
