@@ -481,14 +481,23 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Price"
-            cell.txtField.placeholder = "Add Price Here"
+            cell.txtField.placeholder = "00"
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
+            
+            
             cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
+            cell.lblCurSymbol.text = Local.shared.currencySymbol
+            if cell.txtField.text?.count ?? 0 > 0 {
+                cell.lblCurSymbol.isHidden = false
+            }else {
+                cell.lblCurSymbol.isHidden = true
+            }
+            
             if showErrorMsg == true {
                 if (params[AddKeys.price.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
@@ -573,6 +582,12 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
             params[AddKeys.video_link.rawValue] = strText
         }
         
+    }
+    
+    func changeCharactersIn(selectedRow:Int){
+        if selectedRow == 5 {
+            tblView.reloadData()
+        }
     }
     func textViewEditingDone(selectedRow:Int, strText:String) {
         if selectedRow == 2 {

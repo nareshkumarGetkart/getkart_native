@@ -121,7 +121,6 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
         if selectedCoordinate.latitude != 0 {
             self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
         }
-        
     }
            
     

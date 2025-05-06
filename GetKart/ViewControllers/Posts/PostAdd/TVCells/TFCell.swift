@@ -9,10 +9,16 @@ import UIKit
 
 protocol TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String)
+    func changeCharactersIn(selectedRow:Int)
+}
+extension TextFieldDoneDelegate {
+    func textFieldEditingDone(selectedRow:Int, strText:String){}
+    func changeCharactersIn(selectedRow:Int){}
 }
 
 class TFCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var imgView:UIImageView!
+    @IBOutlet weak var lblCurSymbol:UILabel!
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var txtField:UITextFieldX!
     @IBOutlet weak var btnOption: UIButton!
