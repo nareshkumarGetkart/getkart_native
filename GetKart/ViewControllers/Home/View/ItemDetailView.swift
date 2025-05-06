@@ -289,6 +289,9 @@ struct ItemDetailView: View {
                 
                 
                 if (loggedInUserId != itemUserId) {
+                    
+                    let isReported = objVM.itemObj?.isAlreadyReported ?? false
+                    if isReported == false {
                     VStack(alignment: .leading, spacing: 15) {
                         HStack {
                             Circle()
@@ -309,20 +312,16 @@ struct ItemDetailView: View {
                             ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
                                 
-                                let isReported = objVM.itemObj?.isAlreadyReported ?? false
-                                
-                                if isReported {
-                                    
-                                }else{
-                                    print("Already Reported")
-                                    
-                                    let destVC = UIHostingController(rootView: ReportAdsView())
-                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                    self.navController?.present(destVC, animated: true, completion: nil)
-                                    
+                                let reportAds =  ReportAdsView(itemId:(objVM.itemObj?.id ?? 0)) {bool in
+                                    objVM.itemObj?.isAlreadyReported = bool
                                 }
+                                let destVC = UIHostingController(rootView:reportAds)
+                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                self.navController?.present(destVC, animated: true, completion: nil)
+                                
+                                
                             }
                     }.padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -332,6 +331,8 @@ struct ItemDetailView: View {
                         )
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                         .padding(.top, 5)
+                    
+                }
                 }
            
                 HStack{
@@ -458,7 +459,7 @@ struct ItemDetailView: View {
         
         if loggedInUserId == itemUserId {
             
-            if ((objVM.itemObj?.status ?? "") == "review"){
+            if ((objVM.itemObj?.status ?? "") == "review") || ((objVM.itemObj?.status ?? "") == "draft"){
              
                 
                 HStack {
@@ -683,7 +684,10 @@ struct ItemDetailView: View {
         }else if (objVM.itemObj?.status ?? "") == "inactive"{
             
             strTitle = "Remove"
-        }        
+        } else if (objVM.itemObj?.status ?? "") == "draft"{
+            
+            strTitle = "Draft"
+        }
         
         return strTitle
     }
@@ -712,6 +716,8 @@ struct ItemDetailView: View {
             return (Color(hexString: "#e6eef5"), Color(hexString: "#3e4c63"), "Under review")
         case "sold out":
             return (Color(hexString: "#fff8eb"), Color(hexString: "#ffbb34"), status)
+        case "draft":
+            return (Color(hexString: "#e6eef5"), Color(hexString: "#3e4c63"), "Draft")
         default:
             return (.clear, .black, status)
         }

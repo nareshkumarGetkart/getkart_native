@@ -60,8 +60,14 @@ struct MakeAnOfferView: View {
                     
                     Button(action: {
                         withAnimation {
-                            onOfferSubmit(offer) // Pass the offer back
-                            isPresented = false
+                            if offer.trim().count > 0 &&  offer != "0" {
+                                
+                                if let value = Int(offer.trim()),value > 0{
+                                    onOfferSubmit(offer) // Pass the offer back
+                                    isPresented = false
+                                }
+                            }
+                       
                         }
                     }) {
                         Text("Send")

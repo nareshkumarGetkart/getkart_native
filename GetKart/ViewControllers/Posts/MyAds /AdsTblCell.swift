@@ -15,8 +15,8 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var lblLikeCount:UILabel!
     @IBOutlet weak var btnAdStatus:UIButton!
     @IBOutlet weak var lblItem:UILabel!
-
     @IBOutlet weak var bgView:UIView!
+    @IBOutlet weak var btnAdPost:UIButton!
 
 
     override func awakeFromNib() {
@@ -24,6 +24,10 @@ class AdsTblCell: UITableViewCell {
         // Initialization code
         btnAdStatus.layer.cornerRadius = btnAdStatus.frame.height/2.0
         btnAdStatus.clipsToBounds = true
+        
+        
+        btnAdPost.layer.cornerRadius =  3.0 //btnAdPost.frame.height/2.0
+        btnAdPost.clipsToBounds = true
         
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true

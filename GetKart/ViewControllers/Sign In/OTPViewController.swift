@@ -86,8 +86,7 @@ class OTPViewController: UIViewController {
     //MARK: Api Methods
     func verifyMobileOTPApi(){
         
-        var params = ["mobile": mobile, "countryCode":countryCode, "otp":txtOtp.text ?? ""] as [String : Any]
-        
+        let params = ["mobile": mobile, "countryCode":countryCode, "otp":txtOtp.text ?? ""] as [String : Any]
         
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.verifyMobileOtpUrl, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
@@ -105,16 +104,10 @@ class OTPViewController: UIViewController {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
-                    /*if let payload =  result["payload"] as? Dictionary<String,Any>{
-                     
-                     self?.uid = payload["uid"] as? String ?? ""
-                     
-                     self?.delegate?.navigateToNextScreen(message: message)
-                     }*/
+                 
                     self?.userSignupApi()
                 }else{
-                    //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.showToast(message: message)
                 }
                 
             }
@@ -144,6 +137,8 @@ class OTPViewController: UIViewController {
                 if status == 200{
                     AlertView.sharedManager.showToast(message: message)
                 }else{
+                    AlertView.sharedManager.showToast(message: message)
+
                 }
                 
             }
@@ -169,7 +164,7 @@ class OTPViewController: UIViewController {
                 
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
-                // let message = result["message"] as? String ?? ""
+                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
                     
@@ -187,7 +182,7 @@ class OTPViewController: UIViewController {
                     }
                     
                 }else{
-                    //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.showToast(message: message)
                 }
                 
             }

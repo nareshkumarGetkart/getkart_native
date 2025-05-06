@@ -183,6 +183,27 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     
                 }else{
                     AlertView.sharedManager.showToast(message: message)
+                    
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+                        do {
+                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                            if let itemObj = item.data?.first {
+                                
+                                if itemObj.status == "draft"{
+                                    DispatchQueue.main.async {
+                                        self.navigationController?.popToRootViewController(animated: true)
+                                    }
+                                }
+                            }
+                        }catch {
+                            
+                        }
+                        
+                    } else {
+                        print("Something is wrong while converting dictionary to JSON data.")
+                        
+                    }
+
                 }
             }
         })

@@ -398,6 +398,11 @@ final class Constant: NSObject {
         }
     }
     
+    var add_reports:String{
+        get {
+            return "\(Constant.shared.baseURL)/add-reports"
+        }
+    }
     
     
     var get_followers:String{
@@ -433,7 +438,13 @@ final class Constant: NSObject {
     var verification_request:String{
         get{
             return "\(Constant.shared.baseURL)/verification-request"
-
+        }
+    }
+    
+    
+    var post_draft_item:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/post-draft-item"
         }
     }
     

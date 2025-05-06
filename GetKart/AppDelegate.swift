@@ -399,7 +399,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         if objLoggedInUser.id == nil {
             
         }else{
-            //checkSocketStatus()
+            checkSocketStatus()
             print("didReceive")
             print("NOTIFICATION TAPPED === \(response.notification.request.content.userInfo)")
             
@@ -432,10 +432,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         print("willPresent")
         
         print(notification.request.content)
-        let  notificationType =  notification.request.content.userInfo["notificationType"] as? String ?? ""
-        let  userId =  notification.request.content.userInfo["userId"] as? Int ?? 0
         
-        if notificationType == "messages" {
+        let  notificationType =  notification.request.content.userInfo["type"] as? String ?? ""
+        let  userId = Int(notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
+        
+        if notificationType == "chat" {
             if let destVc = self.navigationController?.topViewController as? ChatVC{
                 
                 if destVc.userId == userId{

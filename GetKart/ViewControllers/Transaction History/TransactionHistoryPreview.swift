@@ -13,8 +13,10 @@ struct TransactionHistoryPreview: View {
     var navController:UINavigationController?
     
   var body: some View {
+      
+      navigationHeader() .frame(height: 44)
+
         VStack(spacing: 0) {
-            navigationHeader()
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 10) {
@@ -69,7 +71,7 @@ struct TransactionHistoryPreview: View {
             .background(Color(.systemGray6))
             
         }.navigationBarHidden(true)
-        .padding(.top)
+        //.padding(.top)
     }
 
     

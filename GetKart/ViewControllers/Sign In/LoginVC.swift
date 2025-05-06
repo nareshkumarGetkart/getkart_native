@@ -41,8 +41,6 @@ class LoginVC: UIViewController {
         txtEmailPhone.leftPadding = 50
         txtEmailPhone.delegate = self
         self.fetChAndSetInitialCodeFromLocale()
-        
-     
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -104,6 +102,7 @@ class LoginVC: UIViewController {
     }
     
     @IBAction func skipButtonAction() {
+        self.txtEmailPhone.text = ""
         if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
             self.navigationController?.pushViewController(vc, animated: true)
         }

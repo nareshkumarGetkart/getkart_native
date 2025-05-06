@@ -203,6 +203,8 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblLikeCount.text = "Like:\(obj.totalLikes ?? 0)"
         cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
         cell.btnAdStatus.setTitle((obj.status ?? "").capitalized, for: .normal)
+        cell.btnAdPost.isHidden = true
+        
         switch obj.status ?? ""{
             
         case "approved":
@@ -230,6 +232,12 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             cell.btnAdStatus.setTitleColor(UIColor(hexString: "#ffbb34"), for: .normal)
             cell.btnAdStatus.backgroundColor = UIColor(hexString: "#fff8eb")
             break
+       
+        case "draft":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            cell.btnAdPost.isHidden = false
+
         default:
             break
         }
@@ -240,7 +248,8 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
 
         }
 
-        
+        cell.btnAdPost.tag = indexPath.item
+        cell.btnAdPost.addTarget(self, action: #selector(addPostBtnAction(_ : )), for: .touchUpInside)
         return cell
         
         
@@ -253,6 +262,65 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true, slug: listArray[indexPath.item].slug))
         hostingController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(hostingController, animated: true)
+    }
+    
+    //MARK: Selector Methods
+    @objc func addPostBtnAction(_ btn:UIButton){
+        
+        self.postDraftAds( post: listArray[btn.tag], index: btn.tag)
+        
+    }
+    
+    
+    func postDraftAds(post:ItemModel,index:Int){
+        
+        let params = ["id":post.id ?? 0]
+       // let strURl = Constant.shared.post_draft_item //+ "?id=\(post.id ?? 0)"
+        URLhandler.sharedinstance.makeCall(url:Constant.shared.post_draft_item , param: params, methodType:.post, showLoader: true) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+                        do {
+                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                            if let itemObj = item.data?.first {
+                             
+                                self.listArray[index] = itemObj
+                                self.tblView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                            }
+                        }catch {
+                            
+                        }
+                        
+                    } else {
+                        print("Something is wrong while converting dictionary to JSON data.")
+                        
+                    }
+                    
+                    
+                    
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    if (post.city?.count ?? 0) > 0 && (post.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = post.categoryID ?? 0
+                            destvc.categoryName = post.category?.name ?? ""
+                            destvc.city = post.city ?? ""
+                            self.navigationController?.pushViewController(destvc, animated: true)
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     
 }

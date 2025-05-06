@@ -69,10 +69,7 @@ class ChatVC: UIViewController {
     
     var youBlockedByUser = ""
     var youBlockedUser = ""
-    
-    
     var popovershow = false
-
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -124,6 +121,7 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(voiceRecord), for: .touchDown)
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
+        
         
         
         // checkOnlineOfflineStatus()
@@ -318,6 +316,10 @@ class ChatVC: UIViewController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(self.blockUnblock), name: NSNotification.Name(rawValue:SocketEvents.blockUnblock.rawValue), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.socketConnected),
+                                               name: NSNotification.Name(rawValue:SocketEvents.socketConnected.rawValue), object: nil)
+
+        
        /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
                                                name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
     }
@@ -431,6 +433,20 @@ class ChatVC: UIViewController {
     
     
     //MARK: Keyboard observers
+    
+    @objc func socketConnected(notification: Notification) {
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            if self.chatArray.count == 0{
+                self.page = 1
+                self.getItemOfferId()
+                self.getMessageList()
+                self.getUserInfo()
+            }
+        })
+    }
+    
+    
     @objc func keyboardWillShow(_ notification: Notification) {
         
         if let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
@@ -866,7 +882,7 @@ extension ChatVC: GrowingTextViewDelegate {
        
         
         
-              if !isTyping {
+               if !isTyping {
                     isTyping = true
                   self.sendtypinStatus(status: true)
                 }
@@ -884,7 +900,7 @@ extension ChatVC: GrowingTextViewDelegate {
     
     func resetTypingTimer() {
          typingTimer?.invalidate()
-         typingTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: false) { [weak self] _ in
+         typingTimer = Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { [weak self] _ in
              self?.userStoppedTyping()
          }
      }

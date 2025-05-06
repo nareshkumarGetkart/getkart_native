@@ -28,7 +28,7 @@ struct MapLocationView: View {
                         } label: {
                             Image("arrow_left").renderingMode(.template).foregroundColor(.black)
                             
-                        }.padding(.leading,10)
+                        }.frame(width:40, height: 40).padding(.leading,10)
                         
                         Spacer()
                         

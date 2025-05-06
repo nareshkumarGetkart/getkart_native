@@ -245,6 +245,7 @@ class ItemDetailViewModel:ObservableObject{
         }
     }
     
+    
 }
 
 

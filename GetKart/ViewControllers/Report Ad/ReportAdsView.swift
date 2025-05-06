@@ -12,8 +12,10 @@ struct ReportAdsView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedReason: String? = nil
     @State private var listArray = [ReportModel]()
+    @State private var selectedReasonId: Int? = nil
+    var itemId = 0
 
-   
+    var onReportSubmit: (Bool) -> Void  // Callback for offer submission
 
     var body: some View {
         
@@ -29,10 +31,12 @@ struct ReportAdsView: View {
                 ForEach(listArray) { report in
                     
                     let selReason = report.reason ?? ""
+                    let selReasonId = report.id ?? 0
 
 
                     Button(action: {
                         selectedReason = selReason
+                        selectedReasonId = selReasonId
                     }) {
                         
                         Text(selReason).font(.manrope(.medium, size: 17))
@@ -59,9 +63,10 @@ struct ReportAdsView: View {
                     
                     Button("Ok") {
                         // Handle report submission
-//                        if (selectedReason?.count ?? "") == 0 {
-//                            presentationMode.wrappedValue.dismiss()
-//                        }
+                        if let selId = selectedReasonId{
+                            
+                            self.reportItemApi(reportedReasonId: selId)
+                        }
                     }.font(.manrope(.semiBold, size: 15))
                     .frame(maxWidth: .infinity,minHeight: 40,maxHeight:40)
                     .background(Color.orange)
@@ -95,13 +100,43 @@ struct ReportAdsView: View {
             
         }
     }
-
+    
+    
+    
+    func reportItemApi(reportedReasonId:Int){
+        
+        let params = ["report_reason_id":reportedReasonId,"item_id":itemId] as [String : Any]
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.add_reports, param: params,methodType: .post) {  responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    AlertView.sharedManager.showToast(message: message)
+                   presentationMode.wrappedValue.dismiss()
+                    onReportSubmit(true) // Pass the offer back
+                }
+            }
+        }
+    }
 }
 
-
-#Preview {
-    ReportAdsView()
-}
+//
+//#Preview {
+//    ReportAdsView(, onReportSubmit: {
+//        
+//    })
+//}
 
 
 

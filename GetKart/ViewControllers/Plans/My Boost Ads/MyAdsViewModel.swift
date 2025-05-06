@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 class MyAdsViewModel:ObservableObject{
@@ -29,5 +30,7 @@ class MyAdsViewModel:ObservableObject{
         }
        
     }
+    
+
     
 }
