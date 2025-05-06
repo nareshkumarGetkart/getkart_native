@@ -489,7 +489,7 @@ struct ItemDetailView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-                    .padding([.leading,.trailing])
+                   // .padding([.leading,.trailing])
                     
                     .confirmationDialog("Confirm Remove",
                                         isPresented: $showConfirmDialog,

@@ -62,7 +62,7 @@ struct SellerProfileView: View {
                         ])
                     }
                     let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                    if objLoggedInUser.id != nil {
+                    if objLoggedInUser.id != nil  && objLoggedInUser.id != (objVM.sellerObj?.id ?? 0) {
                     Button(action: {
                         // Handle more options
                         showOptionSheet = true
