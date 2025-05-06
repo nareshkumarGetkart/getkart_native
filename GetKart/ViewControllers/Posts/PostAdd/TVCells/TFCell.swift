@@ -9,11 +9,9 @@ import UIKit
 
 protocol TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String)
-    func changeCharactersIn(selectedRow:Int)
 }
 extension TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String){}
-    func changeCharactersIn(selectedRow:Int){}
 }
 
 class TFCell: UITableViewCell, UITextFieldDelegate {
@@ -25,6 +23,8 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var btnOptionBig: UIButton!
     var textFieldDoneDelegate:TextFieldDoneDelegate!
     @IBOutlet weak var lblErrorMsg:UILabel!
+    var showCurrencySymbol = false
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -43,10 +43,23 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         textFieldDoneDelegate?.textFieldEditingDone(selectedRow: txtField.tag, strText: textField.text ?? "")
-        }
+        
+    }
     
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            return true;
+        
+        if showCurrencySymbol == true {
+            let textFieldText: NSString = (textField.text ?? "") as NSString
+            let txtAfterUpdate = textFieldText.replacingCharacters(in: range, with: string)
+            if txtAfterUpdate.count > 0 {
+                lblCurSymbol.isHidden = false
+                txtField.leftPadding = 25
+            }else {
+                lblCurSymbol.isHidden = true
+                txtField.leftPadding = 10
+            }
         }
+        return true;
+    }
 }

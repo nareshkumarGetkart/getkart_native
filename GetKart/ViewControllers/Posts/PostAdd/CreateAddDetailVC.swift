@@ -487,16 +487,12 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
-            
+            cell.showCurrencySymbol = true
             
             
             cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
             cell.lblCurSymbol.text = Local.shared.currencySymbol
-            if cell.txtField.text?.count ?? 0 > 0 {
-                cell.lblCurSymbol.isHidden = false
-            }else {
-                cell.lblCurSymbol.isHidden = true
-            }
+            
             
             if showErrorMsg == true {
                 if (params[AddKeys.price.rawValue] as? String ?? "") == "" {
@@ -584,11 +580,7 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
         
     }
     
-    func changeCharactersIn(selectedRow:Int){
-        if selectedRow == 5 {
-            tblView.reloadData()
-        }
-    }
+    
     func textViewEditingDone(selectedRow:Int, strText:String) {
         if selectedRow == 2 {
             params[AddKeys.description.rawValue] = strText
