@@ -166,6 +166,8 @@ class ItemDetailViewModel:ObservableObject{
                     self.itemObj?.isFeature = true
                     nav?.popToRootViewController(animated: true)
                     AlertView.sharedManager.showToast(message: message)
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
                 }
             }
         }
@@ -176,7 +178,7 @@ class ItemDetailViewModel:ObservableObject{
     func getLimitsApi(nav:UINavigationController?){
         
         let strUrl = Constant.shared.getLimits + "?package_type=advertisement"
-        URLhandler.sharedinstance.makeCall(url:strUrl , param:nil,methodType: .get) { responseObject, error in
+        URLhandler.sharedinstance.makeCall(url:strUrl , param:nil,methodType: .get) { [self] responseObject, error in
             
             if(error != nil)
             {
@@ -197,13 +199,25 @@ class ItemDetailViewModel:ObservableObject{
                             AlertView.sharedManager.showToast(message: message)
                         }
                     }
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = self.itemObj?.categoryID ?? 0
+                            destvc.categoryName = self.itemObj?.category?.name ?? ""
+                            destvc.city = self.itemObj?.city ?? ""
+                           nav?.pushViewController(destvc, animated: true)
+                        }
+                    }
+
                 }
             }
         }
     }
-    
-
-    
+        
     
     func updateItemStatus(nav:UINavigationController?){
         
@@ -230,7 +244,6 @@ class ItemDetailViewModel:ObservableObject{
             }
         }
     }
-    
     
 }
 

@@ -70,6 +70,10 @@ class ChatVC: UIViewController {
     var youBlockedByUser = ""
     var youBlockedUser = ""
     
+    
+    var popovershow = false
+
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -996,7 +1000,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 case "text": do{
                     
                     cell = tableView.dequeueReusableCell(withIdentifier: "SendChatCell", for: indexPath) as! SendChatCell
-                    cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                    cell.lblMessage.attributedText = convertAttributtedColorText(text: chatObj.message ?? "") //NSAttributedString(string:  chatObj.message ?? "")
                     DispatchQueue.main.async {
                         cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
@@ -1011,6 +1015,10 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     
 
                     cell.lblTime.text = dateFormatter.string(from: date)
+                    cell.lblMessage.isUserInteractionEnabled = true
+                    cell.lblMessage.tag = indexPath.row
+                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOnLabel(_:)))
+                    cell.lblMessage.addGestureRecognizer(tapGesture)
                 }
                                 
             case "offer": do{
@@ -1153,13 +1161,19 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 case "text": do{
                     cell = tableView.dequeueReusableCell(withIdentifier: "RecieveChatCell", for: indexPath) as! RecieveChatCell
                     
-                    cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                   // cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                    cell.lblMessage.attributedText = convertAttributtedColorText(text: chatObj.message ?? "") //NSAttributedString(string:  chatObj.message ?? "")
+
                     cell.lblTime.text = dateFormatter.string(from: date)
 
                     DispatchQueue.main.async {
                         cell.bgview.roundCorners(corners: [.bottomRight,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
                     }
+                    cell.lblMessage.isUserInteractionEnabled = true
+                    cell.lblMessage.tag = indexPath.row
+                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOnLabel(_:)))
+                    cell.lblMessage.addGestureRecognizer(tapGesture)
                   
                 }
                     
@@ -1250,24 +1264,26 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             
             
         }
-         /*
-        cell.contentView.tag = indexPath.row
-        
-        let long = UILongPressGestureRecognizer(target: self, action: #selector(self.longGestureCellAction(_:)))
-        long.delegate = self
-        cell.contentView.addGestureRecognizer(long)
+      
+        if (chatObj.messageType ?? "") == "text"{
+            cell.contentView.tag = indexPath.row
+            
+            let long = UILongPressGestureRecognizer(target: self, action: #selector(self.longGestureCellAction(_:)))
+            // long.delegate = self
+            cell.contentView.addGestureRecognizer(long)
+        }
         //            let pan = UIPanGestureRecognizer(target: self, action: #selector(self.panGestureCellAction(_:)))
         //            pan.delegate = self
         //             cell1.contentView.addGestureRecognizer(pan)
         
-        let left = UISwipeGestureRecognizer(target : self, action : #selector(Swipeleft(_ : )))
-        left.direction = .left
-        cell.contentView.addGestureRecognizer(left)
-        
-        let right = UISwipeGestureRecognizer(target : self, action : #selector(Swiperight(_ : )))
-        right.direction = .right
-        cell.contentView.addGestureRecognizer(right)
-        */
+//        let left = UISwipeGestureRecognizer(target : self, action : #selector(Swipeleft(_ : )))
+//        left.direction = .left
+//        cell.contentView.addGestureRecognizer(left)
+//        
+//        let right = UISwipeGestureRecognizer(target : self, action : #selector(Swiperight(_ : )))
+//        right.direction = .right
+//        cell.contentView.addGestureRecognizer(right)
+//        
         
         
       
@@ -1278,6 +1294,41 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         
         
     }
+    
+    @objc func handleTapOnLabel(_ gesture: UITapGestureRecognizer) {
+           
+        guard let label = gesture.view as? UILabel else { return }
+
+        guard let text = label.attributedText?.string else { return }
+
+            let layoutManager = NSLayoutManager()
+            let textContainer = NSTextContainer(size: label.bounds.size)
+            let textStorage = NSTextStorage(attributedString: label.attributedText!)
+
+            layoutManager.addTextContainer(textContainer)
+            textStorage.addLayoutManager(layoutManager)
+
+            textContainer.lineFragmentPadding = 0
+            textContainer.maximumNumberOfLines = label.numberOfLines
+            textContainer.lineBreakMode = label.lineBreakMode
+
+            let location = gesture.location(in: label)
+            let index = layoutManager.characterIndex(for: location, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+
+        let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+
+        
+            for match in matches {
+                if NSLocationInRange(index, match.range),
+                   let url = match.url {
+                    UIApplication.shared.open(url)
+                    break
+                }
+            }
+        }
+    
+    
     
     @objc func imageTapped(sender: UITapGestureRecognizer) {
        
@@ -1291,6 +1342,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             AppDelegate.sharedInstance.navigationController?.present(zoomCtrl, animated: true, completion: nil)
         }
     }
+    
     
     
     @objc func playPauseTapped(sender: UIButton) {
@@ -1312,134 +1364,188 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
          // }
       }
       
-    /*
+ 
     
     @objc func longGestureCellAction(_ recognizer: UILongPressGestureRecognizer){
-       
-        
-        
-//        if  self.requestedUser == 0{
-//            return
-//        }
-//        self.center_item.tintColor = CustomColor.sharedInstance.newThemeColor
-//        self.left_item.tintColor = CustomColor.sharedInstance.newThemeColor
-//        self.right_item.tintColor = CustomColor.sharedInstance.newThemeColor
-        
-        if let point = recognizer.view?.convert(recognizer.location(in: recognizer.view), to: self.view) {
-            
-            if(popovershow == false)
-            {
-                popovershow = true
-                
-                let index = IndexPath(row: (recognizer.view?.tag)!, section: 0)
-                
-                let cell = self.tblView.cellForRow(at: index)
-                var messageFrame = ChatDetail()
-                if(self.chatArray.count > (recognizer.view?.tag)!)
-                {
-                    messageFrame = self.chatArray[(recognizer.view?.tag)!]
-                }
-               
-                
-                if messageFrame.isDeleted == 1{
-                    return
-                }
-//                if messageFrame.message.replyObj == nil {
-//                    messageFrame.message.replyObj = ReplyInfo(respDict: [:])
-//                }
-                let cellConfi = FTCellConfiguration()
-                cellConfi.textColor = UIColor.black.withAlphaComponent(0.7)
-                cellConfi.textFont = UIFont.systemFont(ofSize: 15.0)
-                cellConfi.textAlignment = .left
-                cellConfi.menuIconSize = 17.0
-                cellConfi.ignoreImageOriginalColor = true
-                
-                let menuOptionNameArray = self.longGestureDataSource(messageFrame: messageFrame).0
-                
-                let menuOptionImageNameArray = self.longGestureDataSource(messageFrame: messageFrame).1
-                
-                let config = FTConfiguration.shared
-                config.backgoundTintColor = UIColor(red: 213/255, green: 213/255, blue: 211/255, alpha: 1.0)
-                config.borderColor = UIColor.clear
-                config.menuWidth = 155
-                config.menuSeparatorColor = UIColor.lightGray
-                config.menuRowHeight = 44
-                config.cornerRadius = 15
-                config.globalShadow = true
-                
-                let rectOfCell = self.tblView.rectForRow(at: index)
-                let rectOfCellInSuperview = self.tblView.convert(rectOfCell, to: AppDelegate.sharedInstance.navigationController?.topViewController!.view)
-                
-                _ = config.selectedView.subviews.map {
-                    $0.removeFromSuperview()
-                }
-                config.selectedView.frame = rectOfCellInSuperview
-              //  config.selectedView.addSubview(self.copyView(viewforCopy: (cell?.contentView)!))
-                
-                FTPopOverMenu.showFromSenderFrame(senderFrame: CGRect(origin: point, size: CGSize.zero), with: menuOptionNameArray, menuImageArray: menuOptionImageNameArray, cellConfigurationArray: Array(repeating: cellConfi, count: menuOptionNameArray.count), done: { (selectedIndex) in
-                    self.popovershow = false
-                    self.view.endEditing(true)
-                    let action = menuOptionNameArray[selectedIndex]
-                    if(action == "Delete")
-                    {
+     
+     
+     
+     //        if  self.requestedUser == 0{
+     //            return
+     //        }
+     //        self.center_item.tintColor = CustomColor.sharedInstance.newThemeColor
+     //        self.left_item.tintColor = CustomColor.sharedInstance.newThemeColor
+     //        self.right_item.tintColor = CustomColor.sharedInstance.newThemeColor
+             
+             if let point = recognizer.view?.convert(recognizer.location(in: recognizer.view), to: self.view) {
+                 
+                 if(popovershow == false)
+                 {
+                     popovershow = true
+                     
+                     let index = IndexPath(row: (recognizer.view?.tag)!, section: 0)
+                     
+                     let cell = self.tblView.cellForRow(at: index)
+                     var messageFrame = MessageModel(readAt: nil, id: nil, createdAt: nil, file: nil, itemOfferID: nil, message: nil, messageType: nil, updatedAt: nil, senderID: nil, audio: nil, receiverID: nil) // =  ChatDetail()
+                     if(self.chatArray.count > (recognizer.view?.tag)!)
+                     {
+                         messageFrame = self.chatArray[(recognizer.view?.tag)!]
+                     }
+                    
+                     
+//                     if messageFrame.isDeleted == 1{
+//                         return
+//                     }
+     //                if messageFrame.message.replyObj == nil {
+     //                    messageFrame.message.replyObj = ReplyInfo(respDict: [:])
+     //                }
+                     let cellConfi = FTCellConfiguration()
+                     cellConfi.textColor = UIColor.black.withAlphaComponent(0.7)
+                     cellConfi.textFont = UIFont.systemFont(ofSize: 15.0)
+                     cellConfi.textAlignment = .left
+                     cellConfi.menuIconSize = 17.0
+                     cellConfi.ignoreImageOriginalColor = true
+                     
+                         
+                         
+                     
+                     let menuOptionNameArray = self.longGestureDataSource(messageFrame: messageFrame ).0
+                     
+                     let menuOptionImageNameArray = self.longGestureDataSource(messageFrame: messageFrame).1
+                     
+                     let config = FTConfiguration.shared
+                     config.backgoundTintColor = UIColor(red: 213/255, green: 213/255, blue: 211/255, alpha: 1.0)
+                     config.borderColor = UIColor.clear
+                     config.menuWidth = 155
+                     config.menuSeparatorColor = UIColor.lightGray
+                     config.menuRowHeight = 44
+                     config.cornerRadius = 15
+                     config.globalShadow = true
+                     
+                     let rectOfCell = self.tblView.rectForRow(at: index)
+                     let rectOfCellInSuperview = self.tblView.convert(rectOfCell, to: AppDelegate.sharedInstance.navigationController?.topViewController!.view)
+                     
+                     _ = config.selectedView.subviews.map {
+                         $0.removeFromSuperview()
+                     }
+                     config.selectedView.frame = rectOfCellInSuperview
+                   //  config.selectedView.addSubview(self.copyView(viewforCopy: (cell?.contentView)!))
+                     
+                     FTPopOverMenu.showFromSenderFrame(senderFrame: CGRect(origin: point, size: CGSize.zero), with: menuOptionNameArray, menuImageArray: menuOptionImageNameArray, cellConfigurationArray: Array(repeating: cellConfi, count: menuOptionNameArray.count), done: { (selectedIndex) in
+                         self.popovershow = false
+                         self.view.endEditing(true)
+                         let action = menuOptionNameArray[selectedIndex]
+                         if(action == "Delete")
+                         {
+                             /*
+                             let PZUSER = DBManager.fetchUserFromDB(id: Local.shared.getUserId())
+                             if (PZUSER?.role ?? 0) < 2 {
+                                 let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PremiumPlanVC") as! PremiumPlanVC
+                                 vc.type = 1
+                                 vc.planBoughtDelegate = self
+                                 AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+                                 
+                             }else{
+                                 let messageFrame = self.chatArray[index.row]
+                                 
+                                 
+                                 let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: "Delete this message?", preferredStyle: .actionSheet)
+                                 
+                                 let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                                 
+                                 let deleteForMe = UIAlertAction(title: "Delete for me", style: .default) { (action) in
+                                     
+                                     self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 0)
+                                     
+                                 }
+                                 
+                                 let deleteChatBoth = UIAlertAction(title: "Delete for everyone", style: .default) { (action) in
+                                     
+                                     self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 1)
+                                 }
+                                 
+                                 if self.checkTimeStampMorethan5Mins(timestamp: Int(messageFrame.createdAt ?? 0)){
+                                     
+                                     if messageFrame.sender == Local.shared.getUserId(){
+                                         actionSheetAlertController.addAction(deleteChatBoth)
+                                         actionSheetAlertController.addAction(deleteForMe)
+                                     }else{
+                                         actionSheetAlertController.addAction(deleteForMe)
+                                     }
+                                 }else{
+                                     actionSheetAlertController.addAction(deleteForMe)
+                                 }
+                                 
+                                 actionSheetAlertController.addAction(cancelActionButton)
+                                 self.present(actionSheetAlertController, animated: true, completion: nil)
+                                 
+                             }
+                             */
+                         }else if(action == "Reply")
+                         {
+                           //  self.ShowReplyView(messageFrame)
                         
-                        let PZUSER = DBManager.fetchUserFromDB(id: Local.shared.getUserId())
-                        if (PZUSER?.role ?? 0) < 2 {
-                            let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PremiumPlanVC") as! PremiumPlanVC
-                            vc.type = 1
-                            vc.planBoughtDelegate = self
-                            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-                            
-                        }else{
-                            let messageFrame = self.chatArray[index.row]
-                            
-                            
-                            let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: "Delete this message?", preferredStyle: .actionSheet)
-                            
-                            let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-                            
-                            let deleteForMe = UIAlertAction(title: "Delete for me", style: .default) { (action) in
-                                
-                                self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 0)
-                                
-                            }
-                            
-                            let deleteChatBoth = UIAlertAction(title: "Delete for everyone", style: .default) { (action) in
-                                
-                                self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 1)
-                            }
-                            
-                            if self.checkTimeStampMorethan5Mins(timestamp: Int(messageFrame.createdAt ?? 0)){
-                                
-                                if messageFrame.sender == Local.shared.getUserId(){
-                                    actionSheetAlertController.addAction(deleteChatBoth)
-                                    actionSheetAlertController.addAction(deleteForMe)
-                                }else{
-                                    actionSheetAlertController.addAction(deleteForMe)
-                                }
-                            }else{
-                                actionSheetAlertController.addAction(deleteForMe)
-                            }
-                            
-                            actionSheetAlertController.addAction(cancelActionButton)
-                            self.present(actionSheetAlertController, animated: true, completion: nil)
-                            
-                        }
-                    }else if(action == "Reply")
-                    {
-                        self.ShowReplyView(messageFrame)
-                   
-                    }else if(action == "Copy")
-                    {
-                        UIPasteboard.general.string = messageFrame.message ?? ""
-                    }
-                }) {
-                    self.popovershow = false
-                }
-            }
+                         }else if(action == "Copy")
+                         {
+                             UIPasteboard.general.string = messageFrame.message ?? ""
+                         }
+                     }) {
+                         self.popovershow = false
+                     }
+                 }
+             }
+         }
+    
+    
+    func longGestureDataSource(messageFrame : MessageModel) -> ([String], [String]){
+        
+        var menuOptionNameArray : [String] = []
+        var menuOptionImageNameArray : [String] = []
+    /*
+        menuOptionNameArray = ["Reply","Copy","Delete"]
+        menuOptionImageNameArray = [ "menu_reply", "menu_copy", "menu_delete"]
+        
+        /* 0-Text, 1-Media (Image,video,GIF, Document), 2-Link, 3-Contact, 4-Location, 6-Music, 7-gift */
+
+        if messageFrame.messageType != "text"{
+            
+            
+//            menuOptionNameArray = ["Reply","Delete"]
+//            menuOptionImageNameArray = [ "menu_reply", "menu_delete"]
+            
+            menuOptionNameArray = ["Reply"]
+            menuOptionImageNameArray = [ "menu_reply"]
         }
+        
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
+        
+        if messageFrame.senderID != objLoggedInUser.id{
+            if messageFrame.messageType == "text"{
+//                menuOptionNameArray = ["Reply","Copy","Delete"]
+//                menuOptionImageNameArray = [ "menu_reply", "menu_copy", "menu_delete"]
+                
+                menuOptionNameArray = ["Reply","Copy"]
+                menuOptionImageNameArray = [ "menu_reply", "menu_copy"]
+            }else{
+//                menuOptionNameArray = ["Reply","Delete"]
+//                menuOptionImageNameArray = [ "menu_reply", "menu_delete"]
+                
+                menuOptionNameArray = ["Reply"]
+                menuOptionImageNameArray = [ "menu_reply"]
+            }
+            
+        }
+        
+        */
+        menuOptionNameArray = ["Copy"]
+        menuOptionImageNameArray = ["menu_copy"]
+        
+        return (menuOptionNameArray, menuOptionImageNameArray)
     }
-   
+    
+    /*
     func checkTimeStampMorethan5Mins(timestamp : Int) -> Bool
     {
         if(timestamp > 0)
@@ -1574,7 +1680,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         
         return (menuOptionNameArray, menuOptionImageNameArray)
     }
-    
+  
     @objc func Swipeleft(_ recognizer:UIGestureRecognizer){
         
 //        if  self.requestedUser == 0{
@@ -1582,7 +1688,10 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
 //        }
 //
         let cell = self.tblView.cellForRow(at: IndexPath(row: (recognizer.view?.tag)!, section: 0)) as? ChatterCell
-        var messageFrame = ChatDetail()
+        //var messageFrame = ChatDetail()
+        
+        var messageFrame = MessageModel(readAt: nil, id: nil, createdAt: nil, file: nil, itemOfferID: nil, message: nil, messageType: nil, updatedAt: nil, senderID: nil, audio: nil, receiverID: nil) // =  ChatDetail()
+
         if(self.chatArray.count > (recognizer.view?.tag)!)
         {
             messageFrame = self.chatArray[(recognizer.view?.tag)!]
@@ -1635,15 +1744,17 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
 //            return
 //        }
         let cell = self.tblView.cellForRow(at: IndexPath(row: (recognizer.view?.tag)!, section: 0)) as? ChatterCell
-        var messageFrame = ChatDetail()
+       // var messageFrame = ChatDetail()
+        var messageFrame = MessageModel(readAt: nil, id: nil, createdAt: nil, file: nil, itemOfferID: nil, message: nil, messageType: nil, updatedAt: nil, senderID: nil, audio: nil, receiverID: nil) // =  ChatDetail()
+
         if(self.chatArray.count > (recognizer.view?.tag)!)
         {
             messageFrame = self.chatArray[(recognizer.view?.tag)!]
         }
         
-        if messageFrame.isDeleted == 1{
-            return
-        }
+//        if messageFrame.isDeleted == 1{
+//            return
+//        }
         
         let translation: CGPoint = recognizer.location(in: view)  // recognizer.translation(in: view)
         UIView.animate(withDuration: 0.25) {
@@ -1666,15 +1777,80 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                // if CGFloat(x) > 85 {
                     if CGFloat(x) > 25 {
 
-                    if(messageFrame.type ?? 0) != 100
+                        if(messageFrame.messageType ?? "0") != "100"
                     {
                         let _ = self.textView.becomeFirstResponder()
-                        self.ShowReplyView(messageFrame)
+                      //  self.ShowReplyView(messageFrame)
                     }
                 }
                // cell?.replyImg.alpha = 0.0
             }
         }
     }
-    */
+    
+     */
+}
+
+
+
+
+extension ChatVC{
+    
+    //MARK: convertAttributtedColorText
+    func convertAttributtedColorText(text:String) -> NSAttributedString {
+        
+        let  originalStr = text
+        let att = NSMutableAttributedString(string: originalStr);
+        let detectorType: NSTextCheckingResult.CheckingType = [.link]// , .phoneNumber]
+        
+       /* let mentionPattern = "\\B@[A-Za-z0-9_]+"
+        let mentionRegex = try? NSRegularExpression(pattern: mentionPattern, options: [.caseInsensitive])
+        let mentionMatches  = mentionRegex?.matches(in: originalStr, options: [], range: NSMakeRange(0, originalStr.utf16.count
+                                                                                                    ))
+        
+        for result in mentionMatches! {
+            if let range1 = Range(result.range, in: originalStr) {
+                let matchResult = originalStr[range1]
+                
+                if matchResult.count > 0  {
+                    //                   att.addAttributes([NSAttributedString.Key.foregroundColor:Themes.sharedInstance.tagAndLinkColor(),NSAttributedString.Key.font:UIFont.boldSystemFont(ofSize: 18.0)], range: result.range)
+                    att.addAttributes([NSAttributedString.Key.foregroundColor:UIColor.black], range: result.range)
+                }
+            }
+        }
+           */
+        let hashtagPattern =  "#[^\\s!@#\\$%^&*()=+.\\/,\\[{\\]};:'\"?><]+" //(^|\\s)#([A-Za-z_][A-Za-z0-9_]*)"
+        let regex = try? NSRegularExpression(pattern: hashtagPattern, options: [.caseInsensitive])
+        let matches  = regex?.matches(in: originalStr, options: [], range: NSMakeRange(0, originalStr.utf16.count))
+        
+        for result in matches! {
+            if let range1 = Range(result.range, in: originalStr) {
+                let matchResult = originalStr[range1]
+                
+                if matchResult.count > 0  {
+                    att.addAttributes([NSAttributedString.Key.foregroundColor:Themes.sharedInstance.themeColor], range: result.range)
+                }
+            }
+        }
+        
+        do {
+            let detector = try NSDataDetector(types: detectorType.rawValue)
+            let results = detector.matches(in: originalStr, options: [], range: NSRange(location: 0, length:
+                                                                                            originalStr.utf16.count))
+            for result in results {
+                if let range1 = Range(result.range, in: originalStr) {
+                    let matchResult = originalStr[range1]
+                    
+                    if matchResult.count > 0  {
+                        att.addAttributes([NSAttributedString.Key.foregroundColor:Themes.sharedInstance.themeColor], range: result.range)
+                    }
+                }
+            }
+        } catch {
+            print("handle error")
+        }
+        return att
+    }
+   
+    
 }

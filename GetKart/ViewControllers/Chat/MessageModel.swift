@@ -72,6 +72,19 @@ struct MessageModel: Codable {
         case receiverID = "receiver_id"
        // case userType
     }
+    init(readAt: String? = nil, id: Int?, createdAt: String?, file: String?, itemOfferID: Int?, message: String?, messageType: String?, updatedAt: String?, senderID: Int?, audio: String?, receiverID: Int?) {
+        self.readAt = readAt
+        self.id = id
+        self.createdAt = createdAt
+        self.file = file
+        self.itemOfferID = itemOfferID
+        self.message = message
+        self.messageType = messageType
+        self.updatedAt = updatedAt
+        self.senderID = senderID
+        self.audio = audio
+        self.receiverID = receiverID
+    }
 }
 
 
