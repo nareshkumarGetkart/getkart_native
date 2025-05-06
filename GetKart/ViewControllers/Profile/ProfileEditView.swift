@@ -301,7 +301,7 @@ struct ProfileEditView: View {
     
     func sendOTPApi(countryCode:String){
         
-        let params = ["mobile": phoneNumber, "countryCode":"\(countryCode)"] as [String : Any]
+        let params = ["mobile": Int(phoneNumber.trim()) ?? 0, "countryCode":"\(countryCode)"] as [String : Any]
               
         URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) { responseObject, error in
             

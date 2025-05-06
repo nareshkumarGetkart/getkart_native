@@ -458,7 +458,55 @@ struct ItemDetailView: View {
         
         if loggedInUserId == itemUserId {
             
-            if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||  ((objVM.itemObj?.status ?? "") == "review")  || ((objVM.itemObj?.status ?? "") == "inactive"){
+            if ((objVM.itemObj?.status ?? "") == "review"){
+             
+                
+                HStack {
+                    Button(action: {
+                        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                            vc.itemObj = objVM.itemObj
+                            vc.popType = .editPost
+                            self.navController?.pushViewController(vc, animated: true)
+                        }
+                    }) {
+                        Text("Edit")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                   
+                    
+                    Button(action: {
+                        showConfirmDialog = true
+                        
+                    }) {
+                        Text("Remove")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding([.leading,.trailing])
+                    
+                    .confirmationDialog("Confirm Remove",
+                                        isPresented: $showConfirmDialog,
+                                        titleVisibility: .visible) {
+                        Button("Confirm", role: .destructive) {
+                            // Confirm logic
+                            self.objVM.deleteItemApi(nav: navController)
+                            
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("After removing, ads will be deleted.")
+                    }
+                }
+                .padding(.horizontal)
+                
+            }else  if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||   ((objVM.itemObj?.status ?? "") == "inactive"){
                 
                 Button(action: {
                     showConfirmDialog = true
@@ -700,6 +748,7 @@ struct ItemDetailView: View {
                             buttons: [
                                 .default(Text("Copy Link"), action: {
                                     UIPasteboard.general.string = ShareMedia.itemUrl + "\(objVM.itemObj?.slug ?? "")?share=true"
+                                    AlertView.sharedManager.showToast(message: "Copied successfully.")
                                 }),
                                 .default(Text("Share"), action: {
                                     ShareMedia.shareMediafrom(type: .item, mediaId: "\(objVM.itemObj?.slug ?? "")", controller: (self.navController?.topViewController)!)

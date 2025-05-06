@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import Kingfisher
 struct MyBoostAdsView: View {
     var navigation:UINavigationController?
     @StateObject var obj = MyAdsViewModel()
@@ -79,13 +79,26 @@ struct BoostAdsCell: View {
         HStack{
             
             ZStack{
-                AsyncImage(url: URL(string: itemObj?.image ?? "")) { img in
-                    img.frame(width: 120,height: 140).aspectRatio(contentMode: .fit).cornerRadius(5)
-                    
-                } placeholder: {
-                    Image("getkartplaceholder").frame(width: 120,height: 140).cornerRadius(5)
-                    
-                }
+//                AsyncImage(url: URL(string: itemObj?.image ?? "")) { img in
+//                    img.frame(width: 120,height: 140).aspectRatio(contentMode: .fit).cornerRadius(5)
+//                    
+//                } placeholder: {
+//                    Image("getkartplaceholder").frame(width: 120,height: 140).cornerRadius(5)
+//                    
+//                }
+//                
+                
+                KFImage(URL(string:  itemObj?.image ?? ""))
+                    .placeholder {
+                        Image("getkartplaceholder")
+                        .frame(width: 120,height: 140).aspectRatio(contentMode: .fit).cornerRadius(5)
+                    }
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+                                                                height: widthScreen / 2.0 - 15))
+                    )
+                .frame(width: 120,height: 140).aspectRatio(contentMode: .fit).cornerRadius(5)
+
                 
                 VStack(alignment:.leading){
                     HStack{
@@ -99,11 +112,13 @@ struct BoostAdsCell: View {
                 HStack{
                     Text("\(Local.shared.currencySymbol) \(itemObj?.price ?? 0)").font(.custom("Manrope-Regular", size: 16.0)).foregroundColor(.orange)
                     Spacer()
-                    Button {
+                   
+                  /*  Button {
                         
                     } label: {
                         Image("heart")
                     }.padding()
+                    */
                 }
                 
                 Text("Residential floor")

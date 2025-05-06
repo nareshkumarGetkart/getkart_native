@@ -140,10 +140,14 @@ class MyAdsVC: UIViewController {
 
     
     func refreshMyAds(){
+        selectedIndex = 500
         page = 1
         apiStatus = ""
-        getAdsListApi()
+        if let btn = (self.view.viewWithTag(500) as? UIButton){
+            filterBtnAction(btn)
+        }
     }
+    
     //Api methods
     func getAdsListApi(){
         

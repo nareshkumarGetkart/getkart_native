@@ -50,6 +50,7 @@ struct SellerProfileView: View {
                             .default(Text("Copy Link"), action: {
                                 
                                UIPasteboard.general.string = ShareMedia.profileUrl + "\(userId)"
+                                AlertView.sharedManager.showToast(message: "Copied successfully.")
 
                             }),
                             
@@ -110,7 +111,7 @@ struct SellerProfileView: View {
                     .font(.custom("Manrope-Medium", size: 16.0))
                 Spacer()
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                if objLoggedInUser.id != nil {
+                if objLoggedInUser.id != nil && objLoggedInUser.id != (objVM.sellerObj?.id ?? 0) {
                 Button(action: {
                     // Handle follow action
                     let follow = (objVM.sellerObj?.isFollowing ?? false) ? false : true
@@ -175,7 +176,14 @@ struct SellerProfileView: View {
                                 }
                             }
                             .onTapGesture {
-                                let hostingController = UIHostingController(rootView: ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
+                                var detailView =  ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
+                                let hostingController = UIHostingController(rootView:detailView)
+                                
+                                detailView.returnValue = { value in
+                                    if let obj = value{
+                                        self.updateItemInList(obj)
+                                    }
+                                }
                                 self.navController?.pushViewController(hostingController, animated: true)
                             }
                     }
@@ -199,7 +207,12 @@ struct SellerProfileView: View {
         
     
     }
-    
+   
+    private func updateItemInList(_ value: ItemModel) {
+        if let index = $objVM.itemArray.firstIndex(where: { $0.id == value.id }) {
+            objVM.itemArray[index] = value
+        }
+    }
     // Function to create stats view
     private func statView(value: String, label: String) -> some View {
         VStack {
