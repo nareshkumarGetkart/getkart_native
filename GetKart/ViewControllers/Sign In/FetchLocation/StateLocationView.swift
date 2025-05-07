@@ -155,7 +155,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
     
     func fetchStateListing(){
         let url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search=\(searchText)"
-       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:StateParse) in
+       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: url) { (obj:StateParse) in
            if self.pageNo == 1 {
                self.arrStates.removeAll()
            }

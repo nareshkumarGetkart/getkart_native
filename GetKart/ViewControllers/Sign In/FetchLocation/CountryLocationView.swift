@@ -110,7 +110,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }.padding(.top, 10)
         
             Divider().padding([.top,.bottom],10)
-
+/*
             if self.locationManager.checkForLocationAccess() == false {
                 HStack {
                     Button(action: {
@@ -129,7 +129,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
                 Divider()
             }
-            
+            */
             // MARK: - List of Countries
             ScrollView{
                 if popType == .filter || popType == .home{

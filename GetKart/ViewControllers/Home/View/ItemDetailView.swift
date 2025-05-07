@@ -59,6 +59,13 @@ struct ItemDetailView: View {
    
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading) {
+                
+                
+                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                let isFeatured = objVM.itemObj?.isFeature ?? false
+                let loggedInUserId = objLoggedInUser.id ?? 0
+                let itemUserId = objVM.itemObj?.userID ?? 0
+                
                 ZStack(alignment: .topTrailing) {
                     
                     if  (objVM.galleryImgArray.count) > 0 {
@@ -114,33 +121,36 @@ struct ItemDetailView: View {
                     HStack{
                         
                         if (objVM.itemObj?.isFeature ?? false) == true{
-                            Text("Boost").frame(width:70,height:25).background(.orange).cornerRadius(5).foregroundColor(.white).padding(.horizontal)
+                            Text("Boost").frame(width:70,height:25)
+                                .background(.orange)
+                                .cornerRadius(5)
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
                         }
                         
                         Spacer()
-                        Button(action: {
-                            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                        
+                        if itemUserId != objLoggedInUser.id{
+                            Button(action: {
+                                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                    
+                                    objVM.addToFavourite()
+                                }
+                            }) {
                                 
-                                objVM.addToFavourite()
+                                let isLike = (objVM.itemObj?.isLiked ?? false)
+                                Image( isLike ? "like_fill" : "like")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(isLike ? .red : .gray)
+                                    .padding()
                             }
-                        }) {
-                            
-                            let isLike = (objVM.itemObj?.isLiked ?? false)
-                            Image( isLike ? "like_fill" : "like")
-                                .resizable()
-                                .frame(width: 30, height: 30)
-                                .foregroundColor(isLike ? .red : .gray)
-                                .padding()
+
                         }
                     }
                     
                 }
                 
-                
-                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                let isFeatured = objVM.itemObj?.isFeature ?? false
-                let loggedInUserId = objLoggedInUser.id ?? 0
-                let itemUserId = objVM.itemObj?.userID ?? 0
                 
                 if loggedInUserId == itemUserId {
                     
@@ -206,6 +216,39 @@ struct ItemDetailView: View {
                     Text(objVM.itemObj?.expiryDate ?? "")
                 }.padding(5).padding(.bottom,10)
                 
+                
+                if (loggedInUserId == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft"{
+                    
+                    HStack{
+                        Spacer()
+                        Image("create_add").padding(5)
+                        VStack{
+                            Spacer()
+                            Text("Post your ad, attract more clients and sell faster")
+                                .font(.subheadline)
+                                .padding(.top,10)
+                            
+                            HStack{
+                                Button(action: {
+                                   self.objVM.postNowApi(nav: self.navController)
+                                }) {
+                                    Text("Post Now").frame(width: 140, height: 40, alignment: .center)
+                                        .foregroundColor(.white)
+                                        .background(Color.orange)
+                                        .cornerRadius(8)
+                                }.padding([.bottom,.leading],10)
+                                Spacer()
+                                
+                            }
+                            Spacer()
+                            
+                        }
+                        Spacer()
+                        
+                    }
+                    .background(Color.yellow.opacity(0.2))
+                    .cornerRadius(10)
+                }
                 if !isFeatured && (loggedInUserId == itemUserId) && objVM.itemObj?.status == "approved"{
                     
                     HStack{
@@ -459,23 +502,43 @@ struct ItemDetailView: View {
         
         if loggedInUserId == itemUserId {
             
-            if ((objVM.itemObj?.status ?? "") == "review") || ((objVM.itemObj?.status ?? "") == "draft"){
+            if ((objVM.itemObj?.status ?? "") == "review") || ((objVM.itemObj?.status ?? "") == "draft") || ((objVM.itemObj?.status ?? "") == "expired"){
              
-                
                 HStack {
                     Button(action: {
-                        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
-                            vc.itemObj = objVM.itemObj
-                            vc.popType = .editPost
-                            self.navController?.pushViewController(vc, animated: true)
+                        
+                        if ((objVM.itemObj?.status ?? "") == "expired"){
+                            self.objVM.renewAdsApi(nav: self.navController)
+                       
+                        }else{
+                            
+                            if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                                vc.itemObj = objVM.itemObj
+                                vc.popType = .editPost
+                                self.navController?.pushViewController(vc, animated: true)
+                            }
                         }
                     }) {
-                        Text("Edit")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                        
+                        if ((objVM.itemObj?.status ?? "") == "expired"){
+                            Text("Renew")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.white)
+                                .foregroundColor(Color.orange)
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.orange, lineWidth: 1)
+                                )
+                        }else{
+                            Text("Edit")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
                     }
                    
                     
@@ -687,6 +750,9 @@ struct ItemDetailView: View {
         } else if (objVM.itemObj?.status ?? "") == "draft"{
             
             strTitle = "Draft"
+        }else if (objVM.itemObj?.status ?? "") == "expired"{
+            
+            strTitle = "Expired"
         }
         
         return strTitle
@@ -718,6 +784,8 @@ struct ItemDetailView: View {
             return (Color(hexString: "#fff8eb"), Color(hexString: "#ffbb34"), status)
         case "draft":
             return (Color(hexString: "#e6eef5"), Color(hexString: "#3e4c63"), "Draft")
+        case "expired":
+            return (Color(hexString: "#ffe5e6"), Color(hexString: "#fe0002"), status)
         default:
             return (.clear, .black, status)
         }

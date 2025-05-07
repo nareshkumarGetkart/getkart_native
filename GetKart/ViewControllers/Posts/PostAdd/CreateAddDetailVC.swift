@@ -110,16 +110,12 @@ class CreateAddDetailVC: UIViewController {
         //get the data for main image
         if let url = URL(string: self.itemObj?.image ?? "") {
             let task = URLSession.shared.dataTask(with: url) { data, response, error in
+              
                 guard let data = data, error == nil else { return }
-                
-                
-                
                 self.imgData = data
                 self.imgDataEditPost = data
                 
-                
                 DispatchQueue.main.async(execute: {
-                    
                 
                 let indexPath = IndexPath(row: 3, section: 0)
                 if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
@@ -157,9 +153,7 @@ class CreateAddDetailVC: UIViewController {
             
             task.resume()
         }
-        
-        
-    }
+  }
     
     func downloadGalleryImages(index:Int) {
         //get the data for gallery images

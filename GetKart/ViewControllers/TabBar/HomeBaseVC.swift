@@ -109,7 +109,6 @@ class HomeBaseVC: UITabBarController {
                                 destVC.hidesBottomBarWhenPushed = true
                                 destVC.popType = .createPost
                                 selectedVC.pushViewController(destVC, animated: true)
-                                
                             }
                         }
                     }else{

@@ -18,8 +18,8 @@ class MyAdsViewModel:ObservableObject{
     }
     
     func getBoostAdsList(){
-        
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.my_items) { (obj:MyAdsParse) in
+        let strUrl  = "\(Constant.shared.my_items)?status=featured"
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:MyAdsParse) in
             
             
             if (obj.code ?? 0) == 200 {

@@ -246,6 +246,81 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
+    func renewAdsApi(nav:UINavigationController?){
+        
+        let params = ["item_id":itemObj?.id ?? 0]
+        URLhandler.sharedinstance.makeCall(url:Constant.shared.renew_item  , param:params,methodType: .post) { [self] responseObject, error in
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+                    nav?.popToRootViewController(animated: true)
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = self.itemObj?.categoryID ?? 0
+                            destvc.categoryName = self.itemObj?.category?.name ?? ""
+                            destvc.city = self.itemObj?.city ?? ""
+                           nav?.pushViewController(destvc, animated: true)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+        
+    
+    
+    
+    func postNowApi(nav:UINavigationController?){
+        
+        let params = ["id":itemObj?.id ?? 0]
+        URLhandler.sharedinstance.makeCall(url:Constant.shared.post_draft_item , param: params, methodType:.post, showLoader: true) { [self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    AlertView.sharedManager.showToast(message: message)
+                    nav?.popViewController(animated: true)
+                    
+                    
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    if (itemObj?.city?.count ?? 0) > 0 && (itemObj?.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = itemObj?.categoryID ?? 0
+                            destvc.categoryName = itemObj?.category?.name ?? ""
+                            destvc.city = itemObj?.city ?? ""
+                            nav?.pushViewController(destvc, animated: true)
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
 }
 
 

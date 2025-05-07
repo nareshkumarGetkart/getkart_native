@@ -237,6 +237,10 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
             cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
             cell.btnAdPost.isHidden = false
+        case "expired":
+            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
 
         default:
             break

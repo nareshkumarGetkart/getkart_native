@@ -20,6 +20,7 @@ struct SearchProductView: View {
     @State var navigateToFilterScreen = false
     @State var dataArray:Array<CustomField> = Array()
     @State var strCategoryTitle = ""
+   
     var body: some View {
         VStack{
             HStack {
@@ -76,7 +77,8 @@ struct SearchProductView: View {
             }.padding(.leading,10)
                 .padding(.horizontal,10)
             
-            Text("Searched Items")
+            let strHeader = (searchText.count == 0) ? "Popular Items" : "Searched Items"
+            Text(strHeader)
                 .font(.headline)
                 .padding(.horizontal)
                 .padding(.top, 5)

@@ -31,36 +31,86 @@
                         </attributedString>
                         <nil key="highlightedColor"/>
                     </label>
-                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Min" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9XP-kf-9mo">
+                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Min" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9XP-kf-9mo" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                         <rect key="frame" x="10" y="45" width="145" height="50"/>
                         <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="50" id="B5E-fd-nVR"/>
                         </constraints>
                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <textInputTraits key="textInputTraits"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="leftPadding">
+                                <real key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="rightPadding">
+                                <real key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="maxLength">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="delegate" destination="KGk-i7-Jjw" id="fbn-O7-WRE"/>
+                        </connections>
                     </textField>
-                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Max" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uiU-zr-HR3">
+                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RmM-ZD-fam">
+                        <rect key="frame" x="20" y="55" width="10" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="69t-LM-dY6"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Max" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uiU-zr-HR3" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                         <rect key="frame" x="165" y="45" width="145" height="50"/>
                         <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="50" id="u2F-vd-tOh"/>
                         </constraints>
                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <textInputTraits key="textInputTraits"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="leftPadding">
+                                <real key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="rightPadding">
+                                <real key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="maxLength">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="delegate" destination="KGk-i7-Jjw" id="o5z-nq-n6b"/>
+                        </connections>
                     </textField>
+                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NkR-Bj-mZa">
+                        <rect key="frame" x="175" y="55" width="10" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="ZyJ-Rg-trV"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="NkR-Bj-mZa" firstAttribute="centerY" secondItem="uiU-zr-HR3" secondAttribute="centerY" id="1Tt-Oi-dOo"/>
                     <constraint firstItem="uiU-zr-HR3" firstAttribute="leading" secondItem="9XP-kf-9mo" secondAttribute="trailing" constant="10" id="GgR-ep-lPF"/>
                     <constraint firstItem="9XP-kf-9mo" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="I2j-xE-lQn"/>
                     <constraint firstItem="BFd-4g-wRi" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="JnH-kn-nLE"/>
+                    <constraint firstItem="NkR-Bj-mZa" firstAttribute="leading" secondItem="9XP-kf-9mo" secondAttribute="trailing" constant="20" id="Mdp-5c-htu"/>
                     <constraint firstAttribute="trailing" secondItem="BFd-4g-wRi" secondAttribute="trailing" constant="10" id="Nc3-0w-wKk"/>
                     <constraint firstAttribute="bottom" secondItem="9XP-kf-9mo" secondAttribute="bottom" constant="10" id="Sy5-BS-hBA"/>
+                    <constraint firstItem="RmM-ZD-fam" firstAttribute="centerY" secondItem="9XP-kf-9mo" secondAttribute="centerY" id="VIV-4n-f7x"/>
                     <constraint firstAttribute="trailing" secondItem="uiU-zr-HR3" secondAttribute="trailing" constant="10" id="aVU-8k-Zh3"/>
                     <constraint firstItem="uiU-zr-HR3" firstAttribute="firstBaseline" secondItem="9XP-kf-9mo" secondAttribute="firstBaseline" id="dvY-jM-WlT"/>
                     <constraint firstItem="BFd-4g-wRi" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="j49-SD-7NC"/>
+                    <constraint firstItem="RmM-ZD-fam" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="oUX-g1-CYj"/>
                     <constraint firstItem="9XP-kf-9mo" firstAttribute="top" secondItem="BFd-4g-wRi" secondAttribute="bottom" constant="10" id="sI9-6H-Nhn"/>
                     <constraint firstAttribute="bottom" secondItem="uiU-zr-HR3" secondAttribute="bottom" constant="10" id="tBH-RA-jIT"/>
                     <constraint firstItem="uiU-zr-HR3" firstAttribute="width" secondItem="9XP-kf-9mo" secondAttribute="width" id="vDV-IQ-41s"/>
@@ -69,11 +119,13 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="lblCurSymbolLowRange" destination="RmM-ZD-fam" id="pV8-TR-QmE"/>
+                <outlet property="lblCurSymbolUpperRange" destination="NkR-Bj-mZa" id="qaI-DJ-OKl"/>
                 <outlet property="lblTitle" destination="BFd-4g-wRi" id="PHZ-4F-cdC"/>
-                <outlet property="txtLowerRange" destination="9XP-kf-9mo" id="Ssc-cp-kgC"/>
-                <outlet property="txtUpperRange" destination="uiU-zr-HR3" id="gja-wm-P1H"/>
+                <outlet property="txtLowerRange" destination="9XP-kf-9mo" id="llQ-QM-fh7"/>
+                <outlet property="txtUpperRange" destination="uiU-zr-HR3" id="Lp7-AK-e0c"/>
             </connections>
-            <point key="canvasLocation" x="-27.480916030534349" y="19.014084507042256"/>
+            <point key="canvasLocation" x="-27.480916030534349" y="18.661971830985916"/>
         </tableViewCell>
     </objects>
 </document>

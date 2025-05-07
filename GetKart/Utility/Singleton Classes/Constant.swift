@@ -188,6 +188,13 @@ final class Constant: NSObject {
     }
     
    
+    var renew_item:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/renew-item"
+            
+        }
+        
+    }
     
     var cancellation_refund_policy:String{
         get{
@@ -370,7 +377,6 @@ final class Constant: NSObject {
         }
     }
     
-    
     var get_package_banner:String{
         get {
             return "\(Constant.shared.baseURL)/v1/get-package-banner"
@@ -383,8 +389,6 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/order-update"
         }
     }
-    
-    
     
     var in_app_purchase:String{
         get {
@@ -404,7 +408,6 @@ final class Constant: NSObject {
         }
     }
     
-    
     var get_followers:String{
         get {
             return "\(Constant.shared.baseURL)/get-followers"
@@ -414,26 +417,20 @@ final class Constant: NSObject {
     var follow_unfollow:String{
         get{
             return "\(Constant.shared.baseURL)/follow-unfollow"
-
         }
     }
-    
     
     var make_item_featured:String{
         get{
             return "\(Constant.shared.baseURL)/make-item-featured"
-
         }
     }
-    
     
     var send_verification_request:String{
         get{
             return "\(Constant.shared.baseURL)/send-verification-request"
-
         }
     }
-    
     
     var verification_request:String{
         get{
@@ -447,10 +444,6 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/post-draft-item"
         }
     }
-    
-    
-    
-    
     
 }
 

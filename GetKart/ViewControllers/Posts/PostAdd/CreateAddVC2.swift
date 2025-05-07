@@ -26,6 +26,8 @@ class CreateAddVC2: UIViewController {
     var customFieldFilesEditPost :Dictionary<String,Any> = [:]
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt

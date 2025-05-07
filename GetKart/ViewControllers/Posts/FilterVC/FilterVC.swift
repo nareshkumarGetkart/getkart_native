@@ -130,7 +130,6 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         max_price = ""
         
         posted_since.removeAll()
-        
         tblView.reloadData()
     }
     
@@ -188,8 +187,8 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         self.country = country
         self.radius = range
         self.tblView.reloadData()
-        
     }
+    
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
         
         self.latitude = latitude
@@ -199,7 +198,6 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         self.country = country
         //self.radius = range
         self.tblView.reloadData()
-        
     }
     
     @objc func showCategoriesVC(){
@@ -208,10 +206,10 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
             self.navigationController?.pushViewController(destVC, animated: true)
         }
     }
-    
 }
 
 extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDelegate, DropDownSelectionDelegate, TextFieldDoneDelegate {
+   
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -237,7 +235,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 if indexPath.row == 0 {
                     cell.lblTitle.text = "Location"
                     cell.imgImageView.image = UIImage(named: "location_icon")
-                    var strTitle = ""
+                   // var strTitle = ""
                     
                     var address = ""
                     if city.count > 0 {
@@ -260,9 +258,6 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnTextValue.addTarget(self, action: #selector(selectLocationAction(_:)), for: .touchUpInside)
-                    
-                    
-                    
                     cell.btnArrowDown.isHidden = true
                 }else if indexPath.row == 1 {
                     cell.lblTitle.text = "Category"
@@ -277,7 +272,8 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     
                     cell.btnTextValue.addTarget(self, action: #selector(showCategoriesVC), for: .touchUpInside)
-                    
+                    cell.btnArrowDown.addTarget(self, action: #selector(showCategoriesVC), for: .touchUpInside)
+
                     cell.btnArrowDown.isHidden = false
                 }else if indexPath.row == 3 {
                     cell.lblTitle.text = "Posted Since"
@@ -292,9 +288,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     
-                    cell.btnTextValue.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)
-                    
-                    
+                    cell.btnTextValue.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)                    
                     cell.btnArrowDown.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)
 
                     cell.btnArrowDown.isHidden = false
@@ -305,16 +299,35 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 let cell = tableView.dequeueReusableCell(withIdentifier: "BudgetTblViewCell") as! BudgetTblViewCell
                 cell.lblTitle.text = "Budget (Price)"
                 cell.txtLowerRange.tag = 100
-                cell.txtLowerRange.delegate = self
+               // cell.txtLowerRange.delegate = self
                 cell.txtLowerRange.text = min_price
                 cell.txtLowerRange.keyboardType = .numberPad
-                
+                cell.txtLowerRange.placeholder = "Min"
+                cell.textFieldDoneFirstDelegate = self
+                cell.showCurrencySymbolFirst = true
+
                 cell.txtUpperRange.tag = 101
-                cell.txtUpperRange.delegate = self
+              //  cell.txtUpperRange.delegate = self
                 cell.txtUpperRange.text = max_price
                 cell.txtUpperRange.keyboardType = .numberPad
-                
+                cell.txtUpperRange.placeholder = "Max"
+                cell.textFieldSecondDoneDelegate = self
+                cell.showCurrencySymbolSecond = true
                 cell.selectionStyle = .none
+                
+                if min_price.count > 0 {
+                    cell.lblCurSymbolLowRange.isHidden = false
+                    cell.txtLowerRange.leftPadding = 15
+                }
+                
+                if max_price.count > 0 {
+                    cell.lblCurSymbolUpperRange.isHidden = false
+                    cell.txtUpperRange.leftPadding = 15
+                }
+                
+                cell.lblCurSymbolLowRange.text = Local.shared.currencySymbol
+                cell.lblCurSymbolUpperRange.text = Local.shared.currencySymbol
+
                 
                 return cell
             }
@@ -354,13 +367,10 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                    dataArray[indexPath.row] = objCustomField
                }
                 
-                
-                
                 cell.btnOptionBig.isHidden = false
                 cell.btnOptionBig.tag = indexPath.row
                 cell.btnOptionBig.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchDown)
 
-                
                 cell.btnOption.isHidden = false
                 cell.btnOption.tag = indexPath.row
                 cell.btnOption.addTarget(self, action: #selector(dropDownnAction(_:)), for: .touchUpInside)
@@ -372,11 +382,6 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         
         return UITableViewCell()
     }
-    
-    
-    
-    
-   
     
     func radioCellTapped(row:Int, clnCell:Int){
         print(dataArray)
@@ -393,7 +398,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
             
         }else if objCustomField.type == .checkbox {
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
-                if let index = objCustomField.value?.firstIndex{$0 == objCustomField.values?[clnCell]} {
+                if let index = objCustomField.value?.firstIndex(where: {$0 == objCustomField.values?[clnCell]}) {
                     objCustomField.value?.remove(at: index)
                     let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
                     dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
@@ -471,17 +476,24 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         tblView.reloadRows(at: [indexPath], with: .automatic)
         
     }
-    
+
     
     
     func textFieldEditingDone(selectedRow:Int, strText:String) {
-        var objCustomField = self.dataArray[selectedRow]
-        if objCustomField.value?.count ?? 0 > 0 {
-            objCustomField.value?[0] = strText
-        }else {
-            objCustomField.value?.append(strText)
+        
+        if selectedRow == 100{
+            min_price = strText
+        }else if selectedRow == 101 {
+            max_price = strText
+        }else{
+            var objCustomField = self.dataArray[selectedRow]
+            if objCustomField.value?.count ?? 0 > 0 {
+                objCustomField.value?[0] = strText
+            }else {
+                objCustomField.value?.append(strText)
+            }
+            dataArray[selectedRow] = objCustomField
         }
-        dataArray[selectedRow] = objCustomField
     }
     
 }
@@ -499,7 +511,28 @@ extension FilterVC:UITextFieldDelegate {
     }
 }
 
-
+/*
+extension FilterVC: TextFieldDoneDelegate, TextViewDoneDelegate{
+    
+    func textFieldEditingDone(selectedRow:Int, strText:String) {
+        print(selectedRow, strText)
+        print( AddKeys.name)
+        if selectedRow == 100{
+            min_price = strText
+        }else if selectedRow == 101 {
+            max_price = strText
+        }
+        
+    }
+    
+    
+    func textViewEditingDone(selectedRow:Int, strText:String) {
+        if selectedRow == 2 {
+            params[AddKeys.description.rawValue] = strText
+        }
+    }
+}
+*/
 extension FilterVC:RefreshScreen {
     func refreshScreen() {
         print(self.objViewModel?.dataArray)
