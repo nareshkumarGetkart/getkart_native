@@ -43,7 +43,7 @@ class EmptyList: UIView {
         subHeadline?.numberOfLines = 0
         bgView?.addSubview(subHeadline!)
         subHeadline?.textAlignment = .center
-        subHeadline?.textColor = .black
+        subHeadline?.textColor = .label
         subHeadline?.font = UIFont.Manrope.regular(size: 16.0).font
         subHeadline?.text = ""
     }

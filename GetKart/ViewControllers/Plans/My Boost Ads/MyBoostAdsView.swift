@@ -19,13 +19,13 @@ struct MyBoostAdsView: View {
                 navigation?.popViewController(animated: true)
             }) {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                    .foregroundColor(Color(UIColor.label)).padding()
             }
             Text("My Boost Ads").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
             Spacer()
-        }.frame(height: 44)
+        }.frame(height: 44).background(Color(UIColor.systemBackground))
         
         VStack{
             
@@ -54,9 +54,20 @@ struct MyBoostAdsView: View {
                                     hostingController.hidesBottomBarWhenPushed = true
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }
+                                .onAppear{
+                                    
+                                    if let lastItem = obj.listArray.last, lastItem.id == item.id, !obj.isDataLoading {
+                                        obj.getBoostAdsList()
+                                    }
+                                }
                         }
                     }
                     Spacer()
+                }.refreshable {
+                    if obj.isDataLoading == false {
+                        self.obj.page = 1
+                        obj.getBoostAdsList()
+                    }
                 }
             }
         }
@@ -79,15 +90,7 @@ struct BoostAdsCell: View {
         HStack{
             
             ZStack{
-//                AsyncImage(url: URL(string: itemObj?.image ?? "")) { img in
-//                    img.frame(width: 120,height: 140).aspectRatio(contentMode: .fit).cornerRadius(5)
-//                    
-//                } placeholder: {
-//                    Image("getkartplaceholder").frame(width: 120,height: 140).cornerRadius(5)
-//                    
-//                }
-//                
-                
+
                 KFImage(URL(string:  itemObj?.image ?? ""))
                     .placeholder {
                         Image("getkartplaceholder")
@@ -102,13 +105,17 @@ struct BoostAdsCell: View {
                 
                 VStack(alignment:.leading){
                     HStack{
-                        Text("Boost").frame(width:70,height:25).background(.orange).cornerRadius(5).foregroundColor(.white)
+                        Text("Boost")
+                            .frame(width:70,height:25)
+                            .background(.orange)
+                            .cornerRadius(5)
+                            .foregroundColor(Color(UIColor.label))
                     }.padding(.top,5)
                     Spacer()
                 }
             }
             
-            VStack(alignment:.leading){
+            VStack(alignment:.leading,spacing: 2){
                 HStack{
                     Text("\(Local.shared.currencySymbol) \(itemObj?.price ?? 0)").font(.custom("Manrope-Regular", size: 16.0)).foregroundColor(.orange)
                     Spacer()
@@ -121,17 +128,20 @@ struct BoostAdsCell: View {
                     */
                 }
                 
-                Text("Residential floor")
+                Text(itemObj?.name ?? "")
                     .font(.custom("Manrope-Regular", size: 14.0))
                     .multilineTextAlignment(.leading)
+                    .foregroundColor(Color(UIColor.label))
+
                 HStack{
-                    Image("location_icon")
+                    Image("location-outline")
                         .renderingMode(.template)
                         .foregroundColor(Color.gray)
-                    Text(itemObj?.address ?? "" ).font(.custom("Manrope-Regular", size: 12.0)).foregroundColor(Color.gray)
-                }.padding(.bottom,15)
+                    Text(itemObj?.address ?? "" ).font(.custom("Manrope-Regular", size: 12.0))
+                        .foregroundColor(Color.gray)
+                }.padding(.bottom,10)
             }
-        }.background(Color.white)
+        }.background(Color(UIColor.systemBackground))
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)

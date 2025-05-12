@@ -13,8 +13,6 @@ protocol RefreshScreen:AnyObject{
     func refreshBannerList()
     func refreshCategoriesList()
     func newItemRecieve(newItemArray:[Any]?)
-
-
 }
 
 extension RefreshScreen{

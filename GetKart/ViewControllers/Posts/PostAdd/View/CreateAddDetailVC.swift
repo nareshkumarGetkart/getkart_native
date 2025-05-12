@@ -26,6 +26,7 @@ enum AddKeys: String{
     case state
     case show_only_to_premium
 }
+
 class CreateAddDetailVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnBack:UIButton!
@@ -41,7 +42,7 @@ class CreateAddDetailVC: UIViewController {
     
     var objViewModel:CustomFieldsViewModel?
     var params:Dictionary<String,Any> = [:]
-    lazy var imagePicker = UIImagePickerController()
+    lazy private var imagePicker = UIImagePickerController()
     
     var imgData:Data?
     var imgDataEditPost:Data?
@@ -50,15 +51,24 @@ class CreateAddDetailVC: UIViewController {
     var gallery_imageNames:Array<String> = []
     var delete_item_image_id:String = ""
     var isImgData = false
-    var showErrorMsg = false
+    private var showErrorMsg = false
    
     var popType:PopType? = .createPost
-    
      var itemObj:ItemModel?
     
+    //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
+//        
+//        if let originalImage = UIImage(named: "arrow_left") {
+//            let tintedImage = originalImage.tinted(with: .black)
+//            btnBack.setImage(tintedImage, for: .normal)
+//        }
+//        
+        btnBack.setImageColor(color: .label)
+
+
         tblView.register(UINib(nibName: "AlmostThereCell", bundle: nil), forCellReuseIdentifier: "AlmostThereCell")
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
@@ -67,6 +77,7 @@ class CreateAddDetailVC: UIViewController {
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
+       
         if popType == .createPost {
             objViewModel = CustomFieldsViewModel()
             objViewModel?.delegate = self
@@ -83,7 +94,8 @@ class CreateAddDetailVC: UIViewController {
             params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
             params[AddKeys.video_link.rawValue] = ""
             params[AddKeys.description.rawValue] = ""
-        }else {
+            
+        }else{
             objViewModel = CustomFieldsViewModel()
             objViewModel?.dataArray =  self.itemObj?.customFields
             
@@ -101,10 +113,9 @@ class CreateAddDetailVC: UIViewController {
             params["id"] = "\(self.itemObj?.id ?? 0)"
             
             self.downloadImgData()
-            
         }
-        
     }
+    
     
     func downloadImgData(){
         //get the data for main image
@@ -202,6 +213,8 @@ class CreateAddDetailVC: UIViewController {
             }
         }
     }
+    
+    //MARK: UIButton Action Methods
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
@@ -228,51 +241,35 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         
-        print(params)
+        // print(params)
         
         if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
-            /*let alert = UIAlertController(title: "", message: "Title can not be left blank.", preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-             */
             showErrorMsg = true
-         
+            
         }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
-//            let alert = UIAlertController(title: "", message: "Description can not be left blank.", preferredStyle: .alert)
-//            
-//            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-//            self.present(alert, animated: true, completion: nil)
+            
             showErrorMsg = true
-         
+            
         }else if  imgData == nil{
-            /*let alert = UIAlertController(title: "", message: "Main image can not be left blank.", preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-             */
             showErrorMsg = true
-         
+            
         }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
-            /*let alert = UIAlertController(title: "", message: "Price can not be left blank.", preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-             */
             showErrorMsg = true
-         
+            
         }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
-//            let alert = UIAlertController(title: "", message: "Contact can not be left blank.", preferredStyle: .alert)
-//            
-//            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-//            self.present(alert, animated: true, completion: nil)
+            
             showErrorMsg = true
-         
+            
         } else {
             showErrorMsg = false
             self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
+           
             if self.objViewModel?.dataArray?.count == 0 {
-                   let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                //If no any custom field
+                let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                 self.navigationController?.pushViewController(vc, animated: true)
                 
             }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
@@ -283,6 +280,7 @@ class CreateAddDetailVC: UIViewController {
                     vc.imgName = self.imgName
                     vc.gallery_images = self.gallery_images
                     vc.gallery_imageNames = self.gallery_imageNames
+                    
                 }else {
                     
                     if delete_item_image_id.count > 0 {
@@ -296,7 +294,7 @@ class CreateAddDetailVC: UIViewController {
                     
                     //send only images that is updated by user
                     for ind in 0..<self.gallery_images.count{
-                       let data = self.gallery_images[ind]
+                        let data = self.gallery_images[ind]
                         var found = false
                         for index in 0..<(self.itemObj?.galleryImages?.count ?? 0){
                             if let obj = self.itemObj?.galleryImages?[index] {
@@ -320,19 +318,19 @@ class CreateAddDetailVC: UIViewController {
             }
         }
         
-            tblView.reloadData()
-        
+        tblView.reloadData()
     }
     
 }
 
 extension CreateAddDetailVC:RefreshScreen {
     func refreshScreen() {
-        print(self.objViewModel?.dataArray)
+       // print(self.objViewModel?.dataArray)
     }
 }
 
 extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
+   
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -343,14 +341,19 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 6 + numberOfPictures
     }
+   
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+       
         return UITableView.automaticDimension
     }
+    
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+      
         return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+       
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AlmostThereCell") as! AlmostThereCell
             cell.lblCategory.text = strCategoryTitle
@@ -365,6 +368,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.txtField.placeholder = ""
             cell.txtField.text = params[AddKeys.name.rawValue] as? String ?? ""
             if showErrorMsg == true {
                 if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
@@ -553,9 +557,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }
         return UITableViewCell()
     }
-    
-    
 }
+
 
 extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
     
@@ -571,7 +574,6 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
         }else if selectedRow == 7 {
             params[AddKeys.video_link.rawValue] = strText
         }
-        
     }
     
     

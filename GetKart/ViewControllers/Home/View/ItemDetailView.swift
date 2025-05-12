@@ -10,9 +10,13 @@ import MapKit
 import Foundation
 import SVGKit
 import MessageUI
+import CoreImage
+import CoreImage.CIFilterBuiltins
+import AVKit
 
 struct ItemDetailView: View {
-    
+    @State private var backgroundColor: Color = .secondary
+
     var navController:UINavigationController?
     var itemId = 0
     var slug = ""
@@ -46,6 +50,14 @@ struct ItemDetailView: View {
             selectedIndex = 0
         }
         
+        
+        
+        if (itemObj?.videoLink?.count ?? 0) > 0{
+            
+            let new = GalleryImage(id:10, image: itemObj?.videoLink, itemID: 400)
+            viewModel.galleryImgArray.append(new)
+            
+        }
         _objVM = StateObject(wrappedValue: viewModel)
         
         self.isMyProduct = isMyProduct
@@ -74,42 +86,73 @@ struct ItemDetailView: View {
                             TabView(selection: $selectedIndex) {
                                 ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
                                     if let img = objVM.galleryImgArray[index].image {
-                                        AsyncImage(url: URL(string: img)) { image in
-                                            image
-                                                .resizable()
-                                               // .aspectRatio(contentMode: .fit)
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(height: 200)
-                                                .cornerRadius(10)
-                                                .padding(.horizontal, 5)
-                                        } placeholder: {
-                                            Image("getkartplaceholder")
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(height: 200)
-                                                .cornerRadius(10)
-                                                .padding(.horizontal, 5)
-//                                            ProgressView().progressViewStyle(.circular)
-                                        }
-                                        .tag(index)
-                                        .onTapGesture {
-                                            navigateToPager()
+                                        
+                                        let isLast = (index + 1) == objVM.galleryImgArray.count
+                                        let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
+                                        let bothConditionTrue = isLast && isVideoAvailable
+                                        if  bothConditionTrue {
+                                            if let videoURL = URL(string: img) {
+                                                
+                                               // if !videoURL.contains(".mp4"){
+                                                   // videoURL = videoURL + ".mp4"
+                                              //  }
+                                                let player = AVPlayer(url: videoURL)
+                                                VideoPlayer(player: player)
+                                                    .frame(height: 200)
+                                                    .cornerRadius(10)
+                                                    .padding(.horizontal, 5)
+                                            }
+                                                
+                                        } else {
+                                            
+                                            AsyncImage(url: URL(string: img)) { image in
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                // .aspectRatio(contentMode: .fill)
+                                                    .frame(height: 200)
+                                                //.cornerRadius(10)
+                                                    .padding(.horizontal, 5)
+                                                    .onAppear {
+                                                        extractDominantColor(from: image)
+                                                        
+                                                    }//.background(backgroundColor.opacity(0.4))
+                                            } placeholder: {
+                                                Image("getkartplaceholder")
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(height: 200)
+                                                //.cornerRadius(10)
+                                                    .padding(.horizontal, 5)
+                                                // .background(backgroundColor.opacity(0.4))
+                                                //                                            ProgressView().progressViewStyle(.circular)
+                                            }
+                                            .tag(index)
+                                            .onTapGesture {
+                                                navigateToPager()
+                                            }
                                         }
                                     }
                                 }
                             }
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                             .frame(width: widthScreen - 20, height: 200)
-
+                            .background(backgroundColor.opacity(0.4))
+                            .cornerRadius(10)
                             // Custom Dot Indicator
                             HStack(spacing: 8) {
-                                ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
-                                    Circle()
-                                        .fill(selectedIndex == index ? Color.orange : Color.gray.opacity(0.4))
-                                        .frame(width: 8, height: 8)
-                                        .onTapGesture {
-                                            selectedIndex = index // manually change page
-                                        }
+                                
+                               if objVM.galleryImgArray.count > 1{
+                                    
+                                   ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
+                                       Circle()
+                                           .fill(selectedIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                                           .frame(width: 8, height: 8)
+                                           .onTapGesture {
+                                               selectedIndex = index // manually change page
+                                           }
+                                   }
                                 }
+                             
                             }
                         }
 
@@ -342,7 +385,7 @@ struct ItemDetailView: View {
                                 .foregroundColor(.red)
                             Text("Did you find any problem?").font(Font.manrope(.semiBold, size: 16))
                                 .font(.subheadline)
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(UIColor.label))
                         }
                         
                         
@@ -380,7 +423,7 @@ struct ItemDetailView: View {
            
                 HStack{
                     
-                    Text("Related Ads").foregroundColor(.black).font(Font.manrope(.semiBold, size: 16))
+                    Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
                     Spacer()
                     
                 }//.padding(.horizontal)
@@ -446,13 +489,14 @@ struct ItemDetailView: View {
                     userId = buyer_id
                 }
                 objVM.itemObj?.isAlreadyOffered = true
-                objVM.itemObj?.itemOffers = [ ItemOffers(amount: objVM.itemObj?.price, buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
+                objVM.itemObj?.itemOffers = [ItemOffers(amount: objVM.itemObj?.price, buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
                 
                 let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                 destVC.item_offer_id = id
                 destVC.userId = userId
                 self.navController?.pushViewController(destVC, animated: true)
                 
+
             }
         }
         
@@ -767,8 +811,19 @@ struct ItemDetailView: View {
     func navigateToPager(){
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex ?? 0
-        vc.imageArrayUrl = objVM.galleryImgArray
+        
+        if (objVM.itemObj?.videoLink?.count ?? 0) > 0
+        {
+            var arr = objVM.galleryImgArray
+            vc.imageArrayUrl = arr.dropLast()
+        }else{
+            vc.imageArrayUrl = objVM.galleryImgArray
+        }
         self.navController?.pushViewController(vc, animated: true )
+    }
+    
+    func openPlayerAndPlay(strUrl:String){
+        
     }
     
     
@@ -801,7 +856,7 @@ struct ItemDetailView: View {
                 self.navController?.popViewController(animated: true)
             } label: {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
             }.padding(.leading, 10)
 
             Spacer()
@@ -812,7 +867,7 @@ struct ItemDetailView: View {
                     showShareSheet = true
                 } label: {
                     Image("share").renderingMode(.template)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(UIColor.label))
                 }.padding(.trailing, 10)
                 
                     .actionSheet(isPresented: $showShareSheet) {
@@ -841,7 +896,7 @@ struct ItemDetailView: View {
                     showMoreOptionSheet = true
                 } label: {
                     Image("more").renderingMode(.template)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(UIColor.label))
                 }.padding(.trailing, 10)
                     .actionSheet(isPresented: $showMoreOptionSheet) {
                         ActionSheet(
@@ -889,13 +944,29 @@ struct ItemDetailView: View {
             }
             
         }
-        .frame(height: 44)
+        .frame(height: 44)        .background(Color(UIColor.systemBackground))
+
     }
 
     private func updateItemInList(_ value: ItemModel) {
         if let index = $objVM.relatedDataItemArray.firstIndex(where: { $0.id == value.id }) {
             objVM.relatedDataItemArray[index] = value
         }
+    }
+    
+    func extractDominantColor(from image: Image) {
+        // Convert SwiftUI Image to UIImage
+        if #available(iOS 16.0, *) {
+            let renderer = ImageRenderer(content: image)
+            if let uiImage = renderer.uiImage {
+                if let averageUIColor = uiImage.averageColor{
+                    self.backgroundColor = Color(averageUIColor).opacity(0.4)
+                }
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+        
     }
     
 }
@@ -968,16 +1039,16 @@ struct SellerInfoView: View {
                     AsyncImage(url: URL(string: image)) { image in
                         image
                             .resizable()
-                            .scaledToFit()
-                            .frame(width:60, height: 60)
-                            .cornerRadius(30)
+                            .scaledToFill()
+                            .frame(width:55, height: 55)
+                            .cornerRadius(27.5)
                         
                     }placeholder: {
                         
-                        Image("getkartplaceholder").resizable()
+                        Image("user-circle").resizable()
                             .scaledToFit()
-                            .frame(width:60, height: 60)
-                            .cornerRadius(30)
+                            .frame(width:55, height: 55)
+                            .cornerRadius(27.5)
                     }
                 }
                 
@@ -989,7 +1060,9 @@ struct SellerInfoView: View {
                         .foregroundColor(.black)
                 }
                 
+                
                 HStack{
+                    Spacer(minLength: 0)
                     Button {
                         showMessageView = true
                         
@@ -1031,6 +1104,7 @@ struct SellerInfoView: View {
 
     
     
+     
     func callToSellerMobileNumber(){
         if let url = URL(string: "tel://\(mobile)"), UIApplication.shared.canOpenURL(url) {
             if #available(iOS 10, *) {
@@ -1046,6 +1120,8 @@ struct SellerInfoView: View {
 
 import SwiftUI
 import MapKit
+import AVFoundation
+import _AVKit_SwiftUI
 
 struct PinnedMapView: View {
     var coordinate: CLLocationCoordinate2D
@@ -1131,4 +1207,31 @@ struct MessageView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: MFMessageComposeViewController, context: Context) {}
+}
+
+
+extension UIImage {
+    var averageColor: UIColor? {
+        guard let inputImage = CIImage(image: self) else { return nil }
+        let extent = inputImage.extent
+        let filter = CIFilter.areaAverage()
+        filter.inputImage = inputImage
+        filter.extent = extent
+
+        let context = CIContext()
+        guard let outputImage = filter.outputImage else { return nil }
+
+        var bitmap = [UInt8](repeating: 0, count: 4)
+        context.render(outputImage,
+                       toBitmap: &bitmap,
+                       rowBytes: 4,
+                       bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                       format: .RGBA8,
+                       colorSpace: nil)
+
+        return UIColor(red: CGFloat(bitmap[0]) / 255,
+                       green: CGFloat(bitmap[1]) / 255,
+                       blue: CGFloat(bitmap[2]) / 255,
+                       alpha: 1)
+    }
 }

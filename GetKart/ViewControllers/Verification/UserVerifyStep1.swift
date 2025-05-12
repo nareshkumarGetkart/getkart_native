@@ -176,10 +176,10 @@ struct CustomTextField: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.manrope(.regular, size: 15))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             TextField("", text: $text)
                 .padding()
-                .background(Color.white)
+                .background(Color(UIColor.systemBackground))
                 .cornerRadius(8)
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                 .keyboardType(keyboardType)

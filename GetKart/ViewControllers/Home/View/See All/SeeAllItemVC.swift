@@ -19,21 +19,34 @@ class SeeAllItemVC: UIViewController {
     var obj:Any?
     
     private var objViewModel:SeeAllViewModel?
-    
+    private var emptyView:EmptyList?
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         
-        btnBack.setImageColor(color: .black)
+        btnBack.setImageColor(color: .label)
        
         collctionView.register(UINib(nibName: "ProductCell", bundle: nil), forCellWithReuseIdentifier: "ProductCell")
 
+        
+        DispatchQueue.main.async{
+            self.emptyView = EmptyList(frame: CGRect(x: 0, y: 0, width:  self.collctionView.frame.size.width, height:  self.collctionView.frame.size.height))
+            self.collctionView.addSubview(self.emptyView!)
+            self.emptyView?.isHidden = true
+            self.emptyView?.lblMsg?.text = ""
+            self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")
+        }
+        
+        
         if let recieveObj = obj as? FeaturedClass{
             lblTitle.text = recieveObj.title
             objViewModel = SeeAllViewModel(itemId: recieveObj.id ?? 0)
             objViewModel?.delegate = self
         }
+        
+        
         
     }
     
@@ -74,7 +87,9 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             cell.lblItem.text = obj.name
             cell.lblAddress.text = obj.address
             cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-            //  cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            
+            let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
+            cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
             
             let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
             
@@ -126,10 +141,16 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
 extension SeeAllItemVC: RefreshScreen{
     func refreshScreen(){
         self.collctionView.reloadData()
+        
+   
     }
     
     func newItemRecieve(newItemArray:[Any]?){
         if (newItemArray?.count ?? 0) == 0{
+            
+            self.emptyView?.isHidden = (self.objViewModel?.listArray?.count ?? 0) > 0 ? true : false
+            self.emptyView?.lblMsg?.text = "No Ads Found"
+            self.emptyView?.subHeadline?.text = "There are currently no ads available"
             
         }else{
        

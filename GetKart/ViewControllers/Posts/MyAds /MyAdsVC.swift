@@ -10,6 +10,7 @@ import Kingfisher
 import SwiftUI
 
 
+
 class MyAdsVC: UIViewController {
     
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -19,10 +20,19 @@ class MyAdsVC: UIViewController {
     private var apiStatus = ""
     private var page = 1
     private  let filters = ["All ads", "Live", "Deactivate", "Under Review","Sold out","Rejected"]
-    
     var listArray = [ItemModel]()
     private var emptyView:EmptyList?
-    var isClicked = false
+    var isDataLoading = true
+    
+    private  lazy var topRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+                                    #selector(handlePullDownRefresh(_:)),
+                                 for: .valueChanged)
+        refreshControl.tintColor = UIColor.systemYellow
+        return refreshControl
+    }()
+    
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -39,15 +49,33 @@ class MyAdsVC: UIViewController {
         }
         
         addButtonsToScrollView()
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name:NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil)
+        
+        
+        getAdsListApi()
+        
+        self.topRefreshControl.backgroundColor = .clear
+        self.tblView.refreshControl = topRefreshControl
+        
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if isClicked{
-            isClicked = false
-            getAdsListApi()
-        }
+
     }
+    
+    
+    //MARK: Pull Down refresh
+    @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
+        if !isDataLoading {
+            self.isDataLoading = true
+            page = 1
+            self.getAdsListApi()
+        }
+        refreshControl.endRefreshing()
+    }
+     
     
     func addButtonsToScrollView(){
             
@@ -56,9 +84,9 @@ class MyAdsVC: UIViewController {
             let btn = UIButton(frame: CGRect(x: ((120 + 15) * index)  , y: 10, width: 120, height: 40))
             btn.setTitle(filters[index], for: .normal)
             btn.layer.cornerRadius = 10.0
-            btn.layer.borderColor = UIColor.black.cgColor
+            btn.layer.borderColor = UIColor.label.cgColor
             btn.layer.borderWidth = 1.0
-            btn.setTitleColor( UIColor.black, for: .normal)
+            btn.setTitleColor( UIColor.label, for: .normal)
             btn.titleLabel?.font = UIFont.Manrope.medium(size: 16.0).font
             btn.clipsToBounds = true
             btn.tag = index + 500
@@ -72,6 +100,9 @@ class MyAdsVC: UIViewController {
         getAdsListApi()
     }
     
+    @objc func refreshList(){
+        refreshMyAds()
+    }
     
     func updateCoorOfSelectedTab(){
         
@@ -92,14 +123,7 @@ class MyAdsVC: UIViewController {
             (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderWidth = 1.0
             (self.view.viewWithTag(500 + index) as? UIButton)?.setTitleColor( UIColor.black, for: .normal)
             (self.view.viewWithTag(500 + index) as? UIButton)?.clipsToBounds = true
-
         }
-        
-//        (self.view.viewWithTag(btn.tag) as? UIButton)?.backgroundColor = .systemOrange
-//        (self.view.viewWithTag(btn.tag) as? UIButton)?.layer.borderColor = UIColor.clear.cgColor
-//        (self.view.viewWithTag(btn.tag) as? UIButton)?.clipsToBounds = true
-//        (self.view.viewWithTag(btn.tag) as? UIButton)?.setTitleColor(.white, for: .normal)
-
 
         page = 1
         
@@ -150,20 +174,29 @@ class MyAdsVC: UIViewController {
     
     //Api methods
     func getAdsListApi(){
-        
-        
+
         let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
             
-            if self.page == 1{
-                self.listArray.removeAll()
-                self.tblView.reloadData()
-
-            }
-            if obj.data != nil {
-                self.listArray.append(contentsOf: obj.data?.data ?? [])
-                self.tblView.reloadData()
+            
+            if obj.code == 200 {
+                if self.page == 1{
+                    self.listArray.removeAll()
+                    self.tblView.reloadData()
+                }
+                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
+                    self.listArray.append(contentsOf: obj.data?.data ?? [])
+                    self.tblView.reloadData()
+                }
+                                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                    
+                    self.isDataLoading = false
+                    self.page += 1
+                })
+            }else{
+                self.isDataLoading = false
             }
             
             self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
@@ -171,7 +204,58 @@ class MyAdsVC: UIViewController {
             self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
 
         }
-
+    }
+    
+    func postDraftAds(post:ItemModel,index:Int){
+        
+        let params = ["id":post.id ?? 0]
+        URLhandler.sharedinstance.makeCall(url:Constant.shared.post_draft_item , param: params, methodType:.post, showLoader: true) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
+                        do {
+                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                            if let itemObj = item.data?.first {
+                             
+                                self.listArray[index] = itemObj
+                                self.tblView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                            }
+                        }catch {
+                            
+                        }
+                        
+                    } else {
+                        print("Something is wrong while converting dictionary to JSON data.")
+                        
+                    }
+                                        
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    if (post.city?.count ?? 0) > 0 && (post.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = post.categoryID ?? 0
+                            destvc.categoryName = post.category?.name ?? ""
+                            destvc.city = post.city ?? ""
+                            destvc.country =  post.country ?? ""
+                            destvc.state =  post.state ?? ""
+                            destvc.latitude = "\(post.latitude ?? 0.0)"
+                            destvc.longitude = "\(post.longitude ?? 0.0)"
+                            self.navigationController?.pushViewController(destvc, animated: true)
+                        }
+                    }
+                }
+            }
+        }
+        
     }
 }
 
@@ -261,12 +345,33 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        isClicked = true
-
         let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true, slug: listArray[indexPath.item].slug))
         hostingController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
+    
+    
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
+        if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
+            print("up")
+            if scrollView == tblView{
+                return
+            }
+        }
+        
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 400)
+        {
+            if scrollView == tblView{
+                if isDataLoading == false{
+                    self.isDataLoading = true
+                    getAdsListApi()
+                }
+            }
+        }
+    }
+    
     
     //MARK: Selector Methods
     @objc func addPostBtnAction(_ btn:UIButton){
@@ -276,56 +381,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
-    func postDraftAds(post:ItemModel,index:Int){
-        
-        let params = ["id":post.id ?? 0]
-       // let strURl = Constant.shared.post_draft_item //+ "?id=\(post.id ?? 0)"
-        URLhandler.sharedinstance.makeCall(url:Constant.shared.post_draft_item , param: params, methodType:.post, showLoader: true) { responseObject, error in
-            
-            if error == nil {
-                let result = responseObject! as NSDictionary
-                let status = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
-                
-                if status == 200{
-                    
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
-                        do {
-                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
-                            if let itemObj = item.data?.first {
-                             
-                                self.listArray[index] = itemObj
-                                self.tblView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
-                            }
-                        }catch {
-                            
-                        }
-                        
-                    } else {
-                        print("Something is wrong while converting dictionary to JSON data.")
-                        
-                    }
-                    
-                    
-                    
-                }else{
-                    AlertView.sharedManager.showToast(message: message)
-                    
-                    if (post.city?.count ?? 0) > 0 && (post.categoryID ?? 0) > 0 {
-                        
-                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
-                            destvc.hidesBottomBarWhenPushed = true
-                            destvc.categoryId = post.categoryID ?? 0
-                            destvc.categoryName = post.category?.name ?? ""
-                            destvc.city = post.city ?? ""
-                            self.navigationController?.pushViewController(destvc, animated: true)
-                        }
-                    }
-                }
-            }
-        }
-        
-    }
+   
     
 }
 

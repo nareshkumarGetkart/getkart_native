@@ -11,7 +11,12 @@ import MapKit
 
 struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     
-    
+    @StateObject var viewModel = ConfirmLocationViewModel()
+
+    @State var latitiude = 0.0
+    @State var longitude = 0.0
+    @State var isfirst = true
+
     @State var imgData:Data?
     @State var imgName = ""
     @State var gallery_images:Array<Data> = []
@@ -20,19 +25,16 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     @State var popType:PopType?
     @State var params:Dictionary<String,Any> = [:]
     
+//    @State var mapRegion = MKCoordinateRegion(
+//        center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0),
+//        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+//    )
     
-    
-    
-    @State var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0),
-        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-    )
-    
-    @State var locationInfo = ""
-    @State  var selectedCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+  //  @State var locationInfo = ""
+   // @State  var selectedCoordinate = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     
     @State  var range1: Double = 0.0
-    @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
+   // @State var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000.0 as CLLocationDistance)
     
     var body: some View {
             
@@ -47,7 +49,24 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     .font(Font.manrope(.bold, size: 20.0))
                     .foregroundColor(.black)
                 Spacer()
-            }.frame(height:44).background(Color.white)
+            }.frame(height:44).background(Color.white).onAppear{
+                if isfirst{
+                    isfirst = false
+                    
+                    if latitiude != 0{
+                        viewModel.mapRegion = MKCoordinateRegion(
+                            center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude),
+                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                        )
+                        
+                        viewModel.selectedCoordinate = CLLocationCoordinate2D(latitude: latitiude, longitude: longitude)
+                        
+                        viewModel.circle = MKCircle(center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude), radius: 0.0 as CLLocationDistance)
+                        self.updateStateCity1(for: viewModel.selectedCoordinate)
+                    }
+
+                }
+            }
             
         VStack(spacing: 10) {
             Text("What is the location of the item you are selling?")
@@ -73,14 +92,17 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                                 .padding(.horizontal)
                         }
                         
-            if selectedCoordinate.latitude != 0.0 {
-                TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo, range:$range1, circle: $circle)
+            if viewModel.selectedCoordinate.latitude != 0.0 {
+                
+           
+                
+                TapMapView1(coordinate: $viewModel.selectedCoordinate, mapRegion: $viewModel.mapRegion,locationInfo: $viewModel.locationInfo, range:$range1, circle: $viewModel.circle,delegate: self)
             }else {
-                TapMapView(coordinate: $selectedCoordinate, mapRegion: $mapRegion,locationInfo: $locationInfo, range:$range1, circle: $circle)
+                TapMapView1(coordinate: $viewModel.selectedCoordinate, mapRegion: $viewModel.mapRegion,locationInfo: $viewModel.locationInfo, range:$range1, circle: $viewModel.circle,delegate: self)
             }
             HStack{
                 Image(systemName: "location")
-                Text("\(locationInfo)")
+                Text("\(viewModel.locationInfo)")
                 Spacer()
             }.frame(height: 50)
             
@@ -98,12 +120,31 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
             }
             
             
-        }.navigationBarHidden(true).onAppear{
-            
-            LocationManager.sharedInstance.delegate = self
-            LocationManager.sharedInstance.checkLocationAuthorization()
-        }
+        }.navigationBarHidden(true)
+            .onAppear{
+                
+                if latitiude == 0{
+                    LocationManager.sharedInstance.delegate = self
+                    LocationManager.sharedInstance.checkLocationAuthorization()
+                }
+                
+            }
         
+    }
+    
+    
+    func updateStateCity1(for coordinate: CLLocationCoordinate2D) {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            DispatchQueue.main.async {
+                let city = placemark.locality ?? ""
+                let state = placemark.administrativeArea ?? ""
+                let country = placemark.country ?? ""
+                self.savePostLocation(latitude:"\(coordinate.latitude)", longitude: "\(coordinate.longitude)", city: city, state: state, country: country)
+            }
+        }
     }
     
     func fetchCountryListing(){
@@ -118,16 +159,47 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
    }
     
      func postNowAction(){
-        if selectedCoordinate.latitude != 0 {
-            self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
-        }
+         
+        /* if viewModel.selectedCoordinate.latitude == 0{
+             
+             let latitude = LocationManager.sharedInstance.latitude
+             let longitude = LocationManager.sharedInstance.longitude
+             let state = LocationManager.sharedInstance.state
+             let country = LocationManager.sharedInstance.country
+             let city = LocationManager.sharedInstance.city
+             
+             self.params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
+             self.params[AddKeys.latitude.rawValue] = latitude
+             self.params[AddKeys.longitude.rawValue] = longitude
+             self.params[AddKeys.country.rawValue] = country
+             self.params[AddKeys.city.rawValue] = city
+             self.params[AddKeys.state.rawValue] = state
+
+             self.uploadFIleToServer()
+             
+           //  self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
+             
+         }else*/
+         if viewModel.selectedCoordinate.latitude != 0 {
+             
+            self.uploadFIleToServer()
+          //  self.savePostLocation(latitude: "\(LocationManager.sharedInstance.latitude)", longitude: "\(LocationManager.sharedInstance.longitude)", city: LocationManager.sharedInstance.city, state: LocationManager.sharedInstance.state, country: LocationManager.sharedInstance.country)
+         }else{
+             AlertView.sharedManager.showToast(message: "Please enable location  or select location manually.")
+         }
     }
            
+    
+    
     
    
     
      func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
         
+             DispatchQueue.main.async {
+                    self.viewModel.updateLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
+                }
+         
              self.params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
              self.params[AddKeys.latitude.rawValue] = latitude
              self.params[AddKeys.longitude.rawValue] = longitude
@@ -135,13 +207,18 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
              self.params[AddKeys.city.rawValue] = city
              self.params[AddKeys.state.rawValue] = state
          
-//         if self.selectedCoordinate.latitude != Double(latitude) {
-//             self.selectedCoordinate.latitude = Double(latitude) ?? 0.0
-//             self.selectedCoordinate.longitude = Double(longitude) ?? 0.0
-//             self.mapRegion.center = self.selectedCoordinate
-//             self.circle  = MKCircle(center: self.selectedCoordinate, radius: range1)
-//         }
-              self.uploadFIleToServer()
+        /* if viewModel.selectedCoordinate.latitude != Double(latitude) {
+             viewModel.selectedCoordinate.latitude = Double(latitude) ?? 0.0
+             self.selectedCoordinate.longitude = Double(longitude) ?? 0.0
+             self.mapRegion.center = self.selectedCoordinate
+             self.circle  = MKCircle(center: self.selectedCoordinate, radius: range1)
+             self.locationInfo = city + ", " + state + ", " + country
+             mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+
+         }
+         */
+        
+             // self.uploadFIleToServer()
          
     }
     
@@ -161,6 +238,9 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 let message = result["message"] as? String ?? ""
                 
                 
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
+                
                 if code == 200{
                     
                     if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
@@ -178,8 +258,6 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                         print("Something is wrong while converting dictionary to JSON data.")
                         
                     }
-                    
-                    
                     
                 }else{
                     AlertView.sharedManager.showToast(message: message)
@@ -208,7 +286,6 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
             }
         })
     }
-    
 }
 
 
@@ -231,20 +308,34 @@ extension ConfirmLocationCreateAdd :LocationAutorizationUpdated {
                 
                 print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
                 
+                
                 LocationManager.sharedInstance.delegate = nil
+                /*
+                viewModel.mapRegion.center =  LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                viewModel.mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 
-                mapRegion.center =  LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
-                mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                viewModel.locationInfo = Local.shared.getUserCity() + "," + Local.shared.getUserState() + "," + Local.shared.getUserCountry()
+                viewModel.circle = MKCircle(center: LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), radius: (range1) as CLLocationDistance)
                 
-                locationInfo = Local.shared.getUserCity() + "," + Local.shared.getUserState() + "," + Local.shared.getUserCountry()
-                circle = MKCircle(center: LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), radius: (range1) as CLLocationDistance)
+                viewModel.selectedCoordinate = LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                */
+                let latitude = LocationManager.sharedInstance.latitude
+                let longitude = LocationManager.sharedInstance.longitude
+                let state = LocationManager.sharedInstance.state
+                let country = LocationManager.sharedInstance.country
+                let city = LocationManager.sharedInstance.city
                 
-                selectedCoordinate = LocationManager.sharedInstance.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+                
+                self.savePostLocation(latitude:"\(coordinate.latitude)", longitude: "\(coordinate.longitude)", city: city, state: state, country: country)
+
+             
                 
                 
             } else {
                 print("Unknown Location")
             }
+        }else{
+            
         }
     }
 }

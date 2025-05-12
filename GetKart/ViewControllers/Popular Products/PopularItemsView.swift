@@ -28,7 +28,6 @@ struct ProductCard: View {
                             .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
                             .background(Color.gray.opacity(0.3))
                             .cornerRadius(10)
-                            .padding(.bottom, 10)
                     }
                     .setProcessor(
                         DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
@@ -40,27 +39,29 @@ struct ProductCard: View {
                     .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
                     .background(Color.gray.opacity(0.3))
                     .cornerRadius(10)
-                    .padding(.bottom, 10)
+               
+                VStack{
+                    Spacer()
+                    
+                    Button {
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            var obj = objItem
+                            obj.isLiked = !(obj.isLiked ?? false)
+                            objItem = obj
+                            addToFavourite(itemId: objItem.id ?? 0)
+                        }
+                    } label: {
+                        let islike = ((objItem.isLiked ?? false) == true)
+                        Image( islike ? "like_fill" : "like")
+                            .foregroundColor(.gray)
+                            .padding(8)
+                            .background(Color(UIColor.systemBackground))
+                            .clipShape(Circle())
+                            .shadow(radius: 3)
+                    } .padding([.trailing], 15).padding(.bottom,-10)
 
-                
-              /*  AsyncImage(url: URL(string: objItem.image ?? "")) { image in
-                    image
-                        .resizable()
-                        .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(10).padding(.bottom,10)
-                    
-                }placeholder: {
-                    
-                    Image("getkartplaceholder")
-                        .resizable().aspectRatio(contentMode: .fill)
-                        .frame(width: widthScreen/2.0 - 15 , height: widthScreen/2.0 - 15)
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(10).padding(.bottom,10)
                 }
-                */
-                
-                Button( action: {
+              /*  Button( action: {
                     
             
                         
@@ -72,7 +73,7 @@ struct ProductCard: View {
                         Image( islike ? "like_fill" : "like")
                             .foregroundColor(.gray)
                             .padding(8)
-                            .background(Color.white)
+                            .background(Color(UIColor.systemBackground))
                             .clipShape(Circle())
                             .shadow(radius: 3).simultaneousGesture(TapGesture().onEnded {
                                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
@@ -88,24 +89,29 @@ struct ProductCard: View {
                 .padding([.trailing], 15)
                 .simultaneousGesture(TapGesture().onEnded {
                
-                })
+                })*/
             }
            
             VStack(alignment: .leading){
                 Text("\(Local.shared.currencySymbol) \(objItem.price ?? 0)").multilineTextAlignment(.leading).lineLimit(1)
                     .font(.headline)
                     .foregroundColor(Color(hex: "#FF9900"))
-                Text(objItem.name ?? "").multilineTextAlignment(.leading).lineLimit(1)
+                Text(objItem.name ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
                     .font(.subheadline)
-                Text(objItem.address ?? "").multilineTextAlignment(.leading).lineLimit(1)
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                HStack{
+                    Image("location-outline")
+                        .renderingMode(.template)
+                        .foregroundColor(Color(UIColor.label))
+                    Text(objItem.address ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
                 
             }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20)
             
         
     }
-        .background(Color.white)
+        .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
         .shadow(radius: 2)
     }

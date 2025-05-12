@@ -51,8 +51,11 @@ class ZoomImageViewController: UIViewController {
     
     @IBAction func downloadBtnAction(_ sender: UIButton) {
         
-        if let url = URL(string: imageArrayUrl[pager.currentPage].image ?? ""){
-            self.downloadAndSaveToPhotos(url: url)
+        
+        if imageArrayUrl.count > pager.currentPage{
+            if let url = URL(string: imageArrayUrl[pager.currentPage].image ?? ""){
+                self.downloadAndSaveToPhotos(url: url)
+            }
         }
         
         // self.downloadAllMedia(urlArray: [imageArrayUrl[currentTag].image ?? ""])
@@ -183,8 +186,10 @@ extension ZoomImageViewController : UIScrollViewDelegate {
     
    
     func downloadAndSaveToPhotos(url: URL) {
-        
-        Themes.sharedInstance.activityView(uiView: self.view)
+        DispatchQueue.main.async{
+            
+            Themes.sharedInstance.activityView(uiView: self.view)
+        }
         URLSession.shared.dataTask(with: url) { data, response, error in
            
             DispatchQueue.main.async{

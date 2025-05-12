@@ -103,6 +103,12 @@ struct DeleteAccountView: View {
 
                 if status == 200{
                     self.deleteUser()
+                    
+                    AppDelegate.sharedInstance.sharedProfileID = ""
+                    AppDelegate.sharedInstance.notificationType = ""
+                    AppDelegate.sharedInstance.roomId = 0
+                    AppDelegate.sharedInstance.userId = 0
+                    
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
                     ImageCache.default.clearDiskCache()

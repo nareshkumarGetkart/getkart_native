@@ -38,13 +38,14 @@ final class Constant: NSObject {
     }
     
     var socketUrl:String{
+        //https://chat.getkart.com/chat
         get{
             if devEnvironment == .live {
-                return "https://getkartchat.getkart.ca"
+                return  "https://chat.getkart.com" //https://getkartchat.getkart.ca"
             }else if devEnvironment == .staging {
-                return "https://getkartchat.getkart.ca"
+                return   "https://chat.getkart.com" //"https://getkartchat.getkart.ca"
             }else{
-                return "https://getkartchat.getkart.ca"
+                return  "https://chat.getkart.com" //"https://getkartchat.getkart.ca"
             }
         }
     }
@@ -90,7 +91,7 @@ final class Constant: NSObject {
     
     var get_item:String{
         get {
-            return "\(Constant.shared.baseURL)/get-item"
+            return "\(Constant.shared.baseURL)/v1/get-item"
         }
     }
     
@@ -263,7 +264,7 @@ final class Constant: NSObject {
 
     var update_itemURL:String{
         get{
-            return "\(Constant.shared.baseURL)/update-item"
+            return "\(Constant.shared.baseURL)/v1/update-item"
             
         }
         
@@ -272,7 +273,6 @@ final class Constant: NSObject {
     var my_items:String{
         get{
             return "\(Constant.shared.baseURL)/my-items"
-            
         }
         
     }
@@ -603,6 +603,8 @@ enum NotificationKeys:String,CaseIterable{
     case deeplinkProfile = "deeplinkProfile"
     case reconnectInternet = "reconnectInternet"
     case noInternet = "noInternet"
+    case refreshAdsScreen = "refreshAdsScreen"
+
 }
 
 

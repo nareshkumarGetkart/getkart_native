@@ -21,7 +21,11 @@ class CategoryPackageVC: UIViewController {
     var categoryId = 0
     var categoryName = ""
     var city = ""
-    
+    var country = ""
+    var state = ""
+    var latitude = ""
+    var longitude = ""
+
     var planListArray = [[PlanModel]]()
     var bannerArray = [String]()
     
@@ -53,7 +57,14 @@ class CategoryPackageVC: UIViewController {
     
     func getPackagesApi(){
         
-        let strURL = Constant.shared.get_package + "?category_id=\(categoryId)&city=\(city)&platform=ios"
+        
+        var strURL = Constant.shared.get_package + "?category_id=\(categoryId)&city=\(city)&platform=ios"
+        
+        strURL.append("&country=\(country)")
+        strURL.append("&state=\(state)")
+        strURL.append("&latitude=\(latitude)")
+        strURL.append("&longitude=\(longitude)")
+        
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURL) { (obj:Plan) in
             

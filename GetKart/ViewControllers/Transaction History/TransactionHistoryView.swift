@@ -48,6 +48,7 @@ struct TransactionHistoryView: View {
             }else{
                 
                 ScrollView {
+                   
                     HStack{ Spacer() }.frame(height: 5)
                     VStack(spacing: 15) {
                         ForEach(transactions, id:\.id) { transaction in
@@ -68,6 +69,11 @@ struct TransactionHistoryView: View {
                                     self.navigation?.pushViewController(hostView, animated: true)
                                 }
                         }
+                    }
+                }.refreshable {
+                    if isDataLoading == false {
+                        self.page = 1
+                        getTransactionHistory()
                     }
                 }
                 Spacer()
@@ -91,11 +97,18 @@ struct TransactionHistoryView: View {
         let strURl = "\(Constant.shared.payment_transactions)?page=\(page)"
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strURl) { (obj:TransactionParse) in
             if obj.code == 200 {
-                    self.transactions.append(contentsOf: obj.data?.data ?? [])
+                
+                if self.page == 1{
+                    self.transactions.removeAll()
+                }
+                self.transactions.append(contentsOf: obj.data?.data ?? [])
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
                     self.page += 1
                     self.isDataLoading = false
                 })
+            }else{
+                self.isDataLoading = false
+
             }
         }
     }

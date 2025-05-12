@@ -44,6 +44,13 @@ struct MakeAnOfferView: View {
                     .cornerRadius(8)
                     .keyboardType(.numberPad)
                     .padding(.horizontal)
+                    .onChange(of: offer) { newValue in
+                        // Remove leading zeros unless the whole string is "0"
+                        if newValue.hasPrefix("0") && newValue != "0" {
+                            offer = String(newValue.drop(while: { $0 == "0" }))
+                        }
+                    }
+
                 
                 HStack {
                     Button(action: {
@@ -63,9 +70,18 @@ struct MakeAnOfferView: View {
                             if offer.trim().count > 0 &&  offer != "0" {
                                 
                                 if let value = Int(offer.trim()),value > 0{
-                                    onOfferSubmit(offer) // Pass the offer back
-                                    isPresented = false
+                                    
+                                    if value > (Int(sellerPrice) ?? 0){
+                                        UIApplication.shared.endEditing()
+                                        AlertView.sharedManager.showToast(message: "Offer price is more than seller price")
+                                    }else{
+                                        onOfferSubmit(offer) // Pass the offer back
+                                        isPresented = false
+                                    }
                                 }
+                            }else{
+                                UIApplication.shared.endEditing()
+                                AlertView.sharedManager.showToast(message: "Please enter offer price")
                             }
                        
                         }

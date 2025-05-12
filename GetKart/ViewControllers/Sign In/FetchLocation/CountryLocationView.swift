@@ -19,6 +19,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     var delLocationSelected:LocationSelectedDelegate!
     @State var isFirstTime = true
     @State var strCurrentLocagtion = "Show here current location"
+ 
     var body: some View {
         
         VStack(spacing: 0) {
@@ -28,14 +29,14 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
                 Text("Location")
                     .font(Font.manrope(.bold, size: 20.0))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 Spacer()
-            }.frame(height:44).background(Color.white)
+            }.frame(height:44).background(Color(UIColor.systemBackground))
            
             /*
             // MARK: - Search Bar
@@ -106,7 +107,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 }
             Text(strCurrentLocagtion).padding(.leading,50)
                     .font(Font.manrope(.regular, size: 14))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
             }.padding(.top, 10)
         
             Divider().padding([.top,.bottom],10)
@@ -174,7 +175,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             Spacer()
         }//.background(Color(UIColor.systemGray6))
             .onAppear{
-            fetchCountryListing()
+              fetchCountryListing()
                 if isFirstTime == true {
                     findMyLocationAction()
                 }
@@ -217,8 +218,12 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     }
     
      func fetchCountryListing(){
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_Countries) { (obj:CountryParse) in
-            arrCountries = obj.data?.data ?? []
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_Countries) { (obj:CountryParse) in
+            
+            if obj.code == 200 {
+                arrCountries = obj.data?.data ?? []
+
+            }
         }
     }
     
@@ -347,16 +352,18 @@ struct CountryLocationView: View, LocationSelectedDelegate{
 
 struct CountryRow: View {
     var strTitle: String = "India"
-    
+    var isArrowNeeded = true
     var body: some View {
         HStack {
             Text("\(strTitle)")
                 .font(Font.manrope(.medium, size: 15))
             Spacer()
-            Image("arrow_right").frame(width: 30,height:30)
-                .foregroundColor(.orange)
-                .background(Color(UIColor.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+            if isArrowNeeded{
+                Image("arrow_right").frame(width: 30,height:30)
+                    .foregroundColor(.orange)
+                    .background(Color(UIColor.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
 
         }.padding(.horizontal,10)
        .contentShape(Rectangle())

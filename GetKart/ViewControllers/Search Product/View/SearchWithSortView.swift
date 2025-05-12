@@ -29,12 +29,12 @@ struct SearchWithSortView: View {
                 navigationController?.popViewController(animated: true)
                 
             } label: {
-                Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
             Text(categoryName).font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-        }.frame(height:44)
+        }.frame(height:44).background(Color(.systemBackground))
         
         VStack {
             HStack {
@@ -56,17 +56,17 @@ struct SearchWithSortView: View {
                 Button(action: {
                     isGridView = true
                 }) {
-                    Image("grid_view").renderingMode(.template).tint((!isGridView) ? .gray : .black) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
+                    Image("grid_view").renderingMode(.template).tint((!isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
                         .padding(8)
-                }.tint((isGridView) ? .black : .gray)
+                }.tint((isGridView) ? Color(UIColor.label) : .gray)
                 
                 Button(action: {
                     isGridView = false
                 }) {
-                    Image("list_view").renderingMode(.template).tint((isGridView) ? .gray : .black) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
+                    Image("list_view").renderingMode(.template).tint((isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
                         .padding(8)
                 }.tint((isGridView) ? .gray : .black)
-            }.frame(height:50).background(Color.white)
+            }.frame(height:50).background(Color(.systemBackground))
                 .padding(.top,1)
             
             if objVM.items.count == 0 {

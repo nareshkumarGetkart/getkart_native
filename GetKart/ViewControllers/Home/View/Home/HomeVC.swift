@@ -20,6 +20,15 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     @IBOutlet weak var loaderBgView:UIView!
     @IBOutlet weak var cnstrntLoaderHt:NSLayoutConstraint!
 
+    private  lazy var topRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+                                    #selector(handlePullDownRefresh(_:)),
+                                 for: .valueChanged)
+        refreshControl.tintColor = UIColor.systemYellow
+        return refreshControl
+    }()
+    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +42,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel = HomeViewModel()
         homeVModel?.delegate = self
         homeVModel?.getProductListApi()
+        self.topRefreshControl.backgroundColor = .clear
+        tblView.refreshControl = topRefreshControl
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +93,20 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         }
     }
     
+    
+    
+    //MARK: Pull Down refresh
+    @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
+        
+        if !(homeVModel?.isDataLoading ?? false) {
+            homeVModel?.page = 1
+            homeVModel?.getProductListApi()
+            homeVModel?.getSliderListApi()
+            homeVModel?.getFeaturedListApi()
+        }
+        refreshControl.endRefreshing()
+    }
+     
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
@@ -95,7 +121,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     @IBAction func searchBtnAction(_ sender : UIButton){
         let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
         hostingController.hidesBottomBarWhenPushed = true
-
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     

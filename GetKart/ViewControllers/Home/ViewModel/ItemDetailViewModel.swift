@@ -41,6 +41,14 @@ class ItemDetailViewModel:ObservableObject{
                             let new = GalleryImage(id:10, image: img, itemID: self.itemObj?.id)
                             self.galleryImgArray.insert(new, at: 0)
                         }
+                        
+                        if (item.videoLink?.count ?? 0) > 0{
+                            
+                            let new = GalleryImage(id:10, image: item.videoLink, itemID: 400)
+                            self.galleryImgArray.append(new)
+                            
+                        }
+                        
                         self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0)
                         self.setItemTotalApi()
@@ -135,7 +143,8 @@ class ItemDetailViewModel:ObservableObject{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
                     nav?.popToRootViewController(animated: true)
                     AlertView.sharedManager.showToast(message: message)
 
@@ -163,6 +172,8 @@ class ItemDetailViewModel:ObservableObject{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200 {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
                     self.itemObj?.isFeature = true
                     nav?.popToRootViewController(animated: true)
                     AlertView.sharedManager.showToast(message: message)
@@ -209,6 +220,10 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.categoryId = self.itemObj?.categoryID ?? 0
                             destvc.categoryName = self.itemObj?.category?.name ?? ""
                             destvc.city = self.itemObj?.city ?? ""
+                            destvc.country =  self.itemObj?.country ?? ""
+                            destvc.state =  self.itemObj?.state ?? ""
+                            destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
+                            destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }
@@ -217,7 +232,7 @@ class ItemDetailViewModel:ObservableObject{
             }
         }
     }
-        
+
     
     func updateItemStatus(nav:UINavigationController?){
         
@@ -238,6 +253,8 @@ class ItemDetailViewModel:ObservableObject{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
                     AlertView.sharedManager.showToast(message: message)
                     nav?.popToRootViewController(animated: true)
                 }
@@ -261,21 +278,26 @@ class ItemDetailViewModel:ObservableObject{
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
+                let activePackage = result["activePackage"] as? Int ?? 0
                 
                 if status == 200{
-                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
                     AlertView.sharedManager.showToast(message: message)
                     nav?.popToRootViewController(animated: true)
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                     
-                    if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0 {
+                    if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0  && activePackage == 0{
                         
                         if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
                             destvc.hidesBottomBarWhenPushed = true
                             destvc.categoryId = self.itemObj?.categoryID ?? 0
                             destvc.categoryName = self.itemObj?.category?.name ?? ""
                             destvc.city = self.itemObj?.city ?? ""
+                            destvc.country =  self.itemObj?.country ?? ""
+                            destvc.state =  self.itemObj?.state ?? ""
+                            destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
+                            destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }
@@ -299,6 +321,8 @@ class ItemDetailViewModel:ObservableObject{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
                     AlertView.sharedManager.showToast(message: message)
                     nav?.popViewController(animated: true)
                     
@@ -313,6 +337,10 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.categoryId = itemObj?.categoryID ?? 0
                             destvc.categoryName = itemObj?.category?.name ?? ""
                             destvc.city = itemObj?.city ?? ""
+                            destvc.country =  self.itemObj?.country ?? ""
+                            destvc.state =  self.itemObj?.state ?? ""
+                            destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
+                            destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
                             nav?.pushViewController(destvc, animated: true)
                         }
                     }

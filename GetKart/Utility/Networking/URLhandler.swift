@@ -45,14 +45,18 @@ class URLhandler: NSObject{
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{
-                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token]
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios"]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }else{
-                let headers =  [ "Accept":"application/json", "Authorization":token]
+                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios"]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }
+        }else{
+            let headers =  ["platform":"ios"]
+            print("Header == \(headers)")
+            return HTTPHeaders.init(headers)
         }
 
         /*
@@ -342,7 +346,7 @@ class URLhandler: NSObject{
             //let param = [String:AnyObject]()
             AF.upload(multipartFormData: { (multipartFormData) in
                 
-                if let data = profileImg.jpegData(compressionQuality: 0.3) {
+                if let data = profileImg.jpegData(compressionQuality: 1.0) {
                     
                     multipartFormData.append(data, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
                 }else {

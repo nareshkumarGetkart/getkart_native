@@ -43,23 +43,22 @@ struct UserVerifyStep2: View{
                 // Progress Bar
                 ProgressView(value: 0.4)
                     .progressViewStyle(LinearProgressViewStyle(tint: .black))
+                
             }.padding(.top,15)
             .padding(.horizontal, 20)
             
             VStack(alignment: .leading){
-                //  HStack{
                 
                 Text("Gain Instant Trust")
                     .font(.manrope(.medium, size: 22))
                     .multilineTextAlignment(.leading)
-                
-                //                    Spacer()
-                //                }
-                //
+              
                 Text("Follow these steps to complete your verification")
                     .font(.subheadline)
                     .multilineTextAlignment(.leading)
             }
+            .padding(.horizontal, 10)
+
 
             VStack(spacing: 20) {
                 VerificationOption(title: "Selfie Verification", subtitle: "Selfie Verification = Higher Trust & Response Rate", iconImg: "selfieVeriSymbol")
@@ -70,11 +69,9 @@ struct UserVerifyStep2: View{
 
             Button(action: {
                 // Continue action
-                
                 var swidtUIView = TakeSelfieView(navigation:navigation)
                 swidtUIView.businessName = businessName
                 let hostVC = UIHostingController(rootView: swidtUIView)
-
                 self.navigation?.pushViewController(hostVC, animated: true)
             }) {
                 Text("Start now")

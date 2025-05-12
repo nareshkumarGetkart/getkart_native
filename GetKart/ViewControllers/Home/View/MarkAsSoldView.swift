@@ -176,6 +176,8 @@ struct MarkAsSoldView: View {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+
                     AlertView.sharedManager.showToast(message: message)
                     navController?.popToRootViewController(animated: true)
                 }

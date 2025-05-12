@@ -8,9 +8,6 @@
 import SwiftUI
 
 
-
-
-
 struct AddPostSuccessView: View {
     var navigationController: UINavigationController?
     @State private var animateCheck = false

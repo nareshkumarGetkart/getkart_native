@@ -16,6 +16,7 @@ class imgWithBtnViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        btnArrowDown.setImageColor(color: .label)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

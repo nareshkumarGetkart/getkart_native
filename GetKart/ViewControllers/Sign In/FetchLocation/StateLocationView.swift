@@ -11,13 +11,20 @@ import SwiftUI
 struct StateLocationView: View, LocationSelectedDelegate {
     var navigationController: UINavigationController?
     @State var arrStates:Array<StateModal> = []
+    
+    @State var arrSearchStates:Array<StateModal> = []
+
     var strTitle:String = ""
     @State private var searchText = ""
     @State var pageNo = 1
+    @State var pageNoSearch = 1
+    @State private var isSearching = false
+
     @State var totalRecords = 1
-    var country:CountryModel = CountryModel()
+     var country:CountryModel = CountryModel()
    // @State var isNewPost = false
     //@State var isFilterList = false
+    @State var isDataLoading = false
     @State var popType:PopType?
     var delLocationSelected:LocationSelectedDelegate!
     var body: some View {
@@ -28,13 +35,13 @@ struct StateLocationView: View, LocationSelectedDelegate {
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
                 Text("\(strTitle)").font(.custom("Manrope-Bold", size: 20.0))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 Spacer()
-            }.frame(height:44).background(Color.white)
+            }.frame(height:44).background(Color(UIColor.systemBackground))
             
             // MARK: - Search Bar
             HStack {
@@ -59,15 +66,20 @@ struct StateLocationView: View, LocationSelectedDelegate {
                         //.cornerRadius(8)
                         .onChange(of: searchText) { newValue in
                             print(newValue)
-                            pageNo = 1
+                            pageNoSearch = 1
+                            self.isSearching = true
+                            if newValue.count == 0{
+                                self.isSearching = false
+                            }
                             self.fetchStateListing()
+
                         }
                     if searchText.count > 0 {
                         Button("Clear") {
                             searchText = ""
-                        }.padding(.horizontal).foregroundColor(.black)
+                        }.padding(.horizontal).foregroundColor(Color(UIColor.label))
                     }
-                }.background(Color.white).padding().frame(height: 45).overlay {
+                }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
                         RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.gray, lineWidth: 1)
                     }
@@ -83,11 +95,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            
-            
-            
-            
-            
+                        
             Divider()
             
             // MARK: - List of Countries
@@ -100,7 +108,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                             self.allStatesSelected()
                         }
                 }else {
-                    CountryRow(strTitle:"Choose State")
+                    CountryRow(strTitle:"Choose State",isArrowNeeded:false)
                         .frame(height: 40)
                         .padding(.horizontal)
                         .onTapGesture{
@@ -108,32 +116,58 @@ struct StateLocationView: View, LocationSelectedDelegate {
                 }
                 Divider()
                 
-                
                 //ForEach(0..<arrStates.count){ index in
                 //let state = arrStates[index]
                 LazyVStack {
-                    ForEach(arrStates, id:\.id) { state in
+                    
+                    if isSearching{
+                        //IS Searching
+                        ForEach(arrSearchStates, id:\.id) { state in
+                            
+                            CountryRow(strTitle:state.name ?? "")
+                                .frame(height: 40)
+                                .padding(.horizontal)
+                            
+                                .onAppear{
+                                    if  let index = arrSearchStates.firstIndex(where: { $0.id == state.id }) {
+                                            if !isDataLoading {
+                                                fetchStateListing()
+                                            }
+                                    }
+                                    
+                                }
+                                .onTapGesture{
+                                    self.NavigateToCityListing(state:state)
+                                }
+                            Divider()
+                        }
+                    }else{
                         
-                        CountryRow(strTitle:state.name ?? "")
-                            .frame(height: 40)
-                            .padding(.horizontal)
-                        
-                            .onAppear{
-                                if  let index = arrStates.firstIndex(where: { $0.id == state.id }) {
-                                    if index == arrStates.count - 1{
-                                        if self.totalRecords != arrStates.count {
-                                            fetchStateListing()
+                        ForEach(arrStates, id:\.id) { state in
+                            
+                            CountryRow(strTitle:state.name ?? "")
+                                .frame(height: 40)
+                                .padding(.horizontal)
+                            
+                                .onAppear{
+                                    if  let index = arrStates.firstIndex(where: { $0.id == state.id }) {
+                                        if index == arrStates.count - 1{
+                                            if self.totalRecords != arrStates.count  && !isDataLoading {
+                                                fetchStateListing()
+                                            }
                                         }
                                     }
+                                    
                                 }
-                                
-                            }
-                            .onTapGesture{
-                                self.NavigateToCityListing(state:state)
-                            }
-                        Divider()
+                                .onTapGesture{
+                                    self.NavigateToCityListing(state:state)
+                                }
+                            Divider()
+                        }
                     }
-                }.gesture(
+                   
+                }
+               /* .gesture(
                     DragGesture().onChanged { value in
                         if value.translation.height > 0 {
                             print("Scroll down")
@@ -141,11 +175,13 @@ struct StateLocationView: View, LocationSelectedDelegate {
                             print("Scroll up")
                         }
                     }
-                )
+                )*/
             }
             Spacer()
         }.onAppear{
-            self.fetchStateListing()
+            if arrStates.count == 0{
+                self.fetchStateListing()
+            }
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
@@ -153,16 +189,52 @@ struct StateLocationView: View, LocationSelectedDelegate {
     
 }
     
+    
+    
     func fetchStateListing(){
-        let url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search=\(searchText)"
+        
+        self.isDataLoading = true
+
+        var url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search=" //&search=\(searchText)"
+        
+        if isSearching{
+             url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
+        }
+        
+        
        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: url) { (obj:StateParse) in
-           if self.pageNo == 1 {
-               self.arrStates.removeAll()
+           
+           if obj.code == 200{
+               
+               if self.isSearching{
+                   
+                   if self.pageNoSearch == 1 {
+                       self.arrSearchStates.removeAll()
+                   }
+                 //  self.totalRecords = obj.data?.total ?? 0
+                   self.arrSearchStates.append(contentsOf: obj.data?.data ?? [])
+                 
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                       self.isDataLoading = false
+                       self.pageNoSearch = pageNoSearch + 1
+                   })
+               }else{
+                  
+                   if self.pageNo == 1 {
+                       self.arrStates.removeAll()
+                   }
+                   self.totalRecords = obj.data?.total ?? 0
+                   self.arrStates.append(contentsOf: obj.data?.data ?? [])
+                 
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                       self.isDataLoading = false
+                       self.pageNo = pageNo + 1
+                   })
+               }
+             
+           }else{
+               self.isDataLoading = false
            }
-           self.totalRecords = obj.data?.total ?? 0
-           self.pageNo = pageNo + 1
-           self.arrStates.append(contentsOf: obj.data?.data ?? [])
-           print(arrStates)
        }
    }
     

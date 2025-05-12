@@ -722,3 +722,31 @@ extension UILabel {
 }
 
 
+//MARK: UIIMage
+extension UIImage {
+    func tinted(with color: UIColor) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        guard let context = UIGraphicsGetCurrentContext(), let cgImage = self.cgImage else {
+            return self
+        }
+
+        let rect = CGRect(origin: .zero, size: size)
+
+        // Flip context (UIKit uses flipped coordinates)
+        context.translateBy(x: 0, y: size.height)
+        context.scaleBy(x: 1.0, y: -1.0)
+
+        // Draw image
+        context.setBlendMode(.normal)
+        context.draw(cgImage, in: rect)
+
+        // Apply tint
+        context.setBlendMode(.sourceIn)
+        context.setFillColor(color.cgColor)
+        context.fill(rect)
+
+        let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return tintedImage ?? self
+    }
+}

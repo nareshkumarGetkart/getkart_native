@@ -59,9 +59,9 @@ class SellingChatVC: UIViewController {
     }
 
     func getChatList(){
-        
+        isDataLoading = true
         //"type": "seller"  // or buyer
-        let params = ["page":1,"type":"seller"] as [String : Any]
+        let params = ["page":page,"type":"seller"] as [String : Any]
         
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.sellerChatList.rawValue, params)
     }
@@ -99,8 +99,6 @@ class SellingChatVC: UIViewController {
                     if chat.id == response.data?.id{
                         isFound = true
                         if let data = response.data{
-                           // listArray[index] = data
-                            
                             listArray.remove(at: index)
                             listArray.insert(data, at: 0)
                         }
@@ -129,20 +127,30 @@ class SellingChatVC: UIViewController {
         guard let data = notification.userInfo else{
             return
         }
-        
-        if page == 1{
-            self.listArray.removeAll()
-        }
+      
         if let response : BuyerChatParse = try? SocketParser.convert(data: data) {
+    
+            if response.code == 200{
+                
+                if page == 1{
+                    self.listArray.removeAll()
+                }
+                self.listArray.append(contentsOf:response.data?.data ?? [])
+                self.tblView.reloadData()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                    self.isDataLoading = false
+                    self.page = self.page + 1
+                })
+            }else{
+                self.isDataLoading = false
+
+            }
             
-            self.listArray.append(contentsOf:response.data?.data ?? [])
-            self.tblView.reloadData()
             self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
             self.emptyView?.lblMsg?.text = "No chat Found"
             self.emptyView?.subHeadline?.text = ""
-            self.page = self.page + 1
+ 
         }
-        self.isDataLoading = false
         
     }
 }
@@ -214,6 +222,25 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         self.navController?.pushViewController(destVC, animated: true)
     }
     
+     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
+        if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
+            print("up")
+            if scrollView == tblView{
+                return
+            }
+        }
+        
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height)
+        {
+            if scrollView == tblView{
+                if isDataLoading == false{
+                    getChatList()
+                }
+            }
+        }
+    }
+  
     
       @objc func optionBtnAction(_ sender : UIButton){
           

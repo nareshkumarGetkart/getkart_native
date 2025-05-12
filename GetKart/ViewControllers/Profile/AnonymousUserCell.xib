@@ -32,7 +32,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4jh-lf-5Qy">
                                 <rect key="frame" x="0.0" y="0.0" width="310" height="100"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete_illustrator" translatesAutoresizingMaskIntoConstraints="NO" id="hdO-nu-wLd">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="user-circle" translatesAutoresizingMaskIntoConstraints="NO" id="hdO-nu-wLd">
                                         <rect key="frame" x="10" y="15" width="70" height="70"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="70" id="VJy-2F-P1q"/>
@@ -100,15 +100,15 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ti-Mv-uIU">
-                                                <rect key="frame" x="0.0" y="48" width="125" height="24"/>
+                                                <rect key="frame" x="0.0" y="48" width="150" height="24"/>
                                                 <color key="backgroundColor" systemColor="systemOrangeColor"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" constant="125" id="J2L-r1-QFy"/>
+                                                    <constraint firstAttribute="width" constant="150" id="J2L-r1-QFy"/>
                                                     <constraint firstAttribute="height" constant="24" id="OS7-cb-Uay"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="13"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" title="Get Verified Badge"/>
+                                                <state key="normal" title="Get verification Badge"/>
                                             </button>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="9zc-fn-uqZ">
                                                 <rect key="frame" x="0.0" y="77" width="0.0" height="0.0"/>
@@ -250,9 +250,9 @@
     </objects>
     <resources>
         <image name="checkmark.seal.fill" catalog="system" width="128" height="124"/>
-        <image name="delete_illustrator" width="255" height="255"/>
         <image name="no_data_found_illustrator" width="255" height="255"/>
         <image name="pencil" width="25" height="25"/>
+        <image name="user-circle" width="30" height="30"/>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

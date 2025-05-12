@@ -101,7 +101,7 @@ struct SellerProfileView: View {
                         .frame(width: 80, height: 80).cornerRadius(40)
                 } placeholder: {
                     
-                    Image("getkartplaceholder") // Placeholder for profile image
+                    Image("user-circle") // Placeholder for profile image
                         .resizable()
                         .frame(width: 80, height: 80)
                         .cornerRadius(40)
@@ -117,6 +117,9 @@ struct SellerProfileView: View {
                     let follow = (objVM.sellerObj?.isFollowing ?? false) ? false : true
                     
                     objVM.followUnfollowUserApi(isFollow: follow)
+                    
+                    objVM.sellerObj?.followersCount =    (objVM.sellerObj?.followersCount ?? 0)  + ((follow) ? 1 : -1)
+                    
                 }) {
                     
                     let strText = (objVM.sellerObj?.isFollowing ?? false) ? "Unfollow" : "Follow"
@@ -139,7 +142,8 @@ struct SellerProfileView: View {
                 
                 Divider().frame(width: 1,height: 40).background(.gray)
 
-                statView(value: "\(objVM.sellerObj?.followersCount ?? 0)", label: "Followers").onTapGesture {
+                statView(value: "\(objVM.sellerObj?.followersCount ?? 0)", label: "Followers")
+                    .onTapGesture {
                    
                     if (objVM.sellerObj?.followersCount ?? 0) > 0{
                         let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: true,userId: userId))
@@ -149,7 +153,8 @@ struct SellerProfileView: View {
                 
                 Divider().frame(width: 1,height: 40).background(.gray)
                 
-                statView(value: "\(objVM.sellerObj?.followingCount ?? 0)", label: "Following").onTapGesture {
+                statView(value: "\(objVM.sellerObj?.followingCount ?? 0)", label: "Following")
+                    .onTapGesture {
                   
                     if (objVM.sellerObj?.followingCount ?? 0) > 0{
                         

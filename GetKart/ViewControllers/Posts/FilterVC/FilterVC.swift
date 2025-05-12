@@ -77,7 +77,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
             
         }
         
-        btnBack.setImageColor(color: .black)
+        btnBack.setImageColor(color: .label)
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
         tblView.register(UINib(nibName: "BudgetTblViewCell", bundle: nil), forCellReuseIdentifier: "BudgetTblViewCell")

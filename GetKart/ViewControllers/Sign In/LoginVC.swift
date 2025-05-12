@@ -327,7 +327,11 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
         if self.loginType == .gmail {
             params = ["firebase_id":"\(self.socialId)", "type":"google","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)"]
         }else {
-            params = ["firebase_id":"\(self.socialId)", "type":"apple","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)"]
+            params = ["firebase_id":"\(self.socialId)", "type":"apple","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "name":self.socialName, "country_code":"\(countryCode)"]
+            
+            if self.socialEmail.count > 0{
+                params["email"] = self.socialEmail
+            }
         }
       
         URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
@@ -350,8 +354,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                         let token = result["token"] as? String ?? ""
                         let objUserInfo = UserInfo(dict: payload, token: token)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
-                       let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                        print(objLoggedInUser)
+                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                         
                         let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
                         self.navigationController?.pushViewController(hostingController, animated: true)

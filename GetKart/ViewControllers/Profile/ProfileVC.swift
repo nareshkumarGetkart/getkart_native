@@ -34,6 +34,7 @@ class ProfileVC: UIViewController {
         tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
         
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
+        getUserProfileApi()
         
     }
     
@@ -62,6 +63,34 @@ class ProfileVC: UIViewController {
                     }
                 }
                 
+            }
+        }
+    }
+    
+    func getUserProfileApi(){
+        
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        
+        if objLoggedInUser.id != nil {
+            let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+
+            URLhandler.sharedinstance.makeCall(url: strUrl, param: nil,methodType: .get) { responseObject, error in
+                
+                if error == nil{
+                    
+                    let result = responseObject! as NSDictionary
+                    let code = result["code"] as? Int ?? 0
+                    let message = result["message"] as? String ?? ""
+                    
+                    if code == 200{
+                        
+                        if let data = result["data"] as? Dictionary<String,Any>{
+                            
+                            RealmManager.shared.updateUserData(dict: data)
+                            self.tblView.reloadData()
+                        }
+                    }
+                }
             }
         }
     }

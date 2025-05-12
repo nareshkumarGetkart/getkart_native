@@ -25,7 +25,7 @@ class CategoriesVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-        btnBack.setImageColor(color: .black)
+        btnBack.setImageColor(color: .label)
         if popType == .filter || popType == .buyPackage {
             collctionView.isHidden = true
             tblView.isHidden = false

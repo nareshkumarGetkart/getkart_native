@@ -22,41 +22,51 @@ struct SearchProductView: View {
     @State var strCategoryTitle = ""
    
     var body: some View {
-        VStack{
+       
+        VStack {
             HStack {
-                
                 Button(action: {
-                    // Action to go back
                     navigation?.popViewController(animated: true)
                 }) {
-                    Image("arrow_left").renderingMode(.template)
-                        .foregroundColor(.black).padding(5)
+                    Image("arrow_left")
+                        .renderingMode(.template)
+                        .foregroundColor(Color(.label)) // Adapt to dark/light
+                        .padding(5)
                 }
-                Text("Search").font(.custom("Manrope-Bold", size: 20.0))
-                    .foregroundColor(.black)
+                Text("Search")
+                    .font(.custom("Manrope-Bold", size: 20.0))
+                    .foregroundColor(Color(.label))
                 Spacer()
-            }.frame(height: 44).padding(.horizontal)
-            
+            }
+            .frame(height: 44)
+            .padding(.horizontal)
+
             HStack {
-                HStack{
-                    Image("search").resizable().frame(width: 20,height: 20).padding(.leading,10)
-                    TextField("Search any item...", text: $searchText).tint(.orange)
+                HStack {
+                    Image("search")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .padding(.leading, 10)
+
+                    TextField("Search any item...", text: $searchText)
+                        .tint(Color.orange)
                         .frame(height: 45)
-                        .background(Color.white).padding(.trailing,10).tint(Color(hex: "#FF9900"))
                         .submitLabel(.search)
                         .onSubmit {
-                            
                             self.page = 1
                             self.getProductListApi(searchTxt: searchText)
-                            
                         }
-                }.background(Color.white).frame(height: 45).overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray, lineWidth: 1)
+                        .background(Color(.systemBackground)) // Adaptive
+                        .padding(.trailing, 10)
                 }
-                
+                .background(Color(.systemBackground)) // Adaptive
+                .frame(height: 45)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(.separator), lineWidth: 1)
+                )
+
                 Button(action: {
-                    /* Filter action */
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
                         vc.dataArray = self.dataArray
                         vc.dictCustomFields = self.dictCustomFields
@@ -65,97 +75,100 @@ struct SearchProductView: View {
                         self.navigation?.pushViewController(vc, animated: true)
                     }
                 }) {
-                    ZStack{
-                        
-                        Image("filter")
-                            .foregroundColor(.orange)
-                    }.frame(width: 50,height: 45).overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray, lineWidth: 1)
-                    }.background(Color.white)
-                }.padding(.leading,10)
-            }.padding(.leading,10)
-                .padding(.horizontal,10)
-            
+                    Image("filter")
+                        .renderingMode(.template)
+                        .foregroundColor(.orange)
+                        .frame(width: 50, height: 45)
+                        .background(Color(.systemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(.separator), lineWidth: 1)
+                        )
+                }
+                .padding(.leading, 10)
+            }
+            .padding(.horizontal, 10)
+
             let strHeader = (searchText.count == 0) ? "Popular Items" : "Searched Items"
             Text(strHeader)
                 .font(.headline)
                 .padding(.horizontal)
                 .padding(.top, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-          
+
             if items.count == 0 {
-                HStack{
+                HStack {
                     Spacer()
-                    VStack(spacing: 20){
+                    VStack(spacing: 20) {
                         Spacer()
-                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
-                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
-                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+                        Image("no_data_found_illustrator")
+                            .resizable()
+                            .renderingMode(.original)
+                            .frame(width: 150, height: 150)
+                            .padding()
+                        Text("No Data Found")
+                            .foregroundColor(.orange)
+                            .font(Font.manrope(.medium, size: 20.0))
+                            .padding(.top)
+                            .padding(.horizontal)
+                        Text("We're sorry what you were looking for. Please try another way")
+                            .font(Font.manrope(.regular, size: 16.0))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                         Spacer()
                     }
                     Spacer()
                 }
-            }else{
-                
-                
-            ScrollView {
-                VStack(spacing: 10) {
-                    
-                    
-                    ForEach($items) { $item in
-                        // ItemRow(item: item)
-                        FavoritesCell(itemObj: $item).onTapGesture {
-                            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:false, slug: item.slug))
-                            self.navigation?.pushViewController(hostingController, animated: true)
+            } else {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach($items) { $item in
+                            FavoritesCell(itemObj: $item)
+                                .onTapGesture {
+                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navigation, itemId: item.id ?? 0, itemObj: item, isMyProduct: false, slug: item.slug))
+                                    self.navigation?.pushViewController(hostingController, animated: true)
+                                }
                         }
-                        
                     }
-                }.padding([.leading,.trailing],10)
-                
-                // Add a marker at the bottom
-                GeometryReader { geo -> Color in
-                    DispatchQueue.main.async {
-                        let frame = geo.frame(in: .global)
-                        let screenHeight = UIScreen.main.bounds.height
-                        isAtBottom = frame.maxY < screenHeight + 20
+                    .padding(.horizontal, 10)
+
+                    GeometryReader { geo -> Color in
+                        DispatchQueue.main.async {
+                            let frame = geo.frame(in: .global)
+                            let screenHeight = UIScreen.main.bounds.height
+                            isAtBottom = frame.maxY < screenHeight + 20
+                        }
+                        return Color.clear
                     }
-                    return Color.clear
-                }
-                .frame(height: 1)
-                
-                if isDataLoading {
-                    ProgressView()
-                        .padding()
+                    .frame(height: 1)
+
+                    if isDataLoading {
+                        ProgressView()
+                            .padding()
+                    }
                 }
             }
-            
         }
-
-        }.background(Color(UIColor.systemGray6))
-            .navigationBarHidden(true)
-            .onAppear {
-            
-            if (navigateToFilterScreen){
+        .background(Color(.systemGroupedBackground)) // Adaptive background
+        .navigationBarHidden(true)
+        .onAppear {
+            if navigateToFilterScreen {
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
                     vc.delFilterSelected = self
                     vc.isPushedFromHome = navigateToFilterScreen
                     self.navigation?.pushViewController(vc, animated: false)
                 }
                 navigateToFilterScreen = false
-            }else{
+            } else {
                 self.getProductListApi(searchTxt: searchText)
             }
         }
         .onChange(of: isAtBottom) { atBottom in
-            if atBottom {
-                print("Scrolled to bottom!")
-                // You can trigger your 'load more' logic here
-                if isDataLoading == false {
-                    self.getProductListApi(searchTxt: searchText)
-                }
+            if atBottom && isDataLoading == false {
+                self.getProductListApi(searchTxt: searchText)
             }
         }
+
 
     }
     

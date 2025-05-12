@@ -53,6 +53,11 @@ struct FavoritesView: View {
                                 }
                         }
                     }
+                }.refreshable {
+                    if objVM.isDataLoading == false {
+                        self.objVM.page = 1
+                        objVM.getFavoriteHistory()
+                    }
                 }
                 .padding(.horizontal, 10)
             }
@@ -92,7 +97,15 @@ struct FavoritesCell:View {
                 KFImage(URL(string: img))
                     .placeholder {
                         Image("getkartplaceholder")
-                            .resizable().aspectRatio(contentMode: .fit).frame(width: 110)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 110)
+                            .padding(.vertical,0)
+
+                           // .background(Color.gray.opacity(0.3))
+                           // .cornerRadius(10, corners: [.topRight, .bottomRight])
+
+                            
                     }
                     .setProcessor(
                         DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
@@ -100,8 +113,11 @@ struct FavoritesCell:View {
                     )
                     .resizable()
                     .frame(width: 110)
+                    .padding(.vertical,0)
                     .aspectRatio(contentMode: .fit)
+                    .background(Color.gray.opacity(0.3))
                     .cornerRadius(10, corners: [.topRight, .bottomRight])
+
                 
             }
             
@@ -118,7 +134,7 @@ struct FavoritesCell:View {
                             .foregroundColor(.gray)
                         .foregroundColor(isLike ? .red : .gray)
                             .padding(5)
-                            .background(Color.white)
+                            .background(Color(UIColor.systemBackground))
                             .clipShape(Circle())
                             .shadow(radius: 3)
                             .padding(.trailing)
@@ -126,19 +142,20 @@ struct FavoritesCell:View {
                     
                     
                 }
-                Text(itemObj.name ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black).padding(.bottom,10).padding(.trailing)
+                Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                    .padding(.bottom,10).padding(.trailing)
                 
                 HStack{
-                    Image("location_icon").resizable().frame(width: 15, height: 15).foregroundColor(.gray)
+                    Image("location-outline").resizable().frame(width: 10, height: 10).foregroundColor(.gray)
                     Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
                     Spacer()
                 }
                 
-            }
+            }.padding([.top,.bottom],10)
             
         }.frame(height: 115)
            // .padding()
-            .background(Color.white).cornerRadius(15)
+            .background(Color(UIColor.systemBackground)).cornerRadius(15)
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                     .stroke(Color.gray, lineWidth: 0.5)

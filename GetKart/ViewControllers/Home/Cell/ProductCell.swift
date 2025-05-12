@@ -16,6 +16,9 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var lblAddress:UILabel!
     @IBOutlet weak var imgViewitem:UIImageView!
     @IBOutlet weak var bgView:UIView!
+    
+    @IBOutlet weak var imgViewLoc:UIImageView!
+
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -31,9 +34,18 @@ class ProductCell: UICollectionViewCell {
         btnLike.clipsToBounds = true
         btnLike.addShadow(shadowRadius: 5.0)
         
+        if let originalImage = UIImage(named: "location-outline") {
+            let tintedImage = originalImage.tinted(with: .label)
+            imgViewLoc.image = tintedImage
+        }
         
+        imgViewitem.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
+            
+
     }
    
+    
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         imgViewitem.kf.cancelDownloadTask()

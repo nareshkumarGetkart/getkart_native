@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -71,7 +72,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location_icon" translatesAutoresizingMaskIntoConstraints="NO" id="YJj-rV-5eX">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location-outline" translatesAutoresizingMaskIntoConstraints="NO" id="YJj-rV-5eX">
                                 <rect key="frame" x="7" y="179.66666666666666" width="10" height="10"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="10" id="EdG-es-FQ9"/>
@@ -79,7 +80,7 @@
                                 </constraints>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="eBr-cc-kP0" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="-18" id="5c4-xp-mlJ"/>
                             <constraint firstItem="gUh-OP-mJO" firstAttribute="top" secondItem="lEd-a8-Reg" secondAttribute="top" id="GfW-td-gzn"/>
@@ -113,6 +114,7 @@
             <connections>
                 <outlet property="bgView" destination="lEd-a8-Reg" id="uQF-K7-pbM"/>
                 <outlet property="btnLike" destination="eBr-cc-kP0" id="E3d-dH-wZZ"/>
+                <outlet property="imgViewLoc" destination="YJj-rV-5eX" id="Sbp-Lz-l1T"/>
                 <outlet property="imgViewitem" destination="gUh-OP-mJO" id="8mB-SI-Ayi"/>
                 <outlet property="lblAddress" destination="0Hi-BM-ZQM" id="2Ec-0x-0Vh"/>
                 <outlet property="lblItem" destination="NgW-8N-Ybu" id="jlL-5a-mpP"/>
@@ -124,6 +126,9 @@
     <resources>
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="like" width="24" height="24"/>
-        <image name="location_icon" width="20" height="20"/>
+        <image name="location-outline" width="11.333333015441895" height="11.333333015441895"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

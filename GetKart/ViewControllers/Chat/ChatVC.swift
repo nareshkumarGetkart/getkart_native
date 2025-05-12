@@ -9,6 +9,7 @@ import UIKit
 import IQKeyboardManagerSwift
 import MobileCoreServices
 import SwiftUI
+import Photos
 
 class ChatVC: UIViewController {
     
@@ -70,6 +71,7 @@ class ChatVC: UIViewController {
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
+    var isItemDeleted = false
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -124,6 +126,7 @@ class ChatVC: UIViewController {
         
         
         
+        
         // checkOnlineOfflineStatus()
     }
     
@@ -132,6 +135,11 @@ class ChatVC: UIViewController {
         super.viewWillAppear(true)
         IQKeyboardManager.shared.isEnabled = false
          self.getUserInfo()
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -163,18 +171,43 @@ class ChatVC: UIViewController {
     
     
     @IBAction func productBtnAction(sender : UIButton){
+        self.view.endEditing(true)
+        if isItemDeleted{
+            AlertView.sharedManager.showToast(message: "This item is no longer available")
+            return
+            
+        }else if !AppDelegate.sharedInstance.isInternetConnected{
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+      
+        }else{
+            
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil, slug: slug))
+            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        }
         
-        let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil, slug: slug))
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     
     
     @IBAction func sendMessageButtonAction(sender : UIButton){
         
-        if (textView.text?.count ?? 0) > 0{
-            self.sendMessageList(msg: textView.text ?? "", msgType: "text")
-            self.textView.text = ""
+        if isItemDeleted{
+            self.view.endEditing(true)
+
+            AlertView.sharedManager.showToast(message: "This item is no longer available")
+            return
+        }else if !AppDelegate.sharedInstance.isInternetConnected{
+            self.view.endEditing(true)
+
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }else{
+            
+            if (textView.text?.count ?? 0) > 0{
+                self.sendMessageList(msg: textView.text ?? "", msgType: "text")
+                self.textView.text = ""
+            }
         }
     }
     
@@ -183,12 +216,63 @@ class ChatVC: UIViewController {
         
     }
     
+    
+    func checkPhotoLibraryAuthorization(completion: @escaping (Bool) -> Void) {
+        let status = PHPhotoLibrary.authorizationStatus()
+        
+        switch status {
+        case .authorized, .limited:
+            completion(true)
+        case .denied, .restricted:
+            completion(false)
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization { newStatus in
+                DispatchQueue.main.async {
+                    completion(newStatus == .authorized || newStatus == .limited)
+                }
+            }
+        @unknown default:
+            completion(false)
+        }
+    }
+    
     @IBAction func attachmentButtonAction(sender : UIButton){
         
-        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
-        imagePicker.delegate = self
+        if isItemDeleted{
+            self.view.endEditing(true)
+
+            AlertView.sharedManager.showToast(message: "This item is no longer available")
+            return
+        }else if !AppDelegate.sharedInstance.isInternetConnected{
+            self.view.endEditing(true)
+
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+            
+        }else {
+            
+            checkPhotoLibraryAuthorization { granted in
+                if granted {
+                    // Present UIImagePickerController with sourceType .photoLibrary
+                    self.imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+                    self.imagePicker.delegate = self
+                    self.present(self.imagePicker, animated: true)
+                } else {
+                    // Show alert to user to enable photo access in Settings
+                    
+                    AlertView.sharedManager.presentAlertWith(title: "Alert!", msg:  "Please enable photo to send photo from settings.", buttonTitles: ["Cancel","Go to Settings"], onController: self) { title, index in
+                       
+                        if index == 1{
+                            if let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                               UIApplication.shared.canOpenURL(settingsURL) {
+                                UIApplication.shared.open(settingsURL)
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
-        self.present(imagePicker, animated: true)
         
         //        let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.text", "public.data","public.pdf", "public.doc","public.rtf"], in: .import)
         //        documentPicker.allowsMultipleSelection = false
@@ -200,45 +284,45 @@ class ChatVC: UIViewController {
     
     @IBAction func threeDotsButtonAction(sender : UIButton){
         self.view.endEditing(true)
-        //
-        //        if (UIApplication.shared.delegate as! AppDelegate).isInternetConnected == false{
-        //            (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
-        //
-        //            return
-        //        }
         
-        let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        actionSheetAlertController.addAction(cancelActionButton)
-        
-        //        let report = UIAlertAction(title: "Report", style: .default) { (action) in
-        //            self.reportUser()
-        //        }
-        
-        let block = UIAlertAction(title: "Block", style: .default) { (action) in
+        if isItemDeleted{
+            AlertView.sharedManager.showToast(message: "This item is no longer available")
+            return
+        }else if !AppDelegate.sharedInstance.isInternetConnected{
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+       
+        }else {
             
-            self.blockUnblockUser(isBlock: true)
+            let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            actionSheetAlertController.addAction(cancelActionButton)
             
-        }
-        
-        let unblock = UIAlertAction(title: "Unblock", style: .default) { (action) in
-            self.blockUnblockUser(isBlock: false)
+            //        let report = UIAlertAction(title: "Report", style: .default) { (action) in
+            //            self.reportUser()
+            //        }
+            //actionSheetAlertController.addAction(report)
 
+            let block = UIAlertAction(title: "Block", style: .default) { (action) in
+                
+                self.blockUnblockUser(isBlock: true)
+            }
+            
+            let unblock = UIAlertAction(title: "Unblock", style: .default) { (action) in
+                self.blockUnblockUser(isBlock: false)
+            }
+            
+            if youBlockedUser.count > 0  {
+                actionSheetAlertController.addAction(unblock)
+                
+            }else{
+                actionSheetAlertController.addAction(block)
+            }
+            
+            self.present(actionSheetAlertController, animated: true, completion: nil)
             
         }
-        
-        //actionSheetAlertController.addAction(report)
-        
-        
-        if youBlockedUser.count > 0  {
-            actionSheetAlertController.addAction(unblock)
-
-        }else{
-            actionSheetAlertController.addAction(block)
-        }
-  
-        self.present(actionSheetAlertController, animated: true, completion: nil)
+       
         
     }
     
@@ -319,6 +403,8 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.socketConnected),
                                                name: NSNotification.Name(rawValue:SocketEvents.socketConnected.rawValue), object: nil)
 
+        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
         
        /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
                                                name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
@@ -475,6 +561,11 @@ class ChatVC: UIViewController {
         view.layoutIfNeeded()
     }
     
+    @objc func noInternet(notification:Notification?){
+        
+        AlertView.sharedManager.showToast(message: "No internet connection")
+
+    }
     
     func scrollToBottom(animated: Bool) {
         guard chatArray.count > 0 else {
@@ -593,6 +684,9 @@ class ChatVC: UIViewController {
                 self.lblProduct.text = name
                 self.lblPrice.text = "\(Local.shared.currencySymbol) \(price)"
                 self.imgViewProduct.kf.setImage(with: URL(string: image),placeholder: UIImage(named: "getkartplaceholder"))
+            }else{
+                isItemDeleted = true
+                AlertView.sharedManager.showToast(message: "This item is no longer available.")
             }
             
         }
@@ -933,7 +1027,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
         if let pickedImage = info[.originalImage] as? UIImage {
     
             
-            self.uploadFIleToServer(img: pickedImage, name: "file")
+            self.uploadFIleToServer(img: pickedImage.wxCompress(), name: "file")
            
         }
         dismiss(animated: true, completion: nil)
@@ -1027,6 +1121,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     }else{
                         cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                         cell.lblSeen.isHidden = false
+                        cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                     }
                     
 
@@ -1066,6 +1161,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 }else{
                     cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                     cell.lblSeen.isHidden = false
+                    cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                 }
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.imgView.kf.indicatorType = .activity
@@ -1089,6 +1185,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 }else {
                     cell.imgViewSeen.setImageTintColor(color: UIColor(hexString:"#FF9900"))
                     cell.lblSeen.isHidden = false
+                    cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                 }
                 /*
                 cell.lblTime.text = dateFormatter.string(from: date)

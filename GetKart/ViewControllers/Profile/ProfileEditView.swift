@@ -30,12 +30,12 @@ struct ProfileEditView: View {
                 navigationController?.popViewController(animated: true)
                 
             } label: {
-                Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
-            Text("Profile Edit").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+            Text("Edit Profile").font(.custom("Manrope-Bold", size: 20.0))
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-        }.frame(height:44).background()
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
         ScrollView {
             VStack(spacing: 20) {
@@ -269,7 +269,7 @@ struct ProfileEditView: View {
 
         let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotification,"personalDetail":isContact] as [String : Any]
         
-        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage?.wxCompress() ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
             
             self.isDataLoading = false
             
@@ -368,7 +368,7 @@ struct ToggleField: View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.body)
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
         HStack {
             let str = isOn ? "Enabled" : "Disabled"
@@ -380,7 +380,7 @@ struct ToggleField: View {
                 .labelsHidden()
         }
         .padding()
-        .background(Color.white)
+        .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.3), lineWidth: 1))
     }

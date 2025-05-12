@@ -11,6 +11,7 @@ import MapKit
 class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
+    @IBOutlet weak var btnBack:UIButton!
 
     var dataArray:[CustomField] = []
     var params:Dictionary<String,Any> = [:]
@@ -31,7 +32,13 @@ class CreateAddVC2: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-        print(params)
+        
+//        if let originalImage = UIImage(named: "arrow_left") {
+//            let tintedImage = originalImage.tinted(with: .black)
+//            btnBack.setImage(tintedImage, for: .normal)
+//        }
+        btnBack.setImageColor(color: .label)
+
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
         tblView.register(UINib(nibName: "TVCell", bundle: nil), forCellReuseIdentifier: "TVCell")
         tblView.register(UINib(nibName: "RadioTVCell", bundle: nil), forCellReuseIdentifier: "RadioTVCell")
@@ -40,7 +47,7 @@ class CreateAddVC2: UIViewController {
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
-        // Do any additional setup after loading the view.
+
         if popType == .editPost {
             self.downloadCustomFieldFiles()
         }
@@ -112,15 +119,7 @@ class CreateAddVC2: UIViewController {
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+   
 
     @IBAction func nextButtonAction (){
         showErrorMsg = false
@@ -207,7 +206,12 @@ class CreateAddVC2: UIViewController {
 //                 let range1: Double = 0.0
 //                let circle = MKCircle(center: CLLocationCoordinate2D(latitude: lat, longitude: lon), radius: 0.0 as CLLocationDistance)
                 
-                let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params, mapRegion:mapRegion, selectedCoordinate:selectedCoordinate))//,range1: range1, circle:circle))
+                
+                let swiftLocView = ConfirmLocationCreateAdd(latitiude:lat, longitude:lon, imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params)
+              
+                let vc = UIHostingController(rootView: swiftLocView)
+               
+            //    let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params, mapRegion:mapRegion, selectedCoordinate:selectedCoordinate))//,range1: range1, circle:circle))
                 self.navigationController?.pushViewController(vc, animated: true)
                 
             }
@@ -348,18 +352,13 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
-            
-            
             if  objCustomField.value?.count ?? 0 > 0 {
-                   cell.txtField.text = objCustomField.value?.first ?? ""
-           }else {
-                   cell.txtField.text = ""
-               objCustomField.value = Array<String>()
-               dataArray[indexPath.row] = objCustomField
-           }
-            
-            
-            
+                cell.txtField.text = objCustomField.value?.first ?? ""
+            }else{
+                cell.txtField.text = ""
+                objCustomField.value = Array<String>()
+                dataArray[indexPath.row] = objCustomField
+            }
             
             if showErrorMsg == true {
                 if isValidInput(objCustomField: objCustomField) == false {

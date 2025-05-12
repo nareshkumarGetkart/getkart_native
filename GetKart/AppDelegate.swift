@@ -25,6 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var notificationType = ""
     var userId = 0
     var roomId = 0
+    var itemId = 0
+    
     var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -32,14 +34,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.overrideUserInterfaceStyle = .light
+
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         setupKingfisherSettings()
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
-            let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
+            
+           let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
             self.navigationController?.viewControllers = [landingVC]
+                     
         }else  {
             
             let  isFirstTime = UserDefaults.standard.object(forKey: "isFirstTime") as? Bool ?? true
@@ -86,6 +92,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         KingfisherManager.shared.cache.cleanExpiredDiskCache()
         
     }
+    
+    
     
     func applicationWillResignActive(_ application: UIApplication) {
    
@@ -140,12 +148,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     let userId = urlArray?.last ?? ""
                     //https://getkart.com/seller/213619
-                   // self.sharedProfileID = userId
-                    if Constant.shared.isLaunchFirstTime == 0{
-                        // self.showsharedProfileInfo()
-                    }else{
-                        
-                    }
+                  
                     let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0))
                     self.navigationController?.pushViewController(hostingController, animated: true)
                     
@@ -154,13 +157,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
                     
                    // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
-                    
-                    //self.sharedProfileID = userId
-                    if Constant.shared.isLaunchFirstTime == 0{
-                        // self.showsharedProfileInfo()
-                    }else{
-                        
-                    }
+                  
                     
                     let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
                     let hostingController = UIHostingController(rootView:siftUIview)
@@ -212,8 +209,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+   
     @objc func reachabilityChanged(note: NSNotification) {
-        
+       
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+
         let reachability = note.object as! Reachability
         if reachability.isReachable {
             isInternetConnected=true
@@ -226,7 +226,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 byreachable = "2"
             }
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.reconnectInternet.rawValue), object: nil , userInfo: nil)
-            if Local.shared.getUserId().count > 0 {
+
+            if objLoggedInUser.id != nil {
             
                SocketIOManager.sharedInstance.establishConnection()
             }
@@ -243,7 +244,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
-    
     
  
     func registerForRemoteNotification(application:UIApplication){
@@ -299,13 +299,13 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
     
      
-   
+   //MARK: NAvigate
     func  navigateToNotificationType() {
         print("didReceive")
        
         switch notificationType{
             
-        case "chat":
+        case "chat","offer":
             if let destVc = self.navigationController?.topViewController as? ChatVC{
                 
                 if destVc.userId == userId{
@@ -338,14 +338,35 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             
         case "item-update":
             do{
-                
-                
+             
                 for controller in self.navigationController?.viewControllers ?? []{
                     
                     if let destvc =  controller as? HomeBaseVC{
                         
-                        destvc.selectedIndex = 3
+                       
                         
+                        if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                       //destvc.navigationController?.popToRootViewController(animated: true)
+                        destvc.selectedIndex = 3
                         
                         if let navController = destvc.viewControllers?[3] as? UINavigationController {
                           
@@ -354,6 +375,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                             // Notify the 3rd view controller to refresh
                             if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
                                 thirdVC.refreshMyAds()
+                                break
                             }
                         }
                     }
@@ -367,25 +389,68 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 for controller in self.navigationController?.viewControllers ?? []{
                     
                     if let destvc =  controller as? HomeBaseVC{
+                            
+                  //  destvc.navigationController?.popToRootViewController(animated: true)
                         
+                        if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+
                         destvc.selectedIndex = 4
                         
                         // Notify the 3rd view controller to refresh
                         if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                          
                             navController.popToRootViewController(animated: false)
                            if let thirdVC = navController.viewControllers.first as? ProfileVC {
                                 
                                 thirdVC.getVerificationStatusApi()
-                                
+                               break
                             }
                         }
                     }
                 }
             }
        
+        case "notification":
+            do{
+               
+                if itemId == 0{
+                    let hostingController = UIHostingController(rootView: NotificationView(navigation:self.navigationController))
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+               
+                }else{
+                   
+                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemId, itemObj: nil, slug: nil))
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                }
+            }
         default:
             break
         }
+        itemId = 0
+        userId = 0
+        roomId = 0
+        notificationType = ""
     }
 
     func userNotificationCenter(_ a: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -403,6 +468,13 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             notificationType =  response.notification.request.content.userInfo["type"] as? String ?? ""
             userId =  Int(response.notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
             roomId = Int(response.notification.request.content.userInfo["item_offer_id"] as? String ?? "0") ?? 0
+            itemId = Int(response.notification.request.content.userInfo["item_id"] as? String ?? "0") ?? 0
+            
+            
+            if userId == 0{
+                userId =  Int(response.notification.request.content.userInfo["user_id"] as? String ?? "0") ?? 0
+            }
+            
             
             print("notificationType == \(notificationType)")
             print("userId == \(userId)")
@@ -431,7 +503,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         print(notification.request.content)
         
         let  notificationType =  notification.request.content.userInfo["type"] as? String ?? ""
-        let  userId = Int(notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
+        var  userId = Int(notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
+        
+        
+        if userId == 0{
+            userId =  Int(notification.request.content.userInfo["user_id"] as? String ?? "0") ?? 0
+        }
         
         if notificationType == "chat" {
             if let destVc = self.navigationController?.topViewController as? ChatVC{
@@ -482,6 +559,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     }
     
     func showLoginScreen(){
+        
         AppDelegate.sharedInstance.navigationController?.viewControllers.removeAll()
         let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
         AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]

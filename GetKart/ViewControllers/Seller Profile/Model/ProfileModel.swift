@@ -41,7 +41,7 @@ struct Seller: Codable {
     let showPersonalDetails, isVerified: Int?
     var isFollowing: Bool?
     let averageRating: String?
-    let followersCount, followingCount, items: Int?
+    var followersCount, followingCount, items: Int?
     var isBlock: Int?
 
     enum CodingKeys: String, CodingKey {

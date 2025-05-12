@@ -26,7 +26,7 @@ struct LogoutView: View {
                 Text("Logout Confirmation").font(Font.manrope(.semiBold, size: 16))
                     .font(.title2)
                     .fontWeight(.bold)
-                Text("Are you sure you want to logout?").font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                Text("Are you sure you want to logout?").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                 
                 HStack {
                     Button(action: {
@@ -35,7 +35,7 @@ struct LogoutView: View {
                         
                     }) {
                         Text("Cancel").font(Font.manrope(.regular, size: 16))
-                            .foregroundColor(.black).padding()
+                            .foregroundColor(Color(UIColor.label)).padding()
                             .frame(maxWidth: .infinity,idealHeight:40,maxHeight:40)
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
@@ -48,7 +48,7 @@ struct LogoutView: View {
                         Text("OK").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()
                             .frame(maxWidth: .infinity,idealHeight:40,maxHeight:40)
                             .background(Color.orange)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(UIColor.label))
                             .cornerRadius(10)
                     }
                 }.padding(.bottom,10)
@@ -78,23 +78,23 @@ struct LogoutView: View {
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
 
-             //   if status == 200{
-                    // presentationMode.wrappedValue.dismiss()
+                AppDelegate.sharedInstance.sharedProfileID = ""
+                AppDelegate.sharedInstance.notificationType = ""
+                AppDelegate.sharedInstance.roomId = 0
+                AppDelegate.sharedInstance.userId = 0
+
                     ImageCache.default.clearDiskCache()
                     ImageCache.default.clearMemoryCache()
                     SocketIOManager.sharedInstance.socket?.disconnect()
                     SocketIOManager.sharedInstance.socket = nil
                     SocketIOManager.sharedInstance.manager = nil
-                    
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
                     showAlert = false
                     presentationMode.wrappedValue.dismiss()
                     AppDelegate.sharedInstance.showLoginScreen()
                    
-//                }else{
-//                    //self?.delegate?.showError(message: message)
-//                }
+
                 
             }
         }

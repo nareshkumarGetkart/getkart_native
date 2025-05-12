@@ -26,18 +26,18 @@ struct SubCategoriesView: View {
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 let title = popType == .createPost ? "Ad Listing" : (strTitle)
                 Text("\(title)").font(.custom("Manrope-Bold", size: 20.0))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 Spacer()
-            }.frame(height:44).background(Color.white)
+            }.frame(height:44).background(Color(UIColor.systemBackground))
             
             ScrollView{
                 HStack {
                     
-                    Image("home_dark").renderingMode(.template).foregroundColor(.black)
+                    Image("home_dark").renderingMode(.template).foregroundColor(Color(UIColor.label))
                         .frame(width: 30, height: 30, alignment: .leading)
                         .padding([.leading],10)
                     Text(strTitle )
@@ -122,13 +122,20 @@ struct CategoryCellView: View {
     @State var subCategory:Subcategory?
     var body: some View {
         HStack {
-            Text(subCategory?.name ?? "").padding()
+            Text(subCategory?.name ?? "")
+                .foregroundColor(.primary)
+                .padding()
             Spacer()
-            Image("arrow_right").renderingMode(.template).foregroundColor(.black).background(Color(UIColor.systemGray6))
+            Image("arrow_right")
+                .renderingMode(.template)
+                .foregroundColor(Color(UIColor.label))
+                .padding(8) // Add padding so the background shows nicely
+                .background(Color(UIColor.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
-            //.padding(.leading, 8)
-               .padding([.trailing],30)
         }
-        .contentShape(Rectangle())
+        //.contentShape(Rectangle())
+        .padding(.horizontal)
+        .background(Color(UIColor.systemBackground)) // optional for full row
+        .contentShape(Rectangle()) // makes entire row tappable
     }
 }

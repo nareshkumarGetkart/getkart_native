@@ -11,7 +11,7 @@ import SwiftUI
 
 struct NotificationView: View {
     var  navigation:UINavigationController?
-  
+    @State var isDataLoading = true
     @State private var page = 1
     @State var  listArray = [NotificationModel]()
 
@@ -42,12 +42,19 @@ struct NotificationView: View {
                 HStack{  }.frame(height: 5)
                 VStack(spacing: 10) {
                     ForEach(listArray) { notification in
-                        NotificationRow(notification: notification).onTapGesture{
+                        NotificationRow(notification: notification)
+                            .onTapGesture{
                             
                             let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
                             self.navigation?.pushViewController(hostingVC, animated: true)
-                            print("horizontal list item tapped \n \(notification.title)")
                         }
+                            .onAppear{
+                                
+                            if let lastItem = listArray.last, lastItem.id == notification.id, !isDataLoading {
+                                    getNoticiationlistApi()
+                                }
+                            }
+
                     }
                 }
                 .padding(.horizontal, 10)
@@ -66,13 +73,32 @@ struct NotificationView: View {
     
     func getNoticiationlistApi(){
         let strURl = Constant.shared.get_notification_list + "?page=\(page)"
-        
+        self.isDataLoading = true
+
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURl) { (obj:NotificationParse) in
             
        
-            if obj.data != nil {
-                self.listArray.append(contentsOf: obj.data?.data ?? [])
+            if obj.code == 200{
+                
+                if self.page == 1{
+                    self.listArray.removeAll()
+                }
+                
+                if obj.data != nil {
+                    self.listArray.append(contentsOf: obj.data?.data ?? [])
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    self.page += 1
+                    self.isDataLoading = false
+                })
+            }else{
+                self.isDataLoading = false
+
             }
+          
+            
+            
         }
     }
 }

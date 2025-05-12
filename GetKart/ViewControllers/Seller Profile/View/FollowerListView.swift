@@ -92,7 +92,7 @@ struct FollowerRowView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.orange.opacity(0.2))
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "user-circle")
                         .foregroundColor(.orange)
                 }
             }

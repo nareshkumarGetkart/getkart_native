@@ -7,7 +7,7 @@
 
 import Foundation
 import RealmSwift
-
+/*
 class RealmManager: ObservableObject {
     
     static let shared = RealmManager()
@@ -105,4 +105,72 @@ class RealmManager: ObservableObject {
         }
     }
     
+}
+
+
+*/
+
+class RealmManager: ObservableObject {
+
+    static let shared = RealmManager()
+
+    private init() {
+        configureRealm()
+    }
+
+    private func configureRealm() {
+        let config = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
+            if oldSchemaVersion < 1 {
+                // Handle migration if needed
+            }
+        })
+        Realm.Configuration.defaultConfiguration = config
+    }
+
+    private var realm: Realm {
+        return try! Realm()
+    }
+
+    func fetchLoggedInUserInfo() -> UserInfo {
+        if let dbUser = realm.objects(DBUserInfo.self).first {
+            return UserInfo(dbUserInfo: dbUser)
+        }
+        return UserInfo()
+    }
+
+    func saveUserInfo(userInfo: UserInfo) {
+        deleteUserInfoObjects()
+        let dbUser = DBUserInfo(userInfo: userInfo)
+        try? realm.write {
+            realm.add(dbUser)
+        }
+    }
+
+    func deleteUserInfoObjects() {
+        try? realm.write {
+            let allUsers = realm.objects(DBUserInfo.self)
+            realm.delete(allUsers)
+        }
+    }
+
+    func updateUserData(dict: [String: Any]) {
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: dict["id"] as? Int ?? 0) {
+            try? realm.write {
+                user.name = dict["name"] as? String ?? ""
+                user.email = dict["email"] as? String ?? ""
+                user.profile = dict["profile"] as? String ?? ""
+                user.address = dict["address"] as? String ?? ""
+                user.mobile = dict["mobile"] as? String ?? ""
+                user.country_code = dict["country_code"] as? String ?? ""
+                user.mobileVisibility = dict["mobileVisibility"] as? Int ?? 0
+                user.notification = dict["notification"] as? Int ?? 0
+            }
+        }
+    }
+
+    func clearDB() {
+        try? realm.write {
+            realm.deleteAll()
+        }
+    }
 }

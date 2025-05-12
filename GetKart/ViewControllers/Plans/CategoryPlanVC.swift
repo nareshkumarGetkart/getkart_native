@@ -17,7 +17,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
 
     
      let titleArray =  ["Category","Location"]
-    var subTitleArrray = ["",""]
+     var subTitleArrray = ["Select Category","Select Location"]
      let iconArray =  ["category","location_icon_orange"]
     
     var latitude:String = ""
@@ -77,6 +77,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
         }
         
     }
+    
     func saveCategoryInfo(category_id:Int, categoryName:String ) {
         self.category_id = category_id
         self.categoryName = categoryName
@@ -101,9 +102,15 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
                 destvc.categoryId = category_id
                 destvc.categoryName = categoryName
                 destvc.city = city
-                
+                destvc.country = country
+                destvc.state = state
+                destvc.latitude = latitude
+                destvc.longitude = longitude
                 self.navigationController?.pushViewController(destvc, animated: true)
             }
+        }else{
+          
+            AlertView.sharedManager.showToast(message: "Select category and location")
         }
     }
      

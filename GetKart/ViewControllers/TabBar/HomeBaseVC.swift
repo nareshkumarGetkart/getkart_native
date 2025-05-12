@@ -16,12 +16,14 @@ class HomeBaseVC: UITabBarController {
     var controllers: [UIViewController]?
     let middleButton = UIButton()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         AppDelegate.sharedInstance.checkSocketStatus()
 //       tabBar.isTranslucent = true
+        UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
-    
+        tabBar.unselectedItemTintColor = UIColor.label
         delegate = self
         //self.view.backgroundColor = .white
         self.setViewControllers(getControllers(), animated: false)
@@ -34,16 +36,23 @@ class HomeBaseVC: UITabBarController {
         }
         for x in 0..<items.count-1 {
             items[x].tag = x
-            items[x].image = UIImage(named:images[x])?.withRenderingMode(.alwaysOriginal)
-            items[x].selectedImage = UIImage(named:imagesSel[x])?.withRenderingMode(.alwaysOriginal)
+            
+          //  items[x].image = UIImage(named:images[x])? .withTintColor(.label, renderingMode: .alwaysOriginal)
+            
+            tabBar.items?[x].image = nil
+            tabBar.items?[x].image = UIImage(named: images[x])?.withRenderingMode(.alwaysTemplate)
 
+            items[x].selectedImage = UIImage(named:imagesSel[x])?.withRenderingMode(.alwaysOriginal)
         }
         setupMiddleButton()
 
         
-        AppDelegate.sharedInstance.navigateToNotificationType()
-        Constant.shared.isLaunchFirstTime = 0
-        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            
+            AppDelegate.sharedInstance.navigateToNotificationType()
+            Constant.shared.isLaunchFirstTime = 0
+            
+        }
         // Do any additional setup after loading the view.
         
     }
@@ -82,9 +91,16 @@ class HomeBaseVC: UITabBarController {
         print("Middle button tapped!")
         // Handle action (e.g., present a modal view)
         if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            if let selectedVC =  self.selectedViewController as? UINavigationController {
+                print(selectedVC)
+                if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                    destVC.hidesBottomBarWhenPushed = true
+                    destVC.popType = .createPost
+                    selectedVC.pushViewController(destVC, animated: true)
+                }
+            }
             
-            
-            let url = Constant.shared.getLimits + "?package_type=item_listing"
+         /*   let url = Constant.shared.getLimits + "?package_type=item_listing"
             
             URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
                 
@@ -129,7 +145,7 @@ class HomeBaseVC: UITabBarController {
                     
                 }
             }
-            
+            */
         }
     }
     
@@ -138,17 +154,17 @@ class HomeBaseVC: UITabBarController {
     func getControllers() -> [UINavigationController]{
                 
         let homeVc = StoryBoard.main.instantiateViewController(withIdentifier: "HomeVC") as! HomeVC
-        homeVc.tabBarItem = UITabBarItem(title: "Home", image: UIImage(named: "home")?.withRenderingMode(.alwaysOriginal), selectedImage: UIImage(named:"home_active")?.withRenderingMode(.alwaysOriginal))
+        homeVc.tabBarItem = UITabBarItem(title: "Home", image: UIImage(named: "home")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"home_active")?.withRenderingMode(.alwaysOriginal))
 
         
         let chatVc = StoryBoard.main.instantiateViewController(withIdentifier: "ChatListVC") as! ChatListVC
-        chatVc.tabBarItem = UITabBarItem(title: "Chat", image: UIImage(named: "chat")?.withRenderingMode(.alwaysOriginal), selectedImage: UIImage(named:"chat_active")?.withRenderingMode(.alwaysOriginal))
+        chatVc.tabBarItem = UITabBarItem(title: "Chat", image: UIImage(named: "chat")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"chat_active")?.withRenderingMode(.alwaysOriginal))
 
         let adsVc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
-        adsVc.tabBarItem = UITabBarItem(title: "My ads", image: UIImage(named: "myads")?.withRenderingMode(.alwaysOriginal), selectedImage: UIImage(named:"myads_active")?.withRenderingMode(.alwaysOriginal))
+        adsVc.tabBarItem = UITabBarItem(title: "My ads", image: UIImage(named: "myads")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"myads_active")?.withRenderingMode(.alwaysOriginal))
 
         let profileVc = StoryBoard.main.instantiateViewController(withIdentifier: "ProfileVC") as! ProfileVC
-         profileVc.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "profile")?.withRenderingMode(.alwaysOriginal), selectedImage: UIImage(named:"profile_active")?.withRenderingMode(.alwaysOriginal))
+         profileVc.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "profile")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"profile_active")?.withRenderingMode(.alwaysOriginal))
 
         
         
