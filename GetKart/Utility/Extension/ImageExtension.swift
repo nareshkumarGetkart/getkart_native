@@ -27,16 +27,17 @@ extension UIImageView {
             if url.pathExtension == "svg"{
                 DispatchQueue.global(qos: .background).async {
                     
-                        if let data = try? Data(contentsOf: url),
-                           let svgImage = SVGKImage(data: data) {
-                            DispatchQueue.main.async {
-                                self.image = svgImage.uiImage
-                            }
-                            imageCache.setObject(svgImage.uiImage, forKey: strurl as AnyObject)
-                        } else {
-                            print("Failed to load SVG image from URL: \(url)")
+                    if let data = try? Data(contentsOf: url),
+                       let svgImage = SVGKImage(data: data),
+                       let uiImage = svgImage.uiImage {
+                        
+                        DispatchQueue.main.async {
+                            self.image = uiImage
                         }
-                    
+                        imageCache.setObject(uiImage, forKey: strurl as AnyObject)
+                    } else {
+                        print("Failed to load or parse SVG image from URL: \(url)")
+                    }
                 }
             }else {
                 self.kf.setImage(with:  URL(string: strurl) , placeholder:UIImage(named: placeHolderImage))

@@ -25,8 +25,8 @@ struct UserVerifyStep1: View {
                 // Action to go back
                 self.navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Spacer()
         }.frame(height: 44)
@@ -129,6 +129,8 @@ struct UserVerifyStep1: View {
     private func validateForm() {
         if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty || businessName.isEmpty {
             print("Please fill all the fields.")
+            UIApplication.shared.endEditing()
+            AlertView.sharedManager.showToast(message: "All field are required.")
         } else {
             print("Form Submitted!")
             var swidtUIView = UserVerifyStep2(navigation:navigation)

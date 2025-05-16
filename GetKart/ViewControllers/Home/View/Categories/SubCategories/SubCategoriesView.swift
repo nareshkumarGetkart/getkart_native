@@ -16,8 +16,8 @@ struct SubCategoriesView: View {
     @State var strCategoryTitle = ""
     @State var  category_id = ""
     @State var category_ids = ""
-    
     @State var popType:PopType?
+    @State var screenNumber = 1
     var body: some View {
         
         VStack(spacing: 0) {
@@ -32,7 +32,17 @@ struct SubCategoriesView: View {
                 Text("\(title)").font(.custom("Manrope-Bold", size: 20.0))
                     .foregroundColor(Color(UIColor.label))
                 Spacer()
-            }.frame(height:44).background(Color(UIColor.systemBackground))
+            }.frame(height:44).background(Color(UIColor.systemBackground)).onAppear{
+               
+                if screenNumber == 1{
+                    category_ids = category_id
+                    //if subcategories.subcategories?.count == 0 {
+                        strCategoryTitle = strTitle
+//                    }else{
+//                        strCategoryTitle = ""
+//                    }
+                }
+            }
             
             ScrollView{
                 HStack {
@@ -74,9 +84,8 @@ struct SubCategoriesView: View {
             
             if strCategoryTitle.count == 0 {
                 strCategoryTitle = objsubCategory.name ?? ""
-                
             }
-            category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
+             category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
             
             
            if popType == .filter {
@@ -99,15 +108,16 @@ struct SubCategoriesView: View {
                 }
             }
         }else {
+            
             if strCategoryTitle.count == 0 {
                 strCategoryTitle = strTitle + ">" + (objsubCategory.name ?? "")
             }else {
-                strCategoryTitle =  ">" + (objsubCategory.name ?? "")
+                strCategoryTitle +=  ">" + (objsubCategory.name ?? "")
             }
                 
             category_ids =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
             
-            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_id:self.category_id, category_ids: category_ids, popType: self.popType) // Create SwiftUI view
+            let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_id:self.category_id, category_ids: category_ids, popType: self.popType,screenNumber: screenNumber + 1) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
         }

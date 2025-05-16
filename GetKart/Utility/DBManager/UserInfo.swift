@@ -6,7 +6,7 @@
 //
 
 struct UserInfo {
-     var address:String?
+    var address:String?
     var country_code:String?
     var created_at:String?
     var deleted_at:String?

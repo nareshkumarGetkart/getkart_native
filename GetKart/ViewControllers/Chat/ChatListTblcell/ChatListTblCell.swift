@@ -27,6 +27,9 @@ class ChatListTblCell: UITableViewCell {
         
         imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
         imgViewProfile.clipsToBounds = true
+        imgViewProfile.layer.borderColor = UIColor.label.cgColor
+        imgViewProfile.layer.borderWidth = 1.0
+        imgViewProfile.clipsToBounds = true
         
         lblDot.layer.cornerRadius = lblDot.frame.size.height/2.0
         lblDot.clipsToBounds = true

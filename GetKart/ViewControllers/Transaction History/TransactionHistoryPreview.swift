@@ -32,7 +32,7 @@ struct TransactionHistoryPreview: View {
                             .font(.title2)
                             .bold()
                         
-                        Text("Successfully paid \(Local.shared.currencySymbol) \(String(format: "%.2f", transaction?.paymentTransaction?.amount ?? 0.0))")
+                        Text("Successfully paid \(Local.shared.currencySymbol) \( (transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
                             .foregroundColor(.gray)
                             .font(Font.manrope(.regular, size: 16.0))
 
@@ -49,7 +49,7 @@ struct TransactionHistoryPreview: View {
                     detailsCard()
                     
                     Button(action: {}) {
-                        Text("Total Cost \(Local.shared.currencySymbol) \(String(format: "%.2f", transaction?.paymentTransaction?.amount ?? 0.0))")
+                        Text("Total Cost \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
                             .font(Font.manrope(.bold, size: 18.0))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -162,12 +162,13 @@ private func navigationHeader() -> some View {
 
 @ViewBuilder
 private func detailsCard() -> some View {
-    VStack(spacing: 16) {
+    VStack(spacing: 12) {
         let date = Date(timeIntervalSince1970: TimeInterval(convertTimestamp(isoDateString: transaction?.paymentTransaction?.createdAt ?? "")))
 
         detailRow(title: "Name", value: "\(transaction?.package?.name ?? "")")
+        detailRow(title: "Category", value:"\(transaction?.package?.category ?? "")")
+        detailRow(title: "Location", value: "\(transaction?.paymentTransaction?.city ?? "")")
         detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") Ads")
-       // detailRow(title: "Bought pack", value: "\(transaction?.package?.duration ?? "") Days")
 
         detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
         detailRow(title: "Date", value: getConvertedDateFromDate(date: date))

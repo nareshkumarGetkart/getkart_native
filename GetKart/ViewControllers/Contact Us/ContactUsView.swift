@@ -21,8 +21,8 @@ struct ContactUsView: View {
                 // Action to go back
                 navigationController?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                   .padding()
                 
             }
             Text("Contact us").foregroundColor(.black).font(Font.manrope(.semiBold, size: 17))

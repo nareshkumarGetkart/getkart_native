@@ -94,7 +94,6 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
     
     @IBAction func showPackageButtonAction(_ sender : UIButton){
         
-        
         if self.country.count > 0 && self.category_id > 0 {
             
             if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{

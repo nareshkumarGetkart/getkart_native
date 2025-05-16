@@ -68,6 +68,9 @@ class ChatVC: UIViewController {
     var typingTimer: Timer?
     var isTyping = false
     
+    var typingOtherTimer: Timer?
+
+    
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
@@ -151,6 +154,8 @@ class ChatVC: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
         typingTimer?.invalidate()
+        typingOtherTimer?.invalidate()
+
     }
     
     //MARK: Pull Down refresh
@@ -359,7 +364,7 @@ class ChatVC: UIViewController {
     
     func blockUnblockUser(isBlock:Bool){
         let strBlockStatus = isBlock ? "block" : "unblock"
-        let params = ["blocked_user_id":userId,"action":strBlockStatus] as [String : Any]
+        let params = ["blocked_user_id":userId,"action":strBlockStatus,"item_offer_id":item_offer_id] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.blockUnblock.rawValue, params)
         
       /*  let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
@@ -587,12 +592,16 @@ class ChatVC: UIViewController {
             if  let  dataDict = data["data"] as? Dictionary<String,Any>{
                 let blocked_user_id = dataDict["blocked_user_id"] as? Int ?? 0
                 let action = dataDict["action"] as? String ?? ""
-
-                if blocked_user_id == userId{
-                    youBlockedUser = (action == "block") ? "You have blocked this user." : ""
-                }else{
+                let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
+                
+                if self.item_offer_id == item_offer_id {
                     
-                    youBlockedByUser = (action == "block") ? "User has blocked you." : ""
+                    if blocked_user_id == userId{
+                        youBlockedUser = (action == "block") ? "You have blocked this user." : ""
+                    }else{
+                        
+                        youBlockedByUser = (action == "block") ? "User has blocked you." : ""
+                    }
                 }
             }
 
@@ -657,10 +666,15 @@ class ChatVC: UIViewController {
             
             let typing = dataDict["typing"] as? Int ?? 0
             let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
-            let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
+           // let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
             
             if self.item_offer_id == item_offer_id {
                 self.lblTypingStatus.isHidden = (typing == 1) ? false : true
+                typingOtherTimer?.invalidate()
+                typingOtherTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
+                    self?.lblTypingStatus.isHidden = true
+                    self?.typingOtherTimer?.invalidate()
+                 }
             }
             
         }
@@ -974,37 +988,51 @@ extension ChatVC: GrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: GrowingTextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
        
-        
-        
+        userIsTyping(text: text)
+
+        /*
                if !isTyping {
                     isTyping = true
                   self.sendtypinStatus(status: true)
                 }
                 resetTypingTimer()
-        
-       /* if text.count > 0{
-            self.sendtypinStatus(status: true)
-
-        }else{
-            //self.sendtypinStatus(status: false)
-        }
         */
+      
         return true
     }
     
-    func resetTypingTimer() {
-         typingTimer?.invalidate()
-         typingTimer = Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { [weak self] _ in
-             self?.userStoppedTyping()
-         }
-     }
+    
+    
+    func userIsTyping(text: String) {
+        if !isTyping {
+            isTyping = true
+            self.sendtypinStatus(status: true)
+        }
 
-     func userStoppedTyping() {
-         if isTyping {
-             isTyping = false
-             self.sendtypinStatus(status: false)
-         }
-     }
+        // Reset the timer
+        typingTimer?.invalidate()
+        typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            self.isTyping = false
+            self.sendtypinStatus(status: false)
+        }
+    }
+
+  
+//    
+//    func resetTypingTimer() {
+//         typingTimer?.invalidate()
+//         typingTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
+//             self?.userStoppedTyping()
+//         }
+//     }
+//
+//     func userStoppedTyping() {
+//         if isTyping {
+//             isTyping = false
+//             self.sendtypinStatus(status: false)
+//         }
+//     }
 
     func growingTextViewDidBeginEditing(_ growingTextView: GrowingTextView) {
       //  self.sendtypinStatus(status: true)
@@ -1135,7 +1163,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             case "offer": do{
                 
                 cell = tableView.dequeueReusableCell(withIdentifier: "SendOfferChatCell", for: indexPath) as! SendOfferChatCell
-                cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                cell.lblMessage.attributedText = NSAttributedString(string:  "\(Local.shared.currencySymbol) \(chatObj.message ?? "")")
                 DispatchQueue.main.async {
                     cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                     cell.bgview.updateConstraints()
@@ -1293,7 +1321,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 case "offer": do{
                     cell = tableView.dequeueReusableCell(withIdentifier: "RecieveOfferChatCell", for: indexPath) as! RecieveOfferChatCell
                     
-                    cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                    cell.lblMessage.attributedText = NSAttributedString(string: "\(Local.shared.currencySymbol) \(chatObj.message ?? "")")
                     cell.lblTime.text = dateFormatter.string(from: date)
 
                     DispatchQueue.main.async {

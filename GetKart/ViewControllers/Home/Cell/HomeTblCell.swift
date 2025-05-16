@@ -108,8 +108,9 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             if let obj = listArray?[indexPath.item] as? ItemModel{
                 cell.lblItem.text = obj.name
                 cell.lblAddress.text = obj.address
-                cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
-                
+                cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
+                cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
+
                 let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
                 cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
                 
@@ -119,14 +120,13 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 
                 let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
                 
-                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"),
+                cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") ,
+                                             placeholder:UIImage(named: "getkartplaceholder"),
                                              options: [
                                                 .processor(processor),
                                                 .scaleFactor(UIScreen.main.scale)
                                              ])
 
-           
-           
             }
 
             return cell

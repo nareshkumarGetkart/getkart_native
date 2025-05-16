@@ -29,7 +29,7 @@ struct MyLocationView: View {
                         .frame(height: 50, alignment: .center)
                 }.padding(.top ,30)
                 HStack{
-                    Text("Enjoy a personalize selling and buying experience by telling us your locaiton")
+                    Text("Enjoy a personalize selling and buying experience by telling us your location")
                         .font(Font.manrope(.regular, size: 20.0))
                         .foregroundColor(.gray)
                         .padding([.leading, .trailing], 20.0)

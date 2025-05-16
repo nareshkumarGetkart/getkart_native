@@ -30,24 +30,24 @@
                         <rect key="frame" x="10" y="2.6666666666666679" width="300" height="55"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete_illustrator" translatesAutoresizingMaskIntoConstraints="NO" id="uuS-Mc-LQk">
-                                <rect key="frame" x="10" y="5" width="45" height="45"/>
+                                <rect key="frame" x="7" y="5" width="45" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="Lu4-xl-XXf"/>
                                     <constraint firstAttribute="width" constant="45" id="RuF-qT-Th4"/>
                                 </constraints>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Al7-1I-uME">
-                                <rect key="frame" x="31" y="23" width="25" height="25"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Al7-1I-uME">
+                                <rect key="frame" x="33" y="26" width="25" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="XQb-t5-3II"/>
                                     <constraint firstAttribute="width" constant="25" id="haO-DB-RYG"/>
                                 </constraints>
                             </imageView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="acw-p5-U79">
-                                <rect key="frame" x="61" y="-2.3333333333333321" width="209" height="59.333333333333329"/>
+                                <rect key="frame" x="64" y="-2.3333333333333321" width="206" height="59.333333333333329"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Syi-sc-OzF">
-                                        <rect key="frame" x="0.0" y="0.0" width="209" height="20"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="206" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="q2A-qC-if5"/>
                                         </constraints>
@@ -56,7 +56,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jpp-iv-N9r">
-                                        <rect key="frame" x="0.0" y="21" width="209" height="18"/>
+                                        <rect key="frame" x="0.0" y="21" width="206" height="18"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="18" id="qSn-h0-zIR"/>
                                         </constraints>
@@ -65,7 +65,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rue-hB-vsY">
-                                        <rect key="frame" x="0.0" y="40" width="209" height="19.333333333333329"/>
+                                        <rect key="frame" x="0.0" y="40" width="206" height="19.333333333333329"/>
                                         <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="14"/>
                                         <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
@@ -73,11 +73,11 @@
                                 </subviews>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="diG-a2-ssS">
-                                <rect key="frame" x="270" y="25" width="5" height="5"/>
+                                <rect key="frame" x="267" y="23.333333333333332" width="8" height="8"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="5" id="7iU-zK-hef"/>
-                                    <constraint firstAttribute="width" constant="5" id="a1m-Ze-mTl"/>
+                                    <constraint firstAttribute="height" constant="8" id="7iU-zK-hef"/>
+                                    <constraint firstAttribute="width" constant="8" id="a1m-Ze-mTl"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -97,14 +97,14 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="2PJ-NG-CSO" secondAttribute="trailing" constant="6" id="3gR-my-tdy"/>
-                            <constraint firstItem="acw-p5-U79" firstAttribute="leading" secondItem="Al7-1I-uME" secondAttribute="trailing" constant="5" id="4Y3-tN-zcZ"/>
-                            <constraint firstItem="Al7-1I-uME" firstAttribute="leading" secondItem="uuS-Mc-LQk" secondAttribute="trailing" constant="-24" id="KdQ-JV-Dcj"/>
+                            <constraint firstItem="acw-p5-U79" firstAttribute="leading" secondItem="Al7-1I-uME" secondAttribute="trailing" constant="6" id="4Y3-tN-zcZ"/>
+                            <constraint firstItem="Al7-1I-uME" firstAttribute="leading" secondItem="uuS-Mc-LQk" secondAttribute="trailing" constant="-19" id="KdQ-JV-Dcj"/>
                             <constraint firstItem="2PJ-NG-CSO" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" id="Mo7-og-Bej"/>
                             <constraint firstAttribute="trailing" secondItem="acw-p5-U79" secondAttribute="trailing" constant="30" id="OjZ-pK-FR1"/>
-                            <constraint firstItem="Al7-1I-uME" firstAttribute="top" secondItem="uuS-Mc-LQk" secondAttribute="bottom" constant="-27" id="Rh3-Rs-zfY"/>
+                            <constraint firstItem="Al7-1I-uME" firstAttribute="top" secondItem="uuS-Mc-LQk" secondAttribute="bottom" constant="-24" id="Rh3-Rs-zfY"/>
                             <constraint firstItem="acw-p5-U79" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" id="dHk-Pm-IGX"/>
                             <constraint firstAttribute="trailing" secondItem="diG-a2-ssS" secondAttribute="trailing" constant="25" id="gjt-oe-wxU"/>
-                            <constraint firstItem="uuS-Mc-LQk" firstAttribute="leading" secondItem="Svt-8B-KGg" secondAttribute="leading" constant="10" id="mgV-gr-0PK"/>
+                            <constraint firstItem="uuS-Mc-LQk" firstAttribute="leading" secondItem="Svt-8B-KGg" secondAttribute="leading" constant="7" id="mgV-gr-0PK"/>
                             <constraint firstItem="uuS-Mc-LQk" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" id="skt-U3-fKF"/>
                             <constraint firstItem="diG-a2-ssS" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" id="xOp-3N-2b8"/>
                         </constraints>

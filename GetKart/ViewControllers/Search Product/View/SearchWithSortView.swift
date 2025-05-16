@@ -210,7 +210,9 @@ struct SearchWithSortView: View {
     private var gridView: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
             ForEach($objVM.items, id: \.id) { $item in
-                ProductCard(objItem: $item)
+                ProductCard(objItem: $item, onItemLikeDislike: { likedObj in
+                    
+                })
                     .onTapGesture {
                         let itemId = item.id ?? 0
                         self.pushToDetailScreen(id: itemId, item: item)

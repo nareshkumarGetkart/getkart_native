@@ -21,10 +21,10 @@ struct TransactionHistoryView: View {
                 // Action to go back
                 navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
-            Text("Transaction History").font(.custom("Manrope-Bold", size: 20.0))
+            Text("Order History").font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)
             
             Spacer()
@@ -175,7 +175,7 @@ struct TransactionRow: View {
 
             VStack(alignment: .trailing){
                 
-                Text("\(Local.shared.currencySymbol) \( String(format: "%.2f", transaction.paymentTransaction?.amount ?? 0.0))")
+                Text("\(Local.shared.currencySymbol) \((transaction.paymentTransaction?.amount ?? 0.0).formatNumber())")
                     .font(.headline)
                     .foregroundColor(.black).padding(.trailing,10)
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""

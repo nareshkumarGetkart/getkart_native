@@ -58,7 +58,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             locStr =  locStr.count > 0 ? locStr + ", " + state : state
         }
         if country.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + country : country
+            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
         }
         
         if locStr.count == 0 {

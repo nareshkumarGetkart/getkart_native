@@ -125,14 +125,15 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 if let obj = listArray?[indexPath.item] as? ItemModel{
                     cell.lblItem.text = obj.name
                     cell.lblAddress.text = obj.address
-                    cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
+                    cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
                     // cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
                     let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
                     cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
                     cell.btnLike.tag = indexPath.item
                     cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
                     
-                    
+                    cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
+
                     
                     
                     let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)

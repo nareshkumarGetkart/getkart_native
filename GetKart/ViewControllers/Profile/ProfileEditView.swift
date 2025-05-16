@@ -149,7 +149,6 @@ struct ProfileEditView: View {
             } else {
                 // Fallback on earlier versions
                 
-                
                 OTPPopup(
                     showOTPPopup: $showOTPPopup,
                     otp: "",
@@ -228,6 +227,7 @@ struct ProfileEditView: View {
             }
         }
     }
+   
     func getUserProfileApi(){
         
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()

@@ -24,7 +24,8 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
      var navigationController: UINavigationController?
     @State var popType:PopType?
     @State var params:Dictionary<String,Any> = [:]
-    
+    var onAppeared: (() -> Void)?
+
 //    @State var mapRegion = MKCoordinateRegion(
 //        center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0),
 //        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -42,14 +43,15 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
                 Text("Confirm Location")
                     .font(Font.manrope(.bold, size: 20.0))
                     .foregroundColor(.black)
                 Spacer()
-            }.frame(height:44).background(Color.white).onAppear{
+            }.frame(height:44).background(Color.white)
+            .onAppear{
                 if isfirst{
                     isfirst = false
                     
@@ -66,6 +68,11 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     }
 
                 }
+                
+                // Ensure it's not called multiple times
+                               DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                   onAppeared?()
+                               }
             }
             
         VStack(spacing: 10) {
@@ -93,9 +100,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                         }
                         
             if viewModel.selectedCoordinate.latitude != 0.0 {
-                
-           
-                
+                                
                 TapMapView1(coordinate: $viewModel.selectedCoordinate, mapRegion: $viewModel.mapRegion,locationInfo: $viewModel.locationInfo, range:$range1, circle: $viewModel.circle,delegate: self)
             }else {
                 TapMapView1(coordinate: $viewModel.selectedCoordinate, mapRegion: $viewModel.mapRegion,locationInfo: $viewModel.locationInfo, range:$range1, circle: $viewModel.circle,delegate: self)
@@ -196,9 +201,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     
      func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
         
-             DispatchQueue.main.async {
-                    self.viewModel.updateLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
-                }
+            
          
              self.params[AddKeys.address.rawValue] = city + ", " + state + ", " + country
              self.params[AddKeys.latitude.rawValue] = latitude
@@ -206,6 +209,10 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
              self.params[AddKeys.country.rawValue] = country
              self.params[AddKeys.city.rawValue] = city
              self.params[AddKeys.state.rawValue] = state
+         
+         DispatchQueue.main.async {
+               self.viewModel.updateLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
+           }
          
         /* if viewModel.selectedCoordinate.latitude != Double(latitude) {
              viewModel.selectedCoordinate.latitude = Double(latitude) ?? 0.0
@@ -267,9 +274,13 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                             let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
                             if let itemObj = item.data?.first {
                                 
-                                if itemObj.status == "draft"{
+                                if itemObj.status?.lowercased() == "draft"{
                                     DispatchQueue.main.async {
-                                        self.navigationController?.popToRootViewController(animated: true)
+                                        
+                                        let swiftView = AdNotPostedView(navigationController: self.navigationController,itemObj: itemObj)
+                                        let destVC = UIHostingController(rootView: swiftView)
+                                        self.navigationController?.pushViewController(destVC, animated: true)
+                             
                                     }
                                 }
                             }
@@ -336,6 +347,24 @@ extension ConfirmLocationCreateAdd :LocationAutorizationUpdated {
             }
         }else{
             
+        }
+    }
+}
+
+
+
+
+import SwiftUI
+
+class ConfirmLocationHostingController: UIHostingController<ConfirmLocationCreateAdd> {
+    var onDidAppear: (() -> Void)?
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        // Ensure delegate call after view is fully shown
+        DispatchQueue.main.async {
+            self.onDidAppear?()
         }
     }
 }

@@ -20,8 +20,8 @@ struct UserVerifyStep2: View{
                 // Action to go back
                 navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Spacer()
         }.frame(height: 44)

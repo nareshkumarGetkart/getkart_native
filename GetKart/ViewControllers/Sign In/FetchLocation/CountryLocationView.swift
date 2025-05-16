@@ -133,14 +133,17 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             */
             // MARK: - List of Countries
             ScrollView{
-                if popType == .filter || popType == .home{
+              /*  if popType == .filter || popType == .home{
                     CountryRow(strTitle:"All Countries")
                         .frame(height: 40)//.padding(.horizontal)
                         .onTapGesture{
                             self.allCountrySelected()
                         }
                     Divider()
-                }/*else {
+                }
+                */
+                
+                /*else {
                     CountryRow(strTitle:"Choose Country")
                         .frame(height: 40)//.padding(.horizontal)
                         .onTapGesture{
@@ -177,7 +180,11 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             .onAppear{
               fetchCountryListing()
                 if isFirstTime == true {
-                    findMyLocationAction()
+                    
+                    if locationManager.isCurrentLocationEnabled(){
+                        findMyLocationAction()
+                    }
+                   // findMyLocationAction()
                 }
         }
         .navigationTitle("Location")
@@ -262,7 +269,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }else  if popType == .createPost {
                 
                
-                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                if let vc1 = vc as? ConfirmLocationHostingController {
                     delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: "")
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
@@ -311,7 +318,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     }
                 
             }else  if popType == .createPost {
-                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                if let vc1 = vc as? ConfirmLocationHostingController {
                     
                     delLocationSelected?.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
                         self.navigationController?.popToViewController(vc1, animated: true)
@@ -421,7 +428,7 @@ protocol LocationSelectedDelegate{
     
 }
 
-extension LocationSelectedDelegate{
+extension LocationSelectedDelegate {
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String){}
     func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double){}
 }

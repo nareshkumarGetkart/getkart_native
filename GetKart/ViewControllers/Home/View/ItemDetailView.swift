@@ -27,7 +27,8 @@ struct ItemDetailView: View {
     @State private var showShareSheet = false
     @State private var showMoreOptionSheet = false
     @State private var showConfirmDeactvatePopup = false
-
+    @State private var videoPlayer: AVPlayer? = nil
+    @State private var isVideoVisible = false
     @State var isMyProduct = false
     @State private var showConfirmDialog = false
     // Declare callback function variable
@@ -70,8 +71,8 @@ struct ItemDetailView: View {
         Divider()
    
         ScrollView(.vertical, showsIndicators: false) {
+           
             LazyVStack(alignment: .leading) {
-                
                 
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 let isFeatured = objVM.itemObj?.isFeature ?? false
@@ -91,40 +92,44 @@ struct ItemDetailView: View {
                                         let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
                                         let bothConditionTrue = isLast && isVideoAvailable
                                         if  bothConditionTrue {
-                                            if let videoURL = URL(string: img) {
                                                 
-                                               // if !videoURL.contains(".mp4"){
-                                                   // videoURL = videoURL + ".mp4"
-                                              //  }
-                                                let player = AVPlayer(url: videoURL)
-                                                VideoPlayer(player: player)
-                                                    .frame(height: 200)
-                                                    .cornerRadius(10)
-                                                    .padding(.horizontal, 5)
-                                            }
-                                                
+                                                if img.contains("youtube.com"){
+                                                    YouTubeWebView(videoID:extractYouTubeID(from: img), isVisible: $isVideoVisible).frame(height: 200)
+                                                        .cornerRadius(10)
+                                                        .padding(.horizontal, 5)
+                                                        .onAppear {
+                                                            // When the video is on screen, make sure it's playing
+                                                            self.isVideoVisible = true
+                                                        }
+                                                        .onDisappear {
+                                                            // When the video disappears, pause it
+                                                            self.isVideoVisible = false
+                                                        } .tag(index)
+                                                }else{
+                                                  
+                                                    WebVideoView(videoURL:img)
+                                                        .frame(height: 200)
+                                                        .cornerRadius(10)
+                                                        .padding(.horizontal, 5) .tag(index)
+                                                }
+  
                                         } else {
                                             
                                             AsyncImage(url: URL(string: img)) { image in
                                                 image
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fit)
-                                                // .aspectRatio(contentMode: .fill)
                                                     .frame(height: 200)
-                                                //.cornerRadius(10)
                                                     .padding(.horizontal, 5)
                                                     .onAppear {
                                                         extractDominantColor(from: image)
                                                         
-                                                    }//.background(backgroundColor.opacity(0.4))
+                                                    }
                                             } placeholder: {
                                                 Image("getkartplaceholder")
                                                     .aspectRatio(contentMode: .fit)
                                                     .frame(height: 200)
-                                                //.cornerRadius(10)
                                                     .padding(.horizontal, 5)
-                                                // .background(backgroundColor.opacity(0.4))
-                                                //                                            ProgressView().progressViewStyle(.circular)
                                             }
                                             .tag(index)
                                             .onTapGesture {
@@ -164,11 +169,11 @@ struct ItemDetailView: View {
                     HStack{
                         
                         if (objVM.itemObj?.isFeature ?? false) == true{
-                            Text("Boost").frame(width:70,height:25)
+                            Text("Boosted").frame(width:75,height:25)
                                 .background(.orange)
                                 .cornerRadius(5)
-                                .foregroundColor(.white)
-                                .padding(.horizontal)
+                                .foregroundColor(Color(UIColor.label))
+                                .padding(.horizontal).padding(.top,5)
                         }
                         
                         Spacer()
@@ -223,15 +228,18 @@ struct ItemDetailView: View {
                     .foregroundColor(.gray)
                 }
                 
-                Text(objVM.itemObj?.name ?? "").font(Font.manrope(.medium, size: 16))
+                Text(objVM.itemObj?.name ?? "")
                     .font(Font.manrope(.medium, size: 16))
-                    .padding(.top, 10).padding(5)
+                    .padding(.top, 10)
+                    .padding(5)
                 
                 HStack{
                     
-                    Text("\(Local.shared.currencySymbol) \(objVM.itemObj?.price ?? 0)")
+                    Text("\(Local.shared.currencySymbol) \((objVM.itemObj?.price ?? 0.0).formatNumber())")
                         .font(Font.manrope(.medium, size: 16))
-                        .foregroundColor(Color(hex: "#FF9900")).padding(5).padding(.bottom,10)
+                        .foregroundColor(Color(hex: "#FF9900"))
+                        .padding(5)
+                        .padding(.bottom,10)
                     
                     Spacer()
                     if loggedInUserId == itemUserId {
@@ -253,11 +261,17 @@ struct ItemDetailView: View {
                 HStack{
                     HStack{
                         Image("location_icon").renderingMode(.template).foregroundColor(.orange)
-                        Text(objVM.itemObj?.address ?? "").lineLimit(1)
+                        Text(objVM.itemObj?.address ?? "")
+                        .lineLimit(1)
+                        .font(Font.manrope(.medium, size: 15))
                     }
                     Spacer()
-                    Text(objVM.itemObj?.expiryDate ?? "")
-                }.padding(5).padding(.bottom,10)
+                    
+                    
+                    Text(getFormattedCreatedDate())
+                        .font(Font.manrope(.medium, size: 15))
+                }.padding(5)
+                .padding(.bottom,10)
                 
                 
                 if (loggedInUserId == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft"{
@@ -291,6 +305,7 @@ struct ItemDetailView: View {
                     }
                     .background(Color.yellow.opacity(0.2))
                     .cornerRadius(10)
+                    .padding(.bottom)
                 }
                 if !isFeatured && (loggedInUserId == itemUserId) && objVM.itemObj?.status == "approved"{
                     
@@ -323,6 +338,7 @@ struct ItemDetailView: View {
                     }
                     .background(Color.yellow.opacity(0.2))
                     .cornerRadius(10)
+                    .padding(.bottom)
                 }
                 
                 
@@ -335,29 +351,38 @@ struct ItemDetailView: View {
                     if let arr = objVM.itemObj?.customFields{
                         ForEach(arr){obj in
                             
-                            InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""))
+                            InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),navController: self.navController)
                         }
                     }
                 }
                 
-                Divider()
-              //  VStack(alignment: .leading) {
+                
+                VStack(alignment:.leading) {
+                    Divider().padding(.top)
                     Text("About this item").font(Font.manrope(.semiBold, size: 16))
-                    Text(objVM.itemObj?.description ?? "").font(Font.manrope(.regular, size: 15)).foregroundColor(.gray)
-               // }.padding(.vertical,1)
-                
-                Divider()
-                SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "")
-                    .onTapGesture {
+                    Text(objVM.itemObj?.description ?? "")
+                    .font(Font.manrope(.regular, size: 15))
+                    .foregroundColor(.gray)
                     
-                    let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
-                    self.navController?.pushViewController(hostingController, animated: true)
-                }
-                
-                Text("Location").font(Font.manrope(.semiBold, size: 16))
+                    Divider().padding(.bottom)
+                    
+                  
+                    
+                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact)
+                        .onTapGesture {
+                        
+                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
+                        self.navController?.pushViewController(hostingController, animated: true)
+                    }
+                    
+                    Text("Location").font(Font.manrope(.semiBold, size: 16))
+                }//.padding(.vertical,1)
+                                
+              
                 
                 HStack{
-                    Image("location_icon").renderingMode(.template).foregroundColor(.orange)
+                    Image("location_icon").renderingMode(.template)
+                    .foregroundColor(.orange)
                     Text(objVM.itemObj?.address ?? "")
                     Spacer()
                 }
@@ -420,17 +445,70 @@ struct ItemDetailView: View {
                     
                 }
                 }
-           
-                HStack{
+                LazyVStack(alignment: .leading, spacing: 8) {
                     
-                    Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
-                    Spacer()
+                    HStack{
+                        
+                        Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
+                        Spacer()
+                    }//.padding(.bottom)
                     
-                }//.padding(.horizontal)
+                    
+                  /*  ScrollView(.horizontal, showsIndicators: false) {
+                        //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
+                          HStack(spacing: 10) {
+                              ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
+                                  ProductCard(objItem: $item)
+                                      .onTapGesture {
+                                          var swiftUIview = ItemDetailView(
+                                              navController: self.navController,
+                                              itemId: item.id ?? 0,
+                                              itemObj: item,
+                                              slug: item.slug
+                                          )
+                                          swiftUIview.returnValue = { value in
+                                              if let obj = value {
+                                                  updateItemInList(obj)
+                                              }
+                                          }
+                                          let hostingController = UIHostingController(rootView:swiftUIview)
+                                          self.navController?.pushViewController(hostingController, animated: true)
+                                      }
+                              }
+                          }
+                         .padding([.bottom])
+                      }.id("related-scroll")
+                    */
+                    RelatedItemsRow(
+                        items:  objVM.relatedDataItemArray, //.map { $0 },
+                        onItemTapped: { item in
+                            var swiftUIview = ItemDetailView(
+                                navController: self.navController,
+                                itemId: item.id ?? 0,
+                                itemObj: item,
+                                slug: item.slug
+                            )
+                            swiftUIview.returnValue = { value in
+                                if let obj = value {
+                                    updateItemInList(obj)
+                                }
+                            }
+                            let hostingController = UIHostingController(rootView: swiftUIview)
+                            self.navController?.pushViewController(hostingController, animated: true)
+                        }) { likedObj in
+                            updateItemInList(likedObj)
+
+                        }
+                    
                 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHGrid(rows: [GridItem(.adaptive(minimum: 150))], spacing: 10) {
-                        ForEach($objVM.relatedDataItemArray) { $item in
+                    
+                    
+                }
+                
+              /*  ScrollView(.horizontal, showsIndicators: false) {
+                  //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
+                    HStack(spacing: 10) {
+                        ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
                             ProductCard(objItem: $item)
                                 .onTapGesture {
                                     var swiftUIview = ItemDetailView(
@@ -450,8 +528,10 @@ struct ItemDetailView: View {
                         }
                     }
                    .padding([.bottom])
-                }
-            }.padding(.vertical).padding(.horizontal)
+                }.id("related-scroll")
+                */
+            }.padding(.vertical)
+            .padding(.horizontal)
                
         }
         .navigationBarHidden(true)
@@ -489,7 +569,7 @@ struct ItemDetailView: View {
                     userId = buyer_id
                 }
                 objVM.itemObj?.isAlreadyOffered = true
-                objVM.itemObj?.itemOffers = [ItemOffers(amount: objVM.itemObj?.price, buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
+                objVM.itemObj?.itemOffers = [ItemOffers(amount: Int(objVM.itemObj?.price ?? 0.0), buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
                 
                 let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                 destVC.item_offer_id = id
@@ -509,37 +589,8 @@ struct ItemDetailView: View {
             // Apply detents and drag indicator only if iOS 16+
             .modifier(PresentationModifier())
         }
-
         
-      /*  .sheet(isPresented: $showSheet ) {
-            if #available(iOS 16.0, *) {
-                SafetyTipsView(onContinueOfferTap: {
-                    print("offer tap")
-                    
-                    self.showOfferPopup = true
-                    
-                    
-                }).transition(.move(edge: .bottom))
-                    .presentationDetents([.medium, .medium]) // Customizable sizes
-                    .presentationDragIndicator(.visible)
-                
-                
-            } else {
-                // Fallback on earlier versions
-                
-               // if showSheet {
-                    SafetyTipsView(onContinueOfferTap: {
-                        
-                        self.showOfferPopup = true
-                        
-                        print("offer tap")
-                    }).transition(.move(edge: .bottom))
-                    .zIndex(1)
-              //  }
-            } // Shows the drag indicator
-        }
-        
-        */
+      
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         let loggedInUserId = objLoggedInUser.id ?? 0
         let itemUserId = objVM.itemObj?.userID ?? 0
@@ -667,7 +718,7 @@ struct ItemDetailView: View {
                             
                             var markAsSold = MarkAsSoldView(navController: self.navController)
                             markAsSold.productTitle = objVM.itemObj?.name ?? ""
-                            markAsSold.price = objVM.itemObj?.price ?? 0
+                            markAsSold.price = Int(objVM.itemObj?.price ?? 0.0)
                             markAsSold.productImg = objVM.itemObj?.image ?? ""
                             markAsSold.itemId = objVM.itemObj?.id ?? 0
                             let hostingController = UIHostingController(rootView: markAsSold)
@@ -694,7 +745,6 @@ struct ItemDetailView: View {
                 print("Make an Offer")
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                    
                     
                     
                     if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
@@ -742,7 +792,7 @@ struct ItemDetailView: View {
                 if #available(iOS 16.4, *) {
                     MakeAnOfferView(
                         isPresented: $showOfferPopup,
-                        sellerPrice: "\(objVM.itemObj?.price ?? 0)",
+                        sellerPrice: objVM.itemObj?.price ?? 0.0,
                         onOfferSubmit: { offer in
                             // submittedOffer = offer
                             print("User submitted offer: ₹\(offer)")
@@ -757,7 +807,7 @@ struct ItemDetailView: View {
                     
                     MakeAnOfferView(
                         isPresented: $showOfferPopup,
-                        sellerPrice: "\(objVM.itemObj?.price ?? 0)",
+                        sellerPrice: objVM.itemObj?.price ?? 0.0,
                         onOfferSubmit: { offer in
                             // submittedOffer = offer
                             callOfferSocket(amount: offer)
@@ -814,8 +864,7 @@ struct ItemDetailView: View {
         
         if (objVM.itemObj?.videoLink?.count ?? 0) > 0
         {
-            var arr = objVM.galleryImgArray
-            vc.imageArrayUrl = arr.dropLast()
+            vc.imageArrayUrl = objVM.galleryImgArray.dropLast()
         }else{
             vc.imageArrayUrl = objVM.galleryImgArray
         }
@@ -844,6 +893,28 @@ struct ItemDetailView: View {
         default:
             return (.clear, .black, status)
         }
+    }
+    
+    func getFormattedCreatedDate() -> String{
+       
+        
+        let isoDateString = objVM.itemObj?.createdAt ?? ""
+
+        let isoFormatter = DateFormatter()
+        isoFormatter.locale = Locale(identifier: "en_US_POSIX")
+        isoFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+
+        if let date = isoFormatter.date(from: isoDateString) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "yyyy-MM-dd"
+            let formattedDate = outputFormatter.string(from: date)
+            print(formattedDate) // Output: 2025-03-19
+            return formattedDate
+        } else {
+            print("Invalid date string")
+            return ""
+        }
+
     }
     
     
@@ -969,6 +1040,38 @@ struct ItemDetailView: View {
         
     }
     
+
+    func extractYouTubeID(from urlString: String) -> String {
+        let patterns = [
+            "youtube\\.com/watch\\?v=([\\w-]{11})",
+            "youtu\\.be/([\\w-]{11})",
+            "youtube\\.com/embed/([\\w-]{11})"
+        ]
+
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+               let match = regex.firstMatch(in: urlString, options: [], range: NSRange(urlString.startIndex..., in: urlString)),
+               let range = Range(match.range(at: 1), in: urlString) {
+                return String(urlString[range])
+            }
+        }
+
+        return ""
+    }
+
+    
+    var isVisibleContact: Int {
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        let loggedInUserId = objLoggedInUser.id ?? 0
+        let itemUserId = objVM.itemObj?.userID ?? 0
+        
+        if loggedInUserId == itemUserId {
+            return 0
+        } else {
+            return objVM.sellerObj?.mobileVisibility ?? 1
+        }
+    }
+    
 }
 
 
@@ -983,6 +1086,8 @@ struct InfoView: View {
     let icon: String
     let text: String
     let value:String
+    var navController:UINavigationController?
+
     
     var body: some View {
         HStack {
@@ -1004,17 +1109,44 @@ struct InfoView: View {
                  }
             }
        
-            VStack(alignment: .leading){
-                Spacer()
+            VStack(alignment: .leading,spacing: 0){
+               // Spacer()
                 Text(text)
-                    .font(.manrope(.regular, size: 10)).foregroundColor(.gray)
-                Text(value)
-                    .font(.manrope(.medium, size: 14)).foregroundColor(.black)
-                Spacer()
+                    .font(.manrope(.regular, size: 12)).foregroundColor(.gray).lineLimit(2)
+                
+                if value.contains("http"){
+                    Button(action: {
+                        if let url = URL(string: value){
+                           
+                            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:value))
+                            
+                            navController?.pushViewController(vc, animated: true)
+
+                        }
+                    }) {
+                         AsyncImage(url: URL(string: value)) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width:30, height: 30)
+                            
+                        }placeholder: {
+                            
+                            Image("getkartplaceholder").resizable()
+                                .scaledToFit()
+                                .frame(width:30, height: 30)
+                        }
+                    }
+                }else{
+                    Text(value)
+                        .font(.manrope(.medium, size: 15)).foregroundColor(.black).lineLimit(2)
+                }
+               // Spacer()
 
             }
         }
         .padding(.horizontal)
+        .padding(.bottom)
     }
 }
 
@@ -1026,11 +1158,11 @@ struct SellerInfoView: View {
     let email: String
     let image: String
     let mobile: String
+    var mobileVisibility:Int = 1
     @State private var showMessageView = false
 
     var body: some View {
         VStack(alignment: .leading) {
-            
             HStack{
                 Button {
                     
@@ -1058,11 +1190,12 @@ struct SellerInfoView: View {
                     Text(email)
                         .font(.subheadline)
                         .foregroundColor(.black)
-                }
+                }.padding(.trailing,5)
                 
                 
-                HStack{
+              //  HStack{
                     Spacer(minLength: 0)
+                if mobileVisibility == 1 {
                     Button {
                         showMessageView = true
                         
@@ -1073,25 +1206,28 @@ struct SellerInfoView: View {
                             .stroke(Color.gray, lineWidth: 0.5)
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
+                    
                     Button {
                         callToSellerMobileNumber()
                     } label: {
-                        Image("call").renderingMode(.template).foregroundColor(.orange)
+                        Image("call").renderingMode(.template)
+                            .foregroundColor(.orange)
                     }.frame(width: 40,height: 40).overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.gray, lineWidth: 0.5)
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
-                    Button {
+                }
+                  /*  Button {
                         
                     } label: {
-                        Image("arrow_right").renderingMode(.template).foregroundColor(.orange)
+                       
                   
                     }.frame(width: 20,height: 20)
+                */
+                Image("arrow_right").renderingMode(.template).foregroundColor(.orange).frame(width: 20,height: 20)
 
-                }.padding(.leading)
+               // }.padding(.leading,5)
             }
         }.sheet(isPresented: $showMessageView) {
             if MFMessageComposeViewController.canSendText() {
@@ -1116,6 +1252,47 @@ struct SellerInfoView: View {
     }
 }
 
+
+
+
+
+
+struct RelatedItemsRow: View {
+    @State var items: [ItemModel]
+    var onItemTapped: (ItemModel) -> Void
+    var onItemLikedTapped: (ItemModel) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 10) {
+                
+                
+          //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 30))], spacing: 10) {
+
+                ForEach($items, id: \.id) { $item in
+                    ProductCard(objItem: $item,onItemLikeDislike: { likedObj in
+                      //  updateItemInList(likedObj)
+                       // onItemLikedTapped(likedObj)
+                        
+                    }) // Use constant binding to avoid update issues
+                        .onTapGesture {
+                            onItemTapped(item)
+                        }
+                        
+                }
+            }.padding([.bottom])
+           // .padding(.horizontal)
+        }
+       // .frame(height: widthScreen / 2.0 + 30)
+    }
+    
+    
+//    private func updateItemInList(_ value: ItemModel) {
+//        if let index = items.firstIndex(where: { $0.id == value.id }) {
+//            items[index] = value
+//        }
+//    }
+}
 
 
 import SwiftUI
@@ -1234,4 +1411,75 @@ extension UIImage {
                        blue: CGFloat(bitmap[2]) / 255,
                        alpha: 1)
     }
+}
+
+
+
+import SwiftUI
+import WebKit
+
+struct WebVideoView: UIViewRepresentable {
+    let videoURL: String
+
+    func makeUIView(context: Context) -> WKWebView {
+        return WKWebView()
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        let embedHTML = """
+               <html>
+               <head>
+                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+               </head>
+               <body style="margin:0;padding:0;">
+                   <iframe src="https://www.facebook.com/plugins/video.php?href=\(videoURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&show_text=false&width=560"
+                       width="100%" height="100%" style="border:none;overflow:hidden" scrolling="no" frameborder="0"
+                       allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+                   </iframe>
+               </body>
+               </html>
+               """
+               webView.loadHTMLString(embedHTML, baseURL: nil)
+    }
+}
+
+
+
+struct YouTubeWebView: UIViewRepresentable {
+    let videoID: String
+    @Binding var isVisible: Bool  // To track visibility
+
+    func makeUIView(context: Context) -> WKWebView {
+        WKWebView()
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        let embedURL = "https://www.youtube.com/embed/\(videoID)?autoplay=1&mute=0&playsinline=1"
+        let html = """
+        <html>
+        <body style="margin:0;padding:0;">
+            <iframe width="100%" height="100%" src="\(embedURL)"
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </body>
+        </html>
+        """
+        webView.loadHTMLString(html, baseURL: nil)
+        
+        // Pause the video if it is not visible
+               if !isVisible {
+                   pauseVideo(webView: webView)
+               }
+    }
+    
+    func pauseVideo(webView: WKWebView) {
+           let pauseScript = """
+           var iframe = document.getElementById('youtube-video');
+           var player = new YT.Player(iframe);
+           player.pauseVideo();
+           """
+           webView.evaluateJavaScript(pauseScript, completionHandler: nil)
+       }
 }

@@ -10,6 +10,7 @@ import FittedSheets
 import PhonePePayment
 import StoreKit
 import SwiftUI
+
 class PayPlanVC: UIViewController {
     
     private var merchantId = ""
@@ -27,7 +28,17 @@ class PayPlanVC: UIViewController {
     
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     
-    //MARK: COntroller life cycle methods
+    
+    var categoryId = 0
+    var categoryName = ""
+    var city = ""
+    var country = ""
+    var state = ""
+    var latitude = ""
+    var longitude = ""
+    
+    
+    //MARK: Controller life cycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,9 +69,8 @@ class PayPlanVC: UIViewController {
     }
     
     func getPaymentSettings(){
-        let params:Dictionary<String, Any> = [:]
+
         URLhandler.sharedinstance.makeCall(url: Constant.shared.getPaymentSettings, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
-            
             
             if(error != nil)
             {
@@ -107,10 +117,8 @@ class PayPlanVC: UIViewController {
                         }
                     }
                     
-                    
-                    
                 }else{
-                    //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
                 }
                 
             }
@@ -119,9 +127,10 @@ class PayPlanVC: UIViewController {
     
     
     func updateOrderApi(){
+        
         let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId]
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post) { responseObject, error in
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
             if(error != nil)
             {
@@ -143,7 +152,6 @@ class PayPlanVC: UIViewController {
                     }
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
-                    //self?.delegate?.showError(message: message)
                 }
             }
         }
@@ -153,8 +161,8 @@ class PayPlanVC: UIViewController {
     
     
     func createPhonePayOrder(package_id:Int){
-        
-        let params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app"]
+                
+        let params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.paymentIntent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
             
@@ -220,10 +228,6 @@ class PayPlanVC: UIViewController {
             */
         }
     }
-    
-    
-    
-    
 }
 
 
@@ -232,9 +236,9 @@ extension PayPlanVC {
     
     func updateInAppPurchaseOrderApi(transactionId:String){
         //
-        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt]
+        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city]
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post) { responseObject, error in
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
             if(error != nil)
             {
@@ -249,11 +253,15 @@ extension PayPlanVC {
                 
                 if status == 200{
                     self.callbackPaymentSuccess?(true)
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+
                 }
             }
         }
-        
     }
+    
+    
     internal func IAPPaymentForm(){
         
         if self.planObj != nil {
@@ -269,7 +277,6 @@ extension PayPlanVC {
                     Themes.sharedInstance.removeActivityView(uiView: self!.view)
                 }
                 guard let sSelf = self else {return}
-                
                 
                 productsArray = products
                 if productsArray.count > 0 {
@@ -287,10 +294,7 @@ extension PayPlanVC {
                             print("payment_id \(transaction?.transactionIdentifier ?? "")")
                             let transactionId = transaction?.transactionIdentifier ?? ""
                             self?.getInAppReceipt()
-                            
                             self?.updateInAppPurchaseOrderApi(transactionId: transactionId)
-                            
-                            
                         }
                         //Show payment successfull messsage
                     }
@@ -306,7 +310,6 @@ extension PayPlanVC {
         // Get the receipt if it's available.
         if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
-            
             do {
                 let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
                 print(receiptData)

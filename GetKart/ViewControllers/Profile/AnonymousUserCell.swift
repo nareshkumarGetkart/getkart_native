@@ -54,6 +54,11 @@ class AnonymousUserCell: UITableViewCell {
         btnLogin.clipsToBounds = true
         
         
+        bgViewVerified.layer.cornerRadius = 5
+        bgViewVerified.backgroundColor = Themes.sharedInstance.themeColor
+        btnLogin.clipsToBounds = true
+        
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

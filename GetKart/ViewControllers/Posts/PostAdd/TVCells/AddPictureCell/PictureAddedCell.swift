@@ -38,6 +38,13 @@ class PictureAddedCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
+    func reloadCollection() {
+        clnCollectionView.reloadData()
+        clnCollectionView.collectionViewLayout.invalidateLayout()
+        clnCollectionView.layoutIfNeeded()
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         self.clnCollectionView.collectionViewLayout.invalidateLayout()

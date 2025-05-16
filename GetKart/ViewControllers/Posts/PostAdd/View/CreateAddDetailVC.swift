@@ -39,7 +39,6 @@ class CreateAddDetailVC: UIViewController {
     var strCategoryTitle = ""
     var strSubCategoryTitle = ""
     var category_ids = ""
-    
     var objViewModel:CustomFieldsViewModel?
     var params:Dictionary<String,Any> = [:]
     lazy private var imagePicker = UIImagePickerController()
@@ -60,14 +59,8 @@ class CreateAddDetailVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-//        
-//        if let originalImage = UIImage(named: "arrow_left") {
-//            let tintedImage = originalImage.tinted(with: .black)
-//            btnBack.setImage(tintedImage, for: .normal)
-//        }
-//        
-        btnBack.setImageColor(color: .label)
 
+        btnBack.setImageColor(color: .label)
 
         tblView.register(UINib(nibName: "AlmostThereCell", bundle: nil), forCellReuseIdentifier: "AlmostThereCell")
         tblView.register(UINib(nibName: "TFCell", bundle: nil), forCellReuseIdentifier: "TFCell")
@@ -106,7 +99,7 @@ class CreateAddDetailVC: UIViewController {
             let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
             
             params[AddKeys.name.rawValue] = self.itemObj?.name ?? ""
-            params[AddKeys.price.rawValue] = "\(self.itemObj?.price ?? 0)"
+            params[AddKeys.price.rawValue] = "\(Int(self.itemObj?.price ?? 0.0))"
             params[AddKeys.contact.rawValue] = objLoggedInUser.mobile ?? ""
             params[AddKeys.video_link.rawValue] = self.itemObj?.videoLink ?? ""
             params[AddKeys.description.rawValue] = self.itemObj?.description ?? ""
@@ -202,7 +195,7 @@ class CreateAddDetailVC: UIViewController {
                                 let index1 = index + 1
                                 if index1 < (self.itemObj?.galleryImages?.count ?? 0) {
                                     
-                                    self.downloadGalleryImages(index:index1 )
+                                    self.downloadGalleryImages(index:index1)
                                 }
                             }
                         })
@@ -269,7 +262,7 @@ class CreateAddDetailVC: UIViewController {
            
             if self.objViewModel?.dataArray?.count == 0 {
                 //If no any custom field
-                let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                 self.navigationController?.pushViewController(vc, animated: true)
                 
             }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
@@ -615,7 +608,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                             cell.arrImagesData = arr
                         }
                     
-                        cell.clnCollectionView.performBatchUpdates({
+                      /*  cell.clnCollectionView.performBatchUpdates({
                             cell.clnCollectionView.reloadData()
                             cell.clnCollectionView.collectionViewLayout.invalidateLayout()
                         }) { _ in
@@ -623,6 +616,11 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                             self.tblView.beginUpdates()
                             self.tblView.endUpdates()
                         }
+                    
+                    */
+                    cell.reloadCollection()
+                    self.tblView.beginUpdates()
+                    self.tblView.endUpdates()
                 }
             }else {
                 gallery_images.append(pickedImage.wxCompress().jpegData(compressionQuality: 0.0) ?? Data())
@@ -638,7 +636,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                     cell.arrImagesData = self.gallery_images
                     cell.clnCollectionView!.insertItems(at: [IndexPath(item: gallery_images.count - 1, section: 0)])
                     
-                    cell.clnCollectionView.performBatchUpdates({
+                  /*  cell.clnCollectionView.performBatchUpdates({
                         cell.clnCollectionView.reloadData()
                         cell.clnCollectionView.collectionViewLayout.invalidateLayout()
                     }) { _ in
@@ -646,6 +644,10 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                         self.tblView.beginUpdates()
                         self.tblView.endUpdates()
                     }
+                    */
+                    cell.reloadCollection()
+                    self.tblView.beginUpdates()
+                    self.tblView.endUpdates()
                     
                 }
             }
@@ -717,7 +719,9 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
 }
 
 extension CreateAddDetailVC: PictureAddedDelegate {
+  
     func addPictureAction(row:Int) {
+       
         if row == 3 {
             isImgData = true
         }else {
@@ -733,6 +737,7 @@ extension CreateAddDetailVC: PictureAddedDelegate {
         showImagePickerOptions(tag: row)
 
     }
+    
     func removePictureAction(row:Int, col:Int) {
            let indexPath = IndexPath(row: row, section: 0)
             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {

@@ -28,8 +28,8 @@ struct MarkAsSoldView: View {
                     // Back action
                     navController?.popViewController(animated: true)
                 }) {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
-                    
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+
                 }
                 
                 Text("Who bought?")

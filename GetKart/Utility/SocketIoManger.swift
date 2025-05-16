@@ -83,6 +83,7 @@ final class SocketIOManager: NSObject {
         addListeners()
         socket?.connect()
         
+        
         socket?.on(clientEvent: .connect, callback: {data, ack in
             if ISDEBUG == true {
                 print("socket connected")
@@ -132,7 +133,10 @@ final class SocketIOManager: NSObject {
     
     func addListeners(){
         
-        
+        guard let socket1 = self.socket else {
+            print("Socket not ready!")
+            return
+        }
         socket?.on(SocketEvents.getItemOffer.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {

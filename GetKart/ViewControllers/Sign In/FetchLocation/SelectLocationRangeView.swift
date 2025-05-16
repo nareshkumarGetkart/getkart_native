@@ -38,7 +38,7 @@ struct SelectLocationRangeView: View {
                 Button {
                     self.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
                 Text(" Select Location").font(.custom("Manrope-Bold", size: 20.0))
@@ -165,7 +165,7 @@ struct SelectLocationRangeView: View {
             }else  if popType == .createPost {
                 
                
-                if vc.isKind(of: UIHostingController<ConfirmLocationCreateAdd>.self) == true{
+                if vc.isKind(of: ConfirmLocationHostingController.self) == true{
                    
                     delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
                         self.navigationController?.popToViewController(vc, animated: true)

@@ -11,7 +11,7 @@ struct MakeAnOfferView: View {
     @Binding var isPresented: Bool
     @State private var offer: String = ""
 
-    let sellerPrice: String
+    let sellerPrice: Double
     var onOfferSubmit: (String) -> Void  // Callback for offer submission
 
     var body: some View {
@@ -33,7 +33,7 @@ struct MakeAnOfferView: View {
                 
                 Divider()
                 
-                Text("Seller's Price \(Local.shared.currencySymbol) \(sellerPrice)")
+                Text("Seller's Price \(Local.shared.currencySymbol) \((sellerPrice ?? 0.0).formatNumber())")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -69,9 +69,9 @@ struct MakeAnOfferView: View {
                         withAnimation {
                             if offer.trim().count > 0 &&  offer != "0" {
                                 
-                                if let value = Int(offer.trim()),value > 0{
+                                if let value = Double(offer.trim()),value > 0{
                                     
-                                    if value > (Int(sellerPrice) ?? 0){
+                                    if value > sellerPrice{
                                         UIApplication.shared.endEditing()
                                         AlertView.sharedManager.showToast(message: "Offer price is more than seller price")
                                     }else{

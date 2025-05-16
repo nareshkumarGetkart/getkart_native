@@ -111,6 +111,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
     }
     
     @IBAction  func resetBtnAction(){
+        self.view.endEditing(true)
         latitude = ""
         longitude = ""
         city = ""
@@ -445,17 +446,12 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 }
                 destVC.selectionDelegate = self
                 destVC.dropDownRowIndex = sender.tag
-                
                 self.navigationController?.present(destVC, animated: true, completion: nil)
             }
         }
-        
     }
     
     
-  
-    
-   
     
     func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
         print(dropDownRowIndex, selectedRow)

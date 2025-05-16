@@ -88,6 +88,8 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             cell.lblAddress.text = obj.address
             cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
             
+            cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
+            
             let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
             cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
             

@@ -57,14 +57,7 @@ class CategoryPackageVC: UIViewController {
     
     func getPackagesApi(){
         
-        
-        var strURL = Constant.shared.get_package + "?category_id=\(categoryId)&city=\(city)&platform=ios"
-        
-        strURL.append("&country=\(country)")
-        strURL.append("&state=\(state)")
-        strURL.append("&latitude=\(latitude)")
-        strURL.append("&longitude=\(longitude)")
-        
+        let strURL = Constant.shared.get_package + "?category_id=\(categoryId)&country=\(country)&state=\(state)&city=\(city)&latitude=\(latitude)&longitude=\(longitude)&platform=ios"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURL) { (obj:Plan) in
             
@@ -74,6 +67,7 @@ class CategoryPackageVC: UIViewController {
             }
         }
     }
+    
     
     func getPackagesBannersApi(){
         
@@ -215,6 +209,14 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
         as! PayPlanVC
         controller.planObj = planObj
+        
+        controller.categoryId = categoryId
+        controller.categoryName = categoryName
+        controller.city = city
+        controller.country = country
+        controller.state = state
+        controller.latitude = latitude
+        controller.longitude = longitude
         
         controller.callbackPaymentSuccess = { [weak self](isSuccess) -> Void in
             

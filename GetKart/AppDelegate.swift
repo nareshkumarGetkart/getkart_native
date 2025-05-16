@@ -39,10 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         setupKingfisherSettings()
+        
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
-            
            let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
             self.navigationController?.viewControllers = [landingVC]
                      
@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     func applicationWillEnterForeground(_ application: UIApplication){
         print("applicationWillEnterForeground")
-        checkSocketStatus()
+       // checkSocketStatus()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -302,11 +302,50 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
    //MARK: NAvigate
     func  navigateToNotificationType() {
         print("didReceive")
-       
+        checkSocketStatus()
         switch notificationType{
             
         case "chat","offer":
-            if let destVc = self.navigationController?.topViewController as? ChatVC{
+            
+            
+            if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC{
+
+                // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
+                if tabBarController.selectedIndex == 1, // update with your actual chat tab index
+                   let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                   let topVC = navController.topViewController as? ChatVC {
+                    
+                    // Now we know ChatVC is visible
+                    if topVC.userId == userId {
+                        // Same chat already opened — do nothing or update UI
+                        print("ChatVC is already opened for this user.")
+                    } else {
+                        // Different chat user, replace the ChatVC
+                        navController.popViewController(animated: false)
+                        let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                        vc.userId = userId
+                        vc.item_offer_id = roomId
+                        vc.hidesBottomBarWhenPushed = true
+                        navController.pushViewController(vc, animated: true)
+                    }
+                    
+                } else {
+                    // Chat tab not selected, switch to Chat tab and push ChatVC
+                    tabBarController.selectedIndex = 1 // Update with actual index
+                    if let navController = tabBarController.selectedViewController as? UINavigationController {
+                        let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                        vc.userId = userId
+                        vc.item_offer_id = roomId
+                        vc.hidesBottomBarWhenPushed = true
+                        navController.popToRootViewController(animated: false)
+                        navController.pushViewController(vc, animated: true)
+                    }
+                }
+            }
+
+            
+            
+          /*  if let destVc = self.navigationController?.topViewController as? ChatVC{
                 
                 if destVc.userId == userId{
                     
@@ -326,7 +365,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 vc.hidesBottomBarWhenPushed = true
                 AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                 
-            }
+            }*/
         case "payment":
             
            do {
@@ -343,7 +382,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     
                     if let destvc =  controller as? HomeBaseVC{
                         
-                       
                         
                         if let navController = destvc.viewControllers?[0] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
@@ -461,7 +499,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         if objLoggedInUser.id == nil {
             
         }else{
-            checkSocketStatus()
+           // checkSocketStatus()
             print("didReceive")
             print("NOTIFICATION TAPPED === \(response.notification.request.content.userInfo)")
             
@@ -511,25 +549,34 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
         
         if notificationType == "chat" {
-            if let destVc = self.navigationController?.topViewController as? ChatVC{
+            
+            
+            if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC {
                 
-                if destVc.userId == userId{
+                // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
+                if tabBarController.selectedIndex == 1, // update with your actual chat tab index
+                   let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                   let topVC = navController.topViewController as? ChatVC {
                     
-                }else{
-                    //completionHandler( [.alert,.sound,.badge])
+                    // Now we know ChatVC is visible
+                    if topVC.userId == userId {
+                        // Same chat already opened — do nothing or update UI
+                        print("ChatVC is already opened for this user.")
+                    } else {
+                        //completionHandler( [.alert,.sound,.badge])
+                        completionHandler([.banner, .list, .sound])
+                    }
+                    
+                } else {
                     completionHandler([.banner, .list, .sound])
 
-                    //self.playSound()
-
                 }
-                
             }else{
-               // self.playSound()
                 completionHandler([.banner, .list, .sound])
 
-               // completionHandler( [.alert,.sound,.badge])
-
             }
+
+         
         } else{
            // self.playSound()
            // completionHandler( [.alert,.sound,.badge])

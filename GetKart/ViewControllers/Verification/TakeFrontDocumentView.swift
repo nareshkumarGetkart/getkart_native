@@ -24,8 +24,8 @@ struct TakeFrontDocumentView: View {
                 // Action to go back
                 navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Spacer()
         }.frame(height: 44)
@@ -105,7 +105,7 @@ struct TakeFrontDocumentView: View {
                 ZStack {
                     CameraView(capturedImage: $capturedFrontImage, onImageCaptured: {
                         
-                    }, isFrontCamera: false)
+                    }, isFrontCamera: false, cameraHeight: 350)
                     .frame(height: 350)
                     .cornerRadius(12)
                     VStack {

@@ -70,6 +70,7 @@ struct TransactionModel: Codable {
     let package: Package?
     let paymentTransaction: PaymentTransaction?
 
+
     enum CodingKeys: String, CodingKey {
         case id
         case userID = "user_id"
@@ -85,6 +86,7 @@ struct TransactionModel: Codable {
         case remainingItemLimit = "remaining_item_limit"
         case user, package
         case paymentTransaction = "payment_transaction"
+
     }
 }
 
@@ -102,6 +104,7 @@ struct Package: Codable {
     let status: Int?
     let iosProductID: String?
     let createdAt, updatedAt: String?
+    let category :String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, tier, categories
@@ -113,6 +116,7 @@ struct Package: Codable {
         case iosProductID = "ios_product_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case category
     }
 }
 
@@ -122,11 +126,13 @@ struct PaymentTransaction: Codable {
     let amount: Double?
     let paymentGateway, orderID, paymentStatus, createdAt: String?
     let updatedAt: String?
-
+    let city:String?
+    
     enum CodingKeys: String, CodingKey {
         case id
         case userID = "user_id"
         case amount
+        case city
         case paymentGateway = "payment_gateway"
         case orderID = "order_id"
         case paymentStatus = "payment_status"

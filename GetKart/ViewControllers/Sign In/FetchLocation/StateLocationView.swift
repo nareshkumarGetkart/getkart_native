@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Alamofire
 
 struct StateLocationView: View, LocationSelectedDelegate {
     var navigationController: UINavigationController?
@@ -129,7 +130,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                                 .padding(.horizontal)
                             
                                 .onAppear{
-                                    if  let index = arrSearchStates.firstIndex(where: { $0.id == state.id }) {
+                                    if  arrSearchStates.firstIndex(where: { $0.id == state.id }) != nil {
                                             if !isDataLoading {
                                                 fetchStateListing()
                                             }
@@ -201,8 +202,9 @@ struct StateLocationView: View, LocationSelectedDelegate {
              url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
         }
         
-        
-       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: url) { (obj:StateParse) in
+      //  AF.cancelAllRequests()
+
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: url) { (obj:StateParse) in
            
            if obj.code == 200{
                
@@ -214,7 +216,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                  //  self.totalRecords = obj.data?.total ?? 0
                    self.arrSearchStates.append(contentsOf: obj.data?.data ?? [])
                  
-                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                        self.isDataLoading = false
                        self.pageNoSearch = pageNoSearch + 1
                    })
@@ -226,7 +228,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                    self.totalRecords = obj.data?.total ?? 0
                    self.arrStates.append(contentsOf: obj.data?.data ?? [])
                  
-                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                        self.isDataLoading = false
                        self.pageNo = pageNo + 1
                    })
@@ -265,7 +267,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                     }
                 
             }else  if popType == .createPost {
-                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                if let vc1 = vc as? ConfirmLocationHostingController {
                     delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: self.country.name ?? "")
                     self.navigationController?.popToViewController(vc, animated: true)
                     break

@@ -63,6 +63,17 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Boosted" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Ym-I5-cww">
+                                <rect key="frame" x="6" y="6" width="60" height="22"/>
+                                <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="mBu-iw-7eM"/>
+                                    <constraint firstAttribute="height" constant="22" id="z9V-Kc-dWr"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Delhi India" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Hi-BM-ZQM">
                                 <rect key="frame" x="20" y="177" width="115" height="15"/>
                                 <constraints>
@@ -87,10 +98,12 @@
                             <constraint firstItem="0Hi-BM-ZQM" firstAttribute="top" secondItem="NgW-8N-Ybu" secondAttribute="bottom" constant="5" id="Ggr-Tk-BW8"/>
                             <constraint firstItem="1nH-zE-z3D" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="7" id="HYH-6j-zar"/>
                             <constraint firstItem="gUh-OP-mJO" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" id="LFW-SE-8C3"/>
+                            <constraint firstItem="5Ym-I5-cww" firstAttribute="top" secondItem="lEd-a8-Reg" secondAttribute="top" constant="6" id="OHB-tu-Uhq"/>
                             <constraint firstItem="YJj-rV-5eX" firstAttribute="centerY" secondItem="0Hi-BM-ZQM" secondAttribute="centerY" id="ThC-kO-h8s"/>
                             <constraint firstItem="1nH-zE-z3D" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="8" id="WLs-R7-8C5"/>
                             <constraint firstItem="NgW-8N-Ybu" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="7" id="Wew-ey-4l6"/>
                             <constraint firstAttribute="bottom" secondItem="0Hi-BM-ZQM" secondAttribute="bottom" constant="8" id="ZO7-wo-Atw"/>
+                            <constraint firstItem="5Ym-I5-cww" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="6" id="a0X-9W-GbQ"/>
                             <constraint firstItem="0Hi-BM-ZQM" firstAttribute="leading" secondItem="YJj-rV-5eX" secondAttribute="trailing" constant="3" id="aVc-n4-voh"/>
                             <constraint firstItem="YJj-rV-5eX" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="7" id="etu-0E-nYJ"/>
                             <constraint firstItem="NgW-8N-Ybu" firstAttribute="top" secondItem="1nH-zE-z3D" secondAttribute="bottom" constant="1" id="h80-MA-8ne"/>
@@ -117,6 +130,7 @@
                 <outlet property="imgViewLoc" destination="YJj-rV-5eX" id="Sbp-Lz-l1T"/>
                 <outlet property="imgViewitem" destination="gUh-OP-mJO" id="8mB-SI-Ayi"/>
                 <outlet property="lblAddress" destination="0Hi-BM-ZQM" id="2Ec-0x-0Vh"/>
+                <outlet property="lblBoost" destination="5Ym-I5-cww" id="VyS-rg-9jp"/>
                 <outlet property="lblItem" destination="NgW-8N-Ybu" id="jlL-5a-mpP"/>
                 <outlet property="lblPrice" destination="1nH-zE-z3D" id="Xoh-iI-AQh"/>
             </connections>

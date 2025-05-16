@@ -20,7 +20,7 @@ final class Local {
     var compression = 50
     var currencySymbol:String = "₹"
 
-    
+    /*
     func saveUserId(userId:String){
         
         UserDefaults.standard.setValue(userId, forKey: LocalKeys.userId.rawValue)
@@ -31,7 +31,7 @@ final class Local {
         
         return UserDefaults.standard.value(forKey: LocalKeys.userId.rawValue) as? String ?? ""
     }
-        
+        */
     func saveHashToken(token:String){
         
         UserDefaults.standard.setValue(token, forKey: LocalKeys.token.rawValue)
@@ -76,7 +76,6 @@ final class Local {
         UserDefaults.standard.setValue(latitude, forKey: LocalKeys.latitude.rawValue)
         UserDefaults.standard.setValue(longitude, forKey: LocalKeys.longitude.rawValue)
         UserDefaults.standard.setValue(timezone, forKey: LocalKeys.timezone.rawValue)
-        
         
         UserDefaults.standard.synchronize()
     }
@@ -136,7 +135,6 @@ enum LocalKeys:String,CaseIterable{
     case userId = "userId"
     case token = "token"
     case fcmtoken = "fcmtoken"
-    
     case city =  "city"
     case state = "state"
     case country = "country"

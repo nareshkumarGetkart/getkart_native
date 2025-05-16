@@ -59,7 +59,7 @@ struct ItemModelClass: Codable {
 struct ItemModel: Codable,Identifiable {
     let id: Int?
     let name, slug, description: String?
-    let price: Int?
+    let price: Double?
     let image: String?
     let watermarkImage: String?
     let latitude, longitude: Double?
@@ -90,9 +90,11 @@ struct ItemModel: Codable,Identifiable {
     var isAlreadyOffered, isAlreadyReported: Bool?
     let isPurchased: Int?
     var itemOffers:[ItemOffers]?
+    let usedPackage:String?
     
     enum CodingKeys: String, CodingKey {
-        case id, name, slug, description, price, image
+        case id, name, slug, description, image
+        case price
         case watermarkImage = "watermark_image"
         case latitude, longitude, address, contact
         case showOnlyToPremium = "show_only_to_premium"
@@ -121,6 +123,7 @@ struct ItemModel: Codable,Identifiable {
         case isAlreadyReported = "is_already_reported"
         case isPurchased = "is_purchased"
         case itemOffers = "item_offers"
+        case usedPackage
 
     }
 }

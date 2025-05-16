@@ -184,32 +184,40 @@ class ZoomImageViewController: UIViewController {
 //MARK:- UIScrollView
 extension ZoomImageViewController : UIScrollViewDelegate {
     
-   
+ 
+    
     func downloadAndSaveToPhotos(url: URL) {
-        DispatchQueue.main.async{
-            
+        DispatchQueue.main.async {
             Themes.sharedInstance.activityView(uiView: self.view)
         }
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
-           
-            DispatchQueue.main.async{
-                Themes.sharedInstance.removeActivityView(uiView: self.view)
+            guard let data = data, let image = UIImage(data: data) else {
+                DispatchQueue.main.async {
+                    Themes.sharedInstance.removeActivityView(uiView: self.view)
+                }
+                return
+            }
 
-                guard let data = data, let image = UIImage(data: data) else { return }
-
-                PHPhotoLibrary.requestAuthorization { status in
-                    if status == .authorized {
+            PHPhotoLibrary.requestAuthorization { status in
+                if status == .authorized {
+                    // Do UI work on the main thread
+                    DispatchQueue.main.async {
                         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                         AlertView.sharedManager.showToast(message: "Downloaded successfully")
-                    } else {
+                        Themes.sharedInstance.removeActivityView(uiView: self.view)
+                    }
+                } else {
+                    DispatchQueue.main.async {
                         print("Permission denied to access photo library")
+                        AlertView.sharedManager.showToast(message: "Permission denied to access photo library")
+                        Themes.sharedInstance.removeActivityView(uiView: self.view)
                     }
                 }
-                
             }
-         
         }.resume()
     }
+
     
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

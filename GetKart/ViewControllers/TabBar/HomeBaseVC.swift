@@ -12,7 +12,6 @@ class HomeBaseVC: UITabBarController {
     
     
     // MARK: - Actions
-   
     var controllers: [UIViewController]?
     let middleButton = UIButton()
     
@@ -20,12 +19,10 @@ class HomeBaseVC: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         AppDelegate.sharedInstance.checkSocketStatus()
-//       tabBar.isTranslucent = true
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
         tabBar.unselectedItemTintColor = UIColor.label
         delegate = self
-        //self.view.backgroundColor = .white
         self.setViewControllers(getControllers(), animated: false)
         
         let images = ["home","chat","","myads","profile"]
@@ -47,12 +44,11 @@ class HomeBaseVC: UITabBarController {
         setupMiddleButton()
 
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      //  DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             
-            AppDelegate.sharedInstance.navigateToNotificationType()
-            Constant.shared.isLaunchFirstTime = 0
+       
             
-        }
+       // }
         // Do any additional setup after loading the view.
         
     }
@@ -60,6 +56,10 @@ class HomeBaseVC: UITabBarController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupDoubleTapGesture()
+        if  Constant.shared.isLaunchFirstTime == 1{
+            AppDelegate.sharedInstance.navigateToNotificationType()
+            Constant.shared.isLaunchFirstTime = 0
+        }
     }
 
     

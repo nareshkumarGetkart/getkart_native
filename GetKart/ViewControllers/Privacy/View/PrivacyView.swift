@@ -35,7 +35,7 @@ struct PrivacyView: View {
                 navigationController?.popViewController(animated: true)
 
             } label: {
-                Image("arrow_left").renderingMode(.template).foregroundColor(.black)
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
             Text(title).font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)

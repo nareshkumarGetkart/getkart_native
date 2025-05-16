@@ -750,3 +750,18 @@ extension UIImage {
         return tintedImage ?? self
     }
 }
+
+
+
+
+extension Double{
+    
+    func formatNumber() -> String {
+        let intValue = Int(self)  // Removes decimal
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = "," // Default is ","
+        return formatter.string(from: NSNumber(value: intValue)) ?? "\(intValue)"
+    }
+
+}

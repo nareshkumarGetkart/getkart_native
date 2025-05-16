@@ -24,7 +24,8 @@ struct NotificationView: View {
                 navigation?.popViewController(animated: true)
             }) {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                    .foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Text("Notifications").font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)
@@ -55,6 +56,24 @@ struct NotificationView: View {
                                 }
                             }
 
+                    }
+                    
+                    
+                    if listArray.count == 0 {
+                        
+                        HStack{
+                            Spacer()
+                            
+                            VStack(spacing: 30){
+                                Spacer()
+                                Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                                Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                                Spacer()
+                            }
+                            Spacer()
+                        }
+                    }else{
+                        Spacer()
                     }
                 }
                 .padding(.horizontal, 10)

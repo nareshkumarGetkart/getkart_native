@@ -123,7 +123,7 @@ struct FavoritesCell:View {
             
             VStack(alignment: .leading, spacing: 5){
                 HStack{
-                    Text("\(Local.shared.currencySymbol) \(itemObj.price ?? 0)").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(hex: "#FF9900"))
+                    Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(hex: "#FF9900"))
                     Spacer()
                     Button {
                         addToFavourite()
@@ -229,7 +229,8 @@ struct HeaderView: View {
                 navigation?.popViewController(animated: true)
             }) {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                    .foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Text("Favorites").font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)

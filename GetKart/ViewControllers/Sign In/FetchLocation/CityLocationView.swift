@@ -1,7 +1,7 @@
 
 import Foundation
 import SwiftUI
-
+import Alamofire
 
 enum PopType{
     case signUp
@@ -19,23 +19,16 @@ struct CityLocationView: View {
     @State private var searchText = ""
     var country:CountryModel = CountryModel()
     var state:StateModal = StateModal()
-    @State var pageNo = 1
-    @State var totalRecords = 1
-    @State var arrCitiesSearch:Array<CityModal> = []
-    @State var isDataLoading = true
-
-    
-   // @State var isNewPost = false
-   // @State var isFilterList = false
-    
-    @State var pageNoSearch = 1
+    @State private var pageNo = 1
+    @State private var totalRecords = 1
+    @State private var arrCitiesSearch:Array<CityModal> = []
+    @State private var isDataLoading = true
+    @State private var pageNoSearch = 1
     @State private var isSearching = false
-    
     @State var popType:PopType?
-    var delLocationSelected:LocationSelectedDelegate!
+     var delLocationSelected:LocationSelectedDelegate!
     
     var body: some View {
-        
         
         VStack(spacing: 0) {
             HStack{
@@ -73,7 +66,8 @@ struct CityLocationView: View {
                     if searchText.count > 0 {
                         Button("Clear") {
                             searchText = ""
-                        }.padding(.horizontal).foregroundColor(Color(UIColor.label))
+                        }.padding(.horizontal)
+                        .foregroundColor(Color(UIColor.label))
                     }
                 }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
                     RoundedRectangle(cornerRadius: 8)
@@ -92,10 +86,6 @@ struct CityLocationView: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            
-            
-            
-            
             
             Divider()
             
@@ -129,7 +119,7 @@ struct CityLocationView: View {
                                 .padding(.horizontal)
                                 .onAppear{
                                     if  let index = arrCitiesSearch.firstIndex(where: { $0.id == city.id }) {
-                                        if index == arrCitiesSearch.count - 1{
+                                        if index == arrCitiesSearch.count - 1 && !isDataLoading{
                                           //  if self.totalRecords != arrCitiesSearch.count {
                                                 fetchCityListing()
                                           //  }
@@ -151,7 +141,7 @@ struct CityLocationView: View {
                                 .onAppear{
                                     if  let index = arrCities.firstIndex(where: { $0.id == city.id }) {
                                         if index == arrCities.count - 1{
-                                            if self.totalRecords != arrCities.count {
+                                            if self.totalRecords != arrCities.count && !isDataLoading {
                                                 fetchCityListing()
                                             }
                                         }
@@ -180,12 +170,16 @@ struct CityLocationView: View {
   
     
     func fetchCityListing(){
+        
         var url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNo)&search=" //&search=\(searchText)"
         
         if isSearching{
-             url = Constant.shared.get_Cities + "?country_id=\(country.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
+             url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
         }
-        
+       
+        self.isDataLoading = true
+       // AF.cancelAllRequests()
+
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:CityParse) in
             
             if obj.code == 200{
@@ -197,7 +191,7 @@ struct CityLocationView: View {
                     //  self.totalRecords = obj.data?.total ?? 0
                     self.arrCitiesSearch.append(contentsOf: obj.data?.data ?? [])
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                         self.isDataLoading = false
                         self.pageNoSearch = pageNoSearch + 1
                     })
@@ -206,7 +200,7 @@ struct CityLocationView: View {
                   //  pageNo = pageNo + 1
                     totalRecords  = obj.data?.total ?? 0
                     self.arrCities.append(contentsOf:obj.data?.data ?? [])
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                         self.isDataLoading = false
                         self.pageNo = pageNo + 1
                     })
@@ -244,11 +238,46 @@ struct CityLocationView: View {
             }else  if popType == .createPost {
                 
                
-                if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
-                    self.navigationController?.popToViewController(vc, animated: true)
-                    delLocationSelected?.savePostLocation(latitude:city.latitude ?? "", longitude:city.longitude ?? "",  city:city.name ?? "", state:self.state.name ?? "", country:self.country.name ?? "")
+                if let vc1 = vc as? ConfirmLocationHostingController {
+                    // Create a copy of the current view with the new callback
+                    var modifiedRootView = vc1.rootView
+                    modifiedRootView.onAppeared = {
+                        self.delLocationSelected?.savePostLocation(
+                            latitude: city.latitude ?? "",
+                            longitude: city.longitude ?? "",
+                            city: city.name ?? "",
+                            state: self.state.name ?? "",
+                            country: self.country.name ?? ""
+                        )
+                    }
+                    
+                    // Update the root view
+                    vc1.rootView = modifiedRootView
+
+                    // Pop to that view controller
+                    self.navigationController?.popToViewController(vc1, animated: true)
                     break
                 }
+
+              /*  if let vc1 = vc as? UIHostingController<ConfirmLocationCreateAdd> {
+                    CATransaction.begin()
+                       CATransaction.setCompletionBlock {
+                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                               
+                               self.delLocationSelected?.savePostLocation(
+                                latitude: city.latitude ?? "",
+                                longitude: city.longitude ?? "",
+                                city: city.name ?? "",
+                                state: self.state.name ?? "",
+                                country: self.country.name ?? ""
+                               )
+                           }
+                       }
+
+                       self.navigationController?.popToViewController(vc1, animated: true)
+                       CATransaction.commit()
+                       break
+                }*/
                 
             }else if popType == .signUp {
                 

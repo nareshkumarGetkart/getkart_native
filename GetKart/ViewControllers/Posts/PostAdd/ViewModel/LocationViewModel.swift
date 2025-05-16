@@ -27,7 +27,7 @@ class ConfirmLocationViewModel: ObservableObject {
         guard let lat = Double(latitude), let lng = Double(longitude) else { return }
         let coord = CLLocationCoordinate2D(latitude: lat, longitude: lng)
        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9, execute: {
             self.selectedCoordinate = coord
             self.mapRegion.center = coord
             self.circle = MKCircle(center: coord, radius: 0.0)

@@ -41,11 +41,11 @@ final class Constant: NSObject {
         //https://chat.getkart.com/chat
         get{
             if devEnvironment == .live {
-                return  "https://chat.getkart.com" //https://getkartchat.getkart.ca"
+                return  "https://chat.gupsup.com"// "https://chat.getkart.com" //https://getkartchat.getkart.ca"
             }else if devEnvironment == .staging {
-                return   "https://chat.getkart.com" //"https://getkartchat.getkart.ca"
+                return   "https://chat.gupsup.com" //"https://getkartchat.getkart.ca"
             }else{
-                return  "https://chat.getkart.com" //"https://getkartchat.getkart.ca"
+                return  "https://chat.gupsup.com" //"https://getkartchat.getkart.ca"
             }
         }
     }
@@ -360,7 +360,7 @@ final class Constant: NSObject {
     
     var paymentIntent:String{
         get {
-            return "\(Constant.shared.baseURL)/payment-intent"
+            return "\(Constant.shared.baseURL)/v1/payment-intent"
         }
     }
     
@@ -392,7 +392,7 @@ final class Constant: NSObject {
     
     var in_app_purchase:String{
         get {
-            return "\(Constant.shared.baseURL)/in-app-purchase"
+            return "\(Constant.shared.baseURL)/v1/in-app-purchase"
         }
     }
     

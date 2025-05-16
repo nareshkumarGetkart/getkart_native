@@ -23,8 +23,8 @@ struct TakeSelfieView: View {
                 // Action to go back
                 navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Spacer()
         }.frame(height: 44)
@@ -103,7 +103,7 @@ struct TakeSelfieView: View {
                 
                     CameraView(capturedImage: $capturedImage, onImageCaptured: {
                         
-                    }, isFrontCamera: true)
+                    }, isFrontCamera: true, cameraHeight: 420)
                     .frame(height: 420)
                     .cornerRadius(12)
                    
@@ -160,9 +160,11 @@ struct CameraView: UIViewControllerRepresentable {
     @Binding var capturedImage: UIImage?
     var onImageCaptured: () -> Void
     var isFrontCamera = true
+    var cameraHeight:CGFloat
     
     func makeUIViewController(context: Context) -> CameraViewController {
         let controller = CameraViewController()
+        controller.cameraHeight = cameraHeight
         controller.isFrontCamera = isFrontCamera
         controller.delegate = context.coordinator
         return controller
@@ -205,7 +207,7 @@ class CameraViewController: UIViewController {
     var previewLayer: AVCaptureVideoPreviewLayer!
     weak var delegate: CameraView.CameraCoordinator?
     var isFrontCamera = true
- 
+    var cameraHeight = 0.0
    
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -223,6 +225,7 @@ class CameraViewController: UIViewController {
                                                         position: (isFrontCamera) ? .front : .back),
               let input = try? AVCaptureDeviceInput(device: frontCamera) else { return }
         
+        
         if captureSession.canAddInput(input) {
             captureSession.addInput(input)
         }
@@ -234,8 +237,12 @@ class CameraViewController: UIViewController {
         
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.frame = view.bounds
-        view.layer.addSublayer(previewLayer)
+//        previewLayer.frame = view.bounds
+//        view.layer.addSublayer(previewLayer)
+                
+        previewLayer.frame = CGRect(x: view.frame.origin.x, y: view.frame.origin.y, width: view.frame.width, height: cameraHeight)
+        
+        view.layer.insertSublayer(previewLayer, at: 0)
         
         delegate?.parentController = self
         captureSession.startRunning()

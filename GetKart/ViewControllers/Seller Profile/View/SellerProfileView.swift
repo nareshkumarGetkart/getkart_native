@@ -23,9 +23,8 @@ struct SellerProfileView: View {
                     // Handle back action
                     navController?.popViewController(animated: true)
                 }) {
-                    Image("arrow_left").renderingMode(.template)
-                        .font(.title2)
-                        .foregroundColor(.black)
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+
                 }
                 
                 
@@ -172,7 +171,9 @@ struct SellerProfileView: View {
                     
                     ForEach($objVM.itemArray) { $item in
                         
-                        ProductCard(objItem: $item)
+                        ProductCard(objItem: $item, onItemLikeDislike: {likedObj in
+                            
+                        })
                            
                             .onAppear {
                                 

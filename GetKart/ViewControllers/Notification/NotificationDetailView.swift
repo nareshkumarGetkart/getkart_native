@@ -20,7 +20,8 @@ struct NotificationDetailView: View {
                 navigation?.popViewController(animated: true)
             }) {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                    .foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Text("Notifications").font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(.black)

@@ -25,8 +25,8 @@ struct TakeBackDocumentView: View {
                 // Action to go back
                 navigation?.popViewController(animated: true)
             }) {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black).padding()
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                    .padding()
             }
             Spacer()
         }.frame(height: 44)
@@ -125,8 +125,9 @@ struct TakeBackDocumentView: View {
                 ZStack {
                     CameraView(capturedImage: $capturedBackImage, onImageCaptured: {
                         
-                    }, isFrontCamera: false) .frame(height: 350)
-                        .cornerRadius(12)
+                    }, isFrontCamera: false, cameraHeight: 350)
+                    .frame(height: 350)
+                    .cornerRadius(12)
                     VStack{
                         Spacer()
                         Text("Place the back side of the ID Proof inside this box")
@@ -140,7 +141,8 @@ struct TakeBackDocumentView: View {
                             )
                     }
                     
-                }.frame(height: 350).padding(.horizontal)
+                }.frame(height: 350)
+                .padding(.horizontal)
 
                 Spacer()
                 

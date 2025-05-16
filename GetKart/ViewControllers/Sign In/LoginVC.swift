@@ -66,6 +66,16 @@ class LoginVC: UIViewController {
         }
     }
     
+    //MARK: UIButton Action Methods
+    
+    @IBAction func loginWithEmailButton(_ sender : UIButton){
+        
+        if let destVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "SIgnInWithEmailVC") as? SIgnInWithEmailVC{
+        self.navigationController?.pushViewController(destVC, animated: true)
+
+        }
+    }
+    
     
     @IBAction func countruCodeButton(_ sender : UIButton){
         
@@ -197,10 +207,6 @@ class LoginVC: UIViewController {
         navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
 }
-
-
-
-
 
 
 extension LoginVC:UITextFieldDelegate {
@@ -354,7 +360,8 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                         let token = result["token"] as? String ?? ""
                         let objUserInfo = UserInfo(dict: payload, token: token)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
-                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                        
+                      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                         
                         let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
                         self.navigationController?.pushViewController(hostingController, animated: true)
@@ -362,7 +369,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                     }
                     
                 }else{
-                    //self?.delegate?.showError(message: message)
+                    AlertView.sharedManager.showToast(message: message)
                 }
                 
             }

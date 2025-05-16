@@ -27,7 +27,7 @@
                         <constraints>
                             <constraint firstAttribute="height" constant="30" id="97U-O1-fr5"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
+                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="16"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>

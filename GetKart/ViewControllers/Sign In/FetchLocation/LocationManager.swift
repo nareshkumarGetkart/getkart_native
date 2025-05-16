@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreLocation
+import UIKit
 protocol LocationAutorizationUpdated {
     func locationAuthorizationUpdate()
 }
@@ -35,10 +36,13 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
             
         case .restricted://The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
             print("Location restricted")
+            showLocationSettingsAlert()
+
             
         case .denied://The user dennied your app to get location or disabled the services location or the phone is in airplane mode
             print("Location denied")
-            
+            showLocationSettingsAlert()
+
         case .authorizedAlways://This authorization allows you to use all location services and receive location events whether or not your app is in use.
             print("Location authorizedAlways")
             lastKnownLocation = manager.location?.coordinate
@@ -65,10 +69,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
             
         case .restricted://The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
             print("Location restricted")
+            showLocationSettingsAlert()
             return false
             
         case .denied://The user dennied your app to get location or disabled the services location or the phone is in airplane mode
             print("Location denied")
+            showLocationSettingsAlert()
             return false
             
         case .authorizedAlways://This authorization allows you to use all location services and receive location events whether or not your app is in use.
@@ -87,6 +93,17 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     
     
     
+    func showLocationSettingsAlert() {
+        
+        AlertView.sharedManager.presentAlertWith(title: "Location Access Needed", msg: "Please enable location access in Settings to continue.", buttonTitles: ["Cancel","Settings"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
+            if index == 1{
+                if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(appSettings)
+                }
+            }
+        }
+       
+    }
     
     func updateStateCity(){
         // Create Location
@@ -125,4 +142,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         lastKnownLocation = locations.first?.coordinate
     }
+    
+
+    func isCurrentLocationEnabled() -> Bool {
+        return CLLocationManager.locationServicesEnabled() &&
+            (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+             CLLocationManager.authorizationStatus() == .authorizedAlways)
+    }
+
 }

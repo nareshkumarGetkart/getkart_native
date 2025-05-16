@@ -197,6 +197,27 @@ struct SearchProductView: View {
         }
         
         
+        let city = dictCustomFields["city"] as? String ?? ""
+        let state = dictCustomFields["state"] as? String ?? ""
+        let country = dictCustomFields["country"] as? String ?? ""
+        
+        if city.count == 0 && state.count == 0 {
+            
+            let city = Local.shared.getUserCity()
+            let country = Local.shared.getUserCountry()
+            let state = Local.shared.getUserState()
+            let lat = Local.shared.getUserLatitude()
+            let long = Local.shared.getUserLongitude()
+
+            if city.count > 0 {
+                strUrl.append("&country=\(country)")
+                strUrl.append("&state=\(state)")
+                strUrl.append("&city=\(city)")
+                strUrl.append("&latitude=\(lat)")
+                strUrl.append("&longitude=\(long)")
+            }
+        }
+
         if searchTxt.count > 0{
             strUrl.append("&search=\(searchTxt)")
         }

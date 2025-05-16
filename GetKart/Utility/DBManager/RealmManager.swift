@@ -141,6 +141,7 @@ class RealmManager: ObservableObject {
     func saveUserInfo(userInfo: UserInfo) {
         deleteUserInfoObjects()
         let dbUser = DBUserInfo(userInfo: userInfo)
+        
         try? realm.write {
             realm.add(dbUser)
         }

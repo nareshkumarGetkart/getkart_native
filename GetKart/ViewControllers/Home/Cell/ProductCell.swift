@@ -18,7 +18,9 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var bgView:UIView!
     
     @IBOutlet weak var imgViewLoc:UIImageView!
-
+   
+    @IBOutlet weak var lblBoost:UILabel!
+   
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -26,6 +28,9 @@ class ProductCell: UICollectionViewCell {
         
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true
+        
+        lblBoost.layer.cornerRadius = 5.0
+        lblBoost.clipsToBounds = true
         
         imgViewitem.layer.cornerRadius = 8.0
         imgViewitem.clipsToBounds = true
