@@ -31,11 +31,52 @@ class SIgnInWithEmailVC: UIViewController {
     @IBAction func continueBtnAction(_ sender : UIButton){
         if txtFdEmail.text?.isValidEmail() == true {
             lblError.text = ""
+            sendEmailOtp()
         }else{
             lblError.text = "Please enter valid email id."
         }
 
     }
+    
+    //MARK: Api Methods
+    
+    func sendEmailOtp(){
+        let timestamp = Date.timeStamp
+        var params: Dictionary<String,String> =  ["email":txtFdEmail.text ?? ""]
+        
+       
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.send_email_otp, param: params, methodType: .post,showLoader:true) {[weak self]  responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                    let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+                    vc.mobile =  self?.txtFdEmail.text ?? ""
+                    vc.isMobileLogin = false
+                    self?.navigationController?.pushViewController(vc, animated: true)                  
+                    
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                }
+                
+            }
+        }
+    }
+    
 
 }
 

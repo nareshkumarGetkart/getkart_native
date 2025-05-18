@@ -148,7 +148,8 @@ class ChatVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         self.view.endEditing(true)
         IQKeyboardManager.shared.isEnabled = true
-        
+        self.sendtypinStatus(status: false)
+
     }
     
     deinit {

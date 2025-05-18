@@ -58,6 +58,12 @@ final class Constant: NSObject {
     }
     
     
+    var verify_email_otp:String {
+        get {
+            return "\(baseURL)/v1/verify-email-otp"
+        }
+    }
+    
     var sendMobileOtpUrl:String {
         get {
             return"\(Constant.shared.baseURL)/send-mobile-otp"
@@ -79,6 +85,8 @@ final class Constant: NSObject {
     var userSignupUrl:String{
         get {
             return "\(Constant.shared.baseURL)/user-signup"
+           // return "\(Constant.shared.baseURL)/v1/user-signup"
+
         }
     }
     
@@ -102,6 +110,11 @@ final class Constant: NSObject {
         }
     }
     
+    var send_email_otp:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/send-email-otp"
+        }
+    }
     
     var get_featured_section:String{
         get{

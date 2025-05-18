@@ -604,6 +604,7 @@
                     <connections>
                         <outlet property="btnResendOtp" destination="VUm-rN-r8h" id="YNq-2Q-yEh"/>
                         <outlet property="btnSignIn" destination="Dav-M3-6uI" id="bv8-AU-v2w"/>
+                        <outlet property="lblMessage" destination="kua-Fp-tf3" id="ONl-CO-txg"/>
                         <outlet property="lblMobileNo" destination="nKq-cq-Dtt" id="2I6-h8-zAx"/>
                         <outlet property="txtOtp" destination="1Il-XP-MZp" id="GEQ-MP-aA4"/>
                     </connections>

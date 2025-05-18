@@ -12,7 +12,8 @@ struct ContactUsView: View {
     
     @State private var showEmailView = false
     var navigationController:UINavigationController?
-    
+
+
     var body: some View {
         
         // Top Navigation Bar
@@ -111,6 +112,8 @@ struct EmailSupportView: View {
     @State private var subject: String = ""
     @State private var message: String = ""
     @State private var showMailView:Bool = false
+    @State private var showMailAlert: Bool = false
+    @State private var mailAlertMessage: String = ""
     
     var body: some View {
         VStack {
@@ -163,8 +166,14 @@ struct EmailSupportView: View {
                 }
                 
                 Button(action: {
-                    // Send email logic here
-                    showMailView = true
+                    if MFMailComposeViewController.canSendMail() {
+                           showMailView = true
+                    } else {
+                        // Show an alert to user
+                        // You can use .alert modifier or a custom error state
+                        mailAlertMessage = "Mail services are not available. Please set up a mail account in order to send email."
+                        showMailAlert = true
+                    }
 
                     
                 }) {
@@ -186,16 +195,37 @@ struct EmailSupportView: View {
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
         
+            .alert(isPresented: $showMailAlert) {
+                Alert(title: Text("Unable to Send Email"),
+                      message: Text(mailAlertMessage),
+                      dismissButton: .default(Text("OK")))
+            }
        // if(MFMailComposeViewController.canSendMail()) // Disable if Mail is unavailable
             .sheet(isPresented: $showMailView) {
-
-                MailView(subject: subject, message: message, onMailSent: {val in
-                    
-                    if val{
-                        presentationMode.wrappedValue.dismiss()
+                
+                /*  MailView(subject: subject, message: message, onMailSent: {val in
+                 
+                 if val{
+                 presentationMode.wrappedValue.dismiss()
+                 }
+                 })
+                 */
+                
+                if MFMailComposeViewController.canSendMail() {
+                    MailView(subject: subject, message: message) { val in
+                        if val {
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
-                })
-        }
+                } else {
+                    // Optional: Alert or fallback UI
+                    
+                    //   AlertView.sharedManager.showToast(message: "Mail services are not available. Please set up a mail account.")
+                    
+                }
+            }
+        
+          
     }
 }
 

@@ -13,17 +13,27 @@ class OTPViewController: UIViewController {
     @IBOutlet weak var txtOtp:UITextFieldX!
     @IBOutlet weak var btnResendOtp:UIButton!
     @IBOutlet weak var btnSignIn:UIButton!
+    @IBOutlet weak var lblMessage:UILabel!
+
     private var timer: Timer?
     private var remainingSeconds = 60
     var countryCode = ""
     var mobile = ""
+    var isMobileLogin = true
     
     //MARK: Controller Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         lblMobileNo.text = countryCode + mobile
         self.btnSignIn.backgroundColor = UIColor.gray
-        startTimer()
+        if isMobileLogin == true {
+            lblMessage.text = "Sign in with mobile"
+            startTimer()
+        }else{
+            btnResendOtp.isHidden = true
+            lblMessage.text = "Sign in with email"
+
+        }
     }
     
     deinit{
@@ -70,9 +80,14 @@ class OTPViewController: UIViewController {
     }
     
     @IBAction func signInAction(){
-        
+        self.view.endEditing(true)
         if (txtOtp.text?.count ?? 0) >= 4 {
-            self.verifyMobileOTPApi()
+            if isMobileLogin == true {
+                
+                self.verifyMobileOTPApi()
+            }else{
+                self.verifyEmailOTPApi()
+            }
         }
     }
     
@@ -105,7 +120,7 @@ class OTPViewController: UIViewController {
                 
                 if status == 200{
                  
-                    self?.userSignupApi()
+                    self?.userSignupApi(tempToken: "")
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                 }
@@ -115,6 +130,45 @@ class OTPViewController: UIViewController {
     }
     
     
+    
+    
+    func verifyEmailOTPApi(){
+        
+        let params = ["email": mobile,"otp":txtOtp.text ?? ""] as [String : Any]
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.verify_email_otp, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                 
+                    if let  data = result["data"] as? Dictionary<String, Any>{
+                        
+                       if let temp_token = data["temp_token_"] as? String{
+                            
+                           self?.userSignupApi(tempToken: temp_token)
+
+                        }
+                    }
+                   
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                }
+                
+            }
+        }
+    }
     
     
     //MARK: Api Methods
@@ -145,12 +199,17 @@ class OTPViewController: UIViewController {
         }
     }
     
-    func userSignupApi(){
+    func userSignupApi(tempToken:String){
         timer?.invalidate()
         timer = nil
         
         let timestamp = Date.timeStamp
-        let params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)"] as [String : Any]
+        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)"] as [String : Any]
+        
+        if isMobileLogin == false {
+            
+            params = ["email": mobile, "firebase_id":"msg91_\(timestamp)", "type":"email","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "temp_token_":tempToken] as [String : Any]
+        }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
             

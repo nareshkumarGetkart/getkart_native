@@ -12,22 +12,18 @@ import Alamofire
 struct StateLocationView: View, LocationSelectedDelegate {
     var navigationController: UINavigationController?
     @State var arrStates:Array<StateModal> = []
-    
     @State var arrSearchStates:Array<StateModal> = []
-
-    var strTitle:String = ""
     @State private var searchText = ""
-    @State var pageNo = 1
-    @State var pageNoSearch = 1
+    @State private var pageNo = 1
+    @State private var pageNoSearch = 1
     @State private var isSearching = false
-
-    @State var totalRecords = 1
-     var country:CountryModel = CountryModel()
-   // @State var isNewPost = false
-    //@State var isFilterList = false
-    @State var isDataLoading = false
-    @State var popType:PopType?
-    var delLocationSelected:LocationSelectedDelegate!
+    @State private var totalRecords = 1
+    var country:CountryModel = CountryModel()
+    
+    @State private var isDataLoading = false
+    var popType:PopType?
+    var delLocationSelected:LocationSelectedDelegate?
+   
     var body: some View {
         
         VStack(spacing: 0) {
@@ -39,7 +35,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                     Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
-                Text("\(strTitle)").font(.custom("Manrope-Bold", size: 20.0))
+                Text("\(country.name ?? "")").font(.custom("Manrope-Bold", size: 20.0))
                     .foregroundColor(Color(UIColor.label))
                 Spacer()
             }.frame(height:44).background(Color(UIColor.systemBackground))
@@ -245,7 +241,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
         
         if popType == .home || popType == .signUp{
             
-            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude)", longitude: "\(self.country.longitude)"  , timezone: "")
+            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude ?? "")", longitude: "\(self.country.longitude ?? "")"  , timezone: "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {

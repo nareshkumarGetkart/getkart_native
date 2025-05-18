@@ -25,8 +25,8 @@ struct CityLocationView: View {
     @State private var isDataLoading = true
     @State private var pageNoSearch = 1
     @State private var isSearching = false
-    @State var popType:PopType?
-     var delLocationSelected:LocationSelectedDelegate!
+    var popType:PopType?
+    var delLocationSelected:LocationSelectedDelegate?
     
     var body: some View {
         

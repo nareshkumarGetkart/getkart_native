@@ -128,7 +128,9 @@ class URLhandler: NSObject{
 //                     }
                     
                     self.respDictionary = [:]
+                 
                     switch response.result {
+                  
                     case .success(_):
                         self.respDictionary = response.value as? NSDictionary
                         if ISDEBUG == true{

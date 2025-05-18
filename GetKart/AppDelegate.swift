@@ -30,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        getSettingsApi()
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -40,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.navigationController?.isNavigationBarHidden = true
         setupKingfisherSettings()
         
+        getSettingsApi()
+
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
             print(objLoggedInUser)
@@ -63,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
-        
+
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
@@ -613,7 +614,8 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     }
     
     func getSettingsApi(){
-        
+        print("📡 getSettingsApi CALLED")
+
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_system_settings) { (obj:SettingsParse) in
             
             if (obj.code ?? 0) == 200 {

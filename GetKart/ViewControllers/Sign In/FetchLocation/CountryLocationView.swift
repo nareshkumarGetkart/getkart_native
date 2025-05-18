@@ -235,7 +235,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     }
     
     func navigateToStateListing(country:CountryModel){
-        var rootView = StateLocationView(navigationController: self.navigationController, strTitle: country.name ?? "", country: country, popType: self.popType)
+        var rootView = StateLocationView(navigationController: self.navigationController, country: country, popType: self.popType)
         rootView.delLocationSelected = self
         let vc = UIHostingController(rootView: rootView)
         self.navigationController?.pushViewController(vc, animated: true)
@@ -304,7 +304,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city ?? "", state:locationManager.state ?? "", country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
