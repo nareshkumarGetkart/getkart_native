@@ -169,11 +169,13 @@ struct ItemDetailView: View {
                     HStack{
                         
                         if (objVM.itemObj?.isFeature ?? false) == true{
-                            Text("Boosted").frame(width:75,height:25)
+                            Text("Featured").frame(width:75,height:20)
                                 .background(.orange)
                                 .cornerRadius(5)
                                 .foregroundColor(Color(UIColor.label))
                                 .padding(.horizontal).padding(.top,5)
+                                .font(.manrope(.regular, size: 13))
+
                         }
                         
                         Spacer()
@@ -365,10 +367,9 @@ struct ItemDetailView: View {
                     .foregroundColor(.gray)
                     
                     Divider().padding(.bottom)
-                    
                   
                     
-                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact)
+                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact,isverified:objVM.sellerObj?.isVerified ?? 0)
                         .onTapGesture {
                         
                         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
@@ -1159,6 +1160,7 @@ struct SellerInfoView: View {
     let image: String
     let mobile: String
     var mobileVisibility:Int = 1
+    var isverified:Int = 0
     @State private var showMessageView = false
 
     var body: some View {
@@ -1183,10 +1185,22 @@ struct SellerInfoView: View {
                             .cornerRadius(27.5)
                     }
                 }
-                
+             
                 VStack(alignment: .leading) {
-                    Text("\(name)")
-                        .font(.headline)
+                    HStack{
+                        Text("\(name)")
+                            .font(.headline)
+                        if isverified == 1{
+                            Image("verified")
+                                .resizable()
+                                .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                                .scaledToFit()
+                                .frame(width:15, height: 15)
+                        }
+                        
+                        Spacer()
+                    }
+                    
                     Text(email)
                         .font(.subheadline)
                         .foregroundColor(.black)

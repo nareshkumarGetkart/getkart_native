@@ -17,6 +17,7 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var lblItem:UILabel!
     @IBOutlet weak var bgView:UIView!
     @IBOutlet weak var btnAdPost:UIButton!
+    @IBOutlet weak var lblBoost:UILabel!
 
 
     override func awakeFromNib() {
@@ -25,7 +26,12 @@ class AdsTblCell: UITableViewCell {
         btnAdStatus.layer.cornerRadius = btnAdStatus.frame.height/2.0
         btnAdStatus.clipsToBounds = true
         
-        
+        lblBoost.layer.cornerRadius = 5.0
+        lblBoost.clipsToBounds = true
+        lblBoost.isHidden = true
+        lblBoost.textColor = UIColor.label
+        lblBoost.font = UIFont.Manrope.medium(size: 13.0).font
+
         btnAdPost.layer.cornerRadius =  3.0 //btnAdPost.frame.height/2.0
         btnAdPost.clipsToBounds = true
         

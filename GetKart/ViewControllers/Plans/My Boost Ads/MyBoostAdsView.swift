@@ -49,9 +49,16 @@ struct MyBoostAdsView: View {
                         ForEach(obj.listArray) { item in
                             BoostAdsCell(itemObj:item)
                                 .onTapGesture {
-                                    
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug))
+                                    var swiftVw = ItemDetailView(navController:  navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
+                                    let hostingController = UIHostingController(rootView: swiftVw)
                                     hostingController.hidesBottomBarWhenPushed = true
+                                    
+                                    swiftVw.returnValue = { value in
+                                        
+                                        if let obj = value{
+                                            self.updateItemInList(obj)
+                                        }
+                                    }
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }
                                 .onAppear{
@@ -74,6 +81,12 @@ struct MyBoostAdsView: View {
         .background(Color(.systemGray6)).navigationBarHidden(true)
         
         
+    }
+    
+    private func updateItemInList(_ value: ItemModel) {
+        if let index =  obj.listArray.firstIndex(where: { $0.id == value.id }) {
+            obj.listArray[index] = value
+        }
     }
 }
 
@@ -105,11 +118,12 @@ struct BoostAdsCell: View {
                 
                 VStack(alignment:.leading){
                     HStack{
-                        Text("Boosted")
-                            .frame(width:75,height:25)
+                        Text("Featured")
+                            .frame(width:75,height:20)
                             .background(.orange)
                             .cornerRadius(5)
                             .foregroundColor(Color(UIColor.label))
+                            .font(.manrope(.regular, size: 13))
                     }.padding(.top,5)
                     Spacer()
                 }

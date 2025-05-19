@@ -125,7 +125,16 @@ struct SearchProductView: View {
                         ForEach($items) { $item in
                             FavoritesCell(itemObj: $item)
                                 .onTapGesture {
-                                    let hostingController = UIHostingController(rootView: ItemDetailView(navController: self.navigation, itemId: item.id ?? 0, itemObj: item, isMyProduct: false, slug: item.slug))
+                                    var swiftVw = ItemDetailView(navController: self.navigation, itemId: item.id ?? 0, itemObj: item, isMyProduct: false, slug: item.slug)
+                                    let hostingController = UIHostingController(rootView: swiftVw)
+                                    
+                                    swiftVw.returnValue = { value in
+                                        
+                                        if let obj = value{
+                                            self.updateItemInList(obj)
+                                        }
+                                    }
+
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }
                         }
@@ -170,6 +179,12 @@ struct SearchProductView: View {
         }
 
 
+    }
+    
+    private func updateItemInList(_ value: ItemModel) {
+        if let index = $items.firstIndex(where: { $0.id == value.id }) {
+            items[index] = value
+        }
     }
     
     func getProductListApi(searchTxt:String){

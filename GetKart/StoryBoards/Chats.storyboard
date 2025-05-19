@@ -88,16 +88,16 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="92.666666666666671" height="20"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LMy-r3-KYs">
-                                                        <rect key="frame" x="0.0" y="0.0" width="74.666666666666671" height="20"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="82.666666666666671" height="20"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hsm-Nk-Acy" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
-                                                        <rect key="frame" x="79.666666666666657" y="6" width="8" height="8"/>
+                                                        <rect key="frame" x="87.666666666666657" y="6" width="0.0" height="8"/>
                                                         <color key="backgroundColor" systemColor="systemGreenColor"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="8" id="jwd-4e-a6Z"/>
+                                                            <constraint firstAttribute="width" id="jwd-4e-a6Z"/>
                                                             <constraint firstAttribute="height" constant="8" id="wlY-OO-PdO"/>
                                                         </constraints>
                                                         <userDefinedRuntimeAttributes>
@@ -106,12 +106,22 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </view>
+                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="verified" translatesAutoresizingMaskIntoConstraints="NO" id="tPf-2t-KNA">
+                                                        <rect key="frame" x="88.666666666666657" y="2.6666666666666643" width="15" height="15"/>
+                                                        <color key="tintColor" systemColor="linkColor"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="15" id="4mM-tW-BaN"/>
+                                                            <constraint firstAttribute="width" constant="15" id="y7Y-OJ-T6f"/>
+                                                        </constraints>
+                                                    </imageView>
                                                 </subviews>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                 <constraints>
                                                     <constraint firstItem="hsm-Nk-Acy" firstAttribute="centerY" secondItem="LMy-r3-KYs" secondAttribute="centerY" id="0iI-No-4CE"/>
+                                                    <constraint firstItem="tPf-2t-KNA" firstAttribute="centerY" secondItem="LMy-r3-KYs" secondAttribute="centerY" id="6uj-V1-pZP"/>
                                                     <constraint firstItem="hsm-Nk-Acy" firstAttribute="leading" secondItem="LMy-r3-KYs" secondAttribute="trailing" constant="5" id="KbJ-NP-hos"/>
                                                     <constraint firstItem="LMy-r3-KYs" firstAttribute="leading" secondItem="d1A-Uk-Ezq" secondAttribute="leading" id="Kmz-CK-ftb"/>
+                                                    <constraint firstItem="tPf-2t-KNA" firstAttribute="leading" secondItem="hsm-Nk-Acy" secondAttribute="trailing" constant="1" id="VjJ-vo-2WG"/>
                                                     <constraint firstAttribute="bottom" secondItem="LMy-r3-KYs" secondAttribute="bottom" id="bXV-MF-LMb"/>
                                                     <constraint firstItem="LMy-r3-KYs" firstAttribute="top" secondItem="d1A-Uk-Ezq" secondAttribute="top" id="cyX-Sw-FHE"/>
                                                     <constraint firstAttribute="height" constant="20" id="dMX-hP-m9r"/>
@@ -369,6 +379,7 @@
                         <outlet property="cnstrntHtNavBar" destination="cDc-Jy-N0b" id="Nqn-kr-RbI"/>
                         <outlet property="imgViewProduct" destination="nUP-eU-Add" id="wbj-lC-3UR"/>
                         <outlet property="imgViewProfile" destination="DWg-6U-3G1" id="Dng-5Y-OsI"/>
+                        <outlet property="imgVwVerified" destination="tPf-2t-KNA" id="mSW-Ml-YcT"/>
                         <outlet property="inputBarBottomSpace" destination="3AM-Ao-yCF" id="LcJ-MZ-mCt"/>
                         <outlet property="inputBarHeight" destination="7oJ-kb-5nx" id="kjd-2f-0bo"/>
                         <outlet property="lblBlockedMsg" destination="Stg-b6-sCa" id="Rut-hy-ksu"/>
@@ -1124,8 +1135,12 @@
         <image name="more" width="24" height="24"/>
         <image name="msg_send_icon" width="24.333333969116211" height="24.333333969116211"/>
         <image name="pause.fill" catalog="system" width="114" height="128"/>
+        <image name="verified" width="3.6666667461395264" height="4.6666665077209473"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="linkColor">
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

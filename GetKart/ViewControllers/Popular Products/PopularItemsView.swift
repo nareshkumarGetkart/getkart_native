@@ -46,11 +46,13 @@ struct ProductCard: View {
                 HStack{
                     
                     if (objItem.isFeature ?? false) == true{
-                        Text("Boosted").frame(width:75,height:25)
+                        Text("Featured").frame(width:75,height:20)
                             .background(.orange)
                             .cornerRadius(5)
                             .foregroundColor(Color(UIColor.label))
                             .padding(.horizontal).padding(.top)
+                            .font(.manrope(.regular, size: 13))
+
                     }
                     
                     Spacer()

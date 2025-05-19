@@ -144,12 +144,12 @@ struct NotificationRow: View {
           
             VStack(alignment: .leading, spacing: 5) {
                 Text(notification.title ?? "")
-                    .font(.headline)
+                    .font(.manrope(.medium, size: 16))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
 
                 Text(notification.message ?? "")
-                    .font(.subheadline)
+                    .font(.manrope(.regular, size: 15))
                     .foregroundColor(.gray)
             }
             Spacer()

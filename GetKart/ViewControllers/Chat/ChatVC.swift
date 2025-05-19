@@ -51,6 +51,9 @@ class ChatVC: UIViewController {
     var chatArray = [MessageModel]()
     
     
+    @IBOutlet weak var imgVwVerified:UIImageView!
+
+    
     private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
@@ -718,6 +721,9 @@ class ChatVC: UIViewController {
             
             let name = dataDict["name"] as? String ?? ""
             let profile = dataDict["profile"] as? String ?? ""
+            let is_verified = dataDict["is_verified"] as? Int ?? 0
+            self.imgVwVerified.isHidden = (is_verified == 1) ? false : true
+            self.imgVwVerified.setImageTintColor(color: .systemBlue)
             self.lblName.text = name
             self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "user-circle"))
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
@@ -1008,14 +1014,15 @@ extension ChatVC: GrowingTextViewDelegate {
         if !isTyping {
             isTyping = true
             self.sendtypinStatus(status: true)
-        }
-
-        // Reset the timer
-        typingTimer?.invalidate()
-        typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
-            guard let self = self else { return }
-            self.isTyping = false
-            self.sendtypinStatus(status: false)
+            
+            
+            // Reset the timer
+            typingTimer?.invalidate()
+            typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
+                guard let self = self else { return }
+                self.isTyping = false
+                self.sendtypinStatus(status: false)
+            }
         }
     }
 

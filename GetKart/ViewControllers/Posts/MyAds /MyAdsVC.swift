@@ -288,6 +288,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
         cell.btnAdStatus.setTitle((obj.status ?? "").capitalized, for: .normal)
         cell.btnAdPost.isHidden = true
+        cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
         
         switch obj.status ?? ""{
             

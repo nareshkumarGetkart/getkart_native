@@ -20,6 +20,9 @@ struct ProfileEditView: View {
     @State private var showingImagePicker: Bool = false
     @State private var showOTPPopup = false
     @State private var isMobileVerified = false
+    @State private var isEmailVerified = false
+    @State private var isEmailOtpVerifyClicked = false
+
     @State var isDataLoading = false
     var navigationController:UINavigationController?
     
@@ -74,6 +77,24 @@ struct ProfileEditView: View {
                 // Form Fields
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
+                
+                if !isEmailVerified{
+                    HStack{
+                        Spacer()
+                        Button(action: {
+                            if email.isValidEmail(){
+                                isEmailOtpVerifyClicked = true
+
+                                UIApplication.shared.endEditing()
+                                sendEmailOtp(emailId: email)
+                            }
+                        }) {
+                            Text("Verify")
+                                .underline() .foregroundColor(Color.orange).padding(.horizontal)
+                        }
+                    }.frame(height:15)
+                    
+                }
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
                     .disabled(isMobileVerified)
                 
@@ -82,6 +103,7 @@ struct ProfileEditView: View {
                         Spacer()
                         Button(action: {
                             if phoneNumber.count > 5{
+                                isEmailOtpVerifyClicked = false
                                 UIApplication.shared.endEditing()
                                 sendOTPApi(countryCode: "+91")
                             }
@@ -139,7 +161,11 @@ struct ProfileEditView: View {
                     showOTPPopup: $showOTPPopup,
                     otp: "",
                     onVerify: {code in
-                        verifyMobileOTPApi(otp: code)
+                        if isEmailOtpVerifyClicked{
+                            verifyEmailOTPApi(otp: code)
+                        }else{
+                            verifyMobileOTPApi(otp: code)
+                        }
                         print("OTP Entered: \(code)")
                         // Call your verification logic here
                     }
@@ -154,7 +180,11 @@ struct ProfileEditView: View {
                     otp: "",
                     onVerify: {code in
                          print("OTP Entered: \(code)")
-                        verifyMobileOTPApi(otp: code)
+                        if isEmailOtpVerifyClicked{
+                            verifyEmailOTPApi(otp: code)
+                        }else{
+                            verifyMobileOTPApi(otp: code)
+                        }
 
                         // Call your verification logic here
                     }
@@ -182,6 +212,7 @@ struct ProfileEditView: View {
     
     // Form Validation
     private func validateForm() {
+        
         if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
            
             AlertView.sharedManager.showToast(message: "Please fill all the fields.")
@@ -192,7 +223,13 @@ struct ProfileEditView: View {
         }else if !email.isValidEmail(){
             AlertView.sharedManager.showToast(message: "Please enter valid email")
 
-        } else {
+        }else if isMobileVerified == false{
+            AlertView.sharedManager.showToast(message: "Please verify mobile number")
+
+        } else if isEmailVerified == false{
+            AlertView.sharedManager.showToast(message: "Please verify email id")
+
+        }else {
             updateProfile()
         }
     }
@@ -221,12 +258,14 @@ struct ProfileEditView: View {
                 if status == 200{
                     isMobileVerified = true
                 }else{
+                    isMobileVerified = false
 
                 }
                 
             }
         }
     }
+    
    
     func getUserProfileApi(){
         
@@ -254,12 +293,84 @@ struct ProfileEditView: View {
                     }
                 }
                 self.isMobileVerified = (self.phoneNumber.count > 0) ? true : false
+                self.isEmailVerified = (self.email.count > 0) ? true : false
+
+                
             }
         }
     }
     
     
     
+    
+    func sendEmailOtp(emailId:String){
+      //  let timestamp = Date.timeStamp
+        let params: Dictionary<String,String> =  ["email":emailId]
+        
+       
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.send_email_otp, param: params, methodType: .post,showLoader:true) { responseObject, error in
+            
+        
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+
+                if status == 200{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                  
+                    
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+                }
+                
+            }
+        }
+    }
+    
+    
+    func verifyEmailOTPApi(otp:String){
+        
+        let params = ["email": email,"otp":otp] as [String : Any]
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.verify_email_otp, param: params, methodType: .post,showLoader:true) { responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                 
+                    self.isEmailVerified = true
+                    
+                
+                }else{
+                    self.isEmailVerified = false
+
+                    AlertView.sharedManager.showToast(message: message)
+                }
+                
+            }
+        }
+    }
     func updateProfile(){
         
         self.isDataLoading = true

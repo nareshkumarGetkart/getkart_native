@@ -106,8 +106,23 @@ struct SellerProfileView: View {
                         .cornerRadius(40)
                 }
                 
-                Text(objVM.sellerObj?.name ?? "")
-                    .font(.custom("Manrope-Medium", size: 16.0))
+                VStack(alignment:.leading){
+                    HStack{
+                        Text(objVM.sellerObj?.name ?? "")
+                            .font(.custom("Manrope-Medium", size: 16.0))
+                        if(objVM.sellerObj?.isVerified ?? 0) == 1{
+                            Image("verified")
+                                .resizable()
+                                .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                                .scaledToFit()
+                                .frame(width:15, height: 15)
+                            
+                        }
+                        Spacer()
+                    }
+                    Text(objVM.sellerObj?.email ?? "")
+                        .font(.custom("Manrope-Medium", size: 13.0))
+                }
                 Spacer()
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 if objLoggedInUser.id != nil && objLoggedInUser.id != (objVM.sellerObj?.id ?? 0) {

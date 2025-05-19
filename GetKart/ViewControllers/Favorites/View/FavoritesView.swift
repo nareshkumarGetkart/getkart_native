@@ -91,34 +91,52 @@ struct FavoritesCell:View {
     var body: some View {
         
         HStack{
-            
-            if  let img = itemObj.image {
                 
-                KFImage(URL(string: img))
-                    .placeholder {
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 110)
-                            .padding(.vertical,0)
+                ZStack{
+                   // if  let img = itemObj.image {
+                    KFImage(URL(string: itemObj.image ?? ""))
+                        .placeholder {
+                            Image("getkartplaceholder")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 110,height:widthScreen / 2.0 - 15)
+                                .padding(.vertical,0)
+                                .frame(maxHeight: .infinity)
+                               // .background(Color.gray.opacity(0.3))
+                               // .cornerRadius(10, corners: [.topRight, .bottomRight])
+                                
+                        }
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+                                                                    height: widthScreen / 2.0 - 15))
+                        )
+                        .resizable()
+                        .frame(width: 110)
+                        .padding(.vertical,0)
+                        .aspectRatio(contentMode: .fit)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(10, corners: [.topRight, .bottomRight])
+                        .frame(maxHeight: .infinity)
+                    
+                    if (itemObj.isFeature ?? false) == true {
+                        VStack(alignment:.leading){
+                            HStack{
+                                Text("Featured")
+                                    .frame(width:75,height:20)
+                                    .background(.orange)
+                                    .cornerRadius(5)
+                                    .foregroundColor(Color(UIColor.label))
+                                    .font(.manrope(.regular, size: 13))
 
-                           // .background(Color.gray.opacity(0.3))
-                           // .cornerRadius(10, corners: [.topRight, .bottomRight])
-
-                            
+                            }.padding(.top,5)
+                            Spacer()
+                        }
                     }
-                    .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
-                                                                height: widthScreen / 2.0 - 15))
-                    )
-                    .resizable()
-                    .frame(width: 110)
-                    .padding(.vertical,0)
-                    .aspectRatio(contentMode: .fit)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(10, corners: [.topRight, .bottomRight])
 
+               // }
                 
+             
+
             }
             
             VStack(alignment: .leading, spacing: 5){

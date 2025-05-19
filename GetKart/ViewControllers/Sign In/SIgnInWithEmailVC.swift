@@ -41,8 +41,8 @@ class SIgnInWithEmailVC: UIViewController {
     //MARK: Api Methods
     
     func sendEmailOtp(){
-        let timestamp = Date.timeStamp
-        var params: Dictionary<String,String> =  ["email":txtFdEmail.text ?? ""]
+      //  let timestamp = Date.timeStamp
+        let params: Dictionary<String,String> =  ["email":txtFdEmail.text ?? ""]
         
        
       
