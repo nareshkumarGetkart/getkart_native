@@ -90,6 +90,9 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             
             cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
             
+            cell.btnLike.tag = indexPath.item
+            cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
+            
             let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
             cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
             
@@ -107,7 +110,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        var detailView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:(objViewModel?.listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: objViewModel?.listArray?[indexPath.item], slug: objViewModel?.listArray?[indexPath.item].slug)
+        var detailView = ItemDetailView(navController:   self.navigationController, itemId:(objViewModel?.listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: objViewModel?.listArray?[indexPath.item], slug: objViewModel?.listArray?[indexPath.item].slug)
         detailView.returnValue = { [self] value in
            if let obj = value{
                objViewModel?.listArray?[indexPath.item] = obj
@@ -115,7 +118,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
            }
        }
         let hostingController = UIHostingController(rootView: detailView)
-        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -133,6 +136,31 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
                 if objViewModel?.isDataLoading == false{
                     objViewModel?.getItemListApi()
                 }
+            }
+        }
+    }
+    
+    @objc  func likebtnAction(_ sender : UIButton){
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            if  var obj = (objViewModel?.listArray?[sender.tag] as? ItemModel){
+                obj.isLiked?.toggle()
+                objViewModel?.listArray?[sender.tag] = obj
+                addToFavourite(itemId:obj.id ?? 0)
+                self.collctionView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
+                
+            }
+        }
+    }
+    
+    
+    func addToFavourite(itemId:Int){
+        
+        let params = ["item_id":"\(itemId)"]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.manage_favourite, param: params) { responseObject, error in
+            
+            if error == nil {
+                
             }
         }
     }

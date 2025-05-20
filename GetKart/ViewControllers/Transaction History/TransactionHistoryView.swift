@@ -25,7 +25,7 @@ struct TransactionHistoryView: View {
                     .padding()
             }
             Text("Order History").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
             Spacer()
         }.frame(height: 44)
@@ -65,8 +65,8 @@ struct TransactionHistoryView: View {
                                     }
                                 }
                                 .onTapGesture {
-                                    let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transaction, navController: self.navigation))
-                                    self.navigation?.pushViewController(hostView, animated: true)
+                                    self.pushToDesiredScreen(transObj: transaction)
+                                   
                                 }
                         }
                     }
@@ -87,6 +87,15 @@ struct TransactionHistoryView: View {
                 }
         }.navigationBarHidden(true)
         
+    }
+    
+    
+    func pushToDesiredScreen(transObj:TransactionModel){
+        
+        if (transObj.paymentTransaction?.paymentStatus ?? "") == "succeed"{
+            let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transObj, navController: self.navigation))
+            self.navigation?.pushViewController(hostView, animated: true)
+        }
     }
     
     func getTransactionHistory(){
@@ -179,6 +188,7 @@ struct TransactionRow: View {
                     .font(.headline)
                     .foregroundColor(.black).padding(.trailing,10)
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""
+               
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
                 Text(displayStatus)

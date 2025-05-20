@@ -30,6 +30,7 @@ struct MakeAnOfferView: View {
                 Text("Make an offer")
                     .font(.headline)
                     .padding(.top)
+                    .foregroundColor((Color(UIColor.label)))
                 
                 Divider()
                 
@@ -58,7 +59,7 @@ struct MakeAnOfferView: View {
                             isPresented = false
                         }
                     }) {
-                        Text("Cancel").foregroundColor(.black)
+                        Text("Cancel").foregroundColor(Color(UIColor.label))
                             .frame(maxWidth: .infinity)
                             .frame(height: 45)
                             .background(Color(.systemGray5))

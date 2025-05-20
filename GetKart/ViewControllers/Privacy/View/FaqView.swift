@@ -24,9 +24,9 @@ struct FaqView: View {
                     Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 Text("FAQ").font(.custom("Manrope-Bold", size: 20.0))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 Spacer()
-            }.frame(height:44).background()
+            }.frame(height:44).background(Color(UIColor.systemBackground))
             
             
             ScrollView {

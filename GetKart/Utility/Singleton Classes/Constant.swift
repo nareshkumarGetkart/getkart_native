@@ -84,8 +84,7 @@ final class Constant: NSObject {
     
     var userSignupUrl:String{
         get {
-            return "\(Constant.shared.baseURL)/user-signup"
-           // return "\(Constant.shared.baseURL)/v1/user-signup"
+            return "\(Constant.shared.baseURL)/v1/user-signup"
 
         }
     }
@@ -293,7 +292,7 @@ final class Constant: NSObject {
     
     var upload_chat_files:String{
         get{
-            return "\(Constant.shared.baseURL)/upload-chat-files"
+            return "\(Constant.shared.baseURL)/v1/upload-chat-files"
             
         }
     }
@@ -435,7 +434,7 @@ final class Constant: NSObject {
     
     var make_item_featured:String{
         get{
-            return "\(Constant.shared.baseURL)/make-item-featured"
+            return "\(Constant.shared.baseURL)/v1/make-item-featured"
         }
     }
     

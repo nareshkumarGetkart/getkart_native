@@ -43,7 +43,7 @@ struct ReportAdsView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(selectedReason == selReason ? Color.orange.opacity(0.2) : Color(UIColor.systemGray6))
-                            .foregroundColor(selectedReason == selReason ? .orange : .black)
+                            .foregroundColor(selectedReason == selReason ? .orange : (Color(UIColor.label)))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -56,7 +56,7 @@ struct ReportAdsView: View {
                 HStack {
                     Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
-                    }.font(.manrope(.semiBold, size: 15)).foregroundColor(.black)
+                    }.font(.manrope(.semiBold, size: 15)).foregroundColor(Color(UIColor.label))
                         .frame(maxWidth: .infinity,minHeight: 40,maxHeight: 40)
                     .background(Color(UIColor.systemGray5))
                     .cornerRadius(20).padding(5)

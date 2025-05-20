@@ -26,7 +26,8 @@ struct PlanBoughtSuccessView: View {
                 Text("Thankyou").font(Font.manrope(.semiBold, size: 16))
                     .font(.title2)
                     .fontWeight(.bold)
-                Text("Your transaction was successful!").font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
+                Text("Your transaction was successful!").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                 
                 HStack {
                     

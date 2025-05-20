@@ -83,8 +83,8 @@ class ChatVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
-        //btnBack.setImageTintColor(color: .black)
-        btnBack.setImageColor(color: .black)
+        btnThreeDots.setImageColor(color: .label)
+        btnBack.setImageColor(color: .label)
         self.topRefreshControl.backgroundColor = .clear
         self.tblView.refreshControl = topRefreshControl
         
@@ -191,8 +191,8 @@ class ChatVC: UIViewController {
       
         }else{
             
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:itemId, itemObj: nil, slug: slug))
-            AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true)
+            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemId, itemObj: nil, slug: slug))
+            self.navigationController?.pushViewController(hostingController, animated: true)
         }
         
     }
@@ -824,7 +824,8 @@ class ChatVC: UIViewController {
                     sendmessageAcknowledge()
                 }
                 
-                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
             }
         }
     }
@@ -1223,6 +1224,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     cell.lblSeen.isHidden = false
                     cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                 }
+                cell.audioDuration.text = ""
                 /*
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.audioDuration.text =  "\(chatObj.mediaDuration ?? 0)"
@@ -1380,6 +1382,8 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.bgview.roundCorners(corners: [.bottomRight,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
                     }
+                    cell.audioDuration.text = ""
+
                 }
                     /*
                 case 7: do{

@@ -77,7 +77,7 @@ struct ProfileEditView: View {
                 // Form Fields
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
-                
+                    .disabled(isEmailVerified)
                 if !isEmailVerified{
                     HStack{
                         Spacer()
@@ -305,7 +305,7 @@ struct ProfileEditView: View {
     
     func sendEmailOtp(emailId:String){
       //  let timestamp = Date.timeStamp
-        let params: Dictionary<String,String> =  ["email":emailId]
+        let params: Dictionary<String,String> =  ["email":emailId,"type":"update"]
         
        
       
@@ -326,7 +326,8 @@ struct ProfileEditView: View {
                 if status == 200{
                     
                     AlertView.sharedManager.showToast(message: message)
-                    
+                    self.showOTPPopup = true
+
                   
                     
                 }else{
@@ -340,7 +341,7 @@ struct ProfileEditView: View {
     
     func verifyEmailOTPApi(otp:String){
         
-        let params = ["email": email,"otp":otp] as [String : Any]
+        let params = ["email": email,"otp":otp,"type":"update"] as [String : Any]
         
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.verify_email_otp, param: params, methodType: .post,showLoader:true) { responseObject, error in

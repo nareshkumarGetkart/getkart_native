@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.overrideUserInterfaceStyle = .light
+       self.window?.overrideUserInterfaceStyle = .light
 
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
@@ -551,6 +551,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         
         if notificationType == "chat" {
             
+            
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
             
             if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC {
                 

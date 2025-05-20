@@ -87,8 +87,10 @@ class PayPlanVC: UIViewController {
                     
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
                         self?.payment_method_type = dataDict["payment_method_type"] as? Int ?? 0
+                        
                         if self?.payment_method_type == 1 {
-                            
+                            //IN App Purchase
+                       
                         }else if self?.payment_method_type == 3 {//Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
                                 self?.api_key = PhonePeDict["api_key"] as? String ?? ""

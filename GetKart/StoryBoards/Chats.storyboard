@@ -55,7 +55,7 @@
                                             <constraint firstAttribute="height" constant="40" id="Vf5-yF-zci"/>
                                             <constraint firstAttribute="width" constant="40" id="nkB-lM-9LH"/>
                                         </constraints>
-                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" systemColor="labelColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="arrow_left"/>
                                         <connections>
@@ -68,6 +68,7 @@
                                             <constraint firstAttribute="height" constant="40" id="dRw-A0-mfv"/>
                                             <constraint firstAttribute="width" constant="40" id="vvL-vl-G6d"/>
                                         </constraints>
+                                        <color key="tintColor" systemColor="labelColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="more"/>
                                         <connections>
@@ -376,6 +377,7 @@
                         <outlet property="btnImgMicBlink" destination="fHD-hA-ulg" id="aA6-lV-zRc"/>
                         <outlet property="btnMic" destination="dCe-f9-GA2" id="GRD-vJ-ESB"/>
                         <outlet property="btnSend" destination="MdW-Za-lZx" id="stI-Kl-BFU"/>
+                        <outlet property="btnThreeDots" destination="VIk-Je-M1R" id="r5w-a3-yzG"/>
                         <outlet property="cnstrntHtNavBar" destination="cDc-Jy-N0b" id="Nqn-kr-RbI"/>
                         <outlet property="imgViewProduct" destination="nUP-eU-Add" id="wbj-lC-3UR"/>
                         <outlet property="imgViewProfile" destination="DWg-6U-3G1" id="Dng-5Y-OsI"/>
@@ -678,17 +680,10 @@
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RLy-Hc-X9Y" customClass="UIActionSheet">
                                             <rect key="frame" x="10" y="5" width="373" height="70"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SHU-Kt-AIS">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="The package you choose will only be valid for the selected category and location." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SHU-Kt-AIS">
                                                     <rect key="frame" x="42" y="10" width="321" height="50"/>
-                                                    <attributedString key="attributedText">
-                                                        <fragment content="The package you choose will only be valid for the selected category and location.">
-                                                            <attributes>
-                                                                <font key="NSFont" size="12" name="Inter-Regular"/>
-                                                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                            </attributes>
-                                                        </fragment>
-                                                    </attributedString>
-                                                    <nil key="highlightedColor"/>
+                                                    <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="12"/>
+                                                    <color key="highlightedColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="about_us" translatesAutoresizingMaskIntoConstraints="NO" id="mRA-HO-YsL">
                                                     <rect key="frame" x="10" y="24" width="22" height="22"/>
@@ -753,6 +748,7 @@
                         <outlet property="btnBack" destination="YJs-5H-8KH" id="B8X-bK-xwk"/>
                         <outlet property="btnShowPackage" destination="noB-XB-q0u" id="8it-fI-sZI"/>
                         <outlet property="cnstrntHtNavBar" destination="0fP-ke-a8x" id="zRe-44-r79"/>
+                        <outlet property="lblDesc" destination="SHU-Kt-AIS" id="Ck7-OS-GLA"/>
                         <outlet property="tblView" destination="df3-Yz-UgR" id="4hm-OD-xWm"/>
                     </connections>
                 </viewController>
@@ -934,17 +930,15 @@
                                                 <constraint firstAttribute="height" constant="24" id="RhD-cm-veR"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="16"/>
-                                            <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Post multiple ads and get the benefits of auto boost every 7 days" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="62Z-D1-AqT">
                                             <rect key="frame" x="10" y="35" width="373" height="35"/>
                                             <fontDescription key="fontDescription" name="Times-Roman" family="Times" pointSize="14"/>
-                                            <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstItem="62Z-D1-AqT" firstAttribute="leading" secondItem="U7i-HO-ye0" secondAttribute="leading" constant="10" id="4re-dQ-u1o"/>
                                         <constraint firstItem="mdZ-CQ-zyq" firstAttribute="leading" secondItem="U7i-HO-ye0" secondAttribute="leading" constant="10" id="9d9-W0-OdD"/>
@@ -990,7 +984,7 @@
                                             <constraint firstAttribute="height" constant="40" id="3n2-Ud-zlC"/>
                                             <constraint firstAttribute="width" constant="40" id="mj2-PT-t11"/>
                                         </constraints>
-                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" systemColor="labelColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="Cross"/>
                                         <connections>
@@ -1021,7 +1015,7 @@
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="9t6-3x-gTS"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="9t6-3x-gTS" firstAttribute="trailing" secondItem="7cd-YJ-TSS" secondAttribute="trailing" id="6cD-kj-ZxD"/>
                             <constraint firstItem="9t6-3x-gTS" firstAttribute="bottom" secondItem="4Ie-we-Aty" secondAttribute="bottom" id="DNz-13-75T"/>
@@ -1140,25 +1134,25 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

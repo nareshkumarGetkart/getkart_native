@@ -109,7 +109,9 @@ final class Local {
     }
     
     func removeUserData() {
-        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+
         SocketIOManager.sharedInstance.socket?.disconnect()
         SocketIOManager.sharedInstance.socket = nil
         SocketIOManager.sharedInstance.manager = nil

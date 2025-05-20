@@ -201,17 +201,25 @@ struct SearchWithSortView: View {
             }
     }
     
+    
     func pushToDetailScreen(id:Int,item:ItemModel){
-        let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
-         let hostController = UIHostingController(rootView: destView)
-         AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
+        var destView = ItemDetailView(navController:  self.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
+        destView.returnValue = { value in
+            if let obj = value{
+                self.updateItemInList(obj)
+            }
+        }
+        let hostController = UIHostingController(rootView: destView)
+        self.navigationController?.pushViewController(hostController, animated: true)
     }
+    
     
     private var gridView: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
             ForEach($objVM.items, id: \.id) { $item in
                 ProductCard(objItem: $item, onItemLikeDislike: { likedObj in
-                    
+                    updateItemInList(likedObj)
+
                 })
                     .onTapGesture {
                         let itemId = item.id ?? 0
@@ -250,7 +258,11 @@ struct SearchWithSortView: View {
         }
     }
 
-
+    private func updateItemInList(_ value: ItemModel) {
+        if let index = $objVM.items.firstIndex(where: { $0.id == value.id }) {
+            objVM.items[index] = value
+        }
+    }
 }
 
 

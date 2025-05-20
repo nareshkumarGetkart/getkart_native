@@ -38,13 +38,12 @@ struct BlogDetailView: View {
                 if (obj?.image ?? "").count > 0{
                     AsyncImage(url: URL(string: obj?.image ?? "")) { image in
                         image.resizable().aspectRatio(contentMode: .fill)
-                            .frame(width:  UIScreen.main.bounds.width-20, height: 150)
+                            .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
                         
                     }placeholder: {
                         
                         Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill)
-                            .frame(width:  UIScreen.main.bounds.width-20, height: 150)
-                        //                ProgressView().progressViewStyle(.circular)
+                            .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
                         
                     }
                 }

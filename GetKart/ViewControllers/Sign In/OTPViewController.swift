@@ -119,8 +119,16 @@ class OTPViewController: UIViewController {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    
+                    if let  data = result["data"] as? Dictionary<String, Any>{
+                        
+                       if let temp_token = data["temp_token_"] as? String{
+                            
+                           self?.userSignupApi(tempToken: temp_token)
+
+                        }
+                    }
                  
-                    self?.userSignupApi(tempToken: "")
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                 }
@@ -134,7 +142,7 @@ class OTPViewController: UIViewController {
     
     func verifyEmailOTPApi(){
         
-        let params = ["email": mobile,"otp":txtOtp.text ?? ""] as [String : Any]
+        let params = ["email": mobile,"otp":txtOtp.text ?? "","type":"login"] as [String : Any]
         
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.verify_email_otp, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
@@ -204,7 +212,7 @@ class OTPViewController: UIViewController {
         timer = nil
         
         let timestamp = Date.timeStamp
-        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)"] as [String : Any]
+        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)","temp_token_":tempToken] as [String : Any]
         
         if isMobileLogin == false {
             

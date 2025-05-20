@@ -50,8 +50,7 @@ struct MyBoostAdsView: View {
                             BoostAdsCell(itemObj:item)
                                 .onTapGesture {
                                     var swiftVw = ItemDetailView(navController:  navigation, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
-                                    let hostingController = UIHostingController(rootView: swiftVw)
-                                    hostingController.hidesBottomBarWhenPushed = true
+                                 
                                     
                                     swiftVw.returnValue = { value in
                                         
@@ -59,6 +58,8 @@ struct MyBoostAdsView: View {
                                             self.updateItemInList(obj)
                                         }
                                     }
+                                    let hostingController = UIHostingController(rootView: swiftVw)
+                                    hostingController.hidesBottomBarWhenPushed = true
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }
                                 .onAppear{

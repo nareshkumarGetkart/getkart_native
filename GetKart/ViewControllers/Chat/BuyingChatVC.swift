@@ -43,7 +43,7 @@ class BuyingChatVC: UIViewController {
             self.emptyView?.lblMsg?.text = "No chat Found"
             self.emptyView?.imageView?.image = UIImage(named: "no_chat_found")
         }
-        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
        // getChatList()
 
     }
@@ -51,7 +51,7 @@ class BuyingChatVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE == true{
+        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER == true{
             self.page = 1
             getChatList()
         }
@@ -117,7 +117,7 @@ class BuyingChatVC: UIViewController {
     }
     
     @objc func chatList(notification: Notification) {
-        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = false
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = false
 
         guard let data = notification.userInfo else{
             return

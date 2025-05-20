@@ -167,12 +167,12 @@ func navigateToScreen(index:Int, sliderObj:SliderModel?){
     }else{
         
         var detailView =  ItemDetailView(navController:  self.navigationController, itemId:sliderObj?.model?.id ?? 0, itemObj: nil, slug: sliderObj?.model?.slug ?? "")
-        let hostingController = UIHostingController(rootView:detailView)
         detailView.returnValue = { [weak self] value in
             if let obj = value{
                 
             }
         }
+        let hostingController = UIHostingController(rootView:detailView)
         hostingController.hidesBottomBarWhenPushed = true
 
         self.navigationController?.pushViewController(hostingController, animated: true)

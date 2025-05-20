@@ -423,16 +423,16 @@ struct ItemDetailView: View {
                                     .stroke(Color.gray, lineWidth: 0.5)
                             ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
                             .onTapGesture {
-                                
-                                let reportAds =  ReportAdsView(itemId:(objVM.itemObj?.id ?? 0)) {bool in
-                                    objVM.itemObj?.isAlreadyReported = bool
+                                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                    let reportAds =  ReportAdsView(itemId:(objVM.itemObj?.id ?? 0)) {bool in
+                                        objVM.itemObj?.isAlreadyReported = bool
+                                    }
+                                    let destVC = UIHostingController(rootView:reportAds)
+                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                                    self.navController?.present(destVC, animated: true, completion: nil)
                                 }
-                                let destVC = UIHostingController(rootView:reportAds)
-                                destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                self.navController?.present(destVC, animated: true, completion: nil)
-                                
                                 
                             }
                     }.padding()
@@ -481,7 +481,7 @@ struct ItemDetailView: View {
                       }.id("related-scroll")
                     */
                     RelatedItemsRow(
-                        items:  objVM.relatedDataItemArray, //.map { $0 },
+                        items:  $objVM.relatedDataItemArray, //.map { $0 },
                         onItemTapped: { item in
                             var swiftUIview = ItemDetailView(
                                 navController: self.navController,
@@ -1140,7 +1140,7 @@ struct InfoView: View {
                     }
                 }else{
                     Text(value)
-                        .font(.manrope(.medium, size: 15)).foregroundColor(.black).lineLimit(2)
+                        .font(.manrope(.medium, size: 15)).foregroundColor(Color(UIColor.label)).lineLimit(2)
                 }
                // Spacer()
 
@@ -1203,7 +1203,7 @@ struct SellerInfoView: View {
                     
                     Text(email)
                         .font(.subheadline)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(UIColor.label))
                 }.padding(.trailing,5)
                 
                 
@@ -1272,7 +1272,7 @@ struct SellerInfoView: View {
 
 
 struct RelatedItemsRow: View {
-    @State var items: [ItemModel]
+    @Binding var items: [ItemModel]
     var onItemTapped: (ItemModel) -> Void
     var onItemLikedTapped: (ItemModel) -> Void
 

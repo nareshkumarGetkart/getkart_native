@@ -126,7 +126,6 @@ struct SearchProductView: View {
                             FavoritesCell(itemObj: $item)
                                 .onTapGesture {
                                     var swiftVw = ItemDetailView(navController: self.navigation, itemId: item.id ?? 0, itemObj: item, isMyProduct: false, slug: item.slug)
-                                    let hostingController = UIHostingController(rootView: swiftVw)
                                     
                                     swiftVw.returnValue = { value in
                                         
@@ -134,6 +133,7 @@ struct SearchProductView: View {
                                             self.updateItemInList(obj)
                                         }
                                     }
+                                    let hostingController = UIHostingController(rootView: swiftVw)
 
                                     self.navigation?.pushViewController(hostingController, animated: true)
                                 }

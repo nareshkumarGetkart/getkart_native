@@ -21,7 +21,9 @@ final class Themes: NSObject {
      private override init(){
          
      }
-     var is_CHAT_NEW_SEND_OR_RECIEVE = true
+     var is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+     var is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+
      var isLikeSwipePopUp = 0
      let themeColor = UIColor(hexString: "#FF9900")
      var spinnerView:MMMaterialDesignSpinner!

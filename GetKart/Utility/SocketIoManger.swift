@@ -100,7 +100,9 @@ final class SocketIOManager: NSObject {
             DispatchQueue.global(qos: .background).async {
                // self.socket?.connect()
                // self.socket = nil
-            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE = true
+                
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
             }
         }
         
@@ -202,6 +204,10 @@ final class SocketIOManager: NSObject {
                 if ISDEBUG == true {
                     print("\(SocketEvents.sendMessage.rawValue) responseDict =>\(responseDict)")
                 }
+
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.sendMessage.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }

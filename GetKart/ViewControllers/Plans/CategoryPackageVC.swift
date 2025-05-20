@@ -32,7 +32,7 @@ class CategoryPackageVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        btnBack.setImageColor(color: .black)
+        btnBack.setImageColor(color: .label)
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "PackageCell", bundle: nil), forCellReuseIdentifier: "PackageCell")
         collectionViewBanner.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")

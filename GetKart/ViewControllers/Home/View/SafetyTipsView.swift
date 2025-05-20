@@ -34,6 +34,7 @@ struct SafetyTipsView: View {
                     .font(.title2)
                     .bold()
                     .padding(.top, 5)
+                    .foregroundColor(Color(UIColor.label))
                 
                 VStack(alignment: .leading, spacing: 10) {
                     
@@ -58,7 +59,7 @@ struct SafetyTipsView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 20)
             } .edgesIgnoringSafeArea(.all)
-                .background(Color.white)
+                .background(Color(UIColor.systemBackground))
     
         }.onAppear{
             if listArray.count == 0{
@@ -78,6 +79,7 @@ struct SafetyTipsView: View {
             Image("active_mark")
             Text(text).font(.manrope(.medium, size: 16))
                 .font(.body)
+                .foregroundColor(Color(UIColor.label))
         }
     }
     

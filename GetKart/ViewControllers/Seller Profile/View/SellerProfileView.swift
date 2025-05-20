@@ -187,7 +187,8 @@ struct SellerProfileView: View {
                     ForEach($objVM.itemArray) { $item in
                         
                         ProductCard(objItem: $item, onItemLikeDislike: {likedObj in
-                            
+                            updateItemInList(likedObj)
+
                         })
                            
                             .onAppear {
@@ -198,13 +199,14 @@ struct SellerProfileView: View {
                             }
                             .onTapGesture {
                                 var detailView =  ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
-                                let hostingController = UIHostingController(rootView:detailView)
                                 
                                 detailView.returnValue = { value in
                                     if let obj = value{
                                         self.updateItemInList(obj)
                                     }
                                 }
+                                let hostingController = UIHostingController(rootView:detailView)
+
                                 self.navController?.pushViewController(hostingController, animated: true)
                             }
                     }
@@ -232,6 +234,7 @@ struct SellerProfileView: View {
     private func updateItemInList(_ value: ItemModel) {
         if let index = $objVM.itemArray.firstIndex(where: { $0.id == value.id }) {
             objVM.itemArray[index] = value
+            
         }
     }
     // Function to create stats view

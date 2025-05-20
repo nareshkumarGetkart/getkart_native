@@ -83,7 +83,7 @@ struct ProductCard: View {
         .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
         .shadow(radius: 2)
-                        
+        .contentShape(Rectangle())
            // VStack{
               //  Spacer()
                 
@@ -109,6 +109,7 @@ struct ProductCard: View {
                     }
                         .frame(width: 55,height: 50)
                         .padding([.trailing], 15)
+                        .allowsHitTesting(true)
                     
                 }.padding(.top,widthScreen / 2.0 - 108)
               

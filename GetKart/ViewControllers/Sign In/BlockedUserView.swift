@@ -25,9 +25,9 @@ struct BlockedUserView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
             Text("Blocked Users").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-        }.frame(height:44).background(Color.white)
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
         VStack{
             
@@ -50,7 +50,8 @@ struct BlockedUserView: View {
                         .resizable().aspectRatio(contentMode: .fit)
                         .frame(width: 60,height: 60).cornerRadius(30).padding(8)}
                     
-                    Text(obj.name ?? "").foregroundColor(.black).font(Font.manrope(.regular, size: 16.0))
+                    Text(obj.name ?? "").foregroundColor(Color(UIColor.label))
+                        .font(Font.manrope(.regular, size: 16.0))
                     Spacer()
                     
                 }.background(.white).cornerRadius(6.0).padding(.horizontal).tag(index).onTapGesture {

@@ -24,9 +24,9 @@ struct FollowerListView: View {
             
             let strTitle = ((isFollower == true) ? "Followers" : "Following")
             Text(strTitle).font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-         }.frame(height:44).background(Color.white)
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
         
         VStack{
@@ -101,22 +101,28 @@ struct FollowerRowView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 
-                Text(user.name ?? "")
-                    .fontWeight(.semibold)
-                
-                
-                if (user.isVerified ?? 0) != 0 {
-                    HStack {
-                        
-                        Text("Verified")
-                            .foregroundColor(.gray)
-                            .font(.subheadline)
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 12))
-                        Spacer()
+                HStack{
+                    Text(user.name ?? "")
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color(UIColor.label))
+                    
+                    if (user.isVerified ?? 0) != 0 {
+                       // HStack {
+                            
+                           // Text("Verified")
+//                                .foregroundColor(.gray)
+//                                .font(.subheadline)
+                        Image("verified")
+                            .resizable()
+                            .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                            .scaledToFit()
+                            .frame(width:15, height: 15)
+                        //}
                     }
+                    Spacer()
+
                 }
+                
                 
                 
                 Text("Member Since→")
@@ -126,7 +132,7 @@ struct FollowerRowView: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color(UIColor.systemBackground))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)

@@ -11,6 +11,9 @@ import SwiftUI
 class ChatListVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     
+    
+    @IBOutlet weak var btnBlockUser:UIButton!
+
     private var pageMenu: CAPSPageMenu?
     private var viewNotification: UIView?
     private var viewBack: UIView?
@@ -26,6 +29,7 @@ class ChatListVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        btnBlockUser.setImageColor(color: .label)
         cnstrntHtNavBar.constant = self.getNavBarHt
         // Array to keep track of controllers in page menu
         AppDelegate.sharedInstance.checkSocketStatus()

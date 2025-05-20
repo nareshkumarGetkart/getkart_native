@@ -257,7 +257,7 @@
                                             <constraint firstAttribute="width" constant="40" id="7vu-3R-WN9"/>
                                             <constraint firstAttribute="height" constant="40" id="IwL-v9-28q"/>
                                         </constraints>
-                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" systemColor="labelColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="blockuser"/>
                                         <connections>
@@ -294,6 +294,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnBlockUser" destination="61M-KG-Wfk" id="6iL-fr-ki0"/>
                         <outlet property="cnstrntHtNavBar" destination="bGF-S9-KtX" id="HQN-RP-JXh"/>
                     </connections>
                 </viewController>
@@ -736,14 +737,17 @@
         <image name="location_icon" width="20" height="20"/>
         <image name="microphone.fill" catalog="system" width="110" height="128"/>
         <image name="search" width="24" height="24"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

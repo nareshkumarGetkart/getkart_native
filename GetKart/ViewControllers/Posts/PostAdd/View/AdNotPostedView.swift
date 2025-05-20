@@ -42,7 +42,7 @@ struct AdNotPostedView: View {
                 Image("draft")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 200, height: 200)
+                    .frame(width: 140, height: 140)
                     .foregroundColor(.green)
                 
                 Text("Ad not posted, saved in draft")
@@ -94,10 +94,10 @@ struct AdNotPostedView: View {
                         .padding(.horizontal)
                         .font(.manrope(.medium, size: 16.0))
 
-                }
+                }.padding(.bottom)
                 
                 Spacer()
-            }
+            }.padding([.top,.bottom])
         }.navigationBarHidden(true)
         
     }

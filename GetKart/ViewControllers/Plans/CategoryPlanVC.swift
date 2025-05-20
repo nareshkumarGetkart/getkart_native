@@ -14,6 +14,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
      @IBOutlet weak var tblView:UITableView!
      @IBOutlet weak var btnShowPackage:UIButton!
     @IBOutlet weak var btnBack:UIButton!
+    @IBOutlet weak var lblDesc:UILabel!
 
     
      let titleArray =  ["Category","Location"]
@@ -33,7 +34,8 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
      //MARK: Controller life cycle methods
      override func viewDidLoad() {
          super.viewDidLoad()
-         btnBack.setImageColor(color: .black)
+         btnBack.setImageColor(color: .label)
+         lblDesc.textColor = .label
          cnstrntHtNavBar.constant = self.getNavBarHt
          // Do any additional setup after loading the view.
          tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")

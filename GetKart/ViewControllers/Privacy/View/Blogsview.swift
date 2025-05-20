@@ -80,13 +80,12 @@ struct BlogCell:View{
             HStack{ Spacer()}.frame(height: 10)
             AsyncImage(url: URL(string: obj.image ?? "")) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
-                    .frame(width:  UIScreen.main.bounds.width-20, height: 150)
+                    .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
                 
             }placeholder: {
                 
                 Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill)
-                    .frame(width:  UIScreen.main.bounds.width-20, height: 150)
-                //                ProgressView().progressViewStyle(.circular)
+                    .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
                 
             }
             Text(obj.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing]).padding(.top,10)
