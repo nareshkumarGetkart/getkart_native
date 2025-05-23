@@ -25,6 +25,15 @@ class ProfileVC: UIViewController {
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
+    
+    private  lazy var topRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+                                    #selector(handlePullDownRefresh(_:)),
+                                 for: .valueChanged)
+        refreshControl.tintColor = UIColor.systemYellow
+        return refreshControl
+    }()
 
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -35,19 +44,38 @@ class ProfileVC: UIViewController {
         
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
         getUserProfileApi()
+        self.topRefreshControl.backgroundColor = .clear
+        tblView.refreshControl = topRefreshControl
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         self.tblView.reloadData()
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.id != nil {
-            getVerificationStatusApi()
+//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//       
+//        if objLoggedInUser.id != nil {
+            if Local.shared.getUserId() > 0{
+            if Local.shared.isToRefreshVerifiedStatusApi == true{
+                
+                getVerificationStatusApi()
+            }
         }
     }
     
+    //MARK: Pull Down refresh
+    @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else if Local.shared.getUserId() > 0{
+            getVerificationStatusApi()
+        }
+        refreshControl.endRefreshing()
+    }
     
+     
     func getVerificationStatusApi(){
         URLhandler.sharedinstance.makeCall(url: Constant.shared.verification_request, param: nil,methodType: .get) { responseObject, error in
             
@@ -59,7 +87,7 @@ class ProfileVC: UIViewController {
                         self.verifiRejectedReason = data["rejection_reason"] as? String ?? ""
                         self.verifiSttaus = data["status"] as? String ?? ""
                         self.tblView.reloadData()
-
+                        Local.shared.isToRefreshVerifiedStatusApi = false
                     }
                 }
                 
@@ -69,10 +97,13 @@ class ProfileVC: UIViewController {
     
     func getUserProfileApi(){
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        
-        if objLoggedInUser.id != nil {
-            let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//        
+//        if objLoggedInUser.id != nil {
+            
+            if Local.shared.getUserId() > 0{
+
+            let strUrl = Constant.shared.get_seller + "?id=\(Local.shared.getUserId())"
 
             URLhandler.sharedinstance.makeCall(url: strUrl, param: nil,methodType: .get) { responseObject, error in
                 
@@ -111,8 +142,10 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.id != nil {
+//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//        if objLoggedInUser.id != nil {
+        if Local.shared.getUserId() > 0{
+
             return titleArray.count
         }else{
             return (titleArray.count-2)
@@ -141,7 +174,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
                 
 
-                if (objLoggedInUser.is_verified ?? 0) == 1 || verifiSttaus.lowercased() == "approved"{
+                if (objLoggedInUser.is_verified ?? 0) == 1 && verifiSttaus.lowercased() == "approved"{
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = false
                     
@@ -156,6 +189,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = true
                     cell.btnGetVerifiedBadge.isHidden = true
+                    cell.bgViewVerified.isHidden = true
 
                 }else if verifiSttaus.lowercased() == "rejected"{
                     cell.lblStatus.text = verifiSttaus.capitalized
@@ -163,6 +197,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = false
                     cell.btnGetVerifiedBadge.isHidden = true
+                    cell.bgViewVerified.isHidden = true
                 }
                 cell.btnResubmit.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 cell.lblStatus.isUserInteractionEnabled = true

@@ -10,5 +10,6 @@
 
 #import "Mp3Recorder.h"
 #import "lame.h"
+#import "ATAppUpdater.h"
 
 #endif /* Getkart_Bridging_Header_h */

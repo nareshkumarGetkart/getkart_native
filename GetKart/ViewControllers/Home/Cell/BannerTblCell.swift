@@ -28,7 +28,6 @@ class BannerTblCell: UITableViewCell {
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor
         startTimer()
-
         
     }
     
@@ -216,9 +215,10 @@ func navigateToScreen(index:Int, sliderObj:SliderModel?){
     
 func isUserLoggedInRequest() -> Bool {
     
-    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-    if objLoggedInUser.id != nil {
-        
+//    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//    if objLoggedInUser.id != nil {
+
+    if Local.shared.getUserId() > 0 {
         return true
         
         

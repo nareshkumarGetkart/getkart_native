@@ -39,11 +39,14 @@ struct SearchWithSortView: View {
         VStack {
             HStack {
                 HStack{
-                    Image("search").renderingMode(.template).foregroundColor(.gray).padding(.leading,10)
+                    Image("search").renderingMode(.template)
+                        .foregroundColor(.gray)
+                        .padding(.leading,10)
                     TextField("Search any item...", text: $srchTxt).frame(height:40)
                         .background(Color(.systemGray6))
                         .cornerRadius(10)
                         .submitLabel(.search)
+                        .tint(Color(Themes.sharedInstance.themeColor))
                         .onSubmit {
                             self.objVM.page = 1
                             self.objVM.getSearchItemApi(srchTxt:srchTxt)
@@ -197,6 +200,24 @@ struct SearchWithSortView: View {
                     .presentationDetents([.fraction(0.45)])
                 } else {
                     // Fallback on earlier versions
+                  //  fullScreenCover(isPresented: $showSortSheet) {
+                            ZStack {
+                                Color.black.opacity(0.1).ignoresSafeArea()
+                                    .onTapGesture { showSortSheet = false }
+
+                                CustomBottomSheet {
+                                    SortSheetView(
+                                        isPresented: $showSortSheet,
+                                        selectedSort: $selectedSortBy,
+                                        onSortSelected: { selected in
+                                            self.objVM.page = 1
+                                            self.objVM.selectedSortBy = selected
+                                            self.objVM.getSearchItemApi(srchTxt: srchTxt)
+                                        }
+                                    )
+                                }
+                            }.background(Color.clear)
+                      //  }
                 }
             }
     }
@@ -266,8 +287,6 @@ struct SearchWithSortView: View {
 }
 
 
-
-
 extension SearchWithSortView: FilterSelected{
     func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
         print(dict)
@@ -280,11 +299,28 @@ extension SearchWithSortView: FilterSelected{
     }
 }
 
+
 #Preview {
     SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "")
 }
 
 
+struct CustomBottomSheet<Content: View>: View {
+    let content: Content
 
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
 
-
+    var body: some View {
+        VStack {
+            Spacer()
+            content
+                .frame(height: UIScreen.main.bounds.height * 0.45)
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemBackground)))
+                .shadow(radius: 5)
+        }
+        .edgesIgnoringSafeArea(.bottom)
+    }
+}

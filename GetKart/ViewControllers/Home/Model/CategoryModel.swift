@@ -24,7 +24,7 @@ struct CategoryModelClass: Codable {
     let links: [Link]?
     let nextPageURL, path: String?
     let perPage: Int?
-    let prevPageURL: JSONNull?
+   // let prevPageURL: JSONNull?
     let to, total: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -38,7 +38,7 @@ struct CategoryModelClass: Codable {
         case nextPageURL = "next_page_url"
         case path
         case perPage = "per_page"
-        case prevPageURL = "prev_page_url"
+       // case prevPageURL = "prev_page_url"
         case to, total
     }
 }

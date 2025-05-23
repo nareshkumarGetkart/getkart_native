@@ -192,6 +192,7 @@ extension ChatVC:Mp3RecorderDelegate{
     
     func uploadMp3Audio(voiceData: Data){
         
+        Themes.sharedInstance.showActivityViewTop(uiView: self.view,position: .bottom)
         let assetName:String = "\(Int(Date().timeIntervalSince1970)).mp3"
         
         var fileURL:URL?
@@ -211,6 +212,11 @@ extension ChatVC:Mp3RecorderDelegate{
                     
                     if(error != nil)
                     {
+                        DispatchQueue.main.async {
+                            if let velfView = self?.view{
+                                Themes.sharedInstance.removeActivityView(uiView: velfView)
+                            }
+                        }
                         //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
                         print(error ?? "defaultValue")
                     }else{
@@ -234,7 +240,16 @@ extension ChatVC:Mp3RecorderDelegate{
                                 }
                             }
                         }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                            
+                            if let velfView = self?.view{
+                                Themes.sharedInstance.removeActivityView(uiView: velfView)
+                            }
+                        })
                     }
+                    
+                    
                 }
                 
             } catch (let error) {

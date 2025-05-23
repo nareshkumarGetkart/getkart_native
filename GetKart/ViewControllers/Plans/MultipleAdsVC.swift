@@ -62,14 +62,8 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "PackageAdsCell") as! PackageAdsCell
         
         let obj = planListArray[indexPath.row]
-       // cell.bgView.addShadow(shadowColor: UIColor.gray.cgColor, shadowOpacity: 0.5)
-     //   cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? 0)".setStrikeText(color: .gray)
-        // cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? 0)% Savings"
-
         cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? "0")"
         cell.lblNumberOfAds.text = "\(obj.itemLimit ?? "") Ad"
-        
-        
         
         if (obj.discountInPercentage ?? "0") == "0"{
             cell.lblDiscountPercentage.text = ""
@@ -80,7 +74,6 @@ extension MultipleAdsVC: UITableViewDelegate,UITableViewDataSource{
             cell.lblDiscountPercentage.text = "\(obj.discountInPercentage ?? "0")% Savings"
             cell.lblDiscountPercentage.isHidden = false
             cell.lblOriginalAmt.attributedText = "\(Local.shared.currencySymbol) \(obj.price ?? "0")".setStrikeText(color: .gray)
-
         }
     
         

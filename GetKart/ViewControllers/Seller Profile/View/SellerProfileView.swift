@@ -60,8 +60,8 @@ struct SellerProfileView: View {
                                 .cancel()
                         ])
                     }
-                    let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                    if objLoggedInUser.id != nil  && objLoggedInUser.id != (objVM.sellerObj?.id ?? 0) {
+                   // let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                    if Local.shared.getUserId() > 0  && Local.shared.getUserId() != (objVM.sellerObj?.id ?? 0) {
                     Button(action: {
                         // Handle more options
                         showOptionSheet = true
@@ -124,8 +124,8 @@ struct SellerProfileView: View {
                         .font(.custom("Manrope-Medium", size: 13.0))
                 }
                 Spacer()
-                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                if objLoggedInUser.id != nil && objLoggedInUser.id != (objVM.sellerObj?.id ?? 0) {
+               // let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                if Local.shared.getUserId() > 0 && Local.shared.getUserId() != (objVM.sellerObj?.id ?? 0) {
                 Button(action: {
                     // Handle follow action
                     let follow = (objVM.sellerObj?.isFollowing ?? false) ? false : true
@@ -160,8 +160,10 @@ struct SellerProfileView: View {
                     .onTapGesture {
                    
                     if (objVM.sellerObj?.followersCount ?? 0) > 0{
-                        let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: true,userId: userId))
-                        self.navController?.pushViewController(hostVC, animated: true)
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: true,userId: userId))
+                            self.navController?.pushViewController(hostVC, animated: true)
+                        }
                     }
                 }
                 
@@ -171,54 +173,73 @@ struct SellerProfileView: View {
                     .onTapGesture {
                   
                     if (objVM.sellerObj?.followingCount ?? 0) > 0{
-                        
-                        let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: false,userId: userId))
-                        self.navController?.pushViewController(hostVC, animated: true)
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            
+                            let hostVC = UIHostingController(rootView: FollowerListView(navController: navController,isFollower: false,userId: userId))
+                            self.navController?.pushViewController(hostVC, animated: true)
+                        }
                     }
                 }
            
             }.padding(.vertical, 10)
             
-            // Products Section
-            ScrollView {
-                HStack{Spacer()}.frame(height: 5)
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+           
+            if objVM.itemArray.count == 0 {
+                
+                HStack{
+                    Spacer()
                     
-                    ForEach($objVM.itemArray) { $item in
+                    VStack(spacing: 30){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }else{
+                // Products Section
+                ScrollView {
+                    HStack{Spacer()}.frame(height: 5)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                         
-                        ProductCard(objItem: $item, onItemLikeDislike: {likedObj in
-                            updateItemInList(likedObj)
+                        ForEach($objVM.itemArray) { $item in
+                            
+                            ProductCard(objItem: $item, onItemLikeDislike: {likedObj in
+                                updateItemInList(likedObj)
 
-                        })
-                           
-                            .onAppear {
-                                
-                                if let lastItem = objVM.itemArray.last, lastItem.id == item.id, !objVM.isDataLoading {
-                                    objVM.getItemListApi(sellerId: userId)
-                                }
-                            }
-                            .onTapGesture {
-                                var detailView =  ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
-                                
-                                detailView.returnValue = { value in
-                                    if let obj = value{
-                                        self.updateItemInList(obj)
+                            })
+                               
+                                .onAppear {
+                                    
+                                    if let lastItem = objVM.itemArray.last, lastItem.id == item.id, !objVM.isDataLoading {
+                                        objVM.getItemListApi(sellerId: userId)
                                     }
                                 }
-                                let hostingController = UIHostingController(rootView:detailView)
+                                .onTapGesture {
+                                    var detailView =  ItemDetailView(navController:   self.navController, itemId: item.id ?? 0, itemObj: item,isMyProduct:true, slug: item.slug)
+                                    
+                                    detailView.returnValue = { value in
+                                        if let obj = value{
+                                            self.updateItemInList(obj)
+                                        }
+                                    }
+                                    let hostingController = UIHostingController(rootView:detailView)
 
-                                self.navController?.pushViewController(hostingController, animated: true)
-                            }
+                                    self.navController?.pushViewController(hostingController, animated: true)
+                                }
+                        }
+                    }.padding(.horizontal,10)
+                    
+                    if objVM.isDataLoading {
+                        ProgressView()
+                        .padding()
                     }
-                }.padding(.horizontal,10)
+                    
+                }.background(Color(.systemGray6))
                 
-                if objVM.isDataLoading {
-                    ProgressView()
-                    .padding()
-                }
                 
-            }.background(Color(.systemGray6))
-           
+            }
             
         }.navigationBarHidden(true)
         .onAppear{

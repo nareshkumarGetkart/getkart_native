@@ -18,6 +18,7 @@ class HomeBaseVC: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+      //  AppDelegate.sharedInstance.getSettingsApi()
         AppDelegate.sharedInstance.checkSocketStatus()
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
@@ -50,6 +51,8 @@ class HomeBaseVC: UITabBarController {
             
        // }
         // Do any additional setup after loading the view.
+        
+    
         
     }
     

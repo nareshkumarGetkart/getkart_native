@@ -50,7 +50,7 @@ class ItemDetailViewModel:ObservableObject{
                         }
                         
                         self.getSeller(sellerId: item.userID ?? 0)
-                        self.getProductListApi(categoryId: item.categoryID ?? 0)
+                        self.getProductListApi(categoryId: item.categoryID ?? 0, excludeId: item.id ?? 0)
                         self.setItemTotalApi()
                     }else{
                         
@@ -91,9 +91,9 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
-    func getProductListApi(categoryId:Int){
+    func getProductListApi(categoryId:Int,excludeId:Int){
         
-        let strUrl = "\(Constant.shared.get_item)?category_id=\(categoryId)"
+        let strUrl = "\(Constant.shared.get_item)?category_id=\(categoryId)&exclude_id=\(excludeId)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
             
@@ -306,9 +306,7 @@ class ItemDetailViewModel:ObservableObject{
             }
         }
     }
-        
-    
-    
+            
     
     func postNowApi(nav:UINavigationController?){
         

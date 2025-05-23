@@ -31,7 +31,7 @@ struct SuccessVerifyStepView: View {
             Spacer()
 
             Button(action: {
-                
+                Local.shared.isToRefreshVerifiedStatusApi = true
                 navigation?.popToRootViewController(animated: true)
             }) {
                 Text("Back to home")

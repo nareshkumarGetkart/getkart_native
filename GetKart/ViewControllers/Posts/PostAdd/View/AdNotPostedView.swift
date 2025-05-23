@@ -10,7 +10,7 @@ import SwiftUI
 struct AdNotPostedView: View {
     var navigationController: UINavigationController?
     var itemObj:ItemModel?
-    
+    var message:String = ""
     var body: some View {
         
        
@@ -45,7 +45,8 @@ struct AdNotPostedView: View {
                     .frame(width: 140, height: 140)
                     .foregroundColor(.green)
                 
-                Text("Ad not posted, saved in draft")
+                let msg = (message.count > 0) ? message : "Ad not posted, saved in draft"
+                Text(msg)
                     .font(.manrope(.bold, size: 20.0))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)

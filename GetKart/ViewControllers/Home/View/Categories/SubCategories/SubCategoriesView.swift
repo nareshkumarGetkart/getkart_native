@@ -72,6 +72,7 @@ struct SubCategoriesView: View {
     }
                               
      func navigateToPostNew(objsubCategory:Subcategory) {
+         
         if objsubCategory.subcategories?.count == 0 {
             
             
@@ -82,13 +83,25 @@ struct SubCategoriesView: View {
                 return
             }
             
-            if strCategoryTitle.count == 0 {
-                strCategoryTitle = objsubCategory.name ?? ""
+            if popType == .filter{
+                if strCategoryTitle.count == 0 {
+                    strCategoryTitle = objsubCategory.name ?? ""
+                }else{
+                    strCategoryTitle = strCategoryTitle + ">\(objsubCategory.name ?? "")"
+                }
+                
+            }else{
+                
+                if strCategoryTitle.count == 0 {
+                    strCategoryTitle = objsubCategory.name ?? ""
+                }
             }
              category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
             
             
            if popType == .filter {
+               
+               
                 for vc in self.navigationController?.viewControllers ?? []{
                     if let vc1 = vc as? FilterVC  {
                         vc1.strCategoryTitle = strCategoryTitle

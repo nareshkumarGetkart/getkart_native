@@ -77,25 +77,26 @@ struct LogoutView: View {
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-
-                AppDelegate.sharedInstance.sharedProfileID = ""
+                
+              /*  AppDelegate.sharedInstance.sharedProfileID = ""
                 AppDelegate.sharedInstance.notificationType = ""
                 AppDelegate.sharedInstance.roomId = 0
                 AppDelegate.sharedInstance.userId = 0
-
-                    ImageCache.default.clearDiskCache()
-                    ImageCache.default.clearMemoryCache()
-                    SocketIOManager.sharedInstance.socket?.disconnect()
-                    SocketIOManager.sharedInstance.socket = nil
-                    SocketIOManager.sharedInstance.manager = nil
-                    RealmManager.shared.deleteUserInfoObjects()
-                    RealmManager.shared.clearDB()
-                    showAlert = false
-                    presentationMode.wrappedValue.dismiss()
-                    AppDelegate.sharedInstance.showLoginScreen()
-                   
-
-                
+                Local.shared.isToRefreshVerifiedStatusApi = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+                Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                ImageCache.default.clearDiskCache()
+                ImageCache.default.clearMemoryCache()
+                SocketIOManager.sharedInstance.socket?.disconnect()
+                SocketIOManager.sharedInstance.socket = nil
+                SocketIOManager.sharedInstance.manager = nil
+                RealmManager.shared.deleteUserInfoObjects()
+                RealmManager.shared.clearDB()
+                */
+                Local.shared.removeUserData()
+                showAlert = false
+                presentationMode.wrappedValue.dismiss()
+                AppDelegate.sharedInstance.showLoginScreen()
             }
         }
     }

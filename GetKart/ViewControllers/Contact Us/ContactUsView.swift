@@ -42,7 +42,7 @@ struct ContactUsView: View {
             VStack(spacing: 16) {
                 ContactOptionView(icon: "call", title: "Call") {
                     // Implement call action here
-                    makeCall(to: "9574387583")
+                    makeCall(to: Local.shared.companyTelelphone1)
                 }
                 
                 ContactOptionView(icon: "message", title: "Email") {
@@ -139,7 +139,7 @@ struct EmailSupportView: View {
                     .frame(height: 60)
                     .cornerRadius(10).overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.3))).padding(.horizontal,10)
                 
-                Text("support@getkart.com").font(Font.manrope(.regular, size: 16))
+                Text(Local.shared.companyEmail).font(Font.manrope(.regular, size: 16))
                     .foregroundColor(.black)
                     .tint(.black)
                     .padding()
@@ -265,7 +265,7 @@ struct MailView: UIViewControllerRepresentable {
         let mailComposeVC = MFMailComposeViewController()
         mailComposeVC.setSubject(subject) // Set email subject
         mailComposeVC.setMessageBody(message, isHTML: false) // Set email body
-        mailComposeVC.setToRecipients(["radheshyam.getkart@gmail.com"]) // Set recipient email
+        mailComposeVC.setToRecipients([Local.shared.companyEmail]) // Set recipient email
         mailComposeVC.mailComposeDelegate = context.coordinator
         return mailComposeVC
     }

@@ -29,7 +29,7 @@ class AdsTblCell: UITableViewCell {
         lblBoost.layer.cornerRadius = 5.0
         lblBoost.clipsToBounds = true
         lblBoost.isHidden = true
-        lblBoost.textColor = UIColor.label
+        lblBoost.textColor = UIColor.white
         lblBoost.font = UIFont.Manrope.medium(size: 13.0).font
 
         btnAdPost.layer.cornerRadius =  3.0 //btnAdPost.frame.height/2.0

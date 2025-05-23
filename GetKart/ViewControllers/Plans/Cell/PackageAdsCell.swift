@@ -18,6 +18,8 @@ class PackageAdsCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        lblDiscountPercentage.layer.cornerRadius = 1.0
+        lblDiscountPercentage.clipsToBounds = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

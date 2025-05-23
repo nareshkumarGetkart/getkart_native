@@ -316,6 +316,9 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 cell.showCurrencySymbolSecond = true
                 cell.selectionStyle = .none
                 
+                cell.txtLowerRange.maxLength = 10
+                cell.txtUpperRange.maxLength = 10
+
                 if min_price.count > 0 {
                     cell.lblCurSymbolLowRange.isHidden = false
                     cell.txtLowerRange.leftPadding = 15
@@ -359,6 +362,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
                 cell.lblTitle.text = objCustomField.name ?? ""
                 cell.txtField.placeholder = ""
+                
                 
                 if  objCustomField.value?.count ?? 0 > 0 {
                        cell.txtField.text = objCustomField.value?.first ?? ""

@@ -424,6 +424,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             
+            if (objCustomField.maxLength ?? 0) > 0{
+                cell.txtField.maxLength = objCustomField.maxLength ?? 0
+            }else{
+            }
+            
             if  objCustomField.value?.count ?? 0 > 0 {
                 cell.txtField.text = objCustomField.value?.first ?? ""
             }else {
@@ -458,7 +463,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
-            
+            if (objCustomField.maxLength ?? 0) > 0{
+                cell.txtField.maxLength = objCustomField.maxLength ?? 0
+            }else{
+            }
+
             if  objCustomField.value?.count ?? 0 > 0 {
                 cell.txtField.text = objCustomField.value?.first ?? ""
             }else{

@@ -267,7 +267,6 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     }
                     
                 }else{
-                    AlertView.sharedManager.showToast(message: message)
                     
                     if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
                         do {
@@ -277,11 +276,12 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                                 if itemObj.status?.lowercased() == "draft"{
                                     DispatchQueue.main.async {
                                         
-                                        let swiftView = AdNotPostedView(navigationController: self.navigationController,itemObj: itemObj)
+                                        let swiftView = AdNotPostedView(navigationController: self.navigationController,itemObj: itemObj,message:message)
                                         let destVC = UIHostingController(rootView: swiftView)
                                         self.navigationController?.pushViewController(destVC, animated: true)
-                             
                                     }
+                                }else{
+                                    AlertView.sharedManager.showToast(message: message)
                                 }
                             }
                         }catch {

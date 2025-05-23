@@ -46,9 +46,9 @@ final class SocketIOManager: NSObject {
     private override init() {
         super.init()
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.token == nil {
-       // if Local.shared.getUserId().count == 0 {
+//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//        if objLoggedInUser.token == nil {
+        if Local.shared.getUserId() == 0 {
             
         }else{
             manager = SocketManager(socketURL: URL(string:  Constant.shared.socketUrl)!, config: [.log(false), .reconnects(true),.forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false),.extraHeaders(["Authorization": getHeaderToken()])])
@@ -69,8 +69,10 @@ final class SocketIOManager: NSObject {
     
     func establishConnection(){
 
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.token == nil {
+//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//        if objLoggedInUser.token == nil {
+            
+       if Local.shared.getUserId() == 0 {
             return
         }
         
@@ -97,21 +99,20 @@ final class SocketIOManager: NSObject {
         
         socket?.on(clientEvent: .error) {data, ack in
             print("socket disconnect with Error \(data) \(ack)")
-            DispatchQueue.global(qos: .background).async {
+           // DispatchQueue.global(qos: .background).async {
                // self.socket?.connect()
                // self.socket = nil
-                
                 Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
                 Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
-            }
+           // }
         }
         
         socket?.on(clientEvent: .disconnect) {data, ack in
             print("socket disconnect client \(data) \(ack)")
-            DispatchQueue.global(qos: .background).async {
+          //  DispatchQueue.global(qos: .background).async {
               //  self.socket?.connect()
                // self.socket = nil
-            }
+           // }
         }
     }
     
@@ -119,7 +120,7 @@ final class SocketIOManager: NSObject {
     func emitEvent(_ event : String, _ param : Dictionary<String,Any>){
        
         if (UIApplication.shared.delegate as! AppDelegate).isInternetConnected == false{
-           // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+            AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
         
@@ -183,7 +184,6 @@ final class SocketIOManager: NSObject {
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
                     print("\(SocketEvents.itemOffer.rawValue) responseDict =>\(responseDict)")
-                    
                 }
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.itemOffer.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
@@ -276,9 +276,7 @@ final class SocketIOManager: NSObject {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
-        
-        
-       
+               
         
         socket?.on(SocketEvents.blockUnblock.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
@@ -289,9 +287,6 @@ final class SocketIOManager: NSObject {
             }
         }
         
-        
-        
-        
         socket?.on(SocketEvents.unreadNotification.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
@@ -300,10 +295,6 @@ final class SocketIOManager: NSObject {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.unreadNotification.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
-        
-        
-     
-        
         
         socket?.on(SocketEvents.singleMessageDelete.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
@@ -314,6 +305,7 @@ final class SocketIOManager: NSObject {
             }
         }
         
+        
         socket?.on(SocketEvents.clearAllMessage.rawValue) { data, ack in
             if let responseDict = data[0] as? NSDictionary{
                 if ISDEBUG == true {
@@ -322,10 +314,7 @@ final class SocketIOManager: NSObject {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: SocketEvents.clearAllMessage.rawValue), object: nil, userInfo: responseDict as? [AnyHashable : Any])
             }
         }
-        
-        
     }
-    
 }
 
 

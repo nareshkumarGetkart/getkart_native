@@ -17,7 +17,6 @@ class SeeAllItemVC: UIViewController {
     @IBOutlet weak var btnBack:UIButton!
 
     var obj:Any?
-    
     private var objViewModel:SeeAllViewModel?
     private var emptyView:EmptyList?
 
@@ -48,6 +47,16 @@ class SeeAllItemVC: UIViewController {
         
         
         
+    }
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            objViewModel?.isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
     }
     
     //MARK: UIButton Action Methods
@@ -124,7 +133,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-            print("up")
+          //  print("up")
             if scrollView == collctionView{
                 return
             }

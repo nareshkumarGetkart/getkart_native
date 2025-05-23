@@ -43,10 +43,10 @@ class ApiHandler:NSObject{
             if ISDEBUG == true{
                 print("URL: ",url)
                 print("Param: ",param as Any)
-                print("headers: ",httpHeader)
+                print("headers: ",httpHeader ?? [:])
             }
             
-            AF.request(url, method: httpMethod, parameters: param, encoding: JSONEncoding.default, headers: httpHeader)
+            AF.request(url, method: httpMethod, parameters: param, encoding: JSONEncoding.default, headers: httpHeader)               
                 .responseJSON { response in
                     
                     
@@ -96,8 +96,7 @@ class ApiHandler:NSObject{
                     }
                 }
         }else {
-           // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
-
+            AlertView.sharedManager.showToast(message: "No Network Connection")
 
         }
         
@@ -119,7 +118,7 @@ class ApiHandler:NSObject{
             
             if ISDEBUG == true{
                 print("URL: ",url)
-                print("headers: ",httpHeader)
+                print("headers: ",httpHeader ?? [:])
             }
             
 
@@ -175,7 +174,7 @@ class ApiHandler:NSObject{
                     }
                 }
         }else {
-          //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
+            AlertView.sharedManager.showToast(message: "No Network Connection")
 
         }
         

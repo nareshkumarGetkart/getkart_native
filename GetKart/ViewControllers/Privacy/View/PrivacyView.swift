@@ -17,7 +17,7 @@ enum ViewType{
     case aboutUs
     case refundAndCancellationPolicy
 }
-
+/*
 
 struct PrivacyView: View {
     
@@ -25,6 +25,7 @@ struct PrivacyView: View {
     var title:String
     var type:ViewType
     @State var htmlString:String?
+    @State private var renderedHtmlText: AttributedString = AttributedString("Loading...")
 
     var body: some View {
        // let ht = UIDevice().hasNotch ? (navigationController?.getNavBarHt ?? 0.0) - 20 : (navigationController?.getNavBarHt ?? 0.0) + 20
@@ -46,28 +47,21 @@ struct PrivacyView: View {
         VStack{
 
             HStack{Spacer()}
-           // if (htmlString?.count ?? 0) > 1{
                 
                 let metaTag = """
                    <meta name="viewport" content="width=device-width, initial-scale=3.0, maximum-scale=5.0, minimum-scale=3.0, user-scalable=yes">
                    """
                 
                 ScrollView{
-//                    if (htmlString ?? "").contains("<head>") {
-//                        let txt = ((htmlString ?? "").replacingOccurrences(of: "<head>", with: "<head>\(metaTag)"))
-//                        
-//                        Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom)
-//                    } else {
-                        let txt   = ("<html><head>\(metaTag)</head><body>\(htmlString ?? "")</body></html>")
+                     /*   let txt   = ("<html><head>\(metaTag)</head><body>\(htmlString ?? "")</body></html>")
                         Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom)
-                    //}
+                    */
+                    Text(renderedHtmlText)
+                                       .font(.manrope(.regular, size: 17))
+                                       .padding([.leading, .trailing, .top], 8)
+                                       .padding(.bottom)
                 }
-               // Webview(url:nil, htmlText:htmlString ?? "")
-               
-//            }
-//            else  if let url = URL(string:getUrlTYpe(type: type)){
-//                Webview(url: url, htmlText: "").navigationBarBackButtonHidden(true)
-//            }
+
         }.background(Color(.systemGray6)).navigationBarTitleDisplayMode(.inline).navigationBarHidden(true).onAppear{
             callApi(type: type)
         }
@@ -116,6 +110,7 @@ struct PrivacyView: View {
     }
     
     
+    
     func callApi(type:ViewType){
         
         
@@ -136,23 +131,37 @@ struct PrivacyView: View {
                       
                       if let data = result["data"] as? Dictionary<String,Any>{
                           
+                          var rawHtml: String?
+
                           if let cancellation_refund_policy = data["cancellation_refund_policy"] as? String{
                               
-                              htmlString = cancellation_refund_policy
+                              rawHtml = cancellation_refund_policy
                               
                           }else if let privacy_policy = data["privacy_policy"] as? String{
                               
-                              htmlString = privacy_policy
+                              rawHtml = privacy_policy
                               
                           }else if let terms_conditions = data["terms_conditions"] as? String{
                               
-                              htmlString = terms_conditions
+                              rawHtml = terms_conditions
                               
                           }else if let about_us = data["about_us"] as? String{
                               
-                              htmlString = about_us
+                              rawHtml = about_us
                               
                           }
+                          
+                          
+                          DispatchQueue.main.async {
+                                              htmlString = rawHtml
+                                              if let html = rawHtml {
+                                                  let metaTag = """
+                                                      <meta name="viewport" content="width=device-width, initial-scale=3.0, maximum-scale=5.0, minimum-scale=3.0, user-scalable=yes">
+                                                  """
+                                                  let fullHtml = "<html><head>\(metaTag)</head><body>\(html)</body></html>"
+                                                  renderedHtmlText = convertHtmlToAttributedString(fullHtml)
+                                              }
+                                          }
                           
                           
                       }
@@ -163,7 +172,164 @@ struct PrivacyView: View {
 
     }
 }
+*/
+
+import SwiftUI
+import WebKit
+
+struct PrivacyView: View {
+    
+    var navigationController: UINavigationController?
+    var title: String
+    var type: ViewType
+    @State  var htmlString: String? = nil
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Top bar
+            HStack {
+                Button {
+                    navigationController?.popViewController(animated: true)
+                } label: {
+                    Image("arrow_left")
+                        .renderingMode(.template)
+                        .foregroundColor(Color(UIColor.label))
+                }
+                .frame(width: 40, height: 40)
+
+                Text(title)
+                    .font(.custom("Manrope-Bold", size: 20))
+                    .foregroundColor(.black)
+
+                Spacer()
+            }
+            .frame(height: 44)
+            .padding(.horizontal)
+            .background(Color.white)
+
+            // WebView content
+            if let html = htmlString {
+                WebViewHTML(htmlContent: wrapHtmlContent(html))
+                    //.padding()
+                    .background(Color(.systemGray6))
+            } else {
+                ProgressView("Loading...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
+        .onAppear {
+            callApi(type: type)
+        }
+    }
+
+    // MARK: - API Call
+
+    func callApi(type: ViewType) {
+        URLhandler.sharedinstance.makeCall(url: getUrlTYpe(type: type), param: nil, methodType: .get) { responseObject, error in
+            if let error = error {
+                print("Error: \(error)")
+                return
+            }
+
+            guard let result = responseObject,
+                  let data = result["data"] as? [String: Any],
+                  result["code"] as? Int == 200 else {
+                return
+            }
+
+            var rawHtml: String?
+
+            switch type {
+            case .privacy:
+                rawHtml = data["privacy_policy"] as? String
+            case .termsAndConditions:
+                rawHtml = data["terms_conditions"] as? String
+            case .aboutUs:
+                rawHtml = data["about_us"] as? String
+            case .refundAndCancellationPolicy:
+                rawHtml = data["cancellation_refund_policy"] as? String
+            case .faq:
+                rawHtml = ""
+            case .blogs:
+                rawHtml = ""
+            }
+
+            DispatchQueue.main.async {
+                htmlString = rawHtml
+            }
+        }
+    }
+
+    // MARK: - HTML Wrapper
+
+    func wrapHtmlContent(_ body: String) -> String {
+        let metaTag = """
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        """
+        let style = """
+        <style>
+            body {
+                font-family: -apple-system, HelveticaNeue, sans-serif;
+                font-size: 17px;
+                color: #000000;
+                padding: 10px;
+            }
+        </style>
+        """
+        return """
+        <html>
+        <head>
+        \(metaTag)
+        \(style)
+        </head>
+        <body>
+        \(body)
+        </body>
+        </html>
+        """
+    }
+
+    func getUrlTYpe(type: ViewType) -> String {
+        switch type {
+        case .privacy:
+            return Constant.shared.privacy_policy
+        case .termsAndConditions:
+            return Constant.shared.terms_conditions
+        case .aboutUs:
+            return Constant.shared.about_us
+        case .refundAndCancellationPolicy:
+            return Constant.shared.cancellation_refund_policy
+        case .faq:
+            return ""
+        case .blogs:
+            return ""
+        }
+    }
+}
 
 #Preview {
     PrivacyView(navigationController: nil, title: "Privacy", type: .privacy)
+}
+
+
+
+import SwiftUI
+import WebKit
+
+struct WebViewHTML: UIViewRepresentable {
+    let htmlContent: String
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.loadHTMLString(htmlContent, baseURL: nil)
+    }
 }

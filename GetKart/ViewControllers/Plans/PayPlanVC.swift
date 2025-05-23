@@ -97,9 +97,10 @@ class PayPlanVC: UIViewController {
                                 self?.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
                                 
                                 var flowId = ""
-                                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                                if objLoggedInUser.id != nil {
-                                    flowId = "\(objLoggedInUser.id ?? 0)"
+//                                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+//                                if objLoggedInUser.id != nil {
+                                if Local.shared.getUserId() > 0{
+                                    flowId = "\(Local.shared.getUserId())"
                                 }
                                 
                                 self?.payment_method = "PhonePe"

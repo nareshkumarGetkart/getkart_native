@@ -64,7 +64,7 @@ struct SearchProductView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color(.separator), lineWidth: 1)
-                )
+                ).clipShape(RoundedRectangle(cornerRadius: 8))
 
                 Button(action: {
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
@@ -84,8 +84,11 @@ struct SearchProductView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color(.separator), lineWidth: 1)
                         )
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        
                 }
                 .padding(.leading, 10)
+                .clipped()
             }
             .padding(.horizontal, 10)
 

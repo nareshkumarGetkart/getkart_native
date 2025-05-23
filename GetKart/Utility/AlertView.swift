@@ -60,7 +60,7 @@ class AlertView: NSObject {
     func showToast(message : String, font: UIFont = UIFont.Manrope.regular(size: 14).font) {
         
          if let controller = AppDelegate.sharedInstance.navigationController?.topViewController{
-            let toastLabel = UILabel(frame: CGRect(x: 50, y: controller.view.frame.size.height - 150, width: controller.view.frame.size.width - 100, height: 50))
+            let toastLabel = UILabel(frame: CGRect(x: 40, y: controller.view.frame.size.height - 150, width: controller.view.frame.size.width - 80, height: 50))
         toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.9)
         toastLabel.textColor = UIColor.white
         toastLabel.font = font
@@ -69,6 +69,7 @@ class AlertView: NSObject {
         toastLabel.alpha = 1.0
         toastLabel.layer.cornerRadius = 10;
         toastLabel.clipsToBounds  =  true
+        toastLabel.numberOfLines = 0
             
         
             controller.view.addSubview(toastLabel)

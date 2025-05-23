@@ -45,6 +45,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
         
+        
+        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -66,6 +69,12 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         }
         
         self.lblAddress.text = locStr
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            homeVModel?.isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
         
     }
     
@@ -94,16 +103,30 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
     
     
+    @objc func noInternet(notification:Notification?){
+      
+        homeVModel?.isDataLoading = false
+        AlertView.sharedManager.showToast(message: "No internet connection")
+
+    }
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-        
-        if !(homeVModel?.isDataLoading ?? false) {
+      
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            homeVModel?.isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else if !(homeVModel?.isDataLoading ?? false) {
             homeVModel?.page = 1
             homeVModel?.getProductListApi()
             homeVModel?.getSliderListApi()
             homeVModel?.getFeaturedListApi()
         }
+        
+        
+       
+        
         refreshControl.endRefreshing()
     }
      
@@ -390,7 +413,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-            print("up")
+           // print("up")
             if scrollView == tblView{
                 return
             }
@@ -412,66 +435,61 @@ extension HomeVC: RefreshScreen{
     
     
     func refreshFeaturedsList(){
-       // self.tblView.reloadData()
-       // tblView.reloadRows(at: [IndexPath(row: 0, section: 2)], with: .none)
-       tblView.reloadSections(IndexSet(integer: 2), with: .none)
-        
+        UIView.performWithoutAnimation {
+            
+            tblView.reloadSections(IndexSet(integer: 2), with: .none)
+        }
     }
     func refreshBannerList(){
-       // self.tblView.reloadData()
-        tblView.reloadSections(IndexSet(integer: 0), with: .none)
-        
+        UIView.performWithoutAnimation {
+            
+            tblView.reloadSections(IndexSet(integer: 0), with: .none)
+        }
     }
     func refreshCategoriesList(){
-        //self.tblView.reloadData()
-       tblView.reloadSections(IndexSet(integer: 1), with: .none)
+        UIView.performWithoutAnimation {
+            
+            tblView.reloadSections(IndexSet(integer: 1), with: .none)
+        }
         
     }
     
     
     
     func refreshScreen(){
-        
-        self.tblView.reloadData()
-
-       // tblView.reloadSections(IndexSet(integer: 3), with: .none)
-        
-        //self.tblView.invalidateIntrinsicContentSize()
-        /*  if ( self.homeVModel?.page ?? 0) > 1{
-         self.tblView.reloadData()
-         //tblView.reloadSections(IndexSet(integer: 3), with: .none)
-         
-         }else{
-         self.tblView.reloadData()
-         
-         }*/
+        UIView.performWithoutAnimation {
+            
+            self.tblView.reloadData()
+        }
     }
+   
     
-    func newItemRecieve(newItemArray:[Any]?){
+   func newItemRecieve(newItemArray:[Any]?){
         
         if (newItemArray?.count ?? 0) == 0{
             
         }else{
-       
-            for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
             
-            if let obj = newItemArray?[index1] as? ItemModel{
+            for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
                 
-                self.tblView.performBatchUpdates {
+                if let obj = newItemArray?[index1] as? ItemModel{
                     
-                    self.homeVModel?.itemObj?.data?.append(obj)
-                    
-                    if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: 3)) as? HomeTblCell {
+                    self.tblView.performBatchUpdates {
                         
-                        let indexPath = IndexPath(row: (self.homeVModel?.itemObj?.data?.count ?? 0) - 1, section: 0)
-                        cell.listArray =  self.homeVModel?.itemObj?.data
-                        cell.cllctnView?.insertItems(at: [indexPath])
+                        self.homeVModel?.itemObj?.data?.append(obj)
+                        
+                        if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: 3)) as? HomeTblCell {
+                            
+                            let indexPath = IndexPath(row: (self.homeVModel?.itemObj?.data?.count ?? 0) - 1, section: 0)
+                            cell.listArray =  self.homeVModel?.itemObj?.data
+                            cell.cllctnView?.insertItems(at: [indexPath])
+                        }
                     }
+                    
                 }
-                
             }
         }
     }
-        
-    }
+    
+
 }

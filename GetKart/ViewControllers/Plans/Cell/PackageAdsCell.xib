@@ -54,13 +54,13 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="79% Savings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ClC-Jr-red">
-                                <rect key="frame" x="120" y="17.666666666666668" width="64" height="15.000000000000004"/>
+                                <rect key="frame" x="109" y="16" width="75" height="18"/>
                                 <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="64" id="Xdp-9o-0ei"/>
-                                    <constraint firstAttribute="height" constant="15" id="vvT-Xo-a4W"/>
+                                    <constraint firstAttribute="width" constant="75" id="Xdp-9o-0ei"/>
+                                    <constraint firstAttribute="height" constant="18" id="vvT-Xo-a4W"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="10"/>
+                                <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="11"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -93,6 +93,9 @@
                             </userDefinedRuntimeAttribute>
                             <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
                                 <real key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="shadowOffsetY">
+                                <real key="value" value="-1"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>

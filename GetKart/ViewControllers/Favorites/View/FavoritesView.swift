@@ -41,9 +41,9 @@ struct FavoritesView: View {
                                             updateItemInList(obj)
                                         }
                                     }
+                                    
                                     let hostingController = UIHostingController(rootView:destView )
                                     self.navigation?.pushViewController(hostingController, animated: true)
-                                  
                                 }
                                 .onAppear{
                                     
@@ -125,7 +125,7 @@ struct FavoritesCell:View {
                                     .frame(width:75,height:20)
                                     .background(.orange)
                                     .cornerRadius(5)
-                                    .foregroundColor(Color(UIColor.label))
+                                    .foregroundColor(Color(UIColor.white))
                                     .font(.manrope(.regular, size: 13))
 
                             }.padding(.top,5)
@@ -144,7 +144,9 @@ struct FavoritesCell:View {
                     Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(hex: "#FF9900"))
                     Spacer()
                     Button {
-                        addToFavourite()
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            addToFavourite()
+                        }
                     } label: {
                         let isLike = (itemObj.isLiked ?? false)
 

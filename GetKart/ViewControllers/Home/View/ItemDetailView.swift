@@ -15,8 +15,8 @@ import CoreImage.CIFilterBuiltins
 import AVKit
 
 struct ItemDetailView: View {
+    
     @State private var backgroundColor: Color = .secondary
-
     var navController:UINavigationController?
     var itemId = 0
     var slug = ""
@@ -50,9 +50,7 @@ struct ItemDetailView: View {
             viewModel.galleryImgArray.insert(new, at: 0)
             selectedIndex = 0
         }
-        
-        
-        
+                
         if (itemObj?.videoLink?.count ?? 0) > 0{
             
             let new = GalleryImage(id:10, image: itemObj?.videoLink, itemID: 400)
@@ -74,9 +72,7 @@ struct ItemDetailView: View {
            
             LazyVStack(alignment: .leading) {
                 
-                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 let isFeatured = objVM.itemObj?.isFeature ?? false
-                let loggedInUserId = objLoggedInUser.id ?? 0
                 let itemUserId = objVM.itemObj?.userID ?? 0
                 
                 ZStack(alignment: .topTrailing) {
@@ -172,7 +168,7 @@ struct ItemDetailView: View {
                             Text("Featured").frame(width:75,height:20)
                                 .background(.orange)
                                 .cornerRadius(5)
-                                .foregroundColor(Color(UIColor.label))
+                                .foregroundColor(Color(UIColor.white))
                                 .padding(.horizontal).padding(.top,5)
                                 .font(.manrope(.regular, size: 13))
 
@@ -180,7 +176,7 @@ struct ItemDetailView: View {
                         
                         Spacer()
                         
-                        if itemUserId != objLoggedInUser.id{
+                        if itemUserId != Local.shared.getUserId(){
                             Button(action: {
                                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                                     
@@ -202,7 +198,7 @@ struct ItemDetailView: View {
                 }
                 
                 
-                if loggedInUserId == itemUserId {
+                if Local.shared.getUserId() == itemUserId {
                     
                     HStack {
                         HStack {
@@ -244,7 +240,7 @@ struct ItemDetailView: View {
                         .padding(.bottom,10)
                     
                     Spacer()
-                    if loggedInUserId == itemUserId {
+                    if Local.shared.getUserId() == itemUserId {
                         
                         
                         let status = objVM.itemObj?.status ?? ""
@@ -266,9 +262,8 @@ struct ItemDetailView: View {
                         Text(objVM.itemObj?.address ?? "")
                         .lineLimit(1)
                         .font(Font.manrope(.medium, size: 15))
+                        Spacer()
                     }
-                    Spacer()
-                    
                     
                     Text(getFormattedCreatedDate())
                         .font(Font.manrope(.medium, size: 15))
@@ -276,7 +271,7 @@ struct ItemDetailView: View {
                 .padding(.bottom,10)
                 
                 
-                if (loggedInUserId == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft"{
+                if (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft"{
                     
                     HStack{
                         Spacer()
@@ -309,7 +304,7 @@ struct ItemDetailView: View {
                     .cornerRadius(10)
                     .padding(.bottom)
                 }
-                if !isFeatured && (loggedInUserId == itemUserId) && objVM.itemObj?.status == "approved"{
+                if !isFeatured && (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status == "approved"{
                     
                     HStack{
                         Spacer()
@@ -377,9 +372,7 @@ struct ItemDetailView: View {
                     }
                     
                     Text("Location").font(Font.manrope(.semiBold, size: 16))
-                }//.padding(.vertical,1)
-                                
-              
+                }
                 
                 HStack{
                     Image("location_icon").renderingMode(.template)
@@ -400,7 +393,7 @@ struct ItemDetailView: View {
                 }
                 
                 
-                if (loggedInUserId != itemUserId) {
+                if (Local.shared.getUserId() != itemUserId) {
                     
                     let isReported = objVM.itemObj?.isAlreadyReported ?? false
                     if isReported == false {
@@ -449,37 +442,36 @@ struct ItemDetailView: View {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     
                     HStack{
-                        
                         Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
                         Spacer()
                     }//.padding(.bottom)
                     
                     
-                  /*  ScrollView(.horizontal, showsIndicators: false) {
-                        //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
-                          HStack(spacing: 10) {
-                              ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
-                                  ProductCard(objItem: $item)
-                                      .onTapGesture {
-                                          var swiftUIview = ItemDetailView(
-                                              navController: self.navController,
-                                              itemId: item.id ?? 0,
-                                              itemObj: item,
-                                              slug: item.slug
-                                          )
-                                          swiftUIview.returnValue = { value in
-                                              if let obj = value {
-                                                  updateItemInList(obj)
-                                              }
-                                          }
-                                          let hostingController = UIHostingController(rootView:swiftUIview)
-                                          self.navController?.pushViewController(hostingController, animated: true)
-                                      }
-                              }
-                          }
-                         .padding([.bottom])
-                      }.id("related-scroll")
-                    */
+                    /*  ScrollView(.horizontal, showsIndicators: false) {
+                     //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
+                     HStack(spacing: 10) {
+                     ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
+                     ProductCard(objItem: $item)
+                     .onTapGesture {
+                     var swiftUIview = ItemDetailView(
+                     navController: self.navController,
+                     itemId: item.id ?? 0,
+                     itemObj: item,
+                     slug: item.slug
+                     )
+                     swiftUIview.returnValue = { value in
+                     if let obj = value {
+                     updateItemInList(obj)
+                     }
+                     }
+                     let hostingController = UIHostingController(rootView:swiftUIview)
+                     self.navController?.pushViewController(hostingController, animated: true)
+                     }
+                     }
+                     }
+                     .padding([.bottom])
+                     }.id("related-scroll")
+                     */
                     RelatedItemsRow(
                         items:  $objVM.relatedDataItemArray, //.map { $0 },
                         onItemTapped: { item in
@@ -498,11 +490,8 @@ struct ItemDetailView: View {
                             self.navController?.pushViewController(hostingController, animated: true)
                         }) { likedObj in
                             updateItemInList(likedObj)
-
+                            
                         }
-                    
-                
-                    
                     
                 }
                 
@@ -544,7 +533,7 @@ struct ItemDetailView: View {
             }else{
                 if objVM.sellerObj == nil {
                     self.objVM.getSeller(sellerId:objVM.itemObj?.userID ?? 0)
-                    self.objVM.getProductListApi(categoryId: objVM.itemObj?.categoryID ?? 0)
+                    self.objVM.getProductListApi(categoryId: objVM.itemObj?.categoryID ?? 0,excludeId:  objVM.itemObj?.id ?? 0)
                     self.objVM.setItemTotalApi()
                 }
             }
@@ -562,11 +551,10 @@ struct ItemDetailView: View {
                 let buyer_id = dataDict["buyer_id"] as? Int ?? 0
                 let seller_id = dataDict["seller_id"] as? Int ?? 0
                 
-                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 var userId = 0
-                if (objLoggedInUser.id ?? 0) == buyer_id{
+                if Local.shared.getUserId() == buyer_id{
                     userId = seller_id
-                }else if (objLoggedInUser.id ?? 0) == seller_id{
+                }else if Local.shared.getUserId() == seller_id{
                     userId = buyer_id
                 }
                 objVM.itemObj?.isAlreadyOffered = true
@@ -590,13 +578,11 @@ struct ItemDetailView: View {
             // Apply detents and drag indicator only if iOS 16+
             .modifier(PresentationModifier())
         }
+
         
-      
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        let loggedInUserId = objLoggedInUser.id ?? 0
         let itemUserId = objVM.itemObj?.userID ?? 0
         
-        if loggedInUserId == itemUserId {
+        if Local.shared.getUserId() == itemUserId {
             
             if ((objVM.itemObj?.status ?? "") == "review") || ((objVM.itemObj?.status ?? "") == "draft") || ((objVM.itemObj?.status ?? "") == "expired"){
              
@@ -664,7 +650,7 @@ struct ItemDetailView: View {
                         Text("After removing, ads will be deleted.")
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal).padding(.bottom)
                 
             }else  if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||   ((objVM.itemObj?.status ?? "") == "inactive"){
                 
@@ -704,11 +690,22 @@ struct ItemDetailView: View {
                             self.navController?.pushViewController(vc, animated: true)
                         }
                     }) {
+//                        Text("Edit")
+//                            .frame(maxWidth: .infinity)
+//                            .padding()
+//                            .background(Color.orange)
+//                            .foregroundColor(.white)
+//                            .cornerRadius(10)
+                        
                         Text("Edit")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.orange)
-                            .foregroundColor(.white)
+                            .background(Color.white)
+                            .foregroundColor(.orange)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.orange, lineWidth: 1.5)
+                            )
                             .cornerRadius(10)
                     }
                     
@@ -731,12 +728,23 @@ struct ItemDetailView: View {
                         
                     }) {
                         
-                        Text(getButtonTitle())
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                        if "Sold Out" == getButtonTitle(){
+                            
+                            Text(getButtonTitle())
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                           
+                        }else{
+                            Text(getButtonTitle())
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -749,9 +757,7 @@ struct ItemDetailView: View {
                     
                     
                     if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
-                        
-                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                        
+                                                
                         let offerId =
                         objVM.itemObj?.itemOffers?.first?.id ?? 0
                         let sellerId =
@@ -759,7 +765,7 @@ struct ItemDetailView: View {
                         let buyerId =
                         objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
                         var userId = 0
-                        if sellerId == objLoggedInUser.id{
+                        if sellerId == Local.shared.getUserId(){
                             userId = buyerId
                         }else{
                             userId = sellerId
@@ -860,6 +866,7 @@ struct ItemDetailView: View {
     }
     
     func navigateToPager(){
+        
         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
         vc.currentTag = selectedIndex ?? 0
         
@@ -915,9 +922,7 @@ struct ItemDetailView: View {
             print("Invalid date string")
             return ""
         }
-
     }
-    
     
     
     @ViewBuilder
@@ -960,9 +965,8 @@ struct ItemDetailView: View {
                     }
             }
                             
-            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
-            if objVM.sellerObj?.id == objLoggedInUser.id  && objVM.itemObj?.status == "approved"{
+            if objVM.sellerObj?.id == Local.shared.getUserId()  && objVM.itemObj?.status == "approved"{
                 
                 Button {
                     showMoreOptionSheet = true
@@ -1016,7 +1020,8 @@ struct ItemDetailView: View {
             }
             
         }
-        .frame(height: 44)        .background(Color(UIColor.systemBackground))
+        .frame(height: 44)
+        .background(Color(UIColor.systemBackground))
 
     }
 
@@ -1050,6 +1055,7 @@ struct ItemDetailView: View {
         ]
 
         for pattern in patterns {
+            
             if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
                let match = regex.firstMatch(in: urlString, options: [], range: NSRange(urlString.startIndex..., in: urlString)),
                let range = Range(match.range(at: 1), in: urlString) {
@@ -1060,13 +1066,11 @@ struct ItemDetailView: View {
         return ""
     }
 
-    
     var isVisibleContact: Int {
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        let loggedInUserId = objLoggedInUser.id ?? 0
+     
         let itemUserId = objVM.itemObj?.userID ?? 0
         
-        if loggedInUserId == itemUserId {
+        if Local.shared.getUserId() == itemUserId {
             return 0
         } else {
             return objVM.sellerObj?.mobileVisibility ?? 1
@@ -1209,7 +1213,7 @@ struct SellerInfoView: View {
                 
               //  HStack{
                     Spacer(minLength: 0)
-                if mobileVisibility == 1 {
+                if mobileVisibility == 1  && mobile.count > 0{
                     Button {
                         showMessageView = true
                         

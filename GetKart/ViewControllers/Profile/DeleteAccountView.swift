@@ -103,12 +103,12 @@ struct DeleteAccountView: View {
 
                 if status == 200{
                     self.deleteUser()
-                    
+                    /*
                     AppDelegate.sharedInstance.sharedProfileID = ""
                     AppDelegate.sharedInstance.notificationType = ""
                     AppDelegate.sharedInstance.roomId = 0
                     AppDelegate.sharedInstance.userId = 0
-                    
+                    Local.shared.isToRefreshVerifiedStatusApi = true
                     RealmManager.shared.deleteUserInfoObjects()
                     RealmManager.shared.clearDB()
                     ImageCache.default.clearDiskCache()
@@ -116,7 +116,12 @@ struct DeleteAccountView: View {
                     SocketIOManager.sharedInstance.socket?.disconnect()
                     SocketIOManager.sharedInstance.socket = nil
                     SocketIOManager.sharedInstance.manager = nil
+                    Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+                    Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                    */
                     
+                    Local.shared.removeUserData()
+
                     showAlert = false
                     presentationMode.wrappedValue.dismiss()
                     

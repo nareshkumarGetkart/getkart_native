@@ -8,7 +8,7 @@
 import UIKit
 import Kingfisher
 import SwiftUI
-
+import Alamofire
 
 
 class MyAdsVC: UIViewController {
@@ -45,7 +45,7 @@ class MyAdsVC: UIViewController {
             self.tblView.addSubview(self.emptyView!)
             self.emptyView?.isHidden = true
             self.emptyView?.lblMsg?.text = ""
-            self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")
+            self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")          
         }
         
         addButtonsToScrollView()
@@ -57,18 +57,39 @@ class MyAdsVC: UIViewController {
         self.topRefreshControl.backgroundColor = .clear
         self.tblView.refreshControl = topRefreshControl
         
+        
+        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        
 
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
 
     }
     
     
+    @objc func noInternet(notification:Notification?){
+      
+        self.isDataLoading = false
+        AlertView.sharedManager.showToast(message: "No internet connection")
+
+    }
+    
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-        if !isDataLoading {
+        if !AppDelegate.sharedInstance.isInternetConnected{
+             isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else if !isDataLoading {
             self.isDataLoading = true
             page = 1
             self.getAdsListApi()
@@ -114,8 +135,10 @@ class MyAdsVC: UIViewController {
     
     @objc func filterBtnAction(_ btn : UIButton){
         
+      
         selectedIndex = btn.tag
-        
+        self.isDataLoading = true
+
         for index in 0..<filters.count{
             
             (self.view.viewWithTag(500 + index) as? UIButton)?.backgroundColor = .clear
@@ -174,17 +197,22 @@ class MyAdsVC: UIViewController {
     
     //Api methods
     func getAdsListApi(){
+        
+        if self.page == 1{
+            self.listArray.removeAll()
+            self.tblView.reloadData()
+        }
 
         let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
             
             
             if obj.code == 200 {
-                if self.page == 1{
-                    self.listArray.removeAll()
-                    self.tblView.reloadData()
-                }
+//                if self.page == 1{
+//                    self.listArray.removeAll()
+//                    self.tblView.reloadData()
+//                }
                 if obj.data != nil , (obj.data?.data ?? []).count > 0 {
                     self.listArray.append(contentsOf: obj.data?.data ?? [])
                     self.tblView.reloadData()
@@ -194,9 +222,12 @@ class MyAdsVC: UIViewController {
                     
                     self.isDataLoading = false
                     self.page += 1
+
                 })
+
             }else{
                 self.isDataLoading = false
+
             }
             
             self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
@@ -280,7 +311,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as! AdsTblCell
         
-        
+
         let obj = listArray[indexPath.item]
         cell.lblItem.text = obj.name
         cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
@@ -321,7 +352,6 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         case "draft":
             cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
             cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-            cell.btnAdPost.isHidden = false
         case "expired":
             cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
             cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
@@ -334,6 +364,9 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         
         DispatchQueue.main.async {
             cell.imgVwAds.roundCorners([.topRight,.bottomRight], radius: 10)
+            cell.imgVwAds.clipsToBounds = true
+            cell.bgView.addShadow()
+            cell.bgView.clipsToBounds = true
 
         }
 
@@ -356,7 +389,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-            print("up")
+           // print("up")
             if scrollView == tblView{
                 return
             }

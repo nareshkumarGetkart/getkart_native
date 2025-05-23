@@ -44,8 +44,8 @@ class SellingChatVC: UIViewController {
         
         Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
         
-       // getChatList()
-
+        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -55,6 +55,13 @@ class SellingChatVC: UIViewController {
             self.page = 1
             getChatList()
 
+        }
+        
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
         }
         
     }
@@ -71,7 +78,12 @@ class SellingChatVC: UIViewController {
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-        if !isDataLoading {
+       
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else if !isDataLoading {
             isDataLoading = true
             page = 1
             self.getChatList()
@@ -82,7 +94,12 @@ class SellingChatVC: UIViewController {
     
     //MARK: Observers
     
-    
+    @objc func noInternet(notification:Notification?){
+      
+        self.isDataLoading = false
+        AlertView.sharedManager.showToast(message: "No internet connection")
+
+    }
     @objc func updateChatList(notification: Notification) {
         
         
@@ -226,7 +243,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
      func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-            print("up")
+           // print("up")
             if scrollView == tblView{
                 return
             }

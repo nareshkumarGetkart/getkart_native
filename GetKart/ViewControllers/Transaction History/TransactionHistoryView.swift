@@ -191,7 +191,7 @@ struct TransactionRow: View {
                
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
-                Text(displayStatus)
+                Text(displayStatus.capitalized)
                     .font(Font.manrope(.medium, size: 15))
                     .foregroundColor(titleColor)
                     .padding(.horizontal)
@@ -250,9 +250,9 @@ struct TransactionRow: View {
         switch status {
         case "succeed":
             return (Color(hexString: "#e5f7e7"), Color(hexString: "#32b983"), status)
-        case "canceled":
+        case "failed":
             return (Color(hexString: "#ffe5e6"), Color(hexString: "#fe0002"), status)
-        case "pending":
+        case "canceled", "pending":
             return (Color(hexString: "#fff8eb"), Color(hexString: "#ffbb34"), status)
         default:
             return (.clear, .black, status)

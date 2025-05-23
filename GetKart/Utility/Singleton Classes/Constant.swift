@@ -352,7 +352,7 @@ final class Constant: NSObject {
     
     var get_system_settings:String{
         get {
-            return "\(Constant.shared.baseURL)/v1/get-system-settings"
+            return "\(Constant.shared.baseURL)/get-system-settings"
         }
     }
     

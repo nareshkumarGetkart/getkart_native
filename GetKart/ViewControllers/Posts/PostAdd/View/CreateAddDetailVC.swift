@@ -53,7 +53,9 @@ class CreateAddDetailVC: UIViewController {
     private var showErrorMsg = false
    
     var popType:PopType? = .createPost
-     var itemObj:ItemModel?
+    var itemObj:ItemModel?
+    
+    
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -78,6 +80,13 @@ class CreateAddDetailVC: UIViewController {
             
             params[AddKeys.all_category_ids.rawValue] = category_ids
             params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
+            
+            if category_ids.components(separatedBy: ",").count == 1{
+                if let catId = Int(category_ids){
+                    params[AddKeys.category_id.rawValue] = catId
+                }
+            }
+            
             params[AddKeys.show_only_to_premium.rawValue] = 0
             
             let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
@@ -252,6 +261,10 @@ class CreateAddDetailVC: UIViewController {
             
             showErrorMsg = true
             
+        }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), price < 1 {
+            
+            showErrorMsg = true
+            
         }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
@@ -350,7 +363,11 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AlmostThereCell") as! AlmostThereCell
             cell.lblCategory.text = strCategoryTitle
-            cell.lblSubCategory.text = "> \(strSubCategoryTitle)"
+            if strSubCategoryTitle.count > 0 {
+                cell.lblSubCategory.text = "> \(strSubCategoryTitle)"
+            }else{
+                cell.lblSubCategory.text = ""
+            }
             return cell
         }else if indexPath.row == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -362,6 +379,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.txtField.placeholder = ""
+            cell.txtField.maxLength = 130
+
             cell.txtField.text = params[AddKeys.name.rawValue] as? String ?? ""
             if showErrorMsg == true {
                 if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
@@ -382,6 +401,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.lblTitle.text = "Description"
             cell.textViewDoneDelegate = self
             cell.tvTextView.tag = indexPath.row
+            
             cell.tvTextView.text = params[AddKeys.description.rawValue] as? String ?? ""
             if showErrorMsg == true {
                 if (params[AddKeys.description.rawValue] as? String ?? "") == "" {
@@ -479,16 +499,24 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.showCurrencySymbol = true
-            
+            cell.txtField.maxLength = 10
+
             
             cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
             cell.lblCurSymbol.text = Local.shared.currencySymbol
             
             
             if showErrorMsg == true {
-                if (params[AddKeys.price.rawValue] as? String ?? "") == "" {
+                if let price = Int(params[AddKeys.price.rawValue] as? String ?? "0"),price < 1{
+                    cell.lblErrorMsg.text = "Price must be greater than 0"
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    
+                }else if (params[AddKeys.price.rawValue] as? String ?? "") == "" {
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = "Field must not be empty"
+
                 }else {
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
@@ -508,6 +536,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.txtField.maxLength = 11
+
             cell.txtField.text = params[AddKeys.contact.rawValue] as? String ?? ""
             if showErrorMsg == true {
                 if (params[AddKeys.contact.rawValue] as? String ?? "") == "" {

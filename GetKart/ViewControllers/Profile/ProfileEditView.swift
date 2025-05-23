@@ -39,7 +39,6 @@ struct ProfileEditView: View {
                 .foregroundColor(Color(UIColor.label))
             Spacer()
         }.frame(height:44).background(Color(UIColor.systemBackground))
-        
         ScrollView {
             VStack(spacing: 20) {
                 // Profile Image Section
@@ -52,10 +51,22 @@ struct ProfileEditView: View {
                             .clipShape(Circle()).padding(5)
                             .overlay(Circle().stroke(Color.orange, lineWidth: 3))
                     } else {
+//                        Circle()
+//                            .fill(Color.gray.opacity(0.3))
+//                            .frame(width: 100, height: 100).padding(5)
+//                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+//                        
                         Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 100, height: 100).padding(5)
-                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image("user-circle") // <-- Replace with your placeholder asset name
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 100, height: 100)
+                                    )
+                                    //.padding(5)
+                                    .overlay(Circle().stroke(Color.orange, lineWidth: 3))
                     }
                     
                     Button(action: { showingImagePicker.toggle() }) {
@@ -78,7 +89,7 @@ struct ProfileEditView: View {
                 CustomTextField(title: "Full Name", text: $fullName)
                 CustomTextField(title: "Email Address", text: $email, keyboardType: .emailAddress)
                     .disabled(isEmailVerified)
-                if !isEmailVerified{
+                if !isEmailVerified && email.count > 0{
                     HStack{
                         Spacer()
                         Button(action: {
@@ -98,7 +109,7 @@ struct ProfileEditView: View {
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
                     .disabled(isMobileVerified)
                 
-                if !isMobileVerified{
+                if !isMobileVerified && phoneNumber.count > 0{
                     HStack{
                         Spacer()
                         Button(action: {
@@ -269,9 +280,9 @@ struct ProfileEditView: View {
    
     func getUserProfileApi(){
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+       // let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         
-        let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+        let strUrl = Constant.shared.get_seller + "?id=\(Local.shared.getUserId())"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
             

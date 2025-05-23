@@ -164,7 +164,12 @@ class ChatVC: UIViewController {
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-        if !isDataLoading {
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+           isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else if !isDataLoading {
             isDataLoading = true
             page = page + 1
             self.getMessageList()
@@ -499,7 +504,6 @@ class ChatVC: UIViewController {
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "file", url: Constant.shared.upload_chat_files, params: [:]) { responseObject, error in
 
-            Themes.sharedInstance.removeActivityView(uiView: self.view)
 
             if error == nil {
                 let result = responseObject! as NSDictionary
@@ -514,14 +518,18 @@ class ChatVC: UIViewController {
                             
                             self.sendMessageList(msg: fileStr, msgType: "file")
                         }
-                        
-                        if let audio = data["audio"] as? String{
-                           // self.sendMessageList(msg: audio, msgType: "audio")
-                        }
-                 
+                  
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                            
+                            Themes.sharedInstance.removeActivityView(uiView: self.view)
+                            
+                        })
                         
                     }
                 }
+            }else{
+                Themes.sharedInstance.removeActivityView(uiView: self.view)
+
             }
         }
     }
@@ -543,7 +551,12 @@ class ChatVC: UIViewController {
     
     
     @objc func keyboardWillShow(_ notification: Notification) {
-        
+       
+        DispatchQueue.main.async {
+            self.btnMic.isHidden = true
+            self.btnSend.isHidden = false
+        }
+    
         if let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
             var statusBarHeight = 0
             if #available(iOS 13.0, *) {
@@ -553,8 +566,7 @@ class ChatVC: UIViewController {
                 statusBarHeight = Int(UIApplication.shared.statusBarFrame.height) - 5
             }
             inputBarBottomSpace.constant = keyboardFrame.height - CGFloat(statusBarHeight) + 10
-            self.btnMic.isHidden = true
-            self.btnSend.isHidden = false
+         
             view.setNeedsLayout()
             view.layoutIfNeeded()
             scrollToBottom(animated: false)
@@ -563,9 +575,11 @@ class ChatVC: UIViewController {
     
     
     @objc func keyboardWillHide(_ notification: Notification) {
+        DispatchQueue.main.async {
+            self.btnMic.isHidden = false
+            self.btnSend.isHidden = false
+        }
         inputBarBottomSpace.constant = 0
-        self.btnMic.isHidden = false
-        self.btnSend.isHidden = true
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
@@ -697,10 +711,10 @@ class ChatVC: UIViewController {
                                 
                 let name = itemDict["name"] as? String ?? ""
                 let image = itemDict["image"] as? String ?? ""
-                let price = itemDict["price"] as? Int ?? 0
+                let price = itemDict["price"] as? Double ?? 0.0
                 self.itemId = itemDict["id"] as? Int ?? 0
                 self.lblProduct.text = name
-                self.lblPrice.text = "\(Local.shared.currencySymbol) \(price)"
+                self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
                 self.imgViewProduct.kf.setImage(with: URL(string: image),placeholder: UIImage(named: "getkartplaceholder"))
             }else{
                 isItemDeleted = true
@@ -817,10 +831,13 @@ class ChatVC: UIViewController {
                 self.scrollToBottom(animated: true)
                 
                 
-                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+                
+              //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                
-                if objLoggedInUser.id != (obj.senderID ?? 0) {
+//                if objLoggedInUser.id != (obj.senderID ?? 0) {
                     
+                if Local.shared.getUserId() != (obj.senderID ?? 0) {
+
                     sendmessageAcknowledge()
                 }
                 
@@ -1045,6 +1062,7 @@ extension ChatVC: GrowingTextViewDelegate {
 
     func growingTextViewDidBeginEditing(_ growingTextView: GrowingTextView) {
       //  self.sendtypinStatus(status: true)
+        
     }
    
     func growingTextViewDidEndEditing(_ growingTextView: GrowingTextView) {
@@ -1124,7 +1142,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
          dateFormatter.dateFormat = "hh:mm a"
 
         var cell = ChatterCell()
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
         if (chatObj.messageType ?? "") == "100"{
             let cell = tableView.dequeueReusableCell(withIdentifier: "SeperatorDateCell") as! SeperatorDateCell
@@ -1139,7 +1157,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
 
             return cell
             
-        }else if chatObj.senderID == objLoggedInUser.id{
+        }else if chatObj.senderID == Local.shared.getUserId() { // objLoggedInUser.id{
            
                 
             switch (chatObj.messageType ?? ""){

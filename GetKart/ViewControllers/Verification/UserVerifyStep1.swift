@@ -143,9 +143,9 @@ struct UserVerifyStep1: View {
     
     func getUserProfileApi(){
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+       // let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         
-        let strUrl = Constant.shared.get_seller + "?id=\(objLoggedInUser.id ?? 0)"
+        let strUrl = Constant.shared.get_seller + "?id=\(Local.shared.getUserId())"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
             

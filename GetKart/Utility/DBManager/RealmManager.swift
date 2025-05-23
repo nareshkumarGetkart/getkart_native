@@ -140,6 +140,7 @@ class RealmManager: ObservableObject {
 
     func saveUserInfo(userInfo: UserInfo) {
         deleteUserInfoObjects()
+        Local.shared.saveUserId(userId: userInfo.id ?? 0)
         let dbUser = DBUserInfo(userInfo: userInfo)
         
         try? realm.write {
@@ -148,6 +149,7 @@ class RealmManager: ObservableObject {
     }
 
     func deleteUserInfoObjects() {
+        Local.shared
         try? realm.write {
             let allUsers = realm.objects(DBUserInfo.self)
             realm.delete(allUsers)

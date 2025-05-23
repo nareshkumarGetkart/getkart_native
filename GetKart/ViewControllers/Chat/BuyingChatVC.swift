@@ -44,8 +44,9 @@ class BuyingChatVC: UIViewController {
             self.emptyView?.imageView?.image = UIImage(named: "no_chat_found")
         }
         Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
-       // getChatList()
-
+       
+        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,13 +57,25 @@ class BuyingChatVC: UIViewController {
             getChatList()
         }
         
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
+        
     }
     
     
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-        if !isDataLoading {
+       
+        if !AppDelegate.sharedInstance.isInternetConnected{
+          isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+      
+        }else  if !isDataLoading {
             isDataLoading = true
             page = 1
             self.getChatList()
@@ -81,6 +94,12 @@ class BuyingChatVC: UIViewController {
     }
     
     //MARK: Observers
+    @objc func noInternet(notification:Notification?){
+      
+        self.isDataLoading = false
+        AlertView.sharedManager.showToast(message: "No internet connection")
+
+    }
     
     @objc func updateChatList(notification: Notification) {
         
@@ -225,7 +244,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-            print("up")
+           // print("up")
             if scrollView == tblView{
                 return
             }

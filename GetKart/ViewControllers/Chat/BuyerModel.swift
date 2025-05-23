@@ -148,7 +148,9 @@ enum MessageType: String, Codable {
 struct ItemChat: Codable {
     let status: String?
     let soldTo, review: String?
-    let id, price: Int?
+    let id: Int?
+    let price:Double? //    let id, price: Int?
+
     let deletedAt: String?
     let image: String?
     let description, name: String?

@@ -7,31 +7,36 @@
 
 import Foundation
 import UIKit
-
+import Kingfisher
 
 final class Local {
     
     static let shared = Local()
-    var isLogout = false
     
     private  init(){ }
     
- 
+    var isToRefreshVerifiedStatusApi = true
     var compression = 50
     var currencySymbol:String = "₹"
+    var companyEmail:String = "support@getkart.com"
+    var companyTelelphone1:String = "8800957957"
 
-    /*
-    func saveUserId(userId:String){
+
+    var isLogout = false
+
+    
+    func saveUserId(userId:Int){
         
         UserDefaults.standard.setValue(userId, forKey: LocalKeys.userId.rawValue)
         UserDefaults.standard.synchronize()
     }
     
-    func getUserId() -> String{
+    func getUserId() -> Int{
         
-        return UserDefaults.standard.value(forKey: LocalKeys.userId.rawValue) as? String ?? ""
+        return UserDefaults.standard.value(forKey: LocalKeys.userId.rawValue) as? Int ?? 0
     }
-        */
+    
+    
     func saveHashToken(token:String){
         
         UserDefaults.standard.setValue(token, forKey: LocalKeys.token.rawValue)
@@ -109,26 +114,45 @@ final class Local {
     }
     
     func removeUserData() {
-        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
-        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
-
-        SocketIOManager.sharedInstance.socket?.disconnect()
-        SocketIOManager.sharedInstance.socket = nil
-        SocketIOManager.sharedInstance.manager = nil
-        UserDefaults.standard.removeObject(forKey:LocalKeys.userId.rawValue)
-        UserDefaults.standard.removeObject(forKey: LocalKeys.token.rawValue)
-        
+ 
+ 
+       /*
         UserDefaults.standard.removeObject(forKey: LocalKeys.city.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalKeys.state.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalKeys.country.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalKeys.timezone.rawValue)
+        */
+       
+        //Socket
+        SocketIOManager.sharedInstance.socket?.disconnect()
+        SocketIOManager.sharedInstance.socket = nil
+        SocketIOManager.sharedInstance.manager = nil
         
+        //Local
+        UserDefaults.standard.removeObject(forKey:LocalKeys.userId.rawValue)
+        UserDefaults.standard.removeObject(forKey: LocalKeys.token.rawValue)
         UserDefaults.standard.synchronize()
+      
+        //Notification
         AppDelegate.sharedInstance.sharedProfileID = ""
         AppDelegate.sharedInstance.notificationType = ""
         AppDelegate.sharedInstance.userId = 0
         AppDelegate.sharedInstance.roomId = 0
+   
+        Local.shared.isToRefreshVerifiedStatusApi = true
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+        //Cache clear
+        ImageCache.default.clearDiskCache()
+        ImageCache.default.clearMemoryCache()
+   
+        //Realm Database
+        RealmManager.shared.deleteUserInfoObjects()
+        RealmManager.shared.clearDB()
+
     }
+    
+    
     
 }
 

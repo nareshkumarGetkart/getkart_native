@@ -119,35 +119,53 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             
         }else{
         //if popType == .createPost {
+            
+            
             let objCategory = objViewModel?.listArray?[indexPath.item]
-          let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
-            let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-            navigationController?.pushViewController(hostingController, animated: true) //
+            if (objCategory?.subcategories?.count ?? 0) > 0 {
+                let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "",category_id:"\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                navigationController?.pushViewController(hostingController, animated: true) //
+            }else{
+                if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                    vc.objSubCategory = nil
+                    vc.strCategoryTitle = objCategory?.name ?? ""
+                    vc.strSubCategoryTitle =  ""
+                    vc.category_ids = "\(objCategory?.id ?? 0)"
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+            }
         }
     }
     
-//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        
-//        if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-//            print("up")
-//            if scrollView == collctionView{
-//                return
-//            }
-//        }
-//        
-//        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
-//        {
-//            if scrollView == collctionView{
-//                if objViewModel?.isDataLoading == false{
-//                    objViewModel?.getItemListApi()
-//                }
-//            }
-//        }
+   // func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        
 //    }
-    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+   
+        if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
+           // print("up")
+            if scrollView == collctionView{
+                return
+            }else if scrollView == tblView{
+                return
+            }
+        }
+        
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
+        {
+           // if scrollView == collctionView{
+                if objViewModel?.isDataLoading == false{
+                    objViewModel?.getCategoriesListApi()
+                }
+           // }
+        }
+    }
 }
 
+
 extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -189,13 +207,32 @@ extension CategoriesVC:UITableViewDelegate, UITableViewDataSource {
             }
             
         }else if popType == .filter {
-             
+            
             let objCategory = objViewModel?.listArray?[indexPath.item]
-            let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "", category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType) // Create SwiftUI view
-            let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-            navigationController?.pushViewController(hostingController, animated: true)
+            
+            if (objCategory?.subcategories?.count ?? 0) == 0{
+                
+                for vc in self.navigationController?.viewControllers ?? []{
+                    if let vc1 = vc as? FilterVC  {
+                        vc1.strCategoryTitle = objCategory?.name ?? ""
+                        vc1.category_id = "\(objCategory?.id ?? 0)"
+                        vc1.category_ids = "\(objCategory?.id ?? 0)"
+                        vc1.fetchCustomFields()
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                    }
+                }
+                
+            }else{
+                
+              
+                
+                let swiftUIView = SubCategoriesView(subcategories: objCategory?.subcategories, navigationController: self.navigationController, strTitle: objCategory?.name ?? "", category_id: "\(objCategory?.id ?? 0)", category_ids:"\(objCategory?.id ?? 0)", popType:self.popType,screenNumber: 1) // Create SwiftUI view
+                let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+                navigationController?.pushViewController(hostingController, animated: true)
+            }
         }
     }
+    
     
    
 }

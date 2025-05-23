@@ -54,6 +54,8 @@ struct CityLocationView: View {
                         .frame(height: 36)
                     //.background(Color(.systemGray6))
                     //.cornerRadius(8)
+                        .tint(Color(Themes.sharedInstance.themeColor))
+
                         .onChange(of: searchText) { newValue in
                             print(newValue)
                             pageNoSearch = 1

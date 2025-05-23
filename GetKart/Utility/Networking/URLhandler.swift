@@ -149,7 +149,7 @@ class URLhandler: NSObject{
                     }
                 }
         }else {
-            //AlertView.sharedManager.showToast(message: "No Network Connection")
+            AlertView.sharedManager.showToast(message: "No Network Connection")
             //(AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
         }
     }
@@ -267,7 +267,7 @@ class URLhandler: NSObject{
                 }
             }
         }else {
-           // AlertView.sharedManager.showToast(message: "No Network Connection")
+            AlertView.sharedManager.showToast(message: "No Network Connection")
           //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
         }
@@ -328,7 +328,7 @@ class URLhandler: NSObject{
         }else {
            // (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
-            //AlertView.sharedManager.showToast(message: "No Network Connection")
+            AlertView.sharedManager.showToast(message: "No Network Connection")
         }
     }
     
@@ -631,7 +631,7 @@ class URLhandler: NSObject{
                 }
             }
         }else {
-           // AlertView.sharedManager.showToast(message: "No Network Connection")
+            AlertView.sharedManager.showToast(message: "No Network Connection")
           //  (AppDelegate.sharedInstance.navigationController?.topViewController)?.view.makeToast(message: Constant.shared.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault,image: UIImage(named: "wifi")!)
 
         }

@@ -15,10 +15,10 @@ import Kingfisher
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
    
-    let reachability = Reachability()!
+    let reachability = Reachability()
     var isInternetConnected:Bool=Bool()
     var byreachable : String = String()
-    @objc static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
+    static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
     var window: UIWindow?
     var navigationController: UINavigationController?
     var sharedProfileID = ""
@@ -27,27 +27,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var roomId = 0
     var itemId = 0
     
-    var settingsModel:SettingsModel?
+   // var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        IQKeyboardManager.shared.isEnabled = true
-        IQKeyboardManager.shared.resignOnTouchOutside = true
+   
         self.window = UIWindow(frame: UIScreen.main.bounds)
-       self.window?.overrideUserInterfaceStyle = .light
-
+        self.window?.overrideUserInterfaceStyle = .light
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         setupKingfisherSettings()
-        
         getSettingsApi()
-
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.id != nil {
-            print(objLoggedInUser)
-           let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as! HomeBaseVC
-            self.navigationController?.viewControllers = [landingVC]
-                     
-        }else  {
+        
+        let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as! ATAppUpdater
+        updateChecker.delegate = self
+        updateChecker.showUpdateWithForce()
+   
+        if Local.shared.getUserId() > 0{
+            
+            if let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as? HomeBaseVC{
+                self.navigationController?.viewControllers = [landingVC]
+            }
+            
+        }else{
             
             let  isFirstTime = UserDefaults.standard.object(forKey: "isFirstTime") as? Bool ?? true
             if isFirstTime == true {
@@ -56,19 +57,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let vc = UIHostingController(rootView: DemoView())
                 vc.view.setNeedsUpdateConstraints()
                 self.navigationController?.viewControllers = [vc]
-           }else {
-                let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-                self.navigationController?.viewControllers = [landingVC]
+            }else {
+                if let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as? LoginVC{
+                    self.navigationController?.viewControllers = [landingVC]
+                }
             }
         }
         
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
-
+        
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
         registerForRemoteNotification(application: application)
+        IQKeyboardManager.shared.isEnabled = true
+        IQKeyboardManager.shared.resignOnTouchOutside = true
         
         return true
     }
@@ -91,7 +95,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // ImageCache.default.diskStorage.config.expiration = .days(5)
         KingfisherManager.shared.cache.cleanExpiredMemoryCache()
         KingfisherManager.shared.cache.cleanExpiredDiskCache()
-        
     }
     
     
@@ -106,7 +109,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     func applicationWillEnterForeground(_ application: UIApplication){
         print("applicationWillEnterForeground")
-       // checkSocketStatus()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -115,10 +117,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.token != nil {
-            
+
+        if Local.shared.getUserId() > 0{
             var bgTask: UIBackgroundTaskIdentifier = .invalid
             bgTask = UIApplication.shared.beginBackgroundTask {
                 // Cleanup when time expires
@@ -141,10 +141,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             let myUrl: String? = userActivity.webpageURL?.absoluteString
             let urlArray = myUrl?.components(separatedBy: "/")
-          
-            let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-            if objLoggedInUser.token != nil {
-                
+
+           // if Local.shared.getUserId() > 0{
                 if myUrl?.range(of: "/seller/") != nil {
                     
                     let userId = urlArray?.last ?? ""
@@ -166,7 +164,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
 
-            }
+          //  }
         }else{
             
         }
@@ -174,9 +172,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func checkSocketStatus(){
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.token == nil {
+
+       if Local.shared.getUserId() == 0{
+
             return
         }
         
@@ -204,7 +202,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func reachabilityListener(){
         NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),name: ReachabilityChangedNotification, object: reachability)
         do{
-            try reachability.startNotifier()
+            try reachability?.startNotifier()
         }catch{
             print("could not start reachability notifier")
         }
@@ -213,12 +211,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    
     @objc func reachabilityChanged(note: NSNotification) {
        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
-        let reachability = note.object as! Reachability
+        guard  let reachability = note.object as? Reachability else{ return }
         if reachability.isReachable {
             isInternetConnected=true
-          //  Themes.sharedInstance.showWaitingNetwork(true, state: true)
             if reachability.isReachableViaWiFi {
                 print("Reachable via WiFi")
                 byreachable = "1"
@@ -228,16 +225,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.reconnectInternet.rawValue), object: nil , userInfo: nil)
 
-            if objLoggedInUser.id != nil {
-            
-               SocketIOManager.sharedInstance.establishConnection()
+            if Local.shared.getUserId() > 0{
+                SocketIOManager.sharedInstance.establishConnection()
             }
         } else {
             isInternetConnected=false
-            //Themes.sharedInstance.showWaitingNetwork(true, state: false)
             print("Network not reachable")
             byreachable = ""
-           // NotificationCenter.default.post(name: NSNotification.Name(rawValue: Constant.sharedinstance.reloadData), object: nil , userInfo: nil)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.noInternet.rawValue), object: nil , userInfo: nil)
         }
     }
@@ -246,7 +240,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     
- 
     func registerForRemoteNotification(application:UIApplication){
         UNUserNotificationCenter.current().delegate = self
 
@@ -255,11 +248,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
           options: authOptions,
           completionHandler: { _, _ in }
         )
-
         application.registerForRemoteNotifications()
         
         Messaging.messaging().delegate = self
-        
         
         Messaging.messaging().token { token, error in
           if let error = error {
@@ -308,7 +299,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             
         case "chat","offer":
             
-            
             if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC{
 
                 // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
@@ -344,29 +334,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 }
             }
 
-            
-            
-          /*  if let destVc = self.navigationController?.topViewController as? ChatVC{
-                
-                if destVc.userId == userId{
-                    
-                }else{
-                    
-                    AppDelegate.sharedInstance.navigationController?.popViewController(animated: false)
-                    let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                    vc.userId = userId
-                    vc.item_offer_id = roomId
-                    vc.hidesBottomBarWhenPushed = true
-                    AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-                }
-            }else{
-                let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                vc.userId = self.userId
-                vc.item_offer_id = self.roomId
-                vc.hidesBottomBarWhenPushed = true
-                AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-                
-            }*/
         case "payment":
             
            do {
@@ -404,7 +371,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
                         }
                         
-                       //destvc.navigationController?.popToRootViewController(animated: true)
                         destvc.selectedIndex = 3
                         
                         if let navController = destvc.viewControllers?[3] as? UINavigationController {
@@ -425,11 +391,13 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             
         case "verifcation-request-update":
             do{
+                
+                Local.shared.isToRefreshVerifiedStatusApi = true
+                
                 for controller in self.navigationController?.viewControllers ?? []{
                     
                     if let destvc =  controller as? HomeBaseVC{
                             
-                  //  destvc.navigationController?.popToRootViewController(animated: true)
                         
                         if let navController = destvc.viewControllers?[0] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
@@ -483,6 +451,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
             }
+        case "seller-profile":
+            do{
+                let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userId))
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
+      
         default:
             break
         }
@@ -494,13 +468,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
     func userNotificationCenter(_ a: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
       
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
-        if objLoggedInUser.id == nil {
+       if Local.shared.getUserId() == 0{
+
             
         }else{
-           // checkSocketStatus()
             print("didReceive")
             print("NOTIFICATION TAPPED === \(response.notification.request.content.userInfo)")
             
@@ -514,6 +486,10 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 userId =  Int(response.notification.request.content.userInfo["user_id"] as? String ?? "0") ?? 0
             }
             
+            if userId == 0{
+                userId =  Int(response.notification.request.content.userInfo["seller_id"] as? String ?? "0") ?? 0
+            }
+                
             
             print("notificationType == \(notificationType)")
             print("userId == \(userId)")
@@ -526,12 +502,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
     }
     
-    
-    func needToRefreshLikedYou(){
-        
-    //NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotificationKeys.refreshLikeList.rawValue), object: nil, userInfo: nil)
-
-    }
+ 
     
     //This is key callback to present notification while the app is in foreground
 
@@ -549,6 +520,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             userId =  Int(notification.request.content.userInfo["user_id"] as? String ?? "0") ?? 0
         }
         
+        
+//        if userId == 0{
+//            userId =  Int(notification.request.content.userInfo["seller_id"] as? String ?? "0") ?? 0
+//        }
+        
         if notificationType == "chat" {
             
             
@@ -557,20 +533,22 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             
             if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC {
                 
-                // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
-                if tabBarController.selectedIndex == 1, // update with your actual chat tab index
-                   let navController = tabBarController.viewControllers?[1] as? UINavigationController,
-                   let topVC = navController.topViewController as? ChatVC {
+                if (tabBarController.viewControllers?.count ?? 0) > 1{
                     
-                    // Now we know ChatVC is visible
-                    if topVC.userId == userId {
-                        // Same chat already opened — do nothing or update UI
-                        print("ChatVC is already opened for this user.")
-                    } else {
-                        //completionHandler( [.alert,.sound,.badge])
-                        completionHandler([.banner, .list, .sound])
+                    if tabBarController.selectedIndex == 1, // update with your actual chat tab index
+                       
+                       let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                       let topVC = navController.topViewController as? ChatVC {
+                        
+                        // Now we know ChatVC is visible
+                        if topVC.userId == userId {
+                            // Same chat already opened — do nothing or update UI
+                            print("ChatVC is already opened for this user.")
+                        } else {
+                            completionHandler([.banner, .list, .sound])
+                        }
+                        
                     }
-                    
                 } else {
                     completionHandler([.banner, .list, .sound])
 
@@ -580,10 +558,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
             }
 
-         
         } else{
-           // self.playSound()
-           // completionHandler( [.alert,.sound,.badge])
+            if notificationType == "verifcation-request-update"{
+                Local.shared.isToRefreshVerifiedStatusApi = true
+            }
+         
             completionHandler([.banner, .list, .sound])
             
         }
@@ -600,14 +579,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
              UNNotificationPresentationOptions.sound])
     }
     
-    
-    
-    func logoutFromApp(){
-        Local.shared.isLogout = true
-        Local.shared.removeUserData()
-        //DBManager.deleteRecords()
-        AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
-    }
+   
     
     func showLoginScreen(){
         
@@ -617,14 +589,14 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     }
     
     func getSettingsApi(){
-        print("📡 getSettingsApi CALLED")
 
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_system_settings) { (obj:SettingsParse) in
             
             if (obj.code ?? 0) == 200 {
-                self.settingsModel = obj.data
+               // self.settingsModel = obj.data
                 Local.shared.currencySymbol = obj.data?.currencySymbol ?? "₹"
-                
+                Local.shared.companyEmail = obj.data?.companyEmail ?? "support@getkart.com"
+                Local.shared.companyTelelphone1 = obj.data?.companyTel1 ?? "8800957957"
             }
             
         }
@@ -632,12 +604,10 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
    
     
     func isUserLoggedInRequest() -> Bool {
-        
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-        if objLoggedInUser.id != nil {
-            
+
+        if Local.shared.getUserId() > 0{
+
             return true
-            
             
         }else{
             let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {
@@ -656,3 +626,18 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     
 }
 
+
+extension AppDelegate : ATAppUpdaterDelegate{
+    
+    func appUpdaterDidShowUpdateDialog(){
+        
+    }
+    func appUpdaterUserDidLaunchAppStore(){
+        
+    }
+    
+    func appUpdaterUserDidCancel(){
+        
+    }
+    
+}

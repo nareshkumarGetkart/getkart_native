@@ -49,7 +49,7 @@ struct ProductCard: View {
                         Text("Featured").frame(width:75,height:20)
                             .background(.orange)
                             .cornerRadius(5)
-                            .foregroundColor(Color(UIColor.label))
+                            .foregroundColor(Color(UIColor.white))
                             .padding(.horizontal).padding(.top)
                             .font(.manrope(.regular, size: 13))
 
