@@ -145,6 +145,27 @@ struct CategoryCellView: View {
     @State var subCategory:Subcategory?
     var body: some View {
         HStack {
+            if let imgUrl = subCategory?.image{
+                
+                
+                AsyncImage(url: URL(string: imgUrl)) { img in
+                    
+                    img.resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 30,height: 30)
+                        .cornerRadius(15.0)
+                        .clipped()
+                } placeholder: {
+                    Image("getkartplaceholder")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .background(Color(Themes.sharedInstance.themeColor))
+                            .frame(width: 30,height: 30)
+                            .cornerRadius(15.0)
+                            .clipped()
+                }
+
+            }
             Text(subCategory?.name ?? "")
                 .foregroundColor(.primary)
                 .padding()

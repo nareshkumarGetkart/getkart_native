@@ -837,6 +837,27 @@
                                 <color key="textColor" red="1" green="0.14913141730000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V7B-fH-1yX" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="308" y="74" width="75" height="30"/>
+                                <color key="backgroundColor" red="0.95294117649999999" green="0.87843137250000003" blue="0.89411764709999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="4L0-se-8Qz"/>
+                                    <constraint firstAttribute="height" constant="30" id="iUu-MM-5YK"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="15"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Skip">
+                                    <color key="titleColor" red="0.96470588239999999" green="0.35686274509999999" blue="0.26274509800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="15"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="skipButtonAction" destination="RSc-CU-Np4" eventType="touchUpInside" id="kJz-Fs-VJ5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="2O8-9J-iy0"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -844,11 +865,13 @@
                             <constraint firstItem="Um8-BT-TdI" firstAttribute="leading" secondItem="2O8-9J-iy0" secondAttribute="leading" constant="20" id="DGX-ug-u33"/>
                             <constraint firstItem="DGH-ZE-ICL" firstAttribute="top" secondItem="2O8-9J-iy0" secondAttribute="top" constant="10" id="Kw5-8c-UvT"/>
                             <constraint firstItem="xbc-8O-MHf" firstAttribute="top" secondItem="Shc-js-qyV" secondAttribute="bottom" constant="54" id="LDm-94-8W7"/>
+                            <constraint firstItem="V7B-fH-1yX" firstAttribute="top" secondItem="2O8-9J-iy0" secondAttribute="top" constant="15" id="LKq-yq-P5a"/>
                             <constraint firstItem="2O8-9J-iy0" firstAttribute="trailing" secondItem="Y53-PW-pg4" secondAttribute="trailing" constant="20" id="PJA-Zj-OEl"/>
                             <constraint firstItem="2O8-9J-iy0" firstAttribute="trailing" secondItem="Um8-BT-TdI" secondAttribute="trailing" constant="20" id="PJq-n0-KjK"/>
                             <constraint firstItem="2O8-9J-iy0" firstAttribute="trailing" secondItem="xbc-8O-MHf" secondAttribute="trailing" constant="20" id="Tdl-et-GqN"/>
                             <constraint firstItem="xbc-8O-MHf" firstAttribute="top" secondItem="Um8-BT-TdI" secondAttribute="bottom" constant="5" id="ZXO-YK-Gh0"/>
                             <constraint firstItem="Shc-js-qyV" firstAttribute="leading" secondItem="2O8-9J-iy0" secondAttribute="leading" constant="20" id="eYS-LM-7ye"/>
+                            <constraint firstItem="2O8-9J-iy0" firstAttribute="trailing" secondItem="V7B-fH-1yX" secondAttribute="trailing" constant="10" id="erg-5G-yWD"/>
                             <constraint firstItem="2O8-9J-iy0" firstAttribute="trailing" secondItem="Shc-js-qyV" secondAttribute="trailing" constant="20" id="lvR-iL-B6B"/>
                             <constraint firstItem="Shc-js-qyV" firstAttribute="top" secondItem="2O8-9J-iy0" secondAttribute="top" constant="100" id="mbG-Cq-jEh"/>
                             <constraint firstItem="DGH-ZE-ICL" firstAttribute="leading" secondItem="2O8-9J-iy0" secondAttribute="leading" constant="5" id="qE0-Hw-09i"/>
@@ -880,7 +903,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

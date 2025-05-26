@@ -38,6 +38,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         btnLocation.clipsToBounds = true
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = 200
+        updateTolocation()
         registerCells()
         homeVModel = HomeViewModel()
         homeVModel?.delegate = self
@@ -52,6 +53,34 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        /*
+        let city = Local.shared.getUserCity()
+        let state = Local.shared.getUserState()
+        let country = Local.shared.getUserCountry()
+        var locStr = city
+        if state.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + state : state
+        }
+        if country.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
+        }
+        
+        if locStr.count == 0 {
+            locStr = "All Countries"
+        }
+        
+        self.lblAddress.text = locStr
+        */
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            homeVModel?.isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
+        
+    }
+    
+    private func updateTolocation(){
         
         let city = Local.shared.getUserCity()
         let state = Local.shared.getUserState()
@@ -69,20 +98,12 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         }
         
         self.lblAddress.text = locStr
-        
-        if !AppDelegate.sharedInstance.isInternetConnected{
-            homeVModel?.isDataLoading = false
-            AlertView.sharedManager.showToast(message: "No internet connection")
-            return
-        }
-        
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Clear caches, release unnecessary memory
         ImageCache.default.clearMemoryCache()
-
     }
 
     func registerCells(){
@@ -435,32 +456,32 @@ extension HomeVC: RefreshScreen{
     
     
     func refreshFeaturedsList(){
-        UIView.performWithoutAnimation {
+     //   UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 2), with: .none)
-        }
+       // }
     }
     func refreshBannerList(){
-        UIView.performWithoutAnimation {
+      //  UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 0), with: .none)
-        }
+        //}
     }
     func refreshCategoriesList(){
-        UIView.performWithoutAnimation {
+      //  UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 1), with: .none)
-        }
+       // }
         
     }
     
     
     
     func refreshScreen(){
-        UIView.performWithoutAnimation {
+       // UIView.performWithoutAnimation {
             
             self.tblView.reloadData()
-        }
+        //}
     }
    
     

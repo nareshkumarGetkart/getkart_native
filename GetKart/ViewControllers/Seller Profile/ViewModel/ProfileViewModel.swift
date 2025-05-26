@@ -65,12 +65,18 @@ class ProfileViewModel:ObservableObject{
     }
     
     
-    func getSellerProfile(sellerId:Int){
+    func getSellerProfile(sellerId:Int,nav:UINavigationController?){
         
         let strURl = Constant.shared.get_seller + "?id=\(sellerId)"
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURl) { [weak self] (obj:Profile)  in
             if obj.code == 200 {
                 self?.sellerObj = obj.data?.seller
+            }else{
+                AlertView.sharedManager.presentAlertWith(title: "", msg: (obj.message ?? "") as NSString, buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in
+                    
+                    nav?.popViewController(animated: true)
+                    
+                }
             }
         }
     }

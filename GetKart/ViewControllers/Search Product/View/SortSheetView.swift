@@ -42,7 +42,7 @@ struct SortSheetView: View {
                             .foregroundColor(.primary)
                         Spacer()
                         if selectedSort == option {
-                            Image(systemName: "checkmark")
+                            Image(systemName: "checkmark").foregroundColor(Color(Themes.sharedInstance.themeColor))
                         }
                     }
                     .padding()

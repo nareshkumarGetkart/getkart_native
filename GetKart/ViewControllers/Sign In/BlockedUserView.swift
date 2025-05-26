@@ -46,7 +46,8 @@ struct BlockedUserView: View {
                             .cornerRadius(30)
                             .aspectRatio(contentMode: .fit).padding(8)
                         
-                    }placeholder: { Image("getkartplaceholder")
+                    }placeholder: {
+                        Image("user-circle")
                         .resizable().aspectRatio(contentMode: .fit)
                         .frame(width: 60,height: 60).cornerRadius(30).padding(8)}
                     

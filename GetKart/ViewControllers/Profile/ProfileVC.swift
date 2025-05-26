@@ -15,12 +15,13 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     
-  /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+  /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms of Service","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
+    
     let iconArray =  ["","promoted","subscription","transaction","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
       
     var verifiRejectedReason:String = ""
@@ -163,26 +164,14 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             if objLoggedInUser.id != nil {
                 cell.bgViewAnonymousUser.isHidden = true
                 cell.bgViewLoggedInUser.isHidden = false
-                cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
-                
-                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
-
-                cell.lblName.text =  objLoggedInUser.name ?? ""
-                cell.lblEmail.text =  objLoggedInUser.email ?? ""
+                cell.btnGetVerifiedBadge.isHidden = true
+                cell.bgViewVerified.isHidden = true
                 cell.lblStatus.isHidden = true
                 cell.btnResubmit.isHidden = true
+                cell.lblName.text =  objLoggedInUser.name ?? ""
+                cell.lblEmail.text =  objLoggedInUser.email ?? ""
                 cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
-                
-
-                if (objLoggedInUser.is_verified ?? 0) == 1 && verifiSttaus.lowercased() == "approved"{
-                    cell.btnGetVerifiedBadge.isHidden = true
-                    cell.bgViewVerified.isHidden = false
-                    
-                }else{
-                    cell.btnGetVerifiedBadge.isHidden = false
-                    cell.bgViewVerified.isHidden = true
-                }
-                
+                                
                 if verifiSttaus.lowercased() == "pending"{
                     cell.lblStatus.text = verifiSttaus.capitalized
                     cell.lblStatus.backgroundColor = Themes.sharedInstance.themeColor
@@ -198,7 +187,25 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.btnResubmit.isHidden = false
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = true
+                }else if verifiSttaus.lowercased() == "approved"{
+                    
+                    cell.btnGetVerifiedBadge.isHidden = true
+                    cell.bgViewVerified.isHidden = false
+                }else{
+                    
+                    if (objLoggedInUser.is_verified ?? 0) == 1{
+                        cell.btnGetVerifiedBadge.isHidden = true
+                        cell.bgViewVerified.isHidden = false
+                    }else{
+                        cell.btnGetVerifiedBadge.isHidden = false
+                        cell.bgViewVerified.isHidden = true
+                    }
                 }
+                
+                
+                 cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
+                 cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+
                 cell.btnResubmit.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 cell.lblStatus.isUserInteractionEnabled = true
                 cell.lblStatus.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(statusTapped)))
@@ -300,9 +307,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
-            }else if titleArray[indexPath.row] == "Terms of Service"{
+            }else if titleArray[indexPath.row] == "Terms & Conditions"{
                 
-                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of Service", type: .termsAndConditions) // Create SwiftUI view
+                let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms & Conditions", type: .termsAndConditions) // Create SwiftUI view
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)

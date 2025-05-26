@@ -66,7 +66,8 @@ struct MyLocationView: View {
                 }.padding(.top ,30)
                 
                 Spacer()
-            }.navigationBarHidden(true).onAppear {
+            }.navigationBarHidden(true)
+            .onAppear {
                 if Local.shared.getUserCity().count > 0 {
                     if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
                         self.navigationController?.pushViewController(vc, animated: true)
@@ -114,7 +115,7 @@ struct MyLocationView: View {
 }
 
 extension MyLocationView :LocationAutorizationUpdated {
-    func locationAuthorizationUpdate() {
+    func locationAuthorizationUpdate(isToUpdateLocation:Bool) {
         if locationManager.manager.authorizationStatus == .authorizedAlways  ||  locationManager.manager.authorizationStatus == .authorizedWhenInUse {
             if let coordinate = locationManager.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")

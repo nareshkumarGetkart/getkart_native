@@ -7,6 +7,11 @@
 
 import UIKit
 
+
+protocol SignInWithEmailSkipDelegate:AnyObject{
+    func skipAction()
+}
+
 class SIgnInWithEmailVC: UIViewController {
 
     @IBOutlet weak var txtFdEmail:UITextFieldX!
@@ -14,6 +19,8 @@ class SIgnInWithEmailVC: UIViewController {
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var lblError:UILabel!
 
+    weak var delegate:SignInWithEmailSkipDelegate?
+    
     //MARK: Controller lIfe cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +49,12 @@ class SIgnInWithEmailVC: UIViewController {
         }
     }
     
+    
+    @IBAction func skipButtonAction() {
+        self.navigationController?.popViewController(animated: false)
+        self.delegate?.skipAction()
+
+    }
 
     //MARK: Api Methods
     

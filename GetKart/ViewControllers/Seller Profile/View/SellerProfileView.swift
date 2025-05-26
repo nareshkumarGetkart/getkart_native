@@ -244,7 +244,7 @@ struct SellerProfileView: View {
         }.navigationBarHidden(true)
         .onAppear{
             if objVM.itemArray.count == 0{
-                objVM.getSellerProfile(sellerId: userId)
+                objVM.getSellerProfile(sellerId: userId,nav: navController)
                 objVM.getItemListApi(sellerId: userId)
             }
         }

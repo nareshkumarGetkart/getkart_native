@@ -18,8 +18,7 @@ class HomeBaseVC: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-      //  AppDelegate.sharedInstance.getSettingsApi()
-        AppDelegate.sharedInstance.checkSocketStatus()
+
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
         tabBar.unselectedItemTintColor = UIColor.label
@@ -59,9 +58,24 @@ class HomeBaseVC: UITabBarController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupDoubleTapGesture()
-        if  Constant.shared.isLaunchFirstTime == 1{
-            AppDelegate.sharedInstance.navigateToNotificationType()
+       /* if  Constant.shared.isLaunchFirstTime == 1{
+            
             Constant.shared.isLaunchFirstTime = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+
+                AppDelegate.sharedInstance.navigateToNotificationType()
+            }
+        }*/
+        
+        if Constant.shared.isLaunchFirstTime == 1 {
+            Constant.shared.isLaunchFirstTime = 0
+
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
+                AppDelegate.sharedInstance.navigateToNotificationType()
+            }
+
+            // Trigger connection if not already started
+            SocketIOManager.sharedInstance.checkSocketStatus()
         }
     }
 

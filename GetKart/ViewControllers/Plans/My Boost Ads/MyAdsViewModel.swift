@@ -12,9 +12,8 @@ import UIKit
 class MyAdsViewModel:ObservableObject{
     
     @Published var listArray = [ItemModel]()
-    
     var page = 1
-    var isDataLoading = false
+    @Published var isDataLoading = false
     
     init(){
         getBoostAdsList()

@@ -12,13 +12,18 @@ import FirebaseMessaging
 import SwiftUI
 import Kingfisher
 
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
    
     let reachability = Reachability()
     var isInternetConnected:Bool=Bool()
     var byreachable : String = String()
-    static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
+  //  @objc static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
+    static var sharedInstance: AppDelegate {
+        return UIApplication.shared.delegate as? AppDelegate ?? AppDelegate()
+    }
+
     var window: UIWindow?
     var navigationController: UINavigationController?
     var sharedProfileID = ""
@@ -30,20 +35,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    // var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-   
+        
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.overrideUserInterfaceStyle = .light
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
-        setupKingfisherSettings()
-        getSettingsApi()
+
         
-        let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as! ATAppUpdater
-        updateChecker.delegate = self
-        updateChecker.showUpdateWithForce()
+        //  DispatchQueue.global().async {
+               self.setupKingfisherSettings()
+           //    self.getSettingsApi()
+          //}
+
+        if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
+            updateChecker.delegate = self
+            updateChecker.showUpdateWithForce()
+        }
    
+        // Use Firebase library to configure APIs
+        FirebaseApp.configure()
+        reachabilityListener()
+        registerForRemoteNotification(application: application)
+
+        
         if Local.shared.getUserId() > 0{
-            
+   
+
             if let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as? HomeBaseVC{
                 self.navigationController?.viewControllers = [landingVC]
             }
@@ -67,19 +84,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
         
-        // Use Firebase library to configure APIs
-        FirebaseApp.configure()
-        reachabilityListener()
-        registerForRemoteNotification(application: application)
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
+        
+        // Handle notification if app was launched by tapping a push notification
+           if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+               print("Notification Launch Payload: \(remoteNotification)")
+
+               self.notificationType = remoteNotification["type"] as? String ?? ""
+               self.userId = Int(remoteNotification["sender_id"] as? String ?? "0") ?? 0
+               self.roomId = Int(remoteNotification["item_offer_id"] as? String ?? "0") ?? 0
+               self.itemId = Int(remoteNotification["item_id"] as? String ?? "0") ?? 0
+
+               if self.userId == 0 {
+                   self.userId = Int(remoteNotification["user_id"] as? String ?? "0") ?? 0
+               }
+               if self.userId == 0 {
+                   self.userId = Int(remoteNotification["seller_id"] as? String ?? "0") ?? 0
+               }
+
+               Constant.shared.isLaunchFirstTime = 1
+           }
         
         return true
     }
     
+    
     //MARK: Other helpfule Methods
     fileprivate func setupKingfisherSettings() {
        
+    /*    // Limit memory cache size to 300 MB.
+        KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1
+
+        // Limit memory cache to hold 150 images at most.
+        KingfisherManager.shared.cache.memoryStorage.config.countLimit = 150
+        
+        // Limit disk cache size to 1 GB.
+        KingfisherManager.shared.cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024
+      
+        // Check memory clean up every 30 seconds.
+        KingfisherManager.shared.cache.memoryStorage.config.cleanInterval = 5
+        
+        // ImageCache.default.diskStorage.config.expiration = .days(5)
+        KingfisherManager.shared.cache.cleanExpiredMemoryCache()
+        KingfisherManager.shared.cache.cleanExpiredDiskCache()*/
+        
         // Limit memory cache size to 300 MB.
         KingfisherManager.shared.cache.memoryStorage.config.totalCostLimit = 1
 
@@ -113,12 +162,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("applicationDidBecomeActive")
-        checkSocketStatus()
+        SocketIOManager.sharedInstance.checkSocketStatus()
+
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
 
-        if Local.shared.getUserId() > 0{
+       /* if Local.shared.getUserId() > 0{
             var bgTask: UIBackgroundTaskIdentifier = .invalid
             bgTask = UIApplication.shared.beginBackgroundTask {
                 // Cleanup when time expires
@@ -131,7 +181,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             UIApplication.shared.endBackgroundTask(bgTask)
             bgTask = .invalid
+        }*/
+        if Local.shared.getUserId() > 0{
+          //  SocketIOManager.sharedInstance.disconnect() // socket?.disconnect()
         }
+
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
@@ -170,34 +224,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return true
     }
-    
-    func checkSocketStatus(){
 
-       if Local.shared.getUserId() == 0{
-
-            return
-        }
-        
-        switch SocketIOManager.sharedInstance.socket?.status{
-            
-        case .disconnected:
-            SocketIOManager.sharedInstance.establishConnection()
-            return
-        case .notConnected:
-            SocketIOManager.sharedInstance.establishConnection()
-            return
-        case .connecting:
-            SocketIOManager.sharedInstance.establishConnection()
-            return
-            
-        default:
-            if (SocketIOManager.sharedInstance.socket == nil){
-                SocketIOManager.sharedInstance.establishConnection()
-            }
-            break
-        }
-    }
-     
     
     func reachabilityListener(){
         NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),name: ReachabilityChangedNotification, object: reachability)
@@ -236,6 +263,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 }
+
 
 
 extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
@@ -293,8 +321,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
      
    //MARK: NAvigate
     func  navigateToNotificationType() {
+        
+        guard !notificationType.isEmpty else { return }
+           
         print("didReceive")
-        checkSocketStatus()
+        SocketIOManager.sharedInstance.checkSocketStatus()
+
         switch notificationType{
             
         case "chat","offer":
@@ -525,6 +557,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 //            userId =  Int(notification.request.content.userInfo["seller_id"] as? String ?? "0") ?? 0
 //        }
         
+         
+        if notificationType == "offer" {
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+        }
+        
         if notificationType == "chat" {
             
             
@@ -548,6 +585,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                             completionHandler([.banner, .list, .sound])
                         }
                         
+                    }else{
+                        completionHandler([.banner, .list, .sound])
+
                     }
                 } else {
                     completionHandler([.banner, .list, .sound])

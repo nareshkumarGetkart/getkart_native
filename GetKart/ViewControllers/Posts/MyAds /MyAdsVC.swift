@@ -50,10 +50,6 @@ class MyAdsVC: UIViewController {
         
         addButtonsToScrollView()
         NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name:NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil)
-        
-        
-        getAdsListApi()
-        
         self.topRefreshControl.backgroundColor = .clear
         self.tblView.refreshControl = topRefreshControl
         
@@ -122,7 +118,10 @@ class MyAdsVC: UIViewController {
     }
     
     @objc func refreshList(){
-        refreshMyAds()
+        if  self.isDataLoading == false{
+            
+            refreshMyAds()
+        }
     }
     
     func updateCoorOfSelectedTab(){
@@ -187,16 +186,19 @@ class MyAdsVC: UIViewController {
 
     
     func refreshMyAds(){
-        selectedIndex = 500
-        page = 1
-        apiStatus = ""
-        if let btn = (self.view.viewWithTag(500) as? UIButton){
-            filterBtnAction(btn)
+        if  self.isDataLoading == false{
+            selectedIndex = 500
+            page = 1
+            apiStatus = ""
+            if let btn = (self.view.viewWithTag(500) as? UIButton){
+                filterBtnAction(btn)
+            }
         }
     }
     
     //Api methods
     func getAdsListApi(){
+        
         
         if self.page == 1{
             self.listArray.removeAll()
@@ -204,15 +206,13 @@ class MyAdsVC: UIViewController {
         }
 
         let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
-        
+        self.isDataLoading = true
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
             
             
             if obj.code == 200 {
-//                if self.page == 1{
-//                    self.listArray.removeAll()
-//                    self.tblView.reloadData()
-//                }
+                
+
                 if obj.data != nil , (obj.data?.data ?? []).count > 0 {
                     self.listArray.append(contentsOf: obj.data?.data ?? [])
                     self.tblView.reloadData()
@@ -395,7 +395,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             }
         }
         
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 400)
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
         {
             if scrollView == tblView{
                 if isDataLoading == false{

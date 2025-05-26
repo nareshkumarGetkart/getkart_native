@@ -306,7 +306,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
 
 
 extension ConfirmLocationCreateAdd :LocationAutorizationUpdated {
-    func locationAuthorizationUpdate() {
+    func locationAuthorizationUpdate(isToUpdateLocation:Bool) {
         if LocationManager.sharedInstance.manager.authorizationStatus == .authorizedAlways  ||  LocationManager.sharedInstance.manager.authorizationStatus == .authorizedWhenInUse {
             if let coordinate = LocationManager.sharedInstance.lastKnownLocation {
                 print("Latitude: \(coordinate.latitude)")

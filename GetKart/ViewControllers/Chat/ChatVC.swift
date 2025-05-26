@@ -130,9 +130,6 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
         
-        
-        
-        
         // checkOnlineOfflineStatus()
     }
     
@@ -319,7 +316,11 @@ class ChatVC: UIViewController {
 
             let block = UIAlertAction(title: "Block", style: .default) { (action) in
                 
-                self.blockUnblockUser(isBlock: true)
+                AlertView.sharedManager.presentAlertWith(title: "", msg: "Block \(self.lblName.text ?? "")?" as NSString, buttonTitles: ["Cancel","Block"], onController: self, tintColor: .blue) { title, index in
+                    if index == 1{
+                        self.blockUnblockUser(isBlock: true)
+                    }
+                }
             }
             
             let unblock = UIAlertAction(title: "Unblock", style: .default) { (action) in

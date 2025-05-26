@@ -18,7 +18,7 @@ struct NotificationView: View {
 
     var body: some View {
         HStack {
-         
+            
             Button(action: {
                 // Action to go back
                 navigation?.popViewController(animated: true)
@@ -32,7 +32,7 @@ struct NotificationView: View {
             
             Spacer()
         }.frame(height: 44)
-               
+        
         
         
         VStack{
@@ -45,21 +45,21 @@ struct NotificationView: View {
                     ForEach(listArray) { notification in
                         NotificationRow(notification: notification)
                             .onTapGesture{
-                            
-                            let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
-                            self.navigation?.pushViewController(hostingVC, animated: true)
-                        }
+                                
+                                let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
+                                self.navigation?.pushViewController(hostingVC, animated: true)
+                            }
                             .onAppear{
                                 
-                            if let lastItem = listArray.last, lastItem.id == notification.id, !isDataLoading {
+                                if let lastItem = listArray.last, lastItem.id == notification.id, !isDataLoading {
                                     getNoticiationlistApi()
                                 }
                             }
-
+                        
                     }
                     
                     
-                    if listArray.count == 0 {
+                    if listArray.count == 0 && !isDataLoading{
                         
                         HStack{
                             Spacer()
@@ -78,12 +78,10 @@ struct NotificationView: View {
                 }
                 .padding(.horizontal, 10)
             }
-
-                
             
         }.navigationBarHidden(true).background(Color(.systemGray6))
             .onAppear{
-                if listArray.count == 0{
+                if listArray.count == 0 {
                     getNoticiationlistApi()
                 }
             }
@@ -115,9 +113,6 @@ struct NotificationView: View {
                 self.isDataLoading = false
 
             }
-          
-            
-            
         }
     }
 }

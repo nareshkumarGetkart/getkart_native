@@ -99,7 +99,7 @@ struct SearchProductView: View {
                 .padding(.top, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            if items.count == 0 {
+            if items.count == 0  && !isDataLoading{
                 HStack {
                     Spacer()
                     VStack(spacing: 20) {
@@ -242,17 +242,22 @@ struct SearchProductView: View {
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:ItemParse) in
 
-            if self.page == 1{
-                self.items = obj.data?.data ?? []
-
-            }else{
-                self.items.append(contentsOf: (obj.data?.data)!)
-            }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+            if obj.code == 200 {
+                if self.page == 1{
+                    self.items = obj.data?.data ?? []
+                    
+                }else{
+                    self.items.append(contentsOf: (obj.data?.data)!)
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                    self.isDataLoading = false
+                    self.page = (self.page) + 1
+                })
+            }else{
                 self.isDataLoading = false
-                self.page = (self.page) + 1
-            })
+            }
         }
     }
     

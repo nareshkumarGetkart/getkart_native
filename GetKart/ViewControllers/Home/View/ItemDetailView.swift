@@ -755,7 +755,7 @@ struct ItemDetailView: View {
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
-                    
+                    Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
                     if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
                                                 
                         let offerId =

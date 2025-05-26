@@ -33,7 +33,7 @@ struct TransactionHistoryView: View {
         
         
         VStack{
-            if transactions.count == 0 {
+            if transactions.count == 0  && !isDataLoading{
                 
                 HStack{
                     Spacer()

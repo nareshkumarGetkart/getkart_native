@@ -71,6 +71,7 @@ class LoginVC: UIViewController {
     @IBAction func loginWithEmailButton(_ sender : UIButton){
         
         if let destVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "SIgnInWithEmailVC") as? SIgnInWithEmailVC{
+        destVC.delegate = self
         self.navigationController?.pushViewController(destVC, animated: true)
 
         }
@@ -437,3 +438,11 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
         // Handle error.
     }
 }
+
+
+extension LoginVC:SignInWithEmailSkipDelegate{
+    func skipAction(){
+        skipButtonAction()
+    }
+}
+

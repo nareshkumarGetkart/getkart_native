@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 import UIKit
 protocol LocationAutorizationUpdated {
-    func locationAuthorizationUpdate()
+    func locationAuthorizationUpdate(isToUpdateLocation:Bool)
 }
 final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     static var sharedInstance = LocationManager()
@@ -25,8 +25,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     var latitude :Double = 0.0
     var longitude :Double = 0.0
     
-    func checkLocationAuthorization() {
+    var isToUpdateLocation = true
+    
+    
+    func checkLocationAuthorization(isToUpdate:Bool = true) {
         
+        isToUpdateLocation = isToUpdate
         manager.delegate = self
         manager.startUpdatingLocation()
         
@@ -46,12 +50,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         case .authorizedAlways://This authorization allows you to use all location services and receive location events whether or not your app is in use.
             print("Location authorizedAlways")
             lastKnownLocation = manager.location?.coordinate
-            updateStateCity()
+            updateStateCity(isToUpdate: isToUpdate)
             
         case .authorizedWhenInUse://This authorization allows you to use all location services and receive location events only when your app is in use
             print("Location authorized when in use")
             lastKnownLocation = manager.location?.coordinate
-            updateStateCity()
+            updateStateCity(isToUpdate: isToUpdate)
         @unknown default:
             print("Location service disabled")
         
@@ -105,7 +109,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
        
     }
     
-    func updateStateCity(){
+    func updateStateCity(isToUpdate:Bool=true){
         // Create Location
         let location = CLLocation(latitude: lastKnownLocation?.latitude ?? 0.0, longitude:  lastKnownLocation?.longitude ?? 0.0)
         
@@ -113,6 +117,15 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         var geoCoder = CLGeocoder()
         
         geoCoder.reverseGeocodeLocation(location) { (placemarks, error) in
+          
+             if let error = error {
+                   print("❌ Reverse geocode failed: \(error.localizedDescription)")
+                   if let cle = error as? CLError {
+                       print("CLError code: \(cle.code.rawValue)")
+                   }
+                  // return
+               }
+            
             if let placemarks = placemarks{
                 
                 if let location = placemarks.first?.location{
@@ -126,7 +139,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                         self.latitude = location.coordinate.latitude
                         self.longitude = location.coordinate.longitude
                         //Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
-                        self.delegate?.locationAuthorizationUpdate()
+                        self.delegate?.locationAuthorizationUpdate(isToUpdateLocation: isToUpdate)
                     }
                 }
             }

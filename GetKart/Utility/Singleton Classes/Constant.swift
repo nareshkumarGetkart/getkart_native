@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -41,7 +41,7 @@ final class Constant: NSObject {
         //https://chat.getkart.com/chat
         get{
             if devEnvironment == .live {
-                return  "https://chat.gupsup.com"// "https://chat.getkart.com" //https://getkartchat.getkart.ca"
+                return  "https://chat.getkart.com"// "https://chat.getkart.com" //https://getkartchat.getkart.ca"
             }else if devEnvironment == .staging {
                 return   "https://chat.gupsup.com" //"https://getkartchat.getkart.ca"
             }else{

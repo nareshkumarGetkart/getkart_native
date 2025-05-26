@@ -72,7 +72,7 @@ struct SearchWithSortView: View {
             }.frame(height:50).background(Color(.systemBackground))
                 .padding(.top,1)
             
-            if objVM.items.count == 0 {
+            if objVM.items.count == 0 && !objVM.isDataLoading {
                 HStack{
                     Spacer()
                     VStack(spacing: 20){

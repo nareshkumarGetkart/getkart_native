@@ -29,7 +29,7 @@ struct MyBoostAdsView: View {
         
         VStack{
             
-            if obj.listArray.count == 0 {
+            if obj.listArray.count == 0  && !obj.isDataLoading{
                 
                 HStack{
                     Spacer()

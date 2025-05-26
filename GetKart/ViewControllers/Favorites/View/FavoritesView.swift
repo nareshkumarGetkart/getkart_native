@@ -19,7 +19,7 @@ struct FavoritesView: View {
         
         VStack{
             
-            if objVM.listArray.count == 0 {
+            if objVM.listArray.count == 0 && !objVM.isDataLoading{ 
             
                 NoDataView()
                 

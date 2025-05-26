@@ -13,7 +13,7 @@ class SearchViewModel:ObservableObject{
     
     @Published var items = [ItemModel]()
     var page = 1
-    var isDataLoading = false
+    @Published var isDataLoading = false
     var city = ""
     var country = ""
     var state = ""

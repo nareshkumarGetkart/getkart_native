@@ -251,11 +251,14 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                         address =  address.count > 0 ? (address + ", " + country) : country
                     }
                     
-                   /* if address.count == 0 {
-                        address = "All Countries"
-                    }*/
+                   if address.count == 0 {
+                     //   address = "All Countries"
+                       cell.btnTextValue.setTitle("Select Location", for: .normal)
+
+                   }else{
+                       cell.btnTextValue.setTitle(address, for: .normal)
+                   }
                     
-                    cell.btnTextValue.setTitle(address, for: .normal)
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnTextValue.addTarget(self, action: #selector(selectLocationAction(_:)), for: .touchUpInside)

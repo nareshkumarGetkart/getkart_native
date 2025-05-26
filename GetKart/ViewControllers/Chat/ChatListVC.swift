@@ -31,8 +31,7 @@ class ChatListVC: UIViewController {
         super.viewDidLoad()
         btnBlockUser.setImageColor(color: .label)
         cnstrntHtNavBar.constant = self.getNavBarHt
-        // Array to keep track of controllers in page menu
-        AppDelegate.sharedInstance.checkSocketStatus()
+       
         
         var controllerArray : [UIViewController] = []
         
@@ -80,6 +79,7 @@ class ChatListVC: UIViewController {
             pageMenu?.controllerArray[pageMenu?.currentPageIndex ?? 0].viewWillAppear(true)
        // }
         
+        SocketIOManager.sharedInstance.checkSocketStatus()
     }
     
     @IBAction func blockedUSerBtnAction(_ sender : UIButton){

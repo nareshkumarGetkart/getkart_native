@@ -11,7 +11,7 @@ import Foundation
 class FavoriteViewModel :ObservableObject{
     
      var page = 1
-     var isDataLoading = true
+    @Published var isDataLoading = true
     @Published var listArray = [ItemModel]()
     
     init(){
@@ -29,10 +29,12 @@ class FavoriteViewModel :ObservableObject{
                 }
                 self.listArray.append(contentsOf: obj.data?.data ?? [])
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
                     self.page = self.page + 1
                     self.isDataLoading = false
                 })
+            }else{
+                self.isDataLoading = false
             }
         }
     }

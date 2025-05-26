@@ -93,7 +93,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     
                     Button(action: {
                         // Enable location action
-                        findMyLocationAction()
+                        findMyLocationAction(isToUpdate: true)
                     }) {
                         
                         Image("currentLocation")
@@ -178,13 +178,12 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             Spacer()
         }//.background(Color(UIColor.systemGray6))
             .onAppear{
-              fetchCountryListing()
+                fetchCountryListing()
                 if isFirstTime == true {
                     
                     if locationManager.isCurrentLocationEnabled(){
-                        findMyLocationAction()
+                        findMyLocationAction(isToUpdate: false)
                     }
-                   // findMyLocationAction()
                 }
         }
         .navigationTitle("Location")
@@ -192,10 +191,11 @@ struct CountryLocationView: View, LocationSelectedDelegate{
         .navigationBarHidden(true)
     }
     
-    func findMyLocationAction(){
+   
+    func findMyLocationAction(isToUpdate:Bool){
         
         locationManager.delegate = self
-        locationManager.checkLocationAuthorization()
+        locationManager.checkLocationAuthorization(isToUpdate: isToUpdate)
         
         /*if let coordinate = locationManager.lastKnownLocation {
             print("Latitude: \(coordinate.latitude)")
@@ -384,13 +384,16 @@ struct CountryRow: View {
 //
 
 extension CountryLocationView :LocationAutorizationUpdated {
-    func locationAuthorizationUpdate() {
+    func locationAuthorizationUpdate(isToUpdateLocation:Bool) {
+       
         if locationManager.manager.authorizationStatus == .authorizedAlways  ||  locationManager.manager.authorizationStatus == .authorizedWhenInUse {
+            
             if let coordinate = locationManager.lastKnownLocation {
+                
                 print("Latitude: \(coordinate.latitude)")
                 print("Longitude: \(coordinate.longitude)")
                 
-                if popType == .home || popType == .signUp{
+                if (popType == .home || popType == .signUp) && isToUpdateLocation{
                     
                     Local.shared.saveUserLocation(city: locationManager.city, state: locationManager.state, country: locationManager.country,latitude: "\(locationManager.latitude)", longitude: "\(locationManager.longitude)", timezone: locationManager.timezone)
                 }
@@ -398,8 +401,10 @@ extension CountryLocationView :LocationAutorizationUpdated {
                     print(Local.shared.getUserCity(), Local.shared.getUserState(), Local.shared.getUserCountry(),Local.shared.getUserTimeZone())
                     
                     locationManager.delegate = nil
-                if isFirstTime == false {
+                if isFirstTime == false && isToUpdateLocation {
+                    
                     self.locationSelected()
+               
                 }else {
                     self.isFirstTime = false
                     strCurrentLocagtion = locationManager.city

@@ -28,14 +28,15 @@ struct ContactUsView: View {
             }
             Text("Contact us").foregroundColor(.black).font(Font.manrope(.semiBold, size: 17))
             Spacer()
-        }.frame(height: 44)
+        }.frame(height: 44).background(Color(UIColor.systemBackground))
         
         VStack(alignment:.leading, spacing: 20){
             Text("How can we help you?").multilineTextAlignment(.leading)
                 .font(Font.manrope(.semiBold, size: 17))
                 .padding(.top, 10)
             
-            Text("It looks like you have problems with our systems. We are here to help you, so please get in touch with us.").multilineTextAlignment(.leading)
+            Text("It looks like you have problems with our systems. We are here to help you, so please get in touch with us.")
+                .multilineTextAlignment(.leading)
                 .foregroundColor(.gray).font(Font.manrope(.regular, size: 13))
             
             
@@ -52,7 +53,9 @@ struct ContactUsView: View {
             .padding(.top, 5)
             
             Spacer()
-        }.padding().background(Color(UIColor.systemGray6)).navigationBarHidden(true)
+        }.padding()
+            .background(Color(UIColor.systemGray6))
+            .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showEmailView) {
                 EmailSupportView()
             }
@@ -116,20 +119,23 @@ struct EmailSupportView: View {
     @State private var mailAlertMessage: String = ""
     
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image("arrow_left").renderingMode(.template)
-                        .foregroundColor(.black)
-                }
-                .padding()
-                                
-                Text("Send Email").font(Font.manrope(.medium, size: 15))
-                    .font(.headline)
-                Spacer()
-            }.frame(height:44).background(.white)
+        
+        HStack {
+            Button(action: {
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Image("arrow_left").renderingMode(.template)
+                    .foregroundColor(.black)
+            }
+            .padding()
+                            
+            Text("Send Email").font(Font.manrope(.medium, size: 15))
+                .font(.headline)
+            Spacer()
+        }.frame(height:44).background(.white)
+        
+      //  VStack {
+            ScrollView{
             
             VStack(alignment:.leading, spacing: 20) {
                 
@@ -194,23 +200,13 @@ struct EmailSupportView: View {
             Spacer()
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
-        
             .alert(isPresented: $showMailAlert) {
                 Alert(title: Text("Unable to Send Email"),
                       message: Text(mailAlertMessage),
                       dismissButton: .default(Text("OK")))
             }
-       // if(MFMailComposeViewController.canSendMail()) // Disable if Mail is unavailable
             .sheet(isPresented: $showMailView) {
-                
-                /*  MailView(subject: subject, message: message, onMailSent: {val in
-                 
-                 if val{
-                 presentationMode.wrappedValue.dismiss()
-                 }
-                 })
-                 */
-                
+             
                 if MFMailComposeViewController.canSendMail() {
                     MailView(subject: subject, message: message) { val in
                         if val {
@@ -220,7 +216,7 @@ struct EmailSupportView: View {
                 } else {
                     // Optional: Alert or fallback UI
                     
-                    //   AlertView.sharedManager.showToast(message: "Mail services are not available. Please set up a mail account.")
+                    //  AlertView.sharedManager.showToast(message: "Mail services are not available. Please set up a mail account.")
                     
                 }
             }
