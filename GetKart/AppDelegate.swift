@@ -323,11 +323,17 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
     func  navigateToNotificationType() {
         
         guard !notificationType.isEmpty else { return }
+        
+        let roomIdRecieved = self.roomId
+        let userIdRecieved = self.userId
+        let notificationTypeRecieved = self.notificationType
+        let itemIdRecieved = self.itemId
+        
            
         print("didReceive")
         SocketIOManager.sharedInstance.checkSocketStatus()
 
-        switch notificationType{
+        switch notificationTypeRecieved{
             
         case "chat","offer":
             
@@ -339,29 +345,35 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                    let topVC = navController.topViewController as? ChatVC {
                     
                     // Now we know ChatVC is visible
-                    if topVC.userId == userId {
+                    if topVC.userId == userIdRecieved {
                         // Same chat already opened — do nothing or update UI
                         print("ChatVC is already opened for this user.")
                     } else {
                         // Different chat user, replace the ChatVC
                         navController.popViewController(animated: false)
                         let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                        vc.userId = userId
-                        vc.item_offer_id = roomId
+                        vc.userId = userIdRecieved
+                        vc.item_offer_id = roomIdRecieved
                         vc.hidesBottomBarWhenPushed = true
                         navController.pushViewController(vc, animated: true)
                     }
                     
+                    
+                    
                 } else {
+                    
                     // Chat tab not selected, switch to Chat tab and push ChatVC
                     tabBarController.selectedIndex = 1 // Update with actual index
-                    if let navController = tabBarController.selectedViewController as? UINavigationController {
-                        let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                        vc.userId = userId
-                        vc.item_offer_id = roomId
-                        vc.hidesBottomBarWhenPushed = true
-                        navController.popToRootViewController(animated: false)
-                        navController.pushViewController(vc, animated: true)
+                    DispatchQueue.main.async {
+                        
+                        if let navController = tabBarController.selectedViewController as? UINavigationController {
+                            let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                            vc.userId = userIdRecieved
+                            vc.item_offer_id = roomIdRecieved
+                            vc.hidesBottomBarWhenPushed = true
+                            navController.popToRootViewController(animated: false)
+                            navController.pushViewController(vc, animated: true)
+                        }
                     }
                 }
             }
@@ -400,7 +412,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                         
                         if let navController = destvc.viewControllers?[4] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
-
                         }
                         
                         destvc.selectedIndex = 3
@@ -478,26 +489,33 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                
                 }else{
                    
-                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemId, itemObj: nil, slug: nil))
+                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemIdRecieved, itemObj: nil, slug: nil))
                     hostingController.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
             }
         case "seller-profile":
             do{
-                let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userId))
+                let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userIdRecieved))
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }
       
         default:
             break
         }
+    
+        self.clearRecievedNotification()
+    }
+    
+
+    
+    func clearRecievedNotification(){
         itemId = 0
         userId = 0
         roomId = 0
         notificationType = ""
     }
-
+    
     func userNotificationCenter(_ a: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
       
 

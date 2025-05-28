@@ -88,6 +88,7 @@ struct UserVerifyView: View {
                         .underline()
                 }
                 .padding(.top, 10)
+                .contentShape(Rectangle())
                 .padding(.bottom, 30)
             }.navigationBarBackButtonHidden(true)
             .background(Color(UIColor.systemGray6)) // Light gray background

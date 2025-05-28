@@ -80,8 +80,9 @@ struct UserVerifyStep2: View{
                     .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(10)
-            }
+            } .contentShape(Rectangle())
             .padding()
+       
         }    .background(Color(.systemGray6))
             .navigationBarHidden(true)
 

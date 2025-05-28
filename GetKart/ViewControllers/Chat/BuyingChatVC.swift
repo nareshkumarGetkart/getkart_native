@@ -72,10 +72,10 @@ class BuyingChatVC: UIViewController {
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
        
         if !AppDelegate.sharedInstance.isInternetConnected{
-          isDataLoading = false
+            isDataLoading = false
             AlertView.sharedManager.showToast(message: "No internet connection")
-      
-        }else  if !isDataLoading {
+            
+        }else if !isDataLoading {
             isDataLoading = true
             page = 1
             self.getChatList()
@@ -151,8 +151,15 @@ class BuyingChatVC: UIViewController {
                 if page == 1{
                     self.listArray.removeAll()
                 }
-                self.listArray.append(contentsOf:response.data?.data ?? [])
-                self.tblView.reloadData()
+                
+                
+                if  self.listArray.count > 0 && (response.data?.data ?? []).count == 0 {
+                    self.isDataLoading = false
+                    return
+                }else{
+                    self.listArray.append(contentsOf:response.data?.data ?? [])
+                    self.tblView.reloadData()
+                }
                 
             
                 
@@ -199,7 +206,9 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewProfile.kf.setImage(with:  URL(string: obj.seller?.profile ?? "") , placeholder:UIImage(named: "user-circle"))
                 
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        cell.imgViewItem.backgroundColor = Themes.sharedInstance.themeColor
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
+       
         cell.imgViewItem.clipsToBounds = true
        
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
@@ -241,7 +250,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
            // print("up")
@@ -254,6 +263,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         {
             if scrollView == tblView{
                 if isDataLoading == false{
+                    isDataLoading = true
                     getChatList()
                 }
             }

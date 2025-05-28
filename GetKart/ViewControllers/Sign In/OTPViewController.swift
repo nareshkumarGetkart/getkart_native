@@ -32,7 +32,6 @@ class OTPViewController: UIViewController {
         }else{
             btnResendOtp.isHidden = true
             lblMessage.text = "Sign in with email"
-
         }
     }
     
@@ -239,11 +238,10 @@ class OTPViewController: UIViewController {
                         
                         let token = result["token"] as? String ?? ""
                         let objUserInfo = UserInfo(dict: payload, token: token)
+                        Local.shared.saveUserId(userId: objUserInfo.id ?? 0)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
-                        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                        print(objLoggedInUser)
-                        
-                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                        SocketIOManager.sharedInstance.checkSocketStatus()
+                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
                         self.navigationController?.pushViewController(hostingController, animated: true) // Push to
                         
                     }

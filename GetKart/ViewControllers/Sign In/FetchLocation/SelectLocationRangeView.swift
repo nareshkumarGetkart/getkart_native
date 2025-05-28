@@ -149,7 +149,7 @@ struct SelectLocationRangeView: View {
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
+                        delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country, locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -167,7 +167,7 @@ struct SelectLocationRangeView: View {
                
                 if vc.isKind(of: ConfirmLocationHostingController.self) == true{
                    
-                    delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
+                    delLocationSelected?.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country, locality: "")
                         self.navigationController?.popToViewController(vc, animated: true)
                 }
                 break
@@ -183,7 +183,7 @@ struct SelectLocationRangeView: View {
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
-                        vc1.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country)
+                        vc1.savePostLocation(latitude:"\(LocationManager.sharedInstance.latitude)", longitude:"\(LocationManager.sharedInstance.longitude)",  city:LocationManager.sharedInstance.city, state:LocationManager.sharedInstance.state, country:LocationManager.sharedInstance.country, locality: "")
                         
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break

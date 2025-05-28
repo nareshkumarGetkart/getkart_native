@@ -26,7 +26,6 @@ final class Local {
 
     
     func saveUserId(userId:Int){
-        
         UserDefaults.standard.setValue(userId, forKey: LocalKeys.userId.rawValue)
         UserDefaults.standard.synchronize()
     }

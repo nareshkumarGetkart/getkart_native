@@ -23,7 +23,7 @@ class ConfirmLocationViewModel: ObservableObject {
     @Published var circle = MKCircle(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), radius: 1000)
     
     
-    func updateLocation(latitude: String, longitude: String, city: String, state: String, country: String) {
+    func updateLocation(latitude: String, longitude: String, city: String, state: String, country: String,locality:String) {
         guard let lat = Double(latitude), let lng = Double(longitude) else { return }
         let coord = CLLocationCoordinate2D(latitude: lat, longitude: lng)
        
@@ -31,7 +31,11 @@ class ConfirmLocationViewModel: ObservableObject {
             self.selectedCoordinate = coord
             self.mapRegion.center = coord
             self.circle = MKCircle(center: coord, radius: 0.0)
-            self.locationInfo = "\(city), \(state), \(country)"
+            if locality.count > 0{
+                self.locationInfo = "\(locality), \(city), \(state)"//, \(country)"
+            }else{
+                self.locationInfo = "\(city), \(state)"//, \(country)"
+            }
         })
    
     }
@@ -129,8 +133,12 @@ extension TapMapView1 {
                 let city = placemark.locality ?? ""
                 let state = placemark.administrativeArea ?? ""
                 let country = placemark.country ?? ""
+                var locality = placemark.subLocality ?? ""
+                            
+                
+
                 self.locationInfo = [city, state, country].filter { !$0.isEmpty }.joined(separator: ", ")
-                self.delegate?.savePostLocation(latitude:"\(coordinate.latitude)", longitude: "\(coordinate.longitude)", city: city, state: state, country: country)
+                self.delegate?.savePostLocation(latitude:"\(coordinate.latitude)", longitude: "\(coordinate.longitude)", city: city, state: state, country: country, locality: locality)
                 
             }
         }

@@ -16,6 +16,7 @@ protocol RefreshScreen:AnyObject{
 }
 
 extension RefreshScreen{
+    
     func refreshFeaturedsList(){}
     func refreshBannerList(){}
     func refreshCategoriesList(){}
@@ -33,18 +34,28 @@ class HomeViewModel:ObservableObject{
     var page = 1
     var isDataLoading = false
    
+    var city = ""
+    var state = ""
+    var country = ""
+    var latitude = ""
+    var longitude = ""
+
+   
     init(){
-        getCategoriesListApi()
+        
+        city = Local.shared.getUserCity()
+        country = Local.shared.getUserCountry()
+        state = Local.shared.getUserState()
+        latitude = Local.shared.getUserLatitude()
+        longitude = Local.shared.getUserLongitude()
+        
         getSliderListApi()
+        getCategoriesListApi()
         getFeaturedListApi()
     }
     
     
     func getProductListApi(){
-        
-        let city = Local.shared.getUserCity()
-        let country = Local.shared.getUserCountry()
-        let state = Local.shared.getUserState()
 
         if isDataLoading == true{
             return
@@ -64,6 +75,13 @@ class HomeViewModel:ObservableObject{
             strUrl.append("&country=\(country)")
         }
         
+        if latitude.count > 0{
+            strUrl.append("&latitude=\(latitude)")
+        }
+        
+        if longitude.count > 0{
+            strUrl.append("&longitude=\(longitude)")
+        }
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
             if obj.code == 200 {
@@ -74,7 +92,6 @@ class HomeViewModel:ObservableObject{
                     
                 }else{
                     self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
-                    //  self?.itemObj?.data?.append(contentsOf: (obj.data?.data)!)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                     self?.isDataLoading = false
@@ -87,9 +104,9 @@ class HomeViewModel:ObservableObject{
     
     func getFeaturedListApi(){
         
-        let city = Local.shared.getUserCity()
-        let country = Local.shared.getUserCountry()
-        let state = Local.shared.getUserState()
+//        let city = Local.shared.getUserCity()
+//        let country = Local.shared.getUserCountry()
+//        let state = Local.shared.getUserState()
 
         var strUrl = "\(Constant.shared.get_featured_section)"
 
@@ -120,12 +137,33 @@ class HomeViewModel:ObservableObject{
             }
         }
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
-            
-            if obj.code == 200 {
+        
+        if latitude.count > 0{
+            if !strUrl.contains("?"){
+                strUrl.append("?latitude=\(latitude)")
+
+            }else{
+                strUrl.append("&latitude=\(latitude)")
+
+            }
                 
+        }
+        
+        if longitude.count > 0{
+            if !strUrl.contains("?"){
+                strUrl.append("?longitude=\(longitude)")
+            }else{
+                strUrl.append("?longitude=\(longitude)")
+            }
+        }
+        
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
+            if obj.code == 200 {
                 self?.featuredObj = obj.data
                 self?.delegate?.refreshFeaturedsList()
+            }else{
+
             }
         }
     }

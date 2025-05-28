@@ -10,16 +10,15 @@ import SwiftUI
 struct CountryLocationView: View, LocationSelectedDelegate{
     
     @State private var searchText = ""
-    @Environment(\.presentationMode) var presentationMode
     @State var arrCountries:Array<CountryModel> = []
     @State var arrSearchedCountries:Array<CountryModel> = []
     @State var popType:PopType?
+    @State var isFirstTime = true
+    @State var strCurrentLocagtion = "Fetch current location"
     var locationManager = LocationManager()
     var navigationController: UINavigationController?
     var delLocationSelected:LocationSelectedDelegate!
-    @State var isFirstTime = true
-    @State var strCurrentLocagtion = "Show here current location"
- 
+    
     var body: some View {
         
         VStack(spacing: 0) {
@@ -111,26 +110,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }.padding(.top, 10)
         
             Divider().padding([.top,.bottom],10)
-/*
-            if self.locationManager.checkForLocationAccess() == false {
-                HStack {
-                    Button(action: {
-                        // Enable location action
-                    }) {
-                        Text("Enable Location")
-                            .font(Font.manrope(.medium, size: 15))
-                            .foregroundColor(.black)
-                    }.padding(.leading, 20)
-                        .padding(.top, 5)
-                    
-                    
-                    Spacer()
-                }
-                .padding()
-                
-                Divider()
-            }
-            */
+
             // MARK: - List of Countries
             ScrollView{
               /*  if popType == .filter || popType == .home{
@@ -154,7 +134,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 if searchText.count == 0 {
                     ForEach(arrCountries) { country in
                         CountryRow(strTitle:country.name ?? "")
-                            .frame(height: 40)//.padding(.horizontal)
+                            .frame(height: 40)
                             .onTapGesture{
                                 self.navigateToStateListing(country: country)
                             }
@@ -165,7 +145,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     
                     ForEach(arrSearchedCountries) { country in
                         CountryRow(strTitle:country.name ?? "")
-                            .frame(height: 40)//.padding(.horizontal)
+                            .frame(height: 40)
                             .onTapGesture{
                                 
                                 self.navigateToStateListing(country: country)
@@ -176,7 +156,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }
             
             Spacer()
-        }//.background(Color(UIColor.systemGray6))
+        }
             .onAppear{
                 fetchCountryListing()
                 if isFirstTime == true {
@@ -253,7 +233,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        delLocationSelected?.savePostLocation(latitude:"", longitude:"",  city:"", state:"", country:"")
+                        delLocationSelected?.savePostLocation(latitude:"", longitude:"",  city:"", state:"", country:"", locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -261,7 +241,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city: "", state: "", country: "")
+                        delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city: "", state: "", country: "", locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -270,7 +250,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
                
                 if let vc1 = vc as? ConfirmLocationHostingController {
-                    delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: "")
+                    delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: "", locality: "")
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
@@ -285,7 +265,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
-                        delLocationSelected?.savePostLocation(latitude: "", longitude:"",  city:"", state: "", country: "")
+                        delLocationSelected?.savePostLocation(latitude: "", longitude:"",  city:"", state: "", country: "", locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -304,7 +284,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -312,7 +292,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -320,7 +300,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             }else  if popType == .createPost {
                 if let vc1 = vc as? ConfirmLocationHostingController {
                     
-                    delLocationSelected?.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                    delLocationSelected?.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -336,7 +316,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
-                        vc1.savePostLocation(latitude:"\(locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country)
+                        vc1.savePostLocation(latitude:"\(locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, locality: "")
                         
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
@@ -348,7 +328,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     }
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
-        delLocationSelected?.savePostLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
+        delLocationSelected?.savePostLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country, locality: "")
     }
     func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double = 0.0){
         delLocationSelected?.savePostLocationWithRange(latitude:latitude, longitude:longitude,  city:city, state:state, country:country, range:range)
@@ -428,12 +408,13 @@ extension CountryLocationView :LocationAutorizationUpdated {
 
 
 protocol LocationSelectedDelegate{
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String)
+    
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String)
     func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double)
     
 }
 
 extension LocationSelectedDelegate {
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String){}
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){}
     func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double){}
 }

@@ -20,12 +20,17 @@ class SearchViewModel:ObservableObject{
     var categroryId = 0
     var dictCustomFields:Dictionary<String,Any> = [:]
     var selectedSortBy: String  = "Default"
-    
+    var latitude = ""
+    var longitude = ""
+
     init(catId:Int){
         categroryId = catId
         city = Local.shared.getUserCity()
         state = Local.shared.getUserState()
         country = Local.shared.getUserCountry()
+       // latitude = Local.shared.getUserLatitude()
+       // longitude = Local.shared.getUserLongitude()
+
         getSearchItemApi(srchTxt:"")
 
     }
@@ -33,7 +38,7 @@ class SearchViewModel:ObservableObject{
     
     func getSearchItemApi(srchTxt:String){
         var latitude = 0.0
-        var longitude = 0.0
+       var longitude = 0.0
         
         var strUrl = Constant.shared.get_item + "?category_id=\(categroryId)&page=\(page)"
 
@@ -46,7 +51,6 @@ class SearchViewModel:ObservableObject{
             strUrl.append("&city=\(city)")
         }
         
-        
         if country.count > 0{
             strUrl.append("&country=\(country)")
         }
@@ -57,6 +61,17 @@ class SearchViewModel:ObservableObject{
         }
         
         
+        
+     /*
+        if latitude.count > 0{
+            strUrl.append("&latitude=\(latitude)")
+        }
+        
+        
+        if longitude.count > 0{
+            strUrl.append("&longitude=\(longitude)")
+        }
+        */
         if  let  latit = dictCustomFields["latitude"]  as? Double{
             latitude =  latit
             strUrl.append("&latitude=\(latitude)")

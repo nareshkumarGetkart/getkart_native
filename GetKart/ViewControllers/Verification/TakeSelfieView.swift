@@ -69,6 +69,27 @@ struct TakeSelfieView: View {
                     .frame(width: widthScreen-40)
               //  Spacer()
                 HStack {
+                    
+                    Button(action: {
+                        capturedImage = nil
+
+                    }) {
+                        Text("Re-take")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.clear)
+                            .foregroundColor(.orange)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.orange, lineWidth: 1)
+                            }
+                            .contentShape(Rectangle())
+                    }
+                   // .padding()
+
+                    
+                    // .padding()
+                    /*
                     Button("Re-take") {
                         capturedImage = nil
                     }
@@ -80,8 +101,30 @@ struct TakeSelfieView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.orange, lineWidth: 1)
                     }
+                    .contentShape(Rectangle())
+                    */
                     
-                    Button("Next") {
+                    Button(action: {
+                        var swidtUIView = TakeFrontDocumentView(navigation:navigation)
+                        swidtUIView.businessName = businessName
+                        swidtUIView.capturedSelfieImage = capturedImage
+                        let hostVC = UIHostingController(rootView: swidtUIView)
+                        self.navigation?.pushViewController(hostVC, animated: true)
+                    }) {
+                        Text("Next")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .contentShape(Rectangle())
+                    }
+//                   .padding()
+
+
+                    
+                    
+                  /*  Button("Next") {
                         // Navigate to next screen
                         var swidtUIView = TakeFrontDocumentView(navigation:navigation)
                         swidtUIView.businessName = businessName
@@ -94,7 +137,8 @@ struct TakeSelfieView: View {
                     .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(12)
-                    //.padding(.horizontal)
+                    .contentShape(Rectangle())
+                    //.padding(.horizontal)*/
                 }
                 .padding()
                 
@@ -122,7 +166,7 @@ struct TakeSelfieView: View {
 
               //  Spacer()
                 
-                Button("Capture") {
+              /*  Button("Capture") {
                     // Trigger photo capture and set capturedImage
                     
                     //coordinator?.capturePhoto()
@@ -137,6 +181,23 @@ struct TakeSelfieView: View {
                 .cornerRadius(12)
                 .padding(.horizontal)
                 .padding(.bottom,10)
+                .contentShape(Rectangle())
+                
+                */
+                Button(action: {
+                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
+                }) {
+                    Text("Capture")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .contentShape(Rectangle())
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 10)
+
             }
             
             Spacer()

@@ -37,7 +37,6 @@ struct UserVerifyStep1: View {
                 }
             }
         
-        
         VStack {
             ScrollView{
             
@@ -54,6 +53,7 @@ struct UserVerifyStep1: View {
                 // Progress Bar
                 ProgressView(value: 0.2)
                     .progressViewStyle(LinearProgressViewStyle(tint: .black))
+                
             }.padding(.top,15)
                 .padding(.horizontal, 20)
             
@@ -98,6 +98,7 @@ struct UserVerifyStep1: View {
                     .cornerRadius(10)
             }
             .padding(.horizontal, 20)
+            .contentShape(Rectangle())
                 
             
           /*  // Skip for Later Button

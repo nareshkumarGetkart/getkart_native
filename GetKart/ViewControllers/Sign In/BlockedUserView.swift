@@ -44,18 +44,24 @@ struct BlockedUserView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 60,height: 60)
                             .cornerRadius(30)
-                            .aspectRatio(contentMode: .fit).padding(8)
+                            .aspectRatio(contentMode: .fit)
+                            .padding(2)
                         
                     }placeholder: {
                         Image("user-circle")
-                        .resizable().aspectRatio(contentMode: .fit)
-                        .frame(width: 60,height: 60).cornerRadius(30).padding(8)}
+                            .resizable().aspectRatio(contentMode: .fit)
+                            .frame(width: 60,height: 60).cornerRadius(30)
+                            .padding(2)
+                    }
                     
                     Text(obj.name ?? "").foregroundColor(Color(UIColor.label))
                         .font(Font.manrope(.regular, size: 16.0))
                     Spacer()
                     
-                }.background(.white).cornerRadius(6.0).padding(.horizontal).tag(index).onTapGesture {
+                }.background(.white).cornerRadius(6.0)
+                    .padding(.horizontal)
+                    .tag(index)
+                    .onTapGesture {
                     self.selectedIndex = index
                     self.showPopup = true
                 }

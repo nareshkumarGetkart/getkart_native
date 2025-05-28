@@ -71,7 +71,26 @@ struct TakeFrontDocumentView: View {
                 
                 Spacer()
                 HStack {
-                    Button("Re-take") {
+                    
+                    
+                    Button(action: {
+                        capturedFrontImage = nil
+
+                    }) {
+                        Text("Re-take")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.clear)
+                            .foregroundColor(.orange)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.orange, lineWidth: 1)
+                            }
+                            .contentShape(Rectangle())
+                    }
+                    
+                                          
+                  /*  Button("Re-take") {
                         capturedFrontImage = nil
                     }
                     .padding()
@@ -81,9 +100,9 @@ struct TakeFrontDocumentView: View {
                     .overlay {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.orange, lineWidth: 1)
-                    }
+                    }*/
                     
-                    Button("Next") {
+                  /*  Button("Next") {
                         // Navigate to next screen
                         var swidtUIView = TakeBackDocumentView(navigation:navigation)
                         swidtUIView.businessName = businessName
@@ -97,6 +116,26 @@ struct TakeFrontDocumentView: View {
                     .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(12)
+                    */
+                    
+                    Button(action: {
+                        var swidtUIView = TakeBackDocumentView(navigation:navigation)
+                        swidtUIView.businessName = businessName
+                        swidtUIView.frontImage = capturedFrontImage
+                        swidtUIView.selfieImage = capturedSelfieImage
+                        let hostVC = UIHostingController(rootView: swidtUIView)
+                        self.navigation?.pushViewController(hostVC, animated: true)
+                    }) {
+                        Text("Next")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .contentShape(Rectangle())
+                    }
+                    
+                    
                     //.padding(.horizontal)
                 }
                 .padding()
@@ -126,7 +165,7 @@ struct TakeFrontDocumentView: View {
                 
                 Spacer()
                 
-                Button("Capture") {
+              /*  Button("Capture") {
                  
                     NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
                     
@@ -137,7 +176,25 @@ struct TakeFrontDocumentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(12)
                 .padding(.horizontal)
+                .contentShape(Rectangle())
                 .padding(.bottom)
+                */
+                
+                Button(action: {
+                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
+                }) {
+                    Text("Capture")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .contentShape(Rectangle())
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+                
+                
             }
 
         }

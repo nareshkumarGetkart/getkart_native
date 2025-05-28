@@ -19,10 +19,11 @@ struct StateLocationView: View, LocationSelectedDelegate {
     @State private var isSearching = false
     @State private var totalRecords = 1
     var country:CountryModel = CountryModel()
-    
     @State private var isDataLoading = false
     var popType:PopType?
     var delLocationSelected:LocationSelectedDelegate?
+    
+
    
     var body: some View {
         
@@ -42,41 +43,30 @@ struct StateLocationView: View, LocationSelectedDelegate {
             
             // MARK: - Search Bar
             HStack {
-                /*TextField("Search State", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding(.horizontal, 8)
-                    .frame(height: 36)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .onChange(of: searchText) { newValue in
-                        print(newValue)
-                        pageNo = 1
-                        self.fetchStateListing()
-                    }*/
+               
                 HStack {
                     Image("search").resizable().frame(width: 20,height: 20)
                     TextField("Search State", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .padding(.horizontal, 8)
                         .frame(height: 36)
-                        //.background(Color(.systemGray6))
-                        //.cornerRadius(8)
                         .tint(Color(Themes.sharedInstance.themeColor))
 
                         .onChange(of: searchText) { newValue in
                             print(newValue)
-                            pageNoSearch = 1
-                            self.isSearching = true
-                            if newValue.count == 0{
-                                self.isSearching = false
-                            }
-                            self.fetchStateListing()
-
+                                pageNoSearch = 1
+                                self.isSearching = true
+                                if newValue.count == 0{
+                                    self.isSearching = false
+                                }
+                                self.fetchStateListing()
+                            
                         }
                     if searchText.count > 0 {
                         Button("Clear") {
+                            self.isDataLoading = false
                             searchText = ""
-                        }.padding(.horizontal).foregroundColor(Color(UIColor.label))
+                        }.padding(.horizontal,5).foregroundColor(Color(UIColor.label))
                     }
                 }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
                         RoundedRectangle(cornerRadius: 8)
@@ -98,6 +88,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
             Divider()
             
             // MARK: - List of Countries
+            
             ScrollView{
                 if popType == .filter  || popType == .home{
                     CountryRow(strTitle:"All in \(country.name ?? "")")
@@ -114,9 +105,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
                         }
                 }
                 Divider()
-                
-                //ForEach(0..<arrStates.count){ index in
-                //let state = arrStates[index]
+  
                 LazyVStack {
                     
                     if isSearching{
@@ -128,10 +117,10 @@ struct StateLocationView: View, LocationSelectedDelegate {
                                 .padding(.horizontal)
                             
                                 .onAppear{
-                                    if  arrSearchStates.firstIndex(where: { $0.id == state.id }) != nil {
-                                            if !isDataLoading {
-                                                fetchStateListing()
-                                            }
+                                    if state.id == arrSearchStates.last?.id {
+                                        if !isDataLoading {
+                                            fetchStateListing()
+                                        }
                                     }
                                     
                                 }
@@ -149,14 +138,11 @@ struct StateLocationView: View, LocationSelectedDelegate {
                                 .padding(.horizontal)
                             
                                 .onAppear{
-                                    if  let index = arrStates.firstIndex(where: { $0.id == state.id }) {
-                                        if index == arrStates.count - 1{
-                                            if self.totalRecords != arrStates.count  && !isDataLoading {
-                                                fetchStateListing()
-                                            }
+                                    if state.id == arrStates.last?.id {
+                                        if self.totalRecords != arrStates.count  && !isDataLoading {
+                                            fetchStateListing()
                                         }
                                     }
-                                    
                                 }
                                 .onTapGesture{
                                     self.NavigateToCityListing(state:state)
@@ -166,17 +152,15 @@ struct StateLocationView: View, LocationSelectedDelegate {
                     }
                    
                 }
-               /* .gesture(
-                    DragGesture().onChanged { value in
-                        if value.translation.height > 0 {
-                            print("Scroll down")
-                        } else {
-                            print("Scroll up")
-                        }
-                    }
-                )*/
             }
             Spacer()
+            
+           
+            if isDataLoading {
+                ProgressView()
+                    .padding()
+            }
+            
         }.onAppear{
             if arrStates.count == 0{
                 self.fetchStateListing()
@@ -191,16 +175,15 @@ struct StateLocationView: View, LocationSelectedDelegate {
     
     
     func fetchStateListing(){
-        
+        guard !isDataLoading else { return }
+
         self.isDataLoading = true
 
-        var url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search=" //&search=\(searchText)"
+        var url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNo)&search="
         
         if isSearching{
              url = Constant.shared.get_States + "?country_id=\(country.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
         }
-        
-      //  AF.cancelAllRequests()
 
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: url) { (obj:StateParse) in
            
@@ -211,7 +194,6 @@ struct StateLocationView: View, LocationSelectedDelegate {
                    if self.pageNoSearch == 1 {
                        self.arrSearchStates.removeAll()
                    }
-                 //  self.totalRecords = obj.data?.total ?? 0
                    self.arrSearchStates.append(contentsOf: obj.data?.data ?? [])
                  
                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
@@ -241,6 +223,16 @@ struct StateLocationView: View, LocationSelectedDelegate {
     
     func allStatesSelected() {
         
+        let data: [String: Any] = [
+                        "city": "",
+                        "state": "",
+                        "country": self.country.name ?? "",
+                        "latitude":  "",
+                        "longitude": "",
+                        "locality": "",
+
+                    ]
+        
         if popType == .home || popType == .signUp{
             
             Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude ?? "")", longitude: "\(self.country.longitude ?? "")"  , timezone: "")
@@ -251,7 +243,10 @@ struct StateLocationView: View, LocationSelectedDelegate {
             if popType == .buyPackage {
                 
                     if let vc1 = vc as? CategoryPlanVC  {
-                        delLocationSelected?.savePostLocation(latitude:"", longitude:"",  city:"", state:"", country:self.country.name ?? "")
+                        
+                     
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.buyPackageNewLocation.rawValue), object: nil, userInfo: data)
+                        
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -259,14 +254,15 @@ struct StateLocationView: View, LocationSelectedDelegate {
             }else if popType == .filter {
                 
                     if let vc1 = vc as? FilterVC  {
-                        delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city: "", state: "", country: self.country.name ?? "")
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.filterNewLocation.rawValue), object: nil, userInfo: data)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
                 
             }else  if popType == .createPost {
                 if let vc1 = vc as? ConfirmLocationHostingController {
-                    delLocationSelected?.savePostLocation(latitude:"", longitude: "",  city:"", state: "", country: self.country.name ?? "")
+ 
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.createPostNewLocation.rawValue), object: nil, userInfo: data)
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
@@ -281,8 +277,8 @@ struct StateLocationView: View, LocationSelectedDelegate {
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
-                        
-                        delLocationSelected?.savePostLocation(latitude: "", longitude:"",  city:"", state: "", country: self.country.name ?? "")
+
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.homeNewLocation.rawValue), object: nil, userInfo: data)
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
@@ -296,13 +292,11 @@ struct StateLocationView: View, LocationSelectedDelegate {
         var rootView = CityLocationView(navigationController: self.navigationController,country: country, state: state, popType: self.popType)
         rootView.delLocationSelected = self
         let vc = UIHostingController(rootView: rootView)
-           self.navigationController?.pushViewController(vc, animated: true)
-           
-       
-   }
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
-        delLocationSelected?.savePostLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country)
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String) {
+        delLocationSelected?.savePostLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country, locality: locality)
     }
     
 }

@@ -295,6 +295,9 @@ extension SearchWithSortView: FilterSelected{
         self.objVM.city = dict["city"] as? String ?? ""
         self.objVM.country = dict["country"] as? String ?? ""
         self.objVM.state = dict["state"] as? String ?? ""
+       // self.objVM.latitude = dict["latitude"] as? String ?? ""
+      //  self.objVM.longitude = dict["longitude"] as? String ?? ""
+
         self.objVM.getSearchItemApi(srchTxt: srchTxt)
     }
 }

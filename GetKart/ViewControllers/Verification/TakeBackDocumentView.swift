@@ -16,7 +16,8 @@ struct TakeBackDocumentView: View {
     var frontImage: UIImage?
     var selfieImage: UIImage?
     var businessName:String?
-
+     @State private var showProgresOnButton = false
+    
     var body: some View {
         
         // Top Navigation Bar
@@ -81,7 +82,7 @@ struct TakeBackDocumentView: View {
                     .padding(.horizontal)
                 Spacer()
                 HStack {
-                    Button("Re-take") {
+                  /*  Button("Re-take") {
                         capturedBackImage = nil
                     }
                     .padding()
@@ -92,9 +93,27 @@ struct TakeBackDocumentView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.orange, lineWidth: 1)
                     }
+                    */
                     
+                    Button(action: {
+                        capturedBackImage = nil
+
+                    }) {
+                        Text("Re-take")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.clear)
+                            .foregroundColor(.orange)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.orange, lineWidth: 1)
+                            }
+                            .contentShape(Rectangle())
+                    }
+                      
+                    /*
                     Button("Next") {
-                        
+                            showProgresOnButton = true
                         if let img1 = frontImage{
                             
                             if let img2 = capturedBackImage{
@@ -105,19 +124,46 @@ struct TakeBackDocumentView: View {
                                     
                                     if let selfie = selfieImage{
                                         self.uploadData(selfieImg: selfie, mergedImg: mergeimg)
+                                        showProgresOnButton = false
+                                        
                                     }
                                 }
                             }
                         }
+
+                            
+                            
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    */
+                    
+                    Button(action: {
+                        showProgresOnButton = true
+                        DispatchQueue.main.async {
+                            self.mergeAnduploadFile()
+                        }
                       
-                  
+                    }) {
+                        if showProgresOnButton {
+                            ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Text("Next")
+                                .font(.headline)
+                                .contentShape(Rectangle())
+
+                        }
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(12)
-                    //.padding(.horizontal)
+                    .disabled(showProgresOnButton)
+                
                 }
                 .padding()
                 
@@ -146,7 +192,7 @@ struct TakeBackDocumentView: View {
 
                 Spacer()
                 
-                Button("Capture") {
+              /*  Button("Capture") {
                     // Trigger photo capture and set capturedImage
                     
                     //coordinator?.capturePhoto()
@@ -160,6 +206,22 @@ struct TakeBackDocumentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(12)
                 .padding(.horizontal)
+                .contentShape(Rectangle())
+                .padding(.bottom)
+                */
+                
+                Button(action: {
+                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
+                }) {
+                    Text("Capture")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .contentShape(Rectangle())
+                }
+                .padding(.horizontal)
                 .padding(.bottom)
             }
 
@@ -168,11 +230,42 @@ struct TakeBackDocumentView: View {
         .background(Color(UIColor.systemGray6))
     }
     
+    
+    
+    func mergeAnduploadFile(){
+        // Let UI update first
+        if let img1 = frontImage,
+           let img2 = capturedBackImage{
+            //           let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
+            //
+            //            Themes.sharedInstance.activityView(uiView: topView)
+            //
+            // Step 2: Show loader DURING merge
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let mergeimg = mergeImages(img1, img2),
+                   let selfie = selfieImage {
+                    
+                    // Step 3: Back to main thread for uploading (or keep on background if upload is async-safe)
+                    DispatchQueue.main.async {
+                        self.uploadData(selfieImg: selfie, mergedImg: mergeimg)
+                        // Do NOT hide loader here — hide it in the uploadData callback
+                    }
+                } else {
+                    // If merge fails, hide loader
+                    DispatchQueue.main.async {
+                        showProgresOnButton = false
+                    }
+                }
+            }
+            //        } else {
+            //            showProgresOnButton = false
+            //        }
+        }
+    }
+    
+    
     func mergeImages(_ firstImage: UIImage, _ secondImage: UIImage) -> UIImage? {
-//        
-//         let view =  self.navigation?.topViewController?.view ?? UIView()
-//        Themes.sharedInstance.activityView(uiView: view)
-        
+
         let size = CGSize(
             width: max(firstImage.size.width, secondImage.size.width),
             height: firstImage.size.height + secondImage.size.height
@@ -190,21 +283,32 @@ struct TakeBackDocumentView: View {
 
         let mergedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-     //   Themes.sharedInstance.removeActivityView(uiView: view)
         return mergedImage
     }
 
     
     func uploadData(selfieImg:UIImage,mergedImg:UIImage){
         
-        let valDict = ["2":businessName ?? ""]
-        
+//        let valDict = ["2":businessName ?? ""]
+        let valDict = ["1":businessName ?? ""]
+
         let paramDict = ["verification_field":valDict,]
-        let arrKey = ["1","4"]
+//        let arrKey = ["1","4"]
+        
+        let arrKey = ["3","2"]
+
+        /*
+         3 Selfie Image
+         2 Valid Government-Issued ID
+         1 Business Name
+         */
+        
         URLhandler.sharedinstance.uploadArrayOfImagesWithParameters(mediaArray: [selfieImg,mergedImg], mediaKeyArray: arrKey, mediaName: "verification_field_files", url: Constant.shared.send_verification_request, params: paramDict) { responseObject, error in
       
+
             if error != nil {
-                
+                self.showProgresOnButton = false
+
             }else{
                 
                     let result = responseObject! as NSDictionary
@@ -218,8 +322,10 @@ struct TakeBackDocumentView: View {
 
                     }
                 
-           
+                self.showProgresOnButton = false
+
             }
+
         }
     }
     /*

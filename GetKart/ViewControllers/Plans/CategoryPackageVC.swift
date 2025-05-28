@@ -38,7 +38,7 @@ class CategoryPackageVC: UIViewController {
         collectionViewBanner.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
 
         self.lblSelectedCategory.text = "Category: \(categoryName)"
-        self.lblSelectedLoc.text = "Location: \(city)"
+        self.lblSelectedLoc.text = "Location: \(city + ", " + state + ", " + country)"
         getPackagesBannersApi()
         getPackagesApi()
     }

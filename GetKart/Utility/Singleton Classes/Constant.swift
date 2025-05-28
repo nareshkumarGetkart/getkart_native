@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -612,14 +612,21 @@ class ShareMedia{
 
 enum NotificationKeys:String,CaseIterable{
     
-    case deeplinkProfile = "deeplinkProfile"
     case reconnectInternet = "reconnectInternet"
     case noInternet = "noInternet"
     case refreshAdsScreen = "refreshAdsScreen"
-
+    
 }
 
 
+
+enum NotiKeysLocSelected:String,CaseIterable{
+    case homeNewLocation = "homeNewLocation"
+    case filterNewLocation = "filterNewLocation"
+    case createPostNewLocation = "createPostNewLocation"
+    case buyPackageNewLocation = "buyPackageNewLocation"
+    
+}
 
 
 enum ImageName {

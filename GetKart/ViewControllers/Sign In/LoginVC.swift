@@ -26,11 +26,11 @@ class LoginVC: UIViewController {
     @IBOutlet weak var btnContinueLogin:UIButtonX!
     @IBOutlet weak var viewContent:UIView!
     
-    var countryCode = ""
-    var socialId:String = ""
-    var socialName:String = ""
-    var socialEmail:String = ""
-    var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
+    private var countryCode = ""
+    private var socialId:String = ""
+    private var socialName:String = ""
+    private  var socialEmail:String = ""
+    private  var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -188,24 +188,24 @@ class LoginVC: UIViewController {
     
     @IBAction func signUpBtnAction(_ sender : UIButton){
         
-        let swiftUIView = SignUpView(navigationController: self.navigationController) // Create SwiftUI view
-        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+        let swiftUIView = SignUpView(navigationController: self.navigationController)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
     }
     
     
     @IBAction func termsAndCondition(_ sender : UIButton){
         
-        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of service", type: .termsAndConditions) // Create SwiftUI view
-        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Terms of service", type: .termsAndConditions)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
     }
     
     @IBAction func privacyCondition(_ sender : UIButton){
         
-        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy) // Create SwiftUI view
-        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
-        navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
+        let swiftUIView = PrivacyView(navigationController:self.navigationController, title: "Privacy Policy", type: .privacy)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
     }
 }
 
@@ -360,13 +360,11 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                     if let payload =  result["data"] as? Dictionary<String,Any>{
                         let token = result["token"] as? String ?? ""
                         let objUserInfo = UserInfo(dict: payload, token: token)
+                        Local.shared.saveUserId(userId: objUserInfo.id ?? 0)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
-                        
-                      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-                        
-                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                        SocketIOManager.sharedInstance.checkSocketStatus()
+                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) 
                         self.navigationController?.pushViewController(hostingController, animated: true)
-                        
                     }
                     
                 }else{
@@ -406,17 +404,13 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             let socialEmails = appleIDCredential.email ?? ""
             
             print("socialUser \(appleIDCredential.user), socialFullName: \(socialFullName) , socialEmail: \(socialEmail)")
-            
-            // For the purpose of this demo app, show the Apple ID credential information in the `ResultViewController`.
-            //self.showResultViewController(userIdentifier: userIdentifier, fullName: fullName, email: email)
-                      
+       
             socialEmail = socialEmails
             socialName = socialFullName
             socialId = socialUser
             loginType = .apple
             
             self.signInUsingGmailorAppleApi()
-            //self.loginWithSocialID()
             
         case let passwordCredential as ASPasswordCredential:
             

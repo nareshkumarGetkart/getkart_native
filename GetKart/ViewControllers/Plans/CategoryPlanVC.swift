@@ -41,8 +41,51 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
          tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
          btnShowPackage.layer.cornerRadius = 7.0
          btnShowPackage.clipsToBounds = true
+         
+         
+         NotificationCenter.default.addObserver(self,selector: #selector(handleLocationSelected(_:)),
+                                                name:NSNotification.Name(rawValue:NotiKeysLocSelected.buyPackageNewLocation.rawValue), object: nil)
      }
+
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc func handleLocationSelected(_ notification: Notification) {
+        
+        if let userInfo = notification.userInfo as? [String: Any]
+        {
+            let city = userInfo["city"] as? String ?? ""
+            let state = userInfo["state"] as? String ?? ""
+            let country = userInfo["country"] as? String ?? ""
+            let latitude = userInfo["latitude"] as? String ?? ""
+            let longitude = userInfo["longitude"] as? String ?? ""
+            let locality = userInfo["locality"] as? String ?? ""
+            
+            print("Received Location: \(city), \(state), \(country)")
+            
+            
+            self.latitude = latitude
+            self.longitude = longitude
+            self.city = city
+            self.state = state
+            self.country = country
+            
+            
+            subTitleArrray[1] = city + ", " + state + ", " + country
+            
+            self.tblView.reloadData()
+            if self.country.count > 0 && self.category_id > 0 {
+                btnShowPackage.isEnabled = true
+                btnShowPackage.backgroundColor = .orange
+                btnShowPackage.setTitleColor(.white, for: .normal)
+            }
+            
+            
+        }
+    }
+        
     //MARK: UIButton Action Methods
     
     @IBAction func backButtonAction(_ sender : UIButton){
@@ -60,7 +103,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
        }
    }
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String) {
 
         self.latitude = latitude
         self.longitude = longitude

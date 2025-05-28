@@ -24,7 +24,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     var timezone = ""
     var latitude :Double = 0.0
     var longitude :Double = 0.0
-    
+    var locality = ""
+
     var isToUpdateLocation = true
     
     
@@ -138,6 +139,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                         self.country = addressDict["Country"] as? String ?? ""
                         self.latitude = location.coordinate.latitude
                         self.longitude = location.coordinate.longitude
+                        self.locality = addressDict["SubLocality"] as? String ?? ""
+                     
                         //Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
                         self.delegate?.locationAuthorizationUpdate(isToUpdateLocation: isToUpdate)
                     }

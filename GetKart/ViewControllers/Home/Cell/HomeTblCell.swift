@@ -42,6 +42,11 @@ class HomeTblCell: UITableViewCell {
         cllctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
         self.cllctnView.delegate = self
         self.cllctnView.dataSource = self
+        
+      
+
+        
+
     }
     /*
      https://adminweb.getkart.com/images/app_styles/style_1.png

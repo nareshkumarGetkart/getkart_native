@@ -40,6 +40,7 @@ class HomeHorizontalCell: UITableViewCell {
         collctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
         self.collctnView.delegate = self
         self.collctnView.dataSource = self
+       
     }
     
     

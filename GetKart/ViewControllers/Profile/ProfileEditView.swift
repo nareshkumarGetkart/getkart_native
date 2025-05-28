@@ -22,7 +22,6 @@ struct ProfileEditView: View {
     @State private var isMobileVerified = false
     @State private var isEmailVerified = false
     @State private var isEmailOtpVerifyClicked = false
-
     @State var isDataLoading = false
     var navigationController:UINavigationController?
     
@@ -39,6 +38,7 @@ struct ProfileEditView: View {
                 .foregroundColor(Color(UIColor.label))
             Spacer()
         }.frame(height:44).background(Color(UIColor.systemBackground))
+       
         ScrollView {
             VStack(spacing: 20) {
                 // Profile Image Section
@@ -149,6 +149,7 @@ struct ProfileEditView: View {
                         .cornerRadius(12)
                 }
                 .padding(.top, 10)
+                .contentShape(Rectangle())
                 
                 if isDataLoading{
                     ProgressView()

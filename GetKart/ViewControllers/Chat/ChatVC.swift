@@ -1244,6 +1244,8 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                 }
                 cell.audioDuration.text = ""
+                cell.lblTime.text = dateFormatter.string(from: date)
+
                 /*
                 cell.lblTime.text = dateFormatter.string(from: date)
                 cell.audioDuration.text =  "\(chatObj.mediaDuration ?? 0)"
@@ -1402,6 +1404,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.bgview.updateConstraints()
                     }
                     cell.audioDuration.text = ""
+                    cell.lblTime.text = dateFormatter.string(from: date)
 
                 }
                     /*

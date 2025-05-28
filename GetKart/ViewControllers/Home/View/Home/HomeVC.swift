@@ -15,8 +15,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
     @IBOutlet weak var btnLocation:UIButton!
-    var homeVModel:HomeViewModel?
-   
     @IBOutlet weak var loaderBgView:UIView!
     @IBOutlet weak var cnstrntLoaderHt:NSLayoutConstraint!
 
@@ -29,6 +27,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         return refreshControl
     }()
     
+    private var homeVModel:HomeViewModel?
+
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,32 +46,68 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
         
+        NotificationCenter.default.addObserver(self,selector:
+                                                #selector(handleLocationSelected(_:)),
+                                               name:NSNotification.Name(rawValue:NotiKeysLocSelected.homeNewLocation.rawValue), object: nil)
         
-        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
-                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self,selector:
+                                                #selector(noInternet(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
+                                               object: nil)
     }
+    
+    
+    @objc func handleLocationSelected(_ notification: Notification) {
+        
+        if let userInfo = notification.userInfo as? [String: Any]
+        {
+            let city = userInfo["city"] as? String ?? ""
+            let state = userInfo["state"] as? String ?? ""
+            let country = userInfo["country"] as? String ?? ""
+            let latitude = userInfo["latitude"] as? String ?? ""
+            let longitude = userInfo["longitude"] as? String ?? ""
+            let locality = userInfo["locality"] as? String ?? ""
+            
+            print("Received Location: \(city), \(state), \(country)")
+                        
+            homeVModel?.page = 1
+            homeVModel?.itemObj?.data = nil
+            homeVModel?.featuredObj = nil
+            self.tblView.reloadData()
+            
+            homeVModel?.city = city
+            homeVModel?.country = country
+            homeVModel?.state = state
+            homeVModel?.latitude = latitude
+            homeVModel?.longitude = longitude
+
+            homeVModel?.getProductListApi()
+            homeVModel?.getFeaturedListApi()
+            var locStr = city
+            
+            if state.count > 0 {
+                locStr =  locStr.count > 0 ? locStr + ", " + state : state
+            }
+            
+            if country.count > 0 {
+                locStr =  locStr.count > 0 ? locStr + ", " + country : country
+            }
+            
+            if locStr.count == 0 {
+                locStr = "All Countries"
+            }
+            self.lblAddress.text = locStr
+            // Handle UI update or data save
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        /*
-        let city = Local.shared.getUserCity()
-        let state = Local.shared.getUserState()
-        let country = Local.shared.getUserCountry()
-        var locStr = city
-        if state.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + state : state
-        }
-        if country.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
-        }
-        
-        if locStr.count == 0 {
-            locStr = "All Countries"
-        }
-        
-        self.lblAddress.text = locStr
-        */
         if !AppDelegate.sharedInstance.isInternetConnected{
             homeVModel?.isDataLoading = false
             AlertView.sharedManager.showToast(message: "No internet connection")
@@ -79,6 +115,15 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         }
         
     }
+  
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Clear caches, release unnecessary memory
+        ImageCache.default.clearMemoryCache()
+    }
+
+    
     
     private func updateTolocation(){
         
@@ -99,13 +144,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         
         self.lblAddress.text = locStr
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Clear caches, release unnecessary memory
-        ImageCache.default.clearMemoryCache()
-    }
-
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
@@ -144,10 +182,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             homeVModel?.getSliderListApi()
             homeVModel?.getFeaturedListApi()
         }
-        
-        
-       
-        
         refreshControl.endRefreshing()
     }
      
@@ -187,12 +221,18 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
 
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){
 
         homeVModel?.page = 1
         homeVModel?.itemObj?.data = nil
         homeVModel?.featuredObj = nil
         self.tblView.reloadData()
+        
+        homeVModel?.city = city
+        homeVModel?.country = country
+        homeVModel?.state = state
+        homeVModel?.latitude = latitude
+        homeVModel?.longitude = longitude
         homeVModel?.getProductListApi()
         homeVModel?.getFeaturedListApi()
         var locStr = city
@@ -245,7 +285,7 @@ extension HomeVC:FilterSelected{
 extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-       
+        
         return 4
     }
     
@@ -263,7 +303,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         
         return UITableView.automaticDimension
     }
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
@@ -288,7 +328,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-       
+        
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "BannerTblCell") as! BannerTblCell
             cell.listArray = homeVModel?.sliderArray
@@ -297,7 +337,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.updateConstraints()
             cell.navigationController = self.navigationController
             return cell
-           
+            
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
             cell.cnstrntHeightSeeAllView.constant = 0
@@ -335,7 +375,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 
             }else if (obj?.style == "style_2"){
                 //Horizontal
-
+                
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.collctnView.collectionViewLayout.invalidateLayout()
                 cell.istoIncreaseWidth = false
@@ -377,7 +417,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 
             }else if (obj?.style == "style_4"){
                 //Horizontal && increase width
-
+                
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.cnstrntHeightSeeAllView.constant = 35
                 cell.btnSeeAll.setTitle("See All", for: .normal)
@@ -396,9 +436,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 return cell
                 
             }
-          
+            
             return UITableViewCell()
-
+            
         }else{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
@@ -415,26 +455,26 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             return cell
         }
     }
-  
     
-
-       @objc func selectedSeeAll(_ sender : UIButton){
-           
-           let tag =  sender.tag  - 2
-           
-          let sectionObj =  homeVModel?.featuredObj?[tag]
-           if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
-               destVC.obj = sectionObj
-               destVC.hidesBottomBarWhenPushed = true
-               self.navigationController?.pushViewController(destVC, animated: true)
-           }
-       }
-
+    
+    
+    @objc func selectedSeeAll(_ sender : UIButton){
+        
+        let tag =  sender.tag  - 2
+        
+        let sectionObj =  homeVModel?.featuredObj?[tag]
+        if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
+            destVC.obj = sectionObj
+            destVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destVC, animated: true)
+        }
+    }
+    
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-
+        
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
-           // print("up")
+            // print("up")
             if scrollView == tblView{
                 return
             }
@@ -456,36 +496,42 @@ extension HomeVC: RefreshScreen{
     
     
     func refreshFeaturedsList(){
-     //   UIView.performWithoutAnimation {
+        
+        
+       UIView.performWithoutAnimation {
             
-            tblView.reloadSections(IndexSet(integer: 2), with: .none)
-       // }
+           if (homeVModel?.featuredObj?.count ?? 0) == 0{
+               self.tblView.reloadData()
+           }else{
+               tblView.reloadSections(IndexSet(integer: 2), with: .none)
+           }
+       }
     }
     func refreshBannerList(){
-      //  UIView.performWithoutAnimation {
+        UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 0), with: .none)
-        //}
+        }
     }
     func refreshCategoriesList(){
-      //  UIView.performWithoutAnimation {
+       UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 1), with: .none)
-       // }
+        }
         
     }
     
     
     
     func refreshScreen(){
-       // UIView.performWithoutAnimation {
+       UIView.performWithoutAnimation {
             
             self.tblView.reloadData()
-        //}
+        }
     }
    
     
-   func newItemRecieve(newItemArray:[Any]?){
+    func newItemRecieve(newItemArray:[Any]?){
         
         if (newItemArray?.count ?? 0) == 0{
             
@@ -511,6 +557,4 @@ extension HomeVC: RefreshScreen{
             }
         }
     }
-    
-
 }

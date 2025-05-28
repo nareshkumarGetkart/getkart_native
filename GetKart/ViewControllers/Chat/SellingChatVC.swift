@@ -153,8 +153,19 @@ class SellingChatVC: UIViewController {
                 if page == 1{
                     self.listArray.removeAll()
                 }
-                self.listArray.append(contentsOf:response.data?.data ?? [])
-                self.tblView.reloadData()
+                
+                
+                
+                if  self.listArray.count > 0 && (response.data?.data ?? []).count == 0 {
+                    self.isDataLoading = false
+                    return
+                }else{
+                    self.listArray.append(contentsOf:response.data?.data ?? [])
+                    self.tblView.reloadData()
+                }
+                
+//                self.listArray.append(contentsOf:response.data?.data ?? [])
+//                self.tblView.reloadData()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                     self.isDataLoading = false
                     self.page = self.page + 1
@@ -201,7 +212,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
         cell.imgViewItem.clipsToBounds = true
         
-        
+        cell.imgViewItem.backgroundColor = Themes.sharedInstance.themeColor        
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 
         if (obj.lastMessage?.message?.count ?? 0) > 0 {
@@ -240,7 +251,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         self.navController?.pushViewController(destVC, animated: true)
     }
     
-     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
            // print("up")
@@ -253,6 +264,8 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         {
             if scrollView == tblView{
                 if isDataLoading == false{
+                    isDataLoading = true
+
                     getChatList()
                 }
             }

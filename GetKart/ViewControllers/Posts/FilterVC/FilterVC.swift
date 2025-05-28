@@ -87,6 +87,9 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = UITableView.automaticDimension
         tblView.separatorColor = .clear
+        
+        NotificationCenter.default.addObserver(self,selector: #selector(handleLocationSelected(_:)),
+                                               name:NSNotification.Name(rawValue:NotiKeysLocSelected.filterNewLocation.rawValue), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -98,6 +101,35 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         print("dinit called")
     }
     
+    
+   
+
+
+    @objc func handleLocationSelected(_ notification: Notification) {
+        
+        if let userInfo = notification.userInfo as? [String: Any]
+        {
+            let city = userInfo["city"] as? String ?? ""
+            let state = userInfo["state"] as? String ?? ""
+            let country = userInfo["country"] as? String ?? ""
+            let latitude = userInfo["latitude"] as? String ?? ""
+            let longitude = userInfo["longitude"] as? String ?? ""
+            let locality = userInfo["locality"] as? String ?? ""
+            
+            print("Received Location: \(city), \(state), \(country)")
+            
+            
+            self.latitude = latitude
+            self.longitude = longitude
+            self.city = city
+            self.state = state
+            self.country = country
+            //self.radius = range
+            self.tblView.reloadData()
+            
+        }
+        
+    }
     
     //MARK: UIButton Action Methods
     @IBAction  func backButtonAction(_ sender : UIButton){
@@ -190,7 +222,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         self.tblView.reloadData()
     }
     
-    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String) {
+    func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String) {
         
         self.latitude = latitude
         self.longitude = longitude

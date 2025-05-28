@@ -249,6 +249,9 @@ class CreateAddDetailVC: UIViewController {
             
             showErrorMsg = true
             
+        }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
+            showErrorMsg = true
+
         }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
@@ -386,6 +389,12 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = "Field must not be empty."
+                }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = "Please enetr valid Ad Title"
+
                 }else {
                     
                     cell.lblErrorMsg.isHidden = true
