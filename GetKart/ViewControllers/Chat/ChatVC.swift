@@ -63,17 +63,20 @@ class ChatVC: UIViewController {
         return refreshControl
     }()
     
+    var name = ""
+    var profileImg = ""
+    var itemName = ""
+    var itemImg = ""
     var isDataLoading = true
     var userId = 0
     var itemId = 0
     var slug = ""
+    var price:Double = 0.0
+    
     
     var typingTimer: Timer?
     var isTyping = false
-    
     var typingOtherTimer: Timer?
-
-    
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
@@ -85,9 +88,7 @@ class ChatVC: UIViewController {
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnThreeDots.setImageColor(color: .label)
         btnBack.setImageColor(color: .label)
-        self.topRefreshControl.backgroundColor = .clear
-        self.tblView.refreshControl = topRefreshControl
-        
+        updateUserData()
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
         btnSend.clipsToBounds = true
         btnSend.translatesAutoresizingMaskIntoConstraints = false
@@ -131,7 +132,11 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
         
         // checkOnlineOfflineStatus()
+        
+        self.topRefreshControl.backgroundColor = .clear
+        self.tblView.refreshControl = topRefreshControl
     }
+    
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -159,6 +164,29 @@ class ChatVC: UIViewController {
 
     }
     
+    func updateUserData(){
+        
+        if name.count > 0{
+            self.lblName.text = name
+        }
+        
+        if profileImg.count > 0{
+            self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder:ImageName.userPlaceHolder)
+        }
+        
+        
+        if itemName.count > 0{
+            self.lblProduct.text = itemName
+        }
+        
+        if itemImg.count > 0{
+            self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
+        }
+        
+        if price > 0{
+            self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
+        }
+    }
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
         
@@ -710,13 +738,14 @@ class ChatVC: UIViewController {
             
             if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
                                 
-                let name = itemDict["name"] as? String ?? ""
-                let image = itemDict["image"] as? String ?? ""
-                let price = itemDict["price"] as? Double ?? 0.0
+                itemName = itemDict["name"] as? String ?? ""
+                itemImg = itemDict["image"] as? String ?? ""
+                price = itemDict["price"] as? Double ?? 0.0
+                
                 self.itemId = itemDict["id"] as? Int ?? 0
-                self.lblProduct.text = name
+                self.lblProduct.text = itemName
                 self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
-                self.imgViewProduct.kf.setImage(with: URL(string: image),placeholder: UIImage(named: "getkartplaceholder"))
+                self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
             }else{
                 isItemDeleted = true
                 AlertView.sharedManager.showToast(message: "This item is no longer available.")
@@ -734,13 +763,14 @@ class ChatVC: UIViewController {
         
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
-            let name = dataDict["name"] as? String ?? ""
-            let profile = dataDict["profile"] as? String ?? ""
+             name = dataDict["name"] as? String ?? ""
+             profileImg = dataDict["profile"] as? String ?? ""
+            
             let is_verified = dataDict["is_verified"] as? Int ?? 0
             self.imgVwVerified.isHidden = (is_verified == 1) ? false : true
             self.imgVwVerified.setImageTintColor(color: .systemBlue)
             self.lblName.text = name
-            self.imgViewProfile.kf.setImage(with: URL(string: profile),placeholder: UIImage(named: "user-circle"))
+            self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
             self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
             updateUserBlockStatus()

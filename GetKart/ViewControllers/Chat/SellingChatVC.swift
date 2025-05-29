@@ -212,7 +212,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
         cell.imgViewItem.clipsToBounds = true
         
-        cell.imgViewItem.backgroundColor = Themes.sharedInstance.themeColor        
+        cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 
         if (obj.lastMessage?.message?.count ?? 0) > 0 {
@@ -247,6 +247,11 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].buyerID ?? 0
+        destVC.itemImg = listArray[indexPath.item].item?.image ?? ""
+        destVC.itemName = listArray[indexPath.item].item?.name ?? ""
+        destVC.name = listArray[indexPath.item].buyer?.name ?? ""
+        destVC.profileImg = listArray[indexPath.item].buyer?.profile ?? ""
+        destVC.price = listArray[indexPath.item].item?.price ?? 0.0
         destVC.hidesBottomBarWhenPushed = true
         self.navController?.pushViewController(destVC, animated: true)
     }

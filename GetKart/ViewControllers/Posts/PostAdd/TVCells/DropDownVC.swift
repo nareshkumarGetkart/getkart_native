@@ -31,6 +31,9 @@ class DropDownVC: UIViewController {
 //
 //    }
 
+    @IBAction func closeButtonAction(_ sender : UIButton){
+        self.dismiss(animated: true, completion: nil)
+    }
 
 }
 extension DropDownVC:UITableViewDataSource, UITableViewDelegate {

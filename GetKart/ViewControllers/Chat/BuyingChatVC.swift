@@ -206,7 +206,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewProfile.kf.setImage(with:  URL(string: obj.seller?.profile ?? "") , placeholder:UIImage(named: "user-circle"))
                 
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-        cell.imgViewItem.backgroundColor = Themes.sharedInstance.themeColor
+        cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
        
         cell.imgViewItem.clipsToBounds = true
@@ -245,6 +245,11 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
         destVC.item_offer_id = listArray[indexPath.item].id ?? 0
         destVC.userId = listArray[indexPath.item].sellerID ?? 0
+        destVC.itemImg = listArray[indexPath.item].item?.image ?? ""
+        destVC.itemName = listArray[indexPath.item].item?.name ?? ""
+        destVC.name = listArray[indexPath.item].seller?.name ?? ""
+        destVC.profileImg = listArray[indexPath.item].seller?.profile ?? ""
+        destVC.price = listArray[indexPath.item].item?.price ?? 0.0
         destVC.hidesBottomBarWhenPushed = true
         self.navController?.pushViewController(destVC, animated: true)
     }

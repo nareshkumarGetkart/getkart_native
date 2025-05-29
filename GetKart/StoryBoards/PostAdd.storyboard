@@ -226,6 +226,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zft-oi-tbj">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                <connections>
+                                    <action selector="closeButtonAction:" destination="DSc-Im-98m" eventType="touchUpInside" id="UTY-MF-ciV"/>
+                                </connections>
+                            </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="MTq-11-no1">
                                 <rect key="frame" x="20" y="201" width="353" height="450"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -260,8 +269,12 @@
                         <constraints>
                             <constraint firstItem="MTq-11-no1" firstAttribute="centerX" secondItem="SCX-zo-rAS" secondAttribute="centerX" id="21p-Zg-Bea"/>
                             <constraint firstItem="xV9-Eo-qXE" firstAttribute="trailing" secondItem="MTq-11-no1" secondAttribute="trailing" constant="20" id="2nY-fU-mkz"/>
+                            <constraint firstAttribute="trailing" secondItem="Zft-oi-tbj" secondAttribute="trailing" id="6Cu-tf-3ef"/>
+                            <constraint firstAttribute="bottom" secondItem="Zft-oi-tbj" secondAttribute="bottom" id="6r1-C4-dFN"/>
                             <constraint firstItem="MTq-11-no1" firstAttribute="leading" secondItem="xV9-Eo-qXE" secondAttribute="leading" constant="20" id="AwR-Js-fW0"/>
+                            <constraint firstItem="Zft-oi-tbj" firstAttribute="leading" secondItem="xV9-Eo-qXE" secondAttribute="leading" id="J9F-hI-JbJ"/>
                             <constraint firstItem="MTq-11-no1" firstAttribute="centerY" secondItem="SCX-zo-rAS" secondAttribute="centerY" id="MfT-FO-K7m"/>
+                            <constraint firstItem="Zft-oi-tbj" firstAttribute="top" secondItem="SCX-zo-rAS" secondAttribute="top" id="pnd-Gl-NZU"/>
                         </constraints>
                     </view>
                     <connections>

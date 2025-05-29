@@ -384,7 +384,6 @@ struct ItemDetailView: View {
                 if let lat = objVM.itemObj?.latitude, let lon = objVM.itemObj?.longitude {
                     
                     PinnedMapView(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
-                        print("Map tapped")
                         let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
                         let hostingController = UIHostingController(rootView: swiftUIview)
                         self.navController?.pushViewController(hostingController, animated: true)
@@ -572,7 +571,6 @@ struct ItemDetailView: View {
         .sheet(isPresented: $showSheet) {
             // Always present the same view
             SafetyTipsView(onContinueOfferTap: {
-                print("offer tap")
                 self.showOfferPopup = true
             })
             // Apply detents and drag indicator only if iOS 16+
@@ -751,7 +749,6 @@ struct ItemDetailView: View {
             }
         }else{
             Button(action: {
-                print("Make an Offer")
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
@@ -802,7 +799,7 @@ struct ItemDetailView: View {
                         sellerPrice: objVM.itemObj?.price ?? 0.0,
                         onOfferSubmit: { offer in
                             // submittedOffer = offer
-                            print("User submitted offer: ₹\(offer)")
+                           // print("User submitted offer: ₹\(offer)")
                             callOfferSocket(amount: offer)
                             
                         }
@@ -818,7 +815,7 @@ struct ItemDetailView: View {
                         onOfferSubmit: { offer in
                             // submittedOffer = offer
                             callOfferSocket(amount: offer)
-                            print("User submitted offer: ₹\(offer)")
+                           // print("User submitted offer: ₹\(offer)")
                         }
                     )
                 } // Works in iOS 16+
@@ -916,7 +913,6 @@ struct ItemDetailView: View {
             let outputFormatter = DateFormatter()
             outputFormatter.dateFormat = "yyyy-MM-dd"
             let formattedDate = outputFormatter.string(from: date)
-            print(formattedDate) // Output: 2025-03-19
             return formattedDate
         } else {
             print("Invalid date string")

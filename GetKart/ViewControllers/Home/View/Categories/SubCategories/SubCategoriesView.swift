@@ -147,7 +147,6 @@ struct CategoryCellView: View {
         HStack {
             if let imgUrl = subCategory?.image{
                 
-                
                 AsyncImage(url: URL(string: imgUrl)) { img in
                     
                     img.resizable()
@@ -159,7 +158,7 @@ struct CategoryCellView: View {
                     Image("getkartplaceholder")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .background(Color(Themes.sharedInstance.themeColor))
+                        .background(Color(hex: "#FEF6E9"))
                             .frame(width: 30,height: 30)
                             .cornerRadius(15.0)
                             .clipped()

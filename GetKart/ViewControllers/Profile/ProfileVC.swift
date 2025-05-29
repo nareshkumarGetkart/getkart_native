@@ -173,7 +173,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
                                 
                 if verifiSttaus.lowercased() == "pending"{
-                    cell.lblStatus.text = verifiSttaus.capitalized
+                    cell.lblStatus.text =  "Under review" //verifiSttaus.capitalized
                     cell.lblStatus.backgroundColor = Themes.sharedInstance.themeColor
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = true
@@ -181,7 +181,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     cell.bgViewVerified.isHidden = true
 
                 }else if verifiSttaus.lowercased() == "rejected"{
-                    cell.lblStatus.text = verifiSttaus.capitalized
+                    cell.lblStatus.text =  verifiSttaus.capitalized
                     cell.lblStatus.backgroundColor = UIColor.red
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = false
