@@ -283,7 +283,6 @@ class CreateAddDetailVC: UIViewController {
                 
             }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
                 vc.dataArray = self.objViewModel?.dataArray ?? []
-                vc.params = self.params
                 if popType == .createPost {
                     vc.imgData = self.imgData
                     vc.imgName = self.imgName
@@ -321,6 +320,7 @@ class CreateAddDetailVC: UIViewController {
                     }
                 }
                 
+                vc.params = self.params
                 vc.popType = self.popType
                 vc.itemObj = self.itemObj
                 self.navigationController?.pushViewController(vc, animated: true)

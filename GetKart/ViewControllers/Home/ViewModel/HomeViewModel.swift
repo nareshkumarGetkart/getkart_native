@@ -46,8 +46,11 @@ class HomeViewModel:ObservableObject{
         city = Local.shared.getUserCity()
         country = Local.shared.getUserCountry()
         state = Local.shared.getUserState()
-        latitude = Local.shared.getUserLatitude()
-        longitude = Local.shared.getUserLongitude()
+        
+        if state.count > 0 || state.count > 0{
+            latitude = Local.shared.getUserLatitude()
+            longitude = Local.shared.getUserLongitude()
+        }
         
         getSliderListApi()
         getCategoriesListApi()
@@ -75,13 +78,14 @@ class HomeViewModel:ObservableObject{
             strUrl.append("&country=\(country)")
         }
         
-        if latitude.count > 0{
+        if latitude.count > 0 && (state.count > 0 || city.count > 0){
             strUrl.append("&latitude=\(latitude)")
         }
         
-        if longitude.count > 0{
+        if longitude.count > 0 && (state.count > 0 || city.count > 0){
             strUrl.append("&longitude=\(longitude)")
         }
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
             if obj.code == 200 {
@@ -138,7 +142,7 @@ class HomeViewModel:ObservableObject{
         }
         
         
-        if latitude.count > 0{
+        if latitude.count > 0 && (state.count > 0 || city.count > 0){
             if !strUrl.contains("?"){
                 strUrl.append("?latitude=\(latitude)")
 
@@ -149,7 +153,7 @@ class HomeViewModel:ObservableObject{
                 
         }
         
-        if longitude.count > 0{
+        if longitude.count > 0 && (state.count > 0 || city.count > 0){
             if !strUrl.contains("?"){
                 strUrl.append("?longitude=\(longitude)")
             }else{

@@ -363,8 +363,11 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     
     @objc func statusTapped(){
-        if verifiRejectedReason.count > 0{
-            AlertView.sharedManager.displayMessageWithAlert(title: "Rejected Reason", msg: verifiRejectedReason)
+        
+        if verifiSttaus.lowercased() == "rejected"{
+            if verifiRejectedReason.count > 0{
+                AlertView.sharedManager.displayMessageWithAlert(title: "Rejected Reason", msg: verifiRejectedReason)
+            }
         }
     }
     
@@ -374,7 +377,6 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         if objLoggedInUser.id != nil {
             
             return true
-            
             
         }else{
             let deleteAccountView = UIHostingController(rootView: LoginRequiredView(loginCallback: {

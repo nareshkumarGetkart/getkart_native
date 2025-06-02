@@ -71,9 +71,13 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             print("Received Location: \(city), \(state), \(country)")
                         
             homeVModel?.page = 1
-            homeVModel?.itemObj?.data = nil
-            homeVModel?.featuredObj = nil
+            //homeVModel?.itemObj?.data = nil
+           // homeVModel?.featuredObj = nil
+            homeVModel?.itemObj?.data?.removeAll()
+            homeVModel?.featuredObj?.removeAll()
             self.tblView.reloadData()
+            tblView.setNeedsLayout()
+            tblView.layoutIfNeeded()
             
             homeVModel?.city = city
             homeVModel?.country = country
@@ -142,6 +146,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             locStr = "All Countries"
         }
         
+        
         self.lblAddress.text = locStr
     }
     func registerCells(){
@@ -178,6 +183,12 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
       
         }else if !(homeVModel?.isDataLoading ?? false) {
             homeVModel?.page = 1
+            homeVModel?.itemObj?.data = nil
+            homeVModel?.featuredObj = nil
+            homeVModel?.itemObj?.data?.removeAll()
+            homeVModel?.featuredObj?.removeAll()
+            self.tblView.reloadData()
+            
             homeVModel?.getProductListApi()
             homeVModel?.getSliderListApi()
             homeVModel?.getFeaturedListApi()
@@ -226,7 +237,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel?.page = 1
         homeVModel?.itemObj?.data = nil
         homeVModel?.featuredObj = nil
+        homeVModel?.itemObj?.data?.removeAll()
+        homeVModel?.featuredObj?.removeAll()
         self.tblView.reloadData()
+        tblView.setNeedsLayout()
+        tblView.layoutIfNeeded()
         
         homeVModel?.city = city
         homeVModel?.country = country
@@ -294,12 +309,16 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 135 : 0
         }
         if indexPath.section == 2{
-            if let obj = homeVModel?.featuredObj?[indexPath.item]{
+            
+            if (homeVModel?.featuredObj?.count ?? 0) == 0{
+                return 0
+            }else if let obj = homeVModel?.featuredObj?[indexPath.item]{
                 if (obj.style == "style_1") || (obj.style == "style_2") || (obj.style == "style_4"){
                     return  315
                 }
             }
         }
+        
         
         return UITableView.automaticDimension
     }
@@ -319,10 +338,12 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         case 2:
             //Featured
             return  (homeVModel?.featuredObj?.count ?? 0) > 0 ? (homeVModel?.featuredObj?.count ?? 0) : 0
-            
-        default:
+        case 3:
             //Items
             return (homeVModel?.itemObj?.data?.count ?? 0) > 0 ? 1 : 0
+        default:
+            return 0
+            
         }
     }
     
@@ -439,7 +460,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             
             return UITableViewCell()
             
-        }else{
+        }else if indexPath.section == 3{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
             cell.cnstrntHeightSeeAllView.constant = 0
@@ -454,6 +475,8 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.navigationController = self.navigationController
             return cell
         }
+        return UITableViewCell()
+
     }
     
     
@@ -483,7 +506,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 400)
         {
             if scrollView == tblView{
-                if homeVModel?.isDataLoading == false{
+                if homeVModel?.isDataLoading == false && (homeVModel?.itemObj?.data?.count ?? 0) > 0{
                     homeVModel?.getProductListApi()
                 }
             }
@@ -498,45 +521,49 @@ extension HomeVC: RefreshScreen{
     func refreshFeaturedsList(){
         
         
-       UIView.performWithoutAnimation {
+      // UIView.performWithoutAnimation {
             
            if (homeVModel?.featuredObj?.count ?? 0) == 0{
                self.tblView.reloadData()
+               
            }else{
                tblView.reloadSections(IndexSet(integer: 2), with: .none)
            }
-       }
+      // }
     }
     func refreshBannerList(){
-        UIView.performWithoutAnimation {
+       // UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 0), with: .none)
-        }
+      //  }
     }
     func refreshCategoriesList(){
-       UIView.performWithoutAnimation {
+     // UIView.performWithoutAnimation {
             
             tblView.reloadSections(IndexSet(integer: 1), with: .none)
-        }
+        //}
         
     }
     
     
     
     func refreshScreen(){
-       UIView.performWithoutAnimation {
-            
-            self.tblView.reloadData()
-        }
+        // UIView.performWithoutAnimation {
+        
+        self.tblView.reloadData()
+        tblView.setNeedsLayout()
+        tblView.layoutIfNeeded()
+        
+        // }
     }
    
     
-    func newItemRecieve(newItemArray:[Any]?){
+  /*  func newItemRecieve(newItemArray:[Any]?){
+        
         
         if (newItemArray?.count ?? 0) == 0{
             
         }else{
-            
             for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
                 
                 if let obj = newItemArray?[index1] as? ItemModel{
@@ -550,11 +577,43 @@ extension HomeVC: RefreshScreen{
                             let indexPath = IndexPath(row: (self.homeVModel?.itemObj?.data?.count ?? 0) - 1, section: 0)
                             cell.listArray =  self.homeVModel?.itemObj?.data
                             cell.cllctnView?.insertItems(at: [indexPath])
+                        }else {
+                            // If cell not visible, reload section to reflect new data when it comes into view
+                            self.tblView.reloadSections(IndexSet(integer: 3), with: .none)
                         }
                     }
                     
                 }
             }
+        }
+    }
+    
+    */
+    
+    func newItemRecieve(newItemArray:[Any]?){
+        guard let newItems = newItemArray as? [ItemModel], !newItems.isEmpty else { return }
+
+        let section = 3
+        let oldCount = homeVModel?.itemObj?.data?.count ?? 0
+        homeVModel?.itemObj?.data?.append(contentsOf: newItems)
+        let newCount = homeVModel?.itemObj?.data?.count ?? 0
+
+        let newIndexPaths = (oldCount..<newCount).map { IndexPath(item: $0, section: 0) }
+
+        DispatchQueue.main.async {
+            if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: section)) as? HomeTblCell {
+                cell.listArray = self.homeVModel?.itemObj?.data
+                cell.cllctnView.performBatchUpdates({
+                    cell.cllctnView.insertItems(at: newIndexPaths)
+                }, completion: nil)
+            } else {
+                // If cell not visible, reload section to reflect new data when it comes into view
+                self.tblView.reloadSections(IndexSet(integer: section), with: .none)
+            }
+
+            // Recalculate height if needed
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
         }
     }
 }

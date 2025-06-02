@@ -267,7 +267,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height)
         {
             if scrollView == tblView{
-                if isDataLoading == false{
+                if isDataLoading == false && listArray.count > 0{
                     isDataLoading = true
                     getChatList()
                 }

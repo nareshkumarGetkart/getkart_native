@@ -45,7 +45,9 @@ struct FaqView: View {
                         }) {
                             HStack {
                                 Text(faqs[index].question ?? "")
-                                    .fontWeight(.bold).padding()
+                                    .fontWeight(.bold)
+                                    .contentShape(Rectangle())
+                                    .padding()
 
                                 Spacer() // Pushes chevron to the right
 

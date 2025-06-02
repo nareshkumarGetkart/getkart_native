@@ -398,7 +398,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
         {
             if scrollView == tblView{
-                if isDataLoading == false{
+                if isDataLoading == false && listArray.count > 0{
                     self.isDataLoading = true
                     getAdsListApi()
                 }

@@ -40,27 +40,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.overrideUserInterfaceStyle = .light
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
-
         
-        //  DispatchQueue.global().async {
-               self.setupKingfisherSettings()
-           //    self.getSettingsApi()
-          //}
-
+        
+        self.setupKingfisherSettings()
+        self.getSettingsApi()
+        
         if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
             updateChecker.delegate = self
             updateChecker.showUpdateWithForce()
         }
-   
+        
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
         registerForRemoteNotification(application: application)
-
+        
         
         if Local.shared.getUserId() > 0{
-   
-
+            
+            
             if let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as? HomeBaseVC{
                 self.navigationController?.viewControllers = [landingVC]
             }
@@ -88,27 +86,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared.resignOnTouchOutside = true
         
         // Handle notification if app was launched by tapping a push notification
-           if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-               print("Notification Launch Payload: \(remoteNotification)")
-
-               self.notificationType = remoteNotification["type"] as? String ?? ""
-               self.userId = Int(remoteNotification["sender_id"] as? String ?? "0") ?? 0
-               self.roomId = Int(remoteNotification["item_offer_id"] as? String ?? "0") ?? 0
-               self.itemId = Int(remoteNotification["item_id"] as? String ?? "0") ?? 0
-
-               if self.userId == 0 {
-                   self.userId = Int(remoteNotification["user_id"] as? String ?? "0") ?? 0
-               }
-               if self.userId == 0 {
-                   self.userId = Int(remoteNotification["seller_id"] as? String ?? "0") ?? 0
-               }
-
-               Constant.shared.isLaunchFirstTime = 1
-           }
+        if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+            print("Notification Launch Payload: \(remoteNotification)")
+            
+            self.notificationType = remoteNotification["type"] as? String ?? ""
+            self.userId = Int(remoteNotification["sender_id"] as? String ?? "0") ?? 0
+            self.roomId = Int(remoteNotification["item_offer_id"] as? String ?? "0") ?? 0
+            self.itemId = Int(remoteNotification["item_id"] as? String ?? "0") ?? 0
+            
+            if self.userId == 0 {
+                self.userId = Int(remoteNotification["user_id"] as? String ?? "0") ?? 0
+            }
+            if self.userId == 0 {
+                self.userId = Int(remoteNotification["seller_id"] as? String ?? "0") ?? 0
+            }
+            
+            Constant.shared.isLaunchFirstTime = 1
+        }
         
         return true
     }
     
+    
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return .portrait
+    }
+
     
     //MARK: Other helpfule Methods
     fileprivate func setupKingfisherSettings() {
@@ -381,8 +384,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         case "payment":
             
            do {
-                
-                let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController)) 
+                let hostingController = UIHostingController(rootView: TransactionHistoryView(navigation:self.navigationController))
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }

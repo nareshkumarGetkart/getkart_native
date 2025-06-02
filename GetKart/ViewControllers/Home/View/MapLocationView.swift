@@ -26,7 +26,10 @@ struct MapLocationView: View {
                         Button {
                             navController?.popViewController(animated: true)
                         } label: {
-                            Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                            Image("arrow_left").renderingMode(.template)
+                                .foregroundColor(Color(UIColor.label))
+                                .contentShape(Rectangle()).frame(width:44, height: 44)
+                                .background(Color.white.opacity(0.001))
                             
                         }.frame(width:44, height: 44).padding(.leading,10)
                         

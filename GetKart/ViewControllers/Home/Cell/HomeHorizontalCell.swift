@@ -78,6 +78,23 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
+        
+         let height = collectionView.bounds.height
+             let widthCell: CGFloat
+
+             if cellTypes == .categories {
+                 widthCell = collectionView.bounds.size.width / 3.0 - 35
+                 return CGSize(width: widthCell, height: height)
+             } else {
+                 widthCell = istoIncreaseWidth
+                     ? (collectionView.bounds.size.width / 2.0 + 20.0)
+                     : (collectionView.bounds.size.width / 2.0 - 2.5)
+                 return CGSize(width: widthCell, height: height)
+             }
+         
+
+        /*
+        //Existing code
         if cellTypes == .categories{
             return CGSize(width: self.collctnView.bounds.size.width/3.0 - 35, height: 130)
         }else{
@@ -85,9 +102,10 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             let widthCell = (istoIncreaseWidth) ? (self.collctnView.bounds.size.width/2.0 + 20.0) : (self.collctnView.bounds.size.width/2.0 - 2.5)
 
             return CGSize(width: widthCell , height: 260)
-        }
+        }*/
     }
     
+   
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if cellTypes == .categories{

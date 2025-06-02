@@ -95,6 +95,9 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             return CGSize(width: widthCell , height: 260)
         }
     }
+    
+    
+   
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if cellTypes == .categories{
