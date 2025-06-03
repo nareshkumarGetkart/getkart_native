@@ -30,20 +30,20 @@ struct DeleteAccountView: View {
                 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack{
-                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(.black)
-                        Text("Your ads and transactions history will be deleted.").font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(Color(UIColor.label))
+                        Text("Your ads and transactions history will be deleted.").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                     }
                     HStack{
-                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(.black)
-                        Text("Account details can’t be recovered.").font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(Color(UIColor.label))
+                        Text("Account details can’t be recovered.").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                     }
                     HStack{
-                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(.black)
-                        Text("Subscriptions will be cancelled.").font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(Color(UIColor.label))
+                        Text("Subscriptions will be cancelled.").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                     }
                     HStack{
-                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(.black)
-                        Text("Saved preferences and messages will be lost.").font(Font.manrope(.regular, size: 15)).foregroundColor(.black)
+                        Text("\u{2022}").font(Font.manrope(.extraBold, size: 16)).foregroundColor(Color(UIColor.label))
+                        Text("Saved preferences and messages will be lost.").font(Font.manrope(.regular, size: 15)).foregroundColor(Color(UIColor.label))
                     }
                 }
                 .font(.body)
@@ -57,7 +57,7 @@ struct DeleteAccountView: View {
                         
                     }) {
                         Text("No").font(Font.manrope(.regular, size: 16))
-                            .foregroundColor(.black).padding()
+                            .foregroundColor(Color(UIColor.label)).padding()
                             .frame(maxWidth: .infinity,idealHeight:40,maxHeight:40)
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
@@ -80,7 +80,7 @@ struct DeleteAccountView: View {
                 .padding(.horizontal)
             }
             .padding()
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(15)
             .padding(.horizontal, 20)
         }

@@ -124,7 +124,8 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 
                 cell.btnLike.tag = indexPath.item
                 cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
-                
+                cell.btnLike.backgroundColor = .systemBackground
+
                 
                 let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
                 

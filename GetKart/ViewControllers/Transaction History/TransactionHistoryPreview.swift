@@ -31,6 +31,7 @@ struct TransactionHistoryPreview: View {
                         Text("Payment successful")
                             .font(.title2)
                             .bold()
+                            .foregroundColor(Color(UIColor.label))
                         
                         Text("Successfully paid \(Local.shared.currencySymbol) \( (transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
                             .foregroundColor(.gray)
@@ -61,7 +62,7 @@ struct TransactionHistoryPreview: View {
                 }
                 .padding(.vertical)
                 .padding()
-                .background(Color.white)
+                .background(Color(UIColor.systemBackground))
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
             }
@@ -93,8 +94,11 @@ struct TransactionHistoryPreview: View {
                             AlertView.sharedManager.showToast(message: "Copied successfully")
                         }
                 }
-                Text(value).multilineTextAlignment(.trailing)
+                Text(value)
+                    .multilineTextAlignment(.trailing)
                     .font(Font.manrope(.semiBold, size: 16.0))
+                    .foregroundColor(Color(UIColor.label))
+                
             }
         }
     }
@@ -147,12 +151,12 @@ private func navigationHeader() -> some View {
         }) {
             Image("arrow_left")
                 .renderingMode(.template)
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
                 .padding()
         }
         Text("Transaction History")
             .font(.custom("Manrope-Bold", size: 20.0))
-            .foregroundColor(.black)
+            .foregroundColor(Color(UIColor.label))
         Spacer()
     }
     .frame(height: 44)
@@ -207,7 +211,7 @@ private func detailsCard() -> some View {
         }
     }
     .padding()
-    .background(Color.white)
+    .background(Color(UIColor.systemBackground))
     .cornerRadius(16)
     .overlay(
         RoundedRectangle(cornerRadius: 16)

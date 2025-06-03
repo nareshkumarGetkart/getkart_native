@@ -59,11 +59,12 @@ struct MyLocationView: View {
                         .frame(width: (UIScreen.main.bounds.size.width - 60),height: 50)
                         .padding([.leading,.trailing],10)
                 }.foregroundColor(.orange)
-                    .background(.white)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.orange, lineWidth: 1)
-                    )
+                    ).clipped()
             }.padding(.top ,30)
             
             Spacer()

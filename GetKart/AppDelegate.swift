@@ -37,10 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.overrideUserInterfaceStyle = .light
+       // self.window?.overrideUserInterfaceStyle = .light
+        applyTheme()
+
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
-        
         
         self.setupKingfisherSettings()
         self.getSettingsApi()
@@ -191,6 +192,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     }
     
+    
+    
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
         print(" UIApplication, continue userActivity")
         
@@ -265,6 +268,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.noInternet.rawValue), object: nil , userInfo: nil)
         }
     }
+    
+    func applyTheme() {
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.light.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .light
+
+        switch theme {
+        case .light:
+            window?.overrideUserInterfaceStyle = .light
+        case .dark:
+            window?.overrideUserInterfaceStyle = .dark
+        case .system:
+            window?.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
 }
 
 

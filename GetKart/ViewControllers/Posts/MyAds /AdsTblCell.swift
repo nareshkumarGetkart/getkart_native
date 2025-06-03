@@ -19,6 +19,8 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var btnAdPost:UIButton!
     @IBOutlet weak var lblBoost:UILabel!
 
+    @IBOutlet weak var imgVwIconSeen:UIImageView!
+    @IBOutlet weak var imgVwIconLike:UIImageView!
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -26,6 +28,9 @@ class AdsTblCell: UITableViewCell {
         btnAdStatus.layer.cornerRadius = btnAdStatus.frame.height/2.0
         btnAdStatus.clipsToBounds = true
         
+        imgVwIconSeen.setImageTintColor(color: .label)
+        imgVwIconLike.setImageTintColor(color: .label)
+
         lblBoost.layer.cornerRadius = 5.0
         lblBoost.clipsToBounds = true
         lblBoost.isHidden = true

@@ -36,16 +36,14 @@ class SIgnInWithEmailVC: UIViewController {
     
     @IBAction func continueBtnAction(_ sender : UIButton){
         self.view.endEditing(true)
-        txtFdEmail.layer.borderColor =  UIColor.black.cgColor
+        txtFdEmail.layer.borderColor =  UIColor.label.cgColor
 
         if txtFdEmail.text?.isValidEmail() == true {
             lblError.text = ""
-            
             sendEmailOtp()
         }else{
             lblError.text = "Please enter valid email id."
             txtFdEmail.layer.borderColor = UIColor.red.cgColor
-
         }
     }
     
@@ -103,7 +101,7 @@ extension SIgnInWithEmailVC:UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         lblError.text = ""
-        txtFdEmail.layer.borderColor =  UIColor.black.cgColor
+        txtFdEmail.layer.borderColor =  UIColor.label.cgColor
 
         // Current text in the text field
           let currentText = textField.text ?? ""

@@ -24,10 +24,10 @@ struct NotificationDetailView: View {
                     .padding()
             }
             Text("Notifications").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
             Spacer()
-        }.frame(height: 44).background(Color.white)
+        }.frame(height: 44).background(Color(UIColor.systemBackground))
        
 
         VStack(alignment: .leading){
@@ -49,7 +49,7 @@ struct NotificationDetailView: View {
             }
             
             VStack(alignment: .leading,spacing: 5){
-                Text("\(notification?.title ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(.black)
+                Text("\(notification?.title ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                 Text("\(notification?.message ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
             }.padding()
 

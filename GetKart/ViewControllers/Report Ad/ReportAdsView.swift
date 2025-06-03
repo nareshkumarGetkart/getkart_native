@@ -78,7 +78,7 @@ struct ReportAdsView: View {
                 .padding(.bottom, 1)
             } .edgesIgnoringSafeArea(.all)
                 .padding()
-                .background(Color.white)
+                .background(Color(UIColor.systemBackground))
                 .cornerRadius(20)
                 .shadow(radius: 10)
                 .padding(.horizontal, 20)

@@ -55,7 +55,7 @@ struct LogoutView: View {
                 .padding(.horizontal)
             }
             .padding()
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(15)
             .padding(.horizontal, 30)
         }

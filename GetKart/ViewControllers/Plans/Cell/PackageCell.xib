@@ -71,6 +71,7 @@
                                 <string key="text">Multiple Ads + Auto
 Boost Combo</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rxC-xb-hhi">
@@ -80,6 +81,7 @@ Boost Combo</string>
                                         <attributes>
                                             <color key="NSColor" red="0.43137254901960786" green="0.43137254901960786" blue="0.43137254901960786" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="Inter-Medium"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
                                 </attributedString>
@@ -103,6 +105,7 @@ Boost Combo</string>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="890.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5VJ-qA-yXQ">
                                         <rect key="frame" x="0.0" y="0.0" width="33.333333333333336" height="14.333333333333334"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="highlightedColor" systemColor="labelColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="890.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XdD-yX-Uog">
@@ -120,7 +123,7 @@ Boost Combo</string>
                                         <rect key="frame" x="5" y="5" width="30" height="30"/>
                                     </imageView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="AXa-nc-GAF" firstAttribute="top" secondItem="lX4-Kc-fv9" secondAttribute="top" constant="5" id="AcL-D1-GzY"/>
                                     <constraint firstItem="AXa-nc-GAF" firstAttribute="leading" secondItem="lX4-Kc-fv9" secondAttribute="leading" constant="5" id="MKU-x4-6aQ"/>

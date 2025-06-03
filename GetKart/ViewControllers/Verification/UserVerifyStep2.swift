@@ -114,7 +114,7 @@ struct VerificationOption: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.white))
+        .background(Color(.systemBackground))
         .cornerRadius(12)
     }
 }

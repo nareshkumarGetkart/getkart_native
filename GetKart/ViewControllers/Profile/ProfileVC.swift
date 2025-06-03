@@ -19,10 +19,10 @@ class ProfileVC: UIViewController {
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     
-    let iconArray =  ["","promoted","subscription","transaction","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
+    let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
@@ -225,10 +225,25 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             
             cell.lblTitle.text = titleArray[indexPath.row]
             cell.imgVwIcon.image = UIImage(named: iconArray[indexPath.row])
-            cell.imgVwIcon.setImageTintColor(color: .orange)
+            cell.imgVwIcon.setImageTintColor(color: Themes.sharedInstance.themeColor)
+            
+            let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+            let theme = AppTheme(rawValue: savedTheme) ?? .system
+            
+            if theme == .dark{
+                cell.bgviewIcon.backgroundColor = UIColor(hexString: "#342b1e")
+
+            }else{
+                cell.bgviewIcon.backgroundColor = UIColor(hexString: "#FFF7EA")
+            }            
+            
             if titleArray[indexPath.row] == "Dark Theme"{
                 cell.imgVwArrow.isHidden = true
                 cell.btnSwitch.isHidden = false
+                cell.btnSwitch.addTarget(self, action: #selector(didTapSwitch(_:)), for: .touchUpInside)
+              
+                
+                cell.btnSwitch.isOn = (theme == .dark) ? true : false
                 
             }else{
                 cell.imgVwArrow.isHidden = false
@@ -362,6 +377,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
+ 
+    
     @objc func statusTapped(){
         
         if verifiSttaus.lowercased() == "rejected"{
@@ -394,6 +411,23 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     */
     
+    @objc func didTapSwitch(_ sender: UISwitch) {
+        print("Switch tapped at tag:", sender.tag)
+        // Or identify the indexPath and update model
+        if sender.isOn{
+            updateAppTheme(to: .dark)
+        }else{
+            updateAppTheme(to: .light)
+        }
+    }
+    
+    
+    func updateAppTheme(to theme: AppTheme) {
+        UserDefaults.standard.set(theme.rawValue, forKey: LocalKeys.appTheme.rawValue)
+        // Apply it immediately
+        AppDelegate.sharedInstance.applyTheme()
+        self.tblView.reloadData()
+    }
     func rateApp() {
         if #available(iOS 10.3, *) {
             SKStoreReviewController.requestReview()
@@ -457,3 +491,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
 
 
 
+
+enum AppTheme: String {
+    case system
+    case light
+    case dark
+}

@@ -166,11 +166,11 @@ struct SearchWithSortView: View {
                     
                     HStack {
                         
-                        Image("filter").renderingMode(.template).foregroundColor(.black)
+                        Image("filter").renderingMode(.template).foregroundColor(Color(UIColor.label))
                         Text("Filter")
                     }
                     .frame(maxWidth: .infinity)
-                }.tint(.black)
+                }.tint((Color(UIColor.label)))
                 
                 
                 
@@ -179,14 +179,14 @@ struct SearchWithSortView: View {
                     showSortSheet.toggle()
                 } label: {
                     HStack {
-                        Image("sort_by")
+                        Image("sort_by").renderingMode(.template).foregroundColor(Color(UIColor.label))
                         Text("Sort by")
                     }
                     
                     .frame(maxWidth: .infinity)
-                }.tint(.black)
+                }.tint((Color(UIColor.label)))
             }.frame(height: 50)
-                .background(Color.white.shadow(radius: 2))
+                .background(Color(UIColor.systemBackground).shadow(radius: 2))
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
             .sheet(isPresented: $showSortSheet) {

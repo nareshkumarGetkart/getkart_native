@@ -26,7 +26,7 @@ struct ContactUsView: View {
                    .padding()
                 
             }
-            Text("Contact us").foregroundColor(.black).font(Font.manrope(.semiBold, size: 17))
+            Text("Contact us").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 17))
             Spacer()
         }.frame(height: 44).background(Color(UIColor.systemBackground))
         
@@ -96,7 +96,7 @@ struct ContactOptionView: View {
                 }
               
                 Text(title)
-                    .font(.headline).foregroundColor(.black).padding(.leading,10)
+                    .font(.headline).foregroundColor(Color(UIColor.label)).padding(.leading,10)
                 
                 Spacer()
                 
@@ -125,14 +125,14 @@ struct EmailSupportView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
             }
             .padding()
                             
             Text("Send Email").font(Font.manrope(.medium, size: 15))
                 .font(.headline)
             Spacer()
-        }.frame(height:44).background(.white)
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
       //  VStack {
             ScrollView{
@@ -146,7 +146,7 @@ struct EmailSupportView: View {
                     .cornerRadius(10).overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.3))).padding(.horizontal,10)
                 
                 Text(Local.shared.companyEmail).font(Font.manrope(.regular, size: 16))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                     .tint(.black)
                     .padding()
                     .multilineTextAlignment(.leading).frame(maxWidth: .infinity, alignment: .leading)
@@ -185,7 +185,7 @@ struct EmailSupportView: View {
                 }) {
                     Text("Send Email").font(Font.manrope(.medium, size: 16))
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(UIColor.label))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .background(Color.orange)
@@ -194,7 +194,7 @@ struct EmailSupportView: View {
                 
                 HStack{Spacer()}.frame(height: 20)
                 
-            }.background(.white)
+            }.background(Color(UIColor.systemBackground))
                .cornerRadius(10).padding(8)
             
             Spacer()

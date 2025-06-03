@@ -104,7 +104,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             
             let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
             cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
-            
+            cell.btnLike.backgroundColor = .systemBackground
             let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
             
             cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"), options: [

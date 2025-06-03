@@ -15,32 +15,32 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="RadioTVCell" rowHeight="94" id="KGk-i7-Jjw" customClass="RadioTVCell" customModule="GetKart" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="94"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="RadioTVCell" rowHeight="90" id="KGk-i7-Jjw" customClass="RadioTVCell" customModule="GetKart" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="90"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="94"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="90"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4s2-uw-Abf">
-                        <rect key="frame" x="10" y="10" width="40" height="40"/>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4s2-uw-Abf">
+                        <rect key="frame" x="10" y="10" width="30" height="30"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QVP-ky-7CY">
-                                <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                <rect key="frame" x="5" y="5" width="20" height="20"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.97983151670000002" green="0.9539293647" blue="0.90587490800000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="40" id="35u-Fj-5Bc"/>
-                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" constant="10" id="51M-RZ-zhj"/>
-                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="10" id="99Y-Ud-RRp"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" constant="10" id="LNK-h8-iiw"/>
-                            <constraint firstAttribute="height" constant="40" id="Ras-d3-t9S"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" constant="10" id="hHn-5b-u94"/>
+                            <constraint firstAttribute="width" constant="30" id="35u-Fj-5Bc"/>
+                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="5" id="4zD-jO-RzT"/>
+                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" constant="5" id="LTv-Hj-2TD"/>
+                            <constraint firstAttribute="height" constant="30" id="Ras-d3-t9S"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" constant="5" id="TCb-V8-P1r"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" constant="5" id="TxE-mb-GjF"/>
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T50-ep-Z9X">
-                        <rect key="frame" x="60" y="15" width="250" height="30"/>
+                        <rect key="frame" x="50" y="10" width="260" height="30"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="30" id="CQ1-Op-b5T"/>
                         </constraints>
@@ -49,7 +49,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h9q-cg-JlC" customClass="DynamicHeightCollectionView" customModule="GetKart" customModuleProvider="target">
-                        <rect key="frame" x="10" y="60" width="300" height="24"/>
+                        <rect key="frame" x="10" y="50" width="300" height="30"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" priority="999" constant="1" id="TzG-Oa-JBJ"/>
@@ -61,7 +61,7 @@
                         </connections>
                     </collectionView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="i9U-wr-ajG">
-                        <rect key="frame" x="10" y="89" width="300" height="0.0"/>
+                        <rect key="frame" x="10" y="85" width="300" height="0.0"/>
                         <subviews>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Selecting this is required." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kf2-1T-FJN">
                                 <rect key="frame" x="0.0" y="0.0" width="163" height="20.333333333333332"/>
@@ -97,6 +97,7 @@
                 <outlet property="clnCollectionView" destination="h9q-cg-JlC" id="KdR-CZ-64d"/>
                 <outlet property="clnHeight" destination="TzG-Oa-JBJ" id="RNQ-FF-WaQ"/>
                 <outlet property="imgImage" destination="QVP-ky-7CY" id="tTd-vV-sDG"/>
+                <outlet property="imgViewBg" destination="4s2-uw-Abf" id="vad-67-Mij"/>
                 <outlet property="lblErrorMsg" destination="kf2-1T-FJN" id="ZiE-Hh-gcU"/>
                 <outlet property="lblTitle" destination="T50-ep-Z9X" id="xYu-hX-bbb"/>
             </connections>

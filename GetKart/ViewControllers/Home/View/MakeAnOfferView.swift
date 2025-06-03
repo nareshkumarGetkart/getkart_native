@@ -41,7 +41,7 @@ struct MakeAnOfferView: View {
                 TextField("Your Offer", text: $offer) .multilineTextAlignment(.center)
                     .padding()
                     .frame(height: 45)
-                    .background(Color(.systemGray6))
+                    .background(Color(.systemGray5))
                     .cornerRadius(8)
                     .keyboardType(.numberPad)
                     .padding(.horizontal)
@@ -101,7 +101,7 @@ struct MakeAnOfferView: View {
             }
             .padding()
             .frame(width: 300)
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
             .cornerRadius(15)
             .shadow(radius: 10)
             .transition(.scale)

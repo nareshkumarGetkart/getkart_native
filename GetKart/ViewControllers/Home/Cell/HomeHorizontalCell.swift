@@ -150,7 +150,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
                     cell.btnLike.tag = indexPath.item
                     cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
-                    
+                    cell.btnLike.backgroundColor = .systemBackground
                     cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
 
                     

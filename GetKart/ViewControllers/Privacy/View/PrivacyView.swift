@@ -199,13 +199,13 @@ struct PrivacyView: View {
 
                 Text(title)
                     .font(.custom("Manrope-Bold", size: 20))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
 
                 Spacer()
             }
             .frame(height: 44)
             .padding(.horizontal)
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
 
             // WebView content
             if let html = htmlString {
@@ -265,6 +265,10 @@ struct PrivacyView: View {
     // MARK: - HTML Wrapper
 
     func wrapHtmlContent(_ body: String) -> String {
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.light.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .light
+        let isDark = (theme == .dark)
+
         let metaTag = """
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         """
@@ -273,7 +277,9 @@ struct PrivacyView: View {
             body {
                 font-family: -apple-system, HelveticaNeue, sans-serif;
                 font-size: 17px;
-                color: #000000;
+               # color: #000000;
+         color: \(isDark ? "#ffffff" : "#000000");
+        background-color: \(isDark ? "#000000" : "#ffffff");
                 padding: 10px;
             }
         </style>
@@ -331,5 +337,6 @@ struct WebViewHTML: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         uiView.loadHTMLString(htmlContent, baseURL: nil)
+        
     }
 }

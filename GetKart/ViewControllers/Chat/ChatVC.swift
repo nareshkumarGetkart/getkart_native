@@ -13,6 +13,9 @@ import Photos
 
 class ChatVC: UIViewController {
     
+    @IBOutlet weak var imgViewBackground:UIImageView!
+
+    
     @IBOutlet weak var bgViewAudioRecord: UIView!
     @IBOutlet weak var btnAudioRecordStarted: UIButton!
     @IBOutlet weak var btnImgMicBlink: UIButton!
@@ -206,6 +209,13 @@ class ChatVC: UIViewController {
     //MARK: UIButton Action Methods
     @IBAction func backButtonAction(sender : UIButton){
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @IBAction func userProfileBtnAction(sender : UIButton){
+        /*
+        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userId))
+        self.navigationController?.pushViewController(hostingController, animated: true)
+        */
     }
     
     

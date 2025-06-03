@@ -53,7 +53,7 @@ struct TransactionHistoryView: View {
                     VStack(spacing: 15) {
                         ForEach(transactions, id:\.id) { transaction in
                             
-                            TransactionRow(transaction: transaction).background(Color.white)
+                            TransactionRow(transaction: transaction).background((Color(UIColor.systemBackground)))
                                 .cornerRadius(10)
                                 .shadow(radius: 2)
                                 .onAppear{
@@ -157,11 +157,11 @@ struct TransactionRow: View {
                 
                 Text(transaction.package?.name ?? "")
                     .font(Font.manrope(.medium, size: 16))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 
                 Text("Purchased from \(transaction.paymentTransaction?.paymentGateway?.capitalized ?? "")" )
                     .font(Font.manrope(.regular, size: 16))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
 
                 Button(action: {
                     UIPasteboard.general.string = transaction.paymentTransaction?.orderID
@@ -169,13 +169,15 @@ struct TransactionRow: View {
 
                 }) {
                     Text("Transaction ID").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
-                    Image("ic_baseline-content-copy").frame(width: 10, height: 10, alignment: .center)
+                    Image("ic_baseline-content-copy")
+                        .renderingMode(.template)
+                        .frame(width: 10, height: 10, alignment: .center)
                         .foregroundColor(.gray).padding(.leading,10)
                 }
                 
                 Text(transaction.paymentTransaction?.orderID ?? "")
                     .font(Font.manrope(.regular, size: 13))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                 
             }.padding(5)
             Spacer()
@@ -186,7 +188,7 @@ struct TransactionRow: View {
                 
                 Text("\(Local.shared.currencySymbol) \((transaction.paymentTransaction?.amount ?? 0.0).formatNumber())")
                     .font(.headline)
-                    .foregroundColor(.black).padding(.trailing,10)
+                    .foregroundColor(Color(UIColor.label)).padding(.trailing,10)
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""
                
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
@@ -212,7 +214,7 @@ struct TransactionRow: View {
             }
         }
         .padding([.top,.bottom,.horizontal],10)
-        .background(Color.white).cornerRadius(10)
+        .background(Color(UIColor.systemBackground)).cornerRadius(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 0.1)

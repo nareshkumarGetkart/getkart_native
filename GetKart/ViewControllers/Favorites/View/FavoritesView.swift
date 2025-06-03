@@ -93,6 +93,14 @@ struct FavoritesCell:View {
         HStack{
                 
                 ZStack{
+                    
+                    Rectangle()
+                           .fill(Color.gray.opacity(0.3))
+                           .frame(width: 110, height: widthScreen / 2.0 - 15)
+                           .cornerRadius(10, corners: [.topRight, .bottomRight])
+                          // .clipped()
+
+                    
                    // if  let img = itemObj.image {
                     KFImage(URL(string: itemObj.image ?? ""))
                         .placeholder {
@@ -110,13 +118,14 @@ struct FavoritesCell:View {
                             DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
                                                                     height: widthScreen / 2.0 - 15))
                         )
-                        .resizable()
+                       .resizable()
+                       .aspectRatio(contentMode: .fit)
                         .frame(width: 110)
                         .padding(.vertical,0)
-                        .aspectRatio(contentMode: .fit)
-                        .background(Color.gray.opacity(0.3))
+                       // .background(Color.gray.opacity(0.3))
                         .cornerRadius(10, corners: [.topRight, .bottomRight])
                         .frame(maxHeight: .infinity)
+                        .clipped()
                     
                     if (itemObj.isFeature ?? false) == true {
                         VStack(alignment:.leading){
@@ -253,7 +262,7 @@ struct HeaderView: View {
                     .padding()
             }
             Text("Favorites").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
             Spacer()
         }

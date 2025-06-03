@@ -20,19 +20,19 @@ struct LoginRequiredView: View {
                 VStack(alignment: .leading,spacing: 10){
                     HStack{
                         VStack(alignment: .leading,spacing: 5){
-                            Text("Login is required to access").font(Font.manrope(.medium, size: 17)).foregroundColor(.black)
-                            Text("Tap on login to authorize").font(Font.manrope(.regular, size: 14)).foregroundColor(.black).padding(.bottom,10)
+                            Text("Login is required to access").font(Font.manrope(.medium, size: 17)).foregroundColor(Color(UIColor.label))
+                            Text("Tap on login to authorize").font(Font.manrope(.regular, size: 14)).foregroundColor(Color(UIColor.label)).padding(.bottom,10)
                             
                             Button {
                                 loginCallback()
                                 presentationMode.wrappedValue.dismiss()
                             } label: {
-                                Text("Login now").font(Font.manrope(.medium, size: 16)).foregroundColor(.white)
+                                Text("Login now").font(Font.manrope(.medium, size: 16)).foregroundColor(Color.white)
                             }.frame(width:130, height: 40).background(.orange).cornerRadius(4)
                         }.padding()
                         Spacer()
                     }.padding(.top,10)
-                }.background(Color.white).frame(height: 180)
+                }.background(Color(UIColor.systemBackground)).frame(height: 180)
                 
              .background(.clear).onTapGesture {
                 presentationMode.wrappedValue.dismiss()

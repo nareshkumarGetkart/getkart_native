@@ -136,14 +136,28 @@
                                             </label>
                                         </subviews>
                                     </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EjX-LZ-Riy">
+                                        <rect key="frame" x="62.666666666666657" y="38" width="50" height="50"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="8c5-j8-pev"/>
+                                            <constraint firstAttribute="width" constant="50" id="CZb-VA-rfw"/>
+                                        </constraints>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="userProfileBtnActionWithSender:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="92N-ua-DzT"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="VIk-Je-M1R" secondAttribute="trailing" constant="10" id="2gK-uK-qSk"/>
                                     <constraint firstAttribute="bottom" secondItem="gTV-yq-Tqh" secondAttribute="bottom" constant="5" id="8UG-4X-VaD"/>
+                                    <constraint firstItem="EjX-LZ-Riy" firstAttribute="centerX" secondItem="DWg-6U-3G1" secondAttribute="centerX" id="D1O-le-Z6O"/>
                                     <constraint firstItem="VIk-Je-M1R" firstAttribute="leading" secondItem="jvP-sp-hGi" secondAttribute="trailing" constant="5" id="JZg-TE-yiR"/>
                                     <constraint firstItem="DWg-6U-3G1" firstAttribute="centerY" secondItem="gTV-yq-Tqh" secondAttribute="centerY" id="S4e-Sg-ekc"/>
                                     <constraint firstItem="jvP-sp-hGi" firstAttribute="centerY" secondItem="DWg-6U-3G1" secondAttribute="centerY" id="UF3-wb-lJC"/>
+                                    <constraint firstItem="EjX-LZ-Riy" firstAttribute="centerY" secondItem="DWg-6U-3G1" secondAttribute="centerY" id="aGT-7V-3dv"/>
                                     <constraint firstAttribute="height" constant="88" id="cDc-Jy-N0b"/>
                                     <constraint firstItem="DWg-6U-3G1" firstAttribute="leading" secondItem="gTV-yq-Tqh" secondAttribute="trailing" constant="15" id="gSJ-45-GaX"/>
                                     <constraint firstAttribute="bottom" secondItem="VIk-Je-M1R" secondAttribute="bottom" constant="5" id="iz7-VT-8XK"/>
@@ -380,6 +394,7 @@
                         <outlet property="btnSend" destination="MdW-Za-lZx" id="stI-Kl-BFU"/>
                         <outlet property="btnThreeDots" destination="VIk-Je-M1R" id="r5w-a3-yzG"/>
                         <outlet property="cnstrntHtNavBar" destination="cDc-Jy-N0b" id="Nqn-kr-RbI"/>
+                        <outlet property="imgViewBackground" destination="LiT-9T-mg8" id="SlV-G8-lwR"/>
                         <outlet property="imgViewProduct" destination="nUP-eU-Add" id="wbj-lC-3UR"/>
                         <outlet property="imgViewProfile" destination="DWg-6U-3G1" id="Dng-5Y-OsI"/>
                         <outlet property="imgVwVerified" destination="tPf-2t-KNA" id="mSW-Ml-YcT"/>
@@ -666,7 +681,7 @@
                                     <action selector="showPackageButtonAction:" destination="uBL-L3-u8h" eventType="touchUpInside" id="veR-Zl-592"/>
                                 </connections>
                             </button>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="df3-Yz-UgR">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="df3-Yz-UgR">
                                 <rect key="frame" x="0.0" y="91" width="393" height="670"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <view key="tableHeaderView" contentMode="scaleToFill" id="x0y-rw-Lkp">
@@ -684,6 +699,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="The package you choose will only be valid for the selected category and location." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SHU-Kt-AIS">
                                                     <rect key="frame" x="42" y="10" width="321" height="50"/>
                                                     <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="12"/>
+                                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="highlightedColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </label>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="about_us" translatesAutoresizingMaskIntoConstraints="NO" id="mRA-HO-YsL">
@@ -736,16 +752,17 @@
                             <constraint firstItem="fZc-TJ-gVt" firstAttribute="trailing" secondItem="u1W-nl-Pe3" secondAttribute="trailing" id="2lg-tq-5IS"/>
                             <constraint firstItem="u1W-nl-Pe3" firstAttribute="leading" secondItem="fZc-TJ-gVt" secondAttribute="leading" id="3xY-VJ-nzn"/>
                             <constraint firstItem="fZc-TJ-gVt" firstAttribute="trailing" secondItem="noB-XB-q0u" secondAttribute="trailing" constant="30" id="5Qo-yI-e5u"/>
-                            <constraint firstItem="df3-Yz-UgR" firstAttribute="top" secondItem="u1W-nl-Pe3" secondAttribute="bottom" id="7kp-Qn-gNF"/>
+                            <constraint firstItem="df3-Yz-UgR" firstAttribute="top" secondItem="u1W-nl-Pe3" secondAttribute="bottom" constant="3" id="7kp-Qn-gNF"/>
                             <constraint firstItem="df3-Yz-UgR" firstAttribute="trailing" secondItem="fZc-TJ-gVt" secondAttribute="trailing" id="Li0-f7-TCA"/>
                             <constraint firstItem="noB-XB-q0u" firstAttribute="leading" secondItem="fZc-TJ-gVt" secondAttribute="leading" constant="30" id="Rjg-rr-Nf4"/>
                             <constraint firstItem="fZc-TJ-gVt" firstAttribute="bottom" secondItem="noB-XB-q0u" secondAttribute="bottom" constant="10" id="SZg-x9-cyq"/>
                             <constraint firstItem="u1W-nl-Pe3" firstAttribute="top" secondItem="v8t-m2-94s" secondAttribute="top" id="SoQ-xn-qvd"/>
                             <constraint firstItem="df3-Yz-UgR" firstAttribute="leading" secondItem="fZc-TJ-gVt" secondAttribute="leading" id="dqs-3F-0s8"/>
-                            <constraint firstItem="noB-XB-q0u" firstAttribute="top" secondItem="df3-Yz-UgR" secondAttribute="bottom" id="gFY-sv-jiA"/>
+                            <constraint firstItem="noB-XB-q0u" firstAttribute="top" secondItem="df3-Yz-UgR" secondAttribute="bottom" constant="-3" id="gFY-sv-jiA"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bgViewDesc" destination="RLy-Hc-X9Y" id="BF0-3b-xha"/>
                         <outlet property="btnBack" destination="YJs-5H-8KH" id="B8X-bK-xwk"/>
                         <outlet property="btnShowPackage" destination="noB-XB-q0u" id="8it-fI-sZI"/>
                         <outlet property="cnstrntHtNavBar" destination="0fP-ke-a8x" id="zRe-44-r79"/>
@@ -1095,7 +1112,7 @@
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="UYV-g5-0N5"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="LOv-pP-5pe" firstAttribute="leading" secondItem="UYV-g5-0N5" secondAttribute="leading" constant="20" id="0bV-gH-gJd"/>
                             <constraint firstItem="UYV-g5-0N5" firstAttribute="trailing" secondItem="LOv-pP-5pe" secondAttribute="trailing" constant="20" id="8MT-Ja-R7H"/>
@@ -1136,25 +1153,25 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

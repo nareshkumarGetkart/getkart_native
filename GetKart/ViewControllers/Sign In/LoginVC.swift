@@ -26,6 +26,12 @@ class LoginVC: UIViewController {
     @IBOutlet weak var btnContinueLogin:UIButtonX!
     @IBOutlet weak var viewContent:UIView!
     
+    
+    @IBOutlet weak var btnContinueEmail:UIButtonX!
+    @IBOutlet weak var btnContinueGmail:UIButtonX!
+    @IBOutlet weak var btnContinueApple:UIButtonX!
+
+    
     private var countryCode = ""
     private var socialId:String = ""
     private var socialName:String = ""
@@ -39,6 +45,8 @@ class LoginVC: UIViewController {
         if self.navigationController?.viewControllers.count ?? 0 > 1 {
             self.navigationController?.viewControllers.remove(at: 0)
         }
+    
+
         
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
@@ -48,6 +56,12 @@ class LoginVC: UIViewController {
         self.fetChAndSetInitialCodeFromLocale()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        btnContinueEmail.layer.borderColor = UIColor.label.cgColor
+        btnContinueGmail.layer.borderColor = UIColor.label.cgColor
+        btnContinueApple.layer.borderColor = UIColor.label.cgColor
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)

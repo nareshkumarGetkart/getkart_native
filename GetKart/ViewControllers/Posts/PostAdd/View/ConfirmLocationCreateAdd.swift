@@ -37,9 +37,9 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
             
             Text("Confirm Location")
                 .font(Font.manrope(.bold, size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-        }.frame(height:44).background(Color.white)
+        }.frame(height:44).background(Color(UIColor.systemBackground))
             .onAppear{
                 if isfirst{
                     isfirst = false
@@ -76,7 +76,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
             }) {
                 Text("Somewhere else")
                     .font(.system(size: 16))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color(.systemGray6))

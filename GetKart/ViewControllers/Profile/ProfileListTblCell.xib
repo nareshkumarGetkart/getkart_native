@@ -123,6 +123,7 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bgview" destination="HbY-lZ-ptQ" id="toZ-Dr-k3s"/>
+                <outlet property="bgviewIcon" destination="acx-uD-rlv" id="uqy-In-83X"/>
                 <outlet property="btnSwitch" destination="jP0-7V-0XR" id="K8j-W7-Cba"/>
                 <outlet property="imgVwArrow" destination="cFK-LM-llX" id="WfP-Yq-FNo"/>
                 <outlet property="imgVwIcon" destination="w39-7D-eeE" id="wEX-nk-Vh9"/>
@@ -138,10 +139,10 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

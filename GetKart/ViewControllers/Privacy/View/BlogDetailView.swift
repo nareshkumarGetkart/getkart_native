@@ -26,9 +26,9 @@ struct BlogDetailView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
             Text(title).font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             Spacer()
-        }.frame(height:44).background()
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
             ScrollView{
                
@@ -49,8 +49,7 @@ struct BlogDetailView: View {
                 }
                 if (obj?.title ?? "").count > 0{
                     
-                    Text(obj?.title ?? "").font(.manrope(.medium, size: 18)).padding([.leading,.trailing]).padding(.top,10)
-                    
+                    Text(obj?.title ?? "").multilineTextAlignment(.leading).font(.manrope(.medium, size: 18)).padding([.leading,.trailing],8).padding(.top,10)
                 }
                 
                 let metaTag = """
@@ -60,10 +59,12 @@ struct BlogDetailView: View {
                 if (obj?.description ?? "").contains("<head>") {
                     let txt = ((obj?.description ?? "").replacingOccurrences(of: "<head>", with: "<head>\(metaTag)"))
                     
-                    Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom)
+                    let cleanedHTML = stripColorStyles(from: txt)
+
+                    Text(convertHtmlToAttributedString(cleanedHTML)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom).foregroundColor(Color(UIColor.label))
                 } else {
                     let txt   = ("<html><head>\(metaTag)</head><body>\(obj?.description ?? "")</body></html>")
-                    Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom)
+                    Text(convertHtmlToAttributedString(txt)).font(.manrope(.regular, size: 17)).padding([.leading,.trailing,.top],8).padding(.bottom).foregroundColor(Color(UIColor.label))
                 }
             }.background(Color(UIColor.systemGroupedBackground))
             
@@ -76,7 +77,7 @@ struct BlogDetailView: View {
     func convertHtmlToAttributedString(_ txtHtml: String) -> AttributedString {
         guard let data = txtHtml.data(using: .utf8) else { return AttributedString("Failed to load") }
 
-        // Convert HTML to NSAttributedString
+    /*    // Convert HTML to NSAttributedString
         if let nsAttributedString = try? NSAttributedString(data: data,
                                                             options: [.documentType: NSAttributedString.DocumentType.html,
                                                                       .characterEncoding: String.Encoding.utf8.rawValue],
@@ -90,6 +91,33 @@ struct BlogDetailView: View {
             }
         }
         return AttributedString("Failed to convert HTML")
+        */
+        
+        
+        if let nsAttrStr = try? NSMutableAttributedString(
+            data: data,
+            options: [.documentType: NSAttributedString.DocumentType.html,
+                      .characterEncoding: String.Encoding.utf8.rawValue],
+            documentAttributes: nil
+        ) {
+            // Remove hardcoded text colors to support light/dark mode
+            nsAttrStr.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: nsAttrStr.length)) { _, range, _ in
+                nsAttrStr.removeAttribute(.foregroundColor, range: range)
+            }
+
+            // Convert to AttributedString
+            if var attrStr = try? AttributedString(nsAttrStr, including: \.uiKit) {
+                attrStr.font = .system(size: 15)
+                return attrStr
+            }
+        }
+
+        return AttributedString("Failed to convert HTML")
+    }
+    
+    func stripColorStyles(from html: String) -> String {
+        let pattern = "color\\s*:\\s*[^;\"']+;?"
+        return html.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
     }
    
 }

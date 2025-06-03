@@ -151,9 +151,9 @@ PODS:
   - RealmSwift (10.54.2):
     - Realm (= 10.54.2)
   - RecaptchaInterop (100.0.0)
-  - Socket.IO-Client-Swift (15.2.0):
-    - Starscream (~> 3.1)
-  - Starscream (3.1.1)
+  - Socket.IO-Client-Swift (16.1.1):
+    - Starscream (~> 4.0.8)
+  - Starscream (4.0.8)
   - SVGKit (3.0.0):
     - CocoaLumberjack (~> 3.0)
   - SwiftyGif (5.4.5)
@@ -173,7 +173,7 @@ DEPENDENCIES:
   - MMMaterialDesignSpinner
   - PhonePePayment
   - RealmSwift (~> 10)
-  - Socket.IO-Client-Swift (~> 15.2.0)
+  - Socket.IO-Client-Swift (~> 16.0)
   - SVGKit
   - SwiftyGif
 
@@ -261,11 +261,11 @@ SPEC CHECKSUMS:
   Realm: 16852517a207e98cc6acba9336b56c30d06d84ad
   RealmSwift: bca777b3904ee58a9b16036e1840012f03348060
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
-  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
+  Socket.IO-Client-Swift: 3614bea82ba005df1c2ff01154f4004993e05ad7
+  Starscream: 19b5533ddb925208db698f0ac508a100b884a1b9
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: eab243630f97ac022e359c88ce2778c5728e14af
+PODFILE CHECKSUM: 23519558d214863b837afe6e31d6773ac79478a0
 
 COCOAPODS: 1.16.2

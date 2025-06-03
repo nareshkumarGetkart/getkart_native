@@ -48,6 +48,10 @@ class CreateAddVC2: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tblView.reloadData()
+        tblView.performBatchUpdates(nil) { _ in
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        }
     }
     
     

@@ -22,11 +22,15 @@ struct SuccessVerifyStepView: View {
             Text("Thank you!")
                 .font(.largeTitle)
                 .bold()
+                .foregroundColor(Color(.label))
+
 
             Text("Your verification data has been submitted successfully. Expect verification within 24 hours")
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .foregroundColor(Color(.label))
+
 
             Spacer()
 
@@ -45,7 +49,7 @@ struct SuccessVerifyStepView: View {
         }
         .padding()
         .navigationBarHidden(true)
-        .background(Color(UIColor.white))
+        .background(Color(UIColor.systemBackground))
     }
 }
 

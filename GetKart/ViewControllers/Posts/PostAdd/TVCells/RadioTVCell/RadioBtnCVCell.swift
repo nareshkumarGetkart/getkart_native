@@ -13,5 +13,6 @@ class RadioBtnCVCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        backView.layer.borderColor = UIColor.label.cgColor
     }
 }

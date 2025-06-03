@@ -34,7 +34,21 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnLocation.layer.cornerRadius = 8.0
-        btnLocation.backgroundColor = .white
+        btnLocation.backgroundColor = .systemBackground
+        
+        btnLocation.setImageColor(color: .label)
+
+//        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+//        let theme = AppTheme(rawValue: savedTheme) ?? .system
+//        
+//        if theme == .dark{
+//
+//            btnLocation.backgroundColor = UIColor(hexString: "#342b1e")
+//
+//        }else{
+//            btnLocation.backgroundColor = UIColor(hexString: "#FFF7EA")
+//        }
+        
         btnLocation.clipsToBounds = true
         tblView.rowHeight = UITableView.automaticDimension
         tblView.estimatedRowHeight = 200

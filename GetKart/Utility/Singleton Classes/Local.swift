@@ -166,6 +166,7 @@ enum LocalKeys:String,CaseIterable{
     case timezone = "timezone"
     case latitude = "latitude"
     case longitude = "longitude"
+    case appTheme = "AppTheme"
 }
 
 

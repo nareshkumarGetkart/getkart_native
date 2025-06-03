@@ -387,6 +387,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 cell.rowValue = indexPath.row
                 
                 cell.configure(with: objCustomField)
+                cell.reloadCollectionView()
                 cell.selectionStyle = .none
                 return cell
                 
@@ -509,7 +510,6 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         }
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
-        
     }
 
     
@@ -570,7 +570,7 @@ extension FilterVC: TextFieldDoneDelegate, TextViewDoneDelegate{
 */
 extension FilterVC:RefreshScreen {
     func refreshScreen() {
-        print(self.objViewModel?.dataArray)
+       // print(self.objViewModel?.dataArray)
         self.dataArray.removeAll()
         
         //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
@@ -584,8 +584,13 @@ extension FilterVC:RefreshScreen {
                 self.dataArray.append(objCustomField)
             }
         }
-            
+        
         tblView.reloadData()
+        tblView.performBatchUpdates(nil) { _ in
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        }
+
         
     }
 }

@@ -141,9 +141,9 @@ class MyAdsVC: UIViewController {
         for index in 0..<filters.count{
             
             (self.view.viewWithTag(500 + index) as? UIButton)?.backgroundColor = .clear
-            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderColor = UIColor.black.cgColor
+            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderColor = UIColor.label.cgColor
             (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderWidth = 1.0
-            (self.view.viewWithTag(500 + index) as? UIButton)?.setTitleColor( UIColor.black, for: .normal)
+            (self.view.viewWithTag(500 + index) as? UIButton)?.setTitleColor( UIColor.label, for: .normal)
             (self.view.viewWithTag(500 + index) as? UIButton)?.clipsToBounds = true
         }
 

@@ -31,7 +31,7 @@
                                     <constraint firstAttribute="height" constant="20" id="rAw-fl-RYy"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="13"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$ 5000" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="none" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BgM-ty-iQP">
@@ -40,7 +40,7 @@
                                     <constraint firstAttribute="height" constant="20" id="nPx-0V-aAs"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="16"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>

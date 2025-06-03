@@ -15,6 +15,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
      @IBOutlet weak var btnShowPackage:UIButton!
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var lblDesc:UILabel!
+    @IBOutlet weak var bgViewDesc:UIView!
 
     
      let titleArray =  ["Category","Location"]
@@ -35,13 +36,21 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
      override func viewDidLoad() {
          super.viewDidLoad()
          btnBack.setImageColor(color: .label)
-         lblDesc.textColor = .label
          cnstrntHtNavBar.constant = self.getNavBarHt
          // Do any additional setup after loading the view.
          tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
          btnShowPackage.layer.cornerRadius = 7.0
          btnShowPackage.clipsToBounds = true
-         
+                  
+         let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+         let theme = AppTheme(rawValue: savedTheme) ?? .system
+         lblDesc.textColor = .label
+
+         if theme == .dark{
+             bgViewDesc.backgroundColor = UIColor(hexString: "#342b1e")
+         }else{
+             bgViewDesc.backgroundColor = UIColor(hexString: "#FEF6E9")
+         }
          
          NotificationCenter.default.addObserver(self,selector: #selector(handleLocationSelected(_:)),
                                                 name:NSNotification.Name(rawValue:NotiKeysLocSelected.buyPackageNewLocation.rawValue), object: nil)
@@ -190,6 +199,8 @@ extension CategoryPlanVC: UITableViewDelegate,UITableViewDataSource{
         cell.imgVwIcon.image = UIImage(named: iconArray[indexPath.row])
         cell.imgVwArrow.isHidden = false
         cell.btnSwitch.isHidden = true
+        
+       
         
         return cell
     }

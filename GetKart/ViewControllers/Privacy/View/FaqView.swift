@@ -46,6 +46,7 @@ struct FaqView: View {
                             HStack {
                                 Text(faqs[index].question ?? "")
                                     .fontWeight(.bold)
+                                    .foregroundColor(Color(UIColor.label))
                                     .contentShape(Rectangle())
                                     .padding()
 
@@ -58,15 +59,16 @@ struct FaqView: View {
                                     .animation(.easeInOut(duration: 0.2), value: expandedItems.contains(index)).padding()
                             }
                         }
-                        .buttonStyle(PlainButtonStyle()) // Removes button highlight
+                        .buttonStyle(PlainButtonStyle()).background(Color(UIColor.systemBackground)) // Removes button highlight
 
                         // Expandable Content
                         if expandedItems.contains(index) {
                             Text(faqs[index].answer ?? "")
                                 .font(.body)
+                                .foregroundColor(Color(UIColor.label))
                                .padding()
                         }
-                    }.background(Color.white).cornerRadius(1)
+                    }.background(Color(UIColor.systemBackground)).cornerRadius(1)
                         .overlay(
                             RoundedRectangle(cornerRadius: 1)
                                 .stroke(Color.white, lineWidth: 0.5)

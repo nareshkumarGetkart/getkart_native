@@ -29,7 +29,7 @@ struct PreviewURL: View {
                 Spacer()
             }
             .background(Color(UIColor.systemGray6))
-            .foregroundColor(.blue)
+            .foregroundColor(Color(UIColor.label))
 
             Divider()
 

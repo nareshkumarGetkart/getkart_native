@@ -19,10 +19,13 @@ class RadioTVCell: UITableViewCell {
     var objData:CustomField?
     var del:radioCellTappedDelegate?
     var rowValue:Int = 0
-    
+    @IBOutlet weak var imgViewBg:UIView!
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        imgViewBg.layer.cornerRadius = 5.0
+        imgViewBg.clipsToBounds = true
         
         clnCollectionView.register(UINib(nibName: "RadioBtnCVCell", bundle: .main), forCellWithReuseIdentifier: "RadioBtnCVCell")
         clnCollectionView.register(UINib(nibName: "CheckBoxCVCell", bundle: .main), forCellWithReuseIdentifier: "CheckBoxCVCell")
@@ -36,6 +39,13 @@ class RadioTVCell: UITableViewCell {
         
     }
 
+    
+    func reloadCollectionView(){
+        self.clnCollectionView.collectionViewLayout.invalidateLayout()
+        self.clnCollectionView.layoutIfNeeded()
+        self.clnCollectionView.reloadData()
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         self.clnCollectionView.collectionViewLayout.invalidateLayout()
@@ -95,13 +105,14 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
                 cell.backView.borderColor = UIColor.orange
             }else {
                 cell.imgSelect.image = UIImage.init(systemName: "plus")
-                cell.imgSelect.setImageTintColor(color: UIColor.black)
-                cell.btnValue.setTitleColor(.black, for: .normal)
-                cell.backView.borderColor = UIColor.black
+                cell.imgSelect.setImageTintColor(color: UIColor.label)
+                cell.btnValue.setTitleColor(.label, for: .normal)
+                cell.backView.borderColor = UIColor.label
             }
             
             return cell
         }else if objData?.type == .radio {
+            
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RadioBtnCVCell", for: indexPath) as! RadioBtnCVCell
             cell.btnValue.setTitle("", for: .normal)
             
@@ -113,8 +124,8 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
                 cell.btnValue.setTitleColor(.orange, for: .normal)
                 cell.backView.borderColor = UIColor.orange
             }else {
-                cell.btnValue.setTitleColor(.black, for: .normal)
-                cell.backView.borderColor = UIColor.black
+                cell.btnValue.setTitleColor(.label, for: .normal)
+                cell.backView.borderColor = UIColor.label
             }
             
             return cell

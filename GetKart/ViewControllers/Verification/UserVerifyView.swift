@@ -52,7 +52,7 @@ struct UserVerifyView: View {
                 
                 Text("It will only take 2 minutes")
                     .font(.body)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
                     .padding(.top, 5)
@@ -84,7 +84,7 @@ struct UserVerifyView: View {
                 }) {
                     Text("Skip for later")
                         .font(.body)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(UIColor.label))
                         .underline()
                 }
                 .padding(.top, 10)

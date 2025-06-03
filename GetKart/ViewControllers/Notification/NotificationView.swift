@@ -28,10 +28,10 @@ struct NotificationView: View {
                     .padding()
             }
             Text("Notifications").font(.custom("Manrope-Bold", size: 20.0))
-                .foregroundColor(.black)
+                .foregroundColor(Color(UIColor.label))
             
             Spacer()
-        }.frame(height: 44)
+        }.frame(height: 44).background(Color(UIColor.systemBackground))
         
         
         
@@ -141,7 +141,7 @@ struct NotificationRow: View {
                 Text(notification.title ?? "")
                     .font(.manrope(.medium, size: 16))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(UIColor.label))
 
                 Text(notification.message ?? "")
                     .font(.manrope(.regular, size: 15))
@@ -150,7 +150,7 @@ struct NotificationRow: View {
             Spacer()
         }
         .padding()
-        .background(Color.white).cornerRadius(10)
+        .background(Color(UIColor.systemBackground)).cornerRadius(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 0.5)
