@@ -85,6 +85,7 @@
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Phone" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ktA-yF-Crl" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                                                 <rect key="frame" x="20" y="200" width="353" height="50"/>
+                                                <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="50" id="UVQ-OZ-Tvu"/>
                                                 </constraints>
@@ -495,6 +496,7 @@
                             </button>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" usesAttributedText="YES" placeholder="Enter OTP here..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1Il-XP-MZp" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="20" y="254" width="353" height="50"/>
+                                <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="46c-ID-JJ3"/>
                                 </constraints>
@@ -746,6 +748,7 @@
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" usesAttributedText="YES" placeholder="Enter Email " minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="xbc-8O-MHf" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="20" y="248" width="353" height="50"/>
+                                <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="MgG-rJ-vxs"/>
                                 </constraints>

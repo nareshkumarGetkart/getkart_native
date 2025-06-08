@@ -41,19 +41,21 @@ struct NotificationView: View {
             ScrollView {
                 
                 HStack{  }.frame(height: 5)
-                VStack(spacing: 10) {
+                LazyVStack(spacing: 10) {
                     ForEach(listArray) { notification in
                         NotificationRow(notification: notification)
-                            .onTapGesture{
-                                
-                                let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
-                                self.navigation?.pushViewController(hostingVC, animated: true)
-                            }
+                          
                             .onAppear{
                                 
                                 if let lastItem = listArray.last, lastItem.id == notification.id, !isDataLoading {
                                     getNoticiationlistApi()
                                 }
+                            }
+                        
+                            .onTapGesture{
+                                
+                                let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
+                                self.navigation?.pushViewController(hostingVC, animated: true)
                             }
                         
                     }

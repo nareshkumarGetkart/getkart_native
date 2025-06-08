@@ -348,7 +348,10 @@ struct ItemDetailView: View {
                     if let arr = objVM.itemObj?.customFields{
                         ForEach(arr){obj in
                             
-                            InfoView(icon: obj.image ?? "", text: obj.name ?? "",value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),navController: self.navController)
+                            InfoView(icon: obj.image ?? "",
+                                     text: obj.name ?? "",
+                                     value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),
+                                     navController: self.navController)
                         }
                     }
                 }
@@ -528,6 +531,13 @@ struct ItemDetailView: View {
             
             if objVM.itemObj == nil{
                 objVM.getItemDetail(id: self.itemId,slug:self.slug,nav: self.navController)
+                
+                objVM.updateSelectedIndex = {
+                    if objVM.galleryImgArray.count > 1{
+                        selectedIndex = 0
+                    }
+               }
+              
                 
             }else{
                 if objVM.sellerObj == nil {
@@ -911,7 +921,7 @@ struct ItemDetailView: View {
 
         if let date = isoFormatter.date(from: isoDateString) {
             let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "yyyy-MM-dd"
+            outputFormatter.dateFormat = "dd MMM yyyy"
             let formattedDate = outputFormatter.string(from: date)
             return formattedDate
         } else {
@@ -1092,9 +1102,18 @@ struct InfoView: View {
     
     var body: some View {
         HStack {
-            if icon.lowercased().contains(".svg"){
-            SVGImageView(url: URL(string: icon)).frame(width:30, height: 30)
-            }else{
+            
+            if icon.lowercased().contains(".svg"), let iconURL = URL(string: icon) {
+//                SVGImageView(url: iconURL)
+//                    .frame(width: 30, height: 30)
+                RemoteSVGWebView(svgURL: iconURL)
+                      .frame(width: 30, height: 30)
+            } else {
+//            if icon.lowercased().contains(".svg"){
+//                SVGImageView(url: URL(string: icon)).frame(width:30, height: 30)
+//               
+//
+//            }else{
                
                 AsyncImage(url: URL(string: icon)) { image in
                      image
@@ -1497,3 +1516,7 @@ struct YouTubeWebView: UIViewRepresentable {
            webView.evaluateJavaScript(pauseScript, completionHandler: nil)
        }
 }
+
+
+
+

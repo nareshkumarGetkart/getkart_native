@@ -25,7 +25,9 @@ class ZoomImageViewController: UIViewController {
         super.loadView()
         self.navigationController?.isNavigationBarHidden = true
         self.view.backgroundColor = imageColor
-        btnBack.setImageColor(color: .black)
+        btnBack.setImageColor(color: .label)
+        btnDownload.setImageColor(color: .label)
+
     }
     
     override func viewDidLoad() {
@@ -114,7 +116,7 @@ class ZoomImageViewController: UIViewController {
             imageZoom = UIImageView(frame: CGRect(x: CGFloat(0), y: CGFloat(0), width: CGFloat(SCREEN_WIDTH), height: CGFloat(SCREEN_HEIGHT - 160)))
             
             imageZoom.contentMode = .scaleAspectFit
-            self.view.backgroundColor = .darkGray
+            self.view.backgroundColor = .systemGray5 // .darkGray
             imageZoom.kf.setImage(with: URL(string: imageArrayUrl[i].image ?? ""), options: nil, progressBlock: nil) { response in
                 // self.view.backgroundColor = self.imageZoom.image?.getAverageColour
             }
@@ -151,7 +153,7 @@ class ZoomImageViewController: UIViewController {
         parentZoomingScrollView.setContentOffset(CGPoint(x: Int(SCREEN_WIDTH)*tappedIndex, y: 0), animated: false)
         pager.currentPage = tappedIndex
         pager.isHighlighted = true
-        pager.pageIndicatorTintColor = UIColor.black
+        pager.pageIndicatorTintColor = UIColor.label
         pager.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor // UIColor.red
         
         let newPosition = SCREEN_WIDTH * CGFloat(self.pager.currentPage)

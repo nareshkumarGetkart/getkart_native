@@ -46,6 +46,18 @@ struct MakeAnOfferView: View {
                     .keyboardType(.numberPad)
                     .padding(.horizontal)
                     .onChange(of: offer) { newValue in
+                        
+                        
+                        // Allow only digits
+                                let digitsOnly = newValue.filter { $0.isNumber }
+
+                                // Remove leading zeros unless it's just "0"
+                                let cleaned = digitsOnly == "0" ? "0" : digitsOnly.drop(while: { $0 == "0" })
+
+                        let maxDigits = String(Int(sellerPrice)).count
+                        let limited = String(cleaned.prefix(maxDigits))
+                        offer = limited
+                        
                         // Remove leading zeros unless the whole string is "0"
                         if newValue.hasPrefix("0") && newValue != "0" {
                             offer = String(newValue.drop(while: { $0 == "0" }))

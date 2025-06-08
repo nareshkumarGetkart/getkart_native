@@ -399,6 +399,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
+                cell.section = indexPath.section
+                cell.rowIndex = indexPath.row
+                cell.delegateUpdateList = self
                 cell.layoutIfNeeded()
                 cell.updateConstraints()
                 cell.collctnView.updateConstraints()
@@ -419,6 +422,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
+                cell.section = indexPath.section
+                cell.rowIndex = indexPath.row
+                cell.delegateUpdateList = self
                 cell.layoutIfNeeded()
                 cell.collctnView.layoutIfNeeded()
                 cell.updateConstraints()
@@ -440,6 +446,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
+                cell.section = indexPath.section
+                cell.rowIndex = indexPath.row
+                cell.delegateUpdateList = self
                 cell.layoutIfNeeded()
                 cell.cllctnView.layoutIfNeeded()
                 cell.cllctnView.updateConstraints()
@@ -460,6 +469,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 cell.istoIncreaseWidth = true
                 cell.listArray = obj?.sectionData
                 cell.lblTtitle.text = obj?.title
+                cell.section = indexPath.section
+                cell.rowIndex = indexPath.row
+                cell.delegateUpdateList = self
                 cell.layoutIfNeeded()
                 cell.collctnView.layoutIfNeeded()
                 cell.updateConstraints()
@@ -482,6 +494,9 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.cllctnView.isScrollEnabled = false
             cell.cellTypes = .product
             cell.listArray = homeVModel?.itemObj?.data
+            cell.section = indexPath.section
+            cell.rowIndex = indexPath.row
+            cell.delegateUpdateList = self
             cell.cllctnView.layoutIfNeeded()
             cell.cllctnView.updateConstraints()
             cell.cllctnView.reloadData()
@@ -502,6 +517,12 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         let sectionObj =  homeVModel?.featuredObj?[tag]
         if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
             destVC.obj = sectionObj
+            destVC.city = homeVModel?.city ?? ""
+            destVC.state = homeVModel?.state ?? ""
+            destVC.country = homeVModel?.country ?? ""
+            destVC.latitude = homeVModel?.latitude ?? ""
+            destVC.longitude = homeVModel?.longitude ?? ""
+            
             destVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destVC, animated: true)
         }
@@ -630,4 +651,37 @@ extension HomeVC: RefreshScreen{
             self.tblView.endUpdates()
         }
     }
+}
+
+
+extension HomeVC:UPdateListDelegate{
+    
+    func updateArray(section:Int,rowIndex:Int,arrIndex:Int,obj:Any?){
+
+        switch section {
+            
+        case 0: break
+            //Banner
+            
+        case 1: break
+            //Category
+            
+        case 2:
+            //Featured
+            if let selObj = obj as? ItemModel{
+                homeVModel?.featuredObj?[rowIndex].sectionData?[arrIndex] = selObj
+            }
+        case 3:
+            //Items
+            if let selObj = obj as? ItemModel{
+                homeVModel?.itemObj?.data?[rowIndex] = selObj
+            }
+      
+        default:
+            break
+            
+        }
+        
+    }
+    
 }

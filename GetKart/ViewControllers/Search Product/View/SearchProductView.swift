@@ -53,11 +53,20 @@ struct SearchProductView: View {
                         .frame(height: 45)
                         .submitLabel(.search)
                         .onSubmit {
-                            self.page = 1
-                            self.getProductListApi(searchTxt: searchText)
+                          //  if searchText.count > 0{
+                                self.page = 1
+                                self.getProductListApi(searchTxt: searchText)
+                           // }
                         }
                         .background(Color(.systemBackground)) // Adaptive
                         .padding(.trailing, 10)
+                    
+//                        .onChange(of: searchText) { newValue in
+//                                if newValue.isEmpty {
+//                                    self.page = 1
+//                                    self.getProductListApi(searchTxt: "")
+//                                }
+//                            }
                 }
                 .background(Color(.systemBackground)) // Adaptive
                 .frame(height: 45)
@@ -196,6 +205,7 @@ struct SearchProductView: View {
       
         if dictCustomFields.keys.count == 0 {
             strUrl = "\(Constant.shared.get_item)?page=\(page)&sort_by=popular_items"
+            
         }else {
             strUrl = "\(Constant.shared.get_item)?page=\(page)"
             
@@ -207,19 +217,39 @@ struct SearchProductView: View {
 //                }else {
                   //  strUrl = strUrl + "&\(dictCustomFields[key] ?? "")"
                // }
-                if let value = dictCustomFields[key]{
+              /*  if let value = dictCustomFields[key]{
                    
                     strUrl += "&\(key)=\(value)"
+                }*/
+                
+                if let value = dictCustomFields[key]{
+                   
+                    if ["city","state","latitude","longitude","country","min_price","max_price","category_id","posted_since"].contains(key){
+                   
+                        if let value = dictCustomFields[key] {
+                            if "\(value)".trim().count > 0{
+                                strUrl += "&\(key)=\(value)"
+                            }
+                        }
+
+                    }else{
+                        if let value = dictCustomFields[key] {
+                            
+                            strUrl += "&custom_fields[\(key)]=\(value)"
+                        }
+
+                    }
                 }
+
             }
         }
         
         
-        let city = dictCustomFields["city"] as? String ?? ""
-        let state = dictCustomFields["state"] as? String ?? ""
+        let cityDict = dictCustomFields["city"] as? String ?? ""
+        let stateDict = dictCustomFields["state"] as? String ?? ""
         let country = dictCustomFields["country"] as? String ?? ""
         
-        if city.count == 0 && state.count == 0 {
+        if cityDict.count == 0 && stateDict.count == 0  && country.count  == 0{
             
             let city = Local.shared.getUserCity()
             let country = Local.shared.getUserCountry()
@@ -227,13 +257,29 @@ struct SearchProductView: View {
             let lat = Local.shared.getUserLatitude()
             let long = Local.shared.getUserLongitude()
 
-            if city.count > 0 {
-                strUrl.append("&country=\(country)")
-                strUrl.append("&state=\(state)")
-                strUrl.append("&city=\(city)")
-                strUrl.append("&latitude=\(lat)")
-                strUrl.append("&longitude=\(long)")
-            }
+          //  if city.count > 0 {
+                if !strUrl.localizedStandardContains("country") {
+                    strUrl.append("&country=\(country)")
+                }
+                
+             if (!strUrl.localizedStandardContains("state")) && state.count > 0{
+                    
+                    strUrl.append("&state=\(state)")
+                }
+                if (!strUrl.localizedStandardContains("city")) && city.count > 0{
+                    
+                    strUrl.append("&city=\(city)")
+                }
+                if (!strUrl.localizedStandardContains("latitude")) && (city.count > 0 || state.count > 0){
+                    
+                    strUrl.append("&latitude=\(lat)")
+                }
+                
+                if (!strUrl.localizedStandardContains("longitude")) && (city.count > 0 || state.count > 0){
+                    
+                    strUrl.append("&longitude=\(long)")
+                }
+           // }
         }
 
         if searchTxt.count > 0{

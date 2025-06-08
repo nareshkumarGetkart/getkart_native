@@ -76,12 +76,12 @@ struct SubCategoriesView: View {
         if objsubCategory.subcategories?.count == 0 {
             
             
-            if popType == .categoriesSeeAll{
-                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objsubCategory.id ?? 0, navigationController:self.navigationController, categoryName: objsubCategory.name ?? ""))
-                self.navigationController?.pushViewController(vc, animated: true)
-                
-                return
-            }
+//            if popType == .categoriesSeeAll{
+//                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objsubCategory.id ?? 0, navigationController:self.navigationController, categoryName: objsubCategory.name ?? "", categoryIds: ""))
+//                self.navigationController?.pushViewController(vc, animated: true)
+//                
+//                return
+//            }
             
             if popType == .filter{
                 if strCategoryTitle.count == 0 {
@@ -99,6 +99,13 @@ struct SubCategoriesView: View {
              category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
             
             
+            if popType == .categoriesSeeAll{
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objsubCategory.id ?? 0, navigationController:self.navigationController, categoryName: objsubCategory.name ?? "", categoryIds: category_ids))
+                self.navigationController?.pushViewController(vc, animated: true)
+                
+                return
+            }
+            
            if popType == .filter {
                
                
@@ -106,6 +113,13 @@ struct SubCategoriesView: View {
                     if let vc1 = vc as? FilterVC  {
                         vc1.strCategoryTitle = strCategoryTitle
                         vc1.category_id = self.category_id
+                        
+                        let catArr = category_ids.components(separatedBy: ",")
+                        if (catArr.count) > 1 {
+                            if let subCatId = catArr.last{
+                                vc1.category_id = subCatId
+                            }
+                        }
                         vc1.category_ids = category_ids
                         vc1.fetchCustomFields()
                         self.navigationController?.popToViewController(vc1, animated: true)

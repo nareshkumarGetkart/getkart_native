@@ -235,7 +235,11 @@ struct StateLocationView: View, LocationSelectedDelegate {
         
         if popType == .home || popType == .signUp{
             
-            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude ?? "")", longitude: "\(self.country.longitude ?? "")"  , timezone: "")
+//            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude ?? "")", longitude: "\(self.country.longitude ?? "")"  , timezone: "")
+            
+            
+            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "", longitude: "" , timezone: "")
+
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {

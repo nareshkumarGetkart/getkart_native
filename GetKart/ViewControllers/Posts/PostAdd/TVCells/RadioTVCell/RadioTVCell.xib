@@ -26,17 +26,29 @@
                         <rect key="frame" x="10" y="10" width="30" height="30"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QVP-ky-7CY">
-                                <rect key="frame" x="5" y="5" width="20" height="20"/>
+                                <rect key="frame" x="2.6666666666666661" y="2.6666666666666661" width="25" height="25"/>
                             </imageView>
+                            <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5q5-Kq-Fab">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
                         </subviews>
                         <color key="backgroundColor" red="0.97983151670000002" green="0.9539293647" blue="0.90587490800000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="30" id="35u-Fj-5Bc"/>
-                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="5" id="4zD-jO-RzT"/>
-                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" constant="5" id="LTv-Hj-2TD"/>
+                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="2.5" id="4zD-jO-RzT"/>
+                            <constraint firstItem="5q5-Kq-Fab" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" id="Grt-K1-quF"/>
+                            <constraint firstItem="5q5-Kq-Fab" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" id="Jnq-zA-yDI"/>
+                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" constant="2.5" id="LTv-Hj-2TD"/>
+                            <constraint firstAttribute="bottom" secondItem="5q5-Kq-Fab" secondAttribute="bottom" id="Nq8-8w-h5M"/>
                             <constraint firstAttribute="height" constant="30" id="Ras-d3-t9S"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" constant="5" id="TCb-V8-P1r"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" constant="5" id="TxE-mb-GjF"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" constant="2.5" id="TCb-V8-P1r"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" constant="2.5" id="TxE-mb-GjF"/>
+                            <constraint firstAttribute="trailing" secondItem="5q5-Kq-Fab" secondAttribute="trailing" id="bgt-63-dOq"/>
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T50-ep-Z9X">
@@ -96,6 +108,7 @@
             <connections>
                 <outlet property="clnCollectionView" destination="h9q-cg-JlC" id="KdR-CZ-64d"/>
                 <outlet property="clnHeight" destination="TzG-Oa-JBJ" id="RNQ-FF-WaQ"/>
+                <outlet property="iconImgWebView" destination="5q5-Kq-Fab" id="0dZ-IS-suw"/>
                 <outlet property="imgImage" destination="QVP-ky-7CY" id="tTd-vV-sDG"/>
                 <outlet property="imgViewBg" destination="4s2-uw-Abf" id="vad-67-Mij"/>
                 <outlet property="lblErrorMsg" destination="kf2-1T-FJN" id="ZiE-Hh-gcU"/>

@@ -53,7 +53,7 @@ class ChatListVC: UIViewController {
             .menuItemWidth(self.view.frame.size.width/2-50),
             .centerMenuItems(true),
             .bottomMenuHairlineColor(UIColor.clear),
-            .selectionIndicatorColor(UIColor.label),
+            .selectionIndicatorColor(Themes.sharedInstance.themeColor),
             .scrollMenuBackgroundColor(UIColor.systemBackground),
             .selectedMenuItemLabelColor(.label),
             .unselectedMenuItemLabelColor(.darkGray),

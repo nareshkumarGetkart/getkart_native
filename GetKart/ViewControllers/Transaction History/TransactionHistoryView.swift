@@ -148,7 +148,8 @@ struct TransactionRow: View {
             
             AsyncImage(url: URL(string: transaction.package?.icon ?? "")) { img in
                 
-                img.resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).background(Color(hex: "#FEF6E9")).cornerRadius(6)
+                img.resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60)
+                    .background(Color(hex: "#FEF6E9")).cornerRadius(6)
             } placeholder: {
                 Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).background(Color(hex: "#FEF6E9")).cornerRadius(6)
             }
@@ -219,7 +220,7 @@ struct TransactionRow: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 0.1)
         )
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .shadow(color: Color(UIColor.label).opacity(0.05), radius: 5, x: 0, y: 2)
         
     }
     

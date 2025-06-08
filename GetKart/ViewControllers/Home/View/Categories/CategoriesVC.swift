@@ -110,7 +110,7 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
                 let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
                 navigationController?.pushViewController(hostingController, animated: true)
             }else{
-                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objCategory?.id ?? 0, navigationController:self.navigationController, categoryName: objCategory?.name ?? ""))
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: objCategory?.id ?? 0, navigationController:self.navigationController, categoryName: objCategory?.name ?? "", categoryIds: "\(objCategory?.id ?? 0)"))
                 self.navigationController?.pushViewController(vc, animated: true)
             }
             

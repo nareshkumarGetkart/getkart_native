@@ -184,7 +184,7 @@ struct SellerProfileView: View {
             }.padding(.vertical, 10)
             
            
-            if objVM.itemArray.count == 0 {
+            if objVM.itemArray.count == 0  && objVM.isDataLoading == false{
                 
                 HStack{
                     Spacer()
@@ -248,7 +248,6 @@ struct SellerProfileView: View {
                 objVM.getItemListApi(sellerId: userId)
             }
         }
-        
     
     }
    
@@ -258,6 +257,7 @@ struct SellerProfileView: View {
             
         }
     }
+    
     // Function to create stats view
     private func statView(value: String, label: String) -> some View {
         VStack {

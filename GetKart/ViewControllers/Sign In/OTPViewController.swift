@@ -211,11 +211,11 @@ class OTPViewController: UIViewController {
         timer = nil
         
         let timestamp = Date.timeStamp
-        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)","temp_token_":tempToken] as [String : Any]
+        var params = ["mobile": mobile, "firebase_id":"msg91_\(timestamp)", "type":"phone","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "country_code":"\(countryCode)","temp_token_":tempToken,"device_id":UIDevice.getDeviceUIDid(),"device_model":UIDevice.getDeviceModelName()] as [String : Any]
         
         if isMobileLogin == false {
             
-            params = ["email": mobile, "firebase_id":"msg91_\(timestamp)", "type":"email","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "temp_token_":tempToken] as [String : Any]
+            params = ["email": mobile, "firebase_id":"msg91_\(timestamp)", "type":"email","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "temp_token_":tempToken,"device_id":UIDevice.getDeviceUIDid(),"device_model":UIDevice.getDeviceModelName()] as [String : Any]
         }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in

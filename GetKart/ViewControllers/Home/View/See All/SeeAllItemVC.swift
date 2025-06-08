@@ -19,6 +19,14 @@ class SeeAllItemVC: UIViewController {
     var obj:Any?
     private var objViewModel:SeeAllViewModel?
     private var emptyView:EmptyList?
+    
+    
+    var city = ""
+    var state = ""
+    var country = ""
+    var latitude = ""
+    var longitude = ""
+    
 
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -42,7 +50,13 @@ class SeeAllItemVC: UIViewController {
         if let recieveObj = obj as? FeaturedClass{
             lblTitle.text = recieveObj.title
             objViewModel = SeeAllViewModel(itemId: recieveObj.id ?? 0)
+            objViewModel?.city = city
+            objViewModel?.state = state
+            objViewModel?.country = country
+            objViewModel?.latitude = latitude
+            objViewModel?.longitude = longitude
             objViewModel?.delegate = self
+            objViewModel?.getItemListApi()
         }
         
         

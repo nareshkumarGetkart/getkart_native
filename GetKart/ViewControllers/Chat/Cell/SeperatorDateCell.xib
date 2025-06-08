@@ -42,7 +42,6 @@
                                             <constraint firstAttribute="height" constant="20" id="X9P-XG-PN9"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="12"/>
-                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GWv-9V-YRo">
@@ -72,13 +71,12 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="🔒 Messages are end to end encrypted. No one outside of this chat, not even Getkart, can read." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kBM-Ah-5QO">
                                         <rect key="frame" x="5" y="5" width="220" height="40"/>
                                         <fontDescription key="fontDescription" name=".AppleColorEmojiUI" family=".Apple Color Emoji UI" pointSize="11"/>
-                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="50" id="8oC-Xc-3v2"/>
+                                    <constraint firstAttribute="height" constant="45" id="8oC-Xc-3v2"/>
                                     <constraint firstAttribute="trailing" secondItem="kBM-Ah-5QO" secondAttribute="trailing" constant="5" id="Hhr-17-MKo"/>
                                     <constraint firstAttribute="width" constant="230" id="Oui-gv-Ig2"/>
                                     <constraint firstItem="kBM-Ah-5QO" firstAttribute="leading" secondItem="bkT-1X-P0l" secondAttribute="leading" constant="5" id="mMY-ar-yNa"/>
@@ -116,8 +114,8 @@
         </tableViewCell>
     </objects>
     <resources>
-        <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemGray5Color">
+            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

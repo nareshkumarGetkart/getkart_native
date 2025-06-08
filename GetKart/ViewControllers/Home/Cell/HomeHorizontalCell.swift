@@ -9,6 +9,11 @@ import UIKit
 import SwiftUI
 import Kingfisher
 
+
+protocol UPdateListDelegate:AnyObject{
+    
+    func updateArray(section:Int,rowIndex:Int,arrIndex:Int,obj:Any?)
+}
 class HomeHorizontalCell: UITableViewCell {
     
     @IBOutlet weak var collctnView:DynamicHeightCollectionView!
@@ -32,6 +37,10 @@ class HomeHorizontalCell: UITableViewCell {
     var istoIncreaseWidth = false
     
     var listArray:[Any]?
+    var section = 0
+    var rowIndex = 0
+
+    weak var delegateUpdateList:UPdateListDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -83,7 +92,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
              let widthCell: CGFloat
 
              if cellTypes == .categories {
-                 widthCell = collectionView.bounds.size.width / 3.0 - 35
+                 widthCell =  87 // collectionView.bounds.size.width / 3.0 - 35
                  return CGSize(width: widthCell, height: height)
              } else {
                  widthCell = istoIncreaseWidth
@@ -153,7 +162,10 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     cell.btnLike.backgroundColor = .systemBackground
                     cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
 
-                    
+                    if let originalImage = UIImage(named: "location-outline") {
+                        let tintedImage = originalImage.tinted(with: .label)
+                        cell.imgViewLoc.image = tintedImage
+                    }
                     
                     let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
                     
@@ -195,17 +207,19 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }else{
                 
-                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? ""))
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? "", categoryIds: "\(obj?.id ?? 0)"))
                 vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }else if cellTypes == .product{
             
             var swiftUIview =  ItemDetailView(navController:  self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug)
-             swiftUIview.returnValue = { value in
+            swiftUIview.returnValue = { [weak self] value in
                 if let obj = value{
-                    self.listArray?[indexPath.item] = obj
-                    self.collctnView.reloadItems(at: [indexPath])
+                    self?.listArray?[indexPath.item] = obj
+                    self?.collctnView.reloadItems(at: [indexPath])
+                    self?.delegateUpdateList?.updateArray(section: self?.section ?? 0, rowIndex: self?.rowIndex ?? 0, arrIndex: indexPath.item, obj: obj)
+
                 }
             }
             
@@ -223,7 +237,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 obj.isLiked?.toggle()
                 listArray?[sender.tag] = obj
                 self.collctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
-
+                delegateUpdateList?.updateArray(section: section, rowIndex: rowIndex, arrIndex: sender.tag, obj: obj)
                 addToFavourite(itemId:obj.id ?? 0)
             }
         }

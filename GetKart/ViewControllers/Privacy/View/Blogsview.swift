@@ -11,7 +11,9 @@ struct Blogsview: View {
     var title:String = ""
     @State var blogsArray = [BlogsModel]()
     var navigationController:UINavigationController?
-    
+    @State private var isDataLoading = false
+    @State private var page = 1
+
     var body: some View {
         HStack{
             
@@ -29,11 +31,17 @@ struct Blogsview: View {
         
      
         ScrollView{
-            VStack(spacing:0){
+           VStack(spacing:0){
                 HStack{Spacer()}
 
                 ForEach(blogsArray) { blog in
                     BlogCell(obj:blog)
+                        .onAppear{
+                            
+                            if let lastItem = blogsArray.last, lastItem.id == blog.id, !isDataLoading {
+                                blogslistApi()
+                            }
+                        }
                         .onTapGesture {
                             
                             let hostingController = UIHostingController(rootView: BlogDetailView(title: "Blogs",obj:blog,navigationController:self.navigationController)) // Wrap in UIHostingController
@@ -53,10 +61,29 @@ struct Blogsview: View {
     }
     
     func blogslistApi(){
-        
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader:true , url: Constant.shared.blogs) { (obj:Blogs) in
-            if obj.data != nil {
-                self.blogsArray.append(contentsOf: obj.data?.data ?? [])
+        self.isDataLoading = true
+
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader:true , url: Constant.shared.blogs + "?page=\(page)") { (obj:Blogs) in
+           
+            if obj.code == 200{
+                
+                if self.page == 1{
+                    self.blogsArray.removeAll()
+                }
+                
+                if obj.data != nil {
+                    
+                    self.blogsArray.append(contentsOf: obj.data?.data ?? [])
+                    
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                        self.page += 1
+                        self.isDataLoading = false
+                    })
+                }
+            }else{
+                self.isDataLoading = false
+
             }
         }
         

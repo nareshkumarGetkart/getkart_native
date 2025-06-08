@@ -115,8 +115,11 @@ struct FavoritesCell:View {
                                 
                         }
                         .setProcessor(
-                            DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
-                                                                    height: widthScreen / 2.0 - 15))
+//                            DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+//                                                                    height: widthScreen / 2.0 - 15))
+                            
+                            DownsamplingImageProcessor(size: CGSize(width: widthScreen,
+                                                                    height: widthScreen))
                         )
                        .resizable()
                        .aspectRatio(contentMode: .fit)

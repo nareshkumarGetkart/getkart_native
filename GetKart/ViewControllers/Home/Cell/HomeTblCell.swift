@@ -35,6 +35,11 @@ class HomeTblCell: UITableViewCell {
     var istoIncreaseWidth = false
     var navigationController: UINavigationController?
     
+    var section = 0
+    var rowIndex = 0
+
+    weak var delegateUpdateList:UPdateListDelegate?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -95,9 +100,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             return CGSize(width: widthCell , height: 260)
         }
     }
-    
-    
-   
+       
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if cellTypes == .categories{
@@ -126,6 +129,10 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
                 cell.btnLike.backgroundColor = .systemBackground
 
+                if let originalImage = UIImage(named: "location-outline") {
+                    let tintedImage = originalImage.tinted(with: .label)
+                    cell.imgViewLoc.image = tintedImage
+                }
                 
                 let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
                 
@@ -151,12 +158,12 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
    
         if cellTypes == .product{
             
-            
             var detailView = ItemDetailView(navController: self.navigationController, itemId:(listArray?[indexPath.item] as? ItemModel)?.id ?? 0, itemObj: (listArray?[indexPath.item] as? ItemModel), slug: (listArray?[indexPath.item] as? ItemModel)?.slug)
-            detailView.returnValue = { value in
+            detailView.returnValue = { [weak self] value in
                if let obj = value{
-                   self.listArray?[indexPath.item] = obj
-                   self.cllctnView.reloadItems(at: [indexPath])
+                   self?.listArray?[indexPath.item] = obj
+                   self?.delegateUpdateList?.updateArray(section: self?.section ?? 0, rowIndex: self?.rowIndex ?? 0, arrIndex: indexPath.item, obj: obj)
+                   self?.cllctnView.reloadItems(at: [indexPath])
                }
            }
             let hostingController = UIHostingController(rootView:detailView )
@@ -173,6 +180,8 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 obj.isLiked?.toggle()
                 listArray?[sender.tag] = obj
                 addToFavourite(itemId:obj.id ?? 0)
+                delegateUpdateList?.updateArray(section: section, rowIndex: rowIndex, arrIndex: sender.tag, obj: obj)
+
                 self.cllctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
                 
             }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import WebKit
 
 protocol TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String)
@@ -15,6 +16,8 @@ extension TextFieldDoneDelegate {
 }
 
 class TFCell: UITableViewCell, UITextFieldDelegate {
+   
+    @IBOutlet weak var iconImgWebView:WKWebView!
     @IBOutlet weak var imgView:UIImageView!
     @IBOutlet weak var lblCurSymbol:UILabel!
     @IBOutlet weak var lblTitle:UILabel!

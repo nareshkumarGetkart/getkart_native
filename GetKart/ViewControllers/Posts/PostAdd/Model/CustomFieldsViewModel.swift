@@ -12,10 +12,10 @@ class CustomFieldsViewModel{
     weak var delegate:RefreshScreen?
     var page = 1
     var isDataLoading = true
-   
+    
     init(){
     }
-       
+    
     
     func getCustomFieldsListApi(category_ids:String){
         let url = Constant.shared.getCustomfields + "?category_ids=\(category_ids)"
@@ -27,8 +27,34 @@ class CustomFieldsViewModel{
             }
         }
     }
+    
+    
+    func appendInitialFilterFieldAndGetCustomFieldds(category_ids:String){
+        self.dataArray = [CustomField]()
+        
+        for ind in 0..<4 {
+            
+            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+            
+            self.dataArray?.append(obj)
+        }
+        
+        
+        let url = Constant.shared.getCustomfields + "?category_ids=\(category_ids)"
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) {[weak self] (obj:CustomFieldsParse) in
+            
+            if obj.data != nil {
+                
+                for objCustomField in obj.data ?? []{
+                    
+                    if objCustomField.type == .radio || objCustomField.type  ==  .checkbox || objCustomField.type  == .dropdown{
+                        self?.dataArray?.append(objCustomField)
+                    }
+                }
+            }
+        }
+    }
 }
-
 
 // MARK: - CustomFieldsParse
 struct CustomFieldsParse: Codable {

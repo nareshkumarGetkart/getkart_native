@@ -16,10 +16,31 @@ struct SearchWithSortView: View {
     @State var showSortSheet: Bool = false
     @StateObject private var objVM: SearchViewModel
     
-    init(categroryId: Int,navigationController:UINavigationController?,categoryName:String) {
-        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId))
+//    var selectIds = ""
+//    var strTitle = ""
+//    var strSubTitle = ""
+//    
+//    @State var dataArray:[CustomField]?
+
+    var objViewModel:CustomFieldsViewModel?
+
+    init(categroryId: Int,navigationController:UINavigationController?,categoryName:String,categoryIds:String) {
+//        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId))
+        
+        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId, categoryIds: categoryIds))
+
         self.categoryName = categoryName
         self.navigationController = navigationController
+        
+        
+        if objViewModel == nil {
+            objViewModel = CustomFieldsViewModel()
+            objViewModel?.appendInitialFilterFieldAndGetCustomFieldds(category_ids: categoryIds)
+           
+        }
+       // objViewModel?.delegate = self
+       // objViewModel?.getCustomFieldsListApi(category_ids: categoryIds)
+      //  self.getCustomFieldsListApi(category_ids: "\(categroryId)")
     }
     
     var body: some View {
@@ -156,16 +177,18 @@ struct SearchWithSortView: View {
             Spacer()
             // Bottom bar
             HStack {
-                
                 Button {
                     if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
                         vc.delFilterSelected = self
+                        vc.dataArray = objViewModel?.dataArray ?? []
+                        vc.dictCustomFields = self.objVM.dictCustomFields
+                        vc.strCategoryTitle = self.categoryName
+                        vc.isToCategorybtnDisabled = true
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } label: {
                     
                     HStack {
-                        
                         Image("filter").renderingMode(.template).foregroundColor(Color(UIColor.label))
                         Text("Filter")
                     }
@@ -290,8 +313,16 @@ struct SearchWithSortView: View {
 extension SearchWithSortView: FilterSelected{
     func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
         print(dict)
-        self.objVM.page = 1
+        
         self.objVM.dictCustomFields = dict
+
+        if dataArray.count < (self.objViewModel?.dataArray?.count ?? 0){
+            
+            self.objVM.dictCustomFields["category_id"] =  self.objVM.categroryId
+        }else{
+            self.objViewModel?.dataArray = dataArray
+        }
+        self.objVM.page = 1
         self.objVM.city = dict["city"] as? String ?? ""
         self.objVM.country = dict["country"] as? String ?? ""
         self.objVM.state = dict["state"] as? String ?? ""
@@ -304,7 +335,7 @@ extension SearchWithSortView: FilterSelected{
 
 
 #Preview {
-    SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "")
+    SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "",categoryIds:"")
 }
 
 
@@ -327,3 +358,42 @@ struct CustomBottomSheet<Content: View>: View {
         .edgesIgnoringSafeArea(.bottom)
     }
 }
+
+
+
+//extension SearchWithSortView {
+    
+//    func getCustomFieldsListApi(category_ids:String){
+//        let url = Constant.shared.getCustomfields + "?category_ids=\(category_ids)"
+//        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:CustomFieldsParse) in
+//            
+//            if obj.data != nil {
+//                dataArray = obj.data
+//            }
+//        }
+//    }
+  /*  func refreshScreen() {
+       // print(self.objViewModel?.dataArray)
+        self.dataArray.removeAll()
+        
+        //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
+        for ind in 0..<4 {
+            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+            self.dataArray.append(obj)
+        }
+        
+        for objCustomField in self.objViewModel?.dataArray ?? [] {
+            if objCustomField.type == .radio || objCustomField.type  ==  .checkbox || objCustomField.type  == .dropdown{
+                self.dataArray.append(objCustomField)
+            }
+        }
+        
+        tblView.reloadData()
+        tblView.performBatchUpdates(nil) { _ in
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        }
+
+        
+    }*/
+//}

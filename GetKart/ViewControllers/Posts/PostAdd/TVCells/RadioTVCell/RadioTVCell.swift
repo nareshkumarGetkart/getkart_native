@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import WebKit
 protocol radioCellTappedDelegate{
     func radioCellTapped(row:Int, clnCell:Int)
 }
 
 class RadioTVCell: UITableViewCell {
+    @IBOutlet weak var iconImgWebView:WKWebView!
     @IBOutlet weak var imgImage:UIImageView!
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var clnCollectionView:DynamicHeightCollectionView!
@@ -26,6 +28,7 @@ class RadioTVCell: UITableViewCell {
         // Initialization code
         imgViewBg.layer.cornerRadius = 5.0
         imgViewBg.clipsToBounds = true
+        
         
         clnCollectionView.register(UINib(nibName: "RadioBtnCVCell", bundle: .main), forCellWithReuseIdentifier: "RadioBtnCVCell")
         clnCollectionView.register(UINib(nibName: "CheckBoxCVCell", bundle: .main), forCellWithReuseIdentifier: "CheckBoxCVCell")
@@ -95,7 +98,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
             cell.btnValue.setTitle("", for: .normal)
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
-            print("CheckBox objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
+           // print("CheckBox objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
@@ -117,7 +120,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             cell.btnValue.setTitle("", for: .normal)
             
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
-            print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
+          //  print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {

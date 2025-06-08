@@ -27,7 +27,7 @@ struct FeaturedClass: Codable {
     let createdAt, updatedAt: String?
     let description: String?
     let totalData: Int?
-    let sectionData: [ItemModel]?
+    var sectionData: [ItemModel]?
 
     enum CodingKeys: String, CodingKey {
         case id, title, slug, sequence, filter, style

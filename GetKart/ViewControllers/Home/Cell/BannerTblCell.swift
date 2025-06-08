@@ -104,6 +104,8 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BannerCell", for: indexPath) as! BannerCell
         if let obj = listArray?[indexPath.item]{
             cell.imgVwBanner.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.imgVwBanner.contentMode = .scaleToFill
+            cell.imgVwBanner.clipsToBounds = true
         }
         
         return cell
@@ -159,7 +161,7 @@ func navigateToScreen(index:Int, sliderObj:SliderModel?){
             getCategoriesListApi(sliderObj: sliderObj)
             
         }else{
-            let vc = UIHostingController(rootView: SearchWithSortView(categroryId: sliderObj?.modelID ?? 0, navigationController:self.navigationController, categoryName:  sliderObj?.model?.name ?? ""))
+            let vc = UIHostingController(rootView: SearchWithSortView(categroryId: sliderObj?.modelID ?? 0, navigationController:self.navigationController, categoryName:  sliderObj?.model?.name ?? "", categoryIds: "\(sliderObj?.modelID ?? 0)"))
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }

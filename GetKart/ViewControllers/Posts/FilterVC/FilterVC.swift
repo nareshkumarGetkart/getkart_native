@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Kingfisher
 
 protocol FilterSelected{
     func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String)
@@ -37,6 +38,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
     var objViewModel:CustomFieldsViewModel?
     var delFilterSelected:FilterSelected?
     
+    var isToCategorybtnDisabled = false
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -48,32 +50,75 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
                 self.dataArray.append(obj)
             }
             
-            city = Local.shared.getUserCity()
-            self.state = Local.shared.getUserState()
-            self.country = Local.shared.getUserCountry()
-            self.latitude = Local.shared.getUserLatitude()
-            self.longitude = Local.shared.getUserLongitude()
             
+            if (dictCustomFields["country"] as? String ?? "").count > 0{
+                
+                self.city = dictCustomFields["city"] as? String ?? ""
+                self.state = dictCustomFields["state"] as? String ?? ""
+                self.country = dictCustomFields["country"] as? String ?? ""
+                self.radius = dictCustomFields["radius"] as? Double ?? 0.0
+                self.latitude = dictCustomFields["latitude"] as? String ?? ""
+                self.longitude = dictCustomFields["longitude"] as? String ?? ""
+                
+            }else{
+                
+                city = Local.shared.getUserCity()
+                self.state = Local.shared.getUserState()
+                self.country = Local.shared.getUserCountry()
+                self.latitude = Local.shared.getUserLatitude()
+                self.longitude = Local.shared.getUserLongitude()
+            }
+           
+            if let statusPosted = dictCustomFields["posted_since"]  as? String {
+                
+                for obj in arrPostedSinceDict {
+                    if obj["value"] == dictCustomFields["posted_since"]  as? String ?? "" {
+                        posted_since = obj
+                        break
+                    }
+                }
+                
+            }else{
+               
+                for obj in arrPostedSinceDict {
+                    if obj["value"] == "all-time" {
+                        posted_since = obj
+                        break
+                    }
+                }
+            }
             
         }else {
             max_price = dictCustomFields["max_price"] as? String ?? ""
             min_price = dictCustomFields["min_price"] as? String ?? ""
             category_id = dictCustomFields["category_id"] as? String ?? ""
             
-            for obj in arrPostedSinceDict {
-                if obj["value"] == dictCustomFields["posted_since"]  as? String ?? "" {
-                    posted_since = obj
-                    break
+            
+            if (dictCustomFields["posted_since"]  as? String ?? "").count == 0{
+                
+                for obj in arrPostedSinceDict {
+                    if obj["value"] == "all-time" {
+                        posted_since = obj
+                        break
+                    }
+                }
+            }else{
+                for obj in arrPostedSinceDict {
+                    if obj["value"] == dictCustomFields["posted_since"]  as? String ?? "" {
+                        posted_since = obj
+                        break
+                    }
                 }
             }
             //posted_since["value"] = dictCustomFields["posted_since"]  as? String ?? ""
-            
+           
             city = dictCustomFields["city"] as? String ?? ""
             self.state = dictCustomFields["state"] as? String ?? ""
             self.country = dictCustomFields["country"] as? String ?? ""
             radius = dictCustomFields["radius"] as? Double ?? 0.0
             self.latitude = dictCustomFields["latitude"] as? String ?? ""
             self.longitude = dictCustomFields["longitude"] as? String ?? ""
+            
             
         }
         
@@ -95,6 +140,10 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
     override func viewWillAppear(_ animated: Bool) {
         print(strCategoryTitle)
         tblView.reloadData()
+        tblView.performBatchUpdates(nil) { _ in
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        }
     }
     
     deinit{
@@ -149,24 +198,48 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         city = ""
         state = ""
         country = ""
-        
+        posted_since.removeAll()
         self.dataArray.removeAll()
         for ind in 0..<4 {
             let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
             self.dataArray.append(obj)
         }
         dictCustomFields.removeAll()
-        strCategoryTitle = ""
-        category_ids = ""
-        category_id = ""
+        
+        if isToCategorybtnDisabled == true{
+         // Coming from homecategory
+       
+        }else{
+            strCategoryTitle = ""
+            category_ids = ""
+            category_id = ""
+        }
+        
+        for obj in arrPostedSinceDict {
+            if obj["value"] == "all-time" {
+                posted_since = obj
+                break
+            }
+        }
+        
         min_price = ""
         max_price = ""
         
-        posted_since.removeAll()
         tblView.reloadData()
     }
     
     @IBAction  func applyFilterAction() {
+        
+        if max_price.count > 0 && min_price.count > 0{
+            if (Int(max_price) ?? 0) > 0 && (Int(min_price) ?? 0) > 0{
+                
+                if (Int(max_price) ?? 0) < (Int(min_price) ?? 0){
+                    
+                    AlertView.sharedManager.showToast(message: "Min price must be less or eqal to ")
+                }
+
+            }
+        }
         dictCustomFields["max_price"] = max_price
         dictCustomFields["min_price"] = min_price
         dictCustomFields["category_id"] =  category_id
@@ -181,6 +254,11 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         dictCustomFields["longitude"] = self.longitude
         dictCustomFields["latitude"] = self.latitude
         
+        
+//        if  let arr = category_ids.components(separatedBy: ",") as? [String], arr.count > 0{
+//            dictCustomFields["category_id"] =  arr.last
+//        }
+//        
         delFilterSelected?.filterSelectectionDone(dict: dictCustomFields, dataArray:self.dataArray, strCategoryTitle: self.strCategoryTitle)
         self.navigationController?.popViewController(animated: true)
     }
@@ -234,9 +312,12 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
     }
     
     @objc func showCategoriesVC(){
-        if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-            destVC.popType = .filter
-            self.navigationController?.pushViewController(destVC, animated: true)
+        if isToCategorybtnDisabled == false{
+            
+            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                destVC.popType = .filter
+                self.navigationController?.pushViewController(destVC, animated: true)
+            }
         }
     }
 }
@@ -264,7 +345,7 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 let cell = tableView.dequeueReusableCell(withIdentifier: "imgWithBtnViewCell") as! imgWithBtnViewCell
                 cell.btnTextValue.tag = indexPath.row
                 cell.btnArrowDown.tag = indexPath.row
-                
+               
                 if indexPath.row == 0 {
                     cell.lblTitle.text = "Location"
                     cell.imgImageView.image = UIImage(named: "location_icon")
@@ -307,10 +388,15 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnTextValue.removeTarget(nil, action: nil, for: .allEvents)
                     cell.btnArrowDown.removeTarget(nil, action: nil, for: .allEvents)
                     
+                    
                     cell.btnTextValue.addTarget(self, action: #selector(showCategoriesVC), for: .touchUpInside)
                     cell.btnArrowDown.addTarget(self, action: #selector(showCategoriesVC), for: .touchUpInside)
 
-                    cell.btnArrowDown.isHidden = false
+                    if isToCategorybtnDisabled == true{
+                        cell.btnArrowDown.isHidden = true
+                    }else{
+                        cell.btnArrowDown.isHidden = false
+                    }
                 }else if indexPath.row == 3 {
                     cell.lblTitle.text = "Posted Since"
                     cell.imgImageView.image = UIImage(named: "since_icon")
@@ -330,6 +416,10 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                     cell.btnArrowDown.isHidden = false
                 }
                 cell.selectionStyle = .none
+                
+                cell.imgImageView.setImageTintColor(color: .label)
+                cell.btnArrowDown.setImageTintColor(color: .label)
+                
                 return cell
             }else if indexPath.row == 2 {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "BudgetTblViewCell") as! BudgetTblViewCell
@@ -382,20 +472,46 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 }
                 cell.lblTitle.text = objCustomField.name ?? ""
                 
-                cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+             //   cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+                
+                 if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                     cell.imgImage.isHidden = true
+                     cell.iconImgWebView.isHidden = false
+                     cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                 }else{
+                     cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                     cell.imgImage.isHidden = false
+                     cell.iconImgWebView.isHidden = true
+                 }
+                
                 cell.del = self
                 cell.rowValue = indexPath.row
                 
                 cell.configure(with: objCustomField)
                 cell.reloadCollectionView()
                 cell.selectionStyle = .none
+                
+                
+                
                 return cell
                 
             }else if objCustomField.type  == .dropdown {
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
                 cell.imgView.isHidden = false
-                cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+               
+                if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                    cell.imgView.isHidden = true
+                    cell.iconImgWebView.isHidden = false
+                    cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                    //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+                    
+                }else{
+                    cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                    cell.imgView.isHidden = false
+                    cell.iconImgWebView.isHidden = true
+                }
+
                 cell.lblTitle.text = objCustomField.name ?? ""
                 cell.txtField.placeholder = ""
                 
@@ -476,7 +592,16 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
             if let destVC = StoryBoard.postAdd.instantiateViewController(withIdentifier: "DropDownVC")as?  DropDownVC {
                 destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
                 destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+               
+                let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+                let theme = AppTheme(rawValue: savedTheme) ?? .system
+                
+                if theme == .dark{
+                    destVC.view.backgroundColor = UIColor.systemGray5.withAlphaComponent(0.8) // Semi-transparent background
+
+                }else{
+                    destVC.view.backgroundColor = UIColor.label.withAlphaComponent(0.8) // Semi-transparent background
+                }
                 if sender.tag == 3 {
                     let values = self.arrPostedSinceDict.compactMap { $0["status"] }
                     destVC.dataArray = values
@@ -593,4 +718,28 @@ extension FilterVC:RefreshScreen {
 
         
     }
+}
+
+import WebKit
+
+extension WKWebView{
+    
+    
+    func loadSVGURL(iconUrl:String){
+        if let url = URL(string: iconUrl) {
+            let htmlString = """
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style> body { margin: 0; padding: 0; text-align: center; } </style>
+                </head>
+                <body>
+                    <img src="\(url.absoluteString)" style="max-width: 100%; height: auto;" />
+                </body>
+                </html>
+                """
+           self.loadHTMLString(htmlString, baseURL: nil)
+        }
+    }
+    
 }

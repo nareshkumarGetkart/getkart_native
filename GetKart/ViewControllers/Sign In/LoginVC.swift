@@ -26,16 +26,16 @@ class LoginVC: UIViewController {
     @IBOutlet weak var btnContinueLogin:UIButtonX!
     @IBOutlet weak var viewContent:UIView!
     
-    
     @IBOutlet weak var btnContinueEmail:UIButtonX!
     @IBOutlet weak var btnContinueGmail:UIButtonX!
     @IBOutlet weak var btnContinueApple:UIButtonX!
-
     
     private var countryCode = ""
     private var socialId:String = ""
     private var socialName:String = ""
     private  var socialEmail:String = ""
+    private  var firebaseIdEmail:String = ""
+
     private  var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
     
     //MARK: Controller life cycle methods
@@ -45,9 +45,6 @@ class LoginVC: UIViewController {
         if self.navigationController?.viewControllers.count ?? 0 > 1 {
             self.navigationController?.viewControllers.remove(at: 0)
         }
-    
-
-        
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
         txtEmailPhone.text = ""
@@ -58,14 +55,17 @@ class LoginVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        btnContinueEmail.layer.borderColor = UIColor.label.cgColor
-        btnContinueGmail.layer.borderColor = UIColor.label.cgColor
-        btnContinueApple.layer.borderColor = UIColor.label.cgColor
+
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)
+        btnContinueEmail.layer.borderColor = UIColor.label.cgColor
+        btnContinueGmail.layer.borderColor = UIColor.label.cgColor
+        btnContinueApple.layer.borderColor = UIColor.label.cgColor
         
+        btnContinueEmail.setImageTintColor(color: .label)
+        btnContinueApple.setImageTintColor(color: .label)
     }
     
     func fetChAndSetInitialCodeFromLocale(){
@@ -87,7 +87,6 @@ class LoginVC: UIViewController {
         if let destVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "SIgnInWithEmailVC") as? SIgnInWithEmailVC{
         destVC.delegate = self
         self.navigationController?.pushViewController(destVC, animated: true)
-
         }
     }
     
@@ -277,8 +276,6 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             
             self.signInUsingGmailorAppleApi()
         }*/
-        
-        
     }
 
 
@@ -331,7 +328,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                     
                     // Success!
                     print("User is signed in with Firebase: \(authResult?.user.uid ?? "")")
-                    self.socialId = authResult?.user.uid ?? ""
+                    self.firebaseIdEmail = authResult?.user.uid ?? ""
                     self.signInUsingGmailorAppleApi()
 
                 }
@@ -342,18 +339,21 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
     
     
     func signInUsingGmailorAppleApi(){
-        let timestamp = Date.timeStamp
+       
+       // let timestamp = Date.timeStamp
         var params: Dictionary<String,Any> =  [:]
         
         if self.loginType == .gmail {
-            params = ["firebase_id":"\(self.socialId)", "type":"google","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)"]
-        }else {
-            params = ["firebase_id":"\(self.socialId)", "type":"apple","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "name":self.socialName, "country_code":"\(countryCode)"]
             
+            params = ["firebase_id":"\(self.firebaseIdEmail)","social_id":"\(self.socialId)", "type":"google","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())","email":self.socialEmail, "name":self.socialName, "country_code":"\(countryCode)","device_id":UIDevice.getDeviceUIDid(),"device_model":UIDevice.getDeviceModelName()]
+        }else{
+            
+            params = ["firebase_id":"\(self.firebaseIdEmail)","social_id":"\(self.socialId)", "type":"apple","platform_type":"ios", "fcm_id":"\(Local.shared.getFCMToken())", "name":self.socialName, "country_code":"\(countryCode)","device_id":UIDevice.getDeviceUIDid(),"device_model":UIDevice.getDeviceModelName()]
             if self.socialEmail.count > 0{
                 params["email"] = self.socialEmail
             }
         }
+        
       
         URLhandler.sharedinstance.makeCall(url: Constant.shared.userSignupUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
             
@@ -424,7 +424,48 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             socialId = socialUser
             loginType = .apple
             
-            self.signInUsingGmailorAppleApi()
+            
+            
+            guard let appleIDToken = appleIDCredential.identityToken else {
+                print("Unable to fetch identity token")
+                return
+            }
+
+            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                return
+            }
+
+            let credential = OAuthProvider.credential(
+                withProviderID: "apple.com",
+                idToken: idTokenString,
+                rawNonce: ""
+            )
+
+            // Sign in with Firebase
+            Auth.auth().signIn(with: credential) { [self] (authResult, error) in
+                if let error = error {
+                    print("Error authenticating: \(error.localizedDescription)")
+                    return
+                }
+                print("Firebase signed in with Apple!")
+                // Handle user info
+                
+                guard let user = authResult?.user else {
+                       print("No Firebase user found after sign-in.")
+                       return
+                   }
+                
+                print(user)
+                self.socialEmail =  user.email ?? ""
+                self.socialName =  user.displayName ?? ""
+                self.socialId = socialUser
+                self.loginType = .apple
+                self.firebaseIdEmail = user.uid
+                self.signInUsingGmailorAppleApi()
+
+            }
+            
             
         case let passwordCredential as ASPasswordCredential:
             
@@ -441,6 +482,7 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
             break
         }
     }
+    
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.

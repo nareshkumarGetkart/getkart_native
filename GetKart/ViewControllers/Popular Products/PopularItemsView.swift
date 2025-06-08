@@ -32,8 +32,11 @@ struct ProductCard: View {
                             .cornerRadius(10)
                     }
                     .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
-                                                                height: widthScreen / 2.0 - 15))
+//                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+//                                                                height: widthScreen / 2.0 - 15))
+                        
+                        DownsamplingImageProcessor(size: CGSize(width: widthScreen,
+                                                                height: widthScreen))
                     )
                     .fade(duration: 0.25)
                     .resizable()

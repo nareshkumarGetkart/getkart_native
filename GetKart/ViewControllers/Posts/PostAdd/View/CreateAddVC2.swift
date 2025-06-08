@@ -249,6 +249,12 @@ class CreateAddVC2: UIViewController {
                 }else if (objCustomField.type == .textbox ||  objCustomField.type == .number) && (objCustomField.value?.count == 0 || (objCustomField.value?.first as? String ?? "").count  < objCustomField.minLength ?? 0 ||  (objCustomField.value?.first as? String ?? "").count  > objCustomField.maxLength ?? 0) {
                     showErrorMsg = true
                     break
+                }else if (objCustomField.type == .number) && objCustomField.name == "Year"{
+                    
+                    if isValidManufacturingYear((objCustomField.value?.first as? String ?? "")) == false{
+                        showErrorMsg = true
+                        break
+                    }
                 }
             }
         }
@@ -332,6 +338,19 @@ class CreateAddVC2: UIViewController {
         }
     }
     
+    
+    func isValidManufacturingYear(_ input: String) -> Bool {
+        // Check if it's a 4-digit number
+        guard let year = Int(input), input.count == 4 else {
+            return false
+        }
+        
+        let currentYear = Calendar.current.component(.year, from: Date())
+        
+        // Set a reasonable range (e.g., 1900 to current year + 1)
+        return year >= 1900 && year <= currentYear // + 1
+    }
+
     
     func isValidInput(objCustomField:CustomField)->Bool{
         if objCustomField.customFieldRequired == 1{
@@ -419,7 +438,21 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.selectionStyle = .none
 
             cell.imgView.isHidden = false
-            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+            
+            
+            if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                cell.imgView.isHidden = true
+                cell.iconImgWebView.isHidden = false
+                cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+                
+            }else{
+                cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgView.isHidden = false
+                cell.iconImgWebView.isHidden = true
+            }
+            
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.placeholder = ""
             cell.txtField.keyboardType = .default
@@ -459,7 +492,19 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.selectionStyle = .none
             cell.imgView.isHidden = false
-            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+            
+            if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                cell.imgView.isHidden = true
+                cell.iconImgWebView.isHidden = false
+                cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+                
+            }else{
+                cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgView.isHidden = false
+                cell.iconImgWebView.isHidden = true
+            }
+           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.placeholder = ""
             cell.txtField.keyboardType = .numberPad
@@ -485,6 +530,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
+               
+                }else if (isValidManufacturingYear((objCustomField.value?.first as? String ?? "")) == false) && objCustomField.name == "Year"{
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    cell.lblErrorMsg.text = "Please enter valid year."
                 }else {
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
@@ -502,7 +552,18 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
             cell.lblTitle.text = objCustomField.name ?? ""
             
-            cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+           // cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
+            
+            if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                cell.imgImage.isHidden = true
+                cell.iconImgWebView.isHidden = false
+                cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                
+            }else{
+                cell.imgImage.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgImage.isHidden = false
+                cell.iconImgWebView.isHidden = true
+            }
             cell.del = self
             cell.rowValue = indexPath.row
             
@@ -532,7 +593,19 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }else if objCustomField.type  == .dropdown {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-            cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+         
+            if (objCustomField.image ?? "").lowercased().contains(".svg") {
+                cell.imgView.isHidden = true
+                cell.iconImgWebView.isHidden = false
+                cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
+                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
+                
+            }else{
+                cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+                cell.imgView.isHidden = false
+                cell.iconImgWebView.isHidden = true
+            }
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.placeholder = ""
             
@@ -665,7 +738,17 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         if let destVC = StoryBoard.postAdd.instantiateViewController(withIdentifier: "DropDownVC")as?  DropDownVC {
             destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
             destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-            destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+           // destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+           
+            let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+            let theme = AppTheme(rawValue: savedTheme) ?? .system
+            
+            if theme == .dark{
+                destVC.view.backgroundColor = UIColor.systemGray5.withAlphaComponent(0.8) // Semi-transparent background
+
+            }else{
+                destVC.view.backgroundColor = UIColor.label.withAlphaComponent(0.8) // Semi-transparent background
+            }
             let objCustomField = self.dataArray[sender.tag]
             destVC.selectionDelegate = self
             destVC.dropDownRowIndex = sender.tag

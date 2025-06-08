@@ -311,10 +311,10 @@ struct User: Codable {
     let profile: String?
     let createdAt: String?
     let isVerified, showPersonalDetails: Int?
-    let countryCode: CountryCode?
+    let countryCode: String?
     let reviewsCount: Int?
     let averageRating: Int?
-    let sellerReview: [JSONAny]?
+   // let sellerReview: [JSONAny]?
 
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, profile
@@ -324,7 +324,7 @@ struct User: Codable {
         case countryCode = "country_code"
         case reviewsCount = "reviews_count"
         case averageRating = "average_rating"
-        case sellerReview = "seller_review"
+      //  case sellerReview = "seller_review"
     }
 }
 

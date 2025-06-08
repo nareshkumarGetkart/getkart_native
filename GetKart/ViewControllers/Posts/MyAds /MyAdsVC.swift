@@ -56,7 +56,6 @@ class MyAdsVC: UIViewController {
         
         NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
-        
 
     }
     
@@ -72,6 +71,17 @@ class MyAdsVC: UIViewController {
     }
     
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if self.traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            // Appearance (light/dark mode) has changed
+            print("Appearance mode changed: \(traitCollection.userInterfaceStyle == .dark ? "Dark" : "Light")")
+            
+            // Update your UI manually here if needed
+        }
+    }
+
     @objc func noInternet(notification:Notification?){
       
         self.isDataLoading = false
@@ -109,7 +119,6 @@ class MyAdsVC: UIViewController {
             btn.tag = index + 500
             btn.addTarget(self, action: #selector(filterBtnAction(_ : )), for: .touchUpInside)
             btnScrollView.addSubview(btn)
-            
         }
         
         btnScrollView.contentSize.width   = CGFloat(135 * filters.count) + 50
@@ -123,6 +132,8 @@ class MyAdsVC: UIViewController {
             refreshMyAds()
         }
     }
+    
+    
     
     func updateCoorOfSelectedTab(){
         

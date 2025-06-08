@@ -14,19 +14,72 @@ class SeeAllViewModel{
     var listArray:Array<ItemModel>?
     weak var delegate:RefreshScreen?
     var itemId = 0
-    
+    var city = ""
+    var state = ""
+    var country = ""
+    var latitude = ""
+    var longitude = ""
+
     init(itemId:Int){
         self.itemId = itemId
-        getItemListApi()
+       // getItemListApi()
     }
     
     func getItemListApi(){
         isDataLoading = true
         
+        var strUrl = "\(Constant.shared.get_item)?featured_section_id=\(self.itemId)&page=\(page)"
+
+        if city.count > 0{
+            if !strUrl.contains("?"){
+                strUrl.append("?city=\(city)")
+            }else{
+                strUrl.append("&city=\(city)")
+
+            }
+        }
+        
+        if state.count > 0{
+            if !strUrl.contains("?"){
+                strUrl.append("?state=\(state)")
+            }else{
+                strUrl.append("&state=\(state)")
+
+            }
+        }
+        
+        if country.count > 0{
+            if !strUrl.contains("?"){
+                strUrl.append("?country=\(country)")
+
+            }else{
+                strUrl.append("&country=\(country)")
+            }
+        }
+        
+        
+        if latitude.count > 0 && (state.count > 0 || city.count > 0){
+            if !strUrl.contains("?"){
+                strUrl.append("?latitude=\(latitude)")
+
+            }else{
+                strUrl.append("&latitude=\(latitude)")
+            }
+                
+        }
+        
+        if longitude.count > 0 && (state.count > 0 || city.count > 0){
+            if !strUrl.contains("?"){
+                strUrl.append("?longitude=\(longitude)")
+            }else{
+                strUrl.append("?longitude=\(longitude)")
+            }
+        }
+        
+        
        // let params = ["featured_section_id":self.itemId,"page":page,"_total_api_calls":1] as [String : Any]
         
         
-        let strUrl = "\(Constant.shared.get_item)?featured_section_id=\(self.itemId)&page=\(page)"
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:ItemParse) in
         

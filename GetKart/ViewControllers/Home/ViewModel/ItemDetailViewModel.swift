@@ -15,6 +15,10 @@ class ItemDetailViewModel:ObservableObject{
     @Published var sellerObj:SellerModel?
     @Published var relatedDataItemArray = [ItemModel]()
     @Published var itemObj:ItemModel?
+    
+
+    var updateSelectedIndex: (()->())?
+    
     var isMyProduct = false
     
     init(){
@@ -30,7 +34,7 @@ class ItemDetailViewModel:ObservableObject{
         }
         if isMyProduct == false{
             
-            ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SingleItemParse) in
+            ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { [self] (obj:SingleItemParse) in
                 
                 if obj.code == 200 {
                     
@@ -40,18 +44,21 @@ class ItemDetailViewModel:ObservableObject{
                         if let img = self.itemObj?.image {
                             let new = GalleryImage(id:10, image: img, itemID: self.itemObj?.id)
                             self.galleryImgArray.insert(new, at: 0)
+                          
                         }
                         
                         if (item.videoLink?.count ?? 0) > 0{
                             
                             let new = GalleryImage(id:10, image: item.videoLink, itemID: 400)
                             self.galleryImgArray.append(new)
-                            
                         }
+                        
+                        self.updateSelectedIndex?()
                         
                         self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0, excludeId: item.id ?? 0)
                         self.setItemTotalApi()
+                        
                     }else{
                         
                         AlertView.sharedManager.presentAlertWith(title: "", msg: "Item not available", buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in
