@@ -175,7 +175,7 @@ struct CustomField: Codable,Identifiable  {
     let type: TypeEnum?
     let image: String?
     let customFieldRequired: Int?
-    let values: [String?]?
+    var values: [String?]?
     let minLength, maxLength: Int?
     let status: Int?
     var value: [String?]?

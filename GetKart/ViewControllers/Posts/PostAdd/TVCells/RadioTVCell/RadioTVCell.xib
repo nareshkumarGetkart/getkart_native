@@ -37,7 +37,7 @@
                                 </wkWebViewConfiguration>
                             </wkWebView>
                         </subviews>
-                        <color key="backgroundColor" red="0.97983151670000002" green="0.9539293647" blue="0.90587490800000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <color key="backgroundColor" red="0.98039215686274506" green="0.95294117647058818" blue="0.90588235294117647" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="30" id="35u-Fj-5Bc"/>
                             <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="2.5" id="4zD-jO-RzT"/>

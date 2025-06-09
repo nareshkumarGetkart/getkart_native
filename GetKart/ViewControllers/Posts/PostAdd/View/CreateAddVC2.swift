@@ -12,7 +12,6 @@ class CreateAddVC2: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var btnBack:UIButton!
-    
     var dataArray:[CustomField] = []
     var params:Dictionary<String,Any> = [:]
     var dictCustomFields:Dictionary<String,Any> = [:]
@@ -26,6 +25,8 @@ class CreateAddVC2: UIViewController {
     var customFieldFilesEditPost :Dictionary<String,Any> = [:]
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
+    
+    var selectedRow = -1
     
     //MARK: Controller Life cycle methods
     override func viewDidLoad() {
@@ -436,7 +437,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         if objCustomField.type  == .textbox {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.selectionStyle = .none
-
+            cell.iconBgView.isHidden = false
             cell.imgView.isHidden = false
            // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
             
@@ -474,8 +475,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 dataArray[indexPath.row] = objCustomField
             }
             
-            if showErrorMsg == true {
-                if isValidInput(objCustomField: objCustomField) == false {
+            if showErrorMsg == true  && selectedRow != indexPath.row{
+                if isValidInput(objCustomField: objCustomField) == false  {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
@@ -483,6 +484,9 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
+            }else{
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
             
             return cell
@@ -492,6 +496,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.selectionStyle = .none
             cell.imgView.isHidden = false
+            cell.iconBgView.isHidden = false
             
             if (objCustomField.image ?? "").lowercased().contains(".svg") {
                 cell.imgView.isHidden = true
@@ -525,7 +530,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 dataArray[indexPath.row] = objCustomField
             }
             
-            if showErrorMsg == true {
+            if showErrorMsg == true  && selectedRow != indexPath.row{
                 if isValidInput(objCustomField: objCustomField) == false {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
@@ -539,6 +544,9 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
+            }else{
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
             
             return cell
@@ -567,6 +575,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.del = self
             cell.rowValue = indexPath.row
             
+            
             if showErrorMsg == true {
                 if isValidInput(objCustomField: objCustomField) == false {
                     cell.lblErrorMsg.isHidden = false
@@ -594,7 +603,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
            // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
-         
+            cell.iconBgView.isHidden = false
             if (objCustomField.image ?? "").lowercased().contains(".svg") {
                 cell.imgView.isHidden = true
                 cell.iconImgWebView.isHidden = false
@@ -701,11 +710,17 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         var objCustomField = self.dataArray[row]
         
         if objCustomField.type == .radio {
-            objCustomField.value?.removeAll()
-            if let str = objCustomField.values?[clnCell] as? String {
-                objCustomField.value?.append(str)
-            }
+            //
             
+            if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
+                objCustomField.value?.removeAll()
+
+            }else{
+                objCustomField.value?.removeAll()
+                if let str = objCustomField.values?[clnCell] as? String {
+                    objCustomField.value?.append(str)
+                }
+            }
         }else if objCustomField.type == .checkbox {
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
                 if let index = objCustomField.value?.firstIndex(where: {$0 == objCustomField.values?[clnCell]}) {
@@ -728,7 +743,10 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         if let cell = tblView.cellForRow(at: indexPath)as?
             RadioTVCell {
             cell.objData = objCustomField
+            tblView.beginUpdates()
+            cell.lblErrorMsg.isHidden = true
             cell.clnCollectionView.reloadData()
+            tblView.endUpdates()
         }
     }
     
@@ -776,6 +794,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
      }
     
     func textFieldEditingDone(selectedRow:Int, strText:String) {
+        self.selectedRow = -1
         var objCustomField = self.dataArray[selectedRow]
         if objCustomField.value?.count ?? 0 > 0 {
             objCustomField.value?[0] = strText
@@ -784,9 +803,20 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }
        // print(objCustomField.value)
         dataArray[selectedRow] = objCustomField
-        
+        self.tblView.reloadData()
     }
     
+    func textFieldEditingBegin(selectedRow:Int, strText:String)
+    {
+        self.selectedRow = selectedRow
+        
+        if let cell = tblView.cellForRow(at: IndexPath(row: selectedRow, section: 0)) as? TFCell{
+            tblView.beginUpdates()
+            cell.lblErrorMsg.isHidden = true
+            cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            tblView.endUpdates()
+        }
+    }
 }
 
 

@@ -24,32 +24,42 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="pUv-0q-kCq">
-                        <rect key="frame" x="10.000000000000004" y="10" width="52.333333333333343" height="25"/>
+                        <rect key="frame" x="10.000000000000004" y="10" width="52.333333333333343" height="30"/>
                         <subviews>
-                            <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a6m-5p-9fZ">
-                                <rect key="frame" x="-25" y="0.0" width="25" height="25"/>
-                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="erJ-Da-Tai">
+                                <rect key="frame" x="-30" y="0.0" width="30" height="30"/>
+                                <subviews>
+                                    <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a6m-5p-9fZ">
+                                        <rect key="frame" x="2.3333333333333321" y="2.6666666666666661" width="25.333333333333332" height="25"/>
+                                        <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <wkWebViewConfiguration key="configuration">
+                                            <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                            <wkPreferences key="preferences"/>
+                                        </wkWebViewConfiguration>
+                                    </wkWebView>
+                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xQl-he-g7M">
+                                        <rect key="frame" x="2.3333333333333321" y="2.6666666666666661" width="25.333333333333332" height="25"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.98039215686274506" green="0.95294117647058818" blue="0.90588235294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="25" id="Lvk-vX-fKB"/>
-                                    <constraint firstAttribute="width" constant="25" id="QxJ-gJ-VFw"/>
+                                    <constraint firstAttribute="bottom" secondItem="xQl-he-g7M" secondAttribute="bottom" constant="2.5" id="39C-tO-fab"/>
+                                    <constraint firstItem="xQl-he-g7M" firstAttribute="top" secondItem="erJ-Da-Tai" secondAttribute="top" constant="2.5" id="85A-BZ-Ai1"/>
+                                    <constraint firstItem="a6m-5p-9fZ" firstAttribute="leading" secondItem="erJ-Da-Tai" secondAttribute="leading" constant="2.5" id="Er1-Es-vxF"/>
+                                    <constraint firstAttribute="width" constant="30" id="PG1-MX-Spg"/>
+                                    <constraint firstAttribute="height" constant="30" id="cRb-t0-0Rf"/>
+                                    <constraint firstAttribute="bottom" secondItem="a6m-5p-9fZ" secondAttribute="bottom" constant="2.5" id="gMZ-pQ-HAl"/>
+                                    <constraint firstAttribute="trailing" secondItem="xQl-he-g7M" secondAttribute="trailing" constant="2.5" id="mx6-gF-fY3"/>
+                                    <constraint firstItem="xQl-he-g7M" firstAttribute="leading" secondItem="erJ-Da-Tai" secondAttribute="leading" constant="2.5" id="ppz-0y-fuY"/>
+                                    <constraint firstItem="a6m-5p-9fZ" firstAttribute="top" secondItem="erJ-Da-Tai" secondAttribute="top" constant="2.5" id="qqd-7e-q3N"/>
+                                    <constraint firstAttribute="trailing" secondItem="a6m-5p-9fZ" secondAttribute="trailing" constant="2.5" id="zXl-oa-h56"/>
                                 </constraints>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xQl-he-g7M">
-                                <rect key="frame" x="-25" y="0.0" width="25" height="25"/>
-                                <color key="backgroundColor" systemColor="systemGray5Color"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="25" id="hEw-wN-zZz"/>
-                                    <constraint firstAttribute="width" constant="25" id="iLy-Mn-JXx"/>
-                                </constraints>
-                            </imageView>
+                            </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ad Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Vv-sC-WMu">
-                                <rect key="frame" x="0.0" y="0.0" width="52.333333333333336" height="25"/>
+                                <rect key="frame" x="0.0" y="0.0" width="52.333333333333336" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="25" id="n4v-1g-LrB"/>
+                                    <constraint firstAttribute="height" constant="30" id="n4v-1g-LrB"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
                                 <nil key="highlightedColor"/>
@@ -57,7 +67,7 @@
                         </subviews>
                     </stackView>
                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Add Title Here" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1XG-g0-ha2" customClass="UITextFieldX" customModule="GetKart" customModuleProvider="target">
-                        <rect key="frame" x="10" y="39" width="300" height="50"/>
+                        <rect key="frame" x="10" y="44" width="300" height="50"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="tintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -87,7 +97,7 @@
                         </connections>
                     </textField>
                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wRl-rU-P62">
-                        <rect key="frame" x="15" y="39" width="20" height="50"/>
+                        <rect key="frame" x="15" y="44" width="20" height="50"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="20" id="1Lm-Px-WGh"/>
@@ -98,7 +108,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6YH-he-5Kb">
-                        <rect key="frame" x="278" y="54" width="22" height="22"/>
+                        <rect key="frame" x="278" y="59" width="22" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="22" id="iK9-WZ-IrM"/>
                             <constraint firstAttribute="height" constant="22" id="s42-6A-n4F"/>
@@ -107,17 +117,17 @@
                         <state key="normal" image="arrow_dd"/>
                     </button>
                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xrd-qQ-I5q">
-                        <rect key="frame" x="12" y="40" width="260" height="50"/>
+                        <rect key="frame" x="12" y="45" width="260" height="50"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="50" id="lHU-qQ-OZc"/>
                         </constraints>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                     </button>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="6pr-E6-9F4">
-                        <rect key="frame" x="10" y="92" width="300" height="32"/>
+                        <rect key="frame" x="10" y="97" width="300" height="27"/>
                         <subviews>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Field must not be empty." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fhX-9N-fpv">
-                                <rect key="frame" x="0.0" y="32" width="156.66666666666666" height="20.333333333333329"/>
+                                <rect key="frame" x="0.0" y="27" width="156.66666666666666" height="20.333333333333329"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20.329999999999998" id="C2D-3R-fl9"/>
                                 </constraints>
@@ -153,7 +163,8 @@
             <connections>
                 <outlet property="btnOption" destination="6YH-he-5Kb" id="Xsb-Pp-JVv"/>
                 <outlet property="btnOptionBig" destination="Xrd-qQ-I5q" id="cDS-Eh-K3Y"/>
-                <outlet property="iconImgWebView" destination="a6m-5p-9fZ" id="NGe-db-pnR"/>
+                <outlet property="iconBgView" destination="erJ-Da-Tai" id="ncY-Is-fid"/>
+                <outlet property="iconImgWebView" destination="a6m-5p-9fZ" id="C4I-Vu-RCa"/>
                 <outlet property="imgView" destination="xQl-he-g7M" id="MLw-vn-hxo"/>
                 <outlet property="lblCurSymbol" destination="wRl-rU-P62" id="c9d-go-e6l"/>
                 <outlet property="lblErrorMsg" destination="fhX-9N-fpv" id="kiw-bF-EJC"/>
@@ -166,13 +177,13 @@
     <resources>
         <image name="arrow_dd" width="15.333333015441895" height="9"/>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

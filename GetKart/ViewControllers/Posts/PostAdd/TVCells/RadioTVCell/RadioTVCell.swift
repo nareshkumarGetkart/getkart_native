@@ -69,6 +69,11 @@ class RadioTVCell: UITableViewCell {
     @objc func buttonClicked(sender:UIButton)
     {
         print("Tag: ", sender.tag)
+        
+//        if objData?.value?.contains(objData?.values?[sender.tag]) == true{
+//            objData?.values?[sender.tag] = ""
+//            self.clnCollectionView.reloadItems(at: [IndexPath(row:  sender.tag, section: 0)])
+//        }
         self.del?.radioCellTapped(row: self.rowValue, clnCell: sender.tag)
         
     }
@@ -123,6 +128,7 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
           //  print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+           
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
                 cell.btnValue.setTitleColor(.orange, for: .normal)
                 cell.backView.borderColor = UIColor.orange

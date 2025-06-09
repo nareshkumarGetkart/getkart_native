@@ -18,6 +18,7 @@ class PictureAddedCell: UITableViewCell {
     var rowValue = 0
     var pictureAddDelegate:PictureAddedDelegate!
     @IBOutlet weak var lblErrorMsg:UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

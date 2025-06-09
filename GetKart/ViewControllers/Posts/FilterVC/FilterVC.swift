@@ -499,7 +499,8 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
                 cell.imgView.isHidden = false
-               
+                cell.iconBgView.isHidden = false
+                
                 if (objCustomField.image ?? "").lowercased().contains(".svg") {
                     cell.imgView.isHidden = true
                     cell.iconImgWebView.isHidden = false

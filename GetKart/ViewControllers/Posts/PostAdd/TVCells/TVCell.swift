@@ -8,6 +8,7 @@
 import UIKit
 protocol TextViewDoneDelegate {
     func textViewEditingDone(selectedRow:Int, strText:String)
+    func textViewEditingBegin(selectedRow:Int, strText:String)
 }
 class TVCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var lblTitle:UILabel!
@@ -34,4 +35,9 @@ class TVCell: UITableViewCell, UITextViewDelegate {
         textViewDoneDelegate?.textViewEditingDone(selectedRow: tvTextView.tag, strText: tvTextView.text ?? "")
     }
     
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        textViewDoneDelegate?.textViewEditingBegin(selectedRow: tvTextView.tag, strText: tvTextView.text ?? "")
+
+        return true
+    }
 }

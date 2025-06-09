@@ -55,7 +55,7 @@ class CreateAddDetailVC: UIViewController {
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
     
-    
+    var selectedRow = -1
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -375,7 +375,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }else if indexPath.row == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.lblTitle.text = "Add Title"
-            
+            cell.iconBgView.isHidden = true
+
             cell.txtField.keyboardType = .default
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
@@ -383,9 +384,13 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.textFieldDoneDelegate = self
             cell.txtField.placeholder = ""
             cell.txtField.maxLength = 130
-
+            cell.lblCurSymbol.isHidden =  true
+            cell.txtField.leftPadding = 10
+            cell.showCurrencySymbol = false
+            cell.lblErrorMsg.isHidden = true
             cell.txtField.text = params[AddKeys.name.rawValue] as? String ?? ""
-            if showErrorMsg == true {
+
+            if showErrorMsg == true  && (self.selectedRow != indexPath.row) {
                 if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
@@ -394,9 +399,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = "Please enetr valid Ad Title"
-
                 }else {
-                    
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
@@ -406,13 +409,14 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             }
             return cell
         }else if indexPath.row == 2 {
+           
             let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
             cell.lblTitle.text = "Description"
             cell.textViewDoneDelegate = self
             cell.tvTextView.tag = indexPath.row
             
             cell.tvTextView.text = params[AddKeys.description.rawValue] as? String ?? ""
-            if showErrorMsg == true {
+            if showErrorMsg == true && (self.selectedRow != indexPath.row) {
                 if (params[AddKeys.description.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.tvTextView.layer.borderColor = UIColor.red.cgColor
@@ -442,7 +446,6 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnAddPicture.setTitle("Add Main Picture", for: .normal)
             cell.btnAddPicture.tag = indexPath.row
             cell.btnAddPicture.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
-            
             
             cell.rowValue = indexPath.row
             cell.pictureAddDelegate = self
@@ -500,7 +503,10 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             
         }else if indexPath.row == 5 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
+            cell.iconBgView.isHidden = true
+
             cell.lblTitle.text = "Price"
+            
             cell.txtField.placeholder = "00"
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
@@ -509,13 +515,18 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.textFieldDoneDelegate = self
             cell.showCurrencySymbol = true
             cell.txtField.maxLength = 10
-
-            
+            cell.lblErrorMsg.isHidden = true
             cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
             cell.lblCurSymbol.text = Local.shared.currencySymbol
+            if (params[AddKeys.price.rawValue] as? String ?? "").count > 1{
+                cell.lblCurSymbol.isHidden =  false
+                cell.txtField.leftPadding = 25
+            }else{
+                cell.lblCurSymbol.isHidden =  true
+                cell.txtField.leftPadding = 10
+            }
             
-            
-            if showErrorMsg == true {
+            if showErrorMsg == true && (self.selectedRow != indexPath.row) {
                 if let price = Int(params[AddKeys.price.rawValue] as? String ?? "0"),price < 1{
                     cell.lblErrorMsg.text = "Price must be greater than 0"
                     cell.lblErrorMsg.isHidden = false
@@ -538,6 +549,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if indexPath.row == 6 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
+            cell.iconBgView.isHidden = true
+
             cell.lblTitle.text = "Phone Number"
             cell.txtField.placeholder = "Enter Phone Number"
             cell.txtField.keyboardType = .numberPad
@@ -546,9 +559,13 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.txtField.maxLength = 11
+            cell.lblErrorMsg.isHidden = true
+            cell.lblCurSymbol.isHidden =  true
+            cell.txtField.leftPadding = 10
+            cell.showCurrencySymbol = false
 
             cell.txtField.text = params[AddKeys.contact.rawValue] as? String ?? ""
-            if showErrorMsg == true {
+            if showErrorMsg == true && (self.selectedRow != indexPath.row){
                 if (params[AddKeys.contact.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
@@ -563,14 +580,22 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if indexPath.row == 7 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
+            cell.iconBgView.isHidden = true
+
             cell.lblTitle.text = "Video Link"
             cell.txtField.placeholder = "http://example.com/video.mp4"
-            
+            cell.lblErrorMsg.isHidden = true
             cell.txtField.keyboardType = .default
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
+            cell.lblErrorMsg.isHidden = true
+            cell.lblCurSymbol.isHidden =  true
+            cell.txtField.leftPadding = 10
+            cell.showCurrencySymbol = false
+            cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+
             cell.txtField.text = params[AddKeys.video_link.rawValue] as? String ?? ""
            /* if showErrorMsg == true {
                 if (params[AddKeys.video_link.rawValue] as? String ?? "") == "" {
@@ -593,8 +618,10 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
 
 
 extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
-    
+    //MARK: UITextField Delegate
+
     func textFieldEditingDone(selectedRow:Int, strText:String) {
+        self.selectedRow = -1
         print(selectedRow, strText)
         print( AddKeys.name)
         if selectedRow == 1 {
@@ -606,12 +633,44 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
         }else if selectedRow == 7 {
             params[AddKeys.video_link.rawValue] = strText
         }
+        self.tblView.reloadData()
+
     }
     
+    func textFieldEditingBegin(selectedRow:Int, strText:String){
+        self.selectedRow = selectedRow
+        if selectedRow == 7{
+          
+        }else{
+            if let cell = tblView.cellForRow(at: IndexPath(row: selectedRow, section: 0)) as? TFCell{
+                tblView.beginUpdates()
+                cell.lblErrorMsg.isHidden = true
+                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+                tblView.endUpdates()
+            }
+        }
+    }
     
+    //MARK: UITextview Delegate
     func textViewEditingDone(selectedRow:Int, strText:String) {
+        self.selectedRow = -1
+
         if selectedRow == 2 {
             params[AddKeys.description.rawValue] = strText
+        }
+        self.tblView.reloadData()
+
+    }
+    
+    func textViewEditingBegin(selectedRow:Int, strText:String)
+    {
+        self.selectedRow = selectedRow
+        
+        if let cell = tblView.cellForRow(at: IndexPath(row: selectedRow, section: 0)) as? TVCell{
+            tblView.beginUpdates()
+            cell.lblErrorMsg.isHidden = true
+            cell.tvTextView.layer.borderColor = UIColor.opaqueSeparator.cgColor
+            tblView.endUpdates()
         }
     }
 }
@@ -657,6 +716,8 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                         }
                     
                     */
+                    cell.lblErrorMsg.isHidden = true
+                    
                     cell.reloadCollection()
                     self.tblView.beginUpdates()
                     self.tblView.endUpdates()
@@ -671,7 +732,8 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                     
                     cell.btnAddPicture.isHidden = true
                     cell.clnCollectionView.isHidden = false
-                    
+                    cell.lblErrorMsg.isHidden = true
+
                     cell.arrImagesData = self.gallery_images
                     cell.clnCollectionView!.insertItems(at: [IndexPath(item: gallery_images.count - 1, section: 0)])
                     
@@ -758,9 +820,9 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
 }
 
 extension CreateAddDetailVC: PictureAddedDelegate {
-  
+    
     func addPictureAction(row:Int) {
-       
+        
         if row == 3 {
             isImgData = true
         }else {
@@ -774,52 +836,48 @@ extension CreateAddDetailVC: PictureAddedDelegate {
             }
         }
         showImagePickerOptions(tag: row)
-
     }
     
+    
     func removePictureAction(row:Int, col:Int) {
-           let indexPath = IndexPath(row: row, section: 0)
-            if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                cell.clnCollectionView.performBatchUpdates({
-                    cell.arrImagesData.remove(at: col)
-                    if row == 3 {
-                        self.imgData = nil
-                        self.imgName = ""
-                        
-                    }else {
-                        if self.popType == .editPost {
-                            let data = gallery_images[col]
-                            for obj in self.itemObj?.galleryImages ?? []{
-                                if obj.imgData == data {
-                                    if self.delete_item_image_id.count == 0 {
-                                        self.delete_item_image_id = "\(obj.id ?? 0)"
-                                    }else {
-                                        self.delete_item_image_id = self.delete_item_image_id + ",\(obj.id ?? 0)"
-                                    }
+        let indexPath = IndexPath(row: row, section: 0)
+        if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+            cell.clnCollectionView.performBatchUpdates({
+                cell.arrImagesData.remove(at: col)
+                if row == 3 {
+                    self.imgData = nil
+                    self.imgName = ""
+                    
+                }else {
+                    if self.popType == .editPost {
+                        let data = gallery_images[col]
+                        for obj in self.itemObj?.galleryImages ?? []{
+                            if obj.imgData == data {
+                                if self.delete_item_image_id.count == 0 {
+                                    self.delete_item_image_id = "\(obj.id ?? 0)"
+                                }else {
+                                    self.delete_item_image_id = self.delete_item_image_id + ",\(obj.id ?? 0)"
                                 }
                             }
-                            print("delete_item_image_id: ",delete_item_image_id)
                         }
-                        
-                        
-                        gallery_images.remove(at: col)
-                        gallery_imageNames.remove(at: col)
-                        cell.arrImagesData = gallery_images
+                        print("delete_item_image_id: ",delete_item_image_id)
                     }
-                    print("cell.arrImagesData.count : ", cell.arrImagesData.count)
-                    cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
-                    cell.clnCollectionView.reloadData()
-                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                   
-                }) { _ in
-                    // Code to execute after reloadData and layout updates
-                    cell.clnCollectionView.reloadItems(at: cell.clnCollectionView.indexPathsForVisibleItems)
-                    self.tblView.reloadData()
+                    
+                    
+                    gallery_images.remove(at: col)
+                    gallery_imageNames.remove(at: col)
+                    cell.arrImagesData = gallery_images
                 }
+                print("cell.arrImagesData.count : ", cell.arrImagesData.count)
+                cell.clnCollectionView.deleteItems(at: [IndexPath(item: col, section: 0)])
+                cell.clnCollectionView.reloadData()
+                cell.clnCollectionView.collectionViewLayout.invalidateLayout()
+                
+            }) { _ in
+                // Code to execute after reloadData and layout updates
+                cell.clnCollectionView.reloadItems(at: cell.clnCollectionView.indexPathsForVisibleItems)
+                self.tblView.reloadData()
             }
-        
-            
-       
-        
+        }
     }
 }

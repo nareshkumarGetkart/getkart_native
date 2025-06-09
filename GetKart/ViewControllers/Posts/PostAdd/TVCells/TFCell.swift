@@ -10,13 +10,18 @@ import WebKit
 
 protocol TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String)
+    func textFieldEditingBegin(selectedRow:Int, strText:String)
+
 }
 extension TextFieldDoneDelegate {
     func textFieldEditingDone(selectedRow:Int, strText:String){}
+    func textFieldEditingBegin(selectedRow:Int, strText:String){}
 }
 
 class TFCell: UITableViewCell, UITextFieldDelegate {
    
+    @IBOutlet weak var iconBgView:UIView!
+
     @IBOutlet weak var iconImgWebView:WKWebView!
     @IBOutlet weak var imgView:UIImageView!
     @IBOutlet weak var lblCurSymbol:UILabel!
@@ -31,6 +36,12 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        self.showCurrencySymbol = false
+        self.lblCurSymbol.isHidden = true
+        self.txtField.leftPadding = 10
+        iconBgView.layer.cornerRadius = 5.0
+        iconBgView.clipsToBounds = true
+      
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -62,7 +73,17 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
                 lblCurSymbol.isHidden = true
                 txtField.leftPadding = 10
             }
+        }else{
+            lblCurSymbol.isHidden = true
+            txtField.leftPadding = 10
         }
         return true;
+    }
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+  
+        textFieldDoneDelegate?.textFieldEditingBegin(selectedRow: txtField.tag, strText: textField.text ?? "")
+        
+        return true
     }
 }
