@@ -22,24 +22,18 @@ class HomeHorizontalCell: UITableViewCell {
     @IBOutlet weak var bgViewSeeAll:UIView!
     @IBOutlet weak var cnstrntHeightSeeAllView:NSLayoutConstraint!
     var navigationController: UINavigationController?
-    
-    var cellTypes:CellType?{
-        didSet{
-            if cnstrntHeightSeeAllView.constant == 0{
-                btnSeeAll.setTitle("", for: .normal)
-            }else{
-                btnSeeAll.setTitle("See All", for: .normal)
-                
-            }
+  
+    var cellTypes: CellType? {
+        didSet {
+            btnSeeAll.setTitle(cnstrntHeightSeeAllView.constant == 0 ? "" : "See All", for: .normal)
         }
     }
+    
     weak var delegateUpdate: CollectionTableViewCellDelegate?
     var istoIncreaseWidth = false
-    
     var listArray:[Any]?
     var section = 0
     var rowIndex = 0
-
     weak var delegateUpdateList:UPdateListDelegate?
     
     override func awakeFromNib() {
@@ -49,7 +43,6 @@ class HomeHorizontalCell: UITableViewCell {
         collctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
         self.collctnView.delegate = self
         self.collctnView.dataSource = self
-       
     }
     
     
@@ -58,66 +51,37 @@ class HomeHorizontalCell: UITableViewCell {
         
         // Configure the view for the selected state
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        DispatchQueue.main.async {
-            // self.delegateUpdate?.didUpdateCollectionViewHeight()
-        }
-    }
-    
+
 }
 
 
 extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
     
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        1
-    }
+    func numberOfSections(in collectionView: UICollectionView) -> Int {  1 }
     
+  
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if cellTypes == .categories{
-            return (listArray?.count ?? 0) > 0 ?  (listArray?.count ?? 0) + 1 : 0
-        }else{
-            return listArray?.count ?? 0
-        }
+        
+       return (cellTypes == .categories) ? ((listArray?.count ?? 0) > 0 ? (listArray?.count ?? 0) + 1 : 0) : (listArray?.count ?? 0)
     }
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        
-         let height = collectionView.bounds.height
-             let widthCell: CGFloat
-
-             if cellTypes == .categories {
-                 widthCell =  87 // collectionView.bounds.size.width / 3.0 - 35
-                 return CGSize(width: widthCell, height: height)
-             } else {
-                 widthCell = istoIncreaseWidth
-                     ? (collectionView.bounds.size.width / 2.0 + 20.0)
-                     : (collectionView.bounds.size.width / 2.0 - 2.5)
-                 return CGSize(width: widthCell, height: height)
-             }
-         
-
-        /*
-        //Existing code
-        if cellTypes == .categories{
-            return CGSize(width: self.collctnView.bounds.size.width/3.0 - 35, height: 130)
-        }else{
-                
-            let widthCell = (istoIncreaseWidth) ? (self.collctnView.bounds.size.width/2.0 + 20.0) : (self.collctnView.bounds.size.width/2.0 - 2.5)
-
-            return CGSize(width: widthCell , height: 260)
-        }*/
+        let height = collectionView.bounds.height
+        let widthCell: CGFloat = (cellTypes == .categories) ? 87 : (istoIncreaseWidth ? collectionView.bounds.width / 2.0 + 20.0 : collectionView.bounds.width / 2.0 - 2.5)
+        return CGSize(width: widthCell, height: height)
     }
     
    
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if cellTypes == .categories{
+        
+        
+        
+      /*  if cellTypes == .categories{
+          
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
            
             if (listArray?.count ?? 0) == indexPath.item{
@@ -137,8 +101,6 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 cell.imgView.contentMode = .scaleAspectFill
                 cell.imgView.isHidden = false
                 cell.threeDotImgView.isHidden = true
-
-
             }
             
             cell.imgView.layer.cornerRadius = 10.0
@@ -154,7 +116,6 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     cell.lblItem.text = obj.name
                     cell.lblAddress.text = obj.address
                     cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
-                    // cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
                     let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
                     cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
                     cell.btnLike.tag = indexPath.item
@@ -178,6 +139,31 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             
             return cell
             
+        }
+        
+        return UICollectionViewCell()
+        */
+        
+        
+        if cellTypes == .categories {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
+            cell.prepareForReuse()
+            
+            if indexPath.item == listArray?.count {
+                cell.configureAsMoreCell()
+            } else if let obj = listArray?[indexPath.item] as? CategoryModel {
+                cell.configure(with: obj)
+            }
+            return cell
+            
+        } else if cellTypes == .product {
+            
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
+            cell.prepareForReuse()
+            if let obj = listArray?[indexPath.item] as? ItemModel {
+                cell.configure(with: obj, index: indexPath.item, likeAction: #selector(likebtnAction))
+            }
+            return cell
         }
         
         return UICollectionViewCell()
@@ -219,13 +205,11 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     self?.listArray?[indexPath.item] = obj
                     self?.collctnView.reloadItems(at: [indexPath])
                     self?.delegateUpdateList?.updateArray(section: self?.section ?? 0, rowIndex: self?.rowIndex ?? 0, arrIndex: indexPath.item, obj: obj)
-
                 }
             }
             
             let hostingController = UIHostingController(rootView:swiftUIview)
             hostingController.hidesBottomBarWhenPushed = true
-            
             self.navigationController?.pushViewController(hostingController, animated: true)
         }
     }
@@ -236,13 +220,13 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             if  var obj = (listArray?[sender.tag] as? ItemModel){
                 obj.isLiked?.toggle()
                 listArray?[sender.tag] = obj
-                self.collctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
+                collctnView.reloadItems(at: [IndexPath(row: sender.tag, section: 0)])
                 delegateUpdateList?.updateArray(section: section, rowIndex: rowIndex, arrIndex: sender.tag, obj: obj)
                 addToFavourite(itemId:obj.id ?? 0)
             }
         }
     }
-    
+
     
     func addToFavourite(itemId:Int){
         
@@ -255,8 +239,6 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
         }
     }
 }
-
-
 
 
 

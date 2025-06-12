@@ -37,7 +37,6 @@ class HomeTblCell: UITableViewCell {
     
     var section = 0
     var rowIndex = 0
-
     weak var delegateUpdateList:UPdateListDelegate?
     
     override func awakeFromNib() {
@@ -47,31 +46,23 @@ class HomeTblCell: UITableViewCell {
         cllctnView.register(UINib(nibName: "CategoriesCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesCell")
         self.cllctnView.delegate = self
         self.cllctnView.dataSource = self
-        
-      
-
-        
-
     }
+   
     /*
      https://adminweb.getkart.com/images/app_styles/style_1.png
      https://adminweb.getkart.com/images/app_styles/style_2.png
      https://adminweb.getkart.com/images/app_styles/style_3.png
      https://adminweb.getkart.com/images/app_styles/style_4.png
      */
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         
-        // Configure the view for the selected state
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-       // DispatchQueue.main.async {
-            // self.delegateUpdate?.didUpdateCollectionViewHeight()
-      //  }
     }
-    
     
 }
 
@@ -79,14 +70,11 @@ class HomeTblCell: UITableViewCell {
 extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
     
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        1
-    }
+    func numberOfSections(in collectionView: UICollectionView) -> Int { 1 }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return listArray?.count ?? 0
-        
     }
     
     
@@ -103,6 +91,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
        
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         if cellTypes == .categories{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
             
@@ -146,7 +135,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             }
 
             return cell
-            
+
         }
         
         return UICollectionViewCell()
@@ -200,9 +189,6 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
         }
     }
 }
-
-
-
 
 
 

@@ -101,7 +101,7 @@ struct SearchProductView: View {
             }
             .padding(.horizontal, 10)
 
-            let strHeader = (searchText.count == 0) ? "Popular Items" : "Searched Items"
+            let strHeader = (searchText.count == 0) ? "Popular Ads" : "Searched Ads"
             Text(strHeader)
                 .font(.headline)
                 .padding(.horizontal)

@@ -77,22 +77,21 @@ extension CategoriesVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesBigCell", for: indexPath) as! CategoriesBigCell
-        cell.bgView.layer.borderColor = UIColor.lightGray.cgColor
-        cell.bgView.layer.borderWidth = 1.0
-        cell.bgView.layer.cornerRadius = 10.0
-        cell.bgView.clipsToBounds = true
-        cell.imgView.layer.cornerRadius = 15.0
-        cell.imgView.clipsToBounds = true
+     
+        DispatchQueue.main.async {
+            cell.imageBgView.backgroundColor = UIColor(hexString: "#fff7e9")
+            cell.imageBgView.roundCorners(corners: [.bottomLeft,.bottomRight], radius: 15.0)
+            cell.imageBgView.clipsToBounds = true
+            cell.bgView.layer.borderColor = UIColor.lightGray.cgColor
+            cell.bgView.layer.borderWidth = 1.5
+            cell.bgView.layer.cornerRadius = 10.0
+            cell.bgView.clipsToBounds = true
+        }
         
         if let obj = objViewModel?.listArray?[indexPath.item] as? CategoryModel{
             cell.lblTitle.text = obj.name
             cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-           // cell.imgView.layer.borderColor = UIColor.clear.cgColor
-          //  cell.imgView.layer.borderWidth = 0.0
         }
-       
-      //  cell.bgView.addShadow()
-
                 
         return cell
         

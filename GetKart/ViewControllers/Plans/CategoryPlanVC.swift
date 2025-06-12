@@ -54,7 +54,24 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
          
          NotificationCenter.default.addObserver(self,selector: #selector(handleLocationSelected(_:)),
                                                 name:NSNotification.Name(rawValue:NotiKeysLocSelected.buyPackageNewLocation.rawValue), object: nil)
+         
+         let city = Local.shared.getUserCity()
+         let state = Local.shared.getUserState()
+         let country = Local.shared.getUserCountry()
+         let latitude = Local.shared.getUserLatitude()
+         let longitude = Local.shared.getUserLongitude()
+         
+         if city.count > 0 && state.count > 0{
+             self.latitude = latitude
+             self.longitude = longitude
+             self.city = city
+             self.state = state
+             self.country = country
+             subTitleArrray[1] = city + ", " + state + ", " + country
+             self.tblView.reloadData()
+         }
      }
+    
 
     
     deinit {
@@ -162,8 +179,15 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
                 self.navigationController?.pushViewController(destvc, animated: true)
             }
         }else{
-          
-            AlertView.sharedManager.showToast(message: "Select category and location")
+            
+            if self.country.count == 0 && self.category_id == 0 {
+                AlertView.sharedManager.showToast(message: "Please select category and location")
+            }else  if  self.category_id == 0 {
+                AlertView.sharedManager.showToast(message: "Please select category")
+                
+            }else if  self.country.count == 0 {
+                AlertView.sharedManager.showToast(message: "Please select location")
+            }
         }
     }
      

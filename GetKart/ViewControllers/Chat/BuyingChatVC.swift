@@ -204,12 +204,18 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.lblName.text = obj.seller?.name ?? ""
         cell.lblDesc.text = obj.item?.name ?? ""
         cell.imgViewProfile.kf.setImage(with:  URL(string: obj.seller?.profile ?? "") , placeholder:UIImage(named: "user-circle"))
-                
+        
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
-       
+        
         cell.imgViewItem.clipsToBounds = true
+        
+        if (obj.item?.name ?? "").count == 0{
+            cell.lblDesc.isHidden = true
+        }else{
+            cell.lblDesc.isHidden = false
+        }
        
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 

@@ -32,18 +32,18 @@ struct BlogDetailView: View {
         
             ScrollView{
                
-                HStack{ Spacer() }.frame(height: 15)
+                HStack{ Spacer() }.frame(height: 10)
 
                 
                 if (obj?.image ?? "").count > 0{
                     AsyncImage(url: URL(string: obj?.image ?? "")) { image in
-                        image.resizable().aspectRatio(contentMode: .fill)
-                            .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
+                        image.resizable()//.aspectRatio(contentMode: .fill)
+                            .frame(width:  UIScreen.main.bounds.width-20, height: 160).clipped()
                         
                     }placeholder: {
                         
                         Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fill)
-                            .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
+                            .frame(width:  UIScreen.main.bounds.width-20, height: 160).clipped()
                         
                     }
                 }

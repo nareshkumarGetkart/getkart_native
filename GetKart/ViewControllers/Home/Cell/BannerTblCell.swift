@@ -16,19 +16,17 @@ class BannerTblCell: UITableViewCell {
     var navigationController:UINavigationController?
     private  var x = 0
     @IBOutlet weak var pageControl:UIPageControl!
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        
         collctnView.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
         self.collctnView.delegate = self
         self.collctnView.dataSource = self
         pageControl.currentPage = 0
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor
-        startTimer()
-        
+        //startTimer()
     }
     
     
@@ -43,25 +41,38 @@ class BannerTblCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    func configure(with banners: [SliderModel]) {
+        guard self.listArray?.count != banners.count else { return }
+        self.listArray = banners
+        self.pageControl.numberOfPages = banners.count
+        self.pageControl.currentPage = 0
+        self.x = 0
+        self.collctnView.reloadData()
+        startTimer()
+    }
+    
     func startTimer() {
-
+        
         timer =  Timer.scheduledTimer(timeInterval: 2.5, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
-
-
+    
+    
     @objc func scrollAutomatically(_ timer1: Timer) {
         
         if let banner = listArray, banner.count > 0{
             if self.x < banner.count {
-                  let indexPath = IndexPath(item: x, section: 0)
-                  self.collctnView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-                  self.x = self.x + 1
-                }else{
-                  self.x = 0
-                  self.collctnView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredHorizontally, animated: true)
-                }
+                let indexPath = IndexPath(item: x, section: 0)
+                self.collctnView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                self.x = self.x + 1
+            }else{
+                self.x = 0
+                self.collctnView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredHorizontally, animated: true)
+            }
         }
     }
+    
+ 
+
 }
 
 
@@ -175,7 +186,6 @@ func navigateToScreen(index:Int, sliderObj:SliderModel?){
         }
         let hostingController = UIHostingController(rootView:detailView)
         hostingController.hidesBottomBarWhenPushed = true
-
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     

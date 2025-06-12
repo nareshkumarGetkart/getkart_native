@@ -622,8 +622,8 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
 
     func textFieldEditingDone(selectedRow:Int, strText:String) {
         self.selectedRow = -1
-        print(selectedRow, strText)
-        print( AddKeys.name)
+       // print(selectedRow, strText)
+       // print( AddKeys.name)
         if selectedRow == 1 {
             params[AddKeys.name.rawValue] = strText
         }else if selectedRow == 5 {

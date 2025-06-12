@@ -212,10 +212,10 @@ class ChatVC: UIViewController {
     }
     
     @IBAction func userProfileBtnAction(sender : UIButton){
-        /*
+    
         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userId))
         self.navigationController?.pushViewController(hostingController, animated: true)
-        */
+        
     }
     
     

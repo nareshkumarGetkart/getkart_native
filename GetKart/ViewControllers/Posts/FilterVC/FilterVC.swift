@@ -542,16 +542,22 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
     }
     
     func radioCellTapped(row:Int, clnCell:Int){
-        print(dataArray)
-        print(self.dataArray[row])
+      //  print(dataArray)
+      //  print(self.dataArray[row])
         
         var objCustomField = self.dataArray[row]
         
         if objCustomField.type == .radio {
             objCustomField.value?.removeAll()
-            if let str = objCustomField.values?[clnCell] as? String {
-                objCustomField.value?.append(str)
-                dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[clnCell] ?? ""
+            
+            if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
+                //Deselect selected one
+                dictCustomFields["\(objCustomField.id ?? 0)"] = ""
+            }else{
+                if let str = objCustomField.values?[clnCell] as? String {
+                    objCustomField.value?.append(str)
+                    dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[clnCell] ?? ""
+                }
             }
             
         }else if objCustomField.type == .checkbox {

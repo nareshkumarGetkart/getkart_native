@@ -16,12 +16,9 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var lblAddress:UILabel!
     @IBOutlet weak var imgViewitem:UIImageView!
     @IBOutlet weak var bgView:UIView!
-    
     @IBOutlet weak var imgViewLoc:UIImageView!
-   
     @IBOutlet weak var lblBoost:UILabel!
    
-
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -45,7 +42,6 @@ class ProductCell: UICollectionViewCell {
         }
         
         imgViewitem.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
-            
 
     }
    
@@ -55,6 +51,31 @@ class ProductCell: UICollectionViewCell {
         super.prepareForReuse()
         imgViewitem.kf.cancelDownloadTask()
         imgViewitem.image = nil
+        lblItem.text = nil
+        lblAddress.text = nil
+        lblPrice.text = nil
+        lblBoost.isHidden = true
     }
 
+}
+
+
+// Optimized ProductCell (in ProductCell.swift)
+extension ProductCell {
+    func configure(with obj: ItemModel, index: Int, likeAction: Selector) {
+        lblItem.text = obj.name
+        lblAddress.text = obj.address
+        lblPrice.text = "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
+        lblBoost.isHidden = !(obj.isFeature ?? false)
+        let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
+        btnLike.setImage(UIImage(named: imgName), for: .normal)
+        btnLike.tag = index
+        btnLike.addTarget(nil, action: likeAction, for: .touchUpInside)
+        btnLike.backgroundColor = .systemBackground
+        imgViewLoc.image = UIImage(named: "location-outline")?.tinted(with: .label)
+
+        let imageSize = CGSize(width: 130, height: 130)
+        let processor = DownsamplingImageProcessor(size: imageSize)
+        imgViewitem.kf.setImage(with: URL(string: obj.image ?? ""), placeholder: UIImage(named: "getkartplaceholder"), options: [.processor(processor), .scaleFactor(UIScreen.main.scale)])
+    }
 }

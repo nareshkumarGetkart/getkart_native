@@ -109,7 +109,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
         if let obj = objViewModel?.listArray?[indexPath.item] as? ItemModel{
             cell.lblItem.text = obj.name
             cell.lblAddress.text = obj.address
-            cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price ?? 0)"
+            cell.lblPrice.text =  "\(Local.shared.currencySymbol) \(obj.price?.formatNumber() ?? "")"
             
             cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
             

@@ -35,30 +35,13 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnLocation.layer.cornerRadius = 8.0
         btnLocation.backgroundColor = .systemBackground
-        
         btnLocation.setImageColor(color: .label)
-
-//        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
-//        let theme = AppTheme(rawValue: savedTheme) ?? .system
-//        
-//        if theme == .dark{
-//
-//            btnLocation.backgroundColor = UIColor(hexString: "#342b1e")
-//
-//        }else{
-//            btnLocation.backgroundColor = UIColor(hexString: "#FFF7EA")
-//        }
-        
         btnLocation.clipsToBounds = true
-        tblView.rowHeight = UITableView.automaticDimension
-        tblView.estimatedRowHeight = 200
-        updateTolocation()
-        registerCells()
+        configureTableView()
+        updateLocationLabel(city: Local.shared.getUserCity(), state: Local.shared.getUserState(), country: Local.shared.getUserCountry())
         homeVModel = HomeViewModel()
         homeVModel?.delegate = self
         homeVModel?.getProductListApi()
-        self.topRefreshControl.backgroundColor = .clear
-        tblView.refreshControl = topRefreshControl
         
         NotificationCenter.default.addObserver(self,selector:
                                                 #selector(handleLocationSelected(_:)),
@@ -71,6 +54,67 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
     
     
+   
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            homeVModel?.isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
+    }
+  
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Clear caches, release unnecessary memory
+        ImageCache.default.clearMemoryCache()
+    }
+
+    
+    /*
+    private func updateTolocation(){
+        
+       let city = Local.shared.getUserCity()
+        let state = Local.shared.getUserState()
+        let country = Local.shared.getUserCountry()
+        
+     var locStr = city
+        if state.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + state : state
+        }
+        if country.count > 0 {
+            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
+        }
+        
+        if locStr.count == 0 {
+            locStr = "All Countries"
+        }
+        self.lblAddress.text = locStr
+    }
+    */
+    
+    func registerCells(){
+        tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
+        tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
+        tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")        
+    }
+    
+    func scrollToTop() {
+        DispatchQueue.main.async {
+            // scroll code here
+            let topIndex = IndexPath(row: 0, section: 0)
+            if self.tblView?.numberOfRows(inSection: 0) ?? 0 > 0 {
+                self.tblView?.scrollToRow(at: topIndex, at: .top, animated: true)
+            }
+        }
+    }
+    
+    
+    //MARK: Observer Location
     @objc func handleLocationSelected(_ notification: Notification) {
         
         if let userInfo = notification.userInfo as? [String: Any]
@@ -82,6 +126,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             let longitude = userInfo["longitude"] as? String ?? ""
             let locality = userInfo["locality"] as? String ?? ""
             
+            handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
+         /*
             print("Received Location: \(city), \(state), \(country)")
                         
             homeVModel?.page = 1
@@ -116,76 +162,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             }
             self.lblAddress.text = locStr
             // Handle UI update or data save
+            */
         }
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if !AppDelegate.sharedInstance.isInternetConnected{
-            homeVModel?.isDataLoading = false
-            AlertView.sharedManager.showToast(message: "No internet connection")
-            return
-        }
-        
-    }
-  
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Clear caches, release unnecessary memory
-        ImageCache.default.clearMemoryCache()
-    }
-
-    
-    
-    private func updateTolocation(){
-        
-        let city = Local.shared.getUserCity()
-        let state = Local.shared.getUserState()
-        let country = Local.shared.getUserCountry()
-        var locStr = city
-        if state.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + state : state
-        }
-        if country.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
-        }
-        
-        if locStr.count == 0 {
-            locStr = "All Countries"
-        }
-        
-        
-        self.lblAddress.text = locStr
-    }
-    func registerCells(){
-        tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
-        tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
-        tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")        
-    }
-    
-    
-    func scrollToTop() {
-        DispatchQueue.main.async {
-            // scroll code here
-            let topIndex = IndexPath(row: 0, section: 0)
-            if self.tblView?.numberOfRows(inSection: 0) ?? 0 > 0 {
-                self.tblView?.scrollToRow(at: topIndex, at: .top, animated: true)
-            }
-        }
-    }
-    
-    
     @objc func noInternet(notification:Notification?){
       
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
-
     }
     
     //MARK: Pull Down refresh
@@ -202,9 +186,13 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             homeVModel?.itemObj?.data?.removeAll()
             homeVModel?.featuredObj?.removeAll()
             self.tblView.reloadData()
-            
             homeVModel?.getProductListApi()
-            homeVModel?.getSliderListApi()
+            if (homeVModel?.sliderArray?.count ?? 0) == 0{
+                homeVModel?.getSliderListApi()
+            }
+            if (homeVModel?.categoryObj?.data?.count ?? 0) == 0{
+                homeVModel?.getCategoriesListApi()
+            }
             homeVModel?.getFeaturedListApi()
         }
         refreshControl.endRefreshing()
@@ -248,7 +236,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){
 
-        homeVModel?.page = 1
+        handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
+       /* homeVModel?.page = 1
         homeVModel?.itemObj?.data = nil
         homeVModel?.featuredObj = nil
         homeVModel?.itemObj?.data?.removeAll()
@@ -278,9 +267,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             locStr = "All Countries"
         }
         self.lblAddress.text = locStr
+        */
     }
 }
 
+/*
 extension HomeVC:FilterSelected{
     
     
@@ -293,6 +284,8 @@ extension HomeVC:FilterSelected{
         homeVModel?.getProductListApi()
         
         if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
+            
+            handleLocationUpdate(city: city, state: state, country: country, latitude: <#T##String#>, longitude: <#T##String#>)
             var locStr = city
             if state.count > 0 {
                 locStr =  locStr.count > 0 ? locStr + ", " + state : state
@@ -310,7 +303,7 @@ extension HomeVC:FilterSelected{
     }
 }
 
-
+*/
 extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -366,15 +359,19 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "BannerTblCell") as! BannerTblCell
-            cell.listArray = homeVModel?.sliderArray
-            cell.collctnView.updateConstraints()
-            cell.collctnView.reloadData()
-            cell.updateConstraints()
-            cell.navigationController = self.navigationController
+            if let banners = homeVModel?.sliderArray {
+                cell.configure(with: banners)
+            }
+             cell.navigationController = self.navigationController
+
+//            cell.listArray = homeVModel?.sliderArray
+//            cell.collctnView.updateConstraints()
+//            cell.collctnView.reloadData()
+//            cell.updateConstraints()
             return cell
             
         } else if indexPath.section == 1 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
+            guard let cell = tblView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as? HomeHorizontalCell else { return UITableViewCell() }
             cell.cnstrntHeightSeeAllView.constant = 0
             cell.btnSeeAll.setTitle("", for: .normal)
             cell.cellTypes = .categories
@@ -386,6 +383,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.updateConstraints()
             cell.navigationController = self.navigationController
             return cell
+        
             
         }else if indexPath.section == 2{
             let obj = homeVModel?.featuredObj?[indexPath.item]
@@ -555,86 +553,40 @@ extension HomeVC: RefreshScreen{
     
     func refreshFeaturedsList(){
         
-        
-      // UIView.performWithoutAnimation {
-            
-           if (homeVModel?.featuredObj?.count ?? 0) == 0{
-               self.tblView.reloadData()
-               
-           }else{
-               tblView.reloadSections(IndexSet(integer: 2), with: .none)
-           }
-      // }
-    }
-    func refreshBannerList(){
-       // UIView.performWithoutAnimation {
-            
-            tblView.reloadSections(IndexSet(integer: 0), with: .none)
-      //  }
-    }
-    func refreshCategoriesList(){
-     // UIView.performWithoutAnimation {
-            
-            tblView.reloadSections(IndexSet(integer: 1), with: .none)
-        //}
-        
-    }
-    
-    
-    
-    func refreshScreen(){
-        // UIView.performWithoutAnimation {
-        
-        self.tblView.reloadData()
-        tblView.setNeedsLayout()
-        tblView.layoutIfNeeded()
-        
-        // }
-    }
-   
-    
-  /*  func newItemRecieve(newItemArray:[Any]?){
-        
-        
-        if (newItemArray?.count ?? 0) == 0{
+        if (homeVModel?.featuredObj?.count ?? 0) == 0{
+            self.tblView.reloadData()
             
         }else{
-            for index1  in 0...((newItemArray as? [ItemModel])?.count ?? 0) - 1 {
-                
-                if let obj = newItemArray?[index1] as? ItemModel{
-                    
-                    self.tblView.performBatchUpdates {
-                        
-                        self.homeVModel?.itemObj?.data?.append(obj)
-                        
-                        if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: 3)) as? HomeTblCell {
-                            
-                            let indexPath = IndexPath(row: (self.homeVModel?.itemObj?.data?.count ?? 0) - 1, section: 0)
-                            cell.listArray =  self.homeVModel?.itemObj?.data
-                            cell.cllctnView?.insertItems(at: [indexPath])
-                        }else {
-                            // If cell not visible, reload section to reflect new data when it comes into view
-                            self.tblView.reloadSections(IndexSet(integer: 3), with: .none)
-                        }
-                    }
-                    
-                }
-            }
+            tblView.reloadSections(IndexSet(integer: 2), with: .none)
         }
     }
     
-    */
+    func refreshBannerList(){
+        
+        tblView.reloadSections(IndexSet(integer: 0), with: .none)
+    }
+    func refreshCategoriesList(){
+        
+        tblView.reloadSections(IndexSet(integer: 1), with: .none)
+    }
+    
+    func refreshScreen(){
+        self.tblView.reloadData()
+        tblView.setNeedsLayout()
+        tblView.layoutIfNeeded()
+    }
+    
     
     func newItemRecieve(newItemArray:[Any]?){
         guard let newItems = newItemArray as? [ItemModel], !newItems.isEmpty else { return }
-
+        
         let section = 3
         let oldCount = homeVModel?.itemObj?.data?.count ?? 0
         homeVModel?.itemObj?.data?.append(contentsOf: newItems)
         let newCount = homeVModel?.itemObj?.data?.count ?? 0
-
+        
         let newIndexPaths = (oldCount..<newCount).map { IndexPath(item: $0, section: 0) }
-
+        
         DispatchQueue.main.async {
             if let cell = self.tblView.cellForRow(at: IndexPath(row: 0, section: section)) as? HomeTblCell {
                 cell.listArray = self.homeVModel?.itemObj?.data
@@ -645,7 +597,7 @@ extension HomeVC: RefreshScreen{
                 // If cell not visible, reload section to reflect new data when it comes into view
                 self.tblView.reloadSections(IndexSet(integer: section), with: .none)
             }
-
+            
             // Recalculate height if needed
             self.tblView.beginUpdates()
             self.tblView.endUpdates()
@@ -676,7 +628,6 @@ extension HomeVC:UPdateListDelegate{
             if let selObj = obj as? ItemModel{
                 homeVModel?.itemObj?.data?[rowIndex] = selObj
             }
-      
         default:
             break
             
@@ -685,3 +636,53 @@ extension HomeVC:UPdateListDelegate{
     }
     
 }
+
+
+// Optimized HomeVC
+
+extension HomeVC {
+
+
+    func refreshTableOnFilterOrLocationChange() {
+        homeVModel?.page = 1
+        homeVModel?.itemObj?.data?.removeAll()
+        homeVModel?.featuredObj?.removeAll()
+        tblView.reloadData()
+    }
+
+    func configureTableView() {
+        tblView.rowHeight = UITableView.automaticDimension
+        tblView.estimatedRowHeight = 200
+        tblView.refreshControl = topRefreshControl
+        self.topRefreshControl.backgroundColor = .clear
+        
+        registerCells()
+    }
+
+    func handleLocationUpdate(city: String, state: String, country: String, latitude: String, longitude: String) {
+        homeVModel?.city = city
+        homeVModel?.state = state
+        homeVModel?.country = country
+        homeVModel?.latitude = latitude
+        homeVModel?.longitude = longitude
+        refreshTableOnFilterOrLocationChange()
+        homeVModel?.getProductListApi()
+        homeVModel?.getFeaturedListApi()
+        updateLocationLabel(city: city, state: state, country: country)
+    }
+
+    func updateLocationLabel(city: String, state: String, country: String) {
+        var locStr = city
+        if !state.isEmpty { locStr += ", \(state)" }
+        if !country.isEmpty { locStr += ", \(country)" }
+        lblAddress.text = locStr.isEmpty ? "All \(country)" : locStr
+        
+        if state.count == 0 && city.count == 0{
+            lblAddress.text =  "All \(country)"
+        }
+        if let text = lblAddress.text, text.hasPrefix(",") {
+            lblAddress.text = String(text.dropFirst())
+        }
+    }
+}
+

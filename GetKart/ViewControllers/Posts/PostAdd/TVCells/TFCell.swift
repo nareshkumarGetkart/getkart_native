@@ -51,10 +51,11 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            textField.resignFirstResponder();
-            return true
-        }
+        textField.resignFirstResponder();
+        return true
+    }
     
+ 
     func textFieldDidEndEditing(_ textField: UITextField) {
         textFieldDoneDelegate?.textFieldEditingDone(selectedRow: txtField.tag, strText: textField.text ?? "")
         

@@ -215,6 +215,13 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
         cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 
+        
+        if (obj.item?.name ?? "").count == 0{
+            cell.lblDesc.isHidden = true
+        }else{
+            cell.lblDesc.isHidden = false
+        }
+        
         if (obj.lastMessage?.message?.count ?? 0) > 0 {
             cell.lblLastMessage.isHidden = false
             

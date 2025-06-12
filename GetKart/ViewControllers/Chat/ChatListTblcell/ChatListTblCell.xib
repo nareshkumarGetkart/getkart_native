@@ -44,7 +44,7 @@
                                 </constraints>
                             </imageView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="acw-p5-U79">
-                                <rect key="frame" x="64" y="-2.3333333333333321" width="206" height="59.333333333333329"/>
+                                <rect key="frame" x="64" y="-1.6666666666666679" width="206" height="58"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Syi-sc-OzF">
                                         <rect key="frame" x="0.0" y="0.0" width="206" height="20"/>
@@ -60,14 +60,12 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="18" id="qSn-h0-zIR"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
-                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="14"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rue-hB-vsY">
-                                        <rect key="frame" x="0.0" y="40" width="206" height="19.333333333333329"/>
-                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="14"/>
-                                        <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <rect key="frame" x="0.0" y="40" width="206" height="18"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="13"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>

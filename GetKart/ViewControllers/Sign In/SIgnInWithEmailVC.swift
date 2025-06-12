@@ -28,6 +28,16 @@ class SIgnInWithEmailVC: UIViewController {
         lblError.text = ""
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if self.traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            // Appearance (light/dark mode) has changed
+            print("Appearance mode changed: \(traitCollection.userInterfaceStyle == .dark ? "Dark" : "Light")")
+            
+            // Update your UI manually here if needed
+        }
+    }
 
     //MARK: UIButton Action Methods
     @IBAction func backBtnAction(_ sender : UIButton){
@@ -48,12 +58,14 @@ class SIgnInWithEmailVC: UIViewController {
     }
     
     
+    
     @IBAction func skipButtonAction() {
         self.navigationController?.popViewController(animated: false)
         self.delegate?.skipAction()
 
     }
 
+    
     //MARK: Api Methods
     
     func sendEmailOtp(){
@@ -101,8 +113,10 @@ extension SIgnInWithEmailVC:UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         lblError.text = ""
-        txtFdEmail.layer.borderColor =  UIColor.label.cgColor
-
+        txtFdEmail.layer.borderColor =  UIColor.lightGray.cgColor
+        txtFdEmail.layer.borderWidth = 1.0
+        txtFdEmail.clipsToBounds = true
+    
         // Current text in the text field
           let currentText = textField.text ?? ""
           

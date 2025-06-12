@@ -104,9 +104,9 @@ struct BlogCell:View{
         
         VStack(alignment: .leading){
             
-            HStack{ Spacer()}.frame(height: 10)
+           // HStack{ Spacer()}.frame(height: 10)
             AsyncImage(url: URL(string: obj.image ?? "")) { image in
-                image.resizable().aspectRatio(contentMode: .fill)
+                image.resizable()//.aspectRatio(contentMode: .)
                     .frame(width:  UIScreen.main.bounds.width-20, height: 150).clipped()
                 
             }placeholder: {

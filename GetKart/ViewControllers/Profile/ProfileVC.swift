@@ -204,7 +204,18 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
                 
                  cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
-                 cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+                
+                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+                
+               // if (objLoggedInUser.profile ?? "").count == 0{
+                    cell.imgVwProfile.layer.borderColor = Themes.sharedInstance.themeColor.cgColor
+                    cell.imgVwProfile.layer.borderWidth = 1.5
+                    cell.imgVwProfile.clipsToBounds = true
+//                }else{
+//                    cell.imgVwProfile.layer.borderColor = UIColor.clear.cgColor
+//                    cell.imgVwProfile.layer.borderWidth = 0.0
+//                    cell.imgVwProfile.clipsToBounds = true
+//                }
 
                 cell.btnResubmit.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 cell.lblStatus.isUserInteractionEnabled = true
