@@ -153,7 +153,7 @@ class ZoomImageViewController: UIViewController {
         parentZoomingScrollView.setContentOffset(CGPoint(x: Int(SCREEN_WIDTH)*tappedIndex, y: 0), animated: false)
         pager.currentPage = tappedIndex
         pager.isHighlighted = true
-        pager.pageIndicatorTintColor = UIColor.label
+        pager.pageIndicatorTintColor = UIColor.gray
         pager.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor // UIColor.red
         
         let newPosition = SCREEN_WIDTH * CGFloat(self.pager.currentPage)

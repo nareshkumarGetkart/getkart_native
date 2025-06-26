@@ -50,9 +50,8 @@ struct TransactionHistoryView: View {
                 ScrollView {
                    
                     HStack{ Spacer() }.frame(height: 5)
-                    VStack(spacing: 15) {
-                        ForEach(transactions, id:\.id) { transaction in
-                            
+                    LazyVStack(spacing: 15) {
+                        ForEach(transactions,id: \.id) { transaction in
                             TransactionRow(transaction: transaction).background((Color(UIColor.systemBackground)))
                                 .cornerRadius(10)
                                 .shadow(radius: 2)
@@ -69,14 +68,17 @@ struct TransactionHistoryView: View {
                                    
                                 }
                         }
+                        
+                     //  Spacer()
                     }
+                   
+
                 }.refreshable {
                     if isDataLoading == false {
                         self.page = 1
                         getTransactionHistory()
                     }
                 }
-                Spacer()
             }
                         
         }.padding([.leading,.trailing],10).background(Color(.systemGray6))
@@ -110,8 +112,21 @@ struct TransactionHistoryView: View {
                 if self.page == 1{
                     self.transactions.removeAll()
                 }
-                self.transactions.append(contentsOf: obj.data?.data ?? [])
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+//                self.transactions.append(contentsOf: obj.data?.data ?? [])
+                
+                
+                var arr = obj.data?.data ?? []
+                // At loading time
+                for i in 0..<arr.count {
+                    if arr[i].id == nil {
+                        let step = 10
+                        let randomStepped = Int.random(in: 10...1000) * step
+                        arr[i].id = randomStepped
+                    }
+                }
+                self.transactions.append(contentsOf: arr)
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                     self.page += 1
                     self.isDataLoading = false
                 })

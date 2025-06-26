@@ -526,7 +526,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 cell.txtField.leftPadding = 10
             }
             
-            if showErrorMsg == true && (self.selectedRow != indexPath.row) {
+             if showErrorMsg == true && (self.selectedRow != indexPath.row) {
                 if let price = Int(params[AddKeys.price.rawValue] as? String ?? "0"),price < 1{
                     cell.lblErrorMsg.text = "Price must be greater than 0"
                     cell.lblErrorMsg.isHidden = false

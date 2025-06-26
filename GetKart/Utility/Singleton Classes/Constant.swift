@@ -13,7 +13,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -177,6 +177,23 @@ final class Constant: NSObject {
             
         }
     }
+    
+    
+    var getFilterCustomfields:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/get-filterfields"
+            
+        }
+    }
+    
+    
+    var search_suggestions:String{
+        
+        get{
+            return "\(Constant.shared.baseURL)/v1/search-suggestion"
+        }
+    }
+    
     var set_item_total_click:String{
         get{
             return "\(Constant.shared.baseURL)/set-item-total-click"

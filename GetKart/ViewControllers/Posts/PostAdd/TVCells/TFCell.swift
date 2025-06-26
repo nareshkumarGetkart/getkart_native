@@ -39,7 +39,7 @@ class TFCell: UITableViewCell, UITextFieldDelegate {
         self.showCurrencySymbol = false
         self.lblCurSymbol.isHidden = true
         self.txtField.leftPadding = 10
-        iconBgView.layer.cornerRadius = 5.0
+        iconBgView.layer.cornerRadius = 1.0
         iconBgView.clipsToBounds = true
       
     }

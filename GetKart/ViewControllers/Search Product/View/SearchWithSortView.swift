@@ -8,42 +8,30 @@
 import SwiftUI
 
 struct SearchWithSortView: View {
-    @State private var isGridView = true
+   
     var navigationController:UINavigationController?
-    var categoryName = ""
+    @State private var isGridView = true
+    @State var categoryName = ""
+    @State  var categoryImage = ""
     @State var srchTxt = ""
-    @State var selectedSortBy: String  = "Default"
-    @State var showSortSheet: Bool = false
-    @StateObject private var objVM: SearchViewModel
-    
-//    var selectIds = ""
-//    var strTitle = ""
-//    var strSubTitle = ""
-//    
-//    @State var dataArray:[CustomField]?
+    @StateObject  var objVM: SearchViewModel
+    @State var newFieldArray:[CustomField]?
+    @State  private var isByDefaultOpenSearch:Bool
+    @State  private var isByDefaultOpenFilter:Bool
 
-    var objViewModel:CustomFieldsViewModel?
-
-    init(categroryId: Int,navigationController:UINavigationController?,categoryName:String,categoryIds:String) {
-//        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId))
+    init(categroryId: Int,navigationController:UINavigationController?,categoryName:String,categoryIds:String,categoryImg:String,pushToSuggestion:Bool = false,pushToFilter:Bool = false) {
         
         _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId, categoryIds: categoryIds))
-
+        self.isByDefaultOpenSearch = pushToSuggestion
+        self.isByDefaultOpenFilter = pushToFilter
         self.categoryName = categoryName
+        self.categoryImage = categoryImg
         self.navigationController = navigationController
-        
-        
-        if objViewModel == nil {
-            objViewModel = CustomFieldsViewModel()
-            objViewModel?.appendInitialFilterFieldAndGetCustomFieldds(category_ids: categoryIds)
-           
-        }
-       // objViewModel?.delegate = self
-       // objViewModel?.getCustomFieldsListApi(category_ids: categoryIds)
-      //  self.getCustomFieldsListApi(category_ids: "\(categroryId)")
     }
     
+    
     var body: some View {
+        
         
         HStack{
             Button {
@@ -57,41 +45,92 @@ struct SearchWithSortView: View {
             Spacer()
         }.frame(height:44).background(Color(.systemBackground))
         
+            .onAppear{
+                
+                if isByDefaultOpenSearch{
+                    pushToSearchSuggestionScreen()
+                }
+                
+                if (newFieldArray?.count ?? 0) == 0{
+                    getCustomFieldsListApi(category_ids: objVM.categoryIds)
+                }
+            }
+        
         VStack {
             HStack {
-                HStack{
-                    Image("search").renderingMode(.template)
-                        .foregroundColor(.gray)
-                        .padding(.leading,10)
-                    TextField("Search any item...", text: $srchTxt).frame(height:40)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                        .submitLabel(.search)
-                        .tint(Color(Themes.sharedInstance.themeColor))
-                        .onSubmit {
-                            self.objVM.page = 1
-                            self.objVM.getSearchItemApi(srchTxt:srchTxt)
-                        }
-                }.background(Color(.systemGray6))
-                .cornerRadius(10).padding(.leading,10)
-               
+                ZStack{
+                    HStack{
+                        Image("search").renderingMode(.template)
+                            .foregroundColor(.gray)
+                            .padding(.leading,10)
+                        TextField("Search any item...", text: $srchTxt).frame(height:40)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(6)
+                            .tint(Color(Themes.sharedInstance.themeColor))
+                        
+                    }.background(Color(.systemGray6))
+                        .cornerRadius(6).padding(.leading,10)
+                    
+                    // Transparent Button over HStack
+                    Button(action: {
+                        pushToSearchSuggestionScreen()
+                    }) {
+                        Color.clear
+                    }
+                    .contentShape(Rectangle()) // Makes the entire frame tappable
+                    
+                }
                 Spacer()
                 // Toggle button
                 Button(action: {
-                    isGridView = true
+//                    isGridView = true
+                    isGridView.toggle()
                 }) {
-                    Image("grid_view").renderingMode(.template).tint((!isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
-                        .padding(8)
-                }.tint((isGridView) ? Color(UIColor.label) : .gray)
+                    
+                    let strImg = isGridView ? "list_view" : "grid_view"
+                    
+                    Image(strImg).renderingMode(.template)
+                        .tint(Color(UIColor.label))
+                        
+                        
+//                    Image("grid_view").renderingMode(.template).tint((!isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
+//                        .padding(8)
+                }.tint( Color(UIColor.label) ).background(Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .padding(8).padding(.trailing,7)
                 
-                Button(action: {
-                    isGridView = false
-                }) {
-                    Image("list_view").renderingMode(.template).tint((isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
-                        .padding(8)
-                }.tint((isGridView) ? .gray : .black)
+//                Button(action: {
+//                    isGridView = false
+//                }) {
+//                    Image("list_view").renderingMode(.template).tint((isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
+//                        .padding(8)
+//                }.tint((isGridView) ? .gray : .black)
+                
             }.frame(height:50).background(Color(.systemBackground))
                 .padding(.top,1)
+            
+            //Filter and load items
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    let countStr = getFilterAppliedCount()
+                    FilterChip(title: "Filters\(countStr)", icon: "Settings-adjust",isBorder:false)
+                    {selIndx in
+                        
+                    }.onTapGesture {
+                        
+                        pushToFilterScreen(selIndex: 0)
+                        
+                    }
+                    
+                    ForEach(Array((newFieldArray ?? []).enumerated()), id: \.element.id) { index, field in
+                        
+                        filterChipView(for: field, at: index)
+                    }
+                }
+                .padding(.horizontal)
+                .padding([.bottom,.top], 5)
+            }
+            .background(Color(.systemBackground))
             
             if objVM.items.count == 0 && !objVM.isDataLoading {
                 HStack{
@@ -107,144 +146,95 @@ struct SearchWithSortView: View {
                 }
             }else{
                 // Listings
-                ScrollView {
-                    if isGridView {
-                        
-                        gridView //.padding(.horizontal,10)
-                       /* LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                            ForEach($objVM.items, id: \.id) { $item in
-                                
-                                ProductCard(objItem: $item)
-                                    .onTapGesture {
-                                        
-                                        
-                                        let itemId = item.id ?? 0
-                                        
-                                        self.pushToDetailScreen(id: itemId, item: item)
-                                        /*    let destView = ItemDetailView(navController: nil,
-                                                                      itemId:itemId,
-                                                                      isMyProduct:false,
-                                                                      itemObj:nil)
-                                      let hostingVC = UIHostingController(rootView:destView)
-                                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostingVC, animated: true)*/
-                                        
-                                    }
-                                    .onAppear {
-                                        let lastItem = objVM.items.last
-                                        let isLastItem = lastItem?.id == item.id
-                                        let isNotLoading = !objVM.isDataLoading
-                                        if isLastItem && isNotLoading {
-                                            objVM.getSearchItemApi(srchTxt: srchTxt)
-                                        }
-                                    }
-                                
-                            }
+                ScrollViewReader { scrollProxy in
+                    ScrollView {
+                        Color.clear.id("top") // <-- ID to scroll to
+                        if isGridView {
+                            gridView
+                        } else {
+                            listView
                         }
-                        .padding(.horizontal,10)
-                        */
-                    } else {
-                      /*  LazyVStack(spacing: 10) {
-                            ForEach($objVM.items, id: \.id) {
-                                $item in
-                                FavoritesCell(itemObj: $item)
-                                    .padding(.horizontal)
-                                    .onTapGesture {
-                                        
-                                      let itemId =  item.id ?? 0
-                                        self.pushToDetailScreen(id: itemId, item: item)
-
-                                        /*   let destView = ItemDetailView(navController:  AppDelegate.sharedInstance.navigationController, itemId:id,isMyProduct:false,itemObj: item)
-                                        let hostController = UIHostingController(rootView: destView)
-                                        AppDelegate.sharedInstance.navigationController?.pushViewController(hostController, animated: true)
-                                        */
-                                    }.onAppear {
-                                        let lastItem = objVM.items.last
-                                        let isLastItem = lastItem?.id == item.id
-                                        let isNotLoading = !objVM.isDataLoading
-                                        if isLastItem && isNotLoading {
-                                            objVM.getSearchItemApi(srchTxt: srchTxt)
-                                        }
-                                    }
-                            }
+                    }
+                    
+                    .onChange(of: objVM.shouldScrollToTop) { shouldScroll in
+                        if shouldScroll {
+                            scrollProxy.scrollTo("top", anchor: .top)
+                            objVM.shouldScrollToTop = false
                         }
-                        */
-                        listView
                     }
                 }
-                
             }
-           
-            Spacer()
-            // Bottom bar
-            HStack {
-                Button {
-                    if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
-                        vc.delFilterSelected = self
-                        vc.dataArray = objViewModel?.dataArray ?? []
-                        vc.dictCustomFields = self.objVM.dictCustomFields
-                        vc.strCategoryTitle = self.categoryName
-                        vc.isToCategorybtnDisabled = true
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                } label: {
-                    
-                    HStack {
-                        Image("filter").renderingMode(.template).foregroundColor(Color(UIColor.label))
-                        Text("Filter")
-                    }
-                    .frame(maxWidth: .infinity)
-                }.tint((Color(UIColor.label)))
-                
-                
-                
-                Divider()
-                Button {
-                    showSortSheet.toggle()
-                } label: {
-                    HStack {
-                        Image("sort_by").renderingMode(.template).foregroundColor(Color(UIColor.label))
-                        Text("Sort by")
-                    }
-                    
-                    .frame(maxWidth: .infinity)
-                }.tint((Color(UIColor.label)))
-            }.frame(height: 50)
-                .background(Color(UIColor.systemBackground).shadow(radius: 2))
+            
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
-            .sheet(isPresented: $showSortSheet) {
-                if #available(iOS 16.0, *) {
-                    SortSheetView(isPresented: $showSortSheet, selectedSort: $selectedSortBy, onSortSelected: {selected  in
-                        
-                        self.objVM.page = 1
-                        self.objVM.selectedSortBy = selected
-                        self.objVM.getSearchItemApi(srchTxt: srchTxt)
-                    })
-                    .presentationDetents([.fraction(0.45)])
-                } else {
-                    // Fallback on earlier versions
-                  //  fullScreenCover(isPresented: $showSortSheet) {
-                            ZStack {
-                                Color.black.opacity(0.1).ignoresSafeArea()
-                                    .onTapGesture { showSortSheet = false }
-
-                                CustomBottomSheet {
-                                    SortSheetView(
-                                        isPresented: $showSortSheet,
-                                        selectedSort: $selectedSortBy,
-                                        onSortSelected: { selected in
-                                            self.objVM.page = 1
-                                            self.objVM.selectedSortBy = selected
-                                            self.objVM.getSearchItemApi(srchTxt: srchTxt)
-                                        }
-                                    )
-                                }
-                            }.background(Color.clear)
-                      //  }
-                }
-            }
     }
     
+    
+    @ViewBuilder
+     func filterChipView(for field: CustomField, at index: Int) -> some View {
+        let title = field.name ?? ""
+        let isBorder = (field.selectedMaxValue ?? 0) > 0 || (field.value?.count ?? 0) > 0
+
+        FilterChip(title: title, isBorder: isBorder, index: index) { selIndx in
+            
+            self.newFieldArray?[selIndx].value?.removeAll()
+            self.newFieldArray?[selIndx].selectedMaxValue = nil
+            self.newFieldArray?[selIndx].selectedMinValue = nil
+            self.objVM.dictCustomFields.removeValue(forKey: "\(field.id ?? 0)")
+            self.objVM.page = 1
+            self.objVM.getSearchItemApi(srchTxt: srchTxt)
+        }
+        .onTapGesture {
+            pushToFilterScreen(selIndex: index)
+        }
+    }
+
+    
+    func pushToFilterScreen(selIndex:Int){
+        
+        let filterView = FilterView(navigation:self.navigationController,categoryId: objVM.categroryId,categImg: self.categoryImage,categoryName: categoryName,filterDict: objVM.dictCustomFields,fieldArray: newFieldArray,onApplyFilter: { filterDict, filterFieldsArr in
+            objVM.page = 1
+            newFieldArray = filterFieldsArr
+            objVM.dictCustomFields = filterDict
+            self.objVM.getSearchItemApi(srchTxt: srchTxt)
+            
+        }, selectedIndex:selIndex)
+        
+        let hostingVC = UIHostingController(rootView: BottomSheetHost(content: filterView))
+
+        
+        if let sheet = hostingVC.sheetPresentationController {
+            if #available(iOS 16.0, *) {
+                sheet.detents = [.custom(resolver: { context in
+                    context.maximumDetentValue * 0.85
+                })]
+            } else {
+                sheet.detents = [.large()]
+            }
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 20
+        }
+        self.navigationController?.present(hostingVC, animated: true)
+    }
+    
+    func pushToSearchSuggestionScreen(){
+        
+        let swiftUIView = SearchProductView(navigation:self.navigationController){ search in
+            
+            self.objVM.page = 1
+            self.categoryName = search.categoryName ?? ""
+            self.categoryImage = search.categoryImage ?? ""
+            self.srchTxt = search.keyword ?? ""
+            self.objVM.categroryId = "\(search.categoryID ?? 0)"
+            self.objVM.categoryIds = "\(search.categoryID ?? 0)"
+            self.objVM.dictCustomFields["category_id"] =  "\(search.categoryID ?? 0)"
+            self.getCustomFieldsListApi(category_ids: "\(search.categoryID ?? 0)")
+            self.objVM.getSearchItemApi(srchTxt:srchTxt)
+        }
+        let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
+        self.navigationController?.pushViewController(hostingController, animated: true)
+        self.isByDefaultOpenSearch = false
+    }
     
     func pushToDetailScreen(id:Int,item:ItemModel){
         var destView = ItemDetailView(navController:  self.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
@@ -307,93 +297,162 @@ struct SearchWithSortView: View {
             objVM.items[index] = value
         }
     }
-}
-
-
-extension SearchWithSortView: FilterSelected{
-    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
-        print(dict)
-        
-        self.objVM.dictCustomFields = dict
-
-        if dataArray.count < (self.objViewModel?.dataArray?.count ?? 0){
-            
-            self.objVM.dictCustomFields["category_id"] =  self.objVM.categroryId
-        }else{
-            self.objViewModel?.dataArray = dataArray
+    
+    
+    func getFilterAppliedCount() -> String {
+        var count = 0
+        for field in newFieldArray ?? [] {
+            if field.type != .category {
+                if (field.selectedMaxValue ?? 0) > 0 || (field.value?.count ?? 0) > 0 {
+                    count += 1
+                }
+            }
         }
-        self.objVM.page = 1
-        self.objVM.city = dict["city"] as? String ?? ""
-        self.objVM.country = dict["country"] as? String ?? ""
-        self.objVM.state = dict["state"] as? String ?? ""
-       // self.objVM.latitude = dict["latitude"] as? String ?? ""
-      //  self.objVM.longitude = dict["longitude"] as? String ?? ""
-
-        self.objVM.getSearchItemApi(srchTxt: srchTxt)
+        return count > 0 ? " (\(count))" : ""
     }
 }
 
 
 #Preview {
-    SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "",categoryIds:"")
-}
-
-
-struct CustomBottomSheet<Content: View>: View {
-    let content: Content
-
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-
-    var body: some View {
-        VStack {
-            Spacer()
-            content
-                .frame(height: UIScreen.main.bounds.height * 0.45)
-                .frame(maxWidth: .infinity)
-                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemBackground)))
-                .shadow(radius: 5)
-        }
-        .edgesIgnoringSafeArea(.bottom)
-    }
+    SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "",categoryIds:"", categoryImg: "")
 }
 
 
 
-//extension SearchWithSortView {
+
+
+extension SearchWithSortView {
     
-//    func getCustomFieldsListApi(category_ids:String){
-//        let url = Constant.shared.getCustomfields + "?category_ids=\(category_ids)"
-//        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:CustomFieldsParse) in
-//            
-//            if obj.data != nil {
-//                dataArray = obj.data
-//            }
-//        }
-//    }
-  /*  func refreshScreen() {
-       // print(self.objViewModel?.dataArray)
-        self.dataArray.removeAll()
+    func getCustomFieldsListApi(category_ids:String){
         
-        //self.dataArray.append(contentsOf: [CustomFields(),CustomFields(),CustomFields(),CustomFields()])
-        for ind in 0..<4 {
-            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
-            self.dataArray.append(obj)
+       let city = Local.shared.getUserCity()
+       let country = Local.shared.getUserCountry()
+       let  state = Local.shared.getUserState()
+    
+        var latitude = ""
+        var longitude = ""
+
+        if state.count > 0 || state.count > 0{
+            latitude = Local.shared.getUserLatitude()
+            longitude = Local.shared.getUserLongitude()
         }
         
-        for objCustomField in self.objViewModel?.dataArray ?? [] {
-            if objCustomField.type == .radio || objCustomField.type  ==  .checkbox || objCustomField.type  == .dropdown{
-                self.dataArray.append(objCustomField)
+        
+        var strUrl = Constant.shared.getFilterCustomfields + "?category_ids=\(category_ids)"
+        
+        if city.count > 0{
+            strUrl.append("&city=\(city)")
+        }
+        
+        if state.count > 0{
+            strUrl.append("&state=\(state)")
+        }
+        
+        if country.count > 0{
+            strUrl.append("&country=\(country)")
+        }
+        
+        if latitude.count > 0 && (state.count > 0 || city.count > 0){
+            strUrl.append("&latitude=\(latitude)")
+        }
+        
+        if longitude.count > 0 && (state.count > 0 || city.count > 0){
+            strUrl.append("&longitude=\(longitude)")
+        }
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {
+            (obj:CustomFieldsParse) in
+            
+            if obj.data != nil {
+                self.newFieldArray = obj.data ?? []
+                    
+//                if category_ids.count > 0{
+//                    let objCategory = CustomField(id: 123323, name: "Category", type: .category, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+//                    self.newFieldArray?.insert(objCategory, at: 0)
+//                }
+//                
+                let objSortBY = CustomField(id: 345676, name: "Sort By", type: .sortby, image: "", customFieldRequired: nil, values: [
+                    "Default",
+                    "New to Old",
+                    "Old to New",
+                    "Price High to Low",
+                    "Price Low to High"
+                ], minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil,ranges: [])
+                self.newFieldArray?.append(objSortBY)
+                
+                if isByDefaultOpenFilter{
+                    pushToFilterScreen(selIndex: 0)
+                    isByDefaultOpenFilter = false
+                }
             }
         }
-        
-        tblView.reloadData()
-        tblView.performBatchUpdates(nil) { _ in
-            self.tblView.beginUpdates()
-            self.tblView.endUpdates()
-        }
+    }
+    
+}
 
+
+
+struct FilterChip: View {
+    let title: String
+    var icon: String? = nil
+    let isBorder:Bool
+    var index:Int? = nil
+    var getSelectedRemoveIndex: (Int) -> Void
+    
+
+    var body: some View {
+        HStack {
+            if let icon = icon {
+               
+                Image(icon)
+                Text(title)
+                
+            }else{
+                Text(title)
+                if isBorder{
+                    Button {
+                        
+                        getSelectedRemoveIndex(index ?? 0)
+
+                    } label: {
+                        Image("close-small").renderingMode(.template).foregroundColor(.gray)
+                    }
+                }else{
+                    Image("arrow_dd")
+                }
+            }
+            
+        }.padding(8).frame(height: 30)
+            .font(.caption)
+            .background(isBorder ? Color.orange.opacity(0.1) : Color(.systemGray6))
+            .foregroundColor(Color(.label))
+            .cornerRadius(7)
+            .overlay(
+                RoundedRectangle(cornerRadius: 7)
+                    .stroke(((icon?.count ?? 0) > 0) ? Color.clear : (isBorder ? Color.orange : Color(.lightGray)), lineWidth: 1)
+            )
+    }
+}
+
+
+
+
+struct BottomSheetHost: View {
+    let content: FilterView
+
+    var body: some View {
         
-    }*/
-//}
+        if #available(iOS 16.0, *) {
+            
+            content//.padding(.top, 10)
+                .presentationDetents([.fraction(0.8)]) // iOS 16+
+                .presentationDragIndicator(.visible)
+                .ignoresSafeArea(.container, edges: .bottom)
+
+        }else{
+            content//.padding(.top, 10)
+                .ignoresSafeArea(.container, edges: .bottom)
+
+        }
+    }
+}

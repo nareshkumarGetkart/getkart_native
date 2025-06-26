@@ -193,7 +193,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }else{
                 
-                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? "", categoryIds: "\(obj?.id ?? 0)"))
+                let vc = UIHostingController(rootView: SearchWithSortView(categroryId: obj?.id ?? 0, navigationController:self.navigationController, categoryName: obj?.name ?? "", categoryIds: "\(obj?.id ?? 0)", categoryImg:  obj?.image ?? ""))
                 vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
             }

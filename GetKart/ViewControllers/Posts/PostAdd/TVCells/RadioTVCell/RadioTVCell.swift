@@ -26,7 +26,7 @@ class RadioTVCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        imgViewBg.layer.cornerRadius = 5.0
+        imgViewBg.layer.cornerRadius = 1.0
         imgViewBg.clipsToBounds = true
         
         
@@ -35,10 +35,10 @@ class RadioTVCell: UITableViewCell {
         
         let alignedFlowLayout = clnCollectionView?.collectionViewLayout as? AlignedCollectionViewFlowLayout
         alignedFlowLayout?.horizontalAlignment = .left
-                alignedFlowLayout?.verticalAlignment = .top
+        alignedFlowLayout?.verticalAlignment = .top
         alignedFlowLayout?.minimumLineSpacing = 0
         alignedFlowLayout?.minimumInteritemSpacing = 0
-                alignedFlowLayout?.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        alignedFlowLayout?.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         
     }
 
@@ -103,7 +103,6 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CheckBoxCVCell", for: indexPath) as! CheckBoxCVCell
             cell.btnValue.setTitle("", for: .normal)
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
-           // print("CheckBox objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
@@ -125,15 +124,17 @@ extension RadioTVCell:UICollectionViewDelegate, UICollectionViewDataSource, UICo
             cell.btnValue.setTitle("", for: .normal)
             
             cell.btnValue.setTitle(objData?.values?[indexPath.item] ?? "", for: .normal)
-          //  print("Radio objData?.values?[indexPath.item] : ",objData?.values?[indexPath.item] ?? "")
             cell.btnValue.tag = indexPath.item
             cell.btnValue.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
            
             if objData?.value?.contains(objData?.values?[indexPath.item]) == true {
                 cell.btnValue.setTitleColor(.orange, for: .normal)
                 cell.backView.borderColor = UIColor.orange
+                cell.btnValue.titleLabel?.textColor = .orange
+
             }else {
                 cell.btnValue.setTitleColor(.label, for: .normal)
+                cell.btnValue.titleLabel?.textColor = .label
                 cell.backView.borderColor = UIColor.label
             }
             

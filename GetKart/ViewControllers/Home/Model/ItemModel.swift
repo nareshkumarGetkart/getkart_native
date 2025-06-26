@@ -180,8 +180,10 @@ struct CustomField: Codable,Identifiable  {
     let status: Int?
     var value: [String?]?
     let customFieldValue: CustomFieldValue?
-
-   
+    let ranges:[PriceRange]?
+    let minPrice, maxPrice: Double?
+    var selectedMinValue: Double?
+    var selectedMaxValue: Double?
     
     enum CodingKeys: String, CodingKey {
         case id, name, type, image
@@ -192,8 +194,15 @@ struct CustomField: Codable,Identifiable  {
         case maxLength = "max_length"
         case status
         case customFieldValue = "custom_field_value"
+        case ranges = "ranges"
+        case minPrice = "minPrice"
+        case maxPrice = "maxPrice"
+        case selectedMinValue
+        case selectedMaxValue
+
     }
-    init(id: Int?, name: String?, type: TypeEnum?, image: String?, customFieldRequired: Int?, values: [String?]?, minLength: Int?, maxLength: Int?, status: Int?, value: [String?]?, customFieldValue: CustomFieldValue?, arrIsSelected: Array<Bool>, selectedValue: String? = nil) {
+    
+    init(id: Int?, name: String?, type: TypeEnum?, image: String?, customFieldRequired: Int?, values: [String?]?, minLength: Int?, maxLength: Int?, status: Int?, value: [String?]?, customFieldValue: CustomFieldValue?, arrIsSelected: Array<Bool>, selectedValue: String? = nil,ranges:Array<PriceRange> = [], minPrice: Double?=nil, maxPrice: Double?=nil,selectedMinValue:Double?=nil,selectedMaxValue:Double?=nil) {
         self.id = id
         self.name = name
         self.type = type
@@ -205,8 +214,29 @@ struct CustomField: Codable,Identifiable  {
         self.status = status
         self.value = value
         self.customFieldValue = customFieldValue
+        self.ranges = ranges
+        self.minPrice = minPrice
+        self.maxPrice = maxPrice
+        self.selectedMinValue = selectedMinValue
+        self.selectedMaxValue = selectedMaxValue
     }
   
+}
+
+
+struct PriceRange:Codable{
+    
+    let count:Int?
+    let label:String?
+    let max:Double?
+    let min:Double?
+
+    init(count: Int?, label: String?, max: Double?, min: Double?) {
+        self.count = count
+        self.label = label
+        self.max = max
+        self.min = min
+    }
 }
 
 // MARK: - CustomFieldValue
@@ -268,6 +298,10 @@ enum TypeEnum: String, Codable {
     case number = "number"
     case radio = "radio"
     case textbox = "textbox"
+    case range = "range"
+    case sortby = "sortby"
+    case category = "category"
+
 }
 
 // MARK: - Favourite

@@ -14,6 +14,7 @@ protocol FilterSelected{
 }
 
 class FilterVC: UIViewController, LocationSelectedDelegate {
+   
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var btnBack:UIButton!
@@ -110,6 +111,7 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
                     }
                 }
             }
+            
             //posted_since["value"] = dictCustomFields["posted_since"]  as? String ?? ""
            
             city = dictCustomFields["city"] as? String ?? ""
@@ -198,21 +200,32 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
         city = ""
         state = ""
         country = ""
+            min_price = ""
+        max_price = ""
         posted_since.removeAll()
-        self.dataArray.removeAll()
-        for ind in 0..<4 {
-            let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
-            self.dataArray.append(obj)
-        }
-        dictCustomFields.removeAll()
-        
+
         if isToCategorybtnDisabled == true{
          // Coming from homecategory
-       
+            for (index,obj) in dataArray.enumerated(){
+                var objCustomField = self.dataArray[index]
+                if objCustomField.value?.count ?? 0 > 0 {
+                    objCustomField.value?[0] = ""
+                    dictCustomFields["\(objCustomField.id ?? 0)"] = ""
+                    dataArray[index] = objCustomField
+                }
+            }
+            
         }else{
             strCategoryTitle = ""
             category_ids = ""
             category_id = ""
+            self.dataArray.removeAll()
+            dictCustomFields.removeAll()
+            
+            for ind in 0..<4 {
+                let obj = CustomField(id: ind, name: "", type: .none, image: "", customFieldRequired: nil, values: nil, minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil)
+                self.dataArray.append(obj)
+            }
         }
         
         for obj in arrPostedSinceDict {
@@ -222,10 +235,11 @@ class FilterVC: UIViewController, LocationSelectedDelegate {
             }
         }
         
-        min_price = ""
-        max_price = ""
-        
         tblView.reloadData()
+        tblView.performBatchUpdates(nil) { _ in
+            self.tblView.beginUpdates()
+            self.tblView.endUpdates()
+        }
     }
     
     @IBAction  func applyFilterAction() {
@@ -548,12 +562,14 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         var objCustomField = self.dataArray[row]
         
         if objCustomField.type == .radio {
-            objCustomField.value?.removeAll()
             
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
                 //Deselect selected one
                 dictCustomFields["\(objCustomField.id ?? 0)"] = ""
+                objCustomField.value?.removeAll()
+
             }else{
+                objCustomField.value?.removeAll()
                 if let str = objCustomField.values?[clnCell] as? String {
                     objCustomField.value?.append(str)
                     dictCustomFields["\(objCustomField.id ?? 0)"] = objCustomField.values?[clnCell] ?? ""
@@ -589,10 +605,13 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
         if let cell = tblView.cellForRow(at: indexPath)as?
             RadioTVCell {
             cell.objData = objCustomField
+            tblView.beginUpdates()
             cell.clnCollectionView.reloadData()
+            tblView.endUpdates()
         }
     }
-    
+        
+
     @objc func dropDownnAction(_ sender:UIButton) {
         print(sender.tag)
         if sender.tag != 0 {

@@ -58,8 +58,8 @@ struct TransactionClass: Codable {
 }
 
 // MARK: - Datum
-struct TransactionModel: Codable {
-    let id, userID, packageID: Int?
+struct TransactionModel: Codable,Identifiable {
+    var id, userID, packageID: Int?
     let startDate, endDate: String?
     let totalLimit, usedLimit: Int?
     let paymentTransactionsID: Int?
@@ -69,6 +69,8 @@ struct TransactionModel: Codable {
     let user: User?
     let package: Package?
     let paymentTransaction: PaymentTransaction?
+    
+
 
 
     enum CodingKeys: String, CodingKey {

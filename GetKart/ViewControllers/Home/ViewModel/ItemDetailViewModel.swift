@@ -161,8 +161,18 @@ class ItemDetailViewModel:ObservableObject{
     }
     
     
-    func makeItemFeaturedApi(nav:UINavigationController?){
+    func makeItemFeaturd(nav:UINavigationController?){
         
+        AlertView.sharedManager.presentAlertWith(title: "", msg: "Are you sure to create this item as Boost ad?", buttonTitles: ["Cancel","OK"], onController: (nav?.topViewController)!, tintColor: .black) { title, index in
+            if index == 1{
+                self.makeItemFeaturedApi(nav: nav)
+            }else{
+            }
+        }
+    }
+    
+    
+   private func makeItemFeaturedApi(nav:UINavigationController?){
         
         let params = ["item_id":"\(itemObj?.id ?? 0)"]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.make_item_featured, param: params) { responseObject, error in
@@ -180,12 +190,26 @@ class ItemDetailViewModel:ObservableObject{
                 
                 if status == 200 {
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
-
                     self.itemObj?.isFeature = true
                     nav?.popToRootViewController(animated: true)
                     AlertView.sharedManager.showToast(message: message)
                 }else{
                     AlertView.sharedManager.showToast(message: message)
+                    
+                    if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0 {
+                        
+                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                            destvc.hidesBottomBarWhenPushed = true
+                            destvc.categoryId = self.itemObj?.categoryID ?? 0
+                            destvc.categoryName = self.itemObj?.category?.name ?? ""
+                            destvc.city = self.itemObj?.city ?? ""
+                            destvc.country =  self.itemObj?.country ?? ""
+                            destvc.state =  self.itemObj?.state ?? ""
+                            destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
+                            destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                           nav?.pushViewController(destvc, animated: true)
+                        }
+                    }
                 }
             }
         }
@@ -193,7 +217,7 @@ class ItemDetailViewModel:ObservableObject{
     
     
     
-    func getLimitsApi(nav:UINavigationController?){
+  /*  func getLimitsApi(nav:UINavigationController?){
         
         let strUrl = Constant.shared.getLimits + "?package_type=advertisement"
         URLhandler.sharedinstance.makeCall(url:strUrl , param:nil,methodType: .get) { [self] responseObject, error in
@@ -239,7 +263,7 @@ class ItemDetailViewModel:ObservableObject{
             }
         }
     }
-
+*/
     
     func updateItemStatus(nav:UINavigationController?){
         

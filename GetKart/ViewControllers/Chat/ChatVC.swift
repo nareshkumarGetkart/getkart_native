@@ -680,13 +680,11 @@ class ChatVC: UIViewController {
                 let userId =  dataDict["userId"] as? Int ?? 0
                 let status =  dataDict["status"] as? Int ?? 0
                
-                if userId == userId{
+                if userId == self.userId{
                     self.onlineOfflineView.isHidden = (status == 1) ? false : true
                 }
-                
             }
         }
-        
     }
     
     @objc func messageAcknowledge(notification: Notification) {
@@ -746,8 +744,13 @@ class ChatVC: UIViewController {
         
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
+            
             if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
-                                
+                     
+                if let id = dataDict["id"] as? Int, id != item_offer_id{
+                    return
+                }
+                
                 itemName = itemDict["name"] as? String ?? ""
                 itemImg = itemDict["image"] as? String ?? ""
                 price = itemDict["price"] as? Double ?? 0.0
@@ -775,6 +778,8 @@ class ChatVC: UIViewController {
             
              name = dataDict["name"] as? String ?? ""
              profileImg = dataDict["profile"] as? String ?? ""
+            
+            if let usId = dataDict["id"] as? Int , usId != userId{ return }
             
             let is_verified = dataDict["is_verified"] as? Int ?? 0
             self.imgVwVerified.isHidden = (is_verified == 1) ? false : true

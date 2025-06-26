@@ -317,7 +317,9 @@ struct ItemDetailView: View {
                             
                             HStack{
                                 Button(action: {
-                                    self.objVM.getLimitsApi(nav: self.navController)
+//                                    self.objVM.getLimitsApi(nav: self.navController)
+                                    self.objVM.makeItemFeaturd(nav: self.navController)
+
                                 }) {
                                     Text("Create Boost Ad").frame(width: 140, height: 40, alignment: .center)
                                         .foregroundColor(.white)
@@ -559,22 +561,23 @@ struct ItemDetailView: View {
                 let id = dataDict["id"] as? Int ?? 0
                 let buyer_id = dataDict["buyer_id"] as? Int ?? 0
                 let seller_id = dataDict["seller_id"] as? Int ?? 0
+                let item_id = dataDict["item_id"] as? Int ?? 0
                 
-                var userId = 0
-                if Local.shared.getUserId() == buyer_id{
-                    userId = seller_id
-                }else if Local.shared.getUserId() == seller_id{
-                    userId = buyer_id
+                if (item_id == objVM.itemObj?.id ){
+                    var userId = 0
+                    if Local.shared.getUserId() == buyer_id{
+                        userId = seller_id
+                    }else if Local.shared.getUserId() == seller_id{
+                        userId = buyer_id
+                    }
+                    objVM.itemObj?.isAlreadyOffered = true
+                    objVM.itemObj?.itemOffers = [ItemOffers(amount: Int(objVM.itemObj?.price ?? 0.0), buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
+                                      
+                    let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                    destVC.item_offer_id = id
+                    destVC.userId = userId
+                    self.navController?.pushViewController(destVC, animated: true)
                 }
-                objVM.itemObj?.isAlreadyOffered = true
-                objVM.itemObj?.itemOffers = [ItemOffers(amount: Int(objVM.itemObj?.price ?? 0.0), buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
-                
-                let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                destVC.item_offer_id = id
-                destVC.userId = userId
-                self.navController?.pushViewController(destVC, animated: true)
-                
-
             }
         }
         
@@ -778,6 +781,18 @@ struct ItemDetailView: View {
                             userId = sellerId
                         }
                         
+                        //Already pushed same chat screen
+                        for controller in self.navController?.viewControllers ?? []{
+                            
+                            if let destController = controller as? ChatVC{
+                                if destController.userId == userId , destController.item_offer_id == offerId {
+                                    self.navController?.popToViewController(destController, animated: true)
+                                    return
+                                }
+                            }
+                        }
+                        
+                        //Push new chat screen
                         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                         destVC.item_offer_id = offerId
                         destVC.userId = userId
@@ -1108,25 +1123,41 @@ struct InfoView: View {
 //                    .frame(width: 30, height: 30)
                 RemoteSVGWebView(svgURL: iconURL)
                       .frame(width: 30, height: 30)
+                     // .background(Color(.white))
+                      .cornerRadius(7.0)
+                      .clipped()
             } else {
 //            if icon.lowercased().contains(".svg"){
 //                SVGImageView(url: URL(string: icon)).frame(width:30, height: 30)
 //               
 //
 //            }else{
-               
-                AsyncImage(url: URL(string: icon)) { image in
-                     image
-                         .resizable()
-                         .scaledToFit()
-                         .frame(width:30, height: 30)
-                     
-                 }placeholder: {
-                     
-                     Image("getkartplaceholder").resizable()
-                         .scaledToFit()
-                         .frame(width:30, height: 30)
-                 }
+               // ZStack{
+                    // Background
+//                        RoundedRectangle(cornerRadius: 7)
+//                            .fill(Color(.white))
+//                            .frame(width: 30, height: 30)
+//                            .clipped()
+
+                    
+                    AsyncImage(url: URL(string: icon)) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width:30, height: 30)
+                            .cornerRadius(7.0)
+                           
+                        
+                    }placeholder: {
+                        
+                        Image("getkartplaceholder")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width:30, height: 30)
+                            .cornerRadius(7.0)
+
+                    }
+               // }
             }
        
             VStack(alignment: .leading,spacing: 0){

@@ -206,13 +206,21 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
            let vc = UIHostingController(rootView:rootView)
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
+        
     
 }
     
     @IBAction func searchBtnAction(_ sender : UIButton){
-        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
-        hostingController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(hostingController, animated: true)
+//        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
+//        hostingController.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(hostingController, animated: true)
+//        
+            
+        
+        let swiftUIview = SearchWithSortView(categroryId: 0, navigationController:self.navigationController, categoryName:  "", categoryIds: "", categoryImg: "",pushToSuggestion:true)
+        let vc = UIHostingController(rootView: swiftUIview)
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: false)
     }
     
     @IBAction func micBtnAction(_ sender : UIButton){
@@ -222,9 +230,21 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     @IBAction func filterBtnAction(_ sender : UIButton){
         
-        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
-        hostingController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(hostingController, animated: false)
+        
+        let swiftUIview = SearchWithSortView(categroryId: 0, navigationController:self.navigationController, categoryName:  "", categoryIds: "", categoryImg: "",pushToSuggestion:false,pushToFilter:true)
+        let vc = UIHostingController(rootView: swiftUIview)
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
+        
+//        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
+//        hostingController.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(hostingController, animated: false)
+        
+                
+//        let hostingController = UIHostingController(rootView: FilterView(navigation:self.navigationController))
+//        hostingController.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(hostingController, animated: false)
+//
     }
     
     

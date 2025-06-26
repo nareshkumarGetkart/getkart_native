@@ -16,6 +16,7 @@ enum SocialMediaLoginType{
     case gmail, apple
 }
 
+
 class LoginVC: UIViewController {
     
     @IBOutlet weak var scrScrollView:UIScrollView!
@@ -45,6 +46,10 @@ class LoginVC: UIViewController {
         if self.navigationController?.viewControllers.count ?? 0 > 1 {
             self.navigationController?.viewControllers.remove(at: 0)
         }
+        
+        txtEmailPhone.autocorrectionType = .no
+        txtEmailPhone.keyboardType = .phonePad
+        txtEmailPhone.textContentType = .telephoneNumber
         txtEmailPhone.addTarget(self, action: #selector(changedCharacters(textField:)), for: .editingChanged)
         txtEmailPhone.maxLength = 50
         txtEmailPhone.text = ""
@@ -55,8 +60,8 @@ class LoginVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scrScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: 650)
