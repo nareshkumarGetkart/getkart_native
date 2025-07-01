@@ -154,7 +154,7 @@ struct FilterView: View {
                                         
                                         if objCustomField.value?.contains(value) == true {
                                             objCustomField.value?.removeAll { $0 == value }
-                                            let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
+                                            let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                                             fieldVM.dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
 
                                         } else {
@@ -162,7 +162,7 @@ struct FilterView: View {
                                                 objCustomField.value = []
                                             }
                                             objCustomField.value?.append(value)
-                                            let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
+                                            let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                                             fieldVM.dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
                                         }
                                         // Replace the whole struct to trigger  update

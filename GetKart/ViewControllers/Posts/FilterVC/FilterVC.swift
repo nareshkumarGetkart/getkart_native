@@ -580,20 +580,20 @@ extension FilterVC:UITableViewDataSource, UITableViewDelegate, radioCellTappedDe
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
                 if let index = objCustomField.value?.firstIndex(where: {$0 == objCustomField.values?[clnCell]}) {
                     objCustomField.value?.remove(at: index)
-                    let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
+                    let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                     dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
                      
                 }else {
                     if let str = objCustomField.values?[clnCell] as? String{
                         objCustomField.value?.append(str)
-                        let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
+                        let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                         dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
                     }
                 }
             }else {
                 if let str = objCustomField.values?[clnCell] as? String{
                     objCustomField.value?.append(str)
-                    let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ", ")
+                    let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                     dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
                 }
             }
