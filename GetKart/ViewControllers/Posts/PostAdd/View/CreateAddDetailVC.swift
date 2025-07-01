@@ -9,6 +9,7 @@ import UIKit
 import SwiftUI
 
 enum AddKeys: String{
+    
     case name
     case slug
     case description
@@ -28,6 +29,7 @@ enum AddKeys: String{
 }
 
 class CreateAddDetailVC: UIViewController {
+    
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnBack:UIButton!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -42,7 +44,6 @@ class CreateAddDetailVC: UIViewController {
     var objViewModel:CustomFieldsViewModel?
     var params:Dictionary<String,Any> = [:]
     lazy private var imagePicker = UIImagePickerController()
-    
     var imgData:Data?
     var imgDataEditPost:Data?
     var imgName = "image"
@@ -51,10 +52,8 @@ class CreateAddDetailVC: UIViewController {
     var delete_item_image_id:String = ""
     var isImgData = false
     private var showErrorMsg = false
-   
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
-    
     var selectedRow = -1
     
     //MARK: Controller life cycle methods
@@ -76,7 +75,22 @@ class CreateAddDetailVC: UIViewController {
         if popType == .createPost {
             objViewModel = CustomFieldsViewModel()
             objViewModel?.delegate = self
-            objViewModel?.getCustomFieldsListApi(category_ids: category_ids)
+             objViewModel?.getCustomFieldsListApi(category_ids: category_ids)
+
+          /*  let idsArray = category_ids
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+
+            if let lastID = idsArray.last {
+                print("Last ID: \(lastID)")
+                objViewModel?.getCustomFieldsListApi(category_ids: lastID)
+
+            } else {
+                print("No IDs found!")
+                objViewModel?.getCustomFieldsListApi(category_ids: category_ids)
+
+            }*/
             
             params[AddKeys.all_category_ids.rawValue] = category_ids
             params[AddKeys.category_id.rawValue] = objSubCategory?.id ?? 0
@@ -132,7 +146,6 @@ class CreateAddDetailVC: UIViewController {
                 
                 let indexPath = IndexPath(row: 3, section: 0)
                 if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                        
                         
                     cell.btnAddPicture.isHidden = true
                     cell.clnCollectionView.isHidden = false
@@ -242,32 +255,36 @@ class CreateAddDetailVC: UIViewController {
         params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        // print(params)
+                
+        var scrollIndex = -1
         
         if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
+            scrollIndex = 0
             
         }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
             showErrorMsg = true
-
+            scrollIndex = 0
         }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
+            scrollIndex = 1
             
         }else if  imgData == nil{
             
             showErrorMsg = true
+            scrollIndex = 2
             
         }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
-            
+            scrollIndex = 4
         }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), price < 1 {
             
             showErrorMsg = true
-            
+            scrollIndex = 4
+
         }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
             
             showErrorMsg = true
@@ -278,12 +295,58 @@ class CreateAddDetailVC: UIViewController {
            
             if self.objViewModel?.dataArray?.count == 0 {
                 //If no any custom field
-                let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
-                self.navigationController?.pushViewController(vc, animated: true)
+//                var vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+//                
+                
+                if popType == .createPost {
+                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                    self.navigationController?.pushViewController(vc, animated: true)
+
+                }else{
+                    
+                    var pushImgData = self.imgData
+                    var pushImgName = self.imgName
+                    var pushGalleryImg : Array<Data> = []
+                    var pushGallery_imageNames : Array<String> = []
+                    
+                    if delete_item_image_id.count > 0 {
+                        params["delete_item_image_id"] = delete_item_image_id.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                    
+                    if self.imgDataEditPost != imgData {
+                        pushImgData = self.imgData
+                        pushImgName = self.imgName
+                    }
+                    
+                    //send only images that is updated by user
+                    for ind in 0..<self.gallery_images.count{
+                        let data = self.gallery_images[ind]
+                        var found = false
+                        for index in 0..<(self.itemObj?.galleryImages?.count ?? 0){
+                            if let obj = self.itemObj?.galleryImages?[index] {
+                                
+                                if obj.imgData == data {
+                                    found = true
+                                    break
+                                }
+                            }
+                        }
+                        
+                        if found == false {
+                            pushGalleryImg.append(data)
+                            pushGallery_imageNames.append(self.gallery_imageNames[ind])
+                        }
+                    }
+                    
+                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData:pushImgData, imgName: pushImgName, gallery_images: pushGalleryImg, gallery_imageNames: pushGallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                    
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
                 
             }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
                 vc.dataArray = self.objViewModel?.dataArray ?? []
                 if popType == .createPost {
+                    
                     vc.imgData = self.imgData
                     vc.imgName = self.imgName
                     vc.gallery_images = self.gallery_images
@@ -313,13 +376,15 @@ class CreateAddDetailVC: UIViewController {
                                 }
                             }
                         }
-                        if found == false {
+                       
+                         if found == false {
                             vc.gallery_images.append(data)
                             vc.gallery_imageNames.append(self.gallery_imageNames[ind])
                         }
                     }
                 }
                 
+                 print(params)
                 vc.params = self.params
                 vc.popType = self.popType
                 vc.itemObj = self.itemObj
@@ -328,8 +393,11 @@ class CreateAddDetailVC: UIViewController {
         }
         
         tblView.reloadData()
+        
+        if scrollIndex >= 0{
+            self.tblView.scrollToRow(at: IndexPath(row: scrollIndex, section: 0), at: .top, animated: true)
+        }
     }
-    
 }
 
 extension CreateAddDetailVC:RefreshScreen {
@@ -398,7 +466,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
-                    cell.lblErrorMsg.text = "Please enetr valid Ad Title"
+                    cell.lblErrorMsg.text = "Please enter valid Ad Title"
                 }else {
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
@@ -582,7 +650,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.iconBgView.isHidden = true
 
-            cell.lblTitle.text = "Video Link"
+            cell.lblTitle.text = "Video Link(optional)"
             cell.txtField.placeholder = "http://example.com/video.mp4"
             cell.lblErrorMsg.isHidden = true
             cell.txtField.keyboardType = .default
@@ -815,9 +883,8 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
         self.present(imagePicker, animated: true)
 
     }
-    
-    
 }
+
 
 extension CreateAddDetailVC: PictureAddedDelegate {
     
@@ -863,6 +930,10 @@ extension CreateAddDetailVC: PictureAddedDelegate {
                         print("delete_item_image_id: ",delete_item_image_id)
                     }
                     
+                    if (self.itemObj?.galleryImages?.count ?? 0) > col{
+                        
+                        self.itemObj?.galleryImages?.remove(at: col)
+                    }
                     
                     gallery_images.remove(at: col)
                     gallery_imageNames.remove(at: col)

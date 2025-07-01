@@ -14,34 +14,16 @@ import SwiftUI
 struct SearchProductView: View {
  
     var navigation:UINavigationController?
-    @State private var isAtBottom = false
     @State var navigateToFilterScreen = false
     @State var strCategoryTitle = ""
     @StateObject private var viewModel = ProductSearchViewModel()
     @FocusState private var isFocused: Bool
-
     var onSelectSuggestion: (Search) -> Void
 
     var body: some View {
        
         VStack {
-           /* HStack {
-                Button(action: {
-                    navigation?.popViewController(animated: true)
-                }) {
-                    Image("arrow_left")
-                        .renderingMode(.template)
-                        .foregroundColor(Color(.label))
-                        .padding(5)
-                }
-                Text("Search")
-                    .font(.custom("Manrope-Bold", size: 20.0))
-                    .foregroundColor(Color(.label))
-                Spacer()
-            }
-            .frame(height: 44)
-            .padding(.horizontal)
-*/
+
             HStack {
           
                 VStack{
@@ -68,7 +50,7 @@ struct SearchProductView: View {
                                 .focused($isFocused) // bind focus to this field
                                 .tint(Color.orange)
                                 .frame(height: 45)
-                                .submitLabel(.done)
+                                .submitLabel(.search)
                                 .background(Color(.systemBackground))
                                 .padding(.trailing, 10)
                                 .onSubmit {
@@ -82,7 +64,7 @@ struct SearchProductView: View {
                         .frame(height: 45)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(.separator), lineWidth: 1)
+                                .stroke(((viewModel.searchText.count > 0) ? Color(.orange) : Color(.separator)), lineWidth: 1)
                         ).clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     HStack{
@@ -116,38 +98,9 @@ struct SearchProductView: View {
                         }
                     }
 
-               /* Button(action: {
-                    if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
-                        vc.dataArray = self.viewModel.dataArray
-                        vc.dictCustomFields = self.viewModel.dictCustomFields
-                        vc.strCategoryTitle = self.strCategoryTitle
-                        vc.delFilterSelected = self
-                        self.navigation?.pushViewController(vc, animated: true)
-                    }
-                }) {
-                    Image("filter")
-                        .renderingMode(.template)
-                        .foregroundColor(.orange)
-                        .frame(width: 50, height: 45)
-                        .background(Color(.systemBackground))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(.separator), lineWidth: 1)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        
-                }
-                .padding(.leading, 10)
-                .clipped()*/
+              
             }.background(Color(.systemBackground))
             
-
-//            let strHeader = (viewModel.searchText.count == 0) ? "Popular Ads" : "Searched Ads"
-//            Text(strHeader)
-//                .font(.headline)
-//                .padding(.horizontal)
-//                .padding(.top, 5)
-//                .frame(maxWidth: .infinity, alignment: .leading)
 
             if viewModel.items.count == 0  && !viewModel.isDataLoading{
                 HStack {
@@ -173,7 +126,6 @@ struct SearchProductView: View {
                     Spacer()
                 }
             } else {
-               // ScrollViewReader { scrollProxy in
                 ScrollView {
                     VStack(spacing: 0) {
                         
@@ -186,36 +138,10 @@ struct SearchProductView: View {
                                     self.navigation?.popViewController(animated: false)
                             }
                         
-                            /*   ForEach($viewModel.items) { $item in
-                            
-                            
-                         FavoritesCell(itemObj: $item).id(item.id)
-                                .onTapGesture {
-                                    var swiftVw = ItemDetailView(navController: self.navigation, itemId: item.id ?? 0, itemObj: item, isMyProduct: false, slug: item.slug)
-                                    
-                                    swiftVw.returnValue = { value in
-                                        
-                                        if let obj = value{
-                                            self.updateItemInList(obj)
-                                        }
-                                    }
-                                    let hostingController = UIHostingController(rootView: swiftVw)
-
-                                    self.navigation?.pushViewController(hostingController, animated: true)
-                                }*/
+                           
                         }
                     }
                     .padding(.horizontal, 10)
-
-//                    GeometryReader { geo -> Color in
-//                        DispatchQueue.main.async {
-//                            let frame = geo.frame(in: .global)
-//                            let screenHeight = UIScreen.main.bounds.height
-//                            isAtBottom = frame.maxY < screenHeight + 20
-//                        }
-//                        return Color.clear
-//                    }
-//                    .frame(height: 1)
 
                     if viewModel.isDataLoading {
                         ProgressView()
@@ -227,47 +153,14 @@ struct SearchProductView: View {
                         UIApplication.shared.endEditing()
                     }
                 )
-                
-//                .onChange(of: viewModel.shouldScrollToTop) { shouldScroll in
-//                    if shouldScroll {
-//                        withAnimation {
-//                            if let id =  viewModel.items.first?.id{
-//                                scrollProxy.scrollTo(id, anchor: .top)
-//                            }
-//                        }
-//                        viewModel.shouldScrollToTop = false
-//                    }
-//                }
-           // }
-                
-               
+
             }
         }
         .background(Color(.systemGroupedBackground))
         .navigationBarHidden(true)
-//        .onAppear {
-//            if navigateToFilterScreen {
-//                if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "FilterVC") as? FilterVC {
-//                    vc.delFilterSelected = self
-//                    vc.isPushedFromHome = navigateToFilterScreen
-//                    self.navigation?.pushViewController(vc, animated: false)
-//                }
-//                navigateToFilterScreen = false
-//            }
-//        }
-//        .onChange(of: isAtBottom) { atBottom in
-//            if atBottom && self.viewModel.isDataLoading == false {
-//            
-//                self.viewModel.getProductListApi(source:.pagination,searchTxt: viewModel.searchText)
-//            }
-//        }
+
     }
-    
-//    private func updateItemInList(_ value: ItemModel) {
-//        if let index = $viewModel.items.firstIndex(where: { $0.id == value.id }) {
-//            viewModel.items[index] = value
-//        }
-//    }
+
     
     func getLocation()->String{
         let city = Local.shared.getUserCity()
@@ -287,17 +180,6 @@ struct SearchProductView: View {
     }
 }
 
-//extension SearchProductView: FilterSelected{
-//    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
-//        print(dict)
-//        self.viewModel.page = 1
-//        self.viewModel.dictCustomFields = dict
-//        self.viewModel.dataArray = dataArray
-//        self.strCategoryTitle = strCategoryTitle
-//        self.viewModel.getProductListApi(source: .filter, searchTxt: viewModel.searchText)
-//    }
-//    
-//}
 
 #Preview {
     SearchProductView(navigation: nil, strCategoryTitle: "", onSelectSuggestion: {_ in })
@@ -314,14 +196,21 @@ struct SearchSuggestionCell:View {
         VStack{
             HStack{
                 
-                let strTitle =  (title.count == 0) ? categoryTitle : (categoryTitle.count > 0) ? "\(title) in \(categoryTitle)" : title
-                
-               
-                Text(strTitle)
-                    .font(Font.manrope(.regular, size: 16)).padding([.leading,.trailing],8).padding([.top,.bottom],10)
+                Image("search").renderingMode(.template).foregroundColor(Color(.label)).padding(.leading,10)
+                VStack(alignment: .leading){
+                    if title.count > 0{
+                        Text(title)
+                            .font(Font.manrope(.bold, size: 16)).padding([.leading,.trailing],5)
+                    }
+                    if categoryTitle.count == 0{
+                        Text("In all categories") .font(Font.manrope(.regular, size: 15)).padding([.leading,.trailing],8)
+                    }else{
+                        Text("\(categoryTitle)") .font(Font.manrope(.regular, size: 15)).padding([.leading,.trailing],8)
+                    }
+                }
                 Spacer()
                 
-            }
+            }.padding(.top,10)
             Divider().background(Color(.separator))
         }.background(Color(.systemBackground))
     }

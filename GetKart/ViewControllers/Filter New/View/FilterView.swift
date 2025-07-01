@@ -105,12 +105,17 @@ struct FilterView: View {
                     }
                 }
                 ScrollView{
-                    if fieldVM.selectedIndex >= 0{
+                    if fieldVM.selectedIndex >= 0,fieldVM.fieldsArray.count > fieldVM.selectedIndex {
                         let item = fieldVM.fieldsArray[fieldVM.selectedIndex]
                         
                         HStack{
-                            Text("FILTER BY \((item.name ?? "").uppercased())")
-                                .font(Font.manrope(.medium, size: 16.0))
+                            if item.type == .sortby{
+                                Text("\((item.name ?? "").uppercased())")
+                                    .font(Font.manrope(.medium, size: 16.0))
+                            }else{
+                                Text("FILTER BY \((item.name ?? "").uppercased())")
+                                    .font(Font.manrope(.medium, size: 16.0))
+                            }
                             Spacer()
                         }
                        
@@ -265,18 +270,15 @@ struct FilterView: View {
                     fieldVM.fieldsArray[index] = objCustomField
                     */
                 showClearAlert = true
-                   // clearFilterAlert()
-                //}
+                 
             } label: {
                 Text("Clear Filters")
                     .frame(width: 120)
-                   // .padding()
                     .foregroundColor(Color(Themes.sharedInstance.themeColor))
 
             }
             
             
-          //  Spacer()
             
             Button {
                       
@@ -285,6 +287,13 @@ struct FilterView: View {
                     if obj.type == .range{
                         if let min = obj.selectedMinValue, let max = obj.selectedMaxValue{
                             fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(min)),\(Int(max))"
+                        }else if let min = obj.selectedMinValue{
+                            fieldVM.fieldsArray[index].selectedMaxValue = obj.maxPrice ?? 0
+                            fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(min)),\(Int(obj.maxPrice ?? 0))"
+
+                        }else if let max = obj.selectedMaxValue{
+                            fieldVM.fieldsArray[index].selectedMinValue = obj.minPrice ?? 0
+                            fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(obj.minPrice ?? 0)),\(Int(max))"
                         }
                     }
                     
@@ -491,7 +500,9 @@ struct RangePriceView:View {
         HStack{
             Text(obj.label ?? "").font(Font.manrope(.regular, size: 12)).padding(.leading)
             Spacer()
-            Text("\(obj.count ?? 0)+ items").font(Font.manrope(.regular, size: 12)).padding(.trailing)
+            if (obj.count ?? 0) > 0{
+                Text("\(obj.count ?? 0)+ items").font(Font.manrope(.regular, size: 12)).padding(.trailing)
+            }
 
         }.frame(height: 35)
         .background(
@@ -576,7 +587,14 @@ struct RangeViewFilter:View {
             HStack {
                 Text("\(AttributedString(String(format: "%.0f", lowerValue)))")
                 Spacer()
-                Text("\(AttributedString(String(format: "%.0f", upperValue)))")
+                
+//                if upperValue == maxValue{
+//                    Text("\(AttributedString(String(format: "%.0f+", upperValue)))")
+//
+//                }else{
+                    Text("\(AttributedString(String(format: "%.0f", upperValue)))")
+
+               // }
             }.padding([.leading,.trailing],8)
                 .font(.caption)
        

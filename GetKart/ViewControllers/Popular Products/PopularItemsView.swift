@@ -32,10 +32,7 @@ struct ProductCard: View {
                             .cornerRadius(10)
                     }
                     .setProcessor(
-//                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
-//                                                                height: widthScreen / 2.0 - 15))
-                        
-                        DownsamplingImageProcessor(size: CGSize(width: widthScreen,
+                      DownsamplingImageProcessor(size: CGSize(width: widthScreen,
                                                                 height: widthScreen))
                     )
                     .fade(duration: 0.25)
@@ -87,9 +84,7 @@ struct ProductCard: View {
         .cornerRadius(10)
         .shadow(radius: 2)
         .contentShape(Rectangle())
-           // VStack{
-              //  Spacer()
-                
+          
                 HStack{
                     Spacer()
                     Button {
@@ -115,10 +110,7 @@ struct ProductCard: View {
                         .allowsHitTesting(true)
                     
                 }.padding(.top,widthScreen / 2.0 - 108)
-              
-               // Spacer()
-
-           // }
+      
     }
     }
     

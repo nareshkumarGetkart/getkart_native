@@ -67,7 +67,7 @@ class FIlterViewModel:ObservableObject{
 //                }
 //                
                 let objSortBY = CustomField(id: 345676, name: "Sort By", type: .sortby, image: "", customFieldRequired: nil, values: [
-                    "Default",
+                   // "Default",
                     "New to Old",
                     "Old to New",
                     "Price High to Low",

@@ -41,6 +41,7 @@ class CategoryPackageVC: UIViewController {
         self.lblSelectedLoc.text = "Location: \(city + ", " + state + ", " + country)"
         getPackagesBannersApi()
         getPackagesApi()
+        tblView.showsVerticalScrollIndicator = false
     }
    
    //MARK: UIButton Action Methods
@@ -155,6 +156,9 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         cell.bgViewMain.clipsToBounds = true
         cell.btnViewPlans.tag = indexPath.section
         cell.btnViewPlans.addTarget(self, action: #selector(viewPlansBtnAction(_ :)), for: .touchUpInside)
+//        DispatchQueue.main.async {
+//            cell.bgViewMain.addShadow()
+//        }
         
         return cell
     }

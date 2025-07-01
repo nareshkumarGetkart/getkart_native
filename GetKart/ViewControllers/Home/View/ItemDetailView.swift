@@ -57,9 +57,10 @@ struct ItemDetailView: View {
             viewModel.galleryImgArray.append(new)
             
         }
-        _objVM = StateObject(wrappedValue: viewModel)
         
         self.isMyProduct = isMyProduct
+        _objVM = StateObject(wrappedValue: viewModel)
+
     }
     
     var body: some View {
@@ -1119,34 +1120,19 @@ struct InfoView: View {
         HStack {
             
             if icon.lowercased().contains(".svg"), let iconURL = URL(string: icon) {
-//                SVGImageView(url: iconURL)
-//                    .frame(width: 30, height: 30)
+
                 RemoteSVGWebView(svgURL: iconURL)
                       .frame(width: 30, height: 30)
-                     // .background(Color(.white))
                       .cornerRadius(7.0)
                       .clipped()
             } else {
-//            if icon.lowercased().contains(".svg"){
-//                SVGImageView(url: URL(string: icon)).frame(width:30, height: 30)
-//               
-//
-//            }else{
-               // ZStack{
-                    // Background
-//                        RoundedRectangle(cornerRadius: 7)
-//                            .fill(Color(.white))
-//                            .frame(width: 30, height: 30)
-//                            .clipped()
 
-                    
                     AsyncImage(url: URL(string: icon)) { image in
                         image
                             .resizable()
                             .scaledToFit()
                             .frame(width:30, height: 30)
                             .cornerRadius(7.0)
-                           
                         
                     }placeholder: {
                         
@@ -1157,12 +1143,11 @@ struct InfoView: View {
                             .cornerRadius(7.0)
 
                     }
-               // }
             }
        
             VStack(alignment: .leading,spacing: 0){
                // Spacer()
-                Text(text)
+                Text(text.trimmingCharacters(in: .whitespaces))
                     .font(.manrope(.regular, size: 12)).foregroundColor(.gray).lineLimit(2)
                 
                 if value.contains("http"){
@@ -1189,10 +1174,9 @@ struct InfoView: View {
                         }
                     }
                 }else{
-                    Text(value)
-                        .font(.manrope(.medium, size: 15)).foregroundColor(Color(UIColor.label)).lineLimit(2)
+                    Text(value.trimmingCharacters(in: .whitespaces))
+                        .font(.manrope(.medium, size: 12)).foregroundColor(Color(UIColor.label)).lineLimit(3)
                 }
-               // Spacer()
 
             }
         }

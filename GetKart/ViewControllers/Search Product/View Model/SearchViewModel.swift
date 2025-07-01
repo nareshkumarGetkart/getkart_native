@@ -43,7 +43,6 @@ class SearchViewModel:ObservableObject{
         dictCustomFields["category_id"] = self.categroryId
         getSearchItemApi(srchTxt:"")
         
-        
     }
     
     
@@ -86,13 +85,16 @@ class SearchViewModel:ObservableObject{
  
                 if let value = dictCustomFields[key]{
                    
-                    let rawValue = "\(value)"
-                        .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression) // collapse multiple spaces
+                    let rawValue = "\(value)"//.trimmingCharacters(in: .whitespaces)
+                       // .replacingOccurrences(of: "\\s+", with: "", options: .regularExpression) // collapse multiple spaces
                         .trimmingCharacters(in: .whitespacesAndNewlines)
                     let encodedValue = rawValue
-                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&=+"))) ?? rawValue
+                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&="))) ?? rawValue
 
-                    if ["city","state","latitude","longitude","country","min_price","max_price","category_id","posted_since","sort_by"].contains(key){
+                    if key == "category_id" && strUrl.contains("category_id")
+                    {
+                        print("key == \(key)")
+                    }else  if ["city","state","latitude","longitude","country","min_price","max_price","category_id","posted_since","sort_by"].contains(key){
                    
                         if let value = dictCustomFields[key] {
                             if "\(value)".trim().count > 0{
@@ -254,7 +256,9 @@ class SearchViewModel:ObservableObject{
         print("✅ Final URL:", strUrl)
 
       */
-      
+        print("✅ Final URL:", strUrl)
+
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
 
             if obj.code == 200{

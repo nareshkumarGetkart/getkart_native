@@ -9,24 +9,25 @@ import SwiftUI
 
 struct SearchWithSortView: View {
    
-    var navigationController:UINavigationController?
+    private var navigationController:UINavigationController?
     @State private var isGridView = true
-    @State var categoryName = ""
-    @State  var categoryImage = ""
-    @State var srchTxt = ""
-    @StateObject  var objVM: SearchViewModel
-    @State var newFieldArray:[CustomField]?
+    @State private var categoryName = ""
+    @State private var categoryImage = ""
+    @State private var srchTxt = ""
+    @StateObject private var objVM: SearchViewModel
+    @State private var newFieldArray:[CustomField]?
     @State  private var isByDefaultOpenSearch:Bool
     @State  private var isByDefaultOpenFilter:Bool
 
     init(categroryId: Int,navigationController:UINavigationController?,categoryName:String,categoryIds:String,categoryImg:String,pushToSuggestion:Bool = false,pushToFilter:Bool = false) {
-        
-        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId, categoryIds: categoryIds))
+        self.categoryName = categoryName
         self.isByDefaultOpenSearch = pushToSuggestion
         self.isByDefaultOpenFilter = pushToFilter
-        self.categoryName = categoryName
         self.categoryImage = categoryImg
         self.navigationController = navigationController
+        
+        _objVM = StateObject(wrappedValue: SearchViewModel(catId: categroryId, categoryIds: categoryIds))
+
     }
     
     
@@ -40,6 +41,7 @@ struct SearchWithSortView: View {
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
+           
             Text(categoryName).font(.custom("Manrope-Bold", size: 20.0))
                 .foregroundColor(Color(UIColor.label))
             Spacer()
@@ -52,7 +54,7 @@ struct SearchWithSortView: View {
                 }
                 
                 if (newFieldArray?.count ?? 0) == 0{
-                    getCustomFieldsListApi(category_ids: objVM.categoryIds)
+                    getCustomFieldsListApi(category_ids: objVM.categroryId)
                 }
             }
         
@@ -65,11 +67,17 @@ struct SearchWithSortView: View {
                             .padding(.leading,10)
                         TextField("Search any item...", text: $srchTxt).frame(height:40)
                             .background(Color(.systemGray6))
-                            .cornerRadius(6)
+                           // .cornerRadius(6)
                             .tint(Color(Themes.sharedInstance.themeColor))
                         
                     }.background(Color(.systemGray6))
-                        .cornerRadius(6).padding(.leading,10)
+                        //.cornerRadius(6)
+                       
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(.separator), lineWidth: 1)
+                        ).clipShape(RoundedRectangle(cornerRadius: 8))
+                        .padding(.leading,10)
                     
                     // Transparent Button over HStack
                     Button(action: {
@@ -83,7 +91,6 @@ struct SearchWithSortView: View {
                 Spacer()
                 // Toggle button
                 Button(action: {
-//                    isGridView = true
                     isGridView.toggle()
                 }) {
                     
@@ -91,21 +98,17 @@ struct SearchWithSortView: View {
                     
                     Image(strImg).renderingMode(.template)
                         .tint(Color(UIColor.label))
-                        
-                        
-//                    Image("grid_view").renderingMode(.template).tint((!isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
-//                        .padding(8)
-                }.tint( Color(UIColor.label) ).background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .padding(8).padding(.trailing,7)
-                
-//                Button(action: {
-//                    isGridView = false
-//                }) {
-//                    Image("list_view").renderingMode(.template).tint((isGridView) ? .gray : Color(UIColor.label)) .background(Color(.systemGray6)).clipShape(RoundedRectangle(cornerRadius: 6))
-//                        .padding(8)
-//                }.tint((isGridView) ? .gray : .black)
-                
+
+                }.tint( Color(UIColor.label) )
+                    .background(Color(.systemGray6))
+                   
+                    .padding(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(.separator), lineWidth: 1)
+                    ).clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.trailing,7)
+
             }.frame(height:50).background(Color(.systemBackground))
                 .padding(.top,1)
             
@@ -130,7 +133,7 @@ struct SearchWithSortView: View {
                 .padding(.horizontal)
                 .padding([.bottom,.top], 5)
             }
-            .background(Color(.systemBackground))
+            .background(Color(.systemGray5))
             
             if objVM.items.count == 0 && !objVM.isDataLoading {
                 HStack{
@@ -337,9 +340,19 @@ extension SearchWithSortView {
             longitude = Local.shared.getUserLongitude()
         }
         
+      
         
         var strUrl = Constant.shared.getFilterCustomfields + "?category_ids=\(category_ids)"
         
+        
+//        let categoryId = category_ids.components(separatedBy: ",")
+//        
+//        if categoryId.count > 0{
+//            if let strCatId = categoryId.last{
+//                strUrl = Constant.shared.getFilterCustomfields + "?category_ids=\(strCatId)"
+//            }
+//        }
+//            
         if city.count > 0{
             strUrl.append("&city=\(city)")
         }
@@ -372,7 +385,7 @@ extension SearchWithSortView {
 //                }
 //                
                 let objSortBY = CustomField(id: 345676, name: "Sort By", type: .sortby, image: "", customFieldRequired: nil, values: [
-                    "Default",
+                   // "Default",
                     "New to Old",
                     "Old to New",
                     "Price High to Low",
@@ -404,7 +417,7 @@ struct FilterChip: View {
         HStack {
             if let icon = icon {
                
-                Image(icon)
+                Image(icon).renderingMode(.template).foregroundColor(.gray)
                 Text(title)
                 
             }else{
@@ -418,7 +431,7 @@ struct FilterChip: View {
                         Image("close-small").renderingMode(.template).foregroundColor(.gray)
                     }
                 }else{
-                    Image("arrow_dd")
+                    Image("arrow_dd").renderingMode(.template).foregroundColor(.gray)
                 }
             }
             

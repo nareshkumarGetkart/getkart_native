@@ -26,7 +26,7 @@
                         <rect key="frame" x="10" y="10" width="30" height="30"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QVP-ky-7CY">
-                                <rect key="frame" x="2.6666666666666661" y="2.6666666666666661" width="25" height="25"/>
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
                             </imageView>
                             <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5q5-Kq-Fab">
                                 <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
@@ -40,14 +40,14 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="30" id="35u-Fj-5Bc"/>
-                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" constant="2.5" id="4zD-jO-RzT"/>
+                            <constraint firstAttribute="bottom" secondItem="QVP-ky-7CY" secondAttribute="bottom" id="4zD-jO-RzT"/>
                             <constraint firstItem="5q5-Kq-Fab" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" id="Grt-K1-quF"/>
                             <constraint firstItem="5q5-Kq-Fab" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" id="Jnq-zA-yDI"/>
-                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" constant="2.5" id="LTv-Hj-2TD"/>
+                            <constraint firstAttribute="trailing" secondItem="QVP-ky-7CY" secondAttribute="trailing" id="LTv-Hj-2TD"/>
                             <constraint firstAttribute="bottom" secondItem="5q5-Kq-Fab" secondAttribute="bottom" id="Nq8-8w-h5M"/>
                             <constraint firstAttribute="height" constant="30" id="Ras-d3-t9S"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" constant="2.5" id="TCb-V8-P1r"/>
-                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" constant="2.5" id="TxE-mb-GjF"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="leading" secondItem="4s2-uw-Abf" secondAttribute="leading" id="TCb-V8-P1r"/>
+                            <constraint firstItem="QVP-ky-7CY" firstAttribute="top" secondItem="4s2-uw-Abf" secondAttribute="top" id="TxE-mb-GjF"/>
                             <constraint firstAttribute="trailing" secondItem="5q5-Kq-Fab" secondAttribute="trailing" id="bgt-63-dOq"/>
                         </constraints>
                     </view>

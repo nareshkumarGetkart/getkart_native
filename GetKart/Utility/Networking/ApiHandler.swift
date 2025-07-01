@@ -117,12 +117,12 @@ class ApiHandler:NSObject{
             let httpHeader = URLhandler.sharedinstance.getHeaderFields()
             
             if ISDEBUG == true{
-                print("URL: ",url)
+                print("URL: ",url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
                 print("headers: ",httpHeader ?? [:])
             }
             
-
-            AF.request(url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, encoding: JSONEncoding.default, headers: httpHeader)
+//.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            AF.request(url, method: .get, encoding: JSONEncoding.default, headers: httpHeader)
                 .responseJSON { response in
                     
                     DispatchQueue.main.async {

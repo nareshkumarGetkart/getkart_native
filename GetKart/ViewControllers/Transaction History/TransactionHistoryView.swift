@@ -47,14 +47,14 @@ struct TransactionHistoryView: View {
                 }
             }else{
                 
-                ScrollView {
-                   
+                ScrollView(.vertical, showsIndicators: false) {
+
                     HStack{ Spacer() }.frame(height: 5)
                     LazyVStack(spacing: 15) {
                         ForEach(transactions,id: \.id) { transaction in
-                            TransactionRow(transaction: transaction).background((Color(UIColor.systemBackground)))
-                                .cornerRadius(10)
-                                .shadow(radius: 2)
+                            TransactionRow(transaction: transaction)//.background((Color(UIColor.systemBackground)))
+                                //.cornerRadius(10)
+                                //.shadow(radius: 2)
                                 .onAppear{
                                     
                                     let lastId = transactions.last?.id  ?? 0
@@ -230,12 +230,24 @@ struct TransactionRow: View {
             }
         }
         .padding([.top,.bottom,.horizontal],10)
-        .background(Color(UIColor.systemBackground)).cornerRadius(10)
+//        .background(Color(UIColor.systemBackground))//.cornerRadius(10)
+//        .clipped()
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 10)
+//                .stroke(Color(UIColor.separator), lineWidth: 1.0)
+//        )
+//        
+        
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(UIColor.systemBackground))
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray, lineWidth: 0.1)
+                .stroke(Color(UIColor.separator), lineWidth: 1)
         )
-        .shadow(color: Color(UIColor.label).opacity(0.05), radius: 5, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        //.shadow(color: Color(UIColor.label).opacity(0.05), radius: 5, x: 0, y: 2)
         
     }
     

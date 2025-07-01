@@ -92,63 +92,38 @@ struct FavoritesCell:View {
         
         HStack{
                 
-                ZStack{
-                    
-                    Rectangle()
-                           .fill(Color.gray.opacity(0.3))
-                           .frame(width: 110, height: widthScreen / 2.0 - 15)
-                           .cornerRadius(10, corners: [.topRight, .bottomRight])
-                          // .clipped()
-
-                    
-                   // if  let img = itemObj.image {
-                    KFImage(URL(string: itemObj.image ?? ""))
-                        .placeholder {
-                            Image("getkartplaceholder")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 110,height:widthScreen / 2.0 - 15)
-                                .padding(.vertical,0)
-                                .frame(maxHeight: .infinity)
-                               // .background(Color.gray.opacity(0.3))
-                               // .cornerRadius(10, corners: [.topRight, .bottomRight])
-                                
-                        }
-                        .setProcessor(
-//                            DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
-//                                                                    height: widthScreen / 2.0 - 15))
-                            
-                            DownsamplingImageProcessor(size: CGSize(width: widthScreen,
-                                                                    height: widthScreen))
-                        )
-                       .resizable()
-                       .aspectRatio(contentMode: .fit)
-                        .frame(width: 110)
-                        .padding(.vertical,0)
-                       // .background(Color.gray.opacity(0.3))
-                        .cornerRadius(10, corners: [.topRight, .bottomRight])
-                        .frame(maxHeight: .infinity)
-                        .clipped()
-                    
-                    if (itemObj.isFeature ?? false) == true {
-                        VStack(alignment:.leading){
-                            HStack{
-                                Text("Featured")
-                                    .frame(width:75,height:20)
-                                    .background(.orange)
-                                    .cornerRadius(5)
-                                    .foregroundColor(Color(UIColor.white))
-                                    .font(.manrope(.regular, size: 13))
-
-                            }.padding(.top,5)
-                            Spacer()
-                        }
-                    }
-
-               // }
-                
+            ZStack{
              
-
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                 .frame(width: 120,height: 115)
+                    .cornerRadius(10, corners: [.topRight, .bottomRight])
+                
+                
+                KFImage(URL(string:  itemObj.image ?? ""))
+                    .placeholder {
+                        Image("getkartplaceholder")
+                        .frame(width: 120,height: 115).aspectRatio(contentMode: .fit).cornerRadius(5)
+                    }
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
+                                                                height: widthScreen / 2.0 - 15))
+                    )
+                    .resizable().aspectRatio(contentMode: .fit).frame(width: 120,height: 115).cornerRadius(5)
+                
+                if (itemObj.isFeature ?? false) == true{
+                    VStack(alignment:.leading){
+                        HStack{
+                            Text("Featured")
+                                .frame(width:75,height:20)
+                                .background(.orange)
+                                .cornerRadius(5)
+                                .foregroundColor(Color(UIColor.white))
+                                .font(.manrope(.regular, size: 13))
+                        }.padding(.top,5)
+                        Spacer()
+                    }
+                }
             }
             
             VStack(alignment: .leading, spacing: 5){

@@ -26,8 +26,8 @@ class RadioTVCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        imgViewBg.layer.cornerRadius = 1.0
-        imgViewBg.clipsToBounds = true
+//        imgViewBg.layer.cornerRadius = 1.0
+//        imgViewBg.clipsToBounds = true
         
         
         clnCollectionView.register(UINib(nibName: "RadioBtnCVCell", bundle: .main), forCellWithReuseIdentifier: "RadioBtnCVCell")

@@ -377,8 +377,9 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             cell.imgVwAds.roundCorners([.topRight,.bottomRight], radius: 10)
             cell.imgVwAds.clipsToBounds = true
             cell.bgView.addShadow()
+            cell.bgView.layer.borderColor = UIColor.separator.cgColor
+            cell.bgView.layer.borderWidth = 0.5
             cell.bgView.clipsToBounds = true
-
         }
 
         cell.btnAdPost.tag = indexPath.item

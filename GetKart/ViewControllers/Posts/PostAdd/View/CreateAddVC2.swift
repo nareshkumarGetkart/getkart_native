@@ -8,7 +8,9 @@
 import UIKit
 import SwiftUI
 import MapKit
+
 class CreateAddVC2: UIViewController {
+    
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var btnBack:UIButton!
@@ -25,7 +27,6 @@ class CreateAddVC2: UIViewController {
     var customFieldFilesEditPost :Dictionary<String,Any> = [:]
     var popType:PopType? = .createPost
     var itemObj:ItemModel?
-    
     var selectedRow = -1
     
     //MARK: Controller Life cycle methods
@@ -102,7 +103,6 @@ class CreateAddVC2: UIViewController {
                                     arr.append(data)
                                     cell.arrImagesData = arr
                                 }
-                                
                                 
                                 cell.reloadCollection()
                                 self.tblView.beginUpdates()
@@ -234,7 +234,12 @@ class CreateAddVC2: UIViewController {
     @IBAction func nextButtonAction (){
         showErrorMsg = false
         
+        var scrollIndex = -1
+
         for objCustomField in dataArray {
+            
+            scrollIndex = scrollIndex + 1
+            
             if objCustomField.customFieldRequired == 1{
                 if objCustomField.type == .fileinput  {
                     let imgData =  customFieldFiles["\(objCustomField.id ?? 0)"] as? Data
@@ -261,8 +266,11 @@ class CreateAddVC2: UIViewController {
         }
         
         if showErrorMsg == true {
-            
             tblView.reloadData()
+
+            if scrollIndex >= 0{
+                tblView.scrollToRow(at: IndexPath(row: scrollIndex, section: 0), at: .middle, animated: true)
+            }
             
         }else{
             for ind in 0..<self.dataArray.count {
@@ -331,6 +339,7 @@ class CreateAddVC2: UIViewController {
 
                */
                 
+                print("self.params second page == \(self.params)")
                 let swiftLocView = ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0, imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params)
                 let vc = ConfirmLocationHostingController(rootView: swiftLocView)
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -439,14 +448,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             cell.selectionStyle = .none
             cell.iconBgView.isHidden = false
             cell.imgView.isHidden = false
-           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
-            
-            
+           
             if (objCustomField.image ?? "").lowercased().contains(".svg") {
                 cell.imgView.isHidden = true
                 cell.iconImgWebView.isHidden = false
                 cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
-                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
                 
             }else{
                 cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
@@ -502,14 +508,12 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 cell.imgView.isHidden = true
                 cell.iconImgWebView.isHidden = false
                 cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
-                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
                 
             }else{
                 cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
                 cell.imgView.isHidden = false
                 cell.iconImgWebView.isHidden = true
             }
-           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
             cell.lblTitle.text = objCustomField.name ?? ""
             cell.txtField.placeholder = ""
             cell.txtField.keyboardType = .numberPad
@@ -520,6 +524,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             if (objCustomField.maxLength ?? 0) > 0{
                 cell.txtField.maxLength = objCustomField.maxLength ?? 0
             }else{
+                
             }
 
             if  objCustomField.value?.count ?? 0 > 0 {
@@ -559,9 +564,7 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                 dataArray[indexPath.row] = objCustomField
             }
             cell.lblTitle.text = objCustomField.name ?? ""
-            
-           // cell.imgImage.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "getkartplaceholder")
-            
+                        
             if (objCustomField.image ?? "").lowercased().contains(".svg") {
                 cell.imgImage.isHidden = true
                 cell.iconImgWebView.isHidden = false
@@ -574,7 +577,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             }
             cell.del = self
             cell.rowValue = indexPath.row
-            
             
             if showErrorMsg == true {
                 if isValidInput(objCustomField: objCustomField) == false {
@@ -602,14 +604,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         }else if objCustomField.type  == .dropdown {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.imgView.isHidden = false
-           // cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
             cell.iconBgView.isHidden = false
             if (objCustomField.image ?? "").lowercased().contains(".svg") {
                 cell.imgView.isHidden = true
                 cell.iconImgWebView.isHidden = false
                 cell.iconImgWebView.loadSVGURL(iconUrl: objCustomField.image ?? "")
-                //  cell.imgView.loadSVGImagefromURL(strurl: objCustomField.image ?? "", placeHolderImage: "")
-                
             }else{
                 cell.imgView.kf.setImage(with:  URL(string: objCustomField.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
                 cell.imgView.isHidden = false
@@ -629,13 +628,11 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             if showErrorMsg == true {
                 
                 if isValidInput(objCustomField: objCustomField) == false {
-                    
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
                     
                 }else{
-                    
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
@@ -679,13 +676,10 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
                         
             if showErrorMsg == true {
                 if isValidInput(objCustomField: objCustomField) == false {
-                    
                     cell.lblErrorMsg.isHidden = false
                     cell.btnAddPicture.borderColor = UIColor.red
                     cell.lblErrorMsg.text = self.showErrorMessage(objCustomField: objCustomField)
-               
                 }else {
-                    
                     cell.lblErrorMsg.isHidden = true
                     cell.btnAddPicture.borderColor = UIColor.lightGray
                 }
@@ -710,7 +704,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         var objCustomField = self.dataArray[row]
         
         if objCustomField.type == .radio {
-            //
             
             if objCustomField.value?.contains(objCustomField.values?[clnCell]) == true {
                 objCustomField.value?.removeAll()
@@ -763,7 +756,6 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             
             if theme == .dark{
                 destVC.view.backgroundColor = UIColor.systemGray5.withAlphaComponent(0.8) // Semi-transparent background
-
             }else{
                 destVC.view.backgroundColor = UIColor.label.withAlphaComponent(0.8) // Semi-transparent background
             }
@@ -791,6 +783,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
         dataArray[dropDownRowIndex] = objCustomField
         let indexPath = IndexPath(row: dropDownRowIndex, section: 0)
         tblView.reloadRows(at: [indexPath], with: .automatic)
+        self.tblView.reloadData()
+
      }
     
     func textFieldEditingDone(selectedRow:Int, strText:String) {
@@ -826,7 +820,6 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             
-                
             let imgData = pickedImage.wxCompress().jpegData(compressionQuality: 0.0)
                 imgName = "image"
             let tag = picker.navigationBar.tag
@@ -867,6 +860,7 @@ extension CreateAddVC2: UIImagePickerControllerDelegate, UINavigationControllerD
         dismiss(animated: true, completion: nil)
         
     }
+    
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         // Handle the user canceling the image picker, if needed.

@@ -13,7 +13,6 @@ struct AdNotPostedView: View {
     var message:String = ""
     var body: some View {
         
-       
         ZStack{
           //  Image("backgroundAdPost")
             Image("backgroundAdPost")
@@ -30,7 +29,7 @@ struct AdNotPostedView: View {
                         // back action
                         navigationController?.popToRootViewController(animated: true)
                     }) {
-                        Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                        Image("Cross").renderingMode(.template).foregroundColor(.black)
                     }
                     Spacer()
                     
@@ -47,31 +46,31 @@ struct AdNotPostedView: View {
                 
                 let msg = (message.count > 0) ? message : "Ad not posted, saved in draft"
                 Text(msg)
-                    .font(.manrope(.bold, size: 20.0))
+                    .font(.manrope(.bold, size: 20.0)).foregroundColor(.black)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 Spacer()
 
                 VStack(alignment:.leading,spacing:10){
                     Text("The category or location you've selected for this ad doesn't match the package you purchased.")
-                        .font(.manrope(.regular, size: 16.0))
+                        .font(.manrope(.regular, size: 16.0)).foregroundColor(.black)
                         .padding(.horizontal)
                     
                     Text("What you can do:")
-                        .font(.manrope(.regular, size: 16.0))
+                        .font(.manrope(.regular, size: 16.0)).foregroundColor(.black)
                         .padding(.horizontal)
                     
                     HStack{
-                        Text("•").font(.manrope(.bold, size: 20.0))
+                        Text("•").font(.manrope(.bold, size: 20.0)).foregroundColor(.black)
                         Text("Use the same category and location as the package you purchased")
-                            .font(.manrope(.regular, size: 16.0))
+                            .font(.manrope(.regular, size: 16.0)).foregroundColor(.black)
                     }.padding(.horizontal)
                     
                     
                     
                     HStack{
-                        Text("•").font(.manrope(.bold, size: 20.0))
-                        Text("Or buy a new package that matches your desired category and location")
+                        Text("•").font(.manrope(.bold, size: 20.0)).foregroundColor(.black)
+                        Text("Or buy a new package that matches your desired category and location").foregroundColor(.black)
                             .font(.manrope(.regular, size: 16.0))
                     }.padding(.horizontal)
      

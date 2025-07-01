@@ -18,6 +18,8 @@ struct SubCategoriesView: View {
     @State var category_ids = ""
     @State var popType:PopType?
     @State var screenNumber = 1
+  
+    
     var body: some View {
         
         VStack(spacing: 0) {
@@ -126,6 +128,20 @@ struct SubCategoriesView: View {
                     }
                 }
             }else if popType == .createPost {
+                
+             
+                var idsArray = category_ids
+                    .split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+
+                // Remove duplicates while keeping order
+                var seen = Set<String>()
+                let uniqueArray = idsArray.filter { seen.insert($0).inserted }
+
+                // Join back to string
+                category_ids = uniqueArray.joined(separator: ",")
+
                 if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
                     vc.objSubCategory = objsubCategory
                     vc.strCategoryTitle = strCategoryTitle
@@ -142,8 +158,10 @@ struct SubCategoriesView: View {
                 strCategoryTitle +=  ">" + (objsubCategory.name ?? "")
             }
                 
-            category_ids =  category_ids + ", " + "\(objsubCategory.id ?? 0)"
+            category_ids =  category_ids + "," + "\(objsubCategory.id ?? 0)"
             
+       
+
             let swiftUIView = SubCategoriesView(subcategories: objsubCategory.subcategories, navigationController: self.navigationController, strTitle: objsubCategory.name ?? "", strCategoryTitle: strCategoryTitle, category_id:self.category_id, category_ids: category_ids, popType: self.popType,screenNumber: screenNumber + 1) // Create SwiftUI view
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //

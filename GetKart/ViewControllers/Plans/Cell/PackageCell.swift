@@ -25,7 +25,7 @@ class PackageCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        
+    
         btnViewPlans.layer.cornerRadius = 8.0
         btnViewPlans.layer.borderWidth = 1.0
         btnViewPlans.layer.borderColor = UIColor(hexString: "#FF9900").cgColor

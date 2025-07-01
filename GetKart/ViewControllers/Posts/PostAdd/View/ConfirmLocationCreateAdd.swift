@@ -280,13 +280,17 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                                 }else{
                                     AlertView.sharedManager.showToast(message: message)
                                 }
+                            }else{
+                                AlertView.sharedManager.showToast(message: message)
                             }
                         }catch {
-                            
+
                         }
                         
                     } else {
                         print("Something is wrong while converting dictionary to JSON data.")
+                        
+                        AlertView.sharedManager.showToast(message: message)
                         
                     }
 
