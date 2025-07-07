@@ -86,6 +86,7 @@ class HomeViewModel:ObservableObject{
             strUrl.append("&longitude=\(longitude)")
         }
         
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
 
             if obj.code == 200 {

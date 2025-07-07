@@ -698,7 +698,11 @@ extension HomeVC {
         lblAddress.text = locStr.isEmpty ? "All \(country)" : locStr
         
         if state.count == 0 && city.count == 0{
-            lblAddress.text =  "All \(country)"
+            if country.count == 0{
+                lblAddress.text =  "All India"
+            }else{
+                lblAddress.text =  "All \(country)"
+            }
         }
         if let text = lblAddress.text, text.hasPrefix(",") {
             lblAddress.text = String(text.dropFirst())

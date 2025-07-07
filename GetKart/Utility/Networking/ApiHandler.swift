@@ -46,7 +46,7 @@ class ApiHandler:NSObject{
                 print("headers: ",httpHeader ?? [:])
             }
             
-            AF.request(url, method: httpMethod, parameters: param, encoding: JSONEncoding.default, headers: httpHeader)               
+            AF.request(url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: httpMethod, parameters: param, encoding: JSONEncoding.default, headers: httpHeader)               
                 .responseJSON { response in
                     
                     
@@ -122,7 +122,7 @@ class ApiHandler:NSObject{
             }
             
 //.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-            AF.request(url, method: .get, encoding: JSONEncoding.default, headers: httpHeader)
+            AF.request(url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, encoding: JSONEncoding.default, headers: httpHeader)
                 .responseJSON { response in
                     
                     DispatchQueue.main.async {

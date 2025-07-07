@@ -76,6 +76,9 @@ struct FilterView: View {
                     
                     
                         .onTapGesture {
+                            if fieldVM.selectedIndex != index{
+                                searchText = ""
+                            }
                             fieldVM.selectedIndex = index
                         }
                 }
@@ -93,10 +96,15 @@ struct FilterView: View {
                     if (fieldVM.fieldsArray[fieldVM.selectedIndex].values?.count ?? 0) > 12{
                         HStack{
                             
-                            TextField("Search \(fieldVM.fieldsArray[fieldVM.selectedIndex].name ?? "")...", text: $searchText).tint(.orange)
+                            TextField("Search \(fieldVM.fieldsArray[fieldVM.selectedIndex].name ?? "")...", text: $searchText)
+                                .tint(.orange)
                                 .padding(8)
                                 .background(Color(.systemGray6))
-                                .cornerRadius(8)
+                                .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                                        )
+                               // .cornerRadius(8)
                                 //.padding(.horizontal)
                                 .onChange(of: searchText) { newValue in
                                     
@@ -110,20 +118,31 @@ struct FilterView: View {
                         
                         HStack{
                             if item.type == .sortby{
-                                Text("\((item.name ?? "").uppercased())")
+                                Text("\((item.name ?? "").capitalized)")
                                     .font(Font.manrope(.medium, size: 16.0))
                             }else{
-                                Text("FILTER BY \((item.name ?? "").uppercased())")
-                                    .font(Font.manrope(.medium, size: 16.0))
+//                                if item.type == .range{
+//                                    VStack(alignment:.leading){
+//                                        Text("FILTER BY \((item.name ?? ""))".capitalized)
+//                                            .font(Font.manrope(.medium, size: 16.0))
+//                                        Text("Choose From Below Options").font(Font.manrope(.regular, size: 11.0))
+//                                    }
+//                                }else{
+                                    Text("FILTER BY \(item.name ?? "")".capitalized)
+                                        .font(Font.manrope(.medium, size: 16.0))
+                               // }
                             }
                             Spacer()
                         }
+                        
+                     
                        
-                        if fieldVM.selectedIndex > 0{
+                       // if fieldVM.selectedIndex > 0{
+                        if (item.values?.count ?? 0) > 0 || ((item.ranges?.count ?? 0) > 0){
                             
                             HStack{
                                 
-                                Text("Choose from options below").font(Font.manrope(.regular, size: 11.0))
+                                Text("Choose from below options").font(Font.manrope(.regular, size: 11.0))
                                 Spacer()
                             }.padding(.bottom,10)
                         }

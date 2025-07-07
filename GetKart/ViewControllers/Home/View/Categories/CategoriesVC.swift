@@ -14,10 +14,7 @@ class CategoriesVC: UIViewController {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var collctionView:UICollectionView!
     @IBOutlet weak var btnBack:UIButton!
-    
     @IBOutlet weak var tblView:UITableView!
-
-    
     var popType:PopType?
     private var objViewModel:CategoryViewModel?
      
@@ -26,6 +23,8 @@ class CategoriesVC: UIViewController {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnBack.setImageColor(color: .label)
+        collctionView.showsVerticalScrollIndicator = false
+        tblView.showsVerticalScrollIndicator = false
         if popType == .filter || popType == .buyPackage {
             collctionView.isHidden = true
             tblView.isHidden = false

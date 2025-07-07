@@ -148,7 +148,7 @@ class SearchViewModel:ObservableObject{
         }
         
         
-        if selectedSortBy.count > 0{
+       /* if selectedSortBy.count > 0{
             
             if selectedSortBy == "Default"{
                 
@@ -158,7 +158,7 @@ class SearchViewModel:ObservableObject{
                 strUrl.append("&sort_by=\(str)")
             }
         }
-        
+        */
         
         if srchTxt.count > 0{
             strUrl.append("&search=\(srchTxt)")

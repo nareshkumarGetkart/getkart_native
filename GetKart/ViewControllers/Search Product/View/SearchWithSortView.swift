@@ -184,6 +184,10 @@ struct SearchWithSortView: View {
             self.newFieldArray?[selIndx].selectedMaxValue = nil
             self.newFieldArray?[selIndx].selectedMinValue = nil
             self.objVM.dictCustomFields.removeValue(forKey: "\(field.id ?? 0)")
+          
+            if self.newFieldArray?[selIndx].type == .sortby{
+                self.objVM.dictCustomFields.removeValue(forKey: "sort_by")
+            }
             self.objVM.page = 1
             self.objVM.getSearchItemApi(srchTxt: srchTxt)
         }
@@ -222,7 +226,7 @@ struct SearchWithSortView: View {
     
     func pushToSearchSuggestionScreen(){
         
-        let swiftUIView = SearchProductView(navigation:self.navigationController){ search in
+        let swiftUIView = SearchProductView(navigation:self.navigationController,onSelectSuggestion: { search in
             
             self.objVM.page = 1
             self.categoryName = search.categoryName ?? ""
@@ -230,10 +234,11 @@ struct SearchWithSortView: View {
             self.srchTxt = search.keyword ?? ""
             self.objVM.categroryId = "\(search.categoryID ?? 0)"
             self.objVM.categoryIds = "\(search.categoryID ?? 0)"
+            self.objVM.dictCustomFields.removeAll()
             self.objVM.dictCustomFields["category_id"] =  "\(search.categoryID ?? 0)"
             self.getCustomFieldsListApi(category_ids: "\(search.categoryID ?? 0)")
             self.objVM.getSearchItemApi(srchTxt:srchTxt)
-        }
+        }, isToCloseToHomeScreen:self.isByDefaultOpenSearch)
         let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
         self.navigationController?.pushViewController(hostingController, animated: true)
         self.isByDefaultOpenSearch = false

@@ -14,12 +14,13 @@ import SwiftUI
 struct SearchProductView: View {
  
     var navigation:UINavigationController?
-    @State var navigateToFilterScreen = false
+ //   @State var navigateToFilterScreen = false
     @State var strCategoryTitle = ""
     @StateObject private var viewModel = ProductSearchViewModel()
     @FocusState private var isFocused: Bool
     var onSelectSuggestion: (Search) -> Void
-
+     var isToCloseToHomeScreen = false
+    
     var body: some View {
        
         VStack {
@@ -31,7 +32,15 @@ struct SearchProductView: View {
                     HStack{
                         
                         Button(action: {
-                            navigation?.popViewController(animated: true)
+                            if isToCloseToHomeScreen{
+                                for controller in self.navigation?.viewControllers ?? []{
+                                    if controller.isKind(of: HomeVC.self){
+                                        self.navigation?.popToViewController(controller, animated: true)
+                                    }
+                                }
+                            }else{
+                                navigation?.popViewController(animated: true)
+                            }
                         }) {
                             Image("Cross")
                                 .renderingMode(.template)
@@ -182,7 +191,7 @@ struct SearchProductView: View {
 
 
 #Preview {
-    SearchProductView(navigation: nil, strCategoryTitle: "", onSelectSuggestion: {_ in })
+    SearchProductView(navigation: nil, strCategoryTitle: "", onSelectSuggestion: {_ in }, isToCloseToHomeScreen:false)
 }
 
 
