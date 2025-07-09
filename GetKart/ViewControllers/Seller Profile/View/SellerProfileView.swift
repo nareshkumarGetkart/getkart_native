@@ -106,7 +106,7 @@ struct SellerProfileView: View {
                         .cornerRadius(40)
                 }
                 
-                VStack(alignment:.leading){
+              //  VStack(alignment:.leading){
                     HStack{
                         Text(objVM.sellerObj?.name ?? "")
                             .font(.custom("Manrope-Medium", size: 16.0))
@@ -120,9 +120,9 @@ struct SellerProfileView: View {
                         }
                         Spacer()
                     }
-                    Text(objVM.sellerObj?.email ?? "")
-                        .font(.custom("Manrope-Medium", size: 13.0))
-                }
+//                    Text(objVM.sellerObj?.email ?? "")
+//                        .font(.custom("Manrope-Medium", size: 13.0))
+               // }
                 Spacer()
                // let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 if Local.shared.getUserId() > 0 && Local.shared.getUserId() != (objVM.sellerObj?.id ?? 0) {

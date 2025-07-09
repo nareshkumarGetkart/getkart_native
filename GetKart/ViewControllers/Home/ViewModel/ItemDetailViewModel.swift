@@ -12,7 +12,7 @@ import SwiftUI
 class ItemDetailViewModel:ObservableObject{
     
     @Published var galleryImgArray = [GalleryImage]()
-    @Published var sellerObj:SellerModel?
+  //  @Published var sellerObj:SellerModel?
     @Published var relatedDataItemArray = [ItemModel]()
     @Published var itemObj:ItemModel?
     
@@ -55,7 +55,7 @@ class ItemDetailViewModel:ObservableObject{
                         
                         self.updateSelectedIndex?()
                         
-                        self.getSeller(sellerId: item.userID ?? 0)
+                      //  self.getSeller(sellerId: item.userID ?? 0)
                         self.getProductListApi(categoryId: item.categoryID ?? 0, excludeId: item.id ?? 0)
                         self.setItemTotalApi()
                         
@@ -85,18 +85,18 @@ class ItemDetailViewModel:ObservableObject{
     
     
     
-    func getSeller(sellerId:Int){
-        
-        let strUrl = Constant.shared.get_seller + "?id=\(sellerId)"
-        
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
-            
-            if obj.data != nil {
-                self.sellerObj = obj.data?.seller
-            }
-        }
-    }
-    
+//    func getSeller(sellerId:Int){
+//        
+//        let strUrl = Constant.shared.get_seller + "?id=\(sellerId)"
+//        
+//        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:SellerParse) in
+//            
+//            if obj.data != nil {
+//                self.sellerObj = obj.data?.seller
+//            }
+//        }
+//    }
+//    
     
     func getProductListApi(categoryId:Int,excludeId:Int){
         

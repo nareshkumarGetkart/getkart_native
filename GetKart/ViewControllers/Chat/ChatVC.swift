@@ -14,11 +14,10 @@ import Photos
 class ChatVC: UIViewController {
     
     @IBOutlet weak var imgViewBackground:UIImageView!
-
-    
     @IBOutlet weak var bgViewAudioRecord: UIView!
     @IBOutlet weak var btnAudioRecordStarted: UIButton!
     @IBOutlet weak var btnImgMicBlink: UIButton!
+    @IBOutlet weak var btnCall: UIButton!
 
     var isbeginVoiceRecord = false
     var playTime:Int = 0
@@ -84,12 +83,15 @@ class ChatVC: UIViewController {
     var youBlockedUser = ""
     var popovershow = false
     var isItemDeleted = false
+    var mobileNumber = ""
+    
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnThreeDots.setImageColor(color: .label)
+        btnCall.setImageColor(color: .label)
         btnBack.setImageColor(color: .label)
         updateUserData()
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
@@ -217,7 +219,16 @@ class ChatVC: UIViewController {
         self.navigationController?.pushViewController(hostingController, animated: true)
         
     }
-    
+    @IBAction func callBtnAction(sender : UIButton){
+        
+        if let url = NSURL(string: "tel://\(mobileNumber)"), UIApplication.shared.canOpenURL(url as URL) {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url as URL)
+            } else {
+                UIApplication.shared.openURL(url as URL)
+            }
+        }
+    }
     
     @IBAction func productBtnAction(sender : UIButton){
         self.view.endEditing(true)
@@ -424,6 +435,7 @@ class ChatVC: UIViewController {
         }*/
     }
     
+    
     func addObservers(){
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)),
@@ -561,9 +573,7 @@ class ChatVC: UIViewController {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                             
                             Themes.sharedInstance.removeActivityView(uiView: self.view)
-                            
                         })
-                        
                     }
                 }
             }else{
@@ -788,6 +798,15 @@ class ChatVC: UIViewController {
             self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
             self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
+            
+            if let mobileVisibility = dataDict["mobileVisibility"] as? Int, mobileVisibility == 1{
+                self.mobileNumber = dataDict["mobile"] as? String ?? ""
+                self.btnCall.isHidden = false
+            }else{
+                self.mobileNumber = ""
+                self.btnCall.isHidden = true
+            }
+            
             updateUserBlockStatus()
         }
     }

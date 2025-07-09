@@ -9,6 +9,7 @@ import UIKit
 import SwiftUI
 import StoreKit
 import Kingfisher
+import FittedSheets
 
 class ProfileVC: UIViewController {
    
@@ -19,10 +20,10 @@ class ProfileVC: UIViewController {
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]//,"Delete Account","Logout"]
       
     
-    let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]
+    let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]//,"delete_account","logout"]
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
@@ -221,7 +222,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblStatus.isUserInteractionEnabled = true
                 cell.lblStatus.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(statusTapped)))
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
-                                
+                cell.btnEditProfile.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
+                cell.btnSetting.addTarget(self, action: #selector(presentSettingView), for: .touchUpInside)
+
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
@@ -388,6 +391,59 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     
+    
+    @objc func presentSettingView(){
+        
+       
+        
+        let controller =  UIHostingController(rootView:  SettingsView { action in
+            
+            if action == "logout"{
+                
+                let deleteAccountView = UIHostingController(rootView: LogoutView(navigationController: self.navigationController))
+                deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+                deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                self.present(deleteAccountView, animated: true, completion: nil)
+           
+            }else if action == "delete"{
+                let deleteAccountView = UIHostingController(rootView: DeleteAccountView())
+                deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+                deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                self.present(deleteAccountView, animated: true, completion: nil)
+            }
+        })
+        
+        let useInlineMode = view != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        var fixedSize = 0.5
+        if UIDevice().hasNotch{
+            fixedSize = 0.5
+        }else{
+            if UIScreen.main.bounds.size.height <= 700 {
+                fixedSize = 0.6
+            }
+        }
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.percent(Float(fixedSize)),.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
+        sheet.allowGestureThroughOverlay = false
+        // sheet.dismissOnOverlayTap = false
+        sheet.cornerRadius = 15
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+    }
+    
  
     
     @objc func statusTapped(){
@@ -439,6 +495,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         AppDelegate.sharedInstance.applyTheme()
         self.tblView.reloadData()
     }
+    
+    
     func rateApp() {
         if #available(iOS 10.3, *) {
             SKStoreReviewController.requestReview()
@@ -447,7 +505,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             if #available(iOS 10, *) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
                 
-            } else {
+            }else{
                 UIApplication.shared.openURL(url)
             }
         }

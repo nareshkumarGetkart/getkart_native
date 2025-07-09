@@ -53,7 +53,7 @@ class BannerTblCell: UITableViewCell {
     
     func startTimer() {
         
-        timer =  Timer.scheduledTimer(timeInterval: 2.5, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        timer =  Timer.scheduledTimer(timeInterval: 3.5, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
     
     

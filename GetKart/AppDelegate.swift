@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var userId = 0
     var roomId = 0
     var itemId = 0
-    
+    private let isForceAppUpdate = true
    // var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -48,9 +48,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
             updateChecker.delegate = self
-            updateChecker.showUpdateWithForce()
+            if isForceAppUpdate{
+                updateChecker.showUpdateWithForce()
+            }else{
+                updateChecker.showUpdateWithConfirmation()
+            }
         }
-        
+  
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
@@ -167,7 +171,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("applicationDidBecomeActive")
         SocketIOManager.sharedInstance.checkSocketStatus()
-
+       
+        if isForceAppUpdate{
+            if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
+                updateChecker.delegate = self
+                updateChecker.showUpdateWithForce()
+            }
+        }
     }
     
     func applicationWillTerminate(_ application: UIApplication) {

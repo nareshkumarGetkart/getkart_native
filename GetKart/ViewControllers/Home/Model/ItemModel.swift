@@ -349,7 +349,8 @@ struct User: Codable {
     let reviewsCount: Int?
     let averageRating: Int?
    // let sellerReview: [JSONAny]?
-
+    let mobileVisibility: Int?
+    
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, profile
         case createdAt = "created_at"
@@ -358,6 +359,7 @@ struct User: Codable {
         case countryCode = "country_code"
         case reviewsCount = "reviews_count"
         case averageRating = "average_rating"
+        case mobileVisibility
       //  case sellerReview = "seller_review"
     }
 }

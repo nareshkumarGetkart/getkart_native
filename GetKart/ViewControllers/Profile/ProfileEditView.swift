@@ -129,10 +129,10 @@ struct ProfileEditView: View {
                 CustomTextField(title: "Address", text: $address)
                 
                 // Toggle Switches
-                ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
+              /*  ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
                 ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
                
-                
+                */
                 // Update Button
                 Button(action: {
                     UIApplication.shared.endEditing()
@@ -388,10 +388,14 @@ struct ProfileEditView: View {
         
         self.isDataLoading = true
         
-        let isNotification =  isNotificationsEnabled == false ? 0 : 1
-        let isContact =  isContactInfoVisible == false ? 0 : 1
+//        let isNotification =  isNotificationsEnabled == false ? 0 : 1
+//        let isContact =  isContactInfoVisible == false ? 0 : 1
 
-        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotification,"personalDetail":isContact] as [String : Any]
+//        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotification,"personalDetail":isContact] as [String : Any]
+        
+        
+        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91"] as [String : Any]
+
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage?.wxCompress() ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
             

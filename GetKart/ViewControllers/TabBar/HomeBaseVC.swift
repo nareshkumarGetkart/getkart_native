@@ -251,18 +251,19 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         
-        if let index = viewControllers?.firstIndex(of: viewController), index == 1 || index == 3 {
-            
+        guard let index =  viewControllers?.firstIndex(of: viewController) else{ return false}
+        
+        if index == 0{
+            return true
+       
+        }else if index == 1 || index == 3 {
             if AppDelegate.sharedInstance.isUserLoggedInRequest() == false {
                 return false
             }
-        }
-
-        if let index = viewControllers?.firstIndex(of: viewController), index == 2 {
+        }else if index == 2 {
             return false // Prevent selection of the middle (dummy) tab
         }
         return true
-        
     }
     
     func tabBarController(_ tabBarController: UITabBarController,

@@ -47,10 +47,22 @@ struct BlogDetailView: View {
                         
                     }
                 }
-                if (obj?.title ?? "").count > 0{
+               /* if (obj?.title ?? "").count > 0{
                     
                     Text(obj?.title ?? "").multilineTextAlignment(.leading).font(.manrope(.medium, size: 18)).padding([.leading,.trailing],8).padding(.top,10)
+                }*/
+                
+                if (obj?.title ?? "").count > 0 {
+                    HStack {
+                        Text(obj?.title ?? "")
+                            .multilineTextAlignment(.leading)
+                            .font(.manrope(.medium, size: 18))
+                            .padding([.leading, .trailing], 8)
+                            .padding(.top, 10)
+                        Spacer()
+                    }
                 }
+
                 
                 let metaTag = """
                    <meta name="viewport" content="width=device-width, initial-scale=3.0, maximum-scale=5.0, minimum-scale=3.0, user-scalable=yes">

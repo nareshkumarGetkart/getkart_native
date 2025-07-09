@@ -168,6 +168,29 @@ class RealmManager: ObservableObject {
             }
         }
     }
+    
+    
+    func updateNotificationStatus(status:Bool){
+        
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: Local.shared.getUserId()) {
+            try? realm.write {
+                user.notification = status == true ? 1 : 0
+            }
+        }
+    }
+    
+    
+    
+    func updateMobileVisibility(status:Bool){
+        
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: Local.shared.getUserId()) {
+            try? realm.write {
+                user.mobileVisibility = status == true ? 1 : 0
+            }
+        }
+    }
+
+
 
     func clearDB() {
         try? realm.write {

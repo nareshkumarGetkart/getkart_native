@@ -13,8 +13,8 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
-var ISDEBUG = false
+var devEnvironment: DevEnvironment = .staging
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -74,6 +74,21 @@ final class Constant: NSObject {
             return  "\(Constant.shared.baseURL)/verify-mobile-otp"
         }
     }
+    
+    
+    var update_mobile_visibility:String{
+        get {
+            return  "\(Constant.shared.baseURL)/update-mobile-visibility"
+        }
+    }
+    
+    
+    var update_notification:String{
+        get {
+            return  "\(Constant.shared.baseURL)/v1/update-notification"
+        }
+    }
+    
     
     
     var mobile_verify_update:String{

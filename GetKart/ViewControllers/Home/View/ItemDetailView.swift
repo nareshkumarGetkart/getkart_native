@@ -367,15 +367,37 @@ struct ItemDetailView: View {
                     .font(Font.manrope(.regular, size: 15))
                     .foregroundColor(.gray)
                     
-                    Divider().padding(.bottom)
+                    Divider()//.padding(.bottom,5)
                   
                     
-                    SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact,isverified:objVM.sellerObj?.isVerified ?? 0)
+                    let sellerName = objVM.itemObj?.user?.name ?? ""
+                    let sellerPic = objVM.itemObj?.user?.profile ?? ""
+                    let sellerMob = objVM.itemObj?.user?.mobile ?? ""
+                    let sellerIsVerified = objVM.itemObj?.user?.isVerified ?? 0
+                    let sellerId = objVM.itemObj?.user?.id ?? 0
+
+                    
+                    SellerInfoView(name: sellerName, email: "", image:sellerPic,mobile: sellerMob,mobileVisibility:isVisibleContact,isverified:sellerIsVerified)
+                         .onTapGesture {
+                         
+                         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: sellerId))
+                         self.navController?.pushViewController(hostingController, animated: true)
+                     }
+                    
+                    
+//                    SellerInfoView(name:sellerName , email: "", image: sellerPic, mobile:sellerMob ,mobileVisibility: isVisibleContact,isverified:sellerIsVerified)
+//                        .onTapGesture {
+//                        
+//                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.itemObj?.user.id ?? 0))
+//                        self.navController?.pushViewController(hostingController, animated: true)
+//                    }
+                    
+                  /*  SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact,isverified:objVM.sellerObj?.isVerified ?? 0)
                         .onTapGesture {
                         
                         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
                         self.navController?.pushViewController(hostingController, animated: true)
-                    }
+                    }*/
                     
                     Text("Location").font(Font.manrope(.semiBold, size: 16))
                 }
@@ -543,8 +565,9 @@ struct ItemDetailView: View {
               
                 
             }else{
-                if objVM.sellerObj == nil {
-                    self.objVM.getSeller(sellerId:objVM.itemObj?.userID ?? 0)
+              //  if objVM.sellerObj == nil {
+                if objVM.itemObj?.user == nil || objVM.relatedDataItemArray.count == 0 {
+                  //  self.objVM.getSeller(sellerId:objVM.itemObj?.userID ?? 0)
                     self.objVM.getProductListApi(categoryId: objVM.itemObj?.categoryID ?? 0,excludeId:  objVM.itemObj?.id ?? 0)
                     self.objVM.setItemTotalApi()
                 }
@@ -988,7 +1011,10 @@ struct ItemDetailView: View {
             }
                             
 
-            if objVM.sellerObj?.id == Local.shared.getUserId()  && objVM.itemObj?.status == "approved"{
+
+            let sellerId = (objVM.itemObj?.user?.id ?? 0)
+
+            if sellerId == Local.shared.getUserId()  && objVM.itemObj?.status == "approved"{
                 
                 Button {
                     showMoreOptionSheet = true
@@ -1095,7 +1121,9 @@ struct ItemDetailView: View {
         if Local.shared.getUserId() == itemUserId {
             return 0
         } else {
-            return objVM.sellerObj?.mobileVisibility ?? 1
+//            return objVM.sellerObj?.mobileVisibility ?? 0
+            return objVM.itemObj?.user?.mobileVisibility ?? 0
+
         }
     }
     
@@ -1200,9 +1228,9 @@ struct SellerInfoView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack{
-                Button {
-                    
-                } label: {
+//                Button {
+//                    
+//                } label: {
 
                     AsyncImage(url: URL(string: image)) { image in
                         image
@@ -1218,32 +1246,33 @@ struct SellerInfoView: View {
                             .frame(width:55, height: 55)
                             .cornerRadius(27.5)
                     }
-                }
+              //  }
              
-                VStack(alignment: .leading) {
-                    HStack{
-                        Text("\(name)")
-                            .font(.headline)
-                        if isverified == 1{
-                            Image("verified")
-                                .resizable()
-                                .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
-                                .scaledToFit()
-                                .frame(width:15, height: 15)
-                        }
-                        
-                        Spacer()
+              //  VStack(alignment: .leading) {
+                HStack{
+                    Text("\(name)")
+                        .font(.headline)
+                    if isverified == 1{
+                        Image("verified")
+                            .resizable()
+                            .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                            .scaledToFit()
+                            .frame(width:15, height: 15)
                     }
                     
-                    Text(email)
-                        .font(.subheadline)
-                        .foregroundColor(Color(UIColor.label))
-                }.padding(.trailing,5)
-                
+                    Spacer()
+                }
+                    
+//                    Text(email)
+//                        .font(.subheadline)
+//                        .foregroundColor(Color(UIColor.label))
+//                }.padding(.trailing,5)
+//                
                 
               //  HStack{
                     Spacer(minLength: 0)
-                if mobileVisibility == 1  && mobile.count > 0{
+              
+                if mobileVisibility == 1  && mobile.count > 0 {
                     Button {
                         showMessageView = true
                         
