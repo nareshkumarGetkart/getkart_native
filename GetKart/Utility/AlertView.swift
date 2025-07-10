@@ -13,6 +13,7 @@ typealias alertCompletionBlock = (String?, NSInteger?) -> ()
 class AlertView: NSObject {
     static var sharedManager = AlertView()
     var isAlertViewShowing = false
+   
     func presentAlertWith(title : NSString, msg: NSString, buttonTitles:NSArray, onController:UIViewController, tintColor:UIColor = .systemBlue, dismissBlock:@escaping alertCompletionBlock) {
         
         if msg.isKind(of: NSString.self  as AnyClass) {

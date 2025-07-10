@@ -6,28 +6,22 @@
 //
 
 import SwiftUI
+import FittedSheets
 
 struct SettingsView: View {
     
-    @Environment(\.dismiss) private var dismiss
-    
-    
-
+    var navigationController: UINavigationController?
     @State private var isNotificationsEnabled: Bool = true
     @State private var isContactInfoVisible: Bool = false
     @State private var isMobileAvailable = false
-    
-    
-    
     var callbackAction: ((_ action: String) -> Void)
 
     
     var body: some View {
-
+        
         VStack(spacing: 15){
             HStack{ Spacer()}.frame(height: 25)
-            // Toggle Switches
-           // Spacer()
+   
             if isMobileAvailable{
                 SettingRowView(iconStr: "call", title: "Show mobile number in my Ads", isToggle:true , isOn: $isContactInfoVisible)
             }
@@ -35,23 +29,19 @@ struct SettingsView: View {
             
             SettingRowView(iconStr: "delete_account", title: "Delete Account", isToggle:false , isOn: .constant(false))
                 .onTapGesture {
-                    dismiss()
+                    navigationController?.dismiss(animated: true)
                     callbackAction("delete")
-
                 }
             SettingRowView(iconStr: "logout", title: "Logout", isToggle:false , isOn: .constant(false))
                 .onTapGesture {
-                    dismiss()
-                    callbackAction("logout")
-                    
-                }
 
-//            ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
-//            
-//            ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
+                    callbackAction("logout")
+
+                }
+            
             Spacer()
         }.padding(8)
-            //.background(Color(UIColor.systemGray5))
+            .background(Color(UIColor.secondarySystemBackground))
             .onAppear {
                 let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
                 
@@ -63,9 +53,9 @@ struct SettingsView: View {
     
 }
 
-#Preview {
-    SettingsView(callbackAction: {_ in })
-}
+//#Preview {
+//    SettingsView(navigationController:nil, callbackAction: {_ in })
+//}
 
 
 
@@ -121,12 +111,25 @@ struct SettingRowView:View {
                         // 👉 Do your custom action here
                     }
             }else{
-                
+                ZStack {
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(Color(UIColor.systemGray5).opacity(0.9))
+                        .frame(width: 40, height: 40)
+                    
+                    Image("arrow_right")
+                       // .renderingMode(.template)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        //.foregroundColor(.orange)
+                        .frame(width: 20, height: 20)
+                        .padding()
+                }
+                .frame(width: 40, height: 40)
             }
        
         } .padding(8)
             .frame(height: 60)
-            .background(Color(UIColor.systemBackground))
+            .background(Color(UIColor.systemGroupedBackground))
             .cornerRadius(8)
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
         

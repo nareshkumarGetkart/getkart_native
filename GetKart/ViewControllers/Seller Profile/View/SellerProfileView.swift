@@ -41,7 +41,7 @@ struct SellerProfileView: View {
                     }) {
                         Image("share").renderingMode(.template)
                             .font(.title2)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(UIColor.label))
                     } .actionSheet(isPresented: $showShareSheet) {
                         
                         ActionSheet(title: Text(""), message: nil, buttons: [
@@ -68,7 +68,7 @@ struct SellerProfileView: View {
                     }) {
                         Image(systemName: "ellipsis")
                             .font(.title2)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(UIColor.label))
                     } .actionSheet(isPresented: $showOptionSheet) {
                         
                         
@@ -97,6 +97,7 @@ struct SellerProfileView: View {
                 AsyncImage(url: URL(string: objVM.sellerObj?.profile ?? "")) { img in
                     
                     img.resizable()
+                        .aspectRatio(contentMode: .fill)
                         .frame(width: 80, height: 80).cornerRadius(40)
                 } placeholder: {
                     

@@ -41,24 +41,24 @@ struct BlockedUserView: View {
                     AsyncImage(url: URL(string: obj.profile ?? "")) { image in
                         image
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 60,height: 60)
-                            .cornerRadius(30)
-                            .aspectRatio(contentMode: .fit)
-                            .padding(2)
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 55,height: 55)
+                            .cornerRadius(27.5)
+                            .padding(5)
                         
                     }placeholder: {
                         Image("user-circle")
                             .resizable().aspectRatio(contentMode: .fit)
-                            .frame(width: 60,height: 60).cornerRadius(30)
-                            .padding(2)
+                            .frame(width: 55,height: 55)
+                            .cornerRadius(27.5)
+                            .padding(5)
                     }
                     
                     Text(obj.name ?? "").foregroundColor(Color(UIColor.label))
                         .font(Font.manrope(.regular, size: 16.0))
                     Spacer()
                     
-                }.background(.white).cornerRadius(6.0)
+                }.background(Color(UIColor.systemBackground)).cornerRadius(6.0)
                     .padding(.horizontal)
                     .tag(index)
                     .onTapGesture {

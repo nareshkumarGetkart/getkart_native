@@ -33,47 +33,23 @@ class HomeBaseVC: UITabBarController {
         }
         for x in 0..<items.count-1 {
             items[x].tag = x
-            
-          //  items[x].image = UIImage(named:images[x])? .withTintColor(.label, renderingMode: .alwaysOriginal)
-            
             tabBar.items?[x].image = nil
             tabBar.items?[x].image = UIImage(named: images[x])?.withRenderingMode(.alwaysTemplate)
-
             items[x].selectedImage = UIImage(named:imagesSel[x])?.withRenderingMode(.alwaysOriginal)
         }
         setupMiddleButton()
-
-        
-      //  DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            
-       
-            
-       // }
-        // Do any additional setup after loading the view.
-        
-    
-        
+        setupDoubleTapGesture()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setupDoubleTapGesture()
-       /* if  Constant.shared.isLaunchFirstTime == 1{
-            
-            Constant.shared.isLaunchFirstTime = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-
-                AppDelegate.sharedInstance.navigateToNotificationType()
-            }
-        }*/
         
         if Constant.shared.isLaunchFirstTime == 1 {
             Constant.shared.isLaunchFirstTime = 0
-
+            
             NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
                 AppDelegate.sharedInstance.navigateToNotificationType()
             }
-
             // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
@@ -268,33 +244,6 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     
     func tabBarController(_ tabBarController: UITabBarController,
                           didSelect viewController: UIViewController) {
-        
-        
-     /*   switch tabBarController.selectedIndex{
-            
-        case 0:
-            break
-            
-        case 1:
-         
-            break
-            
-        case 2:
-            //Center tab
-            
-            break
-        case 3:
-            
-            break
-        case 4:
-            
-            
-            break
-            
-        default:
-            break
-            
-        }*/
-        
+    
     }
 }

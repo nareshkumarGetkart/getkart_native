@@ -23,7 +23,7 @@ struct UnblockUserView: View {
                 
                 Text("Unblock \(bloclkUser?.name ?? "") to send a message")
                     .font(Font.manrope(.medium, size: 16))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
                 
@@ -36,7 +36,7 @@ struct UnblockUserView: View {
 
                             .frame(maxWidth: .infinity,minHeight: 40,maxHeight: 40)
                             .background(Color(.systemGray5))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(.label))
                             .cornerRadius(20)
                     }
 
@@ -55,7 +55,7 @@ struct UnblockUserView: View {
 
             }
             .padding(20)
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(16)
             .shadow(radius: 10)
             .frame(maxWidth: 300)

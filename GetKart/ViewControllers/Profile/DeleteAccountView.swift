@@ -81,6 +81,7 @@ struct DeleteAccountView: View {
             }
             .padding()
             .background(Color(UIColor.systemBackground))
+            
             .cornerRadius(15)
             .padding(.horizontal, 20)
         }

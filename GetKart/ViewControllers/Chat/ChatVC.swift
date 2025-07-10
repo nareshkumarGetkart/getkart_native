@@ -51,6 +51,7 @@ class ChatVC: UIViewController {
     lazy private var imagePicker = UIImagePickerController()
 
     var chatArray = [MessageModel]()
+    var mobileVisibility = 0
     
     
     @IBOutlet weak var imgVwVerified:UIImageView!
@@ -220,12 +221,16 @@ class ChatVC: UIViewController {
         
     }
     @IBAction func callBtnAction(sender : UIButton){
-        
-        if let url = NSURL(string: "tel://\(mobileNumber)"), UIApplication.shared.canOpenURL(url as URL) {
-            if #available(iOS 10, *) {
-                UIApplication.shared.open(url as URL)
-            } else {
-                UIApplication.shared.openURL(url as URL)
+        if isItemDeleted || youBlockedByUser.count > 0{
+            
+        }else{
+            
+            if let url = NSURL(string: "tel://\(mobileNumber)"), UIApplication.shared.canOpenURL(url as URL) {
+                if #available(iOS 10, *) {
+                    UIApplication.shared.open(url as URL)
+                } else {
+                    UIApplication.shared.openURL(url as URL)
+                }
             }
         }
     }
@@ -401,12 +406,23 @@ class ChatVC: UIViewController {
         if youBlockedUser.count > 0{
             blockedView.isHidden = false
             lblBlockedMsg.text = "You have blocked this user."
+            self.btnCall.isHidden = true
+
         }else  if youBlockedByUser.count > 0{
             blockedView.isHidden = false
             lblBlockedMsg.text = "User has blocked you."
+            self.btnCall.isHidden = true
 
         }else{
              blockedView.isHidden = true
+            
+            if mobileVisibility == 1 && !isItemDeleted{
+                self.btnCall.isHidden = false
+
+            }else{
+                self.btnCall.isHidden = true
+            }
+
             self.btnMic.isUserInteractionEnabled = true
             self.btnSend.isUserInteractionEnabled = true
             self.textView.isUserInteractionEnabled = true
@@ -770,6 +786,7 @@ class ChatVC: UIViewController {
                 self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
                 self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
             }else{
+                self.btnCall.isHidden = true
                 isItemDeleted = true
                 AlertView.sharedManager.showToast(message: "This item is no longer available.")
             }
@@ -798,10 +815,11 @@ class ChatVC: UIViewController {
             self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
             self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
-            
-            if let mobileVisibility = dataDict["mobileVisibility"] as? Int, mobileVisibility == 1{
+            self.mobileVisibility = dataDict["mobileVisibility"] as? Int ?? 0
+            if  self.mobileVisibility == 1{
                 self.mobileNumber = dataDict["mobile"] as? String ?? ""
                 self.btnCall.isHidden = false
+                
             }else{
                 self.mobileNumber = ""
                 self.btnCall.isHidden = true

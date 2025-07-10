@@ -247,7 +247,7 @@ struct ItemDetailView: View {
                         let status = objVM.itemObj?.status ?? ""
                         let (bgColor, titleColor, displayStatus) = statusColors(for: status)
                         
-                        Text(displayStatus)
+                        Text(displayStatus.capitalized)
                             .font(Font.manrope(.medium, size: 15))
                             .foregroundColor(titleColor)
                             .padding(.horizontal)
@@ -468,12 +468,13 @@ struct ItemDetailView: View {
                 }
                 LazyVStack(alignment: .leading, spacing: 8) {
                     
-                    HStack{
-                        Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
-                        Spacer()
-                    }//.padding(.bottom)
-                    
-                    
+                    if objVM.relatedDataItemArray.count > 0 {
+                        HStack{
+                            Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
+                            Spacer()
+                        }//.padding(.bottom)
+                        
+                    }
                     /*  ScrollView(.horizontal, showsIndicators: false) {
                      //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
                      HStack(spacing: 10) {

@@ -74,7 +74,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 // Change location action
                 self.fetchCountryListing()
             }) {
-                Text("Somewhere else")
+                Text("Choose location manually")
                     .font(.system(size: 16))
                     .foregroundColor(Color(UIColor.label))
                     .padding()

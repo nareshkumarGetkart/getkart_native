@@ -394,49 +394,54 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     @objc func presentSettingView(){
         
-       
         
-        let controller =  UIHostingController(rootView:  SettingsView { action in
-            
-            if action == "logout"{
-                
-                let deleteAccountView = UIHostingController(rootView: LogoutView(navigationController: self.navigationController))
-                deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
-                deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                self.present(deleteAccountView, animated: true, completion: nil)
-           
-            }else if action == "delete"{
-                let deleteAccountView = UIHostingController(rootView: DeleteAccountView())
-                deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
-                deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                deleteAccountView.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                self.present(deleteAccountView, animated: true, completion: nil)
-            }
-        })
+        let controller = UIHostingController(rootView: SettingsView( callbackAction: {action in }))
+       
         
         let useInlineMode = view != nil
         controller.title = ""
         controller.navigationController?.navigationBar.isHidden = true
         let nav = UINavigationController(rootViewController: controller)
-        var fixedSize = 0.5
+        var fixedSize = 0.47
         if UIDevice().hasNotch{
-            fixedSize = 0.5
+            fixedSize = 0.47
         }else{
             if UIScreen.main.bounds.size.height <= 700 {
-                fixedSize = 0.6
+                fixedSize = 0.58
             }
         }
         nav.navigationBar.isHidden = true
         controller.modalTransitionStyle = .coverVertical
         controller.modalPresentationStyle = .fullScreen
+              
         let sheet = SheetViewController(
             controller: nav,
             sizes: [.percent(Float(fixedSize)),.intrinsic],
             options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
         sheet.allowGestureThroughOverlay = false
-        // sheet.dismissOnOverlayTap = false
         sheet.cornerRadius = 15
+        
+     
+        let settingView =  SettingsView(navigationController: self.navigationController) { [weak self] action in
+
+               if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+            
+            if action == "logout"{
+
+                self?.presentLogoutView()
+           
+            }else if action == "delete"{
+                self?.presentDeleteAccountView()
+              
+            }
+        }
+        
+        controller.rootView = settingView
+   
         if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
             sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
         } else {
@@ -446,6 +451,36 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
  
     
+    func presentLogoutView(){
+        let logoutView = UIHostingController(rootView: LogoutView(navigationController: self.navigationController))
+        logoutView.modalPresentationStyle = .overFullScreen // Full-screen modal
+        logoutView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        
+        if theme == .dark{
+            logoutView.view.backgroundColor = UIColor.systemGray5.withAlphaComponent(0.8) // Semi-transparent background
+
+        }else{
+            logoutView.view.backgroundColor = UIColor.label.withAlphaComponent(0.8) // Semi-transparent background
+        }
+        self.present(logoutView, animated: true, completion: nil)
+    }
+    
+    func presentDeleteAccountView(){
+        let deleteAccountView = UIHostingController(rootView: DeleteAccountView())
+        deleteAccountView.modalPresentationStyle = .overFullScreen // Full-screen modal
+        deleteAccountView.modalTransitionStyle = .crossDissolve   // Fade-in effect
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        
+        if theme == .dark{
+            deleteAccountView.view.backgroundColor = UIColor.systemGray5.withAlphaComponent(0.8) // Semi-transparent background
+        }else{
+            deleteAccountView.view.backgroundColor = UIColor.label.withAlphaComponent(0.8) // Semi-transparent background
+        }
+        self.present(deleteAccountView, animated: true, completion: nil)
+    }
     @objc func statusTapped(){
         
         if verifiSttaus.lowercased() == "rejected"{

@@ -9,6 +9,7 @@ import UIKit
 import SwiftUI
 import Kingfisher
 
+
 class HomeVC: UIViewController, LocationSelectedDelegate {
    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -75,28 +76,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
 
     
-    /*
-    private func updateTolocation(){
-        
-       let city = Local.shared.getUserCity()
-        let state = Local.shared.getUserState()
-        let country = Local.shared.getUserCountry()
-        
-     var locStr = city
-        if state.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + state : state
-        }
-        if country.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + country : "All \(country)"
-        }
-        
-        if locStr.count == 0 {
-            locStr = "All Countries"
-        }
-        self.lblAddress.text = locStr
-    }
-    */
-    
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
@@ -127,42 +106,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             let locality = userInfo["locality"] as? String ?? ""
             
             handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
-         /*
-            print("Received Location: \(city), \(state), \(country)")
-                        
-            homeVModel?.page = 1
-            //homeVModel?.itemObj?.data = nil
-           // homeVModel?.featuredObj = nil
-            homeVModel?.itemObj?.data?.removeAll()
-            homeVModel?.featuredObj?.removeAll()
-            self.tblView.reloadData()
-            tblView.setNeedsLayout()
-            tblView.layoutIfNeeded()
-            
-            homeVModel?.city = city
-            homeVModel?.country = country
-            homeVModel?.state = state
-            homeVModel?.latitude = latitude
-            homeVModel?.longitude = longitude
-
-            homeVModel?.getProductListApi()
-            homeVModel?.getFeaturedListApi()
-            var locStr = city
-            
-            if state.count > 0 {
-                locStr =  locStr.count > 0 ? locStr + ", " + state : state
-            }
-            
-            if country.count > 0 {
-                locStr =  locStr.count > 0 ? locStr + ", " + country : country
-            }
-            
-            if locStr.count == 0 {
-                locStr = "All Countries"
-            }
-            self.lblAddress.text = locStr
-            // Handle UI update or data save
-            */
+         
         }
     }
 
@@ -211,12 +155,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
 }
     
     @IBAction func searchBtnAction(_ sender : UIButton){
-//        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController)) // Wrap in UIHostingController
-//        hostingController.hidesBottomBarWhenPushed = true
-//        self.navigationController?.pushViewController(hostingController, animated: true)
-//        
-            
-        
+
         let swiftUIview = SearchWithSortView(categroryId: 0, navigationController:self.navigationController, categoryName:  "", categoryIds: "", categoryImg: "",pushToSuggestion:true)
         let vc = UIHostingController(rootView: swiftUIview)
         vc.hidesBottomBarWhenPushed = true
@@ -236,15 +175,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
         
-//        let hostingController = UIHostingController(rootView: SearchProductView(navigation:self.navigationController,navigateToFilterScreen: true))
-//        hostingController.hidesBottomBarWhenPushed = true
-//        self.navigationController?.pushViewController(hostingController, animated: false)
-        
-                
-//        let hostingController = UIHostingController(rootView: FilterView(navigation:self.navigationController))
-//        hostingController.hidesBottomBarWhenPushed = true
-//        self.navigationController?.pushViewController(hostingController, animated: false)
-//
     }
     
     
@@ -257,73 +187,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){
 
         handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
-       /* homeVModel?.page = 1
-        homeVModel?.itemObj?.data = nil
-        homeVModel?.featuredObj = nil
-        homeVModel?.itemObj?.data?.removeAll()
-        homeVModel?.featuredObj?.removeAll()
-        self.tblView.reloadData()
-        tblView.setNeedsLayout()
-        tblView.layoutIfNeeded()
-        
-        homeVModel?.city = city
-        homeVModel?.country = country
-        homeVModel?.state = state
-        homeVModel?.latitude = latitude
-        homeVModel?.longitude = longitude
-        homeVModel?.getProductListApi()
-        homeVModel?.getFeaturedListApi()
-        var locStr = city
-        
-        if state.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + state : state
-        }
-        
-        if country.count > 0 {
-            locStr =  locStr.count > 0 ? locStr + ", " + country : country
-        }
-        
-        if locStr.count == 0 {
-            locStr = "All Countries"
-        }
-        self.lblAddress.text = locStr
-        */
+      
     }
 }
 
-/*
-extension HomeVC:FilterSelected{
-    
-    
-    func filterSelectectionDone(dict:Dictionary<String,Any>, dataArray:Array<CustomField>, strCategoryTitle:String) {
-        print(dict)
-        
-        homeVModel?.page = 1
-        homeVModel?.itemObj?.data = nil
-        self.tblView.reloadData()
-        homeVModel?.getProductListApi()
-        
-        if let  city = dict["city"] as? String,let  state = dict["state"] as? String,let  country = dict["country"] as? String{
-            
-            handleLocationUpdate(city: city, state: state, country: country, latitude: <#T##String#>, longitude: <#T##String#>)
-            var locStr = city
-            if state.count > 0 {
-                locStr =  locStr.count > 0 ? locStr + ", " + state : state
-            }
-            
-            if country.count > 0 {
-                locStr =  locStr.count > 0 ? locStr + ", " + country : country
-            }
-            
-            if locStr.count == 0 {
-                locStr = "All Countries"
-            }
-            self.lblAddress.text = locStr
-        }
-    }
-}
-
-*/
 extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
