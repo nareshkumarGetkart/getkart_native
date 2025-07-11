@@ -63,7 +63,11 @@ struct SearchProductView: View {
                                 .background(Color(.systemBackground))
                                 .padding(.trailing, 10)
                                 .onSubmit {
+
                                     if  viewModel.searchText.count > 0{
+                                        viewModel.istoSearch = false
+                                        isFocused = false
+
                                         onSelectSuggestion(Search(categoryID: 0, categoryName: "", categoryImage: "", keyword:  viewModel.searchText))
                                         self.navigation?.popViewController(animated: false)
                                 }

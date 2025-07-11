@@ -94,6 +94,7 @@ class ChatVC: UIViewController {
         btnThreeDots.setImageColor(color: .label)
         btnCall.setImageColor(color: .label)
         btnBack.setImageColor(color: .label)
+        self.btnCall.isHidden = true
         updateUserData()
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
         btnSend.clipsToBounds = true
@@ -221,16 +222,20 @@ class ChatVC: UIViewController {
         
     }
     @IBAction func callBtnAction(sender : UIButton){
-        if isItemDeleted || youBlockedByUser.count > 0{
+        if isItemDeleted || youBlockedByUser.count > 0 {
             
         }else{
             
-            if let url = NSURL(string: "tel://\(mobileNumber)"), UIApplication.shared.canOpenURL(url as URL) {
-                if #available(iOS 10, *) {
-                    UIApplication.shared.open(url as URL)
-                } else {
-                    UIApplication.shared.openURL(url as URL)
+            if mobileNumber.count > 0 {
+                if let url = NSURL(string: "tel://\(mobileNumber)"), UIApplication.shared.canOpenURL(url as URL) {
+                    if #available(iOS 10, *) {
+                        UIApplication.shared.open(url as URL)
+                    } else {
+                        UIApplication.shared.openURL(url as URL)
+                    }
                 }
+            }else{
+                self.btnCall.isHidden = true
             }
         }
     }
@@ -416,7 +421,7 @@ class ChatVC: UIViewController {
         }else{
              blockedView.isHidden = true
             
-            if mobileVisibility == 1 && !isItemDeleted{
+            if (mobileVisibility == 1 && mobileNumber.count > 0) && !isItemDeleted{
                 self.btnCall.isHidden = false
 
             }else{
@@ -818,7 +823,9 @@ class ChatVC: UIViewController {
             self.mobileVisibility = dataDict["mobileVisibility"] as? Int ?? 0
             if  self.mobileVisibility == 1{
                 self.mobileNumber = dataDict["mobile"] as? String ?? ""
-                self.btnCall.isHidden = false
+                if mobileNumber.count > 0 {
+                    self.btnCall.isHidden = false
+                }
                 
             }else{
                 self.mobileNumber = ""

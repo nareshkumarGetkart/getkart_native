@@ -622,7 +622,7 @@
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" image="close"/>
+                                        <state key="normal" image="Cross"/>
                                         <connections>
                                             <action selector="closeButtonActionMethod:" destination="ih4-Ru-27e" eventType="touchUpInside" id="THo-oe-RAy"/>
                                         </connections>
@@ -630,7 +630,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dgr-FE-XHD" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
                                         <rect key="frame" x="20" y="80" width="353" height="50"/>
                                         <subviews>
-                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchGrey" translatesAutoresizingMaskIntoConstraints="NO" id="0xF-cm-4Sq">
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="search" translatesAutoresizingMaskIntoConstraints="NO" id="0xF-cm-4Sq">
                                                 <rect key="frame" x="10" y="10" width="30" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="30" id="78X-Jy-Cv4"/>
@@ -861,12 +861,12 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Cross" width="20" height="20"/>
         <image name="arrow_left" width="24" height="24"/>
-        <image name="close" width="14.666666984558105" height="14.666666984558105"/>
         <image name="envelope" catalog="system" width="128" height="85"/>
         <image name="login_Apple" width="35" height="35"/>
         <image name="login_Google" width="30" height="30"/>
-        <image name="searchGrey" width="18.333333969116211" height="24.333333969116211"/>
+        <image name="search" width="24" height="24"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
@@ -874,7 +874,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

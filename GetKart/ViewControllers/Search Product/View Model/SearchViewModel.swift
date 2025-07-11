@@ -256,7 +256,7 @@ class SearchViewModel:ObservableObject{
         print("✅ Final URL:", strUrl)
 
       */
-        print("✅ Final URL:", strUrl)
+      //  print("✅ Final URL:", strUrl)
 
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in

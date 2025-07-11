@@ -1262,7 +1262,8 @@ struct SellerInfoView: View {
                     }
                     
                     Spacer()
-                }
+                }.contentShape(Rectangle())
+
                     
 //                    Text(email)
 //                        .font(.subheadline)

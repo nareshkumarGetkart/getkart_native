@@ -48,7 +48,8 @@ struct SearchWithSortView: View {
         }.frame(height:44).background(Color(.systemBackground))
         
             .onAppear{
-                
+                objVM.isDataLoading = false
+
                 if isByDefaultOpenSearch{
                     pushToSearchSuggestionScreen()
                 }
@@ -245,6 +246,8 @@ struct SearchWithSortView: View {
     }
     
     func pushToDetailScreen(id:Int,item:ItemModel){
+        objVM.isDataLoading = true
+        
         var destView = ItemDetailView(navController:  self.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
         destView.returnValue = { value in
             if let obj = value{

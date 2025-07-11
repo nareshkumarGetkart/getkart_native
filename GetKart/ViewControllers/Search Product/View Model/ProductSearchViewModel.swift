@@ -19,16 +19,19 @@ class ProductSearchViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var debounceTimer: AnyCancellable?
     var page = 1
-
+    var istoSearch = true
+    
     init() {
         $searchText
             .removeDuplicates()
             .debounce(for: .milliseconds(400), scheduler: RunLoop.main)
             .sink { [weak self] newValue in
                 guard let self = self else { return }
-                self.page = 1
-                self.isDataLoading = true
-                self.getSearchSuggestionApi()
+                if istoSearch{
+                    self.page = 1
+                    self.isDataLoading = true
+                    self.getSearchSuggestionApi()
+                }
             }
             .store(in: &cancellables)
     }

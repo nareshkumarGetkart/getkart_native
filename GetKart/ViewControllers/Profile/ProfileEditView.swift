@@ -51,12 +51,7 @@ struct ProfileEditView: View {
                             .clipShape(Circle()).padding(5)
                             .overlay(Circle().stroke(Color.orange, lineWidth: 3))
                     } else {
-//                        Circle()
-//                            .fill(Color.gray.opacity(0.3))
-//                            .frame(width: 100, height: 100).padding(5)
-//                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
-//                        
-                        Circle()
+                Circle()
                                     .fill(Color.gray.opacity(0.3))
                                     .frame(width: 100, height: 100)
                                     .overlay(
@@ -79,7 +74,6 @@ struct ProfileEditView: View {
                         )
                     
                         .offset(x: 35, y: 38)
-                    //  .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                 }
                 .sheet(isPresented: $showingImagePicker) {
                     ImagePicker(selectedImage: $selectedImage)
@@ -203,20 +197,6 @@ struct ProfileEditView: View {
                 ).background(Color.clear)
             } // Works in iOS 16+
         }
-        
-        
-        /*.sheet(isPresented: $showOTPPopup) {
-         // Centered OTP Popup
-         OTPPopup(
-         showOTPPopup: $showOTPPopup,
-         otp: "44334",
-         onVerify: {
-         // print("OTP Entered: \(otp)")
-         // Call your verification logic here
-         }
-         )
-         }
-         */
         
     }
     

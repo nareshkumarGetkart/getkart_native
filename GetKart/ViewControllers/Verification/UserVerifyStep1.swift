@@ -10,7 +10,6 @@ import SwiftUI
 struct UserVerifyStep1: View {
   
     var navigation:UINavigationController?
-
     @State private var fullName: String = ""
     @State private var address: String = ""
     @State private var phoneNumber: String = ""
@@ -180,7 +179,7 @@ struct CustomTextField: View {
             Text(title)
                 .font(.manrope(.regular, size: 15))
                 .foregroundColor(Color(UIColor.label))
-            TextField("", text: $text)
+            TextField("", text: $text).tint(Color(UIColor.systemOrange))
                 .padding()
                 .background(Color(UIColor.systemBackground))
                 .cornerRadius(8)

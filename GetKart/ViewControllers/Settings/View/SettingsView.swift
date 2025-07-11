@@ -25,6 +25,7 @@ struct SettingsView: View {
             if isMobileAvailable{
                 SettingRowView(iconStr: "call", title: "Show mobile number in my Ads", isToggle:true , isOn: $isContactInfoVisible)
             }
+            
             SettingRowView(iconStr: "notification", title: "Receive Notification", isToggle:true , isOn: $isNotificationsEnabled)
             
             SettingRowView(iconStr: "delete_account", title: "Delete Account", isToggle:false , isOn: .constant(false))
