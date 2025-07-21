@@ -266,7 +266,8 @@ class CreateAddDetailVC: UIViewController {
         }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
             showErrorMsg = true
             scrollIndex = 0
-        }  else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0 {
+            
+        } else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0  || (params[AddKeys.description.rawValue] as? String  ?? "").count > 4000{
             
             showErrorMsg = true
             scrollIndex = 1
@@ -451,13 +452,14 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.txtField.placeholder = ""
-            cell.txtField.maxLength = 130
+            cell.txtField.maxLength = 60
             cell.lblCurSymbol.isHidden =  true
             cell.txtField.leftPadding = 10
             cell.showCurrencySymbol = false
             cell.lblErrorMsg.isHidden = true
             cell.txtField.text = params[AddKeys.name.rawValue] as? String ?? ""
-
+            cell.txtField.autocapitalizationType = .sentences
+            
             if showErrorMsg == true  && (self.selectedRow != indexPath.row) {
                 if (params[AddKeys.name.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
@@ -476,14 +478,15 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
             return cell
+     
         }else if indexPath.row == 2 {
            
             let cell = tableView.dequeueReusableCell(withIdentifier: "TVCell") as! TVCell
             cell.lblTitle.text = "Description"
             cell.textViewDoneDelegate = self
             cell.tvTextView.tag = indexPath.row
-            
             cell.tvTextView.text = params[AddKeys.description.rawValue] as? String ?? ""
+            cell.lblErrorMsg.text = "Please enter a description under 4000 characters."
             if showErrorMsg == true && (self.selectedRow != indexPath.row) {
                 if (params[AddKeys.description.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false

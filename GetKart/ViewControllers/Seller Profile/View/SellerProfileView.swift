@@ -114,7 +114,7 @@ struct SellerProfileView: View {
                         if(objVM.sellerObj?.isVerified ?? 0) == 1{
                             Image("verified")
                                 .resizable()
-                                .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                                .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
                                 .scaledToFit()
                                 .frame(width:15, height: 15)
                             

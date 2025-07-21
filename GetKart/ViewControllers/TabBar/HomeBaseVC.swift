@@ -8,6 +8,8 @@
 import UIKit
 import SwiftUI
 
+
+
 class HomeBaseVC: UITabBarController {
     
     
@@ -57,7 +59,7 @@ class HomeBaseVC: UITabBarController {
 
     
     func setupMiddleButton() {
-            let buttonSize: CGFloat = 60
+            let buttonSize: CGFloat = 65
             let buttonRadius: CGFloat = buttonSize / 2
             
             // Configure button appearance
@@ -77,7 +79,7 @@ class HomeBaseVC: UITabBarController {
             tabBar.addSubview(middleButton)
             tabBar.bringSubviewToFront(middleButton)
         }
-
+    
 
     
     @objc func middleButtonTapped() {
@@ -91,54 +93,7 @@ class HomeBaseVC: UITabBarController {
                     destVC.popType = .createPost
                     selectedVC.pushViewController(destVC, animated: true)
                 }
-            }
-            
-         /*   let url = Constant.shared.getLimits + "?package_type=item_listing"
-            
-            URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
-                
-                
-                if(error != nil)
-                {
-                    //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
-                    print(error ?? "defaultValue")
-                    
-                }else{
-                    
-                    let result = responseObject! as NSDictionary
-                    let status = result["code"] as? Int ?? 0
-                    let message = result["message"] as? String ?? ""
-                    
-                    if status == 200{
-                        
-                        
-                        if let selectedVC =  self?.selectedViewController as? UINavigationController {
-                            print(selectedVC)
-                            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-                                destVC.hidesBottomBarWhenPushed = true
-                                destVC.popType = .createPost
-                                selectedVC.pushViewController(destVC, animated: true)
-                            }
-                        }
-                    }else{
-                        
-                        AlertView.sharedManager.presentAlertWith(title: "No Package Available", msg: "Please subscribe to any packages to use this functionality", buttonTitles: ["Cancel","Subscribe"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
-                            
-                            if index == 1{
-                                if let selectedVC =  self?.selectedViewController as? UINavigationController {
-                                    
-                                    if  let destVC = StoryBoard.chat.instantiateViewController(identifier: "CategoryPlanVC") as? CategoryPlanVC{
-                                        destVC.hidesBottomBarWhenPushed = true
-                                        selectedVC.pushViewController(destVC, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                }
-            }
-            */
+            }        
         }
     }
     
@@ -174,6 +129,8 @@ class HomeBaseVC: UITabBarController {
         let vc3 = UINavigationController(rootViewController: adsVc)
         let vc4 = UINavigationController(rootViewController: profileVc)
         
+     
+
         
         vc1.navigationBar.isHidden = true
         vc2.navigationBar.isHidden = true
@@ -237,6 +194,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
                 return false
             }
         }else if index == 2 {
+            middleButtonTapped()
             return false // Prevent selection of the middle (dummy) tab
         }
         return true

@@ -207,6 +207,7 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.state =  self.itemObj?.state ?? ""
                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                            destvc.isAdvertisement = true
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }

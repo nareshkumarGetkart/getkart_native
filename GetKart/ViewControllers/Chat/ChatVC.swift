@@ -13,6 +13,12 @@ import Photos
 
 class ChatVC: UIViewController {
     
+    var suggestionArray = [String]()
+    @IBOutlet weak var bgviewSuggestions:UIView!
+    @IBOutlet weak var collectionVwSuggestion:UICollectionView!
+    @IBOutlet weak var btnShowHideSuggestion:UIButton!
+    @IBOutlet weak var cnstrntHeightConstantSuggestion:NSLayoutConstraint!
+    var showSuggestion = false
     @IBOutlet weak var imgViewBackground:UIImageView!
     @IBOutlet weak var bgViewAudioRecord: UIView!
     @IBOutlet weak var btnAudioRecordStarted: UIButton!
@@ -23,7 +29,7 @@ class ChatVC: UIViewController {
     var playTime:Int = 0
     var playTimer:Timer?
     var MP3:Mp3Recorder?
-    
+    private var isMoreChatAvailable = true
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var lblName:UILabel!
@@ -101,6 +107,7 @@ class ChatVC: UIViewController {
         btnSend.translatesAutoresizingMaskIntoConstraints = false
         
         blockedView.isHidden = true
+        bgviewSuggestions.isHidden = true
         
         // Configure the button
         var config = UIButton.Configuration.filled()
@@ -128,7 +135,6 @@ class ChatVC: UIViewController {
         textView.maxNumberOfLines = 5
         textView.delegate = self
         addObservers()
-       // getUserInfo()
         getItemOfferId()
         getMessageList()
         self.btnSend.isHidden = true
@@ -140,8 +146,8 @@ class ChatVC: UIViewController {
         
         // checkOnlineOfflineStatus()
         
-        self.topRefreshControl.backgroundColor = .clear
-        self.tblView.refreshControl = topRefreshControl
+//        self.topRefreshControl.backgroundColor = .clear
+//        self.tblView.refreshControl = topRefreshControl
     }
     
     
@@ -168,7 +174,6 @@ class ChatVC: UIViewController {
         NotificationCenter.default.removeObserver(self)
         typingTimer?.invalidate()
         typingOtherTimer?.invalidate()
-
     }
     
     func updateUserData(){
@@ -197,20 +202,45 @@ class ChatVC: UIViewController {
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
         
-        if !AppDelegate.sharedInstance.isInternetConnected{
-           isDataLoading = false
-            AlertView.sharedManager.showToast(message: "No internet connection")
-      
-        }else if !isDataLoading {
-            isDataLoading = true
-            page = page + 1
-            self.getMessageList()
-        }
+//        if !AppDelegate.sharedInstance.isInternetConnected{
+//           isDataLoading = false
+//            AlertView.sharedManager.showToast(message: "No internet connection")
+//      
+//        }else if !isDataLoading {
+//            isDataLoading = true
+//            page = page + 1
+//            self.getMessageList()
+//        }
         refreshControl.endRefreshing()
     }
       
     
     //MARK: UIButton Action Methods
+    
+    @IBAction func suggestionShowHideButtonAction(sender : UIButton){
+        self.view.endEditing(true)
+        showSuggestion.toggle()
+        hideUnhideSuggestion()
+    }
+    
+    func hideUnhideSuggestion(){
+        if showSuggestion{
+            cnstrntHeightConstantSuggestion.constant  = 170
+            self.btnShowHideSuggestion.setImage(UIImage(named: "arrow_dd"), for: .normal)
+        }else{
+            cnstrntHeightConstantSuggestion.constant  = 35
+            self.btnShowHideSuggestion.setImage(UIImage(named: "arrow_up"), for: .normal)
+
+        }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+            self.scrollToBottom(animated: true)
+
+        }
+      
+    }
+    
     @IBAction func backButtonAction(sender : UIButton){
         self.navigationController?.popViewController(animated: true)
     }
@@ -412,11 +442,15 @@ class ChatVC: UIViewController {
             blockedView.isHidden = false
             lblBlockedMsg.text = "You have blocked this user."
             self.btnCall.isHidden = true
+            self.showSuggestion = false
+            self.hideUnhideSuggestion()
 
         }else  if youBlockedByUser.count > 0{
             blockedView.isHidden = false
             lblBlockedMsg.text = "User has blocked you."
             self.btnCall.isHidden = true
+            self.showSuggestion = false
+            self.hideUnhideSuggestion()
 
         }else{
              blockedView.isHidden = true
@@ -427,6 +461,7 @@ class ChatVC: UIViewController {
             }else{
                 self.btnCall.isHidden = true
             }
+
 
             self.btnMic.isUserInteractionEnabled = true
             self.btnSend.isUserInteractionEnabled = true
@@ -499,6 +534,14 @@ class ChatVC: UIViewController {
     //MARK: Other helpful methods
     func registerTblCell(){
         
+        let alignedFlowLayout = collectionVwSuggestion?.collectionViewLayout as? AlignedCollectionViewFlowLayout
+        alignedFlowLayout?.horizontalAlignment = .left
+        alignedFlowLayout?.verticalAlignment = .top
+        alignedFlowLayout?.minimumLineSpacing = 1
+        alignedFlowLayout?.minimumInteritemSpacing = 1
+        alignedFlowLayout?.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        
+        collectionVwSuggestion.register(UINib(nibName: "SuggestionCollectionCell", bundle: nil), forCellWithReuseIdentifier: "SuggestionCollectionCell")
         tblView.register(UINib(nibName: "SendChatCell", bundle: nil), forCellReuseIdentifier: "SendChatCell")
         tblView.register(UINib(nibName: "RecieveChatCell", bundle: nil), forCellReuseIdentifier: "RecieveChatCell")
         tblView.register(UINib(nibName: "SeperatorDateCell", bundle: nil), forCellReuseIdentifier: "SeperatorDateCell")
@@ -517,8 +560,6 @@ class ChatVC: UIViewController {
         tblView.register(UINib(nibName: "SendOfferChatCell", bundle: nil), forCellReuseIdentifier: "SendOfferChatCell")
         
         tblView.register(UINib(nibName: "RecieveOfferChatCell", bundle: nil), forCellReuseIdentifier: "RecieveOfferChatCell")
-
-        
   
     }
     
@@ -543,7 +584,8 @@ class ChatVC: UIViewController {
     
     func getMessageList(){
         
-        let params = ["page":page,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
+        let pag =  (page == 1) ? page : page + 1
+        let params = ["page":pag,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatMessages.rawValue, params)
         
     }
@@ -556,17 +598,44 @@ class ChatVC: UIViewController {
     func sendMessageList(msg:String,msgType:String){
         
         if msgType == "file"{
+            
             let params = ["message":"","audio":"","file":msg,"item_offer_id":item_offer_id] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
+       
         }else if msgType == "audio"{
+            
             let params = ["message":"","audio":msg,"file":"","item_offer_id":item_offer_id] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
+            
         }else if msgType == "text"{
             
             let params = ["message":msg,"audio":"","file":"","item_offer_id":item_offer_id] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
         }
+    }
     
+    
+    func getSuggestionListApi(categoryId:Int,isBuyer:Bool){
+        
+        let params = ["category_id":categoryId,"type":(isBuyer ? "buyer" : "seller")] as [String : Any]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.chat_suggestions, param: params,methodType: .post) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if code == 200{
+                    
+                    if let data = result["data"] as? Array<String>{
+                        self.showSuggestion = true
+                        self.suggestionArray  = data
+                        self.collectionVwSuggestion.reloadData()
+                        self.bgviewSuggestions.isHidden = false
+                    }
+                }
+            }
+        }
     }
     
     
@@ -625,8 +694,13 @@ class ChatVC: UIViewController {
         DispatchQueue.main.async {
             self.btnMic.isHidden = true
             self.btnSend.isHidden = false
+            self.showSuggestion = false
+            self.hideUnhideSuggestion()
         }
     
+      
+        
+        
         if let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
             var statusBarHeight = 0
             if #available(iOS 13.0, *) {
@@ -648,6 +722,8 @@ class ChatVC: UIViewController {
         DispatchQueue.main.async {
             self.btnMic.isHidden = false
             self.btnSend.isHidden = false
+            self.showSuggestion = true
+            self.hideUnhideSuggestion()
         }
         inputBarBottomSpace.constant = 0
         view.setNeedsLayout()
@@ -657,7 +733,7 @@ class ChatVC: UIViewController {
     @objc func noInternet(notification:Notification?){
         
         AlertView.sharedManager.showToast(message: "No internet connection")
-
+      
     }
     
     func scrollToBottom(animated: Bool) {
@@ -786,6 +862,23 @@ class ChatVC: UIViewController {
                 itemImg = itemDict["image"] as? String ?? ""
                 price = itemDict["price"] as? Double ?? 0.0
                 
+                let category_id = itemDict["category_id"] as? Int ?? 0
+                let seller_id   = dataDict["seller_id"] as? Int ?? 0
+                let buyer_id   = dataDict["buyer_id"] as? Int ?? 0
+
+                print("Local user Id = \(Local.shared.getUserId())")
+                print("seller_id user Id = \(seller_id)")
+                print("buyer_id user Id = \(buyer_id)")
+
+                
+                if self.suggestionArray.count == 0{
+                    if Local.shared.getUserId() == seller_id{
+                        getSuggestionListApi(categoryId: category_id, isBuyer: false)
+                    }else{
+                        getSuggestionListApi(categoryId: category_id, isBuyer: true)
+                    }
+
+                }
                 self.itemId = itemDict["id"] as? Int ?? 0
                 self.lblProduct.text = itemName
                 self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
@@ -815,7 +908,7 @@ class ChatVC: UIViewController {
             
             let is_verified = dataDict["is_verified"] as? Int ?? 0
             self.imgVwVerified.isHidden = (is_verified == 1) ? false : true
-            self.imgVwVerified.setImageTintColor(color: .systemBlue)
+            self.imgVwVerified.setImageTintColor(color: Themes.sharedInstance.themeColor)
             self.lblName.text = name
             self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
@@ -846,18 +939,22 @@ class ChatVC: UIViewController {
         
         if page == 1{
             self.chatArray.removeAll()
+            self.isMoreChatAvailable = true
         }
         if let response : MessageParse = try? SocketParser.convert(data: data) {
 
             
             if (response.data?.data?.count ?? 0) == 0 && self.chatArray.count > 0 {
                 //No chat getting
+                self.isMoreChatAvailable = false
+
             }else{
                 
                 if item_offer_id > 0 && (response.data?.data?.count ?? 0) > 0{
                     //Checking if other room messages
                     if let msg = response.data?.data?.first, (msg.itemOfferID ?? 0) > 0 {
                         if (msg.itemOfferID ?? 0) != item_offer_id{
+                            self.isDataLoading = false
                             return
                         }
                     }
@@ -898,12 +995,21 @@ class ChatVC: UIViewController {
             
             
             self.tblView.reloadData()
-            if self.page >= 2 && (response.data?.data?.count ?? 0) > 0{
+           /* if self.page >= 2 && (response.data?.data?.count ?? 0) > 0{
                 
             }else{
                   self.scrollToBottom(animated: false)
             }
-            self.isDataLoading = false
+            */
+            if page == 1{
+                self.scrollToBottom(animated: false)
+            }
+            DispatchQueue.main.asyncAfter(wallDeadline: .now() + 0.4, execute: {
+                self.page += 1
+                self.isDataLoading = false
+                
+
+            })
         }
     }
     
@@ -915,17 +1021,16 @@ class ChatVC: UIViewController {
         }
         if let response : SendMessageParse = try? SocketParser.convert(data: data) {
             
-            if let obj = response.data ,obj.itemOfferID == item_offer_id {
+            if var obj = response.data ,obj.itemOfferID == item_offer_id {
+                
+                if Local.shared.getUserId() != (obj.senderID ?? 0) {
+                    obj.isCautionExpanded = 1
+                }
+
                 self.chatArray.append(obj)
                 self.tblView.reloadData()
                 self.scrollToBottom(animated: true)
-                
-                
-                
-              //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-               
-//                if objLoggedInUser.id != (obj.senderID ?? 0) {
-                    
+        
                 if Local.shared.getUserId() != (obj.senderID ?? 0) {
 
                     sendmessageAcknowledge()
@@ -1184,9 +1289,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-    print(urls)
-        
-      
+        print(urls)
     }
    
 }
@@ -1195,25 +1298,62 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
 
 extension ChatVC:UITableViewDelegate,UITableViewDataSource {
 
+        
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView == tblView else { return }
+
+        // Only trigger when the user is pulling down
+        let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
+        
+        if translation.y > 0 {
+            let yOffset = scrollView.contentOffset.y
+            
+            // Trigger only if user scrolled near the top, not on every small bounce
+            if yOffset < -5 && !isDataLoading  && isMoreChatAvailable{
+                if !AppDelegate.sharedInstance.isInternetConnected {
+                    isDataLoading = false
+                    AlertView.sharedManager.showToast(message: "No internet connection")
+                    return
+                }
+
+                isDataLoading = true
+                //page += 1
+                getMessageList()
+            }
+        }
+    }
+
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         tblView.reloadData()
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        _ = textView.resignFirstResponder()
+        
+        if scrollView == tblView{
+            _ = textView.resignFirstResponder()
+            
+            if showSuggestion{
+                showSuggestion = false
+                hideUnhideSuggestion()
+            }
+        }
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
         
     }
+    
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
          return chatArray.count
     }
+    
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -1232,7 +1372,6 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
          dateFormatter.dateFormat = "hh:mm a"
 
         var cell = ChatterCell()
-      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
 
         if (chatObj.messageType ?? "") == "100"{
             let cell = tableView.dequeueReusableCell(withIdentifier: "SeperatorDateCell") as! SeperatorDateCell
@@ -1255,7 +1394,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 case "text": do{
                     
                     cell = tableView.dequeueReusableCell(withIdentifier: "SendChatCell", for: indexPath) as! SendChatCell
-                    cell.lblMessage.attributedText = convertAttributtedColorText(text: chatObj.message ?? "") //NSAttributedString(string:  chatObj.message ?? "")
+                    cell.lblMessage.attributedText = convertAttributtedColorText(text: chatObj.message ?? "") 
                     DispatchQueue.main.async {
                         cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
@@ -1269,7 +1408,34 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                     }
                     
+                    cell.lblCaution.text = chatObj.warning ?? ""
 
+                    cell.cautionBgView.layer.borderWidth = 1.0
+                    cell.cautionBgView.layer.cornerRadius = 8.0
+                    cell.cautionBgView.layer.borderColor = Themes.sharedInstance.themeColor.cgColor
+                    cell.cautionBgView.clipsToBounds = true
+                    
+                    cell.btnCautionClose.setImageTintColor(color: .label)
+                    cell.btnCautionClose.tag = indexPath.row
+                    cell.btnCautionClose.addTarget(self, action: #selector(cautionOnOffAction(_:)), for: .touchUpInside)
+                    
+                    cell.btnCautionOnOff.tag = indexPath.row
+                    cell.btnCautionOnOff.addTarget(self, action: #selector(cautionOnOffAction(_ : )), for: .touchUpInside)
+                    
+                    if  (chatObj.warning?.count ?? 0) > 0{
+                        cell.btnCautionOnOff.isHidden = false
+                        if chatObj.isCautionExpanded == 1 && (chatObj.warning?.count ?? 0) > 0{
+                            cell.cautionBgView.isHidden = false
+                        }else{
+                            cell.cautionBgView.isHidden = true
+                        }
+                    }else{
+                        cell.cautionBgView.isHidden = true
+                        cell.btnCautionOnOff.isHidden = true
+                        
+
+                    }
+                    
                     cell.lblTime.text = dateFormatter.string(from: date)
                     cell.lblMessage.isUserInteractionEnabled = true
                     cell.lblMessage.tag = indexPath.row
@@ -1431,6 +1597,35 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         cell.bgview.roundCorners(corners: [.bottomRight,.topLeft,.topRight], radius: 15.0)
                         cell.bgview.updateConstraints()
                     }
+                    
+                    cell.cautionBgView.layer.borderWidth = 1.0
+                    cell.cautionBgView.layer.cornerRadius = 8.0
+                    cell.cautionBgView.layer.borderColor = Themes.sharedInstance.themeColor.cgColor
+                    cell.cautionBgView.clipsToBounds = true
+                    cell.btnCautionOnOff.tag = indexPath.row
+                    cell.btnCautionOnOff.addTarget(self, action: #selector(cautionOnOffAction(_:)), for: .touchUpInside)
+                    cell.btnCautionClose.setImageTintColor(color: .label)
+                    cell.btnCautionClose.tag = indexPath.row
+                    cell.btnCautionClose.addTarget(self, action: #selector(cautionOnOffAction(_:)), for: .touchUpInside)
+                                        
+                    cell.lblCaution.text = chatObj.warning ?? ""
+                    
+                    if  (chatObj.warning?.count ?? 0) > 0{
+                        cell.btnCautionOnOff.isHidden = false
+                       
+                        if chatObj.isCautionExpanded == 1{
+                            cell.cautionBgView.isHidden = false
+                        }else{
+                            cell.cautionBgView.isHidden = true
+                        }
+                    }else{
+                        cell.cautionBgView.isHidden = true
+                        cell.btnCautionOnOff.isHidden = true
+                        
+
+                    }
+                    
+                    
                     cell.lblMessage.isUserInteractionEnabled = true
                     cell.lblMessage.tag = indexPath.row
                     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOnLabel(_:)))
@@ -1557,6 +1752,17 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         return cell
         
         
+    }
+    
+ 
+    @objc func cautionOnOffAction(_ sender : UIButton){
+        
+        if chatArray[sender.tag].isCautionExpanded == 1{
+            chatArray[sender.tag].isCautionExpanded = 0
+        }else{
+            chatArray[sender.tag].isCautionExpanded = 1
+        }
+        self.tblView.reloadRows(at: [IndexPath(row: sender.tag, section: 0)], with: .none)
     }
     
     @objc func handleTapOnLabel(_ gesture: UITapGestureRecognizer) {
@@ -2117,4 +2323,39 @@ extension ChatVC{
     }
    
     
+}
+
+
+extension ChatVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
+   
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+   
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return suggestionArray.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SuggestionCollectionCell", for: indexPath) as! SuggestionCollectionCell
+        cell.lblTitle.text = "  \(suggestionArray[indexPath.item])  "
+        return cell
+    }
+    
+ 
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        if let cell = collectionView.cellForItem(at: indexPath) as? SuggestionCollectionCell {
+            let label = cell.lblTitle
+              let centerPoint = CGPoint(x: label?.bounds.midX ?? 0, y: label?.bounds.midY ?? 0)
+                cell.showRipple(on: label!, at: centerPoint)
+            
+        }
+        self.sendMessageList(msg: suggestionArray[indexPath.item], msgType: "text")
+
+    }
+
 }

@@ -152,20 +152,24 @@ struct SearchWithSortView: View {
                 // Listings
                 ScrollViewReader { scrollProxy in
                     ScrollView {
-                        Color.clear.id("top") // <-- ID to scroll to
+                        Color.clear.id("top")
+                                     
                         if isGridView {
                             gridView
                         } else {
                             listView
                         }
                     }
-                    
                     .onChange(of: objVM.shouldScrollToTop) { shouldScroll in
-                        if shouldScroll {
-                            scrollProxy.scrollTo("top", anchor: .top)
-                            objVM.shouldScrollToTop = false
-                        }
-                    }
+                           if shouldScroll {
+                               DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
+                                   withAnimation {
+                                       scrollProxy.scrollTo("top", anchor: .top)
+                                   }
+                                   objVM.shouldScrollToTop = false
+                               }
+                           }
+                       }
                 }
             }
             
@@ -309,7 +313,6 @@ struct SearchWithSortView: View {
         }
     }
     
-    
     func getFilterAppliedCount() -> String {
         var count = 0
         for field in newFieldArray ?? [] {
@@ -327,9 +330,6 @@ struct SearchWithSortView: View {
 #Preview {
     SearchWithSortView(categroryId: 0, navigationController: nil, categoryName: "",categoryIds:"", categoryImg: "")
 }
-
-
-
 
 
 extension SearchWithSortView {

@@ -10,7 +10,11 @@ import Kingfisher
 import SwiftUI
 import Alamofire
 
-
+extension MyAdsVC: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return self.navigationController?.viewControllers.count ?? 0 > 1
+    }
+}
 class MyAdsVC: UIViewController {
     
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -56,6 +60,9 @@ class MyAdsVC: UIViewController {
         
         NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
 
     }
     

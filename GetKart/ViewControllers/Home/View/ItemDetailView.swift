@@ -36,6 +36,8 @@ struct ItemDetailView: View {
     
     
     init(navController: UINavigationController? = nil, itemId: Int = 0, itemObj: ItemModel?,isMyProduct: Bool = false,slug:String?) {
+        
+
         self.navController = navController
         self.itemId = itemId
         self.slug = slug ?? ""
@@ -60,6 +62,8 @@ struct ItemDetailView: View {
         
         self.isMyProduct = isMyProduct
         _objVM = StateObject(wrappedValue: viewModel)
+        
+        // Enable interactive pop gesture
 
     }
     
@@ -1065,10 +1069,15 @@ struct ItemDetailView: View {
                     } message: {
                         Text("After deactivate, ads will be inactive.")
                     }
-                
             }
             
         }
+        .background(
+            PopGestureDetector {
+                returnValue?(objVM.itemObj) // Called on swipe back too!
+                
+            }
+        )
         .frame(height: 44)
         .background(Color(UIColor.systemBackground))
 
@@ -1256,7 +1265,7 @@ struct SellerInfoView: View {
                     if isverified == 1{
                         Image("verified")
                             .resizable()
-                            .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                            .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
                             .scaledToFit()
                             .frame(width:15, height: 15)
                     }
@@ -1414,7 +1423,7 @@ struct PresentationModifier: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
             content
-                .presentationDetents([.medium])
+                .presentationDetents([.fraction(0.65)])
                 .presentationDragIndicator(.visible)
         } else {
             content // No special presentation on iOS 15
@@ -1566,3 +1575,40 @@ struct YouTubeWebView: UIViewRepresentable {
 
 
 
+
+
+
+import SwiftUI
+
+struct PopGestureDetector: UIViewControllerRepresentable {
+    var onPop: () -> Void
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        context.coordinator
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onPop: onPop)
+    }
+
+    class Coordinator: UIViewController {
+        var onPop: () -> Void
+
+        init(onPop: @escaping () -> Void) {
+            self.onPop = onPop
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func willMove(toParent parent: UIViewController?) {
+            if parent == nil {
+                onPop()
+            }
+        }
+    }
+}

@@ -38,6 +38,7 @@ struct FavoritesView: View {
                                    var destView = ItemDetailView(navController:  self.navigation, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
                                     destView.returnValue = { value in
                                         if let obj = value {
+                                            
                                             updateItemInList(obj)
                                         }
                                     }
@@ -73,7 +74,13 @@ struct FavoritesView: View {
     
     private func updateItemInList(_ value: ItemModel) {
         if let index = objVM.listArray.firstIndex(where: { $0.id == value.id }) {
-            objVM.listArray.remove(at: index)
+          
+            if value.isLiked == false{
+                objVM.listArray.remove(at: index)
+
+            }else{
+                
+            }
         }
     }
 

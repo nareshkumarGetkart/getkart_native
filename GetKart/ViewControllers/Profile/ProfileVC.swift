@@ -11,6 +11,13 @@ import StoreKit
 import Kingfisher
 import FittedSheets
 
+
+extension ProfileVC: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return self.navigationController?.viewControllers.count ?? 0 > 1
+    }
+}
+
 class ProfileVC: UIViewController {
    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -49,6 +56,8 @@ class ProfileVC: UIViewController {
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
         
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -28,6 +28,7 @@ class CategoryPackageVC: UIViewController {
 
     var planListArray = [[PlanModel]]()
     var bannerArray = [String]()
+    var isAdvertisement = false
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -58,7 +59,11 @@ class CategoryPackageVC: UIViewController {
     
     func getPackagesApi(){
         
-        let strURL = Constant.shared.get_package + "?category_id=\(categoryId)&country=\(country)&state=\(state)&city=\(city)&latitude=\(latitude)&longitude=\(longitude)&platform=ios"
+        var strURL = Constant.shared.get_package + "?category_id=\(categoryId)&country=\(country)&state=\(state)&city=\(city)&latitude=\(latitude)&longitude=\(longitude)&platform=ios"
+        
+        if isAdvertisement{
+            strURL.append("&type=advertisement")
+        }
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURL) { (obj:Plan) in
             

@@ -8,6 +8,13 @@
 import UIKit
 import SwiftUI
 
+extension ChatListVC: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return self.navigationController?.viewControllers.count ?? 0 > 1
+    }
+}
+
+
 class ChatListVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     
@@ -69,6 +76,11 @@ class ChatListVC: UIViewController {
         pageMenu?.menuScrollView.isScrollEnabled = false
         pageMenu?.controllerScrollView.isScrollEnabled = false
         self.view.addSubview(pageMenu!.view)
+        
+        
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        
     }
     
     

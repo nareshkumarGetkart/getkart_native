@@ -43,7 +43,7 @@ struct AddPostSuccessView: View {
                 }
                 
                 if (itemObj?.usedPackage ?? "").count > 0{
-                    RoundedRectangle(cornerRadius: 12)
+                   /* RoundedRectangle(cornerRadius: 12)
                         .fill(Color.orange.opacity(0.3))
                         .overlay(
                             //itemObj?.usedPackage ?? ""
@@ -56,6 +56,21 @@ struct AddPostSuccessView: View {
                             
                         )
                         .frame(height: 80)
+                        .padding(.horizontal)
+                    
+                    */
+                    
+                    Text(itemObj?.usedPackage ?? "")
+                        .font(.body)
+                        .foregroundColor(Color(red: 0.58, green: 0.29, blue: 0.00))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.orange.opacity(0.3))
+                        )
                         .padding(.horizontal)
                 }
                 

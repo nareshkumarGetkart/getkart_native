@@ -114,7 +114,7 @@ struct FollowerRowView: View {
 //                                .font(.subheadline)
                         Image("verified")
                             .resizable()
-                            .renderingMode(.template).foregroundColor(Color(UIColor.systemBlue))
+                            .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
                             .scaledToFit()
                             .frame(width:15, height: 15)
                         //}

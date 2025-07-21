@@ -14,7 +14,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -104,6 +104,13 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var alert_popup:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/alert-popup"
+
+        }
+    }
     
     var get_slider:String{
         get {
@@ -325,6 +332,14 @@ final class Constant: NSObject {
     var upload_chat_files:String{
         get{
             return "\(Constant.shared.baseURL)/v1/upload-chat-files"
+            
+        }
+    }
+    
+    
+    var chat_suggestions:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/chat-suggestions"
             
         }
     }

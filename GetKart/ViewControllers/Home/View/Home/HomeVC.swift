@@ -9,6 +9,11 @@ import UIKit
 import SwiftUI
 import Kingfisher
 
+extension HomeVC: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return self.navigationController?.viewControllers.count ?? 0 > 1
+    }
+}
 
 class HomeVC: UIViewController, LocationSelectedDelegate {
    
@@ -52,8 +57,15 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                 #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
                                                object: nil)
+        
+        
+        if Local.shared.getUserId() > 0{
+            getpopupApi()
+        }
+       
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
-    
     
    
     deinit {
@@ -79,7 +91,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
-        tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")        
+        tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")
     }
     
     func scrollToTop() {
@@ -115,6 +127,40 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
     }
+    
+
+    //MARK: Api methods
+    func getpopupApi(){
+
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.alert_popup, param: nil,methodType: .get) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+              //  let message = result["message"] as? String ?? ""
+                
+                if code == 200{
+                    
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        DispatchQueue.main.async {
+                            if let destVc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PopupVC") as? PopupVC{
+                                destVc.respDict = data
+                                destVc.modalPresentationStyle = .overFullScreen
+                                destVc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                                destVc.modalPresentationStyle = .overCurrentContext
+                                destVc.modalTransitionStyle = .coverVertical
+                                AppDelegate.sharedInstance.navigationController?.present(destVc, animated: false)
+                              //  self.navigationController?.present(destVc, animated: false)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){

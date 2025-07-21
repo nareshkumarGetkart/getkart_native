@@ -54,6 +54,11 @@ class ChatterCell:UITableViewCell{
     @IBOutlet weak var playPauseButton: UIButton!
 
     
+    @IBOutlet weak var cautionBgView: UIView!
+    @IBOutlet weak var btnCautionOnOff: UIButton!
+    @IBOutlet weak var btnCautionClose: UIButton!
+    @IBOutlet weak var lblCaution: UILabel!
+
 
     override func awakeFromNib() {
         super.awakeFromNib()

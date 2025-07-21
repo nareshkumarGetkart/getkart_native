@@ -51,17 +51,17 @@ struct ProfileEditView: View {
                             .clipShape(Circle()).padding(5)
                             .overlay(Circle().stroke(Color.orange, lineWidth: 3))
                     } else {
-                Circle()
-                                    .fill(Color.gray.opacity(0.3))
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 100, height: 100)
+                            .overlay(
+                                Image("user-circle") // <-- Replace with your placeholder asset name
+                                    .resizable()
+                                    .scaledToFit()
                                     .frame(width: 100, height: 100)
-                                    .overlay(
-                                        Image("user-circle") // <-- Replace with your placeholder asset name
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 100, height: 100)
-                                    )
-                                    //.padding(5)
-                                    .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+                            )
+                        //.padding(5)
+                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
                     }
                     
                     Button(action: { showingImagePicker.toggle() }) {

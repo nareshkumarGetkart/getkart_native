@@ -23,16 +23,16 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Txh-CO-TFT">
-                        <rect key="frame" x="95" y="10" width="210" height="265"/>
+                        <rect key="frame" x="95" y="15" width="210" height="260"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WzC-21-sM8">
-                                <rect key="frame" x="0.0" y="0.0" width="210" height="240"/>
+                                <rect key="frame" x="0.0" y="0.0" width="210" height="235"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="dyg-4m-WrK"/>
+                                    <constraint firstAttribute="height" constant="235" id="dyg-4m-WrK"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pin-xb-Bv2">
-                                <rect key="frame" x="10" y="245" width="190" height="10"/>
+                                <rect key="frame" x="10" y="240" width="190" height="10"/>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -77,7 +77,7 @@
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
-                    <constraint firstItem="Txh-CO-TFT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="3eq-Yi-13e"/>
+                    <constraint firstItem="Txh-CO-TFT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="3eq-Yi-13e"/>
                     <constraint firstAttribute="bottom" secondItem="lYs-Qk-Zri" secondAttribute="bottom" constant="3" id="9Hw-Bd-3DO"/>
                     <constraint firstAttribute="trailing" secondItem="Txh-CO-TFT" secondAttribute="trailing" constant="15" id="I2j-am-EEX"/>
                     <constraint firstAttribute="trailing" secondItem="lYs-Qk-Zri" secondAttribute="trailing" constant="15" id="YTJ-3z-jHN"/>

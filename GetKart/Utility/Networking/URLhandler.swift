@@ -41,7 +41,6 @@ class URLhandler: NSObject{
 
         if objLoggedInUser.token != nil {
             
-            
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{

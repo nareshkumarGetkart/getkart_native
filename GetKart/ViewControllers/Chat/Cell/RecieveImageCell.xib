@@ -24,16 +24,16 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pJ6-Pj-JzQ">
-                        <rect key="frame" x="15" y="10" width="210" height="265"/>
+                        <rect key="frame" x="15" y="15" width="210" height="260"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="04F-ab-3zT">
-                                <rect key="frame" x="0.0" y="0.0" width="210" height="240"/>
+                                <rect key="frame" x="0.0" y="0.0" width="210" height="235"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="2m8-qJ-ept"/>
+                                    <constraint firstAttribute="height" constant="235" id="2m8-qJ-ept"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1w3-Ic-OEe">
-                                <rect key="frame" x="10" y="245" width="190" height="10"/>
+                                <rect key="frame" x="10" y="240" width="190" height="10"/>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -67,7 +67,7 @@
                 <constraints>
                     <constraint firstItem="MGI-Y1-qFh" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="Eim-kF-0St"/>
                     <constraint firstAttribute="bottom" secondItem="MGI-Y1-qFh" secondAttribute="bottom" constant="5" id="jZg-2F-KGp"/>
-                    <constraint firstItem="pJ6-Pj-JzQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="lnd-dD-oom"/>
+                    <constraint firstItem="pJ6-Pj-JzQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="lnd-dD-oom"/>
                     <constraint firstItem="pJ6-Pj-JzQ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="of5-nu-8hg"/>
                     <constraint firstAttribute="bottom" secondItem="pJ6-Pj-JzQ" secondAttribute="bottom" constant="25" id="r1e-U3-u76"/>
                 </constraints>

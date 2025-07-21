@@ -711,6 +711,119 @@
             </objects>
             <point key="canvasLocation" x="1651" y="4"/>
         </scene>
+        <!--PopupVC-->
+        <scene sceneID="3Rd-vm-FX8">
+            <objects>
+                <viewController storyboardIdentifier="PopupVC" interactionActivityTrackingBaseName="PopupVC" id="Ayw-mc-Yo0" customClass="PopupVC" customModule="GetKart" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="kg6-gG-caR">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ikV-Qe-oiQ" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="25" y="255" width="343" height="342"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mEv-R8-g5O">
+                                        <rect key="frame" x="56.666666666666686" y="272" width="230" height="50"/>
+                                        <color key="backgroundColor" red="1" green="0.70980392160000005" blue="0.27450980390000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="230" id="gBk-d3-Tkk"/>
+                                            <constraint firstAttribute="height" constant="50" id="jX8-iT-G2N"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="17"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Okay"/>
+                                        <connections>
+                                            <action selector="okayButtonAction:" destination="Ayw-mc-Yo0" eventType="touchUpInside" id="6mC-Vf-Tps"/>
+                                        </connections>
+                                    </button>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="k19-d0-nBU">
+                                        <rect key="frame" x="0.0" y="0.0" width="343" height="150"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="150" id="qVO-EH-L6l"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="57N-of-LNY">
+                                        <rect key="frame" x="10" y="160" width="323" height="23.333333333333343"/>
+                                        <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="17"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfy-jf-nCk">
+                                        <rect key="frame" x="10" y="193.33333333333331" width="323" height="20.666666666666657"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="Lorem ipsum dolor sit " selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Zb-rS-hgo">
+                                        <rect key="frame" x="10" y="224" width="323" height="38"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" systemColor="labelColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="420" id="Paw-1P-fRK"/>
+                                        </constraints>
+                                        <color key="textColor" systemColor="labelColor"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bip-Rm-LMH">
+                                        <rect key="frame" x="313" y="10" width="20" height="22"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="Cross"/>
+                                        <connections>
+                                            <action selector="closeButtonAction:" destination="Ayw-mc-Yo0" eventType="touchUpInside" id="Cgg-xb-M92"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="57N-of-LNY" firstAttribute="top" secondItem="k19-d0-nBU" secondAttribute="bottom" constant="10" id="1j9-fd-tMU"/>
+                                    <constraint firstItem="mEv-R8-g5O" firstAttribute="centerX" secondItem="ikV-Qe-oiQ" secondAttribute="centerX" id="1yZ-hh-Wn5"/>
+                                    <constraint firstItem="wfy-jf-nCk" firstAttribute="top" secondItem="57N-of-LNY" secondAttribute="bottom" constant="10" id="EqS-K0-6It"/>
+                                    <constraint firstItem="57N-of-LNY" firstAttribute="leading" secondItem="ikV-Qe-oiQ" secondAttribute="leading" constant="10" id="NWg-pE-cKe"/>
+                                    <constraint firstItem="k19-d0-nBU" firstAttribute="top" secondItem="ikV-Qe-oiQ" secondAttribute="top" id="Q9L-4v-U02"/>
+                                    <constraint firstItem="7Zb-rS-hgo" firstAttribute="leading" secondItem="ikV-Qe-oiQ" secondAttribute="leading" constant="10" id="SgK-8B-LNU"/>
+                                    <constraint firstItem="7Zb-rS-hgo" firstAttribute="top" secondItem="wfy-jf-nCk" secondAttribute="bottom" constant="10" id="UAX-It-Ykj"/>
+                                    <constraint firstAttribute="trailing" secondItem="wfy-jf-nCk" secondAttribute="trailing" constant="10" id="WEg-gl-4NT"/>
+                                    <constraint firstAttribute="trailing" secondItem="7Zb-rS-hgo" secondAttribute="trailing" constant="10" id="WIf-zV-eYk"/>
+                                    <constraint firstItem="mEv-R8-g5O" firstAttribute="top" secondItem="7Zb-rS-hgo" secondAttribute="bottom" constant="10" id="X7F-Er-Z5v"/>
+                                    <constraint firstAttribute="trailing" secondItem="k19-d0-nBU" secondAttribute="trailing" id="da7-x5-m3g"/>
+                                    <constraint firstItem="k19-d0-nBU" firstAttribute="leading" secondItem="ikV-Qe-oiQ" secondAttribute="leading" id="eGN-2u-cIZ"/>
+                                    <constraint firstItem="wfy-jf-nCk" firstAttribute="leading" secondItem="ikV-Qe-oiQ" secondAttribute="leading" constant="10" id="fIn-dC-4Fq"/>
+                                    <constraint firstItem="Bip-Rm-LMH" firstAttribute="top" secondItem="ikV-Qe-oiQ" secondAttribute="top" constant="10" id="fv3-h8-B5D"/>
+                                    <constraint firstAttribute="trailing" secondItem="57N-of-LNY" secondAttribute="trailing" constant="10" id="klp-Ia-Qrp"/>
+                                    <constraint firstAttribute="trailing" secondItem="Bip-Rm-LMH" secondAttribute="trailing" constant="10" id="uu4-cb-8k7"/>
+                                    <constraint firstAttribute="bottom" secondItem="mEv-R8-g5O" secondAttribute="bottom" constant="20" id="yKM-HG-Nbe"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="15"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="i5C-gT-pWT"/>
+                        <color key="backgroundColor" systemColor="systemGreenColor"/>
+                        <constraints>
+                            <constraint firstItem="ikV-Qe-oiQ" firstAttribute="centerX" secondItem="kg6-gG-caR" secondAttribute="centerX" id="NQH-dm-8wk"/>
+                            <constraint firstItem="i5C-gT-pWT" firstAttribute="trailing" secondItem="ikV-Qe-oiQ" secondAttribute="trailing" constant="25" id="Zjf-l7-yCn"/>
+                            <constraint firstItem="ikV-Qe-oiQ" firstAttribute="leading" secondItem="i5C-gT-pWT" secondAttribute="leading" constant="25" id="nTB-cO-OiD"/>
+                            <constraint firstItem="ikV-Qe-oiQ" firstAttribute="centerY" secondItem="kg6-gG-caR" secondAttribute="centerY" id="pgn-Px-L9W"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bgView" destination="ikV-Qe-oiQ" id="tkp-Bf-cvK"/>
+                        <outlet property="btnClose" destination="Bip-Rm-LMH" id="xs4-00-3AO"/>
+                        <outlet property="btnOkay" destination="mEv-R8-g5O" id="J5f-qD-BoH"/>
+                        <outlet property="imgVwBanner" destination="k19-d0-nBU" id="jRa-nu-QUK"/>
+                        <outlet property="lblSubTitle" destination="wfy-jf-nCk" id="YEd-lz-ipP"/>
+                        <outlet property="lblTitle" destination="57N-of-LNY" id="EGS-df-pKJ"/>
+                        <outlet property="txtView" destination="7Zb-rS-hgo" id="sx6-Sa-2R0"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QDb-nj-xW9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2513.740458015267" y="54.929577464788736"/>
+        </scene>
         <!--Ign In With EmailVC-->
         <scene sceneID="TRP-5X-gCh">
             <objects>
@@ -873,8 +986,11 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -18,9 +18,9 @@ struct TipsModel: Codable,Identifiable {
     let id: Int?
     let description, translatedName: String?
     let translations: [JSONAny]?
-
+    let icon:String?
     enum CodingKeys: String, CodingKey {
-        case id, description
+        case id, description, icon
         case translatedName
         case translations
     }
