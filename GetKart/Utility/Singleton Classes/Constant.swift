@@ -663,6 +663,9 @@ enum NotificationKeys:String,CaseIterable{
     case noInternet = "noInternet"
     case refreshAdsScreen = "refreshAdsScreen"
     
+    case refreshChatTblViewScreen = "refreshChatTblViewScreen"
+
+    
 }
 
 

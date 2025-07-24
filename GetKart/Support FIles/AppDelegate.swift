@@ -379,6 +379,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     if topVC.userId == userIdRecieved {
                         // Same chat already opened — do nothing or update UI
                         print("ChatVC is already opened for this user.")
+                        
+                        
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshChatTblViewScreen.rawValue), object: nil , userInfo: nil)
+
+                        
                     } else {
                         // Different chat user, replace the ChatVC
                         navController.popViewController(animated: false)
@@ -388,9 +393,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                         vc.hidesBottomBarWhenPushed = true
                         navController.pushViewController(vc, animated: true)
                     }
-                    
-                    
-                    
+                                        
                 } else {
                     
                     // Chat tab not selected, switch to Chat tab and push ChatVC
@@ -458,7 +461,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                         }
                     }
                 }
-            
             }
             
             
@@ -534,6 +536,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             break
         }
     
+        
         self.clearRecievedNotification()
     }
     
@@ -667,7 +670,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
              UNNotificationPresentationOptions.sound])
     }
     
-   
     
     func showLoginScreen(){
         

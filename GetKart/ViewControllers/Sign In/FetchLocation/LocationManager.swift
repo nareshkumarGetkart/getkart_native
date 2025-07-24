@@ -33,7 +33,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         
         isToUpdateLocation = isToUpdate
         manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.startUpdatingLocation()
+
         
         switch manager.authorizationStatus {
         case .notDetermined://The user choose allow or denny your app to get the location yet
@@ -57,10 +59,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
             print("Location authorized when in use")
             lastKnownLocation = manager.location?.coordinate
             updateStateCity(isToUpdate: isToUpdate)
+            
         @unknown default:
             print("Location service disabled")
         
         }
+        
     }
     
     func checkForLocationAccess()->Bool {
@@ -112,7 +116,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     
     func updateStateCity(isToUpdate:Bool=true){
         // Create Location
-        let location = CLLocation(latitude: lastKnownLocation?.latitude ?? 0.0, longitude:  lastKnownLocation?.longitude ?? 0.0)
+        let location = CLLocation(latitude: lastKnownLocation?.latitude.rounded(toPlaces: 6) ?? 0.0, longitude:  lastKnownLocation?.longitude.rounded(toPlaces: 6) ?? 0.0)
         
         // Geocode Location
         var geoCoder = CLGeocoder()
@@ -137,8 +141,8 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                         self.city = addressDict["City"] as? String ?? ""
                         self.state = addressDict["State"] as? String ?? ""
                         self.country = addressDict["Country"] as? String ?? ""
-                        self.latitude = location.coordinate.latitude
-                        self.longitude = location.coordinate.longitude
+                        self.latitude = location.coordinate.latitude.rounded(toPlaces: 6)
+                        self.longitude = location.coordinate.longitude.rounded(toPlaces: 6)
                         self.locality = addressDict["SubLocality"] as? String ?? ""
                      
                         //Local.shared.saveUserLocation(city: self.city, state: self.state, country: self.country, timezone: self.timezone)
@@ -166,4 +170,12 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
              CLLocationManager.authorizationStatus() == .authorizedAlways)
     }
 
+}
+
+
+extension Double {
+    func roundedDecimal(toPlaces places: Int) -> Double {
+        let factor = pow(10.0, Double(places))
+        return (self * factor).rounded() / factor
+    }
 }

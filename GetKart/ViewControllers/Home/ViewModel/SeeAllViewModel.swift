@@ -72,7 +72,7 @@ class SeeAllViewModel{
             if !strUrl.contains("?"){
                 strUrl.append("?longitude=\(longitude)")
             }else{
-                strUrl.append("?longitude=\(longitude)")
+                strUrl.append("&longitude=\(longitude)")
             }
         }
         

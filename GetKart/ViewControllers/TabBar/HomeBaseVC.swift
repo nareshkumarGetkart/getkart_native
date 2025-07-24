@@ -18,6 +18,7 @@ class HomeBaseVC: UITabBarController {
     let middleButton = UIButton()
     
     
+    //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -41,8 +42,9 @@ class HomeBaseVC: UITabBarController {
         }
         setupMiddleButton()
         setupDoubleTapGesture()
+        
     }
-    
+   
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -55,9 +57,10 @@ class HomeBaseVC: UITabBarController {
             // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
+        
     }
 
-    
+    //MARK: Other Helpful Methods
     func setupMiddleButton() {
             let buttonSize: CGFloat = 65
             let buttonRadius: CGFloat = buttonSize / 2
@@ -79,6 +82,8 @@ class HomeBaseVC: UITabBarController {
             tabBar.addSubview(middleButton)
             tabBar.bringSubviewToFront(middleButton)
         }
+    
+    
     
 
     
@@ -113,10 +118,8 @@ class HomeBaseVC: UITabBarController {
 
         let profileVc = StoryBoard.main.instantiateViewController(withIdentifier: "ProfileVC") as! ProfileVC
          profileVc.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "profile")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"profile_active")?.withRenderingMode(.alwaysOriginal))
-
         
-        
-        //        let images = ["home","chat","","myads","profile"]
+        //let images = ["home","chat","","myads","profile"]
 
         let dummyVC = UIViewController() // Empty view controller for spacing
         dummyVC.tabBarItem = UITabBarItem(title: "", image: nil, tag: 2)
@@ -128,9 +131,6 @@ class HomeBaseVC: UITabBarController {
         let vc2 = UINavigationController(rootViewController: chatVc)
         let vc3 = UINavigationController(rootViewController: adsVc)
         let vc4 = UINavigationController(rootViewController: profileVc)
-        
-     
-
         
         vc1.navigationBar.isHidden = true
         vc2.navigationBar.isHidden = true
@@ -150,6 +150,45 @@ class HomeBaseVC: UITabBarController {
 extension HomeBaseVC: UITabBarControllerDelegate {
     //MARK: Delegate
     
+    func showNChatUnreadCountRedDot(){
+        self.showSmallRedDot(at: 1, tabBar: self.tabBar)
+    }
+    
+    func removeChatUnreadCountRedDot(){
+        self.removeSmallRedDot(at: 1, tabBar: self.tabBar)
+    }
+    
+    func showSmallRedDot(at index: Int, tabBar: UITabBar) {
+        let dotTag = 9999 + index
+
+        // Remove existing dot if any
+        tabBar.viewWithTag(dotTag)?.removeFromSuperview()
+
+        // Get the tab bar button views (UIControl)
+        let tabBarButtons = tabBar.subviews
+            .filter { $0 is UIControl }
+            .sorted { $0.frame.minX < $1.frame.minX }
+
+        guard index < tabBarButtons.count else { return }
+
+        let itemView = tabBarButtons[index]
+
+        // Create the dot
+        let dotSize: CGFloat = 8
+        let dot = UIView(frame: CGRect(x: itemView.frame.width / 2 + 6, y: 6, width: dotSize, height: dotSize))
+        dot.backgroundColor = .red
+        dot.layer.cornerRadius = dotSize / 2
+        dot.clipsToBounds = true
+        dot.tag = dotTag
+
+        itemView.addSubview(dot)
+    }
+
+    func removeSmallRedDot(at index: Int, tabBar: UITabBar) {
+        let dotTag = 9999 + index
+        tabBar.viewWithTag(dotTag)?.removeFromSuperview()
+    }
+
     
     private func setupDoubleTapGesture() {
         guard let items = tabBar.items else { return }

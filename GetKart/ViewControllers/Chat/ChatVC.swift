@@ -122,7 +122,6 @@ class ChatVC: UIViewController {
         imgViewProduct.layer.cornerRadius = imgViewProduct.frame.size.height/2.0
         imgViewProduct.clipsToBounds = true
         
-        
         registerTblCell()
         
         imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
@@ -135,8 +134,7 @@ class ChatVC: UIViewController {
         textView.maxNumberOfLines = 5
         textView.delegate = self
         addObservers()
-        getItemOfferId()
-        getMessageList()
+
         self.btnSend.isHidden = true
         self.btnMic.isHidden = false
         
@@ -148,8 +146,23 @@ class ChatVC: UIViewController {
         
 //        self.topRefreshControl.backgroundColor = .clear
 //        self.tblView.refreshControl = topRefreshControl
+        
+        getItemOfferId()
+        getMessageList()
+        
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: {
+            
+            if self.name.count == 0 && self.itemName.count == 0 && self.isItemDeleted == false{
+                self.isDataLoading = false
+                self.isMoreChatAvailable = true
+                self.page = 1
+                self.getUserInfo()
+                self.getItemOfferId()
+                self.getMessageList()
+            }
+        })
     }
-    
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -211,6 +224,14 @@ class ChatVC: UIViewController {
 //            page = page + 1
 //            self.getMessageList()
 //        }
+        
+//        if chatArray.count == 0 && name.count == 0 && !self.isDataLoading{
+//            isDataLoading = true
+//            self.page = 1
+//            self.getMessageList()
+//            self.getUserInfo()
+//            self.getItemOfferId()
+//        }
         refreshControl.endRefreshing()
     }
       
@@ -223,7 +244,7 @@ class ChatVC: UIViewController {
         hideUnhideSuggestion()
     }
     
-    func hideUnhideSuggestion(){
+    func hideUnhideSuggestion(isToScrollBottom:Bool = true){
         if showSuggestion{
             cnstrntHeightConstantSuggestion.constant  = 170
             self.btnShowHideSuggestion.setImage(UIImage(named: "arrow_dd"), for: .normal)
@@ -235,8 +256,9 @@ class ChatVC: UIViewController {
         
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
-            self.scrollToBottom(animated: true)
-
+            if isToScrollBottom{
+                self.scrollToBottom(animated: true)
+            }
         }
       
     }
@@ -439,6 +461,8 @@ class ChatVC: UIViewController {
         self.btnAttachment.isUserInteractionEnabled = false
         
         if youBlockedUser.count > 0{
+            self.view.endEditing(true)
+            self.textView.text = ""
             blockedView.isHidden = false
             lblBlockedMsg.text = "You have blocked this user."
             self.btnCall.isHidden = true
@@ -446,6 +470,8 @@ class ChatVC: UIViewController {
             self.hideUnhideSuggestion()
 
         }else  if youBlockedByUser.count > 0{
+            self.view.endEditing(true)
+            self.textView.text = ""
             blockedView.isHidden = false
             lblBlockedMsg.text = "User has blocked you."
             self.btnCall.isHidden = true
@@ -462,12 +488,10 @@ class ChatVC: UIViewController {
                 self.btnCall.isHidden = true
             }
 
-
             self.btnMic.isUserInteractionEnabled = true
             self.btnSend.isUserInteractionEnabled = true
             self.textView.isUserInteractionEnabled = true
             self.btnAttachment.isUserInteractionEnabled = true
-
         }
     }
     
@@ -493,6 +517,20 @@ class ChatVC: UIViewController {
     
     
     func addObservers(){
+        
+        
+            super.viewDidLoad()
+            
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(appDidEnterBackground),
+                                                   name: UIApplication.didEnterBackgroundNotification,
+                                                   object: nil)
+
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(appWillEnterForeground),
+                                                   name: UIApplication.willEnterForegroundNotification,
+                                                   object: nil)
+
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)),
                                                name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -526,6 +564,10 @@ class ChatVC: UIViewController {
 
         NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self,selector: #selector(refreshChatTblViewScreen(notification:)),
+                                               name:NSNotification.Name(rawValue:NotificationKeys.refreshChatTblViewScreen.rawValue), object: nil)
         
        /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
                                                name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
@@ -584,8 +626,7 @@ class ChatVC: UIViewController {
     
     func getMessageList(){
         
-        let pag =  (page == 1) ? page : page + 1
-        let params = ["page":pag,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
+        let params = ["page":page,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatMessages.rawValue, params)
         
     }
@@ -676,6 +717,37 @@ class ChatVC: UIViewController {
     
     //MARK: Keyboard observers
     
+    @objc private func appDidEnterBackground() {
+        print("App moved to background")
+        // Your logic here
+    }
+
+    @objc private func appWillEnterForeground() {
+        print("App will enter foreground")
+        // Your logic here
+//        AlertView.sharedManager.displayMessageWithAlert(title: "offer ID :\(item_offer_id)", msg: "userID:\(userId) socket :\(SocketIOManager.sharedInstance.socket?.status)")
+
+        if SocketIOManager.sharedInstance.socket?.status == .connected || SocketIOManager.sharedInstance.socket?.status == .connecting {
+            self.isDataLoading = false
+            self.isMoreChatAvailable = true
+            self.page = 1
+            self.getMessageList()
+        }else{
+          
+        }
+    }
+
+    
+    @objc func refreshChatTblViewScreen(notification:Notification){
+        
+        DispatchQueue.main.async {
+            if self.suggestionArray.count > 0 {
+                self.hideUnhideSuggestion()
+              
+            }
+        }
+    }
+    
     @objc func socketConnected(notification: Notification) {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
@@ -684,6 +756,9 @@ class ChatVC: UIViewController {
                 self.getItemOfferId()
                 self.getMessageList()
                 self.getUserInfo()
+            }else{
+                self.page = 1
+                self.getMessageList()
             }
         })
     }
@@ -926,6 +1001,8 @@ class ChatVC: UIViewController {
             }
             
             updateUserBlockStatus()
+            
+          
         }
     }
    
@@ -937,12 +1014,14 @@ class ChatVC: UIViewController {
             return
         }
         
-        if page == 1{
-            self.chatArray.removeAll()
-            self.isMoreChatAvailable = true
-        }
+//        if page == 1{
+//            self.chatArray.removeAll()
+//            self.isMoreChatAvailable = true
+//        }
         if let response : MessageParse = try? SocketParser.convert(data: data) {
 
+            
+            
             
             if (response.data?.data?.count ?? 0) == 0 && self.chatArray.count > 0 {
                 //No chat getting
@@ -959,6 +1038,29 @@ class ChatVC: UIViewController {
                         }
                     }
                 }
+                
+                if page == 1 {
+                    //If app goes background and socket connect/disconnect then if not new chat no need to reload
+                    if chatArray.count > 0 && (response.data?.data?.count ?? 0) > 0{
+                        
+                        let existingMsgId = chatArray.last?.id  ?? 0
+                        let newMsgId = response.data?.data?.last?.id  ?? 0
+                        
+                        if existingMsgId == newMsgId{
+                            self.isDataLoading = false
+                            self.isMoreChatAvailable = true
+
+                            return
+                        }else{
+                            
+                            self.chatArray.removeAll()
+                            self.isMoreChatAvailable = true
+                        }
+                    }
+                }
+                
+                
+                
                 
                 var index = 0
                 for msg in self.chatArray{
@@ -1035,7 +1137,6 @@ class ChatVC: UIViewController {
 
                     sendmessageAcknowledge()
                 }
-                
                 Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
                 Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
             }
@@ -1309,7 +1410,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             let yOffset = scrollView.contentOffset.y
             
             // Trigger only if user scrolled near the top, not on every small bounce
-            if yOffset < -5 && !isDataLoading  && isMoreChatAvailable{
+            if yOffset < -15 && !isDataLoading  && isMoreChatAvailable{
                 if !AppDelegate.sharedInstance.isInternetConnected {
                     isDataLoading = false
                     AlertView.sharedManager.showToast(message: "No internet connection")
@@ -1317,7 +1418,6 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 }
 
                 isDataLoading = true
-                //page += 1
                 getMessageList()
             }
         }
@@ -1340,6 +1440,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
+    
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
@@ -1762,8 +1863,13 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         }else{
             chatArray[sender.tag].isCautionExpanded = 1
         }
-        self.tblView.reloadRows(at: [IndexPath(row: sender.tag, section: 0)], with: .none)
+        if showSuggestion == true {
+            showSuggestion = false
+            self.hideUnhideSuggestion(isToScrollBottom:false)
+        }
+        self.tblView.reloadRows(at: [IndexPath(row: sender.tag, section: 0)], with: .automatic)
     }
+    
     
     @objc func handleTapOnLabel(_ gesture: UITapGestureRecognizer) {
            

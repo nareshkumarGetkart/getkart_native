@@ -258,16 +258,18 @@ class CreateAddDetailVC: UIViewController {
                 
         var scrollIndex = -1
         
-        if  (params[AddKeys.name.rawValue] as? String  ?? "").count == 0 {
+        if  (params[AddKeys.name.rawValue] as? String  ?? "").trim().count == 0 || (params[AddKeys.name.rawValue] as? String  ?? "").trim().count < 3  {
             
             showErrorMsg = true
             scrollIndex = 0
             
-        }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
-            showErrorMsg = true
-            scrollIndex = 0
-            
-        } else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0  || (params[AddKeys.description.rawValue] as? String  ?? "").count > 4000{
+        }
+//        else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
+//            showErrorMsg = true
+//            scrollIndex = 0
+//            
+//        }
+        else if  (params[AddKeys.description.rawValue] as? String  ?? "").count == 0  || (params[AddKeys.description.rawValue] as? String  ?? "").count > 4000{
             
             showErrorMsg = true
             scrollIndex = 1
@@ -465,11 +467,12 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = "Field must not be empty."
-                }else if !(params[AddKeys.name.rawValue] as? String  ?? "").isValidName(){
+                }
+                else if (params[AddKeys.name.rawValue] as? String  ?? "").count < 3 {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     cell.lblErrorMsg.text = "Please enter valid Ad Title"
-                }else {
+                }else{
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
