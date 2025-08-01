@@ -9,19 +9,14 @@ import SwiftUI
 
 struct SafetyTipsView: View {
     @Environment(\.presentationMode) var presentationMode
-
     @State private var listArray = [TipsModel]()
-    
     var onContinueOfferTap: (() -> Void)?
 
     var body: some View {
         
-        
         ZStack {
-           // Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
             
             VStack {
-                
                 
                 Image("safety_tips")
                     .resizable()

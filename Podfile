@@ -25,6 +25,7 @@ pod 'IQKeyboardManagerSwift'
 pod 'RealmSwift', '~>10'
 pod 'SVGKit'
 pod 'PhonePePayment'
+pod 'Mantis'
 
   target 'GetKartTests' do
     inherit! :search_paths

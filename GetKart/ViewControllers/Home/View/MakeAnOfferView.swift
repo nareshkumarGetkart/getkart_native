@@ -10,7 +10,6 @@ import SwiftUI
 struct MakeAnOfferView: View {
     @Binding var isPresented: Bool
     @State private var offer: String = ""
-
     let sellerPrice: Double
     var onOfferSubmit: (String) -> Void  // Callback for offer submission
 
@@ -34,7 +33,7 @@ struct MakeAnOfferView: View {
                 
                 Divider()
                 
-                Text("Seller's Price \(Local.shared.currencySymbol) \((sellerPrice ?? 0.0).formatNumber())")
+                Text("Seller's Price \(Local.shared.currencySymbol) \((sellerPrice).formatNumber())")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -45,15 +44,15 @@ struct MakeAnOfferView: View {
                     .cornerRadius(8)
                     .keyboardType(.numberPad)
                     .padding(.horizontal)
+                    .tint(Color(.systemOrange))
                     .onChange(of: offer) { newValue in
                         
-                        
                         // Allow only digits
-                                let digitsOnly = newValue.filter { $0.isNumber }
-
-                                // Remove leading zeros unless it's just "0"
-                                let cleaned = digitsOnly == "0" ? "0" : digitsOnly.drop(while: { $0 == "0" })
-
+                        let digitsOnly = newValue.filter { $0.isNumber }
+                        
+                        // Remove leading zeros unless it's just "0"
+                        let cleaned = digitsOnly == "0" ? "0" : digitsOnly.drop(while: { $0 == "0" })
+                        
                         let maxDigits = String(Int(sellerPrice)).count
                         let limited = String(cleaned.prefix(maxDigits))
                         offer = limited
@@ -62,6 +61,10 @@ struct MakeAnOfferView: View {
                         if newValue.hasPrefix("0") && newValue != "0" {
                             offer = String(newValue.drop(while: { $0 == "0" }))
                         }
+                        
+                        // 4. Format using NumberFormatter
+                            let formatted = formatNumberWithComma(offer)
+                            offer = formatted
                     }
 
                 
@@ -82,13 +85,13 @@ struct MakeAnOfferView: View {
                         withAnimation {
                             if offer.trim().count > 0 &&  offer != "0" {
                                 
-                                if let value = Double(offer.trim()),value > 0{
+                                if let value = Double(offer.replacingOccurrences(of: ",", with: "").trim()),value > 0{
                                     
                                     if value > sellerPrice{
                                         UIApplication.shared.endEditing()
                                         AlertView.sharedManager.showToast(message: "Offer price is more than seller price")
                                     }else{
-                                        onOfferSubmit(offer) // Pass the offer back
+                                        onOfferSubmit(offer.replacingOccurrences(of: ",", with: "")) // Pass the offer back
                                         isPresented = false
                                     }
                                 }
@@ -120,6 +123,14 @@ struct MakeAnOfferView: View {
             
         }.background(.clear).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
+    
+    func formatNumberWithComma(_ numberString: String) -> String {
+        guard let number = Int(numberString) else { return "" }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: number)) ?? ""
+    }
+
 }
 
 #Preview {

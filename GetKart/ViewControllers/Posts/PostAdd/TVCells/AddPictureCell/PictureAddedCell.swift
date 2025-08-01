@@ -10,6 +10,7 @@ protocol PictureAddedDelegate {
     func addPictureAction(row:Int)
     func removePictureAction(row:Int, col:Int)
 }
+
 class PictureAddedCell: UITableViewCell {
     @IBOutlet weak var lblTitle:UILabel!
     @IBOutlet weak var clnCollectionView:DynamicHeightCollectionView!
@@ -23,8 +24,6 @@ class PictureAddedCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
         clnCollectionView.register(UINib(nibName: "PictureAddedCVCell", bundle: .main), forCellWithReuseIdentifier: "PictureAddedCVCell")
-        
-        
         let alignedFlowLayout = clnCollectionView?.collectionViewLayout as? AlignedCollectionViewFlowLayout
         alignedFlowLayout?.horizontalAlignment = .left
                 alignedFlowLayout?.verticalAlignment = .top
@@ -58,12 +57,12 @@ class PictureAddedCell: UITableViewCell {
     }
     
     func insertItem(_ itemData: Data, at index: Int) {
-            guard index <= arrImagesData.count else { return }
+        guard index <= arrImagesData.count else { return }
         arrImagesData.insert(itemData, at: index)
         clnCollectionView.performBatchUpdates({
             clnCollectionView.insertItems(at: [IndexPath(item: index, section: 0)])
-            }, completion: nil)
-        }
+        }, completion: nil)
+    }
 }
 
 extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -74,8 +73,13 @@ extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+     
+//        if arrImagesData.count == 5{
+//            return 5
+//        }
         return (arrImagesData.count + 1)
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
@@ -83,7 +87,6 @@ extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource,
         cell.btnRemove.tag = indexPath.item
         print("indexPath.item:\(indexPath.item)")
         cell.btnRemove.addTarget(self, action: #selector(removePictureBtnAction(_:)), for: .touchUpInside)
-        
         cell.btnAddImage.addTarget(self, action: #selector(addPictureBtnAction(_:)), for: .touchDown)
         
         if indexPath.item < arrImagesData.count {
@@ -102,10 +105,8 @@ extension PictureAddedCell:UICollectionViewDelegate, UICollectionViewDataSource,
             cell.btnAddImage.isHidden = false
             cell.imgImage.image = nil
         }
-            
-            
-            return cell
         
+        return cell
     }
     
     @objc func addPictureBtnAction(_ sender:UIButton){

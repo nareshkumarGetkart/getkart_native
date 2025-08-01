@@ -24,20 +24,15 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="U0Z-Uq-fMw">
-                        <rect key="frame" x="10" y="0.0" width="324" height="218"/>
+                        <rect key="frame" x="10" y="5" width="324" height="208"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Qc-HM-jyI">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Qc-HM-jyI">
                                 <rect key="frame" x="0.0" y="0.0" width="324" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="bMT-Kc-T8O"/>
                                 </constraints>
-                                <attributedString key="attributedText">
-                                    <fragment content="Label">
-                                        <attributes>
-                                            <font key="NSFont" size="15" name="Manrope-Regular"/>
-                                        </attributes>
-                                    </fragment>
-                                </attributedString>
+                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="15"/>
+                                <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iGH-N2-Hxf" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
@@ -61,10 +56,14 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                         <real key="value" value="10"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                        <color key="value" systemColor="systemBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="horizontalGradient" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="seu-yW-wtc" customClass="DynamicHeightCollectionView" customModule="GetKart" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="80" width="324" height="138"/>
+                                <rect key="frame" x="0.0" y="80" width="324" height="128"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="Gy3-uc-Ic0"/>
@@ -76,7 +75,7 @@
                                 </connections>
                             </collectionView>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Field must not be empty" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h4Y-AC-aQP">
-                                <rect key="frame" x="0.0" y="218" width="324" height="25"/>
+                                <rect key="frame" x="0.0" y="208" width="324" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="qs4-yo-agY"/>
                                 </constraints>
@@ -96,8 +95,8 @@
                     </stackView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="U0Z-Uq-fMw" secondAttribute="bottom" id="En5-zm-DpW"/>
-                    <constraint firstItem="U0Z-Uq-fMw" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="IPv-Jw-ZTj"/>
+                    <constraint firstAttribute="bottom" secondItem="U0Z-Uq-fMw" secondAttribute="bottom" constant="5" id="En5-zm-DpW"/>
+                    <constraint firstItem="U0Z-Uq-fMw" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="IPv-Jw-ZTj"/>
                     <constraint firstItem="U0Z-Uq-fMw" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="utw-GU-lva"/>
                     <constraint firstAttribute="trailing" secondItem="U0Z-Uq-fMw" secondAttribute="trailing" constant="10" id="zSw-Z1-ZXj"/>
                 </constraints>

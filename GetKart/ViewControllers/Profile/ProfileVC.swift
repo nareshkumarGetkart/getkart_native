@@ -27,10 +27,10 @@ class ProfileVC: UIViewController {
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]//,"Delete Account","Logout"]
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Banner Promotions","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]//,"Delete Account","Logout"]
       
     
-    let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]//,"delete_account","logout"]
+    let iconArray =  ["","promoted","buyPackages","mediaPromotion","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]//,"delete_account","logout"]
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
@@ -308,7 +308,16 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     }
                 }
                 
-            }else if titleArray[indexPath.row] == "FAQs"{
+            }else if titleArray[indexPath.row] ==  "Banner Promotions"{
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    
+                    let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController: navigationController))
+                    destvc.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(destvc, animated: true)
+                    
+                }
+            } else if titleArray[indexPath.row] == "FAQs"{
                 
                 let destVC = UIHostingController(rootView: FaqView(navigationController: self.navigationController))
                 destVC.hidesBottomBarWhenPushed = true

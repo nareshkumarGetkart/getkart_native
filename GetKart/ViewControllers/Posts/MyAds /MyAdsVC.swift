@@ -15,6 +15,7 @@ extension MyAdsVC: UIGestureRecognizerDelegate {
         return self.navigationController?.viewControllers.count ?? 0 > 1
     }
 }
+
 class MyAdsVC: UIViewController {
     
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -23,17 +24,17 @@ class MyAdsVC: UIViewController {
     private  var selectedIndex = 500
     private var apiStatus = ""
     private var page = 1
-    private  let filters = ["All ads", "Live", "Deactivate", "Under Review","Sold out","Rejected"]
-    var listArray = [ItemModel]()
+    private let filters = ["All ads", "Live", "Deactivate", "Under Review","Sold out","Rejected"]
+    private var listArray = [ItemModel]()
     private var emptyView:EmptyList?
-    var isDataLoading = true
+    private var isDataLoading = true
     
     private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
                                     #selector(handlePullDownRefresh(_:)),
                                  for: .valueChanged)
-        refreshControl.tintColor = UIColor.systemYellow
+        refreshControl.tintColor = .systemYellow
         return refreshControl
     }()
     
@@ -41,29 +42,12 @@ class MyAdsVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        cnstrntHtNavBar.constant = self.getNavBarHt
-        tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
-        
-        DispatchQueue.main.async{
-            self.emptyView = EmptyList(frame: CGRect(x: 0, y: 0, width:  self.tblView.frame.size.width, height:  self.tblView.frame.size.height))
-            self.tblView.addSubview(self.emptyView!)
-            self.emptyView?.isHidden = true
-            self.emptyView?.lblMsg?.text = ""
-            self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")          
-        }
-        
-        addButtonsToScrollView()
-        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name:NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil)
-        self.topRefreshControl.backgroundColor = .clear
-        self.tblView.refreshControl = topRefreshControl
-        
-        
-        NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
-                                               name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
-        
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-
+        setupUI()
+        addObservers()
+        topRefreshControl.backgroundColor = .clear
+        tblView.refreshControl = topRefreshControl
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,14 +65,58 @@ class MyAdsVC: UIViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        if self.traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             // Appearance (light/dark mode) has changed
             print("Appearance mode changed: \(traitCollection.userInterfaceStyle == .dark ? "Dark" : "Light")")
             
             // Update your UI manually here if needed
         }
     }
+    
+    
+    // MARK: - Setup
+       private func setupUI() {
+           cnstrntHtNavBar.constant = getNavBarHt
+           tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
+           tblView.refreshControl = topRefreshControl
+           tblView.delegate = self
+           tblView.dataSource = self
+           DispatchQueue.main.async{
+               self.emptyView = EmptyList(frame: self.tblView.bounds)
+               self.emptyView?.isHidden = true
+               self.emptyView?.lblMsg?.text = ""
+               self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")
+               self.tblView.addSubview(self.emptyView!)
+           }
+           setupFilterButtons()
+       }
+    
+     private func setupFilterButtons() {
+            btnScrollView.subviews.forEach { $0.removeFromSuperview() }
+            for (index, filter) in filters.enumerated() {
+                let btn = UIButton(frame: CGRect(x: (135 * index), y: 10, width: 120, height: 40))
+                btn.setTitle(filter, for: .normal)
+                btn.tag = index + 500
+                btn.layer.cornerRadius = 10
+                btn.layer.borderWidth = 1
+                btn.layer.borderColor = UIColor.label.cgColor
+                btn.setTitleColor(.label, for: .normal)
+                btn.titleLabel?.font = UIFont.Manrope.medium(size: 16.0).font
+                btn.addTarget(self, action: #selector(filterBtnAction(_:)), for: .touchUpInside)
+                btnScrollView.addSubview(btn)
+            }
+            btnScrollView.contentSize = CGSize(width: CGFloat(135 * filters.count), height: 60)
+            updateCoorOfSelectedTab()
+            getAdsListApi()
+        }
+    private func addObservers() {
+          NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: .init(NotificationKeys.refreshAdsScreen.rawValue), object: nil)
+          NotificationCenter.default.addObserver(self, selector: #selector(noInternet(notification:)), name: .init(NotificationKeys.noInternet.rawValue), object: nil)
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+      }
 
+    
+    
     @objc func noInternet(notification:Notification?){
       
         self.isDataLoading = false
@@ -110,36 +138,13 @@ class MyAdsVC: UIViewController {
         refreshControl.endRefreshing()
     }
      
-    
-    func addButtonsToScrollView(){
-            
-        for index in 0..<filters.count{
-            
-            let btn = UIButton(frame: CGRect(x: ((120 + 15) * index)  , y: 10, width: 120, height: 40))
-            btn.setTitle(filters[index], for: .normal)
-            btn.layer.cornerRadius = 10.0
-            btn.layer.borderColor = UIColor.label.cgColor
-            btn.layer.borderWidth = 1.0
-            btn.setTitleColor( UIColor.label, for: .normal)
-            btn.titleLabel?.font = UIFont.Manrope.medium(size: 16.0).font
-            btn.clipsToBounds = true
-            btn.tag = index + 500
-            btn.addTarget(self, action: #selector(filterBtnAction(_ : )), for: .touchUpInside)
-            btnScrollView.addSubview(btn)
-        }
-        
-        btnScrollView.contentSize.width   = CGFloat(135 * filters.count) + 50
-        updateCoorOfSelectedTab()
-        getAdsListApi()
-    }
-    
+
     @objc func refreshList(){
         if  self.isDataLoading == false{
             
             refreshMyAds()
         }
     }
-    
     
     
     func updateCoorOfSelectedTab(){
@@ -214,7 +219,7 @@ class MyAdsVC: UIViewController {
         }
     }
     
-    //Api methods
+    //MARK: Api methods
     func getAdsListApi(){
         
         
@@ -255,57 +260,6 @@ class MyAdsVC: UIViewController {
         }
     }
     
-    func postDraftAds(post:ItemModel,index:Int){
-        
-        let params = ["id":post.id ?? 0]
-        URLhandler.sharedinstance.makeCall(url:Constant.shared.post_draft_item , param: params, methodType:.post, showLoader: true) { responseObject, error in
-            
-            if error == nil {
-                let result = responseObject! as NSDictionary
-                let status = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
-                
-                if status == 200{
-                    
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) {
-                        do {
-                            let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
-                            if let itemObj = item.data?.first {
-                             
-                                self.listArray[index] = itemObj
-                                self.tblView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
-                            }
-                        }catch {
-                            
-                        }
-                        
-                    } else {
-                        print("Something is wrong while converting dictionary to JSON data.")
-                        
-                    }
-                                        
-                }else{
-                    AlertView.sharedManager.showToast(message: message)
-                    
-                    if (post.city?.count ?? 0) > 0 && (post.categoryID ?? 0) > 0 {
-                        
-                        if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
-                            destvc.hidesBottomBarWhenPushed = true
-                            destvc.categoryId = post.categoryID ?? 0
-                            destvc.categoryName = post.category?.name ?? ""
-                            destvc.city = post.city ?? ""
-                            destvc.country =  post.country ?? ""
-                            destvc.state =  post.state ?? ""
-                            destvc.latitude = "\(post.latitude ?? 0.0)"
-                            destvc.longitude = "\(post.longitude ?? 0.0)"
-                            self.navigationController?.pushViewController(destvc, animated: true)
-                        }
-                    }
-                }
-            }
-        }
-        
-    }
 }
 
 
@@ -326,74 +280,10 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as? AdsTblCell else { return UITableViewCell() }
+        cell.configureTblCellData(itemObj: listArray[indexPath.item])
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as! AdsTblCell
-        
-
-        let obj = listArray[indexPath.item]
-        cell.lblItem.text = obj.name
-        cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
-        cell.lblLikeCount.text = "Like:\(obj.totalLikes ?? 0)"
-        cell.lblViewCount.text = "Views:\(obj.clicks ?? 0)"
-        cell.btnAdStatus.setTitle((obj.status ?? "").capitalized, for: .normal)
-        cell.btnAdPost.isHidden = true
-        cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
-        
-        switch obj.status ?? ""{
-            
-        case "approved":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
-            break
-
-        case "rejected":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
-            break
-            
-        case "inactive":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
-            break
-        case "review":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-            cell.btnAdStatus.setTitle(("Under review"), for: .normal)
-
-            break
-            
-        case "sold out":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#ffbb34"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#fff8eb")
-            break
-       
-        case "draft":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-        case "expired":
-            cell.btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
-            cell.btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
-            break
-
-        default:
-            break
-        }
-        cell.imgVwAds.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-        
-        DispatchQueue.main.async {
-            cell.imgVwAds.roundCorners([.topRight,.bottomRight], radius: 10)
-            cell.imgVwAds.clipsToBounds = true
-            cell.bgView.addShadow()
-            cell.bgView.layer.borderColor = UIColor.separator.cgColor
-            cell.bgView.layer.borderWidth = 0.5
-            cell.bgView.clipsToBounds = true
-        }
-
-        cell.btnAdPost.tag = indexPath.item
-        cell.btnAdPost.addTarget(self, action: #selector(addPostBtnAction(_ : )), for: .touchUpInside)
         return cell
-        
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -424,18 +314,6 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             }
         }
     }
-    
-    
-    //MARK: Selector Methods
-    @objc func addPostBtnAction(_ btn:UIButton){
-        
-        self.postDraftAds( post: listArray[btn.tag], index: btn.tag)
-        
-    }
-    
-    
-   
-    
 }
 
 

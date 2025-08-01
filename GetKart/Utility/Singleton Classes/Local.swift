@@ -130,6 +130,8 @@ final class Local {
         //Local
         UserDefaults.standard.removeObject(forKey:LocalKeys.userId.rawValue)
         UserDefaults.standard.removeObject(forKey: LocalKeys.token.rawValue)
+        UserDefaults.standard.removeObject(forKey:"reportList")
+
         UserDefaults.standard.synchronize()
       
         //Notification

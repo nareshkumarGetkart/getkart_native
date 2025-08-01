@@ -11,6 +11,7 @@ enum PopType{
     case createPost
     case editPost
     case categoriesSeeAll
+    case bannerPromotionLocation
 }
 
 struct CityLocationView: View {
@@ -284,6 +285,15 @@ struct CityLocationView: View {
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
+                }
+            } else  if popType == .bannerPromotionLocation {
+                
+                if vc.isKind(of: UIHostingController<ChooseLocationBannerView>.self) == true{
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.bannerPromotionNewLocation.rawValue),
+                                                    object: nil, userInfo: data)
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
                 }
             }
         }

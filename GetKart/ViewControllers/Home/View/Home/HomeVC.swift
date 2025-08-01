@@ -58,7 +58,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
                                                object: nil)
         
-        
         if Local.shared.getUserId() > 0{
             getpopupApi()
         }
@@ -123,7 +122,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
 
     @objc func noInternet(notification:Notification?){
-      
+        
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
     }
@@ -131,7 +130,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
 
     //MARK: Api methods
     func getpopupApi(){
-
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.alert_popup, param: nil,methodType: .get) { responseObject, error in
             
@@ -191,12 +189,20 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
+     /*
+        let swiftUIView = CreateAdFirstView(navigationController: self.navigationController)
+        let destVC = UIHostingController(rootView: swiftUIView)
+        destVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(destVC, animated: true)
+      return
+        */
+        
         var rootView = CountryLocationView(popType: .home, navigationController: self.navigationController)
         rootView.delLocationSelected = self
            let vc = UIHostingController(rootView:rootView)
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
-        
+       
     
 }
     

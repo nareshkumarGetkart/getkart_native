@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+
+
+
 struct SubCategoriesView: View {
     
     @State  var subcategories: [Subcategory]?
@@ -149,6 +152,15 @@ struct SubCategoriesView: View {
                     vc.category_ids = category_ids
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
+                
+               /*
+                let swiftuIview = CreateAdFirstView(navigationController: self.navigationController,objSubCategory:objsubCategory, strCategoryTitle:strCategoryTitle,strSubCategoryTitle:objsubCategory.name ?? "", category_ids:category_ids)
+                
+                let hostingVC = UIHostingController(rootView: swiftuIview)
+                
+                self.navigationController?.pushViewController(hostingVC, animated: true)
+                */
+                
             }
         }else {
             

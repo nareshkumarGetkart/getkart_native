@@ -137,6 +137,7 @@ PODS:
   - IQTextView (1.0.5):
     - IQKeyboardToolbar/Placeholderable
   - Kingfisher (7.12.0)
+  - Mantis (2.23.2)
   - MMMaterialDesignSpinner (0.2.5)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -170,6 +171,7 @@ DEPENDENCIES:
   - GoogleSignInSwiftSupport
   - IQKeyboardManagerSwift
   - Kingfisher (~> 7.0)
+  - Mantis
   - MMMaterialDesignSpinner
   - PhonePePayment
   - RealmSwift (~> 10)
@@ -210,6 +212,7 @@ SPEC REPOS:
     - IQTextInputViewNotification
     - IQTextView
     - Kingfisher
+    - Mantis
     - MMMaterialDesignSpinner
     - nanopb
     - PhonePePayment
@@ -254,6 +257,7 @@ SPEC CHECKSUMS:
   IQTextInputViewNotification: f5e954d8881fd9808b744e49e024cc0d4bcfe572
   IQTextView: ae13b4922f22e6f027f62c557d9f4f236b19d5c7
   Kingfisher: 53a10ea35051a436b5fb626ca2dd8f3144d755e9
+  Mantis: 8a6fa3823be4551b3ab6f4a07964f55e2eecf2c2
   MMMaterialDesignSpinner: a548042720c2e5f04212048483085d7942ac3e81
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PhonePePayment: 2c42c23d6ec36f8a5ab47132184a21c1df08f28a
@@ -266,6 +270,6 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: 23519558d214863b837afe6e31d6773ac79478a0
+PODFILE CHECKSUM: 2fb708676f3b80183e9ce1177fa50d10ad42a1bc
 
 COCOAPODS: 1.16.2

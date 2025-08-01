@@ -15,9 +15,6 @@
         <array key="Manrope-Regular.ttf">
             <string>Manrope-Regular</string>
         </array>
-        <array key="Manrope-SemiBold.ttf">
-            <string>Manrope-SemiBold</string>
-        </array>
     </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -138,19 +135,6 @@
                                                     <constraint firstAttribute="height" constant="24" id="ohx-Zp-YFU"/>
                                                 </constraints>
                                             </view>
-                                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="89L-vK-Wgn">
-                                                <rect key="frame" x="148.66666666666669" y="0.0" width="62" height="24"/>
-                                                <color key="backgroundColor" systemColor="systemOrangeColor"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="62" id="X4S-Yh-iPU"/>
-                                                    <constraint firstAttribute="height" constant="24" id="jRU-fe-YHI"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="12"/>
-                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" title="Post Now">
-                                                    <color key="titleColor" systemColor="labelColor"/>
-                                                </state>
-                                            </button>
                                         </subviews>
                                     </stackView>
                                 </subviews>
@@ -166,7 +150,7 @@
                                     <constraint firstAttribute="height" constant="18" id="aSL-3D-qQD"/>
                                     <constraint firstAttribute="width" constant="65" id="u6j-er-EsH"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="14"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -196,7 +180,6 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bgView" destination="Os2-Zs-YXi" id="Pe3-Qk-A1m"/>
-                <outlet property="btnAdPost" destination="89L-vK-Wgn" id="XGH-QY-Ig1"/>
                 <outlet property="btnAdStatus" destination="xxb-IM-XjH" id="2rD-5q-jx6"/>
                 <outlet property="imgVwAds" destination="Vx7-7E-hS2" id="DgO-0f-hQ0"/>
                 <outlet property="imgVwIconLike" destination="jDH-Jy-YuJ" id="OBL-2Y-7Yg"/>
@@ -214,17 +197,11 @@
         <image name="eye" width="22" height="22"/>
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="heart" width="22" height="22"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
-        <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

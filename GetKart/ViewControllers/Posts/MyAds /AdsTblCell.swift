@@ -1,5 +1,5 @@
 //
-//  AdsTblCell.swift
+//  AdsTblswift
 //  GetKart
 //
 //  Created by Radheshyam Yadav on 20/02/25.
@@ -16,9 +16,7 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var btnAdStatus:UIButton!
     @IBOutlet weak var lblItem:UILabel!
     @IBOutlet weak var bgView:UIView!
-    @IBOutlet weak var btnAdPost:UIButton!
     @IBOutlet weak var lblBoost:UILabel!
-
     @IBOutlet weak var imgVwIconSeen:UIImageView!
     @IBOutlet weak var imgVwIconLike:UIImageView!
 
@@ -37,9 +35,7 @@ class AdsTblCell: UITableViewCell {
         lblBoost.textColor = UIColor.white
         lblBoost.font = UIFont.Manrope.medium(size: 13.0).font
 
-        btnAdPost.layer.cornerRadius =  3.0 //btnAdPost.frame.height/2.0
-        btnAdPost.clipsToBounds = true
-        
+      
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true
         
@@ -55,6 +51,66 @@ class AdsTblCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    
+    func configureTblCellData(itemObj:ItemModel){
+        lblItem.text = itemObj.name
+        lblPrice.text =  "\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())"
+        lblLikeCount.text = "Like:\(itemObj.totalLikes ?? 0)"
+        lblViewCount.text = "Views:\(itemObj.clicks ?? 0)"
+        btnAdStatus.setTitle((itemObj.status ?? "").capitalized, for: .normal)
+        lblBoost.isHidden = ((itemObj.isFeature ?? false) == true) ? false : true
+        
+        switch itemObj.status ?? ""{
+            
+        case "approved":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            break
+
+        case "rejected":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
+            
+        case "inactive":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
+        case "review":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            btnAdStatus.setTitle(("Under review"), for: .normal)
+
+            break
+            
+        case "sold out":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#ffbb34"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#fff8eb")
+            break
+       
+        case "draft":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+        case "expired":
+            btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
+            btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
+
+        default:
+            break
+        }
+        imgVwAds.kf.setImage(with:  URL(string: itemObj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        
+        DispatchQueue.main.async {
+            self.imgVwAds.roundCorners([.topRight,.bottomRight], radius: 10)
+            self.imgVwAds.clipsToBounds = true
+           // bgView.addShadow()
+            self.bgView.layer.borderColor = UIColor.separator.cgColor
+            self.bgView.layer.borderWidth = 0.5
+            self.bgView.clipsToBounds = true
+        }
     }
     
 }

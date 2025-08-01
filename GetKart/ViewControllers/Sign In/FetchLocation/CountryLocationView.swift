@@ -323,6 +323,24 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     }
                    
                 }
+            }else  if popType == .bannerPromotionLocation {
+                
+                let data: [String: Any] = [
+                    "city": locationManager.city,
+                    "state": locationManager.state,
+                    "country": locationManager.country,
+                               "latitude": locationManager.latitude,
+                               "longitude": locationManager.longitude,
+                               "locality": "",
+                            ]
+                
+                if vc.isKind(of: UIHostingController<ChooseLocationBannerView>.self) == true{
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.bannerPromotionNewLocation.rawValue),
+                                                    object: nil, userInfo: data)
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
             }
         }
     }

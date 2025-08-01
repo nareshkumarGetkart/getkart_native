@@ -14,7 +14,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = false
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -675,6 +675,8 @@ enum NotiKeysLocSelected:String,CaseIterable{
     case filterNewLocation = "filterNewLocation"
     case createPostNewLocation = "createPostNewLocation"
     case buyPackageNewLocation = "buyPackageNewLocation"
+    case bannerPromotionNewLocation = "bannerPromotionNewLocation"
+
     
 }
 

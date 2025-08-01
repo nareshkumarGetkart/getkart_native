@@ -11,7 +11,7 @@ struct TransactionHistoryPreview: View {
     
     let transaction: TransactionModel?
     var navController:UINavigationController?
-    
+
   var body: some View {
       
       navigationHeader() .frame(height: 44)
@@ -47,7 +47,8 @@ struct TransactionHistoryPreview: View {
                         Spacer()
                     }
 
-                    detailsCard()
+                  //  detailsCard()
+                    bannerAnalyticsdetailsCard()
                     
                     Button(action: {}) {
                         Text("Total Cost \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
@@ -177,8 +178,6 @@ private func detailsCard() -> some View {
         detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
         detailRow(title: "Date", value: getConvertedDateFromDate(date: date))
         detailRow(title: "Purchase from", value: "\(transaction?.paymentTransaction?.paymentGateway?.capitalized ?? "")")
-//        detailRow(title: "Package validity", value: "\(transaction?.totalLimit ?? 0) days")
-        
         detailRow(title: "Package validity", value: "\(transaction?.package?.duration ?? "") days")
 
         
@@ -218,10 +217,59 @@ private func detailsCard() -> some View {
             .stroke(Color(hex:"#DADADA"), lineWidth: 0.5)
     )
     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-    //.padding(.horizontal)
 }
 
 
+    
+    @ViewBuilder
+    private func bannerAnalyticsdetailsCard() -> some View {
+        VStack(spacing: 12) {
+            let date = Date(timeIntervalSince1970: TimeInterval(convertTimestamp(isoDateString: transaction?.paymentTransaction?.createdAt ?? "")))
+
+            detailRow(title: "Name", value: "\(transaction?.package?.name ?? "")")
+            detailRow(title: "Category", value:"\(transaction?.package?.category ?? "")")
+            detailRow(title: "Location", value: "\(transaction?.paymentTransaction?.city ?? "")")
+            detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") Ads")
+
+            detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
+            detailRow(title: "Date", value: getConvertedDateFromDate(date: date))
+            detailRow(title: "Purchase from", value: "\(transaction?.paymentTransaction?.paymentGateway?.capitalized ?? "")")
+           
+            BannerAnalyticCell(title: "Status", value: "", isActive: true)
+            
+            
+                HStack {
+                   
+                    Spacer()
+                    
+                    Button(action:{
+                        pushToBannerAnalytics()
+                    },label:{
+                        
+                        Text("Banner analytics").foregroundColor(.blue).underline()
+                    })
+                    
+                    Spacer()
+                }
+         
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(hex:"#DADADA"), lineWidth: 0.5)
+        )
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+
+
+    func pushToBannerAnalytics(){
+        let swiftView = BannerAlalyticsView(navigationController: self.navController)
+        let destVC = UIHostingController(rootView: swiftView)
+        self.navController?.pushViewController(destVC, animated: true)
+        
+    }
 }
 
 #Preview {

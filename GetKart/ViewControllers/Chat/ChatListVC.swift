@@ -15,6 +15,11 @@ extension ChatListVC: UIGestureRecognizerDelegate {
 }
 
 
+protocol PageVisible {
+    func pageDidBecomeVisible()
+}
+
+
 class ChatListVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     
@@ -87,10 +92,10 @@ class ChatListVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //if pageMenu?.currentPageIndex == 0{
-            pageMenu?.controllerArray[pageMenu?.currentPageIndex ?? 0].viewWillAppear(true)
-       // }
         
+        //pageMenu?.controllerArray[pageMenu?.currentPageIndex ?? 0].viewWillAppear(true)
+        
+        (pageMenu?.controllerArray[pageMenu?.currentPageIndex ?? 0] as? PageVisible)?.pageDidBecomeVisible()
         SocketIOManager.sharedInstance.checkSocketStatus()
     }
     

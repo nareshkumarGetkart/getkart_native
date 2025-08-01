@@ -634,11 +634,20 @@ struct ItemDetailView: View {
                        
                         }else{
                             
-                            if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                           if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
                                 vc.itemObj = objVM.itemObj
                                 vc.popType = .editPost
                                 self.navController?.pushViewController(vc, animated: true)
                             }
+                           
+                            /*
+                            let swiftuIview = CreateAdFirstView(navigationController: self.navController,popType: .editPost, itemObj: objVM.itemObj)
+                            
+                            let hostingVC = UIHostingController(rootView: swiftuIview)
+                            
+                            self.navController?.pushViewController(hostingVC, animated: true)
+                             */
+                            
                         }
                     }) {
                         

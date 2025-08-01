@@ -62,25 +62,14 @@ class CreateAddVC2: UIViewController {
         for ind in 0..<dataArray.count {
             let obj = dataArray[ind]
             if obj.type == .fileinput {
-              //  if let url = URL(string: obj.image ?? "") {
-                    
+                
                 guard let arr = obj.value,arr.count > 0 else{ continue}
                 
                 if let strURl  = arr.first , let url = URL(string: strURl ?? "") {
-                    //By me file input url
-                  /*  if let arr = obj.value as? Array<String> {
-                        
-                        if let url = arr.first{
-                            
-                        }
-                    }
-                    */
-                    //
-                    
+                
                     let task = URLSession.shared.dataTask(with: url) { data, response, error in
                         guard let data = data, error == nil else { return }
                         
-                        //let objCustomField = self.dataArray[]
                         self.customFieldFiles["\(obj.id ?? 0)"] = data
                         self.customFieldFilesEditPost["\(obj.id ?? 0)"] = data
                         self.dictCustomFields["custom_field_files"] = self.customFieldFiles
@@ -107,15 +96,7 @@ class CreateAddVC2: UIViewController {
                                 cell.reloadCollection()
                                 self.tblView.beginUpdates()
                                 self.tblView.endUpdates()
-                                
-                              /*  cell.clnCollectionView.performBatchUpdates({
-                                    cell.clnCollectionView.reloadData()
-                                    cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                                }) { _ in
-                                    // Code to execute after reloadData and layout updates
-                                    self.tblView.beginUpdates()
-                                    self.tblView.endUpdates()
-                                }*/
+                          
                             }
                         })
                     }
@@ -130,102 +111,7 @@ class CreateAddVC2: UIViewController {
             }
         }
     }
-    
-    /*
-    
-    func downloadImgData(obj:CustomField,rowIndex:Int){
-        //get the data for main image
-        if let url = URL(string: (obj.value?.first ?? "") ?? "") {
-            let task = URLSession.shared.dataTask(with: url) { data, response, error in
-              
-                guard let data = data, error == nil else { return }
-                self.imgData = data
-              //  self.imgDataEditPost = data
-                
-                customFieldFiles["\(obj.id ?? 0)"] = data
 
-                
-                DispatchQueue.main.async(execute: {
-                
-                let indexPath = IndexPath(row: rowIndex, section: 0)
-                if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                        
-                        
-                    cell.btnAddPicture.isHidden = true
-                    cell.clnCollectionView.isHidden = false
-                        
-                        if cell.arrImagesData.count == 0 {
-                            var arr:Array<Data> = []
-                            arr.append(self.imgData ?? Data())
-                            cell.arrImagesData = arr
-                            cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
-                        }else {
-                            cell.arrImagesData.removeAll()
-                            var arr:Array<Data> = []
-                            arr.append(self.imgData ?? Data())
-                            cell.arrImagesData = arr
-                        }
-                    
-                        cell.clnCollectionView.performBatchUpdates({
-                            cell.clnCollectionView.reloadData()
-                            cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                        }) { _ in
-                            // Code to execute after reloadData and layout updates
-                            self.tblView.beginUpdates()
-                            self.tblView.endUpdates()
-                         
-                        }
-                }
-                })
-            }
-            
-            task.resume()
-        }
-  }
-    
-   
-     {
-         
-             
-         let imgData = pickedImage.wxCompress().jpegData(compressionQuality: 0.0)
-             imgName = "image"
-         let tag = picker.navigationBar.tag
-         
-         let objCustomField = self.dataArray[tag]
-         customFieldFiles["\(objCustomField.id ?? 0)"] = imgData
-         self.dictCustomFields["custom_field_files"] = customFieldFiles
-         
-             let indexPath = IndexPath(row: tag, section: 0)
-             if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
-                 cell.btnAddPicture.isHidden = true
-                 cell.clnCollectionView.isHidden = false
-                     
-                     if cell.arrImagesData.count == 0 {
-                         var arr:Array<Data> = []
-                         arr.append(imgData ?? Data())
-                         cell.arrImagesData = arr
-                         cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
-                     }else {
-                         cell.arrImagesData.removeAll()
-                         var arr:Array<Data> = []
-                         arr.append(imgData ?? Data())
-                         cell.arrImagesData = arr
-                     }
-                 
-                     cell.clnCollectionView.performBatchUpdates({
-                         cell.clnCollectionView.reloadData()
-                         cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                     }) { _ in
-                         // Code to execute after reloadData and layout updates
-                         self.tblView.beginUpdates()
-                         self.tblView.endUpdates()
-                     }
-             }
-         
-         
-     }
-     */
-    
     //MARK: UIButton Action Methods
     @IBAction func backButtonAction() {
         self.navigationController?.popViewController(animated: true)
@@ -319,25 +205,6 @@ class CreateAddVC2: UIViewController {
                     self.dictCustomFields.removeValue(forKey: "custom_field_files")
                 }
                 params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
-                //only  updated images
-                /*
-                let lat = itemObj?.latitude ?? 0.0
-                let lon = itemObj?.longitude ?? 0.0
-                let mapRegion = MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(latitude: itemObj?.latitude ?? 0.0, longitude: itemObj?.longitude ?? 0.0),
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                )
-                
-                
-                let selectedCoordinate = CLLocationCoordinate2D(latitude: itemObj?.latitude ?? 0.0, longitude: itemObj?.longitude ?? 0.0)
-                
-                 let range1: Double = 0.0
-                  let circle = MKCircle(center: CLLocationCoordinate2D(latitude: lat, longitude: lon), radius: 0.0 as CLLocationDistance)
-                 
-                 let vc = UIHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params, mapRegion:mapRegion, selectedCoordinate:selectedCoordinate))//,range1: range1, circle:circle))
-                 self.navigationController?.pushViewController(vc, animated: true)
-
-               */
                 
                 print("self.params second page == \(self.params)")
                 let swiftLocView = ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0, imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params)
@@ -765,11 +632,8 @@ extension CreateAddVC2:UITableViewDataSource, UITableViewDelegate, radioCellTapp
             destVC.dataArray = objCustomField.values ?? []
             self.navigationController?.present(destVC, animated: true, completion: nil)
         }
-        
     }
-    
-    
-    
+        
     
     func dropDownSelected(dropDownRowIndex:Int, selectedRow:Int) {
        // print(dropDownRowIndex, selectedRow)

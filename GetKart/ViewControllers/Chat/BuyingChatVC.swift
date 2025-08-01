@@ -8,6 +8,9 @@
 import UIKit
 import Kingfisher
 
+
+
+
 class BuyingChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     
@@ -179,6 +182,27 @@ class BuyingChatVC: UIViewController {
            
         }
         
+    }
+}
+
+extension BuyingChatVC: PageVisible {
+    func pageDidBecomeVisible() {
+        // do something when this page becomes visible
+        
+        print("Page is visible == BuyingChatVC")
+        
+        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER == true{
+            self.page = 1
+            getChatList()
+        }
+        
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
+
     }
 }
 

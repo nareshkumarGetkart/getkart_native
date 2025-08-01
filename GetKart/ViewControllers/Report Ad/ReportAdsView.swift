@@ -84,7 +84,10 @@ struct ReportAdsView: View {
                 .padding(.horizontal, 20)
         }.onAppear{
             if listArray.count == 0{
-                getReportListApi()
+                listArray = loadListArray()
+                if listArray.count == 0{
+                    getReportListApi()
+                }
             }
         }
     }
@@ -96,6 +99,7 @@ struct ReportAdsView: View {
             
             if obj.data != nil {
                 self.listArray = obj.data?.data ?? []
+                self.saveListArray(obj.data?.data ?? [])
             }
             
         }
@@ -128,6 +132,21 @@ struct ReportAdsView: View {
                 }
             }
         }
+    }
+    
+    
+    func saveListArray(_ list: [ReportModel]) {
+        if let encoded = try? JSONEncoder().encode(list) {
+            UserDefaults.standard.set(encoded, forKey: "reportList")
+        }
+    }
+
+    func loadListArray() -> [ReportModel] {
+        if let data = UserDefaults.standard.data(forKey: "reportList"),
+           let decoded = try? JSONDecoder().decode([ReportModel].self, from: data) {
+            return decoded
+        }
+        return []
     }
 }
 

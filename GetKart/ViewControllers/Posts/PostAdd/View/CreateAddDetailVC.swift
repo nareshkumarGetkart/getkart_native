@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import PhotosUI
 
 enum AddKeys: String{
     
@@ -283,7 +284,7 @@ class CreateAddDetailVC: UIViewController {
             
             showErrorMsg = true
             scrollIndex = 4
-        }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), price < 1 {
+        }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), (price < 1 && price > 9) {
             
             showErrorMsg = true
             scrollIndex = 4
@@ -588,9 +589,9 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.btnOptionBig.isHidden = true
             cell.textFieldDoneDelegate = self
             cell.showCurrencySymbol = true
-            cell.txtField.maxLength = 10
+            cell.txtField.maxLength = 9
             cell.lblErrorMsg.isHidden = true
-            cell.txtField.text = params[AddKeys.price.rawValue] as? String ?? ""
+            cell.txtField.text = (params[AddKeys.price.rawValue] as? String ?? "")
             cell.lblCurSymbol.text = Local.shared.currencySymbol
             if (params[AddKeys.price.rawValue] as? String ?? "").count > 1{
                 cell.lblCurSymbol.isHidden =  false
@@ -749,16 +750,115 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
     }
 }
 
+//MARK: PHPickerDelegate
+extension CreateAddDetailVC:  PHPickerViewControllerDelegate{
+    
+    
+    func presentPhotoPicker() {
+        var configuration = PHPickerConfiguration()
+        
+        if isImgData{
+            configuration.selectionLimit = 1
+
+        }else{
+            if self.gallery_images.count == 5{
+                configuration.selectionLimit = 0
+
+            }else{
+                configuration.selectionLimit = 5 - self.gallery_images.count // 0 = unlimited selection
+            }
+        }
+       
+        configuration.filter = .images
+
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        picker.modalPresentationStyle = .fullScreen
+        present(picker, animated: true, completion: nil)
+    }
+
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        
+        for result in results {
+            if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                    if let pickedImage = object as? UIImage {
+                        print("Selected image: \(pickedImage)")
+
+                        if self.isImgData{
+                            DispatchQueue.main.async {
+
+                            self.imgData = pickedImage.wxCompress().jpegData(compressionQuality: 1.0)
+                            self.imgName = "image"
+                            let indexPath = IndexPath(row: 3, section: 0)
+                            if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                                
+                                cell.btnAddPicture.isHidden = true
+                                cell.clnCollectionView.isHidden = false
+                                
+                                if cell.arrImagesData.count == 0 {
+                                    var arr:Array<Data> = []
+                                    arr.append(self.imgData ?? Data())
+                                    cell.arrImagesData = arr
+                                    cell.clnCollectionView!.insertItems(at: [IndexPath(item: 0, section: 0)])
+                                }else {
+                                    cell.arrImagesData.removeAll()
+                                    var arr:Array<Data> = []
+                                    arr.append(self.imgData ?? Data())
+                                    cell.arrImagesData = arr
+                                }
+                                
+                                cell.lblErrorMsg.isHidden = true
+                                
+                                cell.reloadCollection()
+                                self.tblView.beginUpdates()
+                                self.tblView.endUpdates()
+                            }
+                        }
+                         }else{
+                            DispatchQueue.main.async {
+                                
+                                self.gallery_images.append(pickedImage.wxCompress().jpegData(compressionQuality: 0.0) ?? Data())
+                                self.gallery_imageNames.append("gallery_images[]")
+                               
+                                let indexPath = IndexPath(row: 4, section: 0)
+                                if let cell = self.tblView.cellForRow(at: indexPath) as? PictureAddedCell {
+                                    
+                                    cell.btnAddPicture.isHidden = true
+                                    cell.clnCollectionView.isHidden = false
+                                    cell.lblErrorMsg.isHidden = true
+
+                                    cell.arrImagesData = self.gallery_images
+                                    cell.clnCollectionView?.insertItems(at: [IndexPath(item: self.gallery_images.count - 1, section: 0)])
+                                    cell.reloadCollection()
+                                    self.tblView.beginUpdates()
+                                    self.tblView.endUpdates()
+                                    
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 // MARK: ImagePicker Delegate
 extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIDocumentPickerDelegate {
-    
+  
+  
+
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             if isImgData == true {
                 
-               // imgData = pickedImage.jpegData(compressionQuality: 0.0)
                 imgData = pickedImage.wxCompress().jpegData(compressionQuality: 1.0)
                 imgName = "image"
                 let indexPath = IndexPath(row: 3, section: 0)
@@ -780,16 +880,6 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
                             cell.arrImagesData = arr
                         }
                     
-                      /*  cell.clnCollectionView.performBatchUpdates({
-                            cell.clnCollectionView.reloadData()
-                            cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                        }) { _ in
-                            // Code to execute after reloadData and layout updates
-                            self.tblView.beginUpdates()
-                            self.tblView.endUpdates()
-                        }
-                    
-                    */
                     cell.lblErrorMsg.isHidden = true
                     
                     cell.reloadCollection()
@@ -810,16 +900,7 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
 
                     cell.arrImagesData = self.gallery_images
                     cell.clnCollectionView!.insertItems(at: [IndexPath(item: gallery_images.count - 1, section: 0)])
-                    
-                  /*  cell.clnCollectionView.performBatchUpdates({
-                        cell.clnCollectionView.reloadData()
-                        cell.clnCollectionView.collectionViewLayout.invalidateLayout()
-                    }) { _ in
-                        // Code to execute after reloadData and layout updates
-                        self.tblView.beginUpdates()
-                        self.tblView.endUpdates()
-                    }
-                    */
+              
                     cell.reloadCollection()
                     self.tblView.beginUpdates()
                     self.tblView.endUpdates()
@@ -881,12 +962,23 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
     
     func openImagePicker(sourceType: UIImagePickerController.SourceType,tag:Int) {
         
-        imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+        if sourceType == .camera{
+            imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
+             imagePicker.delegate = self
+             imagePicker.sourceType = sourceType
+             imagePicker.navigationBar.tag = tag
+             imagePicker.allowsEditing = false
+             self.present(imagePicker, animated: true)
+        }else{
+            presentPhotoPicker()
+        }
+
+       /* imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
         imagePicker.sourceType = sourceType
         imagePicker.navigationBar.tag = tag
         imagePicker.allowsEditing = false
-        self.present(imagePicker, animated: true)
+        self.present(imagePicker, animated: true)*/
 
     }
 }
@@ -956,5 +1048,16 @@ extension CreateAddDetailVC: PictureAddedDelegate {
                 self.tblView.reloadData()
             }
         }
+    }
+}
+
+
+extension String{
+    
+    func formatNumberWithComma() -> String {
+        guard let number = Int(self) else { return "" }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: number)) ?? ""
     }
 }

@@ -7,6 +7,8 @@
 
 import UIKit
 
+
+
 class SellingChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     var listArray = [ChatList]()
@@ -54,17 +56,15 @@ class SellingChatVC: UIViewController {
         if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER == true{
             self.page = 1
             getChatList()
-
         }
-        
         
         if !AppDelegate.sharedInstance.isInternetConnected{
             isDataLoading = false
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
-        
     }
+    
 
     func getChatList(){
         isDataLoading = true
@@ -184,6 +184,27 @@ class SellingChatVC: UIViewController {
     }
 }
 
+
+extension SellingChatVC: PageVisible {
+    func pageDidBecomeVisible() {
+        // do something when this page becomes visible
+        
+        print("Page is visible == SellingChatVC")
+        
+        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER == true{
+            self.page = 1
+            getChatList()
+
+        }
+        
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            isDataLoading = false
+            AlertView.sharedManager.showToast(message: "No internet connection")
+            return
+        }
+    }
+}
 
 
 extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{

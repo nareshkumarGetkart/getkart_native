@@ -10,7 +10,7 @@ import UIKit
 class CheckBoxCVCell: UICollectionViewCell {
     @IBOutlet weak var imgSelect:UIImageView!
     @IBOutlet weak var backView:UIViewX!
-    @IBOutlet weak var btnValue:UIButtonX!
+    @IBOutlet weak var btnValue:UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()

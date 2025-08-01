@@ -12,16 +12,14 @@ import SwiftUI
 
 class HomeBaseVC: UITabBarController {
     
-    
     // MARK: - Actions
-    var controllers: [UIViewController]?
-    let middleButton = UIButton()
+   var controllers: [UIViewController]?
+   private let middleButton = UIButton()
     
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
         tabBar.unselectedItemTintColor = UIColor.label
@@ -30,7 +28,7 @@ class HomeBaseVC: UITabBarController {
         
         let images = ["home","chat","","myads","profile"]
         let imagesSel = ["home_active","chat_active","","myads_active","profile_active"]
-
+        
         guard let items = self.tabBar.items else {
             return
         }
@@ -42,9 +40,9 @@ class HomeBaseVC: UITabBarController {
         }
         setupMiddleButton()
         setupDoubleTapGesture()
-        
     }
    
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -57,35 +55,32 @@ class HomeBaseVC: UITabBarController {
             // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
-        
     }
+    
 
     //MARK: Other Helpful Methods
     func setupMiddleButton() {
-            let buttonSize: CGFloat = 65
-            let buttonRadius: CGFloat = buttonSize / 2
-            
-            // Configure button appearance
-            middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -25, width: buttonSize, height: buttonSize)
-            middleButton.layer.cornerRadius = buttonRadius
-            middleButton.backgroundColor = .clear
-            middleButton.setImage(UIImage(named: "plus_button"), for: .normal)
-            middleButton.tintColor = .white
-            middleButton.addTarget(self, action: #selector(middleButtonTapped), for: .touchUpInside)
+        let buttonSize: CGFloat = 65
+        let buttonRadius: CGFloat = buttonSize / 2
+        
+        // Configure button appearance
+        middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -25, width: buttonSize, height: buttonSize)
+        middleButton.layer.cornerRadius = buttonRadius
+        middleButton.backgroundColor = .clear
+        middleButton.setImage(UIImage(named: "plus_button"), for: .normal)
+        middleButton.tintColor = .white
+        middleButton.addTarget(self, action: #selector(middleButtonTapped), for: .touchUpInside)
         
         // Add shadow
-            middleButton.layer.shadowColor = UIColor.black.cgColor
-            middleButton.layer.shadowOpacity = 0.3
-            middleButton.layer.shadowOffset = CGSize(width: 2, height: 2)
-            middleButton.layer.shadowRadius = 4
-
-            tabBar.addSubview(middleButton)
-            tabBar.bringSubviewToFront(middleButton)
-        }
+        middleButton.layer.shadowColor = UIColor.black.cgColor
+        middleButton.layer.shadowOpacity = 0.3
+        middleButton.layer.shadowOffset = CGSize(width: 2, height: 2)
+        middleButton.layer.shadowRadius = 4
+        
+        tabBar.addSubview(middleButton)
+        tabBar.bringSubviewToFront(middleButton)
+    }
     
-    
-    
-
     
     @objc func middleButtonTapped() {
         print("Middle button tapped!")
@@ -101,7 +96,6 @@ class HomeBaseVC: UITabBarController {
             }        
         }
     }
-    
     
     
     func getControllers() -> [UINavigationController]{
@@ -158,7 +152,8 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         self.removeSmallRedDot(at: 1, tabBar: self.tabBar)
     }
     
-    func showSmallRedDot(at index: Int, tabBar: UITabBar) {
+   
+    private func showSmallRedDot(at index: Int, tabBar: UITabBar) {
         let dotTag = 9999 + index
 
         // Remove existing dot if any
@@ -184,7 +179,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         itemView.addSubview(dot)
     }
 
-    func removeSmallRedDot(at index: Int, tabBar: UITabBar) {
+    private func removeSmallRedDot(at index: Int, tabBar: UITabBar) {
         let dotTag = 9999 + index
         tabBar.viewWithTag(dotTag)?.removeFromSuperview()
     }
@@ -220,6 +215,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
             homeVC.scrollToTop()
         }
     }
+    
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         

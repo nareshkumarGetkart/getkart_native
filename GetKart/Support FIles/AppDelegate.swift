@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let reachability = Reachability()
     var isInternetConnected:Bool=Bool()
     var byreachable : String = String()
-  //  @objc static let sharedInstance = UIApplication.shared.delegate as! AppDelegate
     static var sharedInstance: AppDelegate {
         return UIApplication.shared.delegate as? AppDelegate ?? AppDelegate()
     }
@@ -171,7 +170,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("applicationDidBecomeActive")
         SocketIOManager.sharedInstance.checkSocketStatus()
-       
+        
         if isForceAppUpdate{
             if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
                 updateChecker.delegate = self
@@ -181,25 +180,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-
-       /* if Local.shared.getUserId() > 0{
-            var bgTask: UIBackgroundTaskIdentifier = .invalid
-            bgTask = UIApplication.shared.beginBackgroundTask {
-                // Cleanup when time expires
-                UIApplication.shared.endBackgroundTask(bgTask)
-                bgTask = .invalid
-            }
-            
-            SocketIOManager.sharedInstance.socket?.disconnect()
-            print("applicationWillTerminate")
-            
-            UIApplication.shared.endBackgroundTask(bgTask)
-            bgTask = .invalid
-        }*/
-        if Local.shared.getUserId() > 0{
-          //  SocketIOManager.sharedInstance.disconnect() // socket?.disconnect()
-        }
-
+        
+        print("applicationWillTerminate")
     }
     
     
@@ -212,7 +194,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let myUrl: String? = userActivity.webpageURL?.absoluteString
             let urlArray = myUrl?.components(separatedBy: "/")
 
-           // if Local.shared.getUserId() > 0{
                 if myUrl?.range(of: "/seller/") != nil {
                     
                     let userId = urlArray?.last ?? ""
@@ -226,15 +207,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
                     
                    // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
-                  
                     
                     let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
                     let hostingController = UIHostingController(rootView:siftUIview)
                     hostingController.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
-
-          //  }
         }else{
             
         }
@@ -253,9 +231,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
    
     @objc func reachabilityChanged(note: NSNotification) {
-       
-      //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-
+        
+        //  let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        
         guard  let reachability = note.object as? Reachability else{ return }
         if reachability.isReachable {
             isInternetConnected=true
@@ -267,7 +245,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 byreachable = "2"
             }
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.reconnectInternet.rawValue), object: nil , userInfo: nil)
-
+            
             if Local.shared.getUserId() > 0{
                 SocketIOManager.sharedInstance.establishConnection()
             }
