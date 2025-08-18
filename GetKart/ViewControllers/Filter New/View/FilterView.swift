@@ -532,11 +532,12 @@ struct RangePriceView:View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 0.5).shadow(radius: 10.0)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .contentShape(Rectangle())
     }
 }
 
-
+/*
 struct SortSelectionView:View {
     
     var title:String
@@ -547,19 +548,47 @@ struct SortSelectionView:View {
         HStack{
             Text(title).font(Font.manrope(.regular, size: 12)).padding(.leading)
             Spacer()
-
-        }.frame(height: 35).overlay(
+            
+        }.frame(height: 35)
+            .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? Color.orange.opacity(0.1) : Color.clear).clipped()
+        ).overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 0.5).shadow(radius: 10.0)
         )//.padding(.top,2.5)
-        .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(isSelected ? Color.orange.opacity(0.1) : Color.clear)
-                )
+        
         .contentShape(Rectangle())
     }
     
 }
+*/
+struct SortSelectionView: View {
+    var title: String
+    var isSelected: Bool
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(Font.manrope(.regular, size: 12))
+                .padding(.leading)
+            Spacer()
+        }
+        .frame(height: 35)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? Color.orange.opacity(0.1) : Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray, lineWidth: 0.5)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10)) // Ensures background & overlay are clipped properly
+        .shadow(color: .black.opacity(0.1), radius: isSelected ? 4 : 0, x: 0, y: 1) // Optional shadow only when selected
+        .contentShape(Rectangle())
+    }
+}
+
 
 struct RangeViewFilter:View {
     

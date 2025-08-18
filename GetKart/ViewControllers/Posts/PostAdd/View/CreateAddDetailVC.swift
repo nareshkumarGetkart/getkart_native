@@ -437,12 +437,17 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
        
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AlmostThereCell") as! AlmostThereCell
-            cell.lblCategory.text = strCategoryTitle
+           // cell.lblCategory.text = strCategoryTitle
+           
+            
             if strSubCategoryTitle.count > 0 {
-                cell.lblSubCategory.text = "> \(strSubCategoryTitle)"
+                cell.setAtrributtedTextToLabel(firstText: strCategoryTitle, secondText: "> \(strSubCategoryTitle)")
+               // cell.lblSubCategory.text = "> \(strSubCategoryTitle)"
             }else{
-                cell.lblSubCategory.text = ""
+                cell.setAtrributtedTextToLabel(firstText: strCategoryTitle, secondText: "")
             }
+            
+            
             return cell
         }else if indexPath.row == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell

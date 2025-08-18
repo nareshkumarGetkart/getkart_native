@@ -25,6 +25,10 @@ enum SocketEvents: String, CaseIterable {
     case joinRoom = "joinRoom"
     case leaveRoom = "leaveRoom"
     case socketConnected = "socketConnected"
+    case createRoom = "createRoom"
+    case chatUnreadCount = "chatUnreadCount"
+
+    
 }
 
 final class SocketIOManager: NSObject {
@@ -46,6 +50,8 @@ final class SocketIOManager: NSObject {
             return
         }
         let headers = ["Authorization": getHeaderToken()]
+        
+       
         manager = SocketManager(socketURL: url, config: [.log(false), .reconnects(true), .forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false), .extraHeaders(headers)])
         socket = manager?.socket(forNamespace: "/chat")
     }
@@ -76,6 +82,9 @@ final class SocketIOManager: NSObject {
             self.socket?.removeAllHandlers()
             self.addListeners()
             NotificationCenter.default.post(name: Notification.Name(SocketEvents.socketConnected.rawValue), object: nil)
+            
+            SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+
         }
 
         socket.on(clientEvent: .error) { data, ack in

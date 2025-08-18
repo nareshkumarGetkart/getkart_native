@@ -81,8 +81,7 @@ class ChatListVC: UIViewController {
         pageMenu?.menuScrollView.isScrollEnabled = false
         pageMenu?.controllerScrollView.isScrollEnabled = false
         self.view.addSubview(pageMenu!.view)
-        
-        
+                
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         

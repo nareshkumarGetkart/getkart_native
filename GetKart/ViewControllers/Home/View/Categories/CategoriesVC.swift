@@ -35,11 +35,10 @@ class CategoriesVC: UIViewController {
             tblView.isHidden = true
             collctionView.register(UINib(nibName: "CategoriesBigCell", bundle: nil), forCellWithReuseIdentifier: "CategoriesBigCell")
         }
-            objViewModel = CategoryViewModel()
-            objViewModel?.delegate = self
-        
-        
+        objViewModel = CategoryViewModel()
+        objViewModel?.delegate = self
     }
+    
     
     //MARK: UIButton Action Methods
     @IBAction  func backButtonAction(_ sender : UIButton){

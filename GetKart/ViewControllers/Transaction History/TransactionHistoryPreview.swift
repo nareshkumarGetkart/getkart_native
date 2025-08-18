@@ -47,8 +47,8 @@ struct TransactionHistoryPreview: View {
                         Spacer()
                     }
 
-                  //  detailsCard()
-                    bannerAnalyticsdetailsCard()
+                    detailsCard()
+                   // bannerAnalyticsdetailsCard()
                     
                     Button(action: {}) {
                         Text("Total Cost \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")

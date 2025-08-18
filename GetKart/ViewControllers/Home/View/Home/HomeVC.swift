@@ -8,6 +8,9 @@
 import UIKit
 import SwiftUI
 import Kingfisher
+import FittedSheets
+import Foundation
+import CommonCrypto
 
 extension HomeVC: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -32,6 +35,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         refreshControl.tintColor = UIColor.systemYellow
         return refreshControl
     }()
+    private  var sheet: SheetViewController?
     
     private var homeVModel:HomeViewModel?
 
@@ -58,14 +62,36 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
                                                object: nil)
         
-        if Local.shared.getUserId() > 0{
-            getpopupApi()
-        }
+      
        
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-    }
+        
+        
+        if Local.shared.getUserId() > 0{
+                
+                getpopupApi()
+        }
+        /*
+        print("appVersion == \(UIDevice.appVersion)")
+        
+        // Example usage
+        let salt = "MySecretSalt123" // store securely
+        let customValue = "User123"
+        
+        let customValue = "Gr8@98qwmlx"
+        let salt = "GetkartIndia"
+         
+        let shortKey = generateShortKeyWithSalt(customValue: customValue, salt: salt)
+        print("Generated key: \(shortKey)")
+         
+        // Verify later
+        let sameKey = generateShortKeyWithSalt(customValue: customValue, salt: salt)
+        print("Matches: \(sameKey == shortKey)") // true
+        */
+  }
     
+   
    
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -86,7 +112,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         ImageCache.default.clearMemoryCache()
     }
 
-    
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
@@ -126,33 +151,177 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
     }
-    
+    /*  self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
+                                                               subtitle: "Upgrade your listing for better exposure and faster response.",
+                                                               description: "<ul>                                                <li>Your item is currently listed as a Free Post.</li>                                                <li>Free posts have limited reach and visibility.</li>                                                <li>Upgrade to a premium package to get more views and responses.</li>                                                <li>Premium listings appear at the top and reach more interested buyers.</li>                                                <li>Click 'Boost Now' to enhance your item's performance.</li>                                            </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
+                                                               buttonTitle: "Okay",
+                                                               type: 1, itemID: 49625))
+            
+            
+            return*/
 
     //MARK: Api methods
     func getpopupApi(){
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.alert_popup, param: nil,methodType: .get) { responseObject, error in
+   
+ 
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
-            if error == nil {
-                let result = responseObject! as NSDictionary
-                let code = result["code"] as? Int ?? 0
-              //  let message = result["message"] as? String ?? ""
+            if obj.code == 200,obj.error == false{
                 
-                if code == 200{
-                    
-                    if let data = result["data"] as? Dictionary<String,Any>{
-                        
-                        DispatchQueue.main.async {
-                            if let destVc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PopupVC") as? PopupVC{
-                                destVc.respDict = data
-                                destVc.modalPresentationStyle = .overFullScreen
-                                destVc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-                                destVc.modalPresentationStyle = .overCurrentContext
-                                destVc.modalTransitionStyle = .coverVertical
-                                AppDelegate.sharedInstance.navigationController?.present(destVc, animated: false)
-                              //  self.navigationController?.present(destVc, animated: false)
-                            }
+                /*
+                 // =========== If any add in Draft message will get popped up to Buy Plans ===========
+                 $type = 1;
+                 // =========== If user has Free Approved Add then pop up message to Buy  Plan ===========
+                 $type = 2;
+                 
+                 // =========== If user has Paid Ad from Listing Plan then Pop up message to Boost Plan ===========
+                 $type = 3;
+                 
+                 // =========== If User has just registered and not posted any ad than Pop up message to Run Ad  ===========
+                 $type = 4;
+                 */
+                
+                if (obj.data.type ?? 0) == 0{
+                    DispatchQueue.main.async {
+                        if let destVc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PopupVC") as? PopupVC{
+                            destVc.objPopup = obj.data
+                            destVc.modalPresentationStyle = .overFullScreen
+                            destVc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                            destVc.modalPresentationStyle = .overCurrentContext
+                            destVc.modalTransitionStyle = .coverVertical
+                            AppDelegate.sharedInstance.navigationController?.present(destVc, animated: false)
                         }
+                    }
+                } else if (obj.data.type ?? 0) == 1 || (obj.data.type ?? 0) == 2 || (obj.data.type ?? 0) == 3  || (obj.data.type ?? 0) == 4{
+                    self?.presentHostingController(objPopup: obj.data)
+                }
+            }
+        }
+    }
+    
+    func presentHostingController(objPopup:PopupModel){
+        
+        let controller = UIHostingController(rootView: BottomSheetPopupView(objPopup: objPopup, pushToScreenFromPopup: { [weak self] (obj,dismissOnly) in
+
+            self?.sheet?.attemptDismiss(animated: true)
+            if dismissOnly{
+                
+            }else{
+                if (obj.type ?? 0) == 1  {
+                    self?.pushToMyAdsScreen()
+                }else if (obj.type ?? 0) == 2  || (obj.type ?? 0) == 3  && (obj.itemID ?? 0) > 0{
+                /*
+                 If any add in Draft message will get popped up to Buy Plans type = 1
+                 If user has Free Approved Add then pop up message to Buy  Plan type = 2
+                 If user has Paid Ad from Listing Plan then Pop up message to Boost Plan type = 3
+                */
+                    let siftUIview = ItemDetailView(navController:  self?.navigationController, itemId: objPopup.itemID ?? 0, itemObj: nil, slug: "")
+                    let hostingController = UIHostingController(rootView:siftUIview)
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self?.navigationController?.pushViewController(hostingController, animated: true)
+                    
+                }else if (obj.type ?? 0) == 4  {
+                    //If User has just registered and not posted any ad than Pop up message to Run Ad  type = 4
+                                   
+                    if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                        destVC.hidesBottomBarWhenPushed = true
+                        destVC.popType = .createPost
+                        self?.navigationController?.pushViewController(destVC, animated: true)
+                    }
+                }
+            }
+        }))
+        
+        let useInlineMode = view != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        
+        let nav = UINavigationController(rootViewController: controller)
+        var fixedSize = 510
+        
+        if (objPopup.image?.count ?? 0) == 0{
+            fixedSize = fixedSize - 150
+        }
+        if (objPopup.subtitle?.count ?? 0) == 0{
+            fixedSize = fixedSize - 50
+        }
+        
+        if (objPopup.description?.count ?? 0) == 0{
+            fixedSize = fixedSize - 70
+        }else{
+            fixedSize = fixedSize + 15
+        }
+        nav.navigationBar.isHidden = true
+        
+        
+        sheet = SheetViewController(
+            controller: nav,
+            sizes: [.fixed(CGFloat(fixedSize)),.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 20 , useInlineMode: useInlineMode))
+        sheet?.allowGestureThroughOverlay = false
+        sheet?.cornerRadius = 20
+        sheet?.dismissOnOverlayTap = true
+        sheet?.dismissOnPull = false
+        sheet?.gripColor = .clear
+        
+        if (objPopup.mandatoryClick ?? false){
+            
+            sheet?.dismissOnOverlayTap = false
+            sheet?.dismissOnPull = false
+            sheet?.allowPullingPastMaxHeight = false
+            sheet?.allowPullingPastMinHeight = false
+            sheet?.shouldRecognizePanGestureWithUIControls = false
+            sheet?.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+            sheet?.sheetViewController?.allowGestureThroughOverlay = false
+            sheet?.sheetViewController?.dismissOnPull = false
+            sheet?.allowPullingPastMinHeight = false
+        }
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet?.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            guard let sh = sheet else{ return }
+            self.navigationController?.present(sh, animated: true, completion: nil)
+        }
+    }
+    
+    
+    
+    func pushToMyAdsScreen(){
+        
+        for controller in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
+            
+            if let destvc =  controller as? HomeBaseVC{
+                
+                
+                if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                    navController.popToRootViewController(animated: false)
+
+                }
+                
+                if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                    navController.popToRootViewController(animated: false)
+
+                }
+                
+                if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                    navController.popToRootViewController(animated: false)
+
+                }
+                
+                if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                    navController.popToRootViewController(animated: false)
+                }
+                
+                destvc.selectedIndex = 3
+                
+                if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                  
+                    navController.popToRootViewController(animated: false)
+
+                    // Notify the 3rd view controller to refresh
+                    if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
+                        thirdVC.refreshMyAds()
+                        break
                     }
                 }
             }
@@ -189,19 +358,20 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
-     /*
-        let swiftUIView = CreateAdFirstView(navigationController: self.navigationController)
-        let destVC = UIHostingController(rootView: swiftUIView)
-        destVC.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(destVC, animated: true)
-      return
-        */
+     
+//        let swiftUIView = CreateAdSecondView(navigationController: self.navigationController)
+//        let destVC = UIHostingController(rootView: swiftUIView)
+//        destVC.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(destVC, animated: true)
+//      return
+//        
         
         var rootView = CountryLocationView(popType: .home, navigationController: self.navigationController)
         rootView.delLocationSelected = self
            let vc = UIHostingController(rootView:rootView)
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
+         
        
     
 }

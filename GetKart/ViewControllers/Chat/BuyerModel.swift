@@ -66,7 +66,7 @@ struct LastMessage:Codable{
     //let senderID: Int?
     let audio: String?
    // let receiverID: Int?
-    
+
     enum CodingKeys: String, CodingKey {
         case readAt = "read_at"
        // case id

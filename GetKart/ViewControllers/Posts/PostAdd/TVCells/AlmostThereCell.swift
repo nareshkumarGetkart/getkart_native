@@ -9,7 +9,7 @@ import UIKit
 
 class AlmostThereCell: UITableViewCell {
     @IBOutlet weak var lblCategory:UILabel!
-    @IBOutlet weak var lblSubCategory:UILabel!
+  //  @IBOutlet weak var lblSubCategory:UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,6 +20,28 @@ class AlmostThereCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    
+    
+    func setAtrributtedTextToLabel(firstText:String,secondText:String){
+    
+        guard let fontManrope = UIFont.Manrope.regular(size: 15.0).font else{ return}
+        let firstAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.black,
+            .font:fontManrope
+        ]
+
+        let secondAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: Themes.sharedInstance.themeColor,
+            .font: fontManrope
+        ]
+
+        let attributedText = NSMutableAttributedString(string: firstText, attributes: firstAttributes)
+        attributedText.append(NSAttributedString(string: secondText, attributes: secondAttributes))
+
+        lblCategory.attributedText = attributedText
+
     }
     
 }

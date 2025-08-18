@@ -154,8 +154,8 @@ class LoginVC: UIViewController {
             self.navigationController?.pushViewController(vc, animated: true)
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
-           
-            self.sendOTPApi()
+            self.saltGeneratorApi()
+                // self.sendOTPApi()
             
         }else {
             txtEmailPhone.layer.borderColor = UIColor.red.cgColor
@@ -165,12 +165,24 @@ class LoginVC: UIViewController {
     }
     
     
-    func sendOTPApi(){
+    
+    func saltGeneratorApi(){
         
-        let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)"] as [String : Any]
+        
+        let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
+
+         let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+      
+      //  let strUrl = Constant.shared.salt_handler + "?deviceid=\(UIDevice.getDeviceUIDid())&plateform=ios&authtype=basic&appversion=\(UIDevice.appVersion)&mobile=\(txtEmailPhone.text ?? "")&countryCode=\(countryCode)"
         
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
+        
+//        'http://localhost/api/v1/salt-handler?deviceid=123&plateform=ios&authtype=basic&appversion=1.2&mobile=9312069552&countryCode=%2B91' \
+        
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.salt_handler , param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
             
             
             if(error != nil)
@@ -185,6 +197,52 @@ class LoginVC: UIViewController {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        if let salt_token = data["salt_token"] as? String{
+                            SALT_TOKEN_TO_SEND = salt_token
+                            self?.sendOTPApi(saltKey: salt_token)
+                        }
+                    }
+               
+                }
+                
+            }
+        }
+    }
+    
+    
+    func sendOTPApi(saltKey:String){
+        let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
+
+        let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","salt_token":saltKey,"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.send_mobile_otp_handler, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
+            
+//        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
+//            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        if let salt_token = data["salt_token"] as? String{
+                            SALT_TOKEN_TO_SEND = salt_token
+                        }
+                    }
+
                     
                     let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
                     vc.countryCode = self?.countryCode ?? ""

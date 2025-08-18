@@ -17,6 +17,7 @@ class ChatListTblCell: UITableViewCell {
     @IBOutlet weak var lblLastMessage:UILabel!
     @IBOutlet weak var lblDot:UILabel!
     @IBOutlet weak var btnOption:UIButton!
+    @IBOutlet weak var lblLastMessageTime:UILabel!
 
 
     override func awakeFromNib() {
@@ -43,4 +44,24 @@ class ChatListTblCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    
+    func setDateTime(isoDateString:String){
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        isoFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Ensure UTC time
+        
+        if let date = isoFormatter.date(from: isoDateString) {
+            // print("Converted Date:", date)
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
+            dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
+            dateFormatter.timeZone = .current
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            lblLastMessageTime.text = dateFormatter.string(from: date)
+            
+        } else {
+            print("Invalid date format")
+            lblLastMessageTime.text = ""
+        }
+    }
 }

@@ -19,7 +19,9 @@ struct SearchProductView: View {
     @StateObject private var viewModel = ProductSearchViewModel()
     @FocusState private var isFocused: Bool
     var onSelectSuggestion: (Search) -> Void
-     var isToCloseToHomeScreen = false
+    var isToCloseToHomeScreen = false
+    @State private var recentSearches  = [String]()
+    @State private var wrapHeight: CGFloat = 0
     
     var body: some View {
        
@@ -67,6 +69,7 @@ struct SearchProductView: View {
                                     if  viewModel.searchText.count > 0{
                                         viewModel.istoSearch = false
                                         isFocused = false
+                                        saveSearchTerm(viewModel.searchText)
 
                                         onSelectSuggestion(Search(categoryID: 0, categoryName: "", categoryImage: "", keyword:  viewModel.searchText))
                                         self.navigation?.popViewController(animated: false)
@@ -114,6 +117,9 @@ struct SearchProductView: View {
               
             }.background(Color(.systemBackground))
             
+                .onAppear{
+                    loadRecentSearches()
+                }
 
             if viewModel.items.count == 0  && !viewModel.isDataLoading{
                 HStack {
@@ -141,12 +147,83 @@ struct SearchProductView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
+                       /*
                         
+                        if  viewModel.searchText.count == 0  {
+                            if recentSearches.count > 0{
+
+                                VStack{
+                                    Divider().padding(5)
+                                    HStack{
+                                        Text("Recent Searches").font(.manrope(.semiBold, size: 15.0))
+                                        Spacer()
+                                        Button {
+                                            
+                                            removeAllRecentSearches()
+                                            recentSearches.removeAll()
+                                        } label: {
+                                            Text("Clear").font(.manrope(.semiBold, size: 15.0))
+                                        }
+                                        
+                                    }.padding([.leading,.trailing])
+                                 
+                                    
+                                    FlowLayout(data: recentSearches) { item in
+                                        HStack(spacing: 6) {
+                                            Image(systemName: "clock")
+                                                .font(.caption)
+                                            Text(item)
+                                                .font(.subheadline)
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color(.systemGray6))
+                                        .cornerRadius(20)
+                                    }
+                                  
+                                  /*  LazyVGrid(columns: adaptiveColumns, spacing: 10) {
+
+                                        ForEach(Array(recentSearches.enumerated()), id: \.element) { index, str in
+                                            HStack{
+                                                Spacer()
+                                                Image("search").resizable()
+                                                    .frame(width: 15, height: 15)
+                                                    .padding(.leading, 10)
+                                                Text(str).font(.manrope(.medium, size: 15.0)).padding(.trailing, 10)
+                                                Spacer()
+                                            }.frame(height:30).frame(minWidth:70)
+                                                .overlay {
+                                                RoundedRectangle(cornerRadius: 15.0).stroke(Color(.gray), lineWidth: 1.0)
+                                            }.cornerRadius(15.0)
+                                            
+                                                .onTapGesture {
+                                                    viewModel.searchText = str
+                                                }
+                                            
+                                        }
+                                        
+                                        
+                                    }
+                                    */
+                                    Divider().padding(5)
+                                    HStack{
+                                        Text("Popular Categories").font(.manrope(.semiBold, size: 15.0))
+                                        Spacer()
+                                    }.padding([.leading,.trailing])
+
+                                } .background(Color(.systemBackground))
+                            }
+                            
+                        }
+                        */
                         
-                        ForEach(Array(viewModel.items.enumerated()), id: \.offset) { index, item in
+                       ForEach(Array(viewModel.items.enumerated()), id: \.offset) { index, item in
                         
                             SearchSuggestionCell(title: item.keyword ?? "",categoryTitle:item.categoryName ?? "")
                                 .onTapGesture {
+                                    if  viewModel.searchText.count > 0{
+                                        saveSearchTerm(viewModel.searchText)
+                                    }
                                     onSelectSuggestion(item)
                                     self.navigation?.popViewController(animated: false)
                             }
@@ -191,6 +268,36 @@ struct SearchProductView: View {
             
         return locStr
     }
+    
+    
+    func saveSearchTerm(_ term: String) {
+        var searches = UserDefaults.standard.stringArray(forKey: "recentSearchesKey") ?? []
+
+        // Remove duplicates and add the new term at the beginning
+        searches.removeAll(where: { $0 == term })
+        searches.insert(term, at: 0)
+
+        // Limit the number of recent searches
+        let maxRecents = 5 // Or any desired limit
+        if searches.count > maxRecents {
+            searches = Array(searches.prefix(maxRecents))
+        }
+
+        UserDefaults.standard.set(searches, forKey: "recentSearchesKey")
+        UserDefaults.standard.synchronize()
+    }
+    
+    func loadRecentSearches(){
+        recentSearches =
+ UserDefaults.standard.stringArray(forKey: "recentSearchesKey") ?? []
+    }
+    
+    func removeAllRecentSearches(){
+        UserDefaults.standard.set([], forKey: "recentSearchesKey")
+        UserDefaults.standard.synchronize()
+
+    }
+
 }
 
 
@@ -226,5 +333,57 @@ struct SearchSuggestionCell:View {
             }.padding(.top,10)
             Divider().background(Color(.separator))
         }.background(Color(.systemBackground))
+    }
+}
+
+
+
+struct FlowLayout<Data: RandomAccessCollection, Content: View>: View where Data.Element: Hashable {
+    let data: Data
+    let spacing: CGFloat
+    let alignment: HorizontalAlignment
+    let content: (Data.Element) -> Content
+
+    init(data: Data,
+         spacing: CGFloat = 10,
+         alignment: HorizontalAlignment = .leading,
+         @ViewBuilder content: @escaping (Data.Element) -> Content) {
+        self.data = data
+        self.spacing = spacing
+        self.alignment = alignment
+        self.content = content
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            self.generateContent(in: geometry)
+           
+        }
+    }
+
+    private func generateContent(in geometry: GeometryProxy) -> some View {
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+
+        return    ZStack(alignment: .topLeading) {
+
+            ForEach(Array(data), id: \.self) { item in
+                self.content(item)
+                    .padding(.all, 5)
+                    .alignmentGuide(.leading, computeValue: { d in
+                        if abs(width - d.width) > geometry.size.width {
+                            width = 0
+                            height -= d.height + spacing
+                        }
+                        let result = width
+                        width -= d.width + spacing
+                        return result
+                    })
+                    .alignmentGuide(.top, computeValue: { _ in
+                        let result = height
+                        return result
+                    })
+            }
+        }
     }
 }

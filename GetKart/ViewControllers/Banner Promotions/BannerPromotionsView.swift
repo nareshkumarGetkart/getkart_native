@@ -144,7 +144,7 @@ struct BannerPromotionsView: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(.systemBackground))
                     
-                ).keyboardType(.URL).tint(Color(.systemOrange))
+                ).keyboardType(.URL).tint(Color(.systemOrange)).autocapitalization(.none)
             Text("For the best results on all devices, use an image that's at least 1080 x 354 pixels and 4 MB or less.").font(.manrope(.regular, size: 12.0))
             }
             Spacer()

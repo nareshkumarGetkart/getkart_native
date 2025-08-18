@@ -180,7 +180,7 @@ class ChatVC: UIViewController {
         self.view.endEditing(true)
         IQKeyboardManager.shared.isEnabled = true
         self.sendtypinStatus(status: false)
-
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
     }
     
     deinit {

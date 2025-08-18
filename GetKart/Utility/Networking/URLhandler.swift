@@ -44,19 +44,23 @@ class URLhandler: NSObject{
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{
-                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios"]
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }else{
-                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios"]
+                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }
         }else{
-            let headers =  ["platform":"ios"]
+            let headers =  ["platform":"ios","appversion":UIDevice.appVersion]
+//            if SALT_TOKEN_TO_SEND.count > 0{
+//                headers =  ["platform":"ios","appversion":UIDevice.appVersion,"salt_token":"\(SALT_TOKEN_TO_SEND)"]
+//            }
             print("Header == \(headers)")
             return HTTPHeaders.init(headers)
         }
+
 
         /*
 

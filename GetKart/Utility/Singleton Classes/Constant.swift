@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import Foundation
+import CryptoKit
+import CommonCrypto
 
 enum DevEnvironment{
     case live
@@ -51,6 +54,28 @@ final class Constant: NSObject {
     }
     
     
+    
+    
+    var salt_handler:String {
+        get {
+            return "\(baseURL)/v1/salt-handler"
+        }
+    }
+    
+    var send_mobile_otp_handler:String {
+        get {
+            return "\(baseURL)/v1/send-mobile-otp-handler"
+        }
+    }
+    
+    var verify_mobile_otp_handler:String {
+        get {
+            return "\(baseURL)/v1/verify-mobile-otp-handler"
+        }
+    }
+    
+    
+    
     var user_Insights:String {
         get {
             return "\(baseURL)/v1/user-Insights"
@@ -66,12 +91,12 @@ final class Constant: NSObject {
     
     var sendMobileOtpUrl:String {
         get {
-            return"\(Constant.shared.baseURL)/send-mobile-otp"
+            return"\(Constant.shared.baseURL)/v1/send-mobile-otp"
         }
     }
     var verifyMobileOtpUrl:String{
         get {
-            return  "\(Constant.shared.baseURL)/verify-mobile-otp"
+            return  "\(Constant.shared.baseURL)/v1/verify-mobile-otp"
         }
     }
     
@@ -693,6 +718,10 @@ enum ImageName {
 extension UIDevice{
     
 
+    static  var appVersion : String{
+        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+    }
+   
    static func getDeviceUIDid() ->String{
         
 
@@ -742,5 +771,39 @@ extension UIDevice{
 
         return deviceList[identifier] ?? identifier
     }
+    
+    
+    static let  MY_CUSTOM_KEY = "Gr8@98qwmlx"
+    static  let  MY_CUSTOM_SALT = "GetkartIndia"
+    
+    static  func generateShortKeyWithSalt(customValue: String, salt: String, keyLength: Int = 8) -> String {
+        // Combine: custom value + salt
+        let combinedData = (customValue + salt).data(using: .utf8)!
+     
+        // SHA-256 hash
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        combinedData.withUnsafeBytes {
+            _ = CC_SHA256($0.baseAddress, CC_LONG(combinedData.count), &hash)
+        }
+        let hashedData = Data(hash)
+     
+        // Base64 URL-safe encoding (no padding, no wrap)
+        var encoded = hashedData.base64EncodedString()
+        encoded = encoded
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+     
+        // Return only the first N characters
+        if encoded.count > keyLength {
+            let index = encoded.index(encoded.startIndex, offsetBy: keyLength)
+            return String(encoded[..<index])
+        } else {
+            return encoded
+        }
+    }
 
 }
+
+
+

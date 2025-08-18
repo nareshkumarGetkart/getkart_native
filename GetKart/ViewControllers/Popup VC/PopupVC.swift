@@ -24,6 +24,7 @@ extension String {
 
 
 
+
 class PopupVC: UIViewController {
 
     @IBOutlet weak var btnOkay:UIButton!
@@ -34,19 +35,27 @@ class PopupVC: UIViewController {
     @IBOutlet weak var imgVwBanner:UIImageView!
     
     @IBOutlet weak var bgView:UIViewX!
+   // var respDict:Dictionary<String,Any> = [:]
 
-
-    var respDict:Dictionary<String,Any> = [:]
+    var objPopup:PopupModel = PopupModel(userID: 0, title: "", subtitle: "", description: "", image: "", mandatoryClick: true, buttonTitle: "", type: 0, itemID: 0)
 
     //MARK: Controller Life cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        imgVwBanner.kf.setImage(with: URL(string: respDict["image"] as? String ?? ""))
+       /* imgVwBanner.kf.setImage(with: URL(string: respDict["image"] as? String ?? ""))
         lblTitle.text = respDict["title"] as? String ?? ""
         lblSubTitle.text = respDict["subtitle"] as? String ?? ""
         btnOkay.setTitle(respDict["buttonTitle"] as? String ?? "", for: .normal)
         setHTMLTextToLabel(htmlText: respDict["description"] as? String ?? "")
-        self.btnClose.isHidden = ((respDict["mandatory_click"] as? Int ?? 0) == 1) ? true : false
+        self.btnClose.isHidden = ((respDict["mandatory_click"] as? Int ?? 0) == 1) ? true : false*/
+        
+        
+        imgVwBanner.kf.setImage(with: URL(string: objPopup.image ?? ""))
+        lblTitle.text = objPopup.title ?? ""
+        lblSubTitle.text = objPopup.subtitle ?? ""
+        btnOkay.setTitle(objPopup.buttonTitle ?? "", for: .normal)
+        setHTMLTextToLabel(htmlText: objPopup.description ?? "")
+        self.btnClose.isHidden = ((objPopup.mandatoryClick ?? false) == true) ? true : false
         
         btnOkay.backgroundColor = Themes.sharedInstance.themeColor
         btnOkay.layer.cornerRadius = btnOkay.frame.size.height / 2.0

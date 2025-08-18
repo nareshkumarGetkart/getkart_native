@@ -20,6 +20,9 @@ class HomeBaseVC: UITabBarController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.chatUnreadCount),
+                                               name: NSNotification.Name(rawValue: SocketEvents.chatUnreadCount.rawValue), object: nil)
+        
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
         tabBar.tintColor = .orange
         tabBar.unselectedItemTintColor = UIColor.label
@@ -40,6 +43,9 @@ class HomeBaseVC: UITabBarController {
         }
         setupMiddleButton()
         setupDoubleTapGesture()
+        
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+
     }
    
     
@@ -79,8 +85,26 @@ class HomeBaseVC: UITabBarController {
         
         tabBar.addSubview(middleButton)
         tabBar.bringSubviewToFront(middleButton)
+     
     }
     
+    @objc func chatUnreadCount(notification: Notification) {
+        guard let data = notification.userInfo else{
+            return
+        }
+        
+        if let dataDict = data["data"] as? Dictionary<String,Any>{
+            
+            let unreadCount = dataDict["unreadCount"] as? Int ?? 0
+            removeChatUnreadCountRedDot()
+
+            if unreadCount > 0{
+                showNChatUnreadCountRedDot(count: unreadCount)
+            }else{
+            }
+        }
+    }
+
     
     @objc func middleButtonTapped() {
         print("Middle button tapped!")
@@ -144,11 +168,15 @@ class HomeBaseVC: UITabBarController {
 extension HomeBaseVC: UITabBarControllerDelegate {
     //MARK: Delegate
     
-    func showNChatUnreadCountRedDot(){
+    func showNChatUnreadCountRedDot(count:Int){
+        
+       // let str = count > 10 ? "10+" : "\(count)"
+       // tabBar.items?[1].badgeValue = str
         self.showSmallRedDot(at: 1, tabBar: self.tabBar)
     }
     
     func removeChatUnreadCountRedDot(){
+       // tabBar.items?[1].badgeValue = nil
         self.removeSmallRedDot(at: 1, tabBar: self.tabBar)
     }
     
@@ -169,7 +197,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         let itemView = tabBarButtons[index]
 
         // Create the dot
-        let dotSize: CGFloat = 8
+        let dotSize: CGFloat = 9
         let dot = UIView(frame: CGRect(x: itemView.frame.width / 2 + 6, y: 6, width: dotSize, height: dotSize))
         dot.backgroundColor = .red
         dot.layer.cornerRadius = dotSize / 2

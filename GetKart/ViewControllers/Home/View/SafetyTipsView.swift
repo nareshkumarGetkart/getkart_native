@@ -10,6 +10,7 @@ import SwiftUI
 struct SafetyTipsView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var listArray = [TipsModel]()
+     var btnTitle = "Continue to offer"
     var onContinueOfferTap: (() -> Void)?
 
     var body: some View {
@@ -42,7 +43,7 @@ struct SafetyTipsView: View {
                 .padding([.horizontal,.bottom],20)
                 
                 
-                Button("Continue to offer") {
+                Button(btnTitle) {
 
                     presentationMode.wrappedValue.dismiss()
                     onContinueOfferTap?()

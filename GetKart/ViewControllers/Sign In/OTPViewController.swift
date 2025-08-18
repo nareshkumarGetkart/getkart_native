@@ -8,6 +8,9 @@
 import UIKit
 import SwiftUI
 
+
+var SALT_TOKEN_TO_SEND = ""
+
 class OTPViewController: UIViewController {
     @IBOutlet weak var lblMobileNo:UILabel!
     @IBOutlet weak var txtOtp:UITextFieldX!
@@ -91,8 +94,8 @@ class OTPViewController: UIViewController {
     }
     
     @IBAction func reSendOTPApi(){
-        
-        resendOtpApi()
+        saltGeneratorApi()
+      //  resendOtpApi()
         startTimer()
         
     }
@@ -100,10 +103,13 @@ class OTPViewController: UIViewController {
     //MARK: Api Methods
     func verifyMobileOTPApi(){
         
-        let params = ["mobile": mobile, "countryCode":countryCode, "otp":txtOtp.text ?? ""] as [String : Any]
+      //  let params = ["mobile": mobile, "countryCode":countryCode, "otp":txtOtp.text ?? ""] as [String : Any]
         
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.verifyMobileOtpUrl, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+        let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
+
+        let params = ["mobile": mobile, "countryCode":"\(countryCode)", "otp":txtOtp.text ?? "","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())","salt_token":"\(SALT_TOKEN_TO_SEND)"] as [String : Any]
+ 
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.verify_mobile_otp_handler, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
             
             if(error != nil)
@@ -180,7 +186,90 @@ class OTPViewController: UIViewController {
     
     //MARK: Api Methods
     
-    func resendOtpApi(){
+    
+    func saltGeneratorApi(){
+        
+        
+        let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
+        let params = ["mobile": mobile, "countryCode":"\(countryCode)","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        
+//        'http://localhost/api/v1/salt-handler?deviceid=123&plateform=ios&authtype=basic&appversion=1.2&mobile=9312069552&countryCode=%2B91' \
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.salt_handler, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+               // let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        if let salt_token = data["salt_token"] as? String{
+                            self?.sendOTPApi(saltKey: salt_token)
+                        }
+                    }
+               
+                }
+                
+            }
+        }
+    }
+    
+    
+    func sendOTPApi(saltKey:String){
+      
+        let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
+
+        let params = ["mobile": mobile, "countryCode":"\(countryCode)","salt_token":saltKey,"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.send_mobile_otp_handler, param: params, methodType: .post,showLoader:false) {  responseObject, error in
+            
+//        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
+//
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        if let salt_token = data["salt_token"] as? String{
+                            SALT_TOKEN_TO_SEND = salt_token
+                        }
+                    }
+                    AlertView.sharedManager.showToast(message: message)
+                }else{
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+                
+            }
+        }
+    }
+    
+    
+    
+    
+  /*  func resendOtpApi(){
         let params = ["mobile": mobile, "countryCode":countryCode] as [String : Any]
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:true) {  responseObject, error in
@@ -205,6 +294,7 @@ class OTPViewController: UIViewController {
             }
         }
     }
+    */
     
     func userSignupApi(tempToken:String){
         timer?.invalidate()

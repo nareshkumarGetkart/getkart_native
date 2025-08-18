@@ -32,6 +32,9 @@ struct ItemDetailView: View {
     @State var isMyProduct = false
     @State private var showConfirmDialog = false
     // Declare callback function variable
+    
+    @State private  var isCreateRoomSafetyTips = false
+
     var returnValue: ((_ value: ItemModel?)->())?
     
     
@@ -252,7 +255,7 @@ struct ItemDetailView: View {
                         let (bgColor, titleColor, displayStatus) = statusColors(for: status)
                         
                         Text(displayStatus.capitalized)
-                            .font(Font.manrope(.medium, size: 15))
+                            .font(Font.manrope(.medium, size: 14))
                             .foregroundColor(titleColor)
                             .padding(.horizontal)
                             .frame(height: 30)
@@ -266,9 +269,10 @@ struct ItemDetailView: View {
                         Image("location_icon").renderingMode(.template).foregroundColor(.orange)
                         Text(objVM.itemObj?.address ?? "")
                         .lineLimit(1)
-                        .font(Font.manrope(.medium, size: 15))
+                        .font(Font.manrope(.medium, size: 16))
                         Spacer()
                     }
+                  
                     
                     Text(getFormattedCreatedDate())
                         .font(Font.manrope(.medium, size: 15))
@@ -284,14 +288,14 @@ struct ItemDetailView: View {
                         VStack{
                             Spacer()
                             Text("Post your ad, attract more clients and sell faster")
-                                .font(.subheadline)
+                                .font(.manrope(.regular, size: 16.0))
                                 .padding(.top,10)
                             
                             HStack{
                                 Button(action: {
                                    self.objVM.postNowApi(nav: self.navController)
                                 }) {
-                                    Text("Post Now").frame(width: 140, height: 40, alignment: .center)
+                                    Text("Post Now").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
                                         .foregroundColor(.white)
                                         .background(Color.orange)
                                         .cornerRadius(8)
@@ -317,7 +321,7 @@ struct ItemDetailView: View {
                         VStack{
                             Spacer()
                             Text("Boost your ad, attract more clients and sell faster")
-                                .font(.subheadline)
+                                .font(.manrope(.regular, size: 16.0))
                                 .padding(.top,10)
                             
                             HStack{
@@ -326,7 +330,7 @@ struct ItemDetailView: View {
                                     self.objVM.makeItemFeaturd(nav: self.navController)
 
                                 }) {
-                                    Text("Create Boost Ad").frame(width: 140, height: 40, alignment: .center)
+                                    Text("Create Boost Ad").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
                                         .foregroundColor(.white)
                                         .background(Color.orange)
                                         .cornerRadius(8)
@@ -355,10 +359,12 @@ struct ItemDetailView: View {
                     if let arr = objVM.itemObj?.customFields{
                         ForEach(arr){obj in
                             
-                            InfoView(icon: obj.image ?? "",
-                                     text: obj.name ?? "",
-                                     value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),
-                                     navController: self.navController)
+                            if (obj.value?.count ?? 0) > 0 {
+                                InfoView(icon: obj.image ?? "",
+                                         text: obj.name ?? "",
+                                         value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),
+                                         navController: self.navController)
+                            }
                         }
                     }
                 }
@@ -367,11 +373,17 @@ struct ItemDetailView: View {
                 VStack(alignment:.leading) {
                     Divider().padding(.top)
                     Text("About this item").font(Font.manrope(.semiBold, size: 16))
-                    Text(objVM.itemObj?.description ?? "")
-                    .font(Font.manrope(.regular, size: 15))
-                    .foregroundColor(.gray)
+//                    Text(objVM.itemObj?.description ?? "")
+//                    .font(Font.manrope(.regular, size: 15))
+//                    .foregroundColor(.gray)
+//                    
+                    ExpandableTextView(
+                        text: objVM.itemObj?.description ?? "",
+                        lineLimit: 5
+                    )
+
                     
-                    Divider()//.padding(.bottom,5)
+                    Divider()
                   
                     
                     let sellerName = objVM.itemObj?.user?.name ?? ""
@@ -388,28 +400,14 @@ struct ItemDetailView: View {
                          self.navController?.pushViewController(hostingController, animated: true)
                      }
                     
-                    
-//                    SellerInfoView(name:sellerName , email: "", image: sellerPic, mobile:sellerMob ,mobileVisibility: isVisibleContact,isverified:sellerIsVerified)
-//                        .onTapGesture {
-//                        
-//                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.itemObj?.user.id ?? 0))
-//                        self.navController?.pushViewController(hostingController, animated: true)
-//                    }
-                    
-                  /*  SellerInfoView(name: objVM.sellerObj?.name ?? "", email: objVM.sellerObj?.email ?? "", image: objVM.sellerObj?.profile ?? "",mobile: objVM.sellerObj?.mobile ?? "",mobileVisibility:isVisibleContact,isverified:objVM.sellerObj?.isVerified ?? 0)
-                        .onTapGesture {
-                        
-                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: objVM.sellerObj?.id ?? 0))
-                        self.navController?.pushViewController(hostingController, animated: true)
-                    }*/
-                    
                     Text("Location").font(Font.manrope(.semiBold, size: 16))
                 }
                 
                 HStack{
                     Image("location_icon").renderingMode(.template)
                     .foregroundColor(.orange)
-                    Text(objVM.itemObj?.address ?? "")
+                    Text(objVM.itemObj?.address ?? "").font(Font.manrope(.medium, size: 16))
+
                     Spacer()
                 }
                 
@@ -610,14 +608,78 @@ struct ItemDetailView: View {
             }
         }
         
+        
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.createRoom.rawValue))) { notification in
+                
+                guard let data = notification.userInfo else{
+                    return
+                }
+                
+                if let dataDict = data["data"] as? Dictionary<String,Any>{
+                    
+                    let id = dataDict["id"] as? Int ?? 0
+                    let buyer_id = dataDict["buyer_id"] as? Int ?? 0
+                    let seller_id = dataDict["seller_id"] as? Int ?? 0
+                    let item_id = dataDict["item_id"] as? Int ?? 0
+                    
+                    if (item_id == objVM.itemObj?.id ){
+                        var userId = 0
+                        if Local.shared.getUserId() == buyer_id{
+                            userId = seller_id
+                        }else if Local.shared.getUserId() == seller_id{
+                            userId = buyer_id
+                        }
+                        objVM.itemObj?.isAlreadyOffered = true
+                        objVM.itemObj?.itemOffers = [ItemOffers(amount: Int(objVM.itemObj?.price ?? 0.0), buyerID: buyer_id, createdAt: nil, id: id, itemId: objVM.itemObj?.id, sellerID: seller_id, updatedAt: nil)]
+                                          
+                        let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                        destVC.item_offer_id = id
+                        destVC.userId = userId
+                        self.navController?.pushViewController(destVC, animated: true)
+                        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                    }
+                }
+            }
+        
         .sheet(isPresented: $showSheet) {
             // Always present the same view
             SafetyTipsView(onContinueOfferTap: {
                 self.showOfferPopup = true
             })
             // Apply detents and drag indicator only if iOS 16+
-            .modifier(PresentationModifier())
+            .modifier(PresentationModifier())            
         }
+        
+        
+        .fullScreenCover(isPresented: $showOfferPopup) {
+            if #available(iOS 16.4, *) {
+                MakeAnOfferView(
+                    isPresented: $showOfferPopup,
+                    sellerPrice: objVM.itemObj?.price ?? 0.0,
+                    onOfferSubmit: { offer in
+                        // submittedOffer = offer
+                       // print("User submitted offer: ₹\(offer)")
+                        callOfferSocket(amount: offer)
+                        
+                    }
+                ).presentationDetents([.large, .large]) // Optional for different heights
+                    .background(.clear) // Remove default background
+                    .presentationBackground(.clear)
+            } else {
+                // Fallback on earlier versions
+                
+                MakeAnOfferView(
+                    isPresented: $showOfferPopup,
+                    sellerPrice: objVM.itemObj?.price ?? 0.0,
+                    onOfferSubmit: { offer in
+                        // submittedOffer = offer
+                        callOfferSocket(amount: offer)
+                       // print("User submitted offer: ₹\(offer)")
+                    }
+                )
+            } // Works in iOS 16+
+        }
+
 
         
         let itemUserId = objVM.itemObj?.userID ?? 0
@@ -652,7 +714,7 @@ struct ItemDetailView: View {
                     }) {
                         
                         if ((objVM.itemObj?.status ?? "") == "expired"){
-                            Text("Renew")
+                            Text("Renew").font(.manrope(.semiBold, size: 16.0))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.white)
@@ -663,14 +725,14 @@ struct ItemDetailView: View {
                                         .stroke(Color.orange, lineWidth: 1)
                                 )
                         }else{
-                            Text("Edit")
+                            Text("Edit").font(.manrope(.semiBold, size: 16.0))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.orange)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
-                    }
+                    }.frame(height: 40)
                    
                     
                     Button(action: {
@@ -683,7 +745,7 @@ struct ItemDetailView: View {
                             .background(Color.orange)
                             .foregroundColor(.white)
                             .cornerRadius(10)
-                    }
+                    }.frame(height: 40)
                    // .padding([.leading,.trailing])
                     
                     .confirmationDialog("Confirm Remove",
@@ -713,7 +775,7 @@ struct ItemDetailView: View {
                         .background(Color.orange)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                }
+                }.frame(height: 40)
                 .padding([.leading,.trailing])
                 
                 .confirmationDialog("Confirm Remove",
@@ -746,7 +808,7 @@ struct ItemDetailView: View {
 //                            .foregroundColor(.white)
 //                            .cornerRadius(10)
                         
-                        Text("Edit")
+                        Text("Edit").font(.manrope(.semiBold, size: 16.0))
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.white)
@@ -756,7 +818,7 @@ struct ItemDetailView: View {
                                     .stroke(Color.orange, lineWidth: 1.5)
                             )
                             .cornerRadius(10)
-                    }
+                    }.frame(height: 40)
                     
                     Button(action: {
                         
@@ -779,7 +841,7 @@ struct ItemDetailView: View {
                         
                         if "Sold Out" == getButtonTitle(){
                             
-                            Text(getButtonTitle())
+                            Text(getButtonTitle()).font(.manrope(.semiBold, size: 16.0))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.orange)
@@ -787,102 +849,141 @@ struct ItemDetailView: View {
                                 .cornerRadius(10)
                            
                         }else{
-                            Text(getButtonTitle())
+                            Text(getButtonTitle()).font(.manrope(.semiBold, size: 16.0))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.gray)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
-                    }
+                    }.frame(height: 40)
                 }
                 .padding(.horizontal)
             }
         }else{
-            Button(action: {
+            //Offer and chat button both
+            if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
                 
-                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                Button(action: {
                     
-                    Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
-                    if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
-                                                
-                        let offerId =
-                        objVM.itemObj?.itemOffers?.first?.id ?? 0
-                        let sellerId =
-                        objVM.itemObj?.itemOffers?.first?.sellerID ?? 0
-                        let buyerId =
-                        objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
-                        var userId = 0
-                        if sellerId == Local.shared.getUserId(){
-                            userId = buyerId
-                        }else{
-                            userId = sellerId
-                        }
+                    if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                         
-                        //Already pushed same chat screen
-                        for controller in self.navController?.viewControllers ?? []{
+                        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                        if (objVM.itemObj?.isAlreadyOffered ?? false) == true{
+                                                    
+                            let offerId =
+                            objVM.itemObj?.itemOffers?.first?.id ?? 0
+                            let sellerId =
+                            objVM.itemObj?.itemOffers?.first?.sellerID ?? 0
+                            let buyerId =
+                            objVM.itemObj?.itemOffers?.first?.buyerID ?? 0
+                            var userId = 0
+                            if sellerId == Local.shared.getUserId(){
+                                userId = buyerId
+                            }else{
+                                userId = sellerId
+                            }
                             
-                            if let destController = controller as? ChatVC{
-                                if destController.userId == userId , destController.item_offer_id == offerId {
-                                    self.navController?.popToViewController(destController, animated: true)
-                                    return
+                            //Already pushed same chat screen
+                            for controller in self.navController?.viewControllers ?? []{
+                                
+                                if let destController = controller as? ChatVC{
+                                    if destController.userId == userId , destController.item_offer_id == offerId {
+                                        self.navController?.popToViewController(destController, animated: true)
+                                        return
+                                    }
                                 }
                             }
-                        }
-                        
-                        //Push new chat screen
-                        let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-                        destVC.item_offer_id = offerId
-                        destVC.userId = userId
-                        self.navController?.pushViewController(destVC, animated: true)
-                        
-                    }else{
-                        showSheet = true
-                        
-                    }
-                }
-                
-            }) {
-                
-                let str = (objVM.itemObj?.isAlreadyOffered ?? false) == true ? "Chat" : "Make an Offer"
-                Text(str)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.orange)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-            .padding([.leading,.trailing])
-            
-            
-            .fullScreenCover(isPresented: $showOfferPopup) {
-                if #available(iOS 16.4, *) {
-                    MakeAnOfferView(
-                        isPresented: $showOfferPopup,
-                        sellerPrice: objVM.itemObj?.price ?? 0.0,
-                        onOfferSubmit: { offer in
-                            // submittedOffer = offer
-                           // print("User submitted offer: ₹\(offer)")
-                            callOfferSocket(amount: offer)
+                            
+                            //Push new chat screen
+                            let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                            destVC.item_offer_id = offerId
+                            destVC.userId = userId
+                            self.navController?.pushViewController(destVC, animated: true)
+                            
+                        }else{
+                            showSheet = true
                             
                         }
-                    ).presentationDetents([.large, .large]) // Optional for different heights
-                        .background(.clear) // Remove default background
-                        .presentationBackground(.clear)
-                } else {
-                    // Fallback on earlier versions
+                    }
                     
-                    MakeAnOfferView(
-                        isPresented: $showOfferPopup,
-                        sellerPrice: objVM.itemObj?.price ?? 0.0,
-                        onOfferSubmit: { offer in
-                            // submittedOffer = offer
-                            callOfferSocket(amount: offer)
-                           // print("User submitted offer: ₹\(offer)")
+                }) {
+                    
+                    Text("Chat").font(.manrope(.semiBold, size: 16.0))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }.frame(height: 40)
+                .padding([.leading,.trailing])
+                
+            }else{
+                
+                HStack{
+              
+                    Button(action: {
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            
+                            //Call create offer Id sockeet
+                            isCreateRoomSafetyTips = true
+                            
                         }
-                    )
-                } // Works in iOS 16+
+                        
+                    
+                    }) {
+                        
+                        Text("Chat").font(.manrope(.semiBold, size: 16.0))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }.frame(height: 40)
+                  //  .padding([.leading,.trailing])
+                    
+                    .sheet(isPresented: $isCreateRoomSafetyTips) {
+                        // Always present the same view
+                        SafetyTipsView(btnTitle:"Continue to chat", onContinueOfferTap: {
+                            createRoom()
+                            
+                        })
+                        // Apply detents and drag indicator only if iOS 16+
+                        .modifier(PresentationModifier())
+                        
+                    }
+
+                    
+                    Spacer(minLength: 10)
+                 
+                    Button(action: {
+                        
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            
+                            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+                                
+                            showSheet = true
+                            
+                        }
+                        
+                    }) {
+                        
+                        Text("Make an Offer").font(.manrope(.semiBold, size: 16.0))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }.frame(height: 40)
+                   // .padding([.leading,.trailing])
+                    
+                   
+                    
+                }.padding([.leading,.trailing])
             }
+      
+            
+            
         }
     }
     
@@ -943,6 +1044,12 @@ struct ItemDetailView: View {
         
     }
     
+    
+    func createRoom(){
+        
+        let params = ["item_id":(objVM.itemObj?.id ?? 0)] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.createRoom.rawValue, params)
+    }
     
     func statusColors(for status: String) -> (Color, Color, String) {
         switch status {
@@ -1230,6 +1337,9 @@ struct InfoView: View {
         .padding(.horizontal)
         .padding(.bottom)
     }
+    
+    
+    
 }
 
 
@@ -1619,5 +1729,82 @@ struct PopGestureDetector: UIViewControllerRepresentable {
                 onPop()
             }
         }
+    }
+}
+
+
+
+struct ExpandableTextView: View {
+    let text: String
+    let lineLimit: Int
+    @State private var isExpanded = false
+    @State private var truncated = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ZStack {
+                Text(text)
+                    .font(.manrope(.regular, size: 15))
+                    .foregroundColor(.gray)
+                    .lineLimit(isExpanded ? nil : lineLimit)
+                    .background(
+                        TextSizeReader(text: text, font: .manrope(.regular, size: 15), lineLimit: lineLimit) { isTruncated in
+                            self.truncated = isTruncated
+                        }
+                    )
+            }
+
+            if truncated {
+                Button(action: {
+                    isExpanded.toggle()
+                }) {
+                    HStack{
+                        Spacer()
+                        Text(isExpanded ? "Read less" : "Read more")
+                            .font(.manrope(.semiBold, size: 16))
+                            .foregroundColor(.blue)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+        }
+    }
+}
+
+
+
+
+
+
+struct TextSizeReader: View {
+    let text: String
+    let font: Font
+    let lineLimit: Int
+    let onChange: (Bool) -> Void
+
+    var body: some View {
+        ZStack {
+            Text(text)
+                .font(font)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(
+                    GeometryReader { fullGeometry in
+                        Color.clear
+                            .onAppear {
+                                let fullHeight = fullGeometry.size.height
+                                DispatchQueue.main.async {
+                                    onChange(fullHeight > lineHeight * CGFloat(lineLimit))
+                                }
+                            }
+                    }
+                )
+        }
+        .hidden()
+    }
+
+    var lineHeight: CGFloat {
+        // Estimated height per line for 15pt font
+        18
     }
 }

@@ -234,8 +234,12 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
         cell.imgViewItem.clipsToBounds = true
         
         cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
-        cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
 
+        if ( obj.lastMessageTime ?? "").count > 0{
+            cell.setDateTime(isoDateString: obj.lastMessageTime ?? "")
+        }else{
+            cell.setDateTime(isoDateString: obj.createdAt ?? "")
+        }
         
         if (obj.item?.name ?? "").count == 0{
             cell.lblDesc.isHidden = true
@@ -243,7 +247,22 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
             cell.lblDesc.isHidden = false
         }
         
+         cell.lblLastMessage.isHidden = true
+
         if (obj.lastMessage?.message?.count ?? 0) > 0 {
+            cell.lblLastMessage.isHidden = false
+            cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
+            
+        }else  if obj.lastMessage?.audio?.count ?? 0 > 0 {
+            cell.lblLastMessage.text = "📢"
+            cell.lblLastMessage.isHidden = false
+
+        }else if obj.lastMessage?.file?.count ?? 0 > 0{
+            cell.lblLastMessage.text = "📝"
+            cell.lblLastMessage.isHidden = false
+        }
+        
+       /* if (obj.lastMessage?.message?.count ?? 0) > 0 {
             cell.lblLastMessage.isHidden = false
             
             if obj.lastMessage?.audio?.count ?? 0 > 0 {
@@ -252,8 +271,10 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblLastMessage.text = "📝"
             }
         }else{
-            cell.lblLastMessage.isHidden = true
+           
+                cell.lblLastMessage.isHidden = true
         }
+        */
         
         if (obj.readAt?.count ?? 0) == 0 && (obj.chatCount ?? 0 > 0){
             cell.lblDot.isHidden = false

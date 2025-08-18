@@ -148,16 +148,6 @@
                                             </stackView>
                                         </subviews>
                                     </stackView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JJE-aA-Ckz">
-                                        <rect key="frame" x="275" y="1" width="30" height="30"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="Qw2-t3-zEl"/>
-                                            <constraint firstAttribute="width" constant="30" id="tjF-33-Ifb"/>
-                                        </constraints>
-                                        <color key="tintColor" red="1" green="0.70980392160000005" blue="0.27450980390000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" image="gearshape.fill" catalog="system"/>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -169,9 +159,7 @@
                                     <constraint firstItem="QHe-Jn-gcN" firstAttribute="centerX" secondItem="hdO-nu-wLd" secondAttribute="centerX" id="Yce-Xr-1SH"/>
                                     <constraint firstAttribute="height" constant="100" id="aQi-8F-Zi0"/>
                                     <constraint firstItem="TQv-7M-ksk" firstAttribute="leading" secondItem="hdO-nu-wLd" secondAttribute="trailing" constant="-25" id="cOJ-33-LpC"/>
-                                    <constraint firstItem="JJE-aA-Ckz" firstAttribute="top" secondItem="4jh-lf-5Qy" secondAttribute="top" constant="1" id="vC0-5U-adf"/>
                                     <constraint firstItem="hdO-nu-wLd" firstAttribute="centerY" secondItem="4jh-lf-5Qy" secondAttribute="centerY" id="wdR-fb-Tv8"/>
-                                    <constraint firstAttribute="trailing" secondItem="JJE-aA-Ckz" secondAttribute="trailing" constant="5" id="yNe-Qc-JiB"/>
                                     <constraint firstItem="TQv-7M-ksk" firstAttribute="top" secondItem="hdO-nu-wLd" secondAttribute="bottom" constant="-25" id="ygb-1g-DbX"/>
                                 </constraints>
                             </view>
@@ -263,7 +251,6 @@
                 <outlet property="btnLogin" destination="6gw-zu-0Cc" id="H82-1E-lCZ"/>
                 <outlet property="btnPencil" destination="TQv-7M-ksk" id="lSx-P8-pig"/>
                 <outlet property="btnResubmit" destination="7fg-4C-Gg2" id="Xzv-qP-Gs1"/>
-                <outlet property="btnSetting" destination="JJE-aA-Ckz" id="Hhb-7n-aee"/>
                 <outlet property="imgVwProfile" destination="hdO-nu-wLd" id="vgj-LG-3m1"/>
                 <outlet property="lblEmail" destination="NLx-cz-HLM" id="9mh-Bk-LrY"/>
                 <outlet property="lblName" destination="NkV-Zq-Hpb" id="2yx-uX-9WG"/>
@@ -273,7 +260,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="gearshape.fill" catalog="system" width="128" height="123"/>
         <image name="pencil" width="25" height="25"/>
         <image name="user-circle" width="30" height="30"/>
         <image name="verified" width="3.6666667461395264" height="4.6666665077209473"/>
@@ -281,7 +267,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -22,15 +22,19 @@ class ProfileVC: UIViewController {
    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
+    @IBOutlet weak var btnSetting:UIButton!
+
     
+    @IBOutlet weak var lblAppVersion:UILabel!
+
   /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
-    
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Banner Promotions","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]//,"Delete Account","Logout"]
+    //,"Banner Promotions"
+    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
-    
-    let iconArray =  ["","promoted","buyPackages","mediaPromotion","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]//,"delete_account","logout"]
+//,"mediaPromotion"
+    let iconArray =  ["","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
@@ -58,6 +62,11 @@ class ProfileVC: UIViewController {
         
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        
+        btnSetting.layer.cornerRadius = btnSetting.frame.size.height/2.0
+        btnSetting.clipsToBounds = true
+        btnSetting.backgroundColor = Themes.sharedInstance.themeColor.withAlphaComponent(0.2)
+        lblAppVersion.text = "App version : \(UIDevice.appVersion)"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -71,7 +80,16 @@ class ProfileVC: UIViewController {
                 
                 getVerificationStatusApi()
             }
-        }
+                self.btnSetting.isHidden = false
+
+            }else{
+                self.btnSetting.isHidden = true
+            }
+    }
+    
+    //MARK: UIButton Action Methods
+    @IBAction func settingsBtnAction(_ sender : UIButton){
+        presentSettingView()
     }
     
     //MARK: Pull Down refresh
@@ -232,7 +250,6 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblStatus.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(statusTapped)))
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
                 cell.btnEditProfile.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
-                cell.btnSetting.addTarget(self, action: #selector(presentSettingView), for: .touchUpInside)
 
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
@@ -438,7 +455,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
         sheet.allowGestureThroughOverlay = false
         sheet.cornerRadius = 15
-        
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
      
         let settingView =  SettingsView(navigationController: self.navigationController) { [weak self] action in
 
