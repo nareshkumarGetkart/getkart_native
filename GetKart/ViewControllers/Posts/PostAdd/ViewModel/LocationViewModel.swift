@@ -32,9 +32,9 @@ class ConfirmLocationViewModel: ObservableObject {
             self.mapRegion.center = coord
             self.circle = MKCircle(center: coord, radius: 0.0)
             if locality.count > 0{
-                self.locationInfo = "\(locality), \(city), \(state)"//, \(country)"
+                self.locationInfo = "\(locality), \(city)\((city.count > 0) ? ", " : "") \(state)"//, \(country)"
             }else{
-                self.locationInfo = "\(city), \(state)"//, \(country)"
+                self.locationInfo = "\(city)\((city.count > 0) ? ", " : "") \(state)"//, \(country)"
             }
         })
    

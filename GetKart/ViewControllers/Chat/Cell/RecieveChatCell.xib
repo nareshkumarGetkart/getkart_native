@@ -103,7 +103,7 @@
                                             <constraint firstAttribute="height" constant="25" id="ghU-U8-7hy"/>
                                         </constraints>
                                     </imageView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Getkart want to pay you attention!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qg6-PM-iIt">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Getkart want you to pay Attention!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qg6-PM-iIt">
                                         <rect key="frame" x="45" y="10" width="225" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="0bp-UO-6IQ"/>

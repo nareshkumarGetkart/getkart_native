@@ -25,7 +25,7 @@ final class Constant: NSObject {
     let ErrorMessage = "No Network Connection. Please check your internet connection."
     var userActiveStatus = 0 //0-> account Unapproved ,1 - account Approved
     var isLaunchFirstTime = 1
-    
+    var xApiKey = ""
     private override init(){ }
     
     var baseURL:String {
@@ -54,6 +54,19 @@ final class Constant: NSObject {
     }
     
     
+    
+    var device_register:String {
+        get {
+            return "\(baseURL)/v1/device-register"
+        }
+    }
+    
+   
+    var device_refresh:String {
+        get {
+            return "\(baseURL)/v1/device-refresh"
+        }
+    }
     
     
     var salt_handler:String {
@@ -188,6 +201,14 @@ final class Constant: NSObject {
             
         }
     }
+
+    var get_areas:String{
+        get{
+            return "\(Constant.shared.baseURL)/areas"
+            
+        }
+    }
+    
     var get_seller:String{
         get{
             return "\(Constant.shared.baseURL)/v1/get-seller"

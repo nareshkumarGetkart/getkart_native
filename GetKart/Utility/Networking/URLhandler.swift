@@ -44,16 +44,16 @@ class URLhandler: NSObject{
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{
-                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion]
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }else{
-                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion]
+                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }
         }else{
-            let headers =  ["platform":"ios","appversion":UIDevice.appVersion]
+            let headers =  ["platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"Accept":"application/json"]
 //            if SALT_TOKEN_TO_SEND.count > 0{
 //                headers =  ["platform":"ios","appversion":UIDevice.appVersion,"salt_token":"\(SALT_TOKEN_TO_SEND)"]
 //            }

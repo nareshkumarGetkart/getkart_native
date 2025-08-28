@@ -12,7 +12,6 @@ import MapKit
 struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     
     @StateObject var viewModel = ConfirmLocationViewModel()
-
     @State var latitiude = 0.0
     @State var longitude = 0.0
     @State var isfirst = true
@@ -20,7 +19,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
     @State var imgName = ""
     @State var gallery_images:Array<Data> = []
     @State var gallery_imageNames:Array<String> = []
-     var navigationController: UINavigationController?
+    var navigationController: UINavigationController?
     @State var popType:PopType?
     @State var params:Dictionary<String,Any> = [:]
     var onAppeared: (() -> Void)?
@@ -144,10 +143,10 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     
                     
                     if locality.count > 0{
-                        self.params[AddKeys.address.rawValue] =  locality + "," + city + ", " + state //+ ", " + country
+                        self.params[AddKeys.address.rawValue] =  locality + "," + city + ((city.count > 0) ? ", " : "") + state //+ ", " + country
                         
                     }else{
-                        self.params[AddKeys.address.rawValue] = city + ", " + state //+ ", " + country
+                        self.params[AddKeys.address.rawValue] =   city +  ((city.count > 0) ? ", " : "") + state //+ ", " + country
                         
                     }
                     self.params[AddKeys.latitude.rawValue] = latitude

@@ -72,7 +72,7 @@ final class Local {
         return ""
     }
     
-    func saveUserLocation(city:String, state:String, country:String, latitude:String, longitude:String, timezone:String ) {
+    func saveUserLocation(city:String, state:String, country:String, latitude:String, longitude:String, timezone:String,locality:String = "") {
         
         UserDefaults.standard.setValue(city, forKey: LocalKeys.city.rawValue)
         UserDefaults.standard.setValue(state, forKey: LocalKeys.state.rawValue)
@@ -80,8 +80,14 @@ final class Local {
         UserDefaults.standard.setValue(latitude, forKey: LocalKeys.latitude.rawValue)
         UserDefaults.standard.setValue(longitude, forKey: LocalKeys.longitude.rawValue)
         UserDefaults.standard.setValue(timezone, forKey: LocalKeys.timezone.rawValue)
-        
+        UserDefaults.standard.setValue(locality, forKey: LocalKeys.locality.rawValue)
+
         UserDefaults.standard.synchronize()
+    }
+    
+    func getUserLocality() -> String{
+        
+        return UserDefaults.standard.value(forKey: LocalKeys.locality.rawValue) as? String ?? ""
     }
     
     func getUserCity() -> String{
@@ -169,6 +175,8 @@ enum LocalKeys:String,CaseIterable{
     case latitude = "latitude"
     case longitude = "longitude"
     case appTheme = "AppTheme"
+    case locality =  "locality"
+
 }
 
 

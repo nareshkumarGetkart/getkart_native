@@ -48,7 +48,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         btnLocation.setImageColor(color: .label)
         btnLocation.clipsToBounds = true
         configureTableView()
-        updateLocationLabel(city: Local.shared.getUserCity(), state: Local.shared.getUserState(), country: Local.shared.getUserCountry())
+        updateLocationLabel(city: Local.shared.getUserCity(), state: Local.shared.getUserState(), country: Local.shared.getUserCountry(), locality:  Local.shared.getUserLocality())
         homeVModel = HomeViewModel()
         homeVModel?.delegate = self
         homeVModel?.getProductListApi()
@@ -141,7 +141,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             let longitude = userInfo["longitude"] as? String ?? ""
             let locality = userInfo["locality"] as? String ?? ""
             
-            handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
+            handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude, locality: locality)
          
         }
     }
@@ -408,7 +408,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){
 
-        handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude)
+        handleLocationUpdate(city: city, state: state, country: country, latitude: latitude, longitude: longitude, locality: locality)
       
     }
 }
@@ -768,7 +768,7 @@ extension HomeVC {
         registerCells()
     }
 
-    func handleLocationUpdate(city: String, state: String, country: String, latitude: String, longitude: String) {
+    func handleLocationUpdate(city: String, state: String, country: String, latitude: String, longitude: String,locality:String) {
         homeVModel?.city = city
         homeVModel?.state = state
         homeVModel?.country = country
@@ -777,11 +777,13 @@ extension HomeVC {
         refreshTableOnFilterOrLocationChange()
         homeVModel?.getProductListApi()
         homeVModel?.getFeaturedListApi()
-        updateLocationLabel(city: city, state: state, country: country)
+        updateLocationLabel(city: city, state: state, country: country,locality: locality)
     }
 
-    func updateLocationLabel(city: String, state: String, country: String) {
+    func updateLocationLabel(city: String, state: String, country: String,locality:String) {
         var locStr = city
+       
+        if !locality.isEmpty { locStr  = "\(locality), \(city)" }
         if !state.isEmpty { locStr += ", \(state)" }
         if !country.isEmpty { locStr += ", \(country)" }
         lblAddress.text = locStr.isEmpty ? "All \(country)" : locStr

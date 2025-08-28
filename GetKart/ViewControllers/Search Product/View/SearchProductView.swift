@@ -256,8 +256,17 @@ struct SearchProductView: View {
         let city = Local.shared.getUserCity()
         let country = Local.shared.getUserCountry()
         let state = Local.shared.getUserState()
+        let locality = Local.shared.getUserLocality()
+
+        var locStr = locality
         
-        var locStr = "\(city) \(state) \(country)"
+        if locality.count > 0{
+            locStr += ",\(city) \(state) \(country)"
+
+        }else{
+            locStr = "\(city) \(state) \(country)"
+        }
+        
 
         if city.count == 0 && state.count == 0{
             locStr = "All India"

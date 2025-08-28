@@ -2,32 +2,24 @@
 import Foundation
 import SwiftUI
 import Alamofire
+import CoreLocation
 
-enum PopType{
-    case signUp
-    case filter
-    case home
-    case buyPackage
-    case createPost
-    case editPost
-    case categoriesSeeAll
-    case bannerPromotionLocation
-}
-
-struct CityLocationView: View {
+struct AreaLocationView: View {
     
     var navigationController: UINavigationController?
     var country:CountryModel = CountryModel()
     var state:StateModal = StateModal()
+    var city:CityModal = CityModal()
     var popType:PopType?
     var delLocationSelected:LocationSelectedDelegate?
+   
     @State private var pageNo = 1
     @State private var totalRecords = 1
-    @State private var arrCitiesSearch:Array<CityModal> = []
+    @State private var arrAreaSearch:Array<AreaModal> = []
     @State private var isDataLoading = false
     @State private var pageNoSearch = 1
     @State private var isSearching = false
-    @State var arrCities:Array<CityModal> = []
+    @State var arrAreas:Array<AreaModal> = []
     @State private var searchText = ""
     
     var body: some View {
@@ -41,7 +33,7 @@ struct CityLocationView: View {
                     Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }.frame(width: 40,height: 40)
                 
-                Text("\(self.state.name ?? "")").font(.custom("Manrope-Bold", size: 20.0))
+                Text("\(self.city.name ?? "")").font(.custom("Manrope-Bold", size: 20.0))
                     .foregroundColor(Color(UIColor.label))
                 Spacer()
             }.frame(height:44).background(Color(UIColor.systemBackground))
@@ -50,7 +42,7 @@ struct CityLocationView: View {
             HStack {
                 HStack {
                     Image("search").resizable().frame(width: 20,height: 20)
-                    TextField("Search City", text: $searchText)
+                    TextField("Search Area", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .padding(.horizontal, 8)
                         .frame(height: 36)
@@ -64,7 +56,7 @@ struct CityLocationView: View {
                             if newValue.count == 0{
                                 self.isSearching = false
                             }
-                            self.fetchCityListing()
+                            self.fetchAreaListing()
                         }
                     if searchText.count > 0 {
                         Button("Clear") {
@@ -97,13 +89,13 @@ struct CityLocationView: View {
             ScrollView{
                 LazyVStack {
                     if popType == .filter || popType == .home{
-                        CountryRow(strTitle:"All in \(state.name ?? "")")
+                        CountryRow(strTitle:"All in \(city.name ?? "")")
                             .frame(height: 40)
                             .padding(.horizontal)
                         
                             .onTapGesture{
                                 
-                                self.citySelected(city: CityModal())
+                                self.areaSelected(area: AreaModal(id: nil, name: nil, cityID: nil, stateID: nil, stateCode: nil, countryID: nil, createdAt: nil, updatedAt: nil))
                             }
                     }else {
                         CountryRow(strTitle:"Choose City",isArrowNeeded:false)
@@ -117,33 +109,33 @@ struct CityLocationView: View {
                     
                     if isSearching{
                         
-                        ForEach(arrCitiesSearch) { city in
-                            CountryRow(strTitle:city.name ?? "")
+                        ForEach(arrAreaSearch) { area in
+                            CountryRow(strTitle:area.name ?? "")
                                 .frame(height: 40)
                                 .padding(.horizontal)
                                 .onAppear{
-                                    checkAndCallApi(cityObj: city, isSearching: true)
+                                    checkAndCallApi(areaObj: area, isSearching: true)
                                 }
                                 .onTapGesture{
-                                   // self.citySelected(city: city)
-                                    self.fetchAreaListing(cityObj: city)
-
+                                    
+                                    self.getLatLongFromAddress(areaObj: area)
+                                   // self.areaSelected(arae: area)
                                 }
                             Divider()
                         }
                         
                     }else{
-                        ForEach(arrCities) { city in
-                            CountryRow(strTitle:city.name ?? "")
+                        ForEach(arrAreas) { area in
+                            CountryRow(strTitle:area.name ?? "")
                                 .frame(height: 40)
                                 .padding(.horizontal)
                                 .onAppear{
-                                    checkAndCallApi(cityObj: city, isSearching: false)
+                                    checkAndCallApi(areaObj: area, isSearching: false)
                                 }
                                 .onTapGesture{
-                                 //   self.citySelected(city: city)
-                                    
-                                    self.fetchAreaListing(cityObj: city)
+                                  //  self.areaSelected(city: area)
+                                    self.getLatLongFromAddress(areaObj: area)
+
                                 }
                             Divider()
                         }
@@ -155,7 +147,7 @@ struct CityLocationView: View {
             Spacer()
             
         }.onAppear{
-            self.fetchCityListing()
+            self.fetchAreaListing()
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
@@ -164,43 +156,43 @@ struct CityLocationView: View {
     }
   
     
-    func checkAndCallApi(cityObj:CityModal,isSearching:Bool){
+    func checkAndCallApi(areaObj:AreaModal,isSearching:Bool){
         
         if isSearching{
-            if  let cityId = arrCitiesSearch.last?.id, cityObj.id == cityId{
-                fetchCityListing()
+            if  let areaId = arrAreaSearch.last?.id, areaObj.id == areaId{
+                fetchAreaListing()
             }
             
         }else{
           
-            if  let cityId = arrCities.last?.id, cityObj.id == cityId{
-                if self.totalRecords != arrCities.count {
-                    fetchCityListing()
+            if  let areaId = arrAreas.last?.id, areaObj.id == areaId{
+                if self.totalRecords != arrAreas.count {
+                    fetchAreaListing()
                 }
             }
         }
     }
     
-    func fetchCityListing(){
+    func fetchAreaListing(){
         guard !isDataLoading else { return }
 
-        var url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNo)&search=" //&search=\(searchText)"
+        var url = Constant.shared.get_areas + "?city_id=\(city.id ?? 0)&page=\(pageNo)&search=" //&search=\(searchText)"
         
         if isSearching{
-            url = Constant.shared.get_Cities + "?state_id=\(state.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
+             url = Constant.shared.get_areas + "?city_id=\(city.id ?? 0)&page=\(pageNoSearch)&search=\(searchText)"
         }
        
         self.isDataLoading = true
 
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:CityParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:AreaModelParse) in
             
             if obj.code == 200{
                 if self.isSearching{
                     
                     if self.pageNoSearch == 1 {
-                        self.arrCitiesSearch.removeAll()
+                        self.arrAreaSearch.removeAll()
                     }
-                    self.arrCitiesSearch.append(contentsOf: obj.data?.data ?? [])
+                    self.arrAreaSearch.append(contentsOf: obj.data?.data ?? [])
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                         self.isDataLoading = false
@@ -209,7 +201,7 @@ struct CityLocationView: View {
                
                 }else{
                     totalRecords  = obj.data?.total ?? 0
-                    self.arrCities.append(contentsOf:obj.data?.data ?? [])
+                    self.arrAreas.append(contentsOf:obj.data?.data ?? [])
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                         self.isDataLoading = false
                         self.pageNo = pageNo + 1
@@ -224,53 +216,20 @@ struct CityLocationView: View {
    }
    
     
-    func fetchAreaListing(cityObj:CityModal){
-        guard !isDataLoading else { return }
-        
-        let url = Constant.shared.get_areas + "?city_id=\(cityObj.id ?? 0)&page=1&search="
-        self.isDataLoading = true
-        
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: url) { (obj:AreaModelParse) in
-            
-            if obj.code == 200{
-                
-                let arrAreas = obj.data?.data ?? []
-                
-                if arrAreas.count > 0{
-                    
-                    var rootView = AreaLocationView(navigationController: self.navigationController, city: cityObj, popType: self.popType)
-                   // rootView.delLocationSelected = self
-                    let vc = UIHostingController(rootView: rootView)
-                    self.navigationController?.pushViewController(vc, animated: true)
-              
-                }else{
-                    self.citySelected(city: cityObj)
-                }
-              
-                self.isDataLoading = false
-                
-            }else{
-                self.isDataLoading = false
-                
-            }
-            
-        }
-    }
-    
-    func citySelected(city:CityModal) {
+    func areaSelected(area:AreaModal) {
         
         
          let data: [String: Any] = [
                         "city": city.name ?? "",
                         "state": self.state.name ?? "",
                         "country": self.country.name ?? "",
-                        "latitude": city.latitude ?? "",
-                        "longitude": city.longitude ?? "",
-                        "locality": "",
+                        "latitude": area.latitude ?? "",
+                        "longitude": area.longitude ?? "",
+                        "locality": area.name ?? "",
                      ]
         
         if popType == .home || popType == .signUp{
-            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", latitude:city.latitude ?? "", longitude:city.longitude ?? "", timezone: "")
+            Local.shared.saveUserLocation(city: city.name ?? "", state: self.state.name ?? "", country: self.country.name ?? "", latitude:area.latitude ?? "", longitude:area.longitude ?? "", timezone: "",locality: area.name ?? "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {
@@ -335,9 +294,32 @@ struct CityLocationView: View {
             }
         }
     }
+    
+    
+    func getLatLongFromAddress(areaObj:AreaModal){
+        
+        let address = "\(areaObj.name ?? "") \(city.name ?? "") \(state.name ?? "") \(country.name ?? "")"
+        let geocoder = CLGeocoder()
+        
+        geocoder.geocodeAddressString(address) {
+            placemarks, error in
+            let placemark = placemarks?.first
+            if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
+                
+                print("Lat: \(lat), Lon: \(lon)")
+                var obj =  areaObj
+                
+                obj.latitude = "\(lat)"
+                obj.longitude = "\(lon)"
+                self.areaSelected(area: obj)
+            }
+        }
+
+    
+    }
 }
 
 
 #Preview {
-    StateLocationView()
+    AreaLocationView()
 }

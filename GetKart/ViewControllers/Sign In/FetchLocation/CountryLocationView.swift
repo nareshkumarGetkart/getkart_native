@@ -18,7 +18,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     var locationManager = LocationManager()
     var navigationController: UINavigationController?
     var delLocationSelected:LocationSelectedDelegate!
-    
+    @State private var showSearch:Bool = false
     var body: some View {
         
         VStack(spacing: 0) {
@@ -88,6 +88,53 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             
             // MARK: - Current Location Row
             VStack(alignment:.leading){
+                
+                ZStack{
+                    HStack {
+                        Image("search").resizable().frame(width: 20,height: 20)
+                        TextField("Search city,area or locality", text: $searchText)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .padding(.horizontal, 8)
+                            .frame(height: 36)
+                            .tint(Color(Themes.sharedInstance.themeColor)).disabled(true)
+                           
+                    }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 1)
+                        
+                        Button(action: {
+                            showSearch = true
+                        }) {
+                            Color.clear
+                        }
+                        .contentShape(Rectangle())
+                        
+                    }
+                        
+                    }.padding()
+                    .sheet(isPresented: $showSearch) {
+                        PlaceSearchView { selected in
+                            print("User picked: \(selected)")
+                            
+                            placeApiLocSelected(selLoc: selected)
+                          
+                          //  self.navigationController?.popViewController(animated: true)
+
+                        }
+                    }
+                
+                    // Icon button on the right (for settings or any other action)
+                  /*  Button(action: {
+                        // Action for icon button
+                        
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.gray)
+                            .padding(.leading, 8)
+                    }*/
+                
+                
+                //
                 HStack {
                     
                     Button(action: {
@@ -277,6 +324,88 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     
     
     
+    
+    
+    func placeApiLocSelected(selLoc:SelectedPlace) {
+        
+        
+         let data: [String: Any] = [
+                        "city": selLoc.city ?? "",
+                        "state": selLoc.state ?? "",
+                        "country": selLoc.country ?? "",
+                        "latitude": "\(selLoc.latitude)",
+                        "longitude": "\(selLoc.longitude)",
+                        "locality": selLoc.locality ?? "",
+                     ]
+        
+        if popType == .home || popType == .signUp{
+            Local.shared.saveUserLocation(city: selLoc.city ?? "", state: selLoc.state ?? "", country: selLoc.country ?? "", latitude: "\(selLoc.latitude)", longitude:  "\(selLoc.longitude)", timezone: "",locality: selLoc.locality ?? "")
+        }
+        
+        for vc in self.navigationController?.viewControllers ?? [] {
+          
+            if popType == .buyPackage {
+                
+                if let vc1 = vc as? CategoryPlanVC  {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.buyPackageNewLocation.rawValue),
+                                                    object: nil, userInfo: data)
+                    self.navigationController?.popToViewController(vc1, animated: true)
+                    break
+                }
+                
+            }else if popType == .filter {
+                
+                if let vc1 = vc as? FilterVC  {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.filterNewLocation.rawValue),
+                                                    object: nil, userInfo: data)
+                    self.navigationController?.popToViewController(vc1, animated: true)
+                    break
+                }
+                
+            }else  if popType == .createPost {
+                
+                if let vc1 = vc as? ConfirmLocationHostingController {
+                    
+                    // Pop to that view controller
+                    self.navigationController?.popToViewController(vc1, animated: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.createPostNewLocation.rawValue),
+                                                        object: nil, userInfo: data)
+                    }
+                    break
+                }
+                
+            }else if popType == .signUp {
+                
+                if vc.isKind(of: UIHostingController<MyLocationView>.self) == true{
+                    
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            } else  if popType == .home {
+                
+                if vc.isKind(of: HomeVC.self) == true {
+                    if let vc1 = vc as? HomeVC {
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.homeNewLocation.rawValue),
+                                                        object: nil, userInfo: data)
+                        self.navigationController?.popToViewController(vc1, animated: true)
+                        break
+                    }
+                }
+            } else  if popType == .bannerPromotionLocation {
+                
+                if vc.isKind(of: UIHostingController<ChooseLocationBannerView>.self) == true{
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.bannerPromotionNewLocation.rawValue),
+                                                    object: nil, userInfo: data)
+                    self.navigationController?.popToViewController(vc, animated: true)
+                    break
+                }
+            }
+        }
+    }
+    
+
     func locationSelected() {
                 
         for vc in self.navigationController?.viewControllers ?? [] {

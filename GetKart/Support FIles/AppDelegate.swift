@@ -11,7 +11,7 @@ import FirebaseCore
 import FirebaseMessaging
 import SwiftUI
 import Kingfisher
-
+import GooglePlaces
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -31,10 +31,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var roomId = 0
     var itemId = 0
     private let isForceAppUpdate = true
+    private var isDeviceRegistered = false
+    
    // var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+     
+
         self.window = UIWindow(frame: UIScreen.main.bounds)
        // self.window?.overrideUserInterfaceStyle = .light
         applyTheme()
@@ -43,7 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.navigationController?.isNavigationBarHidden = true
         
         self.setupKingfisherSettings()
-        self.getSettingsApi()
         
         if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
             updateChecker.delegate = self
@@ -53,12 +55,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 updateChecker.showUpdateWithConfirmation()
             }
         }
-  
+       
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
         registerForRemoteNotification(application: application)
         
+//        GMSPlacesClient.provideAPIKey("AIzaSyC3783IubyvkwUH97MjCmaJ4d3-9IraMb4")
+        GMSPlacesClient.provideAPIKey("AIzaSyBuCMK0nPRM2xsoy8qfRvosrMTeQ2kn1rA")
+
+       // navigateToHomeOrLogin()
+  
+        IQKeyboardManager.shared.isEnabled = true
+        IQKeyboardManager.shared.resignOnTouchOutside = true
+        
+        // Handle notification if app was launched by tapping a push notification
+        if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+            print("Notification Launch Payload: \(remoteNotification)")
+            
+            self.notificationType = remoteNotification["type"] as? String ?? ""
+            self.userId = Int(remoteNotification["sender_id"] as? String ?? "0") ?? 0
+            self.roomId = Int(remoteNotification["item_offer_id"] as? String ?? "0") ?? 0
+            self.itemId = Int(remoteNotification["item_id"] as? String ?? "0") ?? 0
+            
+            if self.userId == 0 {
+                self.userId = Int(remoteNotification["user_id"] as? String ?? "0") ?? 0
+            }
+            if self.userId == 0 {
+                self.userId = Int(remoteNotification["seller_id"] as? String ?? "0") ?? 0
+            }
+            
+            Constant.shared.isLaunchFirstTime = 1
+        }
+        
+        
+        self.deviceRegisterApi()
+        
+        return true
+    }
+    
+    
+    private func navigateToHomeOrLogin(){
         
         if Local.shared.getUserId() > 0{
             
@@ -86,31 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.navigationController?.navigationBar.isHidden = true
         self.window?.setRootViewController(self.navigationController!, options: .init(direction: .fade, style: .easeOut))
         
-        IQKeyboardManager.shared.isEnabled = true
-        IQKeyboardManager.shared.resignOnTouchOutside = true
-        
-        // Handle notification if app was launched by tapping a push notification
-        if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-            print("Notification Launch Payload: \(remoteNotification)")
-            
-            self.notificationType = remoteNotification["type"] as? String ?? ""
-            self.userId = Int(remoteNotification["sender_id"] as? String ?? "0") ?? 0
-            self.roomId = Int(remoteNotification["item_offer_id"] as? String ?? "0") ?? 0
-            self.itemId = Int(remoteNotification["item_id"] as? String ?? "0") ?? 0
-            
-            if self.userId == 0 {
-                self.userId = Int(remoteNotification["user_id"] as? String ?? "0") ?? 0
-            }
-            if self.userId == 0 {
-                self.userId = Int(remoteNotification["seller_id"] as? String ?? "0") ?? 0
-            }
-            
-            Constant.shared.isLaunchFirstTime = 1
-        }
-        
-        return true
     }
-    
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return .portrait
@@ -176,6 +189,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 updateChecker.delegate = self
                 updateChecker.showUpdateWithForce()
             }
+        }
+        
+        if isDeviceRegistered{
+            
+            self.deviceRefreshApi()
         }
     }
     
@@ -706,6 +724,47 @@ extension AppDelegate : ATAppUpdaterDelegate{
     
     func appUpdaterUserDidCancel(){
         
+    }
+    
+    
+    func deviceRegisterApi(){
+        
+        let params = ["device_id":UIDevice.getDeviceUIDid()] as [String : Any]
+        
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.device_register, param: params,methodType: .post,showLoader: false) {  responseObject, error in
+       
+            self.isDeviceRegistered = true
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let message = result["message"] as? String ?? ""
+                
+                if let data = result["data"] as? Dictionary<String, Any>{
+                    Constant.shared.xApiKey = data["key"] as? String ?? ""
+                    
+                    self.getSettingsApi()
+                    self.navigateToHomeOrLogin()
+
+
+                }
+            }
+        }
+    }
+    
+    
+    func deviceRefreshApi(){
+        let params:Dictionary<String,Any> = ["device_id":UIDevice.getDeviceUIDid()]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.device_refresh, param: params,methodType: .post) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let message = result["message"] as? String ?? ""
+                
+                if let data = result["data"] as? Dictionary<String, Any>{
+                    Constant.shared.xApiKey = data["key"] as? String ?? ""
+                }
+            }
+        }
     }
     
 }
