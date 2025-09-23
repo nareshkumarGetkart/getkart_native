@@ -429,15 +429,17 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             if (homeVModel?.featuredObj?.count ?? 0) == 0{
                 return 0
             }else if let obj = homeVModel?.featuredObj?[indexPath.item]{
+                if (obj.sectionData?.count ?? 0) == 0{ return 0} // section is empty
                 if (obj.style == "style_1") || (obj.style == "style_2") || (obj.style == "style_4"){
                     return  315
                 }
             }
         }
-        
-        
-        return UITableView.automaticDimension
+       
+        return  UITableView.automaticDimension
     }
+    
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -596,9 +598,10 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         }else if indexPath.section == 3{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
-            cell.cnstrntHeightSeeAllView.constant = 0
+            cell.cnstrntHeightSeeAllView.constant = 35 //0
             cell.btnSeeAll.setTitle("", for: .normal)
             cell.cllctnView.isScrollEnabled = false
+            cell.lblTtitle.text = "Suggested for You"
             cell.cellTypes = .product
             cell.listArray = homeVModel?.itemObj?.data
             cell.section = indexPath.section
@@ -609,6 +612,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             cell.cllctnView.reloadData()
             cell.updateConstraints()
             cell.navigationController = self.navigationController
+
             return cell
         }
         return UITableViewCell()
@@ -775,8 +779,8 @@ extension HomeVC {
         homeVModel?.latitude = latitude
         homeVModel?.longitude = longitude
         refreshTableOnFilterOrLocationChange()
-        homeVModel?.getProductListApi()
         homeVModel?.getFeaturedListApi()
+        homeVModel?.getProductListApi()
         updateLocationLabel(city: city, state: state, country: country,locality: locality)
     }
 

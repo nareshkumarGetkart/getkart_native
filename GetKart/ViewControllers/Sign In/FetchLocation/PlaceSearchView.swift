@@ -135,7 +135,6 @@ class PlacesSearch {
             completion(place)
         }
     }
-    
    
 }
 

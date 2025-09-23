@@ -69,7 +69,7 @@ class PayPlanVC: UIViewController {
     }
     
     func getPaymentSettings(){
-
+        
         URLhandler.sharedinstance.makeCall(url: Constant.shared.getPaymentSettings, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
             
             if(error != nil)
@@ -85,37 +85,38 @@ class PayPlanVC: UIViewController {
                 
                 if status == 200{
                     
+                    guard let self = self else { return }
+                    
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
-                        self?.payment_method_type = dataDict["payment_method_type"] as? Int ?? 0
+                        self.payment_method_type = dataDict["payment_method_type"] as? Int ?? 0
                         
-                        if self?.payment_method_type == 1 {
+                        if self.payment_method_type == 1 {
                             //IN App Purchase
-                       
-                        }else if self?.payment_method_type == 3 {//Phone Pay
+                            
+                        }else if self.payment_method_type == 3 {//Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
-                                self?.api_key = PhonePeDict["api_key"] as? String ?? ""
-                                self?.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
+                                self.api_key = PhonePeDict["api_key"] as? String ?? ""
+                                self.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
                                 
                                 var flowId = ""
-//                                let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-//                                if objLoggedInUser.id != nil {
+            
                                 if Local.shared.getUserId() > 0{
                                     flowId = "\(Local.shared.getUserId())"
                                 }
                                 
-                                self?.payment_method = "PhonePe"
+                                self.payment_method = "PhonePe"
                                 
                                 if devEnvironment == .live {
-                                    self?.ppPayment = PPPayment(environment: .production,
-                                                                flowId: flowId,
-                                                                merchantId: self?.merchantId ?? "",
-                                                                enableLogging: false)
+                                    self.ppPayment = PPPayment(environment: .production,
+                                                               flowId: flowId,
+                                                               merchantId: self.merchantId,
+                                                               enableLogging: false)
                                 }else {
-                                    self?.ppPayment = PPPayment(environment: .sandbox,
-                                                                flowId: flowId,
-                                                                merchantId: self?.merchantId ?? "", enableLogging: true)
+                                    self.ppPayment = PPPayment(environment: .sandbox,
+                                                               flowId: flowId,
+                                                               merchantId: self.merchantId, enableLogging: true)
                                 }
-                                
+
                             }
                         }
                     }
@@ -123,7 +124,6 @@ class PayPlanVC: UIViewController {
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
                 }
-                
             }
         }
     }
@@ -205,12 +205,8 @@ class PayPlanVC: UIViewController {
     }
     
     
-    
-    
-    
-    
     func startCheckoutPhonePay(orderId: String, token:String){
-        let appSchema = "Getkart IOS App"
+        let appSchema =  "getkart.com"//"Getkart IOS App"
         ppPayment.startCheckoutFlow(merchantId: merchantId,
                                     orderId: orderId,
                                     token: token,

@@ -360,7 +360,7 @@ class ItemDetailViewModel:ObservableObject{
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                     
-                    if (itemObj?.city?.count ?? 0) > 0 && (itemObj?.categoryID ?? 0) > 0 {
+                   if (itemObj?.city?.count ?? 0) > 0 && (itemObj?.categoryID ?? 0) > 0 {
                         
                         if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
                             destvc.hidesBottomBarWhenPushed = true

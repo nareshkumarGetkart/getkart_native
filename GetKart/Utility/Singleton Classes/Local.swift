@@ -20,6 +20,8 @@ final class Local {
     var currencySymbol:String = "₹"
     var companyEmail:String = "support@getkart.com"
     var companyTelelphone1:String = "8800957957"
+   
+    var placeApiKey:String = ""
 
 
     var isLogout = false

@@ -70,7 +70,7 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let height = collectionView.bounds.height
-        let widthCell: CGFloat = (cellTypes == .categories) ? 87 : (istoIncreaseWidth ? collectionView.bounds.width / 2.0 + 20.0 : collectionView.bounds.width / 2.0 - 2.5)
+        let widthCell: CGFloat = (cellTypes == .categories) ? 87 : (istoIncreaseWidth ? collectionView.bounds.width / 2.0 + 21.0 : collectionView.bounds.width / 2.0 - 11.5)
         return CGSize(width: widthCell, height: height)
     }
     

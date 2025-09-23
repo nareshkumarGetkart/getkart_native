@@ -223,6 +223,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
     
     func allStatesSelected() {
         
+ 
         let data: [String: Any] = [
                         "city": "",
                         "state": "",

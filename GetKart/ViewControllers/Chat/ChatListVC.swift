@@ -84,7 +84,6 @@ class ChatListVC: UIViewController {
                 
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        
     }
     
     
@@ -106,6 +105,15 @@ class ChatListVC: UIViewController {
       //  AppDelegate.sharedInstance.navigationController?.pushViewController(hostingController, animated: true) // Push to navigation stack
     }
     
+    func updateandcheckStatus(){
+        
+        SocketIOManager.sharedInstance.checkSocketStatus()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            
+            (self.pageMenu?.controllerArray[self.pageMenu?.currentPageIndex ?? 0] as? PageVisible)?.pageDidBecomeVisible()
+        })
+    }
 }
 
 extension ChatListVC : CAPSPageMenuDelegate {

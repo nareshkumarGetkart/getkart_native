@@ -308,8 +308,8 @@ class CreateAddDetailVC: UIViewController {
 
                 }else{
                     
-                    var pushImgData = self.imgData
-                    var pushImgName = self.imgName
+                    var pushImgData:Data? // = self.imgData
+                    var pushImgName = "" // self.imgName
                     var pushGalleryImg : Array<Data> = []
                     var pushGallery_imageNames : Array<String> = []
                     
@@ -406,7 +406,7 @@ class CreateAddDetailVC: UIViewController {
 
 extension CreateAddDetailVC:RefreshScreen {
     func refreshScreen() {
-       // print(self.objViewModel?.dataArray)
+        // print(self.objViewModel?.dataArray)
     }
 }
 

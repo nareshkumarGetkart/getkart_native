@@ -19,6 +19,8 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     var navigationController: UINavigationController?
     var delLocationSelected:LocationSelectedDelegate!
     @State private var showSearch:Bool = false
+    @State private var showAlert = false
+
     var body: some View {
         
         VStack(spacing: 0) {
@@ -89,40 +91,58 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             // MARK: - Current Location Row
             VStack(alignment:.leading){
                 
-                ZStack{
-                    HStack {
-                        Image("search").resizable().frame(width: 20,height: 20)
-                        TextField("Search city,area or locality", text: $searchText)
-                            .textFieldStyle(PlainTextFieldStyle())
-                            .padding(.horizontal, 8)
-                            .frame(height: 36)
-                            .tint(Color(Themes.sharedInstance.themeColor)).disabled(true)
-                           
-                    }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray, lineWidth: 1)
-                        
-                        Button(action: {
-                            showSearch = true
-                        }) {
-                            Color.clear
+                if Local.shared.placeApiKey.count > 0 {
+                    
+                    ZStack{
+                        HStack {
+                            Image("search").resizable().frame(width: 20,height: 20)
+                            TextField("Search city,area or locality", text: $searchText)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .padding(.horizontal, 8)
+                                .frame(height: 36)
+                                .tint(Color(Themes.sharedInstance.themeColor)).disabled(true)
+                            
+                        }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray, lineWidth: 1)
+                            
+                            Button(action: {
+                                showSearch = true
+                            }) {
+                                Color.clear
+                            }
+                            .contentShape(Rectangle())
+                            
                         }
-                        .contentShape(Rectangle())
-                        
-                    }
                         
                     }.padding()
-                    .sheet(isPresented: $showSearch) {
-                        PlaceSearchView { selected in
-                            print("User picked: \(selected)")
-                            
-                            placeApiLocSelected(selLoc: selected)
-                          
-                          //  self.navigationController?.popViewController(animated: true)
-
+                        .sheet(isPresented: $showSearch) {
+                            PlaceSearchView { selected in
+                                print("User picked: \(selected)")
+                                
+                                
+                                if popType == .createPost || popType == .buyPackage {
+                                    
+                                    if (selected.city?.count ?? 0) == 0{
+                                        showAlert = true
+                                    }else{
+                                        placeApiLocSelected(selLoc: selected)
+                                    }
+                                    
+                                }else{
+                                    placeApiLocSelected(selLoc: selected)
+                                }
+                                
+                                //  self.navigationController?.popViewController(animated: true)
+                                
+                            }
+                        }.alert("", isPresented: $showAlert) {
+                            Button("OK", role: .cancel) { }
+                        } message: {
+                            Text("Please select specific city or area.")
                         }
-                    }
-                
+                    
+                }
                     // Icon button on the right (for settings or any other action)
                   /*  Button(action: {
                         // Action for icon button
@@ -386,9 +406,10 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
+                   
+                        self.navigationController?.popToViewController(vc1, animated: true)
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.homeNewLocation.rawValue),
                                                         object: nil, userInfo: data)
-                        self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
                 }

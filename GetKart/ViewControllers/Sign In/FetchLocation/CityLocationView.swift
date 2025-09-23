@@ -2,6 +2,7 @@
 import Foundation
 import SwiftUI
 import Alamofire
+import CoreLocation
 
 enum PopType{
     case signUp
@@ -102,8 +103,9 @@ struct CityLocationView: View {
                             .padding(.horizontal)
                         
                             .onTapGesture{
+                                self.getLatLongOfAllCity(city: CityModal())
                                 
-                                self.citySelected(city: CityModal())
+                             //   self.citySelected(city: CityModal())
                             }
                     }else {
                         CountryRow(strTitle:"Choose City",isArrowNeeded:false)
@@ -257,7 +259,13 @@ struct CityLocationView: View {
         }
     }
     
+    
+    
+    
     func citySelected(city:CityModal) {
+        
+        
+        
         
         
          let data: [String: Any] = [
@@ -335,6 +343,48 @@ struct CityLocationView: View {
             }
         }
     }
+    
+    
+    func getLatLongOfAllCity(city:CityModal){
+        
+        var obj =  city
+        
+        obj.latitude = state.latitude ?? ""
+        obj.longitude = state.longitude ?? ""
+        self.citySelected(city: obj)
+       /*
+        let address = "\(city.name ?? "") \(state.name ?? "") \(country.name ?? "")"
+        let geocoder = CLGeocoder()
+        if let view = self.navigationController?.topViewController?.view{
+            Themes.sharedInstance.showActivityViewTop(uiView: view)
+        }
+            geocoder.geocodeAddressString(address) {
+                placemarks, error in
+                let placemark = placemarks?.first
+                if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
+                    
+                    print("Lat: \(lat), Lon: \(lon)")
+                    var obj =  city
+                    
+                    obj.latitude = "\(lat)"
+                    obj.longitude = "\(lon)"
+                    self.citySelected(city: obj)
+                }else{
+                    self.citySelected(city: city)
+                }
+                if let view = self.navigationController?.topViewController?.view{
+                    
+                    DispatchQueue.main.async {
+                        Themes.sharedInstance.removeActivityView(uiView: view)
+                        
+                    }
+                }
+                
+            }
+            */
+        
+    }
+
 }
 
 

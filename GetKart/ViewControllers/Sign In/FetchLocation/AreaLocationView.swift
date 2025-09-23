@@ -276,9 +276,10 @@ struct AreaLocationView: View {
                 
                 if vc.isKind(of: HomeVC.self) == true {
                     if let vc1 = vc as? HomeVC {
+                        self.navigationController?.popToViewController(vc1, animated: true)
+
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.homeNewLocation.rawValue),
                                                         object: nil, userInfo: data)
-                        self.navigationController?.popToViewController(vc1, animated: true)
                         break
                     }
                 }
@@ -301,8 +302,19 @@ struct AreaLocationView: View {
         let address = "\(areaObj.name ?? "") \(city.name ?? "") \(state.name ?? "") \(country.name ?? "")"
         let geocoder = CLGeocoder()
         
-        geocoder.geocodeAddressString(address) {
-            placemarks, error in
+        if let view = self.navigationController?.topViewController?.view{
+            Themes.sharedInstance.showActivityViewTop(uiView: view)
+        }
+        
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            
+            if let view = self.navigationController?.topViewController?.view{
+                
+                DispatchQueue.main.async {
+                    Themes.sharedInstance.removeActivityView(uiView: view)
+                    
+                }
+            }
             let placemark = placemarks?.first
             if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
                 
@@ -313,6 +325,11 @@ struct AreaLocationView: View {
                 obj.longitude = "\(lon)"
                 self.areaSelected(area: obj)
             }
+            else{
+               // self.areaSelected(area: areaObj)
+            }
+            
+          
         }
 
     

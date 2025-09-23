@@ -36,39 +36,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    // var settingsModel:SettingsModel?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-     
+        
 
         self.window = UIWindow(frame: UIScreen.main.bounds)
-       // self.window?.overrideUserInterfaceStyle = .light
+        // self.window?.overrideUserInterfaceStyle = .light
+        
         applyTheme()
-
+        
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         
-        self.setupKingfisherSettings()
+           let splashVC = SplashViewController() // simple UIViewController with logo/loader
+          navigationController?.viewControllers = [splashVC]
+          self.window?.rootViewController = navigationController
+          self.window?.makeKeyAndVisible()
         
-        if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
-            updateChecker.delegate = self
-            if isForceAppUpdate{
-                updateChecker.showUpdateWithForce()
-            }else{
-                updateChecker.showUpdateWithConfirmation()
-            }
-        }
-       
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
         reachabilityListener()
         registerForRemoteNotification(application: application)
         
-//        GMSPlacesClient.provideAPIKey("AIzaSyC3783IubyvkwUH97MjCmaJ4d3-9IraMb4")
-        GMSPlacesClient.provideAPIKey("AIzaSyBuCMK0nPRM2xsoy8qfRvosrMTeQ2kn1rA")
+            
 
-       // navigateToHomeOrLogin()
-  
-        IQKeyboardManager.shared.isEnabled = true
-        IQKeyboardManager.shared.resignOnTouchOutside = true
-        
         // Handle notification if app was launched by tapping a push notification
         if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
             print("Notification Launch Payload: \(remoteNotification)")
@@ -88,9 +77,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Constant.shared.isLaunchFirstTime = 1
         }
         
+
+        self.setupKingfisherSettings()
         
+        if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
+            updateChecker.delegate = self
+            if isForceAppUpdate{
+                updateChecker.showUpdateWithForce()
+            }else{
+                updateChecker.showUpdateWithConfirmation()
+            }
+        }
+        
+        IQKeyboardManager.shared.isEnabled = true
+        IQKeyboardManager.shared.resignOnTouchOutside = true
+        
+
         self.deviceRegisterApi()
-        
+
         return true
     }
     
@@ -216,20 +220,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     let userId = urlArray?.last ?? ""
                     //https://getkart.com/seller/213619
-                  
-                    let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0))
-                    self.navigationController?.pushViewController(hostingController, animated: true)
-                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        
+                        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0))
+                        self.navigationController?.pushViewController(hostingController, animated: true)
+                    }
                 }else  if myUrl?.range(of: "/product-details/") != nil {
                     
                     let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
                     
                    // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
-                    
-                    let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
-                    let hostingController = UIHostingController(rootView:siftUIview)
-                    hostingController.hidesBottomBarWhenPushed = true
-                    self.navigationController?.pushViewController(hostingController, animated: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        
+                        let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
+                        let hostingController = UIHostingController(rootView:siftUIview)
+                        hostingController.hidesBottomBarWhenPushed = true
+                        self.navigationController?.pushViewController(hostingController, animated: true)
+                    }
                 }
         }else{
             
@@ -527,6 +534,92 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userIdRecieved))
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }
+        case "chatReminder":
+            do{
+                
+                for controller in self.navigationController?.viewControllers ?? []{
+                    
+                    if let destvc =  controller as? HomeBaseVC{
+                        
+                        
+                        if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+                        }
+                        
+                        destvc.selectedIndex = 1
+                        
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                          
+                            navController.popToRootViewController(animated: false)
+                            
+                            // Notify the 3rd view controller to refresh
+                            if  let thirdVC = navController.viewControllers.first as? ChatListVC {
+                                thirdVC.updateandcheckStatus()
+                                break
+                            }
+
+                        }
+                    }
+                }
+            }
+      
+        case "draftItemReminder":
+            do{
+                
+                for controller in self.navigationController?.viewControllers ?? []{
+                    
+                    if let destvc =  controller as? HomeBaseVC{
+                        
+                        
+                        if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+                        }
+                        
+                        destvc.selectedIndex = 3
+                        
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                          
+                            navController.popToRootViewController(animated: false)
+
+                            // Notify the 3rd view controller to refresh
+                            if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
+                                thirdVC.refreshMyAds()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
       
         default:
             break
@@ -674,20 +767,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         AppDelegate.sharedInstance.navigationController?.viewControllers = [landingVC]
     }
     
-    func getSettingsApi(){
-
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_system_settings) { (obj:SettingsParse) in
-            
-            if (obj.code ?? 0) == 200 {
-               // self.settingsModel = obj.data
-                Local.shared.currencySymbol = obj.data?.currencySymbol ?? "₹"
-                Local.shared.companyEmail = obj.data?.companyEmail ?? "support@getkart.com"
-                Local.shared.companyTelelphone1 = obj.data?.companyTel1 ?? "8800957957"
-            }
-            
-        }
-    }
-   
+ 
     
     func isUserLoggedInRequest() -> Bool {
 
@@ -731,20 +811,20 @@ extension AppDelegate : ATAppUpdaterDelegate{
         
         let params = ["device_id":UIDevice.getDeviceUIDid()] as [String : Any]
         
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.device_register, param: params,methodType: .post,showLoader: false) {  responseObject, error in
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.device_register, param: params,methodType: .post,showLoader: false) {[weak self]  responseObject, error in
        
-            self.isDeviceRegistered = true
+            self?.isDeviceRegistered = true
             if error == nil {
-                let result = responseObject! as NSDictionary
-                let message = result["message"] as? String ?? ""
-                
-                if let data = result["data"] as? Dictionary<String, Any>{
-                    Constant.shared.xApiKey = data["key"] as? String ?? ""
-                    
-                    self.getSettingsApi()
-                    self.navigateToHomeOrLogin()
+                if  let result = responseObject{
+                    if let data = result["data"] as? Dictionary<String, Any>{
+                        Constant.shared.xApiKey = data["key"] as? String ?? ""
+                       DispatchQueue.main.async {
+                           self?.navigateToHomeOrLogin()
+                        }
+                        
+                        self?.getSettingsApi()
 
+                    }
 
                 }
             }
@@ -754,17 +834,78 @@ extension AppDelegate : ATAppUpdaterDelegate{
     
     func deviceRefreshApi(){
         let params:Dictionary<String,Any> = ["device_id":UIDevice.getDeviceUIDid()]
+        
         URLhandler.sharedinstance.makeCall(url: Constant.shared.device_refresh, param: params,methodType: .post) { responseObject, error in
             
             if error == nil {
-                let result = responseObject! as NSDictionary
-                let message = result["message"] as? String ?? ""
-                
-                if let data = result["data"] as? Dictionary<String, Any>{
-                    Constant.shared.xApiKey = data["key"] as? String ?? ""
+                if  let result = responseObject{
+                    if let data = result["data"] as? Dictionary<String, Any>{
+                        Constant.shared.xApiKey = data["key"] as? String ?? ""
+                    }
                 }
             }
         }
     }
     
+    func getSettingsApi(){
+
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.get_system_settings) { (obj:SettingsParse) in
+            
+            if (obj.code ?? 0) == 200 {
+               // self.settingsModel = obj.data
+                Local.shared.currencySymbol = obj.data?.currencySymbol ?? "₹"
+                Local.shared.companyEmail = obj.data?.companyEmail ?? "support@getkart.com"
+                Local.shared.companyTelelphone1 = obj.data?.companyTel1 ?? "8800957957"
+                Local.shared.placeApiKey = obj.data?.iosPlaceKey ?? ""
+                
+                if (obj.data?.iosPlaceKey ?? "").count > 0{
+                    GMSPlacesClient.provideAPIKey(obj.data?.iosPlaceKey ?? "")
+                }
+            }
+            
+        }
+    }
+
+}
+
+
+
+
+
+import UIKit
+
+class SplashViewController: UIViewController {
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "Logo") // replace with your logo asset name
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground   // or your theme color
+        
+        setupLogo()
+        
+        
+        if !AppDelegate.sharedInstance.isInternetConnected{
+            AlertView.sharedManager.showToast(message: "No internet connection")
+        }
+    }
+
+    private func setupLogo() {
+        view.addSubview(logoImageView)
+
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 250),
+            logoImageView.heightAnchor.constraint(equalToConstant: 140)
+        ])
+    }
+    
+   
 }

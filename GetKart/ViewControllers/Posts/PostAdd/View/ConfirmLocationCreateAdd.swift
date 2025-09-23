@@ -43,7 +43,7 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 if isfirst{
                     isfirst = false
                     
-                    if latitiude != 0{
+                     if latitiude != 0{
                         viewModel.mapRegion = MKCoordinateRegion(
                             center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude),
                             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -127,7 +127,6 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 }
                 
             }
-        
         
             .onReceive(NotificationCenter.default.publisher(for: Notification.Name(NotiKeysLocSelected.createPostNewLocation.rawValue))) { notification in
                 if let userInfo = notification.userInfo as? [String: Any] {
@@ -352,8 +351,6 @@ extension ConfirmLocationCreateAdd :LocationAutorizationUpdated {
 }
 
 
-
-
 import SwiftUI
 
 class ConfirmLocationHostingController: UIHostingController<ConfirmLocationCreateAdd> {
@@ -361,7 +358,7 @@ class ConfirmLocationHostingController: UIHostingController<ConfirmLocationCreat
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         // Ensure delegate call after view is fully shown
         DispatchQueue.main.async {
             self.onDidAppear?()

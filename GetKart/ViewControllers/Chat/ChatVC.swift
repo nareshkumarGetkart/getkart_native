@@ -1898,8 +1898,35 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             for match in matches {
                 if NSLocationInRange(index, match.range),
                    let url = match.url {
-                    UIApplication.shared.open(url)
-                    break
+                    
+                    let myUrl: String? = url.absoluteString
+                    let urlArray = myUrl?.components(separatedBy: "/")
+
+                        if myUrl?.range(of: "/seller/") != nil {
+                            
+                            let userId = urlArray?.last ?? ""
+                         
+                                
+                                let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0))
+                                self.navigationController?.pushViewController(hostingController, animated: true)
+                            
+                            break
+
+                        }else  if myUrl?.range(of: "/product-details/") != nil {
+                            
+                            let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
+                            
+                                
+                                let siftUIview = ItemDetailView(navController:  self.navigationController, itemId: 0, itemObj: nil, slug: slugName)
+                                let hostingController = UIHostingController(rootView:siftUIview)
+                                hostingController.hidesBottomBarWhenPushed = true
+                                self.navigationController?.pushViewController(hostingController, animated: true)
+                                break
+                        }else{
+                            UIApplication.shared.open(url)
+                            break
+                        }
+                 
                 }
             }
         }

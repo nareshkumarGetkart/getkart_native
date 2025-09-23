@@ -49,7 +49,8 @@ struct SettingsModel: Codable {
     let demoMode: Bool?
     let languages: [Language]?
     let admin: Admin?
-
+    let iosPlaceKey:String?
+    
     enum CodingKeys: String, CodingKey {
         case companyName = "company_name"
         case currencySymbol = "currency_symbol"
@@ -116,6 +117,7 @@ struct SettingsModel: Codable {
         case watermarkImage = "watermark_image"
         case demoMode = "demo_mode"
         case languages, admin
+        case iosPlaceKey
     }
 }
 

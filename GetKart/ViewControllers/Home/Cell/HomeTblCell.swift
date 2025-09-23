@@ -84,7 +84,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             return CGSize(width: self.cllctnView.bounds.size.width/3.0 + 60, height: 130)
         }else{
         
-            let widthCell = (istoIncreaseWidth) ? (self.cllctnView.bounds.size.width/2.0 + 20.0) : (self.cllctnView.bounds.size.width/2.0 - 2.5)
+            let widthCell = (istoIncreaseWidth) ? (self.cllctnView.bounds.size.width/2.0 + 20.0) : (self.cllctnView.bounds.size.width/2.0 - 2.0)
             return CGSize(width: widthCell , height: 260)
         }
     }
@@ -92,7 +92,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if cellTypes == .categories{
+         if cellTypes == .categories{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
             
             if let obj = listArray?[indexPath.item] as? CategoryModel{

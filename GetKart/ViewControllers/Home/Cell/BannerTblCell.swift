@@ -53,7 +53,7 @@ class BannerTblCell: UITableViewCell {
     
     func startTimer() {
         
-        timer =  Timer.scheduledTimer(timeInterval: 4.0, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        timer =  Timer.scheduledTimer(timeInterval: 7.0, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
     
     
@@ -93,7 +93,7 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collctnView.frame.size.width, height: 200)
+        return CGSize(width: self.collctnView.frame.size.width, height: 175)
         
     }
     

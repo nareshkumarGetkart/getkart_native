@@ -27,6 +27,7 @@ class MultipleAdsVC: UIViewController {
         tblView.register(UINib(nibName: "PackageAdsCell", bundle: nil), forCellReuseIdentifier: "PackageAdsCell")
         lblHeader.text = planListArray.first?.name ?? ""
         lblSubTitle.text = planListArray.first?.title ?? ""
+        lblTitle.text = "Package availability - \(planListArray.first?.duration ?? "") days"
     }
     
     //MARK: UIbutton Action Methods

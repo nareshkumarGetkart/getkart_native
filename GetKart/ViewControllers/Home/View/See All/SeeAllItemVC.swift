@@ -96,7 +96,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width:  (self.collctionView.bounds.size.width/2.0 - 2.5) , height: 260)
+        return CGSize(width:  (self.collctionView.bounds.size.width/2.0 - 2.0) , height: 260)
         
     }
     
