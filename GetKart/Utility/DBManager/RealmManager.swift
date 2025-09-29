@@ -179,6 +179,15 @@ class RealmManager: ObservableObject {
         }
     }
     
+    func updateMobileNo(mobile:String,code:String){
+        
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: Local.shared.getUserId()) {
+            try? realm.write {
+                user.mobile = mobile
+                user.country_code = code
+            }
+        }
+    }
     
     
     func updateMobileVisibility(status:Bool){

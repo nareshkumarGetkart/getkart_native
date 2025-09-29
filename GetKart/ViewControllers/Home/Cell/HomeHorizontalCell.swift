@@ -8,7 +8,7 @@
 import UIKit
 import SwiftUI
 import Kingfisher
-
+import FittedSheets
 
 protocol UPdateListDelegate:AnyObject{
     
@@ -162,6 +162,9 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             cell.prepareForReuse()
             if let obj = listArray?[indexPath.item] as? ItemModel {
                 cell.configure(with: obj, index: indexPath.item, likeAction: #selector(likebtnAction))
+                
+                cell.btnIsVerified.tag = indexPath.item
+                cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
             }
             return cell
         }
@@ -237,6 +240,12 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                 
             }
         }
+    }
+    
+    @objc func presentVerifiedView(){
+  
+        AppDelegate.sharedInstance.presentVerifiedInfoView()
+
     }
 }
 

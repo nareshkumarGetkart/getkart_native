@@ -43,17 +43,28 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                 if isfirst{
                     isfirst = false
                     
-                     if latitiude != 0{
-                        viewModel.mapRegion = MKCoordinateRegion(
-                            center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude),
-                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                        )
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                         
-                        viewModel.selectedCoordinate = CLLocationCoordinate2D(latitude: latitiude, longitude: longitude)
-                        
-                        viewModel.circle = MKCircle(center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude), radius: 0.0 as CLLocationDistance)
-                        self.updateStateCity1(for: viewModel.selectedCoordinate)
-                    }
+                        if latitiude != 0{
+                           viewModel.mapRegion = MKCoordinateRegion(
+                               center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude),
+                               span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                           )
+                           
+                           viewModel.selectedCoordinate = CLLocationCoordinate2D(latitude: latitiude, longitude: longitude)
+                           
+                           viewModel.circle = MKCircle(center: CLLocationCoordinate2D(latitude: latitiude, longitude: longitude), radius: 0.0 as CLLocationDistance)
+                            
+                            
+                            viewModel.selectedCoordinate = CLLocationCoordinate2D(latitude: latitiude, longitude: longitude)
+                         
+                            self.updateStateCity1(for: viewModel.selectedCoordinate)
+                            
+                            self.viewModel.locationInfo =  self.params[AddKeys.address.rawValue] as? String ?? ""
+                         
+                       }
+                    })
+                 
                     
                 }
                 
@@ -153,7 +164,9 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
                     self.params[AddKeys.country.rawValue] = country
                     self.params[AddKeys.city.rawValue] = city
                     self.params[AddKeys.state.rawValue] = state
-                    
+                   
+                    self.params[AddKeys.area.rawValue] = locality
+
                     DispatchQueue.main.async {
                         self.viewModel.updateLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country, locality: locality)
                     }
@@ -216,6 +229,9 @@ struct ConfirmLocationCreateAdd: View, LocationSelectedDelegate {
              self.params[AddKeys.country.rawValue] = country
              self.params[AddKeys.city.rawValue] = city
              self.params[AddKeys.state.rawValue] = state
+        
+             self.params[AddKeys.area.rawValue] = locality
+
          
          DispatchQueue.main.async {
              self.viewModel.updateLocation(latitude: latitude, longitude: longitude, city: city, state: state, country: country, locality: locality)

@@ -18,86 +18,80 @@ struct ProductCard: View {
     var body: some View {
         
         ZStack{
-        VStack(alignment: .leading) {
-            
-            ZStack(alignment: .topTrailing) {
+            VStack(alignment: .leading) {
                 
-                KFImage(URL(string: objItem.image ?? ""))
-                    .placeholder {
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(10)
-                    }
-                    .setProcessor(
-                      DownsamplingImageProcessor(size: CGSize(width: widthScreen,
-                                                                height: widthScreen))
-                    )
-                    .fade(duration: 0.25)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(10)
-                
-                
-                HStack{
+                ZStack(alignment: .topTrailing) {
                     
-                    if (objItem.isFeature ?? false) == true{
-                        Text("Featured").frame(width:75,height:20)
-                            .background(.orange)
-                            .cornerRadius(5)
-                            .foregroundColor(Color(UIColor.white))
-                            .padding(.horizontal).padding(.top)
-                            .font(.manrope(.regular, size: 13))
-
-                    }
-                    
-                    Spacer()
-                }
-
-            }
-            
-            
-            VStack(alignment: .leading){
-                Text("\(Local.shared.currencySymbol) \((objItem.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).lineLimit(1)
-                    .font(.headline)
-                    .foregroundColor(Color(hex: "#FF9900"))
-                Text(objItem.name ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
-                    .font(.subheadline)
-                HStack{
-                    Image("location-outline")
-                        .renderingMode(.template)
-                        .foregroundColor(Color(UIColor.label))
-                    Text(objItem.address ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-            }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20)
-            
-            
-        }
-        .background(Color(UIColor.systemBackground))
-        .cornerRadius(10)
-        .shadow(radius: 2)
-        .contentShape(Rectangle())
-          
-                HStack{
-                    Spacer()
-                    Button {
-                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                            var obj = objItem
-                            obj.isLiked = !(obj.isLiked ?? false)
-                            objItem = obj
-                            addToFavourite(itemId: objItem.id ?? 0)
-                            onItemLikeDislike(objItem)
+                    KFImage(URL(string: objItem.image ?? ""))
+                        .placeholder {
+                            Image("getkartplaceholder")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(10)
                         }
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: widthScreen,
+                                                                    height: widthScreen))
+                        )
+                        .fade(duration: 0.25)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(10)
+                    
+                    
+                    HStack{
+                        
+                        if (objItem.isFeature ?? false) == true{
+                            Text("Featured").frame(width:75,height:20)
+                                .background(.orange)
+                                .cornerRadius(5)
+                                .foregroundColor(Color(UIColor.white))
+                                .padding(.horizontal).padding(.top)
+                                .font(.manrope(.regular, size: 13))
+                            
+                        }
+                        
+                        Spacer()
+                    }
+                    
+                }.padding(.bottom)
+                
+                
+                VStack(alignment: .leading){
+                    Text("\(Local.shared.currencySymbol) \((objItem.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).lineLimit(1)
+                        .font(.headline)
+                        .foregroundColor(Color(hex: "#FF9900"))
+                    Text(objItem.name ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
+                        .font(.subheadline)
+                    HStack{
+                        Image("location-outline")
+                            .renderingMode(.template)
+                            .foregroundColor(Color(UIColor.label))
+                        Text(objItem.address ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    
+                }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20)
+                
+                
+            }
+            .background(Color(UIColor.systemBackground))
+            .cornerRadius(10)
+            .shadow(radius: 2)
+            .contentShape(Rectangle())
+            
+            HStack{
+                //
+                if (objItem.user?.isVerified ?? 0) == 1{
+                    Button {
+                        AppDelegate.sharedInstance.presentVerifiedInfoView()
                     } label: {
-                        let islike = ((objItem.isLiked ?? false) == true)
-                        Image( islike ? "like_fill" : "like")
+                        Image( "verifiedIcon").resizable().aspectRatio(contentMode: .fit)
                             .foregroundColor(.gray)
                             .padding(8)
                             .background(Color(UIColor.systemBackground))
@@ -105,14 +99,40 @@ struct ProductCard: View {
                             .shadow(radius: 3)
                         
                     }
-                        .frame(width: 55,height: 50)
-                        .padding([.trailing], 15)
-                        .allowsHitTesting(true)
+                    .frame(width: 40,height: 40)
+                    .padding([.leading], 15)
+                    .allowsHitTesting(true)
                     
-                }.padding(.top,widthScreen / 2.0 - 108)
-      
+                }
+                Spacer()
+                Button {
+                    if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                        var obj = objItem
+                        obj.isLiked = !(obj.isLiked ?? false)
+                        objItem = obj
+                        addToFavourite(itemId: objItem.id ?? 0)
+                        onItemLikeDislike(objItem)
+                    }
+                } label: {
+                    let islike = ((objItem.isLiked ?? false) == true)
+                    Image( islike ? "like_fill" : "like")
+                        .foregroundColor(.gray)
+                        .padding(8)
+                        .background(Color(UIColor.systemBackground))
+                        .clipShape(Circle())
+                        .shadow(radius: 3)
+                    
+                }
+                .frame(width: 50,height: 50)
+                .padding([.trailing], 15)
+                .allowsHitTesting(true)
+                
+            }.padding(.top,widthScreen / 2.0 - 108)
+            
+        }
     }
-    }
+    
+    
     
     func addToFavourite(itemId:Int){
         

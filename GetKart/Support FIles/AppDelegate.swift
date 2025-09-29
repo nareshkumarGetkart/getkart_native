@@ -12,6 +12,7 @@ import FirebaseMessaging
 import SwiftUI
 import Kingfisher
 import GooglePlaces
+import FittedSheets
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -789,6 +790,46 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
     }
     
+    
+ func presentVerifiedInfoView(){
+  
+        let controller = UIHostingController(rootView: SellerVeriedSheetView())
+
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        var fixedSize = 0.27
+        if UIDevice().hasNotch{
+            fixedSize = 0.27
+        }else{
+            if UIScreen.main.bounds.size.height <= 700 {
+                fixedSize = 0.38
+            }
+        }
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+              
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.percent(Float(fixedSize)),.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: true))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+     
+        
+        let settingView =  SellerVeriedSheetView()
+
+        controller.rootView = settingView
+   
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+    }
     
 }
 

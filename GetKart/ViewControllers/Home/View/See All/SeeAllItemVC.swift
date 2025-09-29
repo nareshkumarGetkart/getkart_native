@@ -8,7 +8,7 @@
 import UIKit
 import SwiftUI
 import Kingfisher
-
+import FittedSheets
 class SeeAllItemVC: UIViewController {
     
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
@@ -125,6 +125,9 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale)
             ])
+            cell.btnIsVerified.isHidden = (obj.user?.isVerified ?? 0) == 1 ? false : true
+            cell.btnIsVerified.tag = indexPath.item
+            cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
         }
         
         return cell
@@ -187,7 +190,11 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             }
         }
     }
-    
+    @objc func presentVerifiedView(){
+  
+        AppDelegate.sharedInstance.presentVerifiedInfoView()
+
+    }
 }
 
 

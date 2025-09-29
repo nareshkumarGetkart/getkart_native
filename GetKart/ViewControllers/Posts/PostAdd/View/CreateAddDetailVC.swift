@@ -27,6 +27,8 @@ enum AddKeys: String{
     case city
     case state
     case show_only_to_premium
+    case area
+
 }
 
 class CreateAddDetailVC: UIViewController {
@@ -128,6 +130,16 @@ class CreateAddDetailVC: UIViewController {
             params[AddKeys.video_link.rawValue] = self.itemObj?.videoLink ?? ""
             params[AddKeys.description.rawValue] = self.itemObj?.description ?? ""
             params["id"] = "\(self.itemObj?.id ?? 0)"
+            
+            
+            params[AddKeys.city.rawValue] =  self.itemObj?.city ?? ""
+            params[AddKeys.state.rawValue] =  self.itemObj?.state ?? ""
+            params[AddKeys.country.rawValue] =  self.itemObj?.country ?? ""
+            params[AddKeys.latitude.rawValue] =  self.itemObj?.latitude ?? ""
+            params[AddKeys.longitude.rawValue] =  self.itemObj?.longitude ?? ""
+            params[AddKeys.address.rawValue] =  self.itemObj?.address ?? ""
+
+            
             
             self.downloadImgData()
         }
@@ -247,9 +259,18 @@ class CreateAddDetailVC: UIViewController {
         return slug
     }
     
-    
+    func pushToValidateMobileNumber(){
+        if (params[AddKeys.contact.rawValue] as? String ?? "").count > 0 { return}
+        let destVc = UIHostingController(rootView: MobileNumberView(navigationController: self.navigationController,onDismissUpdatedMobile: { strMob in
+            self.params[AddKeys.contact.rawValue]  = strMob
+            self.tblView.reloadData()
+        }))
+        self.navigationController?.pushViewController(destVc, animated: true)
+    }
     
     @IBAction func nextButtonAction() {
+        
+        
         
         params[AddKeys.name.rawValue] = (params[AddKeys.name.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.price.rawValue] = (params[AddKeys.price.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -342,7 +363,7 @@ class CreateAddDetailVC: UIViewController {
                         }
                     }
                     
-                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData:pushImgData, imgName: pushImgName, gallery_images: pushGalleryImg, gallery_imageNames: pushGallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0,imgData:pushImgData, imgName: pushImgName, gallery_images: pushGalleryImg, gallery_imageNames: pushGallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                     
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
@@ -636,14 +657,17 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
             cell.btnOption.isHidden = true
-            cell.btnOptionBig.isHidden = true
+            cell.btnOptionBig.isHidden = false
             cell.textFieldDoneDelegate = self
             cell.txtField.maxLength = 11
             cell.lblErrorMsg.isHidden = true
             cell.lblCurSymbol.isHidden =  true
             cell.txtField.leftPadding = 10
             cell.showCurrencySymbol = false
+            
+           // cell.txtField.isUserInteractionEnabled = (params[AddKeys.contact.rawValue] as? String ?? "").count > 0 ? false : true
 
+            cell.btnOptionBig.addTarget(self, action: #selector(moileVerifyAction), for: .touchUpInside)
             cell.txtField.text = params[AddKeys.contact.rawValue] as? String ?? ""
             if showErrorMsg == true && (self.selectedRow != indexPath.row){
                 if (params[AddKeys.contact.rawValue] as? String ?? "") == "" {
@@ -694,6 +718,10 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
         }
         return UITableViewCell()
     }
+    
+    @objc func moileVerifyAction(){
+        pushToValidateMobileNumber()
+    }
 }
 
 
@@ -717,9 +745,13 @@ extension CreateAddDetailVC: TextFieldDoneDelegate, TextViewDoneDelegate{
 
     }
     
+    
     func textFieldEditingBegin(selectedRow:Int, strText:String){
         self.selectedRow = selectedRow
-        if selectedRow == 7{
+        if selectedRow == 6{
+            self.view.endEditing(true)
+            self.pushToValidateMobileNumber()
+        }else  if selectedRow == 7{
           
         }else{
             if let cell = tblView.cellForRow(at: IndexPath(row: selectedRow, section: 0)) as? TFCell{

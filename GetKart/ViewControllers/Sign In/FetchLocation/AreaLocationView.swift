@@ -21,7 +21,7 @@ struct AreaLocationView: View {
     @State private var isSearching = false
     @State var arrAreas:Array<AreaModal> = []
     @State private var searchText = ""
-    
+
     var body: some View {
         
         VStack(spacing: 0) {
@@ -299,41 +299,116 @@ struct AreaLocationView: View {
     
     func getLatLongFromAddress(areaObj:AreaModal){
         
-        let address = "\(areaObj.name ?? "") \(city.name ?? "") \(state.name ?? "") \(country.name ?? "")"
-        let geocoder = CLGeocoder()
         
-        if let view = self.navigationController?.topViewController?.view{
-            Themes.sharedInstance.showActivityViewTop(uiView: view)
-        }
-        
-        geocoder.geocodeAddressString(address) { placemarks, error in
-            
-            if let view = self.navigationController?.topViewController?.view{
-                
-                DispatchQueue.main.async {
-                    Themes.sharedInstance.removeActivityView(uiView: view)
-                    
-                }
-            }
-            let placemark = placemarks?.first
-            if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
-                
-                print("Lat: \(lat), Lon: \(lon)")
-                var obj =  areaObj
-                
-                obj.latitude = "\(lat)"
-                obj.longitude = "\(lon)"
-                self.areaSelected(area: obj)
-            }
-            else{
-               // self.areaSelected(area: areaObj)
-            }
-            
-          
-        }
+        if ((areaObj.latitude?.count ?? 0) == 0) && ((areaObj.longitude?.count ?? 0) == 0){
+            //  let address = "\(areaObj.name ?? "") \(city.name ?? "") \(state.name ?? "") \(country.name ?? "")"
+              
+              let parts = [areaObj.name, city.name, state.name, country.name]
+                  .compactMap { $0?.trimmingCharacters(in: .whitespaces) }
+                  .filter { !$0.isEmpty }
+              let address = parts.joined(separator: ", ")
 
-    
+              print("address = \(address)")
+              if let view = self.navigationController?.topViewController?.view{
+                  Themes.sharedInstance.showActivityViewTop(uiView: view)
+              }
+             
+            CLGeocoder().geocodeAddressString(address) { placemarks, error in
+
+                  if let view = self.navigationController?.topViewController?.view{
+                      
+                      DispatchQueue.main.async {
+                          Themes.sharedInstance.removeActivityView(uiView: view)
+                          
+                      }
+                  }
+                  let placemark = placemarks?.first
+                  if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
+                      
+                      print("Lat: \(lat), Lon: \(lon)")
+                      var obj =  areaObj
+                      
+                      obj.latitude = "\(lat)"
+                      obj.longitude = "\(lon)"
+                      self.areaSelected(area: obj)
+                  }
+                else{
+                    // self.areaSelected(area: areaObj)
+                    print(error?.localizedDescription ?? "")
+                    
+                   /* var obj =  areaObj
+                    obj.latitude =  city.latitude
+                    obj.longitude = city.longitude
+                    self.areaSelected(area: obj)
+                    */
+                  /*  fetchCoordinates(for: address, apiKey: Local.shared.placeApiKey) { result in
+                        switch result {
+                        case .success(let coord):
+                            print("Lat:", coord.latitude, "Lon:", coord.longitude)
+                            DispatchQueue.main.async {
+                                var obj =  areaObj
+                                obj.latitude = "\(coord.latitude)"
+                                obj.longitude = "\(coord.longitude)"
+                                self.areaSelected(area: obj)
+                            }
+                            
+                        case .failure(let err):
+                            print("Error:", err)
+                        }
+                    }*/
+
+                  }
+            }
+
+        }else{
+            self.areaSelected(area: areaObj)
+        }
+     
     }
+    
+    // only if you want to use CLLocationCoordinate2D
+
+    struct GeocodingResponse: Decodable {
+        struct Result: Decodable {
+            struct Geometry: Decodable {
+                struct Location: Decodable {
+                    let lat: Double
+                    let lng: Double
+                }
+                let location: Location
+            }
+            let geometry: Geometry
+        }
+        let results: [Result]
+        let status: String
+    }
+
+    func fetchCoordinates(for address: String, apiKey: String,
+                          completion: @escaping (Result<CLLocationCoordinate2D, Error>) -> Void) {
+
+        guard let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "https://maps.googleapis.com/maps/api/geocode/json?address=\(encoded)&key=\(apiKey)")
+        else { return }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error { completion(.failure(error)); return }
+
+            do {
+                let decoded = try JSONDecoder().decode(GeocodingResponse.self, from: data!)
+                if decoded.status == "OK", let first = decoded.results.first {
+                    let loc = first.geometry.location
+                    completion(.success(CLLocationCoordinate2D(latitude: loc.lat, longitude: loc.lng)))
+                } else {
+                    let err = NSError(domain: "Geocoding", code: 0,
+                                      userInfo: [NSLocalizedDescriptionKey: "Status: \(decoded.status)"])
+                    completion(.failure(err))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
 }
 
 

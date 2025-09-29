@@ -30,13 +30,13 @@
                         <rect key="frame" x="5" y="5" width="140" height="200"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="getkartplaceholder" translatesAutoresizingMaskIntoConstraints="NO" id="gUh-OP-mJO">
-                                <rect key="frame" x="0.0" y="0.0" width="140" height="125"/>
+                                <rect key="frame" x="0.0" y="0.0" width="140" height="121"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="125" id="UhK-Q4-nyp"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="120" id="UhK-Q4-nyp"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eBr-cc-kP0">
-                                <rect key="frame" x="90" y="107" width="30" height="30"/>
+                                <rect key="frame" x="95" y="103" width="30" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="GIe-Ta-AlW"/>
@@ -45,8 +45,18 @@
                                 <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
                                 <state key="normal" image="like"/>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bha-r8-Xo1">
+                                <rect key="frame" x="15" y="103" width="30" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="NL6-1Q-RDn"/>
+                                    <constraint firstAttribute="height" constant="30" id="wfb-Zs-M19"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
+                                <state key="normal" image="verifiedIcon"/>
+                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1nH-zE-z3D">
-                                <rect key="frame" x="7" y="133" width="128" height="18"/>
+                                <rect key="frame" x="7" y="135" width="128" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="fXE-49-DgD"/>
                                 </constraints>
@@ -55,7 +65,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NgW-8N-Ybu">
-                                <rect key="frame" x="7" y="152" width="128" height="20"/>
+                                <rect key="frame" x="7" y="154" width="128" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="a7M-rA-8Ap"/>
                                 </constraints>
@@ -95,12 +105,14 @@
                         <constraints>
                             <constraint firstItem="eBr-cc-kP0" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="-18" id="5c4-xp-mlJ"/>
                             <constraint firstItem="gUh-OP-mJO" firstAttribute="top" secondItem="lEd-a8-Reg" secondAttribute="top" id="GfW-td-gzn"/>
-                            <constraint firstItem="0Hi-BM-ZQM" firstAttribute="top" secondItem="NgW-8N-Ybu" secondAttribute="bottom" constant="5" id="Ggr-Tk-BW8"/>
+                            <constraint firstItem="0Hi-BM-ZQM" firstAttribute="top" secondItem="NgW-8N-Ybu" secondAttribute="bottom" constant="3" id="Ggr-Tk-BW8"/>
                             <constraint firstItem="1nH-zE-z3D" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="7" id="HYH-6j-zar"/>
                             <constraint firstItem="gUh-OP-mJO" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" id="LFW-SE-8C3"/>
+                            <constraint firstItem="bha-r8-Xo1" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="-18" id="NCx-MP-pVF"/>
                             <constraint firstItem="5Ym-I5-cww" firstAttribute="top" secondItem="lEd-a8-Reg" secondAttribute="top" constant="6" id="OHB-tu-Uhq"/>
+                            <constraint firstItem="bha-r8-Xo1" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="15" id="P1H-vi-XYZ"/>
                             <constraint firstItem="YJj-rV-5eX" firstAttribute="centerY" secondItem="0Hi-BM-ZQM" secondAttribute="centerY" id="ThC-kO-h8s"/>
-                            <constraint firstItem="1nH-zE-z3D" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="8" id="WLs-R7-8C5"/>
+                            <constraint firstItem="1nH-zE-z3D" firstAttribute="top" secondItem="gUh-OP-mJO" secondAttribute="bottom" constant="14" id="WLs-R7-8C5"/>
                             <constraint firstItem="NgW-8N-Ybu" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="7" id="Wew-ey-4l6"/>
                             <constraint firstAttribute="bottom" secondItem="0Hi-BM-ZQM" secondAttribute="bottom" constant="8" id="ZO7-wo-Atw"/>
                             <constraint firstItem="5Ym-I5-cww" firstAttribute="leading" secondItem="lEd-a8-Reg" secondAttribute="leading" constant="6" id="a0X-9W-GbQ"/>
@@ -111,7 +123,7 @@
                             <constraint firstAttribute="trailing" secondItem="gUh-OP-mJO" secondAttribute="trailing" id="niz-PE-Yzr"/>
                             <constraint firstAttribute="trailing" secondItem="NgW-8N-Ybu" secondAttribute="trailing" constant="5" id="qJ3-yn-6by"/>
                             <constraint firstAttribute="trailing" secondItem="1nH-zE-z3D" secondAttribute="trailing" constant="5" id="rIi-n2-nOi"/>
-                            <constraint firstAttribute="trailing" secondItem="eBr-cc-kP0" secondAttribute="trailing" constant="20" id="wwV-Fa-jh9"/>
+                            <constraint firstAttribute="trailing" secondItem="eBr-cc-kP0" secondAttribute="trailing" constant="15" id="wwV-Fa-jh9"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -126,6 +138,7 @@
             <size key="customSize" width="150" height="202"/>
             <connections>
                 <outlet property="bgView" destination="lEd-a8-Reg" id="uQF-K7-pbM"/>
+                <outlet property="btnIsVerified" destination="bha-r8-Xo1" id="zB4-Y3-X62"/>
                 <outlet property="btnLike" destination="eBr-cc-kP0" id="E3d-dH-wZZ"/>
                 <outlet property="imgViewLoc" destination="YJj-rV-5eX" id="Sbp-Lz-l1T"/>
                 <outlet property="imgViewitem" destination="gUh-OP-mJO" id="8mB-SI-Ayi"/>
@@ -141,6 +154,7 @@
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="like" width="24" height="24"/>
         <image name="location-outline" width="11.333333015441895" height="11.333333015441895"/>
+        <image name="verifiedIcon" width="30" height="30"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

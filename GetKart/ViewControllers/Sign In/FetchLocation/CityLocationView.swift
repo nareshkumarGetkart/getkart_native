@@ -31,6 +31,7 @@ struct CityLocationView: View {
     @State var arrCities:Array<CityModal> = []
     @State private var searchText = ""
     
+    
     var body: some View {
         
         VStack(spacing: 0) {
@@ -240,7 +241,7 @@ struct CityLocationView: View {
                 
                 if arrAreas.count > 0{
                     
-                    var rootView = AreaLocationView(navigationController: self.navigationController, city: cityObj, popType: self.popType)
+                    var rootView = AreaLocationView(navigationController: self.navigationController,country: country, state:state, city: cityObj, popType: self.popType)
                    // rootView.delLocationSelected = self
                     let vc = UIHostingController(rootView: rootView)
                     self.navigationController?.pushViewController(vc, animated: true)

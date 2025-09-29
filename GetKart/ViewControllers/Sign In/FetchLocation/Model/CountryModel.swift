@@ -53,15 +53,15 @@ struct CountryModelClass: Codable {
 struct CountryModel: Codable,Identifiable {
     var id: Int?
     var name, iso3, numericCode, iso2: String?
-    var phonecode: JSONNull?
+    var phonecode: Int?
     var capital, currency, currencyName, currencySymbol: String?
     var tld, native, region: String?
-    var regionID: JSONNull?
+    var regionID: Int?
     var subregion: String?
-    var subregionID: JSONNull?
+    var subregionID: Int?
     var nationality, timezones, translations, latitude: String?
     var longitude, emoji, emojiU: String?
-    var flag, wikiDataID: JSONNull?
+    var flag, wikiDataID: Int?
     var createdAt, updatedAt: String?
     var statesCount: Int?
 
