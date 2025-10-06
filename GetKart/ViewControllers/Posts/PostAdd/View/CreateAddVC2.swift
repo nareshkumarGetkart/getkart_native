@@ -177,8 +177,25 @@ class CreateAddVC2: UIViewController {
                 }
                 params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
                 
-                let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+               /* let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                 self.navigationController?.pushViewController(vc, animated: true)
+                
+                */
+                
+                if let vc = StoryBoard.postAdd.instantiateViewController(withIdentifier: "PostAdFinalVC") as? PostAdFinalVC{
+                    
+                    vc.latitude = itemObj?.latitude ?? 0.0
+                    vc.longitude = itemObj?.longitude ?? 0.0
+                    vc.imgData = self.imgData
+                    vc.gallery_images = self.gallery_images
+                    vc.gallery_imageNames = self.gallery_imageNames
+                    vc.popType = self.popType
+                    vc.params = self.params
+
+                    self.navigationController?.pushViewController(vc, animated: true)
+
+                     
+                 }
                 
             }else {
                 
@@ -207,9 +224,26 @@ class CreateAddVC2: UIViewController {
                 params[AddKeys.custom_fields.rawValue] = self.dictCustomFields
                 
                 print("self.params second page == \(self.params)")
-                let swiftLocView = ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0, imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params)
+              /*  let swiftLocView = ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0, imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params)
                 let vc = ConfirmLocationHostingController(rootView: swiftLocView)
                 self.navigationController?.pushViewController(vc, animated: true)
+                */
+                
+               if let vc = StoryBoard.postAdd.instantiateViewController(withIdentifier: "PostAdFinalVC") as? PostAdFinalVC{
+                   
+                   vc.latitude = itemObj?.latitude ?? 0.0
+                   vc.longitude = itemObj?.longitude ?? 0.0
+                   vc.imgData = self.imgData
+                   vc.imgName = self.imgName
+                   vc.gallery_images = self.gallery_images
+                   vc.gallery_imageNames = self.gallery_imageNames
+                   vc.popType = self.popType
+                   vc.params = self.params
+
+                   self.navigationController?.pushViewController(vc, animated: true)
+
+                    
+                }
                 
             }
         }

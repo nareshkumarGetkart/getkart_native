@@ -254,14 +254,16 @@ struct AreaLocationView: View {
                 
             }else  if popType == .createPost {
                 
-                if let vc1 = vc as? ConfirmLocationHostingController {
-                    
+              //  if let vc1 = vc as? ConfirmLocationHostingController {
+                    if let vc1 = vc as? PostAdFinalVC {
+
                     // Pop to that view controller
-                    self.navigationController?.popToViewController(vc1, animated: true)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                   // DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue:NotiKeysLocSelected.createPostNewLocation.rawValue),
                                                         object: nil, userInfo: data)
-                    }
+                        self.navigationController?.popToViewController(vc1, animated: true)
+
+                   // }
                     break
                 }
                 
@@ -314,56 +316,66 @@ struct AreaLocationView: View {
               }
              
             CLGeocoder().geocodeAddressString(address) { placemarks, error in
-
-                  if let view = self.navigationController?.topViewController?.view{
-                      
-                      DispatchQueue.main.async {
-                          Themes.sharedInstance.removeActivityView(uiView: view)
-                          
-                      }
-                  }
-                  let placemark = placemarks?.first
-                  if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
-                      
-                      print("Lat: \(lat), Lon: \(lon)")
-                      var obj =  areaObj
-                      
-                      obj.latitude = "\(lat)"
-                      obj.longitude = "\(lon)"
-                      self.areaSelected(area: obj)
-                  }
-                else{
-                    // self.areaSelected(area: areaObj)
-                    print(error?.localizedDescription ?? "")
+                
+                if let view = self.navigationController?.topViewController?.view{
                     
-                   /* var obj =  areaObj
-                    obj.latitude =  city.latitude
-                    obj.longitude = city.longitude
-                    self.areaSelected(area: obj)
-                    */
-                  /*  fetchCoordinates(for: address, apiKey: Local.shared.placeApiKey) { result in
-                        switch result {
-                        case .success(let coord):
-                            print("Lat:", coord.latitude, "Lon:", coord.longitude)
-                            DispatchQueue.main.async {
-                                var obj =  areaObj
-                                obj.latitude = "\(coord.latitude)"
-                                obj.longitude = "\(coord.longitude)"
-                                self.areaSelected(area: obj)
-                            }
-                            
-                        case .failure(let err):
-                            print("Error:", err)
-                        }
-                    }*/
-
-                  }
+                    DispatchQueue.main.async {
+                        Themes.sharedInstance.removeActivityView(uiView: view)
+                        
+                    }
+                }
+                
+                if let error = error {
+                    print("❌ Reverse geocode failed: \(error.localizedDescription)")
+                    if let cle = error as? CLError {
+                        print("CLError code: \(cle.code.rawValue)")
+                    }
+                    getLatLonfromAddressgApi(areaObj: areaObj)
+                    
+                    return
+                }else{
+                    let placemark = placemarks?.first
+                    if  let lat = placemark?.location?.coordinate.latitude, let lon = placemark?.location?.coordinate.longitude{
+                        
+                        print("Lat: \(lat), Lon: \(lon)")
+                        var obj =  areaObj
+                        
+                        obj.latitude = "\(lat)"
+                        obj.longitude = "\(lon)"
+                        self.areaSelected(area: obj)
+                    }
+                }
             }
 
         }else{
             self.areaSelected(area: areaObj)
         }
      
+    }
+    
+    
+    
+    
+    func getLatLonfromAddressgApi(areaObj:AreaModal) {
+        // type :  2=> retrive lat long , 1=>retrive address
+        let params = ["country":country.name,"state":state.name,"city":city.name,"area":areaObj.name,"type":"2"]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.fetch_google_location, param: params as Dictionary<String, Any>, methodType: .post,showLoader: true) { responseObject, error in
+            
+            if error == nil {
+                if let result = responseObject{
+                    
+                    if let data = result["data"] as? Dictionary<String, Any>{
+                        
+                        var obj =  areaObj
+                        obj.latitude = "\(data["latitude"] as? String ?? "")"
+                        obj.longitude = "\(data["longitude"] as? String ?? "")"
+                        self.areaSelected(area: obj)
+                    }
+                }
+            }
+        }
+        
     }
     
     // only if you want to use CLLocationCoordinate2D

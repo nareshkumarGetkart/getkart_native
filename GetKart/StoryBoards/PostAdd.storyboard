@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,6 +12,9 @@
     <customFonts key="customFonts">
         <array key="Inter-Regular.otf">
             <string>Inter-Regular</string>
+        </array>
+        <array key="Manrope-Medium.ttf">
+            <string>Manrope-Medium</string>
         </array>
         <array key="Manrope-Regular.ttf">
             <string>Manrope-Regular</string>
@@ -760,6 +764,158 @@
             </objects>
             <point key="canvasLocation" x="1900" y="605"/>
         </scene>
+        <!--Post Ad FinalVC-->
+        <scene sceneID="UzY-d6-HGF">
+            <objects>
+                <viewController storyboardIdentifier="PostAdFinalVC" interactionActivityTrackingBaseName="PostAdFinalVC" id="qcl-hm-2Pz" customClass="PostAdFinalVC" customModule="GetKart" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="514-eq-vhZ">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="woZ-QS-pPd">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="80"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cqm-rR-xNc">
+                                        <rect key="frame" x="10" y="35" width="40" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="40" id="At0-mA-hbV"/>
+                                            <constraint firstAttribute="height" constant="40" id="L6C-aX-Ssj"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="labelColor"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="arrow_left"/>
+                                        <connections>
+                                            <action selector="backButtonAction:" destination="qcl-hm-2Pz" eventType="touchUpInside" id="EIl-M5-KkW"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Confirm Location" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k07-du-KyH">
+                                        <rect key="frame" x="54.999999999999993" y="35" width="123.33333333333331" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="TxN-iN-h6E"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="16"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="Cqm-rR-xNc" secondAttribute="bottom" constant="5" id="H3N-8F-LsK"/>
+                                    <constraint firstAttribute="height" constant="80" id="JX4-jJ-sZ1"/>
+                                    <constraint firstAttribute="bottom" secondItem="k07-du-KyH" secondAttribute="bottom" constant="5" id="UEu-Ik-tp1"/>
+                                    <constraint firstItem="k07-du-KyH" firstAttribute="leading" secondItem="Cqm-rR-xNc" secondAttribute="trailing" constant="5" id="VAF-jS-B3s"/>
+                                    <constraint firstItem="Cqm-rR-xNc" firstAttribute="leading" secondItem="woZ-QS-pPd" secondAttribute="leading" constant="10" id="X3C-g4-j3A"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k6o-To-SR8" customClass="UIButtonX" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="20" y="758" width="353" height="50"/>
+                                <color key="backgroundColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="vmj-D0-hRP"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="18"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Update"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="postButtonAction:" destination="qcl-hm-2Pz" eventType="touchUpInside" id="YqY-2D-uxb"/>
+                                </connections>
+                            </button>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O4o-G9-efK">
+                                <rect key="frame" x="15" y="215" width="363" height="458"/>
+                                <standardMapConfiguration key="preferredConfiguration"/>
+                            </mapView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="What is the location of item you are selling?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gTB-Jd-PRM">
+                                <rect key="frame" x="15" y="90" width="363" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="rRd-cu-RbL"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lNr-lv-J7s">
+                                <rect key="frame" x="30" y="145" width="333" height="50"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="zfD-Vr-xCX"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Choose location manually">
+                                    <color key="titleColor" systemColor="labelColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="chooseLocationtButtonAction:" destination="qcl-hm-2Pz" eventType="touchUpInside" id="t3g-EJ-zPm"/>
+                                </connections>
+                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="S6I-01-Tu8">
+                                <rect key="frame" x="15" y="693" width="363" height="45"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="JeA-o1-akZ">
+                                        <rect key="frame" x="0.0" y="10.999999999999996" width="25" height="23.333333333333332"/>
+                                        <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="25" id="NL4-Ly-Aqk"/>
+                                            <constraint firstAttribute="width" constant="25" id="QIA-H2-nLe"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading.." lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CZV-NJ-k7e">
+                                        <rect key="frame" x="30" y="0.0" width="333" height="45"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="45" id="a5O-ly-qaD"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="16"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="pbF-L7-qcR"/>
+                        <color key="backgroundColor" systemColor="systemGray6Color"/>
+                        <constraints>
+                            <constraint firstItem="woZ-QS-pPd" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" id="30d-QQ-LIt"/>
+                            <constraint firstItem="O4o-G9-efK" firstAttribute="top" secondItem="lNr-lv-J7s" secondAttribute="bottom" constant="20" id="4LT-A5-M5T"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="trailing" secondItem="k6o-To-SR8" secondAttribute="trailing" constant="20" id="7o0-6U-lsx"/>
+                            <constraint firstItem="gTB-Jd-PRM" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" constant="15" id="8Xa-oU-XzM"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="bottom" secondItem="k6o-To-SR8" secondAttribute="bottom" constant="10" id="DhR-yq-rhm"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="trailing" secondItem="woZ-QS-pPd" secondAttribute="trailing" id="JVm-Z2-Pqw"/>
+                            <constraint firstItem="lNr-lv-J7s" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" constant="30" id="KWL-P5-gPA"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="trailing" secondItem="O4o-G9-efK" secondAttribute="trailing" constant="15" id="Lm9-un-cEh"/>
+                            <constraint firstItem="lNr-lv-J7s" firstAttribute="top" secondItem="gTB-Jd-PRM" secondAttribute="bottom" constant="10" id="MO9-tN-nhn"/>
+                            <constraint firstItem="S6I-01-Tu8" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" constant="15" id="PaC-Yj-7b8"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="trailing" secondItem="lNr-lv-J7s" secondAttribute="trailing" constant="30" id="XjQ-Q4-Xa0"/>
+                            <constraint firstItem="gTB-Jd-PRM" firstAttribute="top" secondItem="woZ-QS-pPd" secondAttribute="bottom" constant="10" id="YPx-Ar-ZY3"/>
+                            <constraint firstItem="k6o-To-SR8" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" constant="20" id="dWJ-Fb-7x9"/>
+                            <constraint firstItem="k6o-To-SR8" firstAttribute="top" secondItem="S6I-01-Tu8" secondAttribute="bottom" constant="20" id="fj7-co-ycc"/>
+                            <constraint firstAttribute="trailing" secondItem="gTB-Jd-PRM" secondAttribute="trailing" constant="15" id="j9X-Uq-e35"/>
+                            <constraint firstItem="woZ-QS-pPd" firstAttribute="top" secondItem="514-eq-vhZ" secondAttribute="top" id="lWd-bY-St6"/>
+                            <constraint firstItem="S6I-01-Tu8" firstAttribute="top" secondItem="O4o-G9-efK" secondAttribute="bottom" constant="20" id="ojt-HR-9s4"/>
+                            <constraint firstItem="O4o-G9-efK" firstAttribute="leading" secondItem="pbF-L7-qcR" secondAttribute="leading" constant="15" id="wtw-ee-XbR"/>
+                            <constraint firstItem="pbF-L7-qcR" firstAttribute="trailing" secondItem="S6I-01-Tu8" secondAttribute="trailing" constant="15" id="zlr-vU-rzx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="btnBack" destination="Cqm-rR-xNc" id="ZKj-FK-Cao"/>
+                        <outlet property="btnChooseLocation" destination="lNr-lv-J7s" id="CmW-3Q-LXa"/>
+                        <outlet property="btnUpdatePost" destination="k6o-To-SR8" id="Kp0-Bt-Bt8"/>
+                        <outlet property="cnstrntHtNavBar" destination="JX4-jJ-sZ1" id="hoO-uo-Wxc"/>
+                        <outlet property="lblLocation" destination="CZV-NJ-k7e" id="gZ1-kn-8Ij"/>
+                        <outlet property="mapView" destination="O4o-G9-efK" id="5sw-hE-OFZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8ZS-C1-dhX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1290.8396946564885" y="-161.26760563380282"/>
+        </scene>
     </scenes>
     <resources>
         <image name="arrow_left" width="24" height="24"/>
@@ -768,17 +924,21 @@
         <image name="bannerPreview_3.png" width="310" height="628"/>
         <image name="bannerPreview_4.png" width="310" height="628"/>
         <image name="handPoint.gif" width="150" height="150"/>
+        <image name="location" catalog="system" width="128" height="119"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -163,6 +163,25 @@ struct FavoritesCell:View {
                     Image("location-outline").resizable().frame(width: 10, height: 10).foregroundColor(.gray)
                     Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
                     Spacer()
+                    
+                    if (itemObj.user?.isVerified ?? 0) == 1{
+                        Button {
+                            AppDelegate.sharedInstance.presentVerifiedInfoView()
+                        } label: {
+                            Image( "verifiedIcon").resizable().aspectRatio(contentMode: .fit)
+                                .foregroundColor(.gray)
+                                .padding(3)
+                                .background(Color(UIColor.systemBackground))
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                            
+                        }
+                        .frame(width: 30,height: 30)
+                        .padding([.trailing], 15)
+                        .allowsHitTesting(true)
+                        
+                    }
+
                 }
                 
             }.padding([.top,.bottom],10)

@@ -43,13 +43,16 @@ struct ProfileEditView: View {
             VStack(spacing: 20) {
                 // Profile Image Section
                 ZStack {
-                    if let image = selectedImage {
+                  /*  if let image = selectedImage {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 100, height: 100)
                             .clipShape(Circle()).padding(5)
                             .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+                        
+                        
+                        
                     } else {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
@@ -75,6 +78,34 @@ struct ProfileEditView: View {
                     
                         .offset(x: 35, y: 38)
                 }
+                */
+                    
+                    ContactImageSwiftUIView(
+                          name: fullName,                 // or pass your user's name
+                          imageUrl: nil,                      // remote URL if available
+                          fallbackImageName: "user-circle",   // local placeholder asset
+                          imgWidth: 100,
+                          imgHeight: 100,
+                          selectedImage: selectedImage        // 👈 picked image state
+                      )
+                      .overlay(Circle().stroke(Color.orange, lineWidth: 2))
+                      .padding(5)
+                      
+                      Button(action: { showingImagePicker.toggle() }) {
+                          Image("edit")
+                              .resizable()
+                              .frame(width: 15, height: 15)
+                              .aspectRatio(contentMode: .fit)
+                      }
+                      .frame(width: 30, height: 30)
+                      .background(Color.orange)
+                      .cornerRadius(15)
+                      .overlay(
+                          RoundedRectangle(cornerRadius: 15)
+                              .stroke(Color.white, lineWidth: 3)
+                      )
+                      .offset(x: 35, y: 38)
+                  }
                 .sheet(isPresented: $showingImagePicker) {
                     ImagePicker(selectedImage: $selectedImage)
                 }
@@ -89,7 +120,7 @@ struct ProfileEditView: View {
                         Button(action: {
                             if email.isValidEmail(){
                                 isEmailOtpVerifyClicked = true
-
+                                
                                 UIApplication.shared.endEditing()
                                 sendEmailOtp(emailId: email)
                             }
@@ -100,37 +131,52 @@ struct ProfileEditView: View {
                     }.frame(height:15)
                     
                 }
+                
+                
                 CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
-                    .disabled(isMobileVerified)
-                
-                if !isMobileVerified && phoneNumber.count > 0{
-                    HStack{
-                        Spacer()
-                        Button(action: {
-                            if phoneNumber.count > 5{
-                                isEmailOtpVerifyClicked = false
-                                UIApplication.shared.endEditing()
-                                sendOTPApi(countryCode: "+91")
-                            }
-                        }) {
-                            Text("Verify")
-                                .underline() .foregroundColor(Color.orange).padding(.horizontal)
+                    .disabled(true) // prevents typing
+                    .onTapGesture {
+                        if !isMobileVerified {
+                            pushToValidateMobileNumber()
                         }
-                    }.frame(height:15)
-                    
-                }
+                    }
+                //                CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
+                //                    .allowsHitTesting(!isMobileVerified)//.disabled(isMobileVerified)
+                //
+                //                    .onTapGesture {
+                //                        if !isMobileVerified{
+                //                            pushToValidateMobileNumber()
+                //                        }
+                //                    }
                 
+                /*   if !isMobileVerified && phoneNumber.count > 0{
+                 HStack{
+                 Spacer()
+                 Button(action: {
+                 if phoneNumber.count > 5{
+                 isEmailOtpVerifyClicked = false
+                 UIApplication.shared.endEditing()
+                 sendOTPApi(countryCode: "+91")
+                 }
+                 }) {
+                 Text("Verify")
+                 .underline() .foregroundColor(Color.orange).padding(.horizontal)
+                 }
+                 }.frame(height:15)
+                 
+                 }
+                 */
                 CustomTextField(title: "Address", text: $address)
                 
                 // Toggle Switches
-              /*  ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
-                ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
-               
-                */
+                /*  ToggleField(title: "Notification", isOn: $isNotificationsEnabled)
+                 ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
+                 
+                 */
                 // Update Button
                 Button(action: {
                     UIApplication.shared.endEditing()
-
+                    
                     validateForm()
                     
                 }) {
@@ -166,7 +212,7 @@ struct ProfileEditView: View {
                 OTPPopup(
                     showOTPPopup: $showOTPPopup,
                     otp: "",
-                    onVerify: {code in
+                    onVerify: { code in
                         if isEmailOtpVerifyClicked{
                             verifyEmailOTPApi(otp: code)
                         }else{
@@ -197,17 +243,15 @@ struct ProfileEditView: View {
                 ).background(Color.clear)
             } // Works in iOS 16+
         }
-        
     }
     
-//    func pushToValidateMobileNumber(){
-//        if (params[AddKeys.contact.rawValue] as? String ?? "").count > 0 { return}
-//        let destVc = UIHostingController(rootView: MobileNumberView(navigationController: self.navigationController,onDismissUpdatedMobile: { strMob in
-//            self.params[AddKeys.contact.rawValue]  = strMob
-//            self.tblView.reloadData()
-//        }))
-//        self.navigationController?.pushViewController(destVc, animated: true)
-//    }
+    func pushToValidateMobileNumber(){
+        let destVc = UIHostingController(rootView: MobileNumberView(navigationController: self.navigationController,onDismissUpdatedMobile: { strMob in
+            self.phoneNumber = strMob
+            self.isMobileVerified = true
+        }))
+        self.navigationController?.pushViewController(destVc, animated: true)
+    }
     
     // Form Validation
     private func validateForm() {

@@ -9,7 +9,7 @@ import UIKit
 
 class ChatListTblCell: UITableViewCell {
     
-    @IBOutlet weak var imgViewProfile:UIImageView!
+    @IBOutlet weak var imgViewProfile:ContactImageView!
     @IBOutlet weak var lblName:UILabel!
     @IBOutlet weak var lblDesc:UILabel!
     @IBOutlet weak var bgView:UIView!

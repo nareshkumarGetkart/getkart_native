@@ -263,10 +263,14 @@ struct VerifyMobileNumberView: View {
                         
                         RealmManager.shared.updateUserData(dict: data)
                     }
-                    onDismiss(mobileNo)
-                    dismiss()
+                    DispatchQueue.main.async {
+                        dismiss()
+                        onDismiss(mobileNo)
+                    }
+                
 
                 }else{
+                    AlertView.sharedManager.showToast(message: message)
 
                 }
                 

@@ -44,16 +44,16 @@ class URLhandler: NSObject{
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{
-                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey]
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }else{
-                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey]
+                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
                 print("Header == \(headers)")
                 return HTTPHeaders.init(headers)
             }
         }else{
-            let headers =  ["platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"Accept":"application/json"]
+            let headers =  ["platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"Accept":"application/json","device-model":UIDevice.getDeviceModelName()]
 //            if SALT_TOKEN_TO_SEND.count > 0{
 //                headers =  ["platform":"ios","appversion":UIDevice.appVersion,"salt_token":"\(SALT_TOKEN_TO_SEND)"]
 //            }
@@ -61,7 +61,7 @@ class URLhandler: NSObject{
             return HTTPHeaders.init(headers)
         }
 
-
+        
         /*
 
        let timeZone = TimeZone.current.identifier

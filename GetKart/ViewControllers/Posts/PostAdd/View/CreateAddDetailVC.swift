@@ -260,7 +260,7 @@ class CreateAddDetailVC: UIViewController {
     }
     
     func pushToValidateMobileNumber(){
-        if (params[AddKeys.contact.rawValue] as? String ?? "").count > 0 { return}
+      //  if (params[AddKeys.contact.rawValue] as? String ?? "").count > 0 { return}
         let destVc = UIHostingController(rootView: MobileNumberView(navigationController: self.navigationController,onDismissUpdatedMobile: { strMob in
             self.params[AddKeys.contact.rawValue]  = strMob
             self.tblView.reloadData()
@@ -274,7 +274,12 @@ class CreateAddDetailVC: UIViewController {
         
         params[AddKeys.name.rawValue] = (params[AddKeys.name.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.price.rawValue] = (params[AddKeys.price.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0{
+            params.removeValue(forKey: AddKeys.contact.rawValue)
+        }else{
+            params[AddKeys.contact.rawValue] = (params[AddKeys.contact.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         params[AddKeys.video_link.rawValue] = (params[AddKeys.video_link.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         params[AddKeys.description.rawValue] = (params[AddKeys.description.rawValue] as? String  ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                 
@@ -310,9 +315,9 @@ class CreateAddDetailVC: UIViewController {
             showErrorMsg = true
             scrollIndex = 4
 
-        }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
-            
-            showErrorMsg = true
+//        }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
+//            
+//            showErrorMsg = true
             
         } else {
             showErrorMsg = false
@@ -324,8 +329,24 @@ class CreateAddDetailVC: UIViewController {
 //                
                 
                 if popType == .createPost {
-                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
-                    self.navigationController?.pushViewController(vc, animated: true)
+                  /*  let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.imgData, imgName: self.imgName, gallery_images: self.gallery_images, gallery_imageNames: self.gallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                    self.navigationController?.pushViewController(vc, animated: true)*/
+                    
+                    
+                    
+                    if let vc = StoryBoard.postAdd.instantiateViewController(withIdentifier: "PostAdFinalVC") as? PostAdFinalVC{
+                        
+//                        vc.latitude = itemObj?.latitude ?? 0.0
+//                        vc.longitude = itemObj?.longitude ?? 0.0
+                        vc.imgData = self.imgData
+                        vc.imgName = self.imgName
+                        vc.gallery_images = self.gallery_images
+                        vc.gallery_imageNames = self.gallery_imageNames
+                        vc.popType = self.popType
+                        vc.params = self.params
+                        
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }
 
                 }else{
                     
@@ -363,9 +384,23 @@ class CreateAddDetailVC: UIViewController {
                         }
                     }
                     
-                    let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0,imgData:pushImgData, imgName: pushImgName, gallery_images: pushGalleryImg, gallery_imageNames: pushGallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                   /* let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(latitiude:itemObj?.latitude ?? 0.0, longitude:itemObj?.longitude ?? 0.0,imgData:pushImgData, imgName: pushImgName, gallery_images: pushGalleryImg, gallery_imageNames: pushGallery_imageNames, navigationController: self.navigationController, popType: self.popType, params: self.params))
                     
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)*/
+                    
+                    if let vc = StoryBoard.postAdd.instantiateViewController(withIdentifier: "PostAdFinalVC") as? PostAdFinalVC{
+                        
+                        vc.latitude = itemObj?.latitude ?? 0.0
+                        vc.longitude = itemObj?.longitude ?? 0.0
+                        vc.imgData = pushImgData
+                        vc.imgName = pushImgName
+                        vc.gallery_images = pushGalleryImg
+                        vc.gallery_imageNames =  pushGallery_imageNames
+                        vc.popType = self.popType
+                        vc.params = self.params
+                        
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }
                 }
                 
             }else  if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddVC2") as? CreateAddVC2 {
@@ -652,7 +687,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
             cell.iconBgView.isHidden = true
 
-            cell.lblTitle.text = "Phone Number"
+            cell.lblTitle.text = "Phone Number(optional)"
             cell.txtField.placeholder = "Enter Phone Number"
             cell.txtField.keyboardType = .numberPad
             cell.txtField.tag = indexPath.row
@@ -669,7 +704,8 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
 
             cell.btnOptionBig.addTarget(self, action: #selector(moileVerifyAction), for: .touchUpInside)
             cell.txtField.text = params[AddKeys.contact.rawValue] as? String ?? ""
-            if showErrorMsg == true && (self.selectedRow != indexPath.row){
+            
+            /*if showErrorMsg == true && (self.selectedRow != indexPath.row){
                 if (params[AddKeys.contact.rawValue] as? String ?? "") == "" {
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
@@ -677,10 +713,16 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                     cell.lblErrorMsg.isHidden = true
                     cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
                 }
-            }else {
-                cell.lblErrorMsg.isHidden = true
-                cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
-            }
+            }else {*/
+               // cell.lblErrorMsg.isHidden = true
+                //cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
+           // }
+            
+           // if (params[AddKeys.contact.rawValue] as? String ?? "").count == 0{
+                cell.lblErrorMsg.text = "Verified mobiles build trust & get faster responses ✓"
+                cell.lblErrorMsg.isHidden = false
+                cell.lblErrorMsg.textColor = UIColor.lightGray
+            //}
             return cell
         }else if indexPath.row == 7 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "TFCell") as! TFCell
@@ -714,6 +756,7 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
                 cell.txtField.layer.borderColor = UIColor.opaqueSeparator.cgColor
             }
             */
+            
             return cell
         }
         return UITableViewCell()

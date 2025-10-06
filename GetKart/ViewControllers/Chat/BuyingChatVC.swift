@@ -227,11 +227,13 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         let obj = listArray[indexPath.item]
         cell.lblName.text = obj.seller?.name ?? ""
         cell.lblDesc.text = obj.item?.name ?? ""
-        cell.imgViewProfile.kf.setImage(with:  URL(string: obj.seller?.profile ?? "") , placeholder:UIImage(named: "user-circle"))
+      //  cell.imgViewProfile.kf.setImage(with:  URL(string: obj.seller?.profile ?? "") , placeholder:UIImage(named: "user-circle"))
         
+        cell.imgViewProfile.configure(name: obj.seller?.name ?? "", imageUrl: obj.seller?.profile ?? "",fontSize: 14.0)
         cell.imgViewItem.kf.setImage(with:  URL(string: obj.item?.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         cell.imgViewItem.backgroundColor = UIColor(hexString: "#FEF6E9")
         cell.imgViewItem.layer.cornerRadius = cell.imgViewItem.frame.size.height/2.0
+        
         
         cell.imgViewItem.clipsToBounds = true
         

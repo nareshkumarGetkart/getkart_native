@@ -33,7 +33,7 @@ class ChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var lblName:UILabel!
-    @IBOutlet weak var imgViewProfile:UIImageView!
+    @IBOutlet weak var imgViewProfile:ContactImageView!
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var imgViewProduct:UIImageView!
     @IBOutlet weak var lblProduct:UILabel!
@@ -195,9 +195,11 @@ class ChatVC: UIViewController {
             self.lblName.text = name
         }
         
-        if profileImg.count > 0{
+       /* if profileImg.count > 0{
             self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder:ImageName.userPlaceHolder)
         }
+        */
+        self.imgViewProfile.configure(name: name, imageUrl: profileImg)
         
         
         if itemName.count > 0{
@@ -983,9 +985,12 @@ class ChatVC: UIViewController {
             
             let is_verified = dataDict["is_verified"] as? Int ?? 0
             self.imgVwVerified.isHidden = (is_verified == 1) ? false : true
-            self.imgVwVerified.setImageTintColor(color: Themes.sharedInstance.themeColor)
+          //  self.imgVwVerified.setImageTintColor(color: Themes.sharedInstance.themeColor)
             self.lblName.text = name
-            self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
+           // self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder: ImageName.userPlaceHolder)
+            
+            self.imgViewProfile.configure(name: name, imageUrl: profileImg)
+
             self.youBlockedByUser = dataDict["youBlockedByUser"] as? String ?? ""
             self.youBlockedUser = dataDict["youBlockedUser"] as? String ?? ""
             self.mobileVisibility = dataDict["mobileVisibility"] as? Int ?? 0

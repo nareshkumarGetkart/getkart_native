@@ -56,6 +56,7 @@ struct MobileNumberView: View {
                         // Send OTP Button
                         Button(action: {
                             // handle send OTP
+                            UIApplication.shared.endEditing()
                             sendOTPApi(countryCode: "+91")
                         }) {
                             Text("Send OTP")

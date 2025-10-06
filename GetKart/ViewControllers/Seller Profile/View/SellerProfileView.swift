@@ -94,7 +94,7 @@ struct SellerProfileView: View {
             
             // Profile Info Section
             HStack {
-                AsyncImage(url: URL(string: objVM.sellerObj?.profile ?? "")) { img in
+               /* AsyncImage(url: URL(string: objVM.sellerObj?.profile ?? "")) { img in
                     
                     img.resizable()
                         .aspectRatio(contentMode: .fill)
@@ -105,18 +105,23 @@ struct SellerProfileView: View {
                         .resizable()
                         .frame(width: 80, height: 80)
                         .cornerRadius(40)
-                }
+                }*/
                 
+                ContactImageSwiftUIView(name: objVM.sellerObj?.name ?? "", imageUrl: objVM.sellerObj?.profile ?? "", fallbackImageName: "user-circle", imgWidth: 80, imgHeight: 80)
+
               //  VStack(alignment:.leading){
                     HStack{
                         Text(objVM.sellerObj?.name ?? "")
                             .font(.custom("Manrope-Medium", size: 16.0))
                         if(objVM.sellerObj?.isVerified ?? 0) == 1{
-                            Image("verified")
+                            Image("verifiedIcon")
                                 .resizable()
-                                .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
+                               // .renderingMode(.template)
+                                //.foregroundColor(Color(UIColor.systemOrange))
                                 .scaledToFit()
-                                .frame(width:15, height: 15)
+                                .frame(width:20, height: 20).onTapGesture {
+                                    AppDelegate.sharedInstance.presentVerifiedInfoView()
+                                }
                             
                         }
                         Spacer()

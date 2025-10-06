@@ -230,10 +230,28 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     }
                 }
                 
+                /*
+                 1 If Username Exists-> Username's First Character as Image Icon
+                 2 if no user name then-> profile placeholder (Guest User)
+                 3 if user upload image  then will show user's profile image
+                 */
                 
                  cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 
-                cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+                // cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
+                
+                
+                cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
+
+//                if (objLoggedInUser.profile ?? "").count == 0{
+//                    cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
+//
+//                }else if (objLoggedInUser.name ?? "") == "Guest User"{
+//                    
+//                }else{
+//                    cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
+//
+//                }
                 
                // if (objLoggedInUser.profile ?? "").count == 0{
                     cell.imgVwProfile.layer.borderColor = Themes.sharedInstance.themeColor.cgColor

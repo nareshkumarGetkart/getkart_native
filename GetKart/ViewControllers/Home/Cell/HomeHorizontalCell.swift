@@ -160,11 +160,13 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
             cell.prepareForReuse()
-            if let obj = listArray?[indexPath.item] as? ItemModel {
-                cell.configure(with: obj, index: indexPath.item, likeAction: #selector(likebtnAction))
-                
-                cell.btnIsVerified.tag = indexPath.item
-                cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
+            if (listArray?.count ?? 0) > indexPath.item{
+                if let obj = listArray?[indexPath.item] as? ItemModel {
+                    cell.configure(with: obj, index: indexPath.item, likeAction: #selector(likebtnAction))
+                    
+                    cell.btnIsVerified.tag = indexPath.item
+                    cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
+                }
             }
             return cell
         }

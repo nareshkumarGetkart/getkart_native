@@ -38,7 +38,9 @@ struct BlockedUserView: View {
                 
                 HStack{
                     // Spacer()
-                    AsyncImage(url: URL(string: obj.profile ?? "")) { image in
+                    
+                    ContactImageSwiftUIView(name: obj.name ?? "", imageUrl: obj.profile ?? "", fallbackImageName: "user-circle", imgWidth: 50, imgHeight: 50, selectedImage: nil).padding(.leading,7)
+                  /*  AsyncImage(url: URL(string: obj.profile ?? "")) { image in
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -53,18 +55,19 @@ struct BlockedUserView: View {
                             .cornerRadius(27.5)
                             .padding(5)
                     }
-                    
+                    */
                     Text(obj.name ?? "").foregroundColor(Color(UIColor.label))
                         .font(Font.manrope(.regular, size: 16.0))
                     Spacer()
                     
-                }.background(Color(UIColor.systemBackground)).cornerRadius(6.0)
+                }.frame(minHeight:60, maxHeight:60).background(Color(UIColor.systemBackground)).cornerRadius(6.0)
+                    
                     .padding(.horizontal)
                     .tag(index)
                     .onTapGesture {
                     self.selectedIndex = index
                     self.showPopup = true
-                }
+                    }
             }
             
             if listArray.count == 0 {

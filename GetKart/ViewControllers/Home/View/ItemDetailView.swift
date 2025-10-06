@@ -1357,11 +1357,8 @@ struct SellerInfoView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack{
-//                Button {
-//                    
-//                } label: {
 
-                    AsyncImage(url: URL(string: image)) { image in
+                 /*   AsyncImage(url: URL(string: image)) { image in
                         image
                             .resizable()
                             .scaledToFill()
@@ -1375,31 +1372,26 @@ struct SellerInfoView: View {
                             .frame(width:55, height: 55)
                             .cornerRadius(27.5)
                     }
-              //  }
+                */
+                
+                ContactImageSwiftUIView(name: name, imageUrl: image, fallbackImageName: "user-circle", imgWidth: 55, imgHeight: 55)
+
              
-              //  VStack(alignment: .leading) {
                 HStack{
                     Text("\(name)")
                         .font(.headline)
                     if isverified == 1{
-                        Image("verified")
+                        Image("verifiedIcon")
                             .resizable()
-                            .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
+                   
                             .scaledToFit()
-                            .frame(width:15, height: 15)
+                            .frame(width:20, height: 20)
                     }
                     
                     Spacer()
                 }.contentShape(Rectangle())
 
-                    
-//                    Text(email)
-//                        .font(.subheadline)
-//                        .foregroundColor(Color(UIColor.label))
-//                }.padding(.trailing,5)
-//                
-                
-              //  HStack{
+ 
                     Spacer(minLength: 0)
               
                 if mobileVisibility == 1  && mobile.count > 0 {
@@ -1425,16 +1417,9 @@ struct SellerInfoView: View {
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                 }
-                  /*  Button {
-                        
-                    } label: {
-                       
-                  
-                    }.frame(width: 20,height: 20)
-                */
+             
                 Image("arrow_right").renderingMode(.template).foregroundColor(.orange).frame(width: 20,height: 20)
 
-               // }.padding(.leading,5)
             }
         }.sheet(isPresented: $showMessageView) {
             if MFMessageComposeViewController.canSendText() {

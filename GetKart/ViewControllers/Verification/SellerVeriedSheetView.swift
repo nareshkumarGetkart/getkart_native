@@ -24,7 +24,7 @@ struct SellerVeriedSheetView: View {
                     
                 }
                 
-                Text("So go ahead and enjoy a safe transaction!").font(Font.manrope(.regular, size: 14)).foregroundColor(.gray).padding(.leading,45)
+                Text("Go on and complete your transaction securely.").font(Font.manrope(.regular, size: 14)).foregroundColor(.gray).padding(.leading,45)
                 
             }.padding(5)
             

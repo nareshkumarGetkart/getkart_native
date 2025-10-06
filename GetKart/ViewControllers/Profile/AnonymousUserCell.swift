@@ -17,7 +17,7 @@ class AnonymousUserCell: UITableViewCell {
     @IBOutlet weak var lblName:UILabel!
     @IBOutlet weak var lblEmail:UILabel!
     @IBOutlet weak var btnPencil:UIButton!
-    @IBOutlet weak var imgVwProfile:UIImageView!
+    @IBOutlet weak var imgVwProfile:ContactImageView!
     @IBOutlet weak var btnGetVerifiedBadge:UIButton!
         
     @IBOutlet weak var btnResubmit:UIButton!

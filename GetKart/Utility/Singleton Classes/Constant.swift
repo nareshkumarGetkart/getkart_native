@@ -61,6 +61,13 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var fetch_google_location:String {
+        get {
+            return "\(baseURL)/v1/fetch-google-location"
+        }
+    }
+    
    
     var device_refresh:String {
         get {

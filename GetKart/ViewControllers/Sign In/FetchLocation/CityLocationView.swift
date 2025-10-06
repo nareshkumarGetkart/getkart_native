@@ -304,8 +304,10 @@ struct CityLocationView: View {
                 
             }else  if popType == .createPost {
                 
-                if let vc1 = vc as? ConfirmLocationHostingController {
+              //  if let vc1 = vc as? ConfirmLocationHostingController {
                     
+                    if let vc1 = vc as? PostAdFinalVC {
+
                     // Pop to that view controller
                     self.navigationController?.popToViewController(vc1, animated: true)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

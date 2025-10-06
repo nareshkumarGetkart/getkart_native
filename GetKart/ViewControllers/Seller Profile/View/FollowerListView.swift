@@ -85,7 +85,9 @@ struct FollowerRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             
-            AsyncImage(url: URL(string: user.profile ?? "")) { image in
+            ContactImageSwiftUIView(name: user.name ?? "", imageUrl: user.profile ?? "", fallbackImageName: "user-circle", imgWidth: 50, imgHeight: 50, selectedImage: nil)
+            
+        /*    AsyncImage(url: URL(string: user.profile ?? "")) { image in
                 image.resizable()
                     .scaledToFill()
             } placeholder: {
@@ -94,11 +96,12 @@ struct FollowerRowView: View {
                         .fill(Color.orange.opacity(0.2))
                     Image(systemName: "user-circle")
                         .foregroundColor(.orange)
+                    
                 }
             }
             .frame(width: 50, height: 50)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            
+            */
             VStack(alignment: .leading, spacing: 4) {
                 
                 HStack{
@@ -112,11 +115,12 @@ struct FollowerRowView: View {
                            // Text("Verified")
 //                                .foregroundColor(.gray)
 //                                .font(.subheadline)
-                        Image("verified")
+                        Image("verifiedIcon")
                             .resizable()
-                            .renderingMode(.template).foregroundColor(Color(UIColor.systemOrange))
+                            //.renderingMode(.template)
+                            //.foregroundColor(Color(UIColor.systemOrange))
                             .scaledToFit()
-                            .frame(width:15, height: 15)
+                            .frame(width:20, height: 20)
                         //}
                     }
                     Spacer()

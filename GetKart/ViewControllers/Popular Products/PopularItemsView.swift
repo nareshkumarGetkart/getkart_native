@@ -93,7 +93,7 @@ struct ProductCard: View {
                     } label: {
                         Image( "verifiedIcon").resizable().aspectRatio(contentMode: .fit)
                             .foregroundColor(.gray)
-                            .padding(8)
+                            .padding(3)
                             .background(Color(UIColor.systemBackground))
                             .clipShape(Circle())
                             .shadow(radius: 3)

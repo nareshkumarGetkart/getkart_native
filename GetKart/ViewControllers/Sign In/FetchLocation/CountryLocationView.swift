@@ -384,8 +384,9 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                 
             }else  if popType == .createPost {
                 
-                if let vc1 = vc as? ConfirmLocationHostingController {
-                    
+              //  if let vc1 = vc as? ConfirmLocationHostingController {
+                    if let vc1 = vc as? PostAdFinalVC {
+
                     // Pop to that view controller
                     self.navigationController?.popToViewController(vc1, animated: true)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -448,12 +449,14 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     }
                 
             }else  if popType == .createPost {
-                if let vc1 = vc as? ConfirmLocationHostingController {
+               // if let vc1 = vc as? ConfirmLocationHostingController {
                     
+                if let vc1 = vc as? PostAdFinalVC {
+
                     delLocationSelected?.savePostLocation(latitude:"\(self.locationManager.latitude)", longitude:"\(locationManager.longitude)",  city:locationManager.city, state:locationManager.state, country:locationManager.country, locality: "")
                         self.navigationController?.popToViewController(vc1, animated: true)
                         break
-                    }
+                }
                 
             }else if popType == .signUp {
                 
