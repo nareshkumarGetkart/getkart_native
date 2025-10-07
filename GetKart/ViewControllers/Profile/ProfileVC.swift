@@ -615,7 +615,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         if objLoggedInUser.id != nil {
-            if (objLoggedInUser.email?.count ?? 0) == 0 || (objLoggedInUser.mobile?.count ?? 0) == 0  || (objLoggedInUser.name?.count ?? 0) == 0 {
+            if (objLoggedInUser.email?.count ?? 0) == 0 || (objLoggedInUser.mobile?.count ?? 0) == 0  || (objLoggedInUser.name?.count ?? 0) == 0 || (objLoggedInUser.address?.count ?? 0) == 0 {
                 
                 AlertView.sharedManager.presentAlertWith(title: "", msg: "Complete your profile to apply verification request.", buttonTitles: ["Cancel","OK"], onController: self) { title, index in
                     

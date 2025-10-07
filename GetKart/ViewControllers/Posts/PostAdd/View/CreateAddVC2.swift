@@ -187,6 +187,7 @@ class CreateAddVC2: UIViewController {
                     vc.latitude = itemObj?.latitude ?? 0.0
                     vc.longitude = itemObj?.longitude ?? 0.0
                     vc.imgData = self.imgData
+                    vc.imgName = self.imgName
                     vc.gallery_images = self.gallery_images
                     vc.gallery_imageNames = self.gallery_imageNames
                     vc.popType = self.popType

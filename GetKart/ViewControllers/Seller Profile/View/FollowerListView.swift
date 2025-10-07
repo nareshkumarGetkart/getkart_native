@@ -129,9 +129,9 @@ struct FollowerRowView: View {
                 
                 
                 
-                Text("Member Since→")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+//                Text("Member Since→")
+//                    .font(.caption)
+//                    .foregroundColor(.gray)
             }
             Spacer()
         }
