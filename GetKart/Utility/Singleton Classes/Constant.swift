@@ -16,8 +16,8 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
-var ISDEBUG = false
+var devEnvironment: DevEnvironment = .staging
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -53,6 +53,20 @@ final class Constant: NSObject {
         }
     }
     
+    
+    
+    
+    var  campaign_payment_intent:String {
+        get {
+            return "\(baseURL)/v1/campaign-payment-intent"
+        }
+    }
+    
+    var  get_campaign_package:String {
+        get {
+            return "\(baseURL)/v1/get-campaign-package"
+        }
+    }
     
     
     var device_register:String {

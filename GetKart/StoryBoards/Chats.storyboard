@@ -1165,7 +1165,7 @@
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pay Rs 1000" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PKt-Ee-0Ze">
                                         <rect key="frame" x="20" y="10" width="318" height="40"/>
-                                        <fontDescription key="fontDescription" name="Inter-SemiBold" family="Inter" pointSize="17"/>
+                                        <fontDescription key="fontDescription" name="Inter-SemiBold" family="Inter" pointSize="18"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
@@ -1195,7 +1195,7 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LOv-pP-5pe">
-                                <rect key="frame" x="20" y="144" width="353" height="50"/>
+                                <rect key="frame" x="20" y="170.33333333333334" width="353" height="50"/>
                                 <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="bGu-R4-9qO"/>
@@ -1207,13 +1207,22 @@
                                     <action selector="payBtnAction:" destination="6Lq-bE-Vg5" eventType="touchUpInside" id="Ive-ze-FEC"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pay Rs 1000" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="af5-ee-11G">
+                                <rect key="frame" x="20" y="129" width="353" height="16.333333333333343"/>
+                                <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="UYV-g5-0N5"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="LOv-pP-5pe" firstAttribute="leading" secondItem="UYV-g5-0N5" secondAttribute="leading" constant="20" id="0bV-gH-gJd"/>
+                            <constraint firstItem="UYV-g5-0N5" firstAttribute="trailing" secondItem="af5-ee-11G" secondAttribute="trailing" constant="20" id="2e7-8k-u2d"/>
                             <constraint firstItem="UYV-g5-0N5" firstAttribute="trailing" secondItem="LOv-pP-5pe" secondAttribute="trailing" constant="20" id="8MT-Ja-R7H"/>
-                            <constraint firstItem="LOv-pP-5pe" firstAttribute="top" secondItem="UKE-s5-aNC" secondAttribute="bottom" constant="20" id="I2U-sP-fzw"/>
+                            <constraint firstItem="af5-ee-11G" firstAttribute="top" secondItem="UKE-s5-aNC" secondAttribute="bottom" constant="5" id="ED7-Ag-nkV"/>
+                            <constraint firstItem="af5-ee-11G" firstAttribute="leading" secondItem="UYV-g5-0N5" secondAttribute="leading" constant="20" id="Jmg-fA-75v"/>
+                            <constraint firstItem="LOv-pP-5pe" firstAttribute="top" secondItem="af5-ee-11G" secondAttribute="bottom" constant="25" id="VNW-eW-1ri"/>
                             <constraint firstItem="UYV-g5-0N5" firstAttribute="trailing" secondItem="UKE-s5-aNC" secondAttribute="trailing" id="bMn-8d-3Ij"/>
                             <constraint firstItem="UKE-s5-aNC" firstAttribute="top" secondItem="UYV-g5-0N5" secondAttribute="top" constant="5" id="cZt-EJ-bIC"/>
                             <constraint firstItem="UKE-s5-aNC" firstAttribute="leading" secondItem="UYV-g5-0N5" secondAttribute="leading" id="fAG-dT-c4Z"/>
@@ -1221,6 +1230,7 @@
                     </view>
                     <connections>
                         <outlet property="btnPay" destination="LOv-pP-5pe" id="Nhc-VN-ZiA"/>
+                        <outlet property="lblDesc" destination="af5-ee-11G" id="PkP-1G-EdJ"/>
                         <outlet property="lblPrice" destination="PKt-Ee-0Ze" id="RIj-pg-mhk"/>
                     </connections>
                 </viewController>
@@ -1251,28 +1261,28 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FittedSheets
 
 struct BannerPromotionsView: View {
     var navigationController:UINavigationController?
@@ -19,7 +20,13 @@ struct BannerPromotionsView: View {
     @State private var latitude:Double = 0
     @State private var longitude:Double = 0
     @State private var radius:Int = 0
+    @State private var selectedPkgObj:PlanModel?
 
+    @State private var country:String = ""
+    @State private var city:String = ""
+    @State private var state:String = ""
+    @State private var area:String = ""
+    @State private var pincode:String = ""
 
     var body: some View {
         HStack{
@@ -86,7 +93,7 @@ struct BannerPromotionsView: View {
                     }
                 }
               
-                Text("Allowed file types: PNG, JPG, JPEG, SVG, PDF").font(.manrope(.regular, size: 14.0)).foregroundColor(Color.red)
+                Text("Allowed file types: PNG, JPG, JPEG").font(.manrope(.regular, size: 14.0)).foregroundColor(Color.red)
             }
             
             HStack{
@@ -186,25 +193,36 @@ struct BannerPromotionsView: View {
         
             .sheet(isPresented: $showSheetpackages) {
                 if #available(iOS 16.0, *) {
-                    PromotionPackagesView(navigationController: self.navigationController, packageSelectedPressed: {
-                        
-                        showBuySheetpackages = true
+                    PromotionPackagesView(navigationController: self.navigationController, packageSelectedPressed: {selPkgObj in
+                        selectedPkgObj = selPkgObj
+                        self.presentPayView(planObj: selPkgObj)
+                        //showBuySheetpackages = true
                         
                         
                     })
-                    .presentationDetents([.fraction(0.5)]) // 📏 50% screen height
+                    .presentationDetents([.fraction(0.6)]) // 📏 50% screen height
                     .presentationDragIndicator(.visible)
                 } else {
                     // Fallback on earlier versions
                 }   // ⬆️ Optional drag handle
             }
+            
+//            .onChange(of: selectedPkgObj) { newValue in
+//                if newValue != nil {
+//                    showBuySheetpackages = true
+//                }
+//            }
         
             .sheet(isPresented: $showBuySheetpackages) {
                 
                 if #available(iOS 16.0, *) {
-                    BuyPromotionPackageView(navigationController: self.navigationController) {
+                    
+                    BuyPromotionPackageView(navigationController: self.navigationController, buyButtonPressed: {
                         
-                    }
+                        //Call upload pic api
+                        
+                    }, selPkgObj: selectedPkgObj)
+                   
                     .presentationDetents([.fraction(0.25)]) // 📏 50% screen height
                     .presentationDragIndicator(.visible)
                 } else {
@@ -226,19 +244,137 @@ struct BannerPromotionsView: View {
     
     
     func pushToLocationcreen(){
-        let destVC = UIHostingController(rootView: ChooseLocationBannerView(navigationController: self.navigationController, selectedLocation: { (lat, long, address, locality, radius) in
+        let destVC = UIHostingController(rootView: ChooseLocationBannerView(navigationController: self.navigationController, selectedLocation: { (lat, long, address, locality, radius,city,state,country)  in
             
             self.strAddress = address
             self.latitude = lat
             self.longitude = long
             self.radius = radius
+            self.area = locality
+            self.city = city
+            self.state = state
+            self.country = country
+
 
         }))
       self.navigationController?.pushViewController(destVC, animated: true)
     }
     
+  
+
+
+    func uploadFileAndDataApi(){
+    
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(selectedPkgObj?.id ?? ""),"status":"active","type":"redirect","url":"https://example.com/job-promotions"] as [String : Any]
+        
+        guard let img = selectedImage?.wxCompress() else{ return }
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { str, index in
+                        
+                        self.navigationController?.popViewController(animated: true)
+                    }
+               
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
+    }
     
     
+  /*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
+    --header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
+    --header 'Accept: application/json' \
+    --form 'image=@"/home/khusyal/Desktop/error_17382998.png"' \
+    --form 'country="India"' \
+    --form 'state="Maharashtra"' \
+    --form 'city="Mumbai"' \
+    --form 'area="Andheri East"' \
+    --form 'pincode="400059"' \
+    --form 'latitude="19.1136"' \
+    --form 'longitude="72.8697"' \
+    --form 'radius="15"' \
+    --form 'type="redirect"' \
+    --form 'url="https://example.com/job-promotions"' \
+    --form 'status="active"' \
+    --form 'city="Delhi"' \
+    --form 'package_id="516"' \
+    --form 'payment_method="PhonePe"'
+     
+    */
+    
+    func presentPayView(planObj:PlanModel){
+        
+        let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
+        as! PayPlanVC
+        controller.planObj = planObj
+        controller.isBannerPromotionPay = true
+        controller.categoryId = 0
+        controller.categoryName = ""
+        controller.radius = radius
+        controller.area = area
+        controller.selectedImage = selectedImage
+        controller.city = city
+        controller.country = country
+        controller.state = state
+        controller.latitude = "\(latitude)"
+        controller.longitude = "\(longitude)"
+        
+        controller.callbackPaymentSuccess = { (isSuccess) -> Void in
+            
+            if controller.sheetViewController?.options.useInlineMode == true {
+                controller.sheetViewController?.attemptDismiss(animated: true)
+            } else {
+                controller.dismiss(animated: true, completion: nil)
+            }
+            
+            if isSuccess == true {
+                let vc = UIHostingController(rootView: PlanBoughtSuccessView(navigationController: self.navigationController))
+                vc.modalPresentationStyle = .overFullScreen // Full-screen modal
+                vc.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                self.navigationController?.present(vc, animated: true, completion: nil)
+            }
+        }
+        
+        let useInlineMode = (self.navigationController?.topViewController?.view)! != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        var fixedSize = 0.3
+        if UIDevice().hasNotch{
+            fixedSize = 0.27
+        }else{
+            if UIScreen.main.bounds.size.height <= 700 {
+                fixedSize = 0.37
+            }
+        }
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.percent(Float(fixedSize)),.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
+        sheet.allowGestureThroughOverlay = false
+        // sheet.dismissOnOverlayTap = false
+        sheet.cornerRadius = 15
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+    }
 }
 
 #Preview {

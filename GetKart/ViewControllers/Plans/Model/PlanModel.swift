@@ -17,7 +17,7 @@ struct Plan: Codable {
 }
 
 // MARK: - Datum
-struct PlanModel: Codable {
+struct PlanModel: Codable,Identifiable, Equatable {
     let id: Int?
     let name: String?
     let tier: Int?

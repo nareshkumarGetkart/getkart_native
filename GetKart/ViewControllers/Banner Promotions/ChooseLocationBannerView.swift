@@ -15,9 +15,15 @@ struct ChooseLocationBannerView: View {
     @State private var mapRadius: Int = 1500
     @State private var latitude: Double = 0.0
     @State private var longitude: Double = 0.0
+    @State  private var city = ""
+    @State  private var state = ""
+    @State  private var country = ""
+    @State  private var locality = ""
+    
+    
 
     
-    var selectedLocation: (_ lat: Double, _ long: Double, _ address: String, _ locality: String, _ radius: Int) -> Void
+    var selectedLocation: (_ lat: Double, _ long: Double, _ address: String, _ locality: String, _ radius: Int,_ city:String,_ state:String,_ country:String) -> Void
 
     var body: some View {
 
@@ -39,7 +45,7 @@ struct ChooseLocationBannerView: View {
                 if latitude == 0{
                     latitude = Double(Local.shared.getUserLatitude()) ?? 0
                     longitude = Double(Local.shared.getUserLongitude()) ?? 0
-                    self.updateLocationLabel(city:  Local.shared.getUserCity(), state:  Local.shared.getUserState(), country:  Local.shared.getUserCountry())
+                    self.updateLocationLabel(city:  Local.shared.getUserCity(), state:  Local.shared.getUserState(), country:  Local.shared.getUserCountry(),locality: Local.shared.getUserLocality())
                 }
             }
         VStack{
@@ -90,7 +96,7 @@ struct ChooseLocationBannerView: View {
             }.padding()
             
             Button {
-                selectedLocation(latitude,longitude,searchTxt,"",mapRadius/100)
+                selectedLocation(latitude,longitude,searchTxt,"",mapRadius/100,city,state,country)
                 self.navigationController?.popViewController(animated: true)
 
             } label: {
@@ -110,7 +116,7 @@ struct ChooseLocationBannerView: View {
                     let state = userInfo["state"] as? String ?? ""
                     let country = userInfo["country"] as? String ?? ""
                     let locality = userInfo["locality"] as? String ?? ""
-                    
+                    print(notification.userInfo)
                     // Handle the data in SwiftUI View
                     print("Location: \(city), \(state), \(country)")
                     
@@ -124,6 +130,11 @@ struct ChooseLocationBannerView: View {
                     self.latitude = Double(latitude) ?? 0
                     self.longitude =  Double(longitude) ?? 0
                     
+                    self.city = city
+                    self.state = state
+                    self.country = country
+                    self.locality = locality
+
                     //DispatchQueue.main.async { }
                 }
             }
@@ -140,12 +151,13 @@ struct ChooseLocationBannerView: View {
      }
     
     
-    func updateLocationLabel(city: String, state: String, country: String) {
+    func updateLocationLabel(city: String, state: String, country: String,locality:String) {
        
         if city.count == 0{
             
         }else{
-            var locStr = city
+            var locStr = locality
+            if !city.isEmpty { locStr += ", \(city)" }
             if !state.isEmpty { locStr += ", \(state)" }
             if !country.isEmpty { locStr += ", \(country)" }
             searchTxt = locStr.isEmpty ? "" : locStr

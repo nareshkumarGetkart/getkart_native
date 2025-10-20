@@ -24,6 +24,8 @@ class PayPlanVC: UIViewController {
     var payment_method_type = 0
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var btnPay:UIButton!
+    @IBOutlet weak var lblDesc:UILabel!
+
     var InAppReceipt = ""
     
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
@@ -36,7 +38,11 @@ class PayPlanVC: UIViewController {
     var state = ""
     var latitude = ""
     var longitude = ""
-    
+    var isBannerPromotionPay = false
+    var radius = 10
+    var area = ""
+    var pincode = ""
+    var selectedImage:UIImage?
     
     //MARK: Controller life cycle methods
     
@@ -44,8 +50,18 @@ class PayPlanVC: UIViewController {
         super.viewDidLoad()
         btnPay.layer.cornerRadius = 8.0
         btnPay.clipsToBounds = true
-        lblPrice.text = "Total \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")"
-        btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
+        if isBannerPromotionPay{
+            lblDesc.text = "You've selected the \(planObj?.name ?? "") Plan"
+            lblPrice.text = "Let's Get You More Views & Sales"
+            btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
+            lblDesc.textAlignment = .center
+            lblPrice.textAlignment = .center
+
+        }else{
+            lblDesc.text = ""
+            lblPrice.text = "Total \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")"
+            btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
+        }
         self.getPaymentSettings()
     }
     
@@ -64,7 +80,15 @@ class PayPlanVC: UIViewController {
         if payment_method_type == 1 {//In App
             self.IAPPaymentForm()
         }else if payment_method_type == 3 {//Phone Pay
-            self.createPhonePayOrder(package_id: planObj?.id ?? 0)
+            
+            if isBannerPromotionPay{
+                
+                getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
+            }else{
+                self.createPhonePayOrder(package_id: planObj?.id ?? 0)
+
+            }
+
         }
     }
     
@@ -162,10 +186,71 @@ class PayPlanVC: UIViewController {
     }
     
     
+
+
+    func getIntentForBannerPromotions(package_id:Int){
+
+    
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":"https://example.com/job-promotions","platform_type":"app"] as [String : Any]
+        
+        guard let img = selectedImage?.wxCompress() else{ return }
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                            
+                            if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                let token  = payment_gateway_response["token"] as? String ?? ""
+                                self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                            }
+                        }
+                    }
+                    
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
+    }
+    
+    
+  /*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
+    --header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
+    --header 'Accept: application/json' \
+    --form 'image=@"/home/khusyal/Desktop/error_17382998.png"' \
+    --form 'country="India"' \
+    --form 'state="Maharashtra"' \
+    --form 'city="Mumbai"' \
+    --form 'area="Andheri East"' \
+    --form 'pincode="400059"' \
+    --form 'latitude="19.1136"' \
+    --form 'longitude="72.8697"' \
+    --form 'radius="15"' \
+    --form 'type="redirect"' \
+    --form 'url="https://example.com/job-promotions"' \
+    --form 'status="active"' \
+    --form 'city="Delhi"' \
+    --form 'package_id="516"' \
+    --form 'payment_method="PhonePe"'
+     
+    */
+    
     
     func createPhonePayOrder(package_id:Int){
                 
-        let params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city]
+        let params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city,"state":state]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.paymentIntent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
             

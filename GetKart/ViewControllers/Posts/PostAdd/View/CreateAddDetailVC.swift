@@ -306,18 +306,18 @@ class CreateAddDetailVC: UIViewController {
             showErrorMsg = true
             scrollIndex = 2
             
-        }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0 {
+        }else if  (params[AddKeys.price.rawValue] as? String  ?? "").count == 0  || (params[AddKeys.price.rawValue] as? String ?? "0").hasPrefix("0"){
             
             showErrorMsg = true
             scrollIndex = 4
-        }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), (price < 1 && price > 9) {
+       }else if let price =  Int(params[AddKeys.price.rawValue] as? String  ?? "0"), (price < 1 && price > 9) {
             
             showErrorMsg = true
             scrollIndex = 4
-
-//        }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
-//            
-//            showErrorMsg = true
+            
+            //        }else if  (params[AddKeys.contact.rawValue] as? String  ?? "").count == 0 {
+            //
+            //            showErrorMsg = true
             
         } else {
             showErrorMsg = false
@@ -663,8 +663,13 @@ extension CreateAddDetailVC:UITableViewDelegate, UITableViewDataSource {
             }
             
              if showErrorMsg == true && (self.selectedRow != indexPath.row) {
-                if let price = Int(params[AddKeys.price.rawValue] as? String ?? "0"),price < 1{
+                 if let price = Int(params[AddKeys.price.rawValue] as? String ?? "0"),price < 1{
                     cell.lblErrorMsg.text = "Price must be greater than 0"
+                    cell.lblErrorMsg.isHidden = false
+                    cell.txtField.layer.borderColor = UIColor.red.cgColor
+                    
+                 }else if (params[AddKeys.price.rawValue] as? String ?? "0").hasPrefix("0"){
+                    cell.lblErrorMsg.text = "Price must be valid"
                     cell.lblErrorMsg.isHidden = false
                     cell.txtField.layer.borderColor = UIColor.red.cgColor
                     

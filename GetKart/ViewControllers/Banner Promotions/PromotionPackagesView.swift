@@ -10,8 +10,8 @@ import SwiftUI
 struct PromotionPackagesView: View {
     
     var navigationController:UINavigationController?
-    var packageSelectedPressed: (()->Void)?
-
+    var packageSelectedPressed: ((_ selPkgObj:PlanModel)->Void)?
+    @State private var planListArray:Array<PlanModel>?
     var body: some View {
         HStack{
             Text("Promotion Pakages").font(.manrope(.medium, size: 20))
@@ -23,7 +23,7 @@ struct PromotionPackagesView: View {
                 Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }
             
-        }.frame(height:44).padding([.leading,.trailing,.top])
+        }.frame(height:30).padding([.leading,.trailing,.top])
         
         VStack(spacing:15){
             
@@ -32,31 +32,37 @@ struct PromotionPackagesView: View {
             Text("Want more product views? Banner Ads bring users straight to you.")
             ScrollView{
                 VStack(alignment:.leading, spacing:10){
-                    PromotionPackageCell().onTapGesture {
-                        self.navigationController?.dismiss(animated: true)
-                        packageSelectedPressed?()
-                    }
-                    PromotionPackageCell().onTapGesture {
-                        self.navigationController?.dismiss(animated: true)
-                        packageSelectedPressed?()                }
                     
-                    PromotionPackageCell().onTapGesture {
-                        self.navigationController?.dismiss(animated: true)
-                        packageSelectedPressed?()                }
                     
-                    PromotionPackageCell()
-                        .onTapGesture {
-                            self.navigationController?.dismiss(animated: true)
-                            packageSelectedPressed?()
-                        }
+                    ForEach(planListArray ?? [], id: \.id) { pkgObj in
+                           PromotionPackageCell(obj: pkgObj)
+                               .onTapGesture {
+                                   self.navigationController?.dismiss(animated: true)
+                                   packageSelectedPressed?(pkgObj)
+                               }
+                       }
+                   
                     Spacer()
 
                 }
                 
+            }.onAppear() {
+                getPackagesApi()
             }
         }.padding()
         
     }
+    
+    func getPackagesApi(){
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_campaign_package ) { (obj:PromotionPkg) in
+            
+            if obj.code == 200 {
+                planListArray = obj.data
+            }
+        }
+    }
+
 }
 
 #Preview {
@@ -67,13 +73,24 @@ struct PromotionPackagesView: View {
 
 struct PromotionPackageCell:View {
     
+    let obj:PlanModel
     var body: some View {
         
         HStack{
-            Text("100 Clicks").font(.manrope(.medium, size: 16)).padding(.leading)
+            Text(obj.name ?? "").font(.manrope(.medium, size: 16)).padding(.leading)
             Spacer()
-            Text("2% Savings").font(.manrope(.medium, size: 10)).background(Color(.systemYellow))
-            Text("\(Local.shared.currencySymbol) 17,500").font(.manrope(.regular, size: 16)).padding(.trailing)
+            if (obj.discountInPercentage ?? "0") != "0"{
+
+           // if obj.discountInPercentage > 0{
+                Text(" \(obj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.manrope(.medium, size: 13)).background(Color(.systemYellow))
+                
+                let amt = "\(obj.finalPrice ?? "0")".formatNumberWithComma()
+                Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
+            }else{
+                let amt = "\(obj.price ?? "0")".formatNumberWithComma()
+                Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
+            }
+          
         }.frame(height:55).overlay{
             
             RoundedRectangle(cornerRadius: 8.0).stroke(Color.gray,lineWidth: 0.6)
