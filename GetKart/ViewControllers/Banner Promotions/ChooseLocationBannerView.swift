@@ -11,7 +11,11 @@ struct ChooseLocationBannerView: View {
     
     var navigationController:UINavigationController?
     @State  private var searchTxt = ""
-    @State private var sliderValue: Double = 15
+    @State  var sliderValue: Double = 50
+    var minSliderValue: Int = 25
+    var maxSliderValue: Int = 100
+    var defaultValue: Int = 50
+
     @State private var mapRadius: Int = 1500
     @State private var latitude: Double = 0.0
     @State private var longitude: Double = 0.0
@@ -45,8 +49,16 @@ struct ChooseLocationBannerView: View {
                 if latitude == 0{
                     latitude = Double(Local.shared.getUserLatitude()) ?? 0
                     longitude = Double(Local.shared.getUserLongitude()) ?? 0
+                    
+                    city = Local.shared.getUserCity()
+                    state = Local.shared.getUserState()
+                    country = Local.shared.getUserCountry()
+                    locality = Local.shared.getUserLocality()
+                    
                     self.updateLocationLabel(city:  Local.shared.getUserCity(), state:  Local.shared.getUserState(), country:  Local.shared.getUserCountry(),locality: Local.shared.getUserLocality())
                 }
+                sliderValue = Double(defaultValue)
+                
             }
         VStack{
             
@@ -82,17 +94,23 @@ struct ChooseLocationBannerView: View {
             VStack(alignment:.leading, spacing: 10) {
                 Text("Radius").font(.manrope(.regular, size: 14))
                 HStack{ Spacer()
-                    Text("\(Int(sliderValue))")
+                    Text("\(Int(sliderValue)) km")
                         .font(.headline)
                     Spacer()
                 }
                 
-                Slider(value: $sliderValue, in: 1...30, step: 1).onChange(of: sliderValue) { newValue in
+                Slider(value: $sliderValue, in: Double(minSliderValue)...Double(maxSliderValue), step: 1).onChange(of: sliderValue) { newValue in
                     print("Slider changed to: \(newValue)")
                     // Perform your logic here
                     mapRadius = Int(newValue * 100)
                 }
                 .accentColor(Color(.systemOrange))
+                HStack{
+                    Text("\(minSliderValue) km")
+                    Spacer()
+                    Text("\(maxSliderValue) km")
+
+                }
             }.padding()
             
             Button {

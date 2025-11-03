@@ -622,6 +622,49 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 }
             }
       
+        case "campaign-update":
+            do{
+                
+                for controller in self.navigationController?.viewControllers ?? []{
+                    
+                    if let destvc =  controller as? HomeBaseVC{
+                        
+                        
+                        if let navController = destvc.viewControllers?[0] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+
+                        }
+                        
+                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                            navController.popToRootViewController(animated: false)
+                        }
+                        
+                        destvc.selectedIndex = 3
+                        
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                          
+                            navController.popToRootViewController(animated: false)
+
+                            // Notify the 3rd view controller to refresh
+                            if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
+                                thirdVC.refreshBannerAds()
+                     
+                                break
+                            }
+                        }
+                    }
+                }
+            }
         default:
             break
         }

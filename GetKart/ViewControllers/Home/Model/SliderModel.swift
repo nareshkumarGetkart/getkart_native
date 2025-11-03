@@ -25,7 +25,10 @@ struct SliderModel: Codable {
     let appRedirection: Bool?
     let redirectionType: String?
     let model: Model?
-
+    let is_campaign:Bool?
+    let is_active:Int?
+    let campaign_id:Int?
+    
     enum CodingKeys: String, CodingKey {
         case id, image, sequence
         case thirdPartyLink = "third_party_link"
@@ -34,6 +37,8 @@ struct SliderModel: Codable {
         case modelType = "model_type"
         case modelID = "model_id"
         case appRedirection, redirectionType, model
+        case is_campaign, is_active, campaign_id
+
     }
 }
 

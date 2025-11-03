@@ -30,6 +30,8 @@ class PayPlanVC: UIViewController {
     
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     
+    var campaign_banner_id:Int?
+
     
     var categoryId = 0
     var categoryName = ""
@@ -43,6 +45,7 @@ class PayPlanVC: UIViewController {
     var area = ""
     var pincode = ""
     var selectedImage:UIImage?
+    var strUrl = ""
     
     //MARK: Controller life cycle methods
     
@@ -155,7 +158,8 @@ class PayPlanVC: UIViewController {
     
     func updateOrderApi(){
         
-        let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId]
+        let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
+        let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId]
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
@@ -191,7 +195,7 @@ class PayPlanVC: UIViewController {
     func getIntentForBannerPromotions(package_id:Int){
 
     
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":"https://example.com/job-promotions","platform_type":"app"] as [String : Any]
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
         guard let img = selectedImage?.wxCompress() else{ return }
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
@@ -204,6 +208,11 @@ class PayPlanVC: UIViewController {
                 
                 if code == 200{
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                            self?.campaign_banner_id = campaign_banner_id
+                        }
+                        
                         if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
                             
                             self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""

@@ -47,7 +47,6 @@ struct PreviewAdView: View {
                     
                     PreviewAdsCell(title: titleArray[index], icon: iconArray[index]).onTapGesture {
                         pushtoPreviewScren(index: index)
-                       // pushToBannerAnalytics()
                     }
                 }
             }
@@ -80,12 +79,7 @@ struct PreviewAdView: View {
             }
         }
     }
-    func pushToBannerAnalytics(){
-        let swiftView = BannerAlalyticsView(navigationController: self.navigationController)
-        let destVC = UIHostingController(rootView: swiftView)
-        self.navigationController?.pushViewController(destVC, animated: true)
-        
-    }
+
 }
 
 #Preview {

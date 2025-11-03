@@ -17,7 +17,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -53,6 +53,39 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var  campaign_event:String {
+        get {
+            return "\(baseURL)/v1/campaign-event"
+        }
+    }
+    
+    
+    var   get_user_banners:String {
+        get {
+            return "\(baseURL)/v1/get-user-banners"
+        }
+    }
+    
+    var   banner_analytics:String {
+        get {
+            return "\(baseURL)/v1/banner-analytics"
+        }
+    }
+    
+    
+    var  campaign_settings:String {
+        get {
+            return "\(baseURL)/v1/campaign-settings"
+        }
+    }
+    
+    
+    var  update_campaign_banner:String {
+        get {
+            return "\(baseURL)/v1/update-campaign-banner"
+        }
+    }
     
     
     
@@ -173,7 +206,9 @@ final class Constant: NSObject {
     
     var get_slider:String{
         get {
-            return "\(Constant.shared.baseURL)/v1/get-slider"
+           // return "\(Constant.shared.baseURL)/v1/get-slider"
+            
+            return "\(Constant.shared.baseURL)/v2/get-slider"
         }
     }
     

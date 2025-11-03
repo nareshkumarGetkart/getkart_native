@@ -47,8 +47,13 @@ struct TransactionHistoryPreview: View {
                         Spacer()
                     }
 
-                    detailsCard()
-                   // bannerAnalyticsdetailsCard()
+                    if transaction?.package?.type == "campaign"{
+                        bannerAnalyticsdetailsCard()
+
+                    }else{
+                        detailsCard()
+
+                    }
                     
                     Button(action: {}) {
                         Text("Total Cost \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
@@ -235,7 +240,7 @@ private func detailsCard() -> some View {
             detailRow(title: "Date", value: getConvertedDateFromDate(date: date))
             detailRow(title: "Purchase from", value: "\(transaction?.paymentTransaction?.paymentGateway?.capitalized ?? "")")
            
-            BannerAnalyticCell(title: "Status", value: "", isActive: true)
+          //  BannerAnalyticCell(title: "Status", value: "", isActive: true)
             
             
                 HStack {
@@ -246,11 +251,11 @@ private func detailsCard() -> some View {
                         pushToBannerAnalytics()
                     },label:{
                         
-                        Text("Banner analytics").foregroundColor(.blue).underline()
+                        Text("Banner analytics").foregroundColor(.blue).underline().font(.manrope(.regular, size: 17))
                     })
                     
                     Spacer()
-                }
+                }.padding(.top,10).padding(.bottom,10)
          
         }
         .padding()
@@ -265,9 +270,12 @@ private func detailsCard() -> some View {
 
 
     func pushToBannerAnalytics(){
-        let swiftView = BannerAlalyticsView(navigationController: self.navController)
-        let destVC = UIHostingController(rootView: swiftView)
-        self.navController?.pushViewController(destVC, animated: true)
+        if let bannerId = transaction?.banners?.first?.id{
+            let swiftView = BannerAlalyticsView(navigationController: self.navController, bannerId: bannerId)
+            let destVC = UIHostingController(rootView: swiftView)
+            self.navController?.pushViewController(destVC, animated: true)
+        }
+      
         
     }
 }

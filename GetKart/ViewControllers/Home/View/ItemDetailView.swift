@@ -468,6 +468,8 @@ struct ItemDetailView: View {
                     
                 }
                 }
+                
+               
                 LazyVStack(alignment: .leading, spacing: 8) {
                     
                     if objVM.relatedDataItemArray.count > 0 {
@@ -477,6 +479,12 @@ struct ItemDetailView: View {
                         }//.padding(.bottom)
                         
                     }
+                    
+                    if !objVM.bannerAdsArray.isEmpty {
+                        AutoScrollBannerAdsView(sliderArray: objVM.bannerAdsArray, currentIndex: 0,navController:self.navController)
+                            .frame(height: 200)
+                    }
+                    
                     /*  ScrollView(.horizontal, showsIndicators: false) {
                      //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
                      HStack(spacing: 10) {
@@ -1791,5 +1799,59 @@ struct TextSizeReader: View {
     var lineHeight: CGFloat {
         // Estimated height per line for 15pt font
         18
+    }
+}
+
+
+struct AutoScrollBannerAdsView: View {
+    @State var sliderArray: [SliderModel]
+    @State var currentIndex = 0
+    let navController:UINavigationController?
+    
+    
+    var body: some View {
+        VStack {
+            TabView(selection: $currentIndex) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    let slider = sliderArray[index]
+                    
+                    ZStack { // ✅ Wrapper to apply radius & spacing properly
+                        AsyncImage(url: URL(string: slider.image ?? "")) { image in
+                            image.resizable()
+                               // .scaledToFill()
+                                .cornerRadius(10)
+                              //.frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                        } placeholder: {
+                            ProgressView()
+                        }.onTapGesture {
+                            
+                            BannerNavigation.navigateToScreen(index: index, sliderObj: slider, navigationController: navController,viewType: "AD_DETAIL")
+                        }
+                    }
+                    .frame(height: 170)
+                    .background(Color.clear)
+                   // .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous)) // ✅ Now works
+                   // .padding(.horizontal, 12) // ✅ Visible spacing between pages
+                   // .shadow(radius: 3) // Optional: card effect
+                    .tag(index)
+                    //.cornerRadius(20)
+                }
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 185)
+//            .cornerRadius(20)
+//            .clipped()
+            // Page Indicator
+            HStack(spacing: 5) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    Capsule()
+                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
+                        .animation(.easeInOut, value: currentIndex)
+                }
+            }
+            .padding(.top, -5)
+        }
     }
 }

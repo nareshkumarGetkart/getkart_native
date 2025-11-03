@@ -9,6 +9,7 @@ import SwiftUI
 import FittedSheets
 
 struct BannerPromotionsView: View {
+    
     var navigationController:UINavigationController?
     @State private var selectedImage: UIImage? = nil
     @State private var strUrl:String = ""
@@ -27,7 +28,10 @@ struct BannerPromotionsView: View {
     @State private var state:String = ""
     @State private var area:String = ""
     @State private var pincode:String = ""
+    @State private var isSettingCalled:Bool = false
+    @State private var settingObj:PromotionSettingModel = PromotionSettingModel(crop_height: 100, crop_width: 100, default_radius: 50, min_radius: 25, max_radius: 100)
 
+    
     var body: some View {
         HStack{
             Button {
@@ -49,7 +53,13 @@ struct BannerPromotionsView: View {
             }
 
          }.frame(height:44).background(Color(UIColor.systemBackground))
-        
+            .onAppear{
+                
+                if !isSettingCalled{
+                    getCmpaignSettingsApi()
+                    isSettingCalled = true
+                }
+            }
          VStack(alignment:.leading,spacing: 25){
             VStack(alignment:.leading,spacing: 5){
                 Text("Banner image").font(.manrope(.semiBold, size: 16.0))
@@ -152,7 +162,7 @@ struct BannerPromotionsView: View {
                         .fill(Color(.systemBackground))
                     
                 ).keyboardType(.URL).tint(Color(.systemOrange)).autocapitalization(.none)
-            Text("For the best results on all devices, use an image that's at least 1080 x 354 pixels and 4 MB or less.").font(.manrope(.regular, size: 12.0))
+            Text("Add your business page link and let users discover you in just one click.").font(.manrope(.regular, size: 12.0))
             }
             Spacer()
             
@@ -160,7 +170,8 @@ struct BannerPromotionsView: View {
             Button {
                 
                 if isFilled{
-                    showSheetpackages = true
+                    validateField()
+//                    showSheetpackages = true
                 }
             } label: {
                 
@@ -182,7 +193,10 @@ struct BannerPromotionsView: View {
                        if let img = selectedImage {
                            ImageCropperView(
                                image: img,
-                               cropAspectRatio: CGSize(width: 1180, height: 500) // 354)
+                              // cropAspectRatio: CGSize(width: 1180, height: 500) // 354)
+                               
+                               cropAspectRatio: CGSize(width: settingObj.crop_width, height: settingObj.crop_height) // 354)
+
                            ) { croppedImage in
                                self.selectedImage = croppedImage
                                self.showCropper = false
@@ -233,6 +247,22 @@ struct BannerPromotionsView: View {
     }
     
     
+    func validateField(){
+        if selectedImage == nil {
+            AlertView.sharedManager.showToast(message: "Please upload banner image")
+        }else if city.count == 0
+        {
+            AlertView.sharedManager.showToast(message: "Please select location")
+
+        }else if strUrl.count > 0 && !strUrl.isValidWebsiteURL() {
+            AlertView.sharedManager.showToast(message: "Please enter valid url")
+
+        }else{
+            showSheetpackages = true
+
+        }
+    }
+    
     func pushToPreviewScreen(){
         if let img = selectedImage{
             let destVC = UIHostingController(rootView: PreviewAdView(navigationController: self.navigationController, image: img))
@@ -244,7 +274,7 @@ struct BannerPromotionsView: View {
     
     
     func pushToLocationcreen(){
-        let destVC = UIHostingController(rootView: ChooseLocationBannerView(navigationController: self.navigationController, selectedLocation: { (lat, long, address, locality, radius,city,state,country)  in
+        let destVC = UIHostingController(rootView: ChooseLocationBannerView(navigationController: self.navigationController,minSliderValue: settingObj.min_radius,maxSliderValue: settingObj.max_radius,defaultValue: Int(Double(settingObj.default_radius)),  selectedLocation: { (lat, long, address, locality, radius,city,state,country)  in
             
             self.strAddress = address
             self.latitude = lat
@@ -292,6 +322,35 @@ struct BannerPromotionsView: View {
     }
     
     
+    func getCmpaignSettingsApi(){
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_settings, param: nil,methodType: .get) { responseObject, error in
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if let data = result["data"] as? Dictionary<String,Any>{
+                        
+                        self.settingObj.crop_height = data["crop_height"] as? Int ?? 0
+                        self.settingObj.crop_width = data["crop_width"] as? Int ?? 0
+                        self.settingObj.default_radius = data["default_radius"] as? Int ?? 0
+                        self.settingObj.min_radius = data["min_radius"] as? Int ?? 0
+                        self.settingObj.max_radius = data["max_radius"] as? Int ?? 0
+
+                    }
+                }else{
+                    
+
+                }
+            }
+        }
+    }
+    
+    
+    
   /*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
     --header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
     --header 'Accept: application/json' \
@@ -329,6 +388,7 @@ struct BannerPromotionsView: View {
         controller.state = state
         controller.latitude = "\(latitude)"
         controller.longitude = "\(longitude)"
+        controller.strUrl = strUrl
         
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
@@ -428,4 +488,48 @@ struct ImagePickerPromotion: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+}
+
+
+struct PromotionSettingModel{
+    
+    var crop_height:Int
+    var crop_width:Int
+    var default_radius:Int
+    var min_radius:Int
+    var max_radius:Int
+
+}
+
+
+
+
+import Foundation
+
+extension String {
+    /// Valid only if starts with http://, https://, or www.
+    func isValidWebsiteURL() -> Bool {
+        let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Must start with one of these
+        guard trimmed.lowercased().hasPrefix("http://") ||
+              trimmed.lowercased().hasPrefix("https://") ||
+              trimmed.lowercased().hasPrefix("www.") else {
+            return false
+        }
+
+        // Try to create a URL (auto-add https:// if only www. present)
+        var testURL = trimmed
+        if testURL.lowercased().hasPrefix("www.") {
+            testURL = "https://" + testURL
+        }
+
+        guard let url = URL(string: testURL),
+              let host = url.host,
+              host.contains(".") else {
+            return false
+        }
+
+        return true
+    }
 }

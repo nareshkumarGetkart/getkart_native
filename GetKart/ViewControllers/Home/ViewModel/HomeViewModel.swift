@@ -176,14 +176,17 @@ class HomeViewModel:ObservableObject{
     
     
     func getSliderListApi(){
+     
+        let params = ["referrer_url":"HOME","country":Local.shared.getUserCountry(),"state":Local.shared.getUserState(),"city":Local.shared.getUserCity(),"area":Local.shared.getUserLocality(),"latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude()]
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_slider) {[weak self] (obj:SliderModelParse) in
-            
+        ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.get_slider, param: params,httpMethod: .post, completion:  {[weak self] (obj:SliderModelParse) in
+      /*  ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_slider) {[weak self] (obj:SliderModelParse) in
+            */
             if obj.code == 200 {
                 self?.sliderArray = obj.data
                 self?.delegate?.refreshBannerList()
             }
-        }
+        })
     }
     
     

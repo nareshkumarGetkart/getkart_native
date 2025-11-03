@@ -69,12 +69,12 @@ struct TransactionModel: Codable,Identifiable {
     let user: User?
     let package: Package?
     let paymentTransaction: PaymentTransaction?
-    
+    let banners: [Banner]?
 
 
 
     enum CodingKeys: String, CodingKey {
-        case id
+        case id,banners
         case userID = "user_id"
         case packageID = "package_id"
         case startDate = "start_date"
@@ -121,6 +121,47 @@ struct Package: Codable {
         case category
     }
 }
+
+
+// MARK: - Banner
+struct Banner: Codable {
+    let id, userID, userPurchasedPackageID: Int?
+    let campaignID: Int?
+    let imagePath: String?
+    let fileType: Int?
+    let country, state: String?
+    let city: String?
+    let area, pincode: String?
+    let latitude, longitude: String?
+    let radius: Int?
+    let type: String?
+    let url: String?
+    let status: String?
+    let isActive: Int?
+    let rejectionReason: String?
+    let startDate: String?
+    let endDate: String?
+    let createdAt, updatedAt: String?
+    let deletedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userID = "user_id"
+        case userPurchasedPackageID = "user_purchased_package_id"
+        case campaignID = "campaign_id"
+        case imagePath = "image_path"
+        case fileType = "file_type"
+        case country, state, city, area, pincode, latitude, longitude, radius, type, url, status
+        case isActive = "is_active"
+        case rejectionReason = "rejection_reason"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case deletedAt = "deleted_at"
+    }
+}
+
 
 // MARK: - PaymentTransaction
 struct PaymentTransaction: Codable {
