@@ -12,6 +12,9 @@
         <array key="Manrope-Medium.ttf">
             <string>Manrope-Medium</string>
         </array>
+        <array key="Manrope-Regular.ttf">
+            <string>Manrope-Regular</string>
+        </array>
     </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -92,36 +95,63 @@
                                     <constraint firstAttribute="trailing" secondItem="gy4-py-b2h" secondAttribute="trailing" constant="5" id="mpu-qk-FrX"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pCD-v6-CxY">
-                                <rect key="frame" x="216" y="5" width="74" height="23"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="IvN-bD-yRT">
+                                <rect key="frame" x="134" y="5" width="156" height="23"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lo1-ho-adJ">
-                                        <rect key="frame" x="1" y="1" width="72" height="21"/>
-                                        <fontDescription key="fontDescription" name="Manrope-Medium" family="Manrope" pointSize="13"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pCD-v6-CxY">
+                                        <rect key="frame" x="0.0" y="0.0" width="74" height="23"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lo1-ho-adJ">
+                                                <rect key="frame" x="1" y="1" width="72" height="21"/>
+                                                <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="13"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="74" id="5eC-8x-xtS"/>
+                                            <constraint firstAttribute="bottom" secondItem="Lo1-ho-adJ" secondAttribute="bottom" constant="1" id="A0A-NO-yBV"/>
+                                            <constraint firstItem="Lo1-ho-adJ" firstAttribute="leading" secondItem="pCD-v6-CxY" secondAttribute="leading" constant="1" id="b6F-oF-ATN"/>
+                                            <constraint firstAttribute="trailing" secondItem="Lo1-ho-adJ" secondAttribute="trailing" constant="1" id="eQR-DU-3mE"/>
+                                            <constraint firstAttribute="height" constant="23" id="l7A-Ie-ymj"/>
+                                            <constraint firstItem="Lo1-ho-adJ" firstAttribute="top" secondItem="pCD-v6-CxY" secondAttribute="top" constant="1" id="zK0-6R-Lhe"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VaM-Wq-HUd">
+                                        <rect key="frame" x="82" y="0.0" width="74" height="23"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s6F-Ry-IXx">
+                                                <rect key="frame" x="1" y="1" width="72" height="21"/>
+                                                <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="13"/>
+                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                <state key="normal" title="Active" image="checkmark-circle-outline">
+                                                    <color key="titleColor" red="0.0" green="0.50196078431372548" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="s6F-Ry-IXx" firstAttribute="leading" secondItem="VaM-Wq-HUd" secondAttribute="leading" constant="1" id="5Vx-E7-jeh"/>
+                                            <constraint firstAttribute="trailing" secondItem="s6F-Ry-IXx" secondAttribute="trailing" constant="1" id="B9t-3D-s0U"/>
+                                            <constraint firstItem="s6F-Ry-IXx" firstAttribute="top" secondItem="VaM-Wq-HUd" secondAttribute="top" constant="1" id="UCn-kB-DRQ"/>
+                                            <constraint firstAttribute="bottom" secondItem="s6F-Ry-IXx" secondAttribute="bottom" constant="1" id="aNx-bW-NbO"/>
+                                            <constraint firstAttribute="width" constant="74" id="bjV-t6-iwZ"/>
+                                            <constraint firstAttribute="height" constant="23" id="uNs-2v-tCc"/>
+                                        </constraints>
+                                    </view>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="74" id="5eC-8x-xtS"/>
-                                    <constraint firstAttribute="bottom" secondItem="Lo1-ho-adJ" secondAttribute="bottom" constant="1" id="A0A-NO-yBV"/>
-                                    <constraint firstItem="Lo1-ho-adJ" firstAttribute="leading" secondItem="pCD-v6-CxY" secondAttribute="leading" constant="1" id="b6F-oF-ATN"/>
-                                    <constraint firstAttribute="trailing" secondItem="Lo1-ho-adJ" secondAttribute="trailing" constant="1" id="eQR-DU-3mE"/>
-                                    <constraint firstAttribute="height" constant="23" id="l7A-Ie-ymj"/>
-                                    <constraint firstItem="Lo1-ho-adJ" firstAttribute="top" secondItem="pCD-v6-CxY" secondAttribute="top" constant="1" id="zK0-6R-Lhe"/>
-                                </constraints>
-                            </view>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="IvN-bD-yRT" firstAttribute="top" secondItem="CYi-6b-aIh" secondAttribute="top" constant="5" id="7gI-Vh-tdO"/>
                             <constraint firstItem="RyM-Gx-Czr" firstAttribute="leading" secondItem="CYi-6b-aIh" secondAttribute="leading" id="7nC-bA-eUt"/>
                             <constraint firstItem="5mk-V0-FQd" firstAttribute="leading" secondItem="CYi-6b-aIh" secondAttribute="leading" id="8lN-pP-Iz3"/>
                             <constraint firstItem="RyM-Gx-Czr" firstAttribute="top" secondItem="5mk-V0-FQd" secondAttribute="bottom" id="9mw-Yp-Ni3"/>
-                            <constraint firstAttribute="trailing" secondItem="pCD-v6-CxY" secondAttribute="trailing" constant="10" id="Bz7-9H-oyR"/>
                             <constraint firstAttribute="trailing" secondItem="RyM-Gx-Czr" secondAttribute="trailing" id="PbW-U0-ZsV"/>
                             <constraint firstAttribute="trailing" secondItem="5mk-V0-FQd" secondAttribute="trailing" id="VI2-PS-CuC"/>
-                            <constraint firstItem="pCD-v6-CxY" firstAttribute="top" secondItem="CYi-6b-aIh" secondAttribute="top" constant="5" id="etw-h6-VjQ"/>
+                            <constraint firstAttribute="trailing" secondItem="IvN-bD-yRT" secondAttribute="trailing" constant="10" id="mkd-fw-Shm"/>
                             <constraint firstItem="5mk-V0-FQd" firstAttribute="top" secondItem="CYi-6b-aIh" secondAttribute="top" id="mpu-1Z-vFH"/>
                             <constraint firstAttribute="bottom" secondItem="RyM-Gx-Czr" secondAttribute="bottom" id="zeg-NJ-eo3"/>
                         </constraints>
@@ -139,6 +169,7 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bgView" destination="CYi-6b-aIh" id="YMI-jo-bYH"/>
+                <outlet property="bgViewActiveStatus" destination="VaM-Wq-HUd" id="M13-mu-ogL"/>
                 <outlet property="bgViewStatus" destination="pCD-v6-CxY" id="y5i-DR-KkQ"/>
                 <outlet property="imgVwBanner" destination="5mk-V0-FQd" id="Ycj-JA-3up"/>
                 <outlet property="lblLikeCount" destination="iKM-YF-wZ8" id="fUb-iY-gcO"/>
@@ -149,6 +180,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="checkmark-circle-outline" width="18" height="18"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -10,8 +10,8 @@ import SwiftUI
 struct PreviewAdView: View {
     var navigationController:UINavigationController?
     var image:UIImage
-    private let titleArray = ["Home Page","Buy Packages","Item description","All categories"]
-    private let iconArray = ["home","buyPackages","category","category"]
+    private let titleArray = ["Home Page","Buy Packages","Item description"]//,"All categories"]
+    private let iconArray = ["home","buyPackages","category"]//,"category"]
 
     var body: some View {
         HStack{

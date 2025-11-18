@@ -39,7 +39,7 @@ struct ChooseLocationBannerView: View {
                 Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
         
-            Text("Locations").font(.manrope(.bold, size: 20.0))
+            Text("Location").font(.manrope(.bold, size: 20.0))
                 .foregroundColor(Color(UIColor.label))
             Spacer()
             
@@ -58,7 +58,8 @@ struct ChooseLocationBannerView: View {
                     self.updateLocationLabel(city:  Local.shared.getUserCity(), state:  Local.shared.getUserState(), country:  Local.shared.getUserCountry(),locality: Local.shared.getUserLocality())
                 }
                 sliderValue = Double(defaultValue)
-                
+                mapRadius = defaultValue * 100
+
             }
         VStack{
             
@@ -114,8 +115,12 @@ struct ChooseLocationBannerView: View {
             }.padding()
             
             Button {
-                selectedLocation(latitude,longitude,searchTxt,"",mapRadius/100,city,state,country)
-                self.navigationController?.popViewController(animated: true)
+                if city.count == 0{
+                    AlertView.sharedManager.showToast(message: "Please select specific city or area.")
+                }else{
+                    selectedLocation(latitude,longitude,searchTxt,"",mapRadius/100,city,state,country)
+                    self.navigationController?.popViewController(animated: true)
+                }
 
             } label: {
                 Text("Done").foregroundColor(.white)
@@ -128,16 +133,28 @@ struct ChooseLocationBannerView: View {
         
             .onReceive(NotificationCenter.default.publisher(for: Notification.Name(NotiKeysLocSelected.bannerPromotionNewLocation.rawValue))) { notification in
                 if let userInfo = notification.userInfo as? [String: Any] {
-                    let latitude = userInfo["latitude"] as? String ?? ""
-                    let longitude = userInfo["longitude"] as? String ?? ""
                     let city = userInfo["city"] as? String ?? ""
                     let state = userInfo["state"] as? String ?? ""
                     let country = userInfo["country"] as? String ?? ""
                     let locality = userInfo["locality"] as? String ?? ""
-                    print(notification.userInfo)
-                    // Handle the data in SwiftUI View
-                    print("Location: \(city), \(state), \(country)")
+                    print(userInfo)
                     
+                    // Handle the data in SwiftUI View
+                 //  print("Location: \(city), \(state), \(country)")
+                    
+                     if let lat = userInfo["latitude"] as? Double {
+                        self.latitude = lat
+
+                     }else{
+                        self.latitude = Double(userInfo["latitude"] as? String ?? "0") ?? 0
+                    }
+                    
+                    if let long = userInfo["longitude"] as? Double {
+                         self.longitude = long
+
+                     }else{
+                         self.longitude = Double(userInfo["longitude"] as? String ?? "0") ?? 0
+                     }
                     if locality.count > 0{
                         searchTxt =  locality + "," + city + ", " + state + ", " + country
                         
@@ -145,8 +162,6 @@ struct ChooseLocationBannerView: View {
                         searchTxt = city + ", " + state + ", " + country
                         
                     }
-                    self.latitude = Double(latitude) ?? 0
-                    self.longitude =  Double(longitude) ?? 0
                     
                     self.city = city
                     self.state = state

@@ -242,8 +242,9 @@ struct ItemDetailView: View {
                 HStack{
                     
                     Text("\(Local.shared.currencySymbol) \((objVM.itemObj?.price ?? 0.0).formatNumber())")
-                        .font(Font.manrope(.medium, size: 16))
-                        .foregroundColor(Color(hex: "#FF9900"))
+                        .font(Font.manrope(.bold, size: 16))
+                        .foregroundColor(Color(.systemGreen))
+                        //.foregroundColor(Color(hex: "#FF9900"))
                         .padding(5)
                         .padding(.bottom,10)
                     
@@ -1802,12 +1803,14 @@ struct TextSizeReader: View {
     }
 }
 
+/*
 
 struct AutoScrollBannerAdsView: View {
     @State var sliderArray: [SliderModel]
     @State var currentIndex = 0
     let navController:UINavigationController?
-    
+    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+
     
     var body: some View {
         VStack {
@@ -1842,6 +1845,73 @@ struct AutoScrollBannerAdsView: View {
             .frame(height: 185)
 //            .cornerRadius(20)
 //            .clipped()
+            // Page Indicator
+            HStack(spacing: 5) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    Capsule()
+                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
+                        .animation(.easeInOut, value: currentIndex)
+                }
+            }
+            .padding(.top, -5)
+        }
+    }
+}
+
+
+import SwiftUI
+*/
+struct AutoScrollBannerAdsView: View {
+    @State var sliderArray: [SliderModel]
+    @State var currentIndex = 0
+    let navController: UINavigationController?
+    
+    // Timer that fires every 3 seconds
+    private let timer = Timer.publish(every: TimeInterval(Local.shared.bannerScrollInterval), on: .main, in: .common).autoconnect()
+    
+    var body: some View {
+        VStack {
+            TabView(selection: $currentIndex) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    let slider = sliderArray[index]
+                    
+                    ZStack {
+                        AsyncImage(url: URL(string: slider.image ?? "")) { image in
+                            image
+                                .resizable()
+                                .cornerRadius(10)
+                                .clipped()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .onTapGesture {
+                            BannerNavigation.navigateToScreen(
+                                index: index,
+                                sliderObj: slider,
+                                navigationController: navController,
+                                viewType: "AD_DETAIL"
+                            )
+                        }
+                    }
+                    .frame(height: 170)
+                    .background(Color.clear)
+                    .tag(index)
+                }
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 185)
+            .onReceive(timer) { _ in
+                // Auto-scroll every 3 seconds
+                withAnimation {
+                    if currentIndex < sliderArray.count - 1 {
+                        currentIndex += 1
+                    } else {
+                        currentIndex = 0
+                    }
+                }
+            }
+            
             // Page Indicator
             HStack(spacing: 5) {
                 ForEach(sliderArray.indices, id: \.self) { index in

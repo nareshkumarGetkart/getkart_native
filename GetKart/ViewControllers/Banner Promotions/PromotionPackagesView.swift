@@ -81,8 +81,15 @@ struct PromotionPackageCell:View {
             Spacer()
             if (obj.discountInPercentage ?? "0") != "0"{
 
-           // if obj.discountInPercentage > 0{
                 Text(" \(obj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.manrope(.medium, size: 13)).background(Color(.systemYellow))
+                
+                
+                let originalPrice = "\(obj.price ?? "0")".formatNumberWithComma()
+
+                Text("\(Local.shared.currencySymbol) \(originalPrice)")
+                               .font(.subheadline)
+                               .foregroundColor(.gray)
+                               .strikethrough(true, color: .gray)
                 
                 let amt = "\(obj.finalPrice ?? "0")".formatNumberWithComma()
                 Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
@@ -90,6 +97,7 @@ struct PromotionPackageCell:View {
                 let amt = "\(obj.price ?? "0")".formatNumberWithComma()
                 Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
             }
+        
           
         }.frame(height:55).overlay{
             

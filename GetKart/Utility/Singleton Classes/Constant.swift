@@ -16,7 +16,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = false
 
 final class Constant: NSObject {
@@ -88,6 +88,20 @@ final class Constant: NSObject {
     }
     
     
+    var delete_campaign_banner:String{
+        
+        get {
+            return "\(baseURL)/v1/delete-campaign-banner"
+        }
+    }
+    
+    
+    
+    var  revoke_campaign_payment:String {
+        get {
+            return "\(baseURL)/v1/revoke-campaign-payment"
+        }
+    }
     
     var  campaign_payment_intent:String {
         get {
@@ -764,7 +778,8 @@ enum NotificationKeys:String,CaseIterable{
     case reconnectInternet = "reconnectInternet"
     case noInternet = "noInternet"
     case refreshAdsScreen = "refreshAdsScreen"
-    
+    case refreshBannerAdsScreen = "refreshBannerAdsScreen"
+
     case refreshChatTblViewScreen = "refreshChatTblViewScreen"
 
     

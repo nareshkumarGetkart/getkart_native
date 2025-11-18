@@ -14,8 +14,8 @@ struct BannerNavigation{
     
     static func navigateToScreen(index:Int, sliderObj:SliderModel?,navigationController:UINavigationController?,viewType:String){
         
-        if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.campaign_id ?? 0) > 0{
-            campaignClickEventApi(campaign_banner_id: sliderObj?.campaign_id ?? 0, viewType: viewType)
+        if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.id ?? 0) > 0 && (sliderObj?.is_campaign ?? false){
+            campaignClickEventApi(campaign_banner_id: sliderObj?.id ?? 0, viewType: viewType)
         }
         if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "AdsListing"{
             
@@ -24,6 +24,16 @@ struct BannerNavigation{
                     destvc.hidesBottomBarWhenPushed = true
                    navigationController?.pushViewController(destvc, animated: true)
                 }
+            }
+            
+        }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "CampaignBanner"{
+            
+            if isUserLoggedInRequest() {
+               
+                let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController: navigationController))
+                destvc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destvc, animated: true)
+                
             }
             
         }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "BoostAdsListing"{
@@ -60,6 +70,7 @@ struct BannerNavigation{
               navigationController?.pushViewController(vc, animated: true)
             }
         }else{
+          
             if (sliderObj?.model?.id ?? 0) == 0 && (sliderObj?.model?.slug ?? "").count == 0{return}
 
             var detailView =  ItemDetailView(navController:  navigationController, itemId:sliderObj?.model?.id ?? 0, itemObj: nil, slug: sliderObj?.model?.slug ?? "")
@@ -136,7 +147,7 @@ struct BannerNavigation{
     static private func campaignClickEventApi(campaign_banner_id:Int,viewType:String){
         
 
-        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":viewType,"latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":""] as [String : Any]
+        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":"click","latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":viewType] as [String : Any]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_event, param: params,methodType:.post,showLoader: false) { responseObject, error in
             
             if error == nil {

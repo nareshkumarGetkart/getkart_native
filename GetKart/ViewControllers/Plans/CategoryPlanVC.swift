@@ -306,7 +306,7 @@ extension CategoryPlanVC {
     
     func startTimer() {
         
-        timer =  Timer.scheduledTimer(timeInterval: 7.0, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        timer =  Timer.scheduledTimer(timeInterval: TimeInterval(Local.shared.bannerScrollInterval), target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
     }
     
     

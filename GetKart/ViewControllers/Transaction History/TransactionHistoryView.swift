@@ -97,6 +97,8 @@ struct TransactionHistoryView: View {
         if (transObj.paymentTransaction?.paymentStatus ?? "") == "succeed"{
             let hostView = UIHostingController(rootView: TransactionHistoryPreview(transaction: transObj, navController: self.navigation))
             self.navigation?.pushViewController(hostView, animated: true)
+        }else{
+            AlertView.sharedManager.displayMessage(title: "Order Details", msg: "Order details are available only for successful orders!", controller: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
         }
     }
     

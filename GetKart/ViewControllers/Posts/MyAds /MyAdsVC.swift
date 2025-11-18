@@ -114,6 +114,10 @@ class MyAdsVC: UIViewController {
     private func addObservers() {
           NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: .init(NotificationKeys.refreshAdsScreen.rawValue), object: nil)
           NotificationCenter.default.addObserver(self, selector: #selector(noInternet(notification:)), name: .init(NotificationKeys.noInternet.rawValue), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reBannerList), name: .init(NotificationKeys.refreshBannerAdsScreen.rawValue), object: nil)
+
+        
           navigationController?.interactivePopGestureRecognizer?.delegate = self
       }
 
@@ -154,6 +158,13 @@ class MyAdsVC: UIViewController {
         }
     }
     
+    
+    @objc func reBannerList(){
+        if  self.isDataLoading == false{
+            
+            refreshBannerAds()
+        }
+    }
     
     func updateCoorOfSelectedTab(){
         
@@ -387,11 +398,20 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
 
             }
             */
+            if obj.isActive == 1{
+                cell.bgViewStatus.isHidden = true
+                cell.bgViewActiveStatus.isHidden = false
+                cell.bgViewActiveStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+
+            }else{
+                cell.bgViewStatus.isHidden = false
+                cell.bgViewActiveStatus.isHidden = true
+            }
             cell.lblStatus.text = obj.status?.capitalized ?? ""
 
             switch obj.status ?? ""{
                 
-            case "approved":
+            case "approved", "completed":
                 cell.lblStatus.textColor = UIColor(hexString: "#32b983")
                 cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
                 break
@@ -415,7 +435,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
                 cell.bgViewStatus.backgroundColor = UIColor(hexString: "#fff8eb")
                 break
            
-            case "draft":
+            case "draft","pending":
                 cell.lblStatus.textColor = UIColor(hexString: "#3e4c63")
                 cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
             case "expired":

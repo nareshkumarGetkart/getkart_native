@@ -45,11 +45,15 @@ class URLhandler: NSObject{
             
             if isFormData{
                 let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
-                print("Header == \(headers)")
+                if ISDEBUG{
+                    print("Header == \(headers)")
+                }
                 return HTTPHeaders.init(headers)
             }else{
                 let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
-                print("Header == \(headers)")
+                if ISDEBUG{
+                    print("Header == \(headers)")
+                }
                 return HTTPHeaders.init(headers)
             }
         }else{
@@ -57,7 +61,9 @@ class URLhandler: NSObject{
 //            if SALT_TOKEN_TO_SEND.count > 0{
 //                headers =  ["platform":"ios","appversion":UIDevice.appVersion,"salt_token":"\(SALT_TOKEN_TO_SEND)"]
 //            }
-            print("Header == \(headers)")
+            if ISDEBUG{
+                print("Header == \(headers)")
+            }
             return HTTPHeaders.init(headers)
         }
 
@@ -84,7 +90,7 @@ class URLhandler: NSObject{
             print(headers)
         }
          */
-        return nil
+       // return nil
     }
     
     
@@ -337,7 +343,7 @@ class URLhandler: NSObject{
     
     
     
-    func uploadImageWithParameters(profileImg : UIImage,imageName:String, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
+    func uploadImageWithParameters(profileImg : UIImage?,imageName:String, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
     
         if isConnectedToNetwork() == true {
             if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
@@ -351,7 +357,7 @@ class URLhandler: NSObject{
             //let param = [String:AnyObject]()
             AF.upload(multipartFormData: { (multipartFormData) in
                 
-                if let data = profileImg.jpegData(compressionQuality: 1.0) {
+                if let data = profileImg?.jpegData(compressionQuality: 1.0) {
                     
                     multipartFormData.append(data, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
                 }else {

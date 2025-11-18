@@ -228,8 +228,8 @@ struct StateLocationView: View, LocationSelectedDelegate {
                         "city": "",
                         "state": "",
                         "country": self.country.name ?? "",
-                        "latitude":  "",
-                        "longitude": "",
+                        "latitude":  "0.0",
+                        "longitude": "0.0",
                         "locality": "",
 
                     ]
@@ -239,7 +239,7 @@ struct StateLocationView: View, LocationSelectedDelegate {
 //            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "\(self.country.latitude ?? "")", longitude: "\(self.country.longitude ?? "")"  , timezone: "")
             
             
-            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "", longitude: "" , timezone: "")
+            Local.shared.saveUserLocation(city: "", state:  "", country:self.country.name ?? "", latitude: "0.0", longitude: "0.0" , timezone: "")
 
         }
         

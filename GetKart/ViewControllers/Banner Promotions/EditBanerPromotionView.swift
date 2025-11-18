@@ -68,11 +68,25 @@ struct EditBanerPromotionView: View {
                                     .clipped() //  Important to crop overflowing area
                                     .cornerRadius(8)
                             }
+                        }else{
+                            
+                            GeometryReader { geo in
+                                
+                                AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
+                                    img.image?.resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: geo.size.width, height: geo.size.height)
+                                        .clipped() //  Important to crop overflowing area
+                                        .cornerRadius(8)
+                                }
+                                
+                            }
+                           
                         }
                         VStack{
                             
                             Image("gallery")
-                            Text("Select file").font(.manrope(.regular, size: 15.0)).foregroundColor(Color(hexString: "#888888"))
+                            Text("Upload Banner").font(.manrope(.regular, size: 15.0)).foregroundColor(Color(hexString: "#888888"))
                         }.opacity(selectedImage == nil ? 1 : 0) // hide label over image
                     }.frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150)
                         .background(
@@ -105,7 +119,7 @@ struct EditBanerPromotionView: View {
             }
             Spacer()
             
-             let isFilled = (selectedImage != nil)
+             let isFilled = true // (selectedImage != nil)
             Button {
                 
                 if isFilled{
@@ -156,8 +170,10 @@ struct EditBanerPromotionView: View {
     
     
     func validateField(){
-        if selectedImage == nil {
-            AlertView.sharedManager.showToast(message: "Please upload banner image")
+        
+        if ( selectedImage == nil) && objBanner?.url?.trim() == strUrl.trim(){
+           // AlertView.sharedManager.showToast(message: "Please ")
+
         }else if strUrl.count > 0 && !strUrl.isValidWebsiteURL() {
             AlertView.sharedManager.showToast(message: "Please enter valid url")
 
@@ -177,7 +193,10 @@ struct EditBanerPromotionView: View {
     func uploadFileAndDataApi(){
     
         let params = ["url":strUrl,"banner_id":(objBanner?.id ?? 0)] as [String : Any]
-        guard let img = selectedImage?.wxCompress() else{ return }
+//        guard let img = selectedImage?.wxCompress() else{ return }
+     
+         let img = selectedImage?.wxCompress() //else{ return }
+
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.update_campaign_banner, params: params) { responseObject, error in
             
             if error == nil {

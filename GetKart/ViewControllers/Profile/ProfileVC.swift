@@ -23,21 +23,20 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnSetting:UIButton!
-
-    
     @IBOutlet weak var lblAppVersion:UILabel!
 
   /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     //,"Banner Promotions"
-    let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Banner Promotions","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+    var titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
 //,"mediaPromotion"
-    let iconArray =  ["","promoted","buyPackages","mediaPromotion","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
+    var iconArray =  ["","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
       
     var verifiRejectedReason:String = ""
     var verifiSttaus:String = ""
+    var isBannerPromotion = 0
     
     private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -146,6 +145,32 @@ class ProfileVC: UIViewController {
                         
                         if let data = result["data"] as? Dictionary<String,Any>{
                             
+                            if let seller = data["seller"] as? Dictionary<String,Any>{
+                                
+                                if let intValue = seller["isBannerPromotion"] as? Int {
+                                    self.isBannerPromotion = intValue
+                                } else if let boolValue = seller["isBannerPromotion"] as? Bool {
+                                    self.isBannerPromotion = boolValue ? 1 : 0
+                                } else {
+                                    self.isBannerPromotion = 0
+                                }
+                            }
+                            
+                            let strToCheck =  "Banner Promotions"
+                            if self.isBannerPromotion == 0{
+
+                                if let index = self.titleArray.firstIndex(of: strToCheck) {
+                                    self.titleArray.remove(at: index)
+                                    self.iconArray.remove(at: index)
+                                }
+                               
+                            }else{
+                                if !self.titleArray.contains(strToCheck){
+                                    self.titleArray.insert(strToCheck, at: 3)
+                                    self.iconArray.insert("mediaPromotion", at: 3)
+                                }
+                            }
+                       
                             RealmManager.shared.updateUserData(dict: data)
                             self.tblView.reloadData()
                         }

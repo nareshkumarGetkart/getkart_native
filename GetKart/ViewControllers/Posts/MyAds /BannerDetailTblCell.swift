@@ -16,13 +16,17 @@ class BannerDetailTblCell: UITableViewCell {
     @IBOutlet weak var bgView:UIView!
     @IBOutlet weak var bgViewStatus:UIView!
 
-    
+    @IBOutlet weak var bgViewActiveStatus:UIView!
+
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         bgViewStatus.layer.cornerRadius = bgViewStatus.frame.height/2.0
         bgViewStatus.clipsToBounds = true
+        
+        bgViewActiveStatus.layer.cornerRadius = bgViewActiveStatus.frame.height/2.0
+        bgViewActiveStatus.clipsToBounds = true
         
     }
 

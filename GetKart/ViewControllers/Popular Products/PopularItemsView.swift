@@ -63,8 +63,8 @@ struct ProductCard: View {
                 
                 VStack(alignment: .leading){
                     Text("\(Local.shared.currencySymbol) \((objItem.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).lineLimit(1)
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#FF9900"))
+                        .font(.headline).foregroundColor(Color(.systemGreen))
+                       // .foregroundColor(Color(hex: "#FF9900"))
                     Text(objItem.name ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
                         .font(.subheadline)
                     HStack{

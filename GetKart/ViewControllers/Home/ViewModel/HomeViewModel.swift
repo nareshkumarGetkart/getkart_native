@@ -39,6 +39,7 @@ class HomeViewModel:ObservableObject{
     var country = ""
     var latitude = ""
     var longitude = ""
+    var area = ""
 
    
     init(){
@@ -46,12 +47,12 @@ class HomeViewModel:ObservableObject{
         city = Local.shared.getUserCity()
         country = Local.shared.getUserCountry()
         state = Local.shared.getUserState()
-        
-        if state.count > 0 || state.count > 0{
+        area = Local.shared.getUserLocality()
+
+       // if state.count > 0 || city.count > 0{
             latitude = Local.shared.getUserLatitude()
             longitude = Local.shared.getUserLongitude()
-        }
-        
+//        }
         getSliderListApi()
         getCategoriesListApi()
         getFeaturedListApi()
@@ -177,7 +178,11 @@ class HomeViewModel:ObservableObject{
     
     func getSliderListApi(){
      
-        let params = ["referrer_url":"HOME","country":Local.shared.getUserCountry(),"state":Local.shared.getUserState(),"city":Local.shared.getUserCity(),"area":Local.shared.getUserLocality(),"latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude()]
+//        let params = ["referrer_url":"HOME","country":Local.shared.getUserCountry(),"state":Local.shared.getUserState(),"city":Local.shared.getUserCity(),"area":Local.shared.getUserLocality(),"latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude()]
+        
+        
+        let params = ["referrer_url":"HOME","country":country,"state":state,"city":city,"area":area,"latitude":latitude,"longitude":longitude]
+
         
         ApiHandler.sharedInstance.makePostGenericData(url: Constant.shared.get_slider, param: params,httpMethod: .post, completion:  {[weak self] (obj:SliderModelParse) in
       /*  ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_slider) {[weak self] (obj:SliderModelParse) in

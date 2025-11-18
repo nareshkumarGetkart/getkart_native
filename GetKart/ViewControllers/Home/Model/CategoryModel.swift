@@ -6,11 +6,11 @@ struct CategoryParse: Codable {
     let message: Message?
     let data: CategoryModelClass?
     let code: Int?
-    let selfCategory: JSONNull?
+   // let selfCategory: JSONNull?
 
     enum CodingKeys: String, CodingKey {
         case error, message, data, code
-        case selfCategory = "self_category"
+       // case selfCategory = "self_category"
     }
 }
 
@@ -20,12 +20,12 @@ struct CategoryModelClass: Codable {
     let data: [CategoryModel]?
     let firstPageURL: String?
     let from, lastPage: Int?
-    let lastPageURL: String?
+   // let lastPageURL: String?
     let links: [Link]?
-    let nextPageURL, path: String?
-    let perPage: Int?
+   // let nextPageURL, path: String?
+  //  let perPage: Int?
    // let prevPageURL: JSONNull?
-    let to, total: Int?
+   // let to, total: Int?
 
     enum CodingKeys: String, CodingKey {
         case currentPage = "current_page"
@@ -33,13 +33,13 @@ struct CategoryModelClass: Codable {
         case firstPageURL = "first_page_url"
         case from
         case lastPage = "last_page"
-        case lastPageURL = "last_page_url"
+        //case lastPageURL = "last_page_url"
         case links
-        case nextPageURL = "next_page_url"
-        case path
-        case perPage = "per_page"
+      //  case nextPageURL = "next_page_url"
+      //  case path
+       // case perPage = "per_page"
        // case prevPageURL = "prev_page_url"
-        case to, total
+       // case to, total
     }
 }
 
@@ -84,7 +84,7 @@ struct Subcategory: Codable, Identifiable {
     let approvedItemsCount, subcategoriesCount: Int?
     let translatedName: String?
     let subcategories: [Subcategory]?
-    let translations: [JSONAny]?
+   // let translations: [JSONAny]?
 
     enum CodingKeys: String, CodingKey {
         case id, sequence, name, image
@@ -96,7 +96,7 @@ struct Subcategory: Codable, Identifiable {
         case approvedItemsCount = "approved_items_count"
         case subcategoriesCount = "subcategories_count"
         case translatedName = "translated_name"
-        case subcategories, translations
+        case subcategories//, translations
     }
 }
 

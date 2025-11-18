@@ -344,9 +344,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             homeVModel?.featuredObj?.removeAll()
             self.tblView.reloadData()
             homeVModel?.getProductListApi()
-            if (homeVModel?.sliderArray?.count ?? 0) == 0{
+          //  if (homeVModel?.sliderArray?.count ?? 0) == 0{
                 homeVModel?.getSliderListApi()
-            }
+          //  }
             if (homeVModel?.categoryObj?.data?.count ?? 0) == 0{
                 homeVModel?.getCategoriesListApi()
             }
@@ -778,9 +778,12 @@ extension HomeVC {
         homeVModel?.country = country
         homeVModel?.latitude = latitude
         homeVModel?.longitude = longitude
+        homeVModel?.area = locality
         refreshTableOnFilterOrLocationChange()
         homeVModel?.getFeaturedListApi()
         homeVModel?.getProductListApi()
+        homeVModel?.getSliderListApi()
+
         updateLocationLabel(city: city, state: state, country: country,locality: locality)
     }
 

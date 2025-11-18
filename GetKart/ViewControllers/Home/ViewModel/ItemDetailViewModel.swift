@@ -415,6 +415,16 @@ class ItemDetailViewModel:ObservableObject{
                 }
             }
             
+        }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "CampaignBanner"{
+            
+            if isUserLoggedInRequest() {
+               
+                let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController: navigationController))
+                destvc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destvc, animated: true)
+                
+            }
+            
         }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "BoostAdsListing"{
             
             if isUserLoggedInRequest() {
@@ -524,7 +534,7 @@ class ItemDetailViewModel:ObservableObject{
     func campaignClickEventApi(campaign_banner_id:Int){
         
 
-        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":"AD_DETAIL","latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":""] as [String : Any]
+        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":"click","latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":""] as [String : Any]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_event, param: params,methodType:.post,showLoader: false) { responseObject, error in
             
             if error == nil {

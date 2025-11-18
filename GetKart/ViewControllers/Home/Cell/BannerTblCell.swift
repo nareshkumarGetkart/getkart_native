@@ -52,8 +52,9 @@ class BannerTblCell: UITableViewCell {
     }
     
     func startTimer() {
-        
-        timer =  Timer.scheduledTimer(timeInterval: 7.0, target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        if timer == nil {
+            timer =  Timer.scheduledTimer(timeInterval:  TimeInterval(Local.shared.bannerScrollInterval), target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
+        }
     }
     
     
@@ -137,8 +138,10 @@ extension BannerTblCell{
     
     func navigateToScreen(index:Int, sliderObj:SliderModel?){
         
-        if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.campaign_id ?? 0) > 0{
-            self.campaignClickEventApi(campaign_banner_id: sliderObj?.campaign_id ?? 0)
+        if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.id ?? 0) > 0 && (sliderObj?.is_campaign ?? false){
+
+       // if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.campaign_id ?? 0) > 0{
+            self.campaignClickEventApi(campaign_banner_id: sliderObj?.id ?? 0)
         }
     
     if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "AdsListing"{
@@ -148,6 +151,16 @@ extension BannerTblCell{
                 destvc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destvc, animated: true)
             }
+        }
+        
+    }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "CampaignBanner"{
+        
+        if isUserLoggedInRequest() {
+           
+            let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController: navigationController))
+            destvc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destvc, animated: true)
+            
         }
         
     }else if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "BoostAdsListing"{
@@ -185,6 +198,7 @@ extension BannerTblCell{
     }else{
         
         if (sliderObj?.model?.id ?? 0) == 0 && (sliderObj?.model?.slug ?? "").count == 0{return}
+        
         var detailView =  ItemDetailView(navController:  self.navigationController, itemId:sliderObj?.model?.id ?? 0, itemObj: nil, slug: sliderObj?.model?.slug ?? "")
         detailView.returnValue = { [weak self] value in
             if let obj = value{
@@ -259,7 +273,7 @@ func isUserLoggedInRequest() -> Bool {
     func campaignClickEventApi(campaign_banner_id:Int){
         
 
-        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":"HOME","latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":""] as [String : Any]
+        let params = ["campaign_banner_id":campaign_banner_id,"country":Local.shared.getUserCountry(),"city": Local.shared.getUserCity(),"state":Local.shared.getUserState(),"area":Local.shared.getUserLocality(),"event_type":"click","latitude":Local.shared.getUserLatitude(),"longitude":Local.shared.getUserLongitude(),"referrer_url":"HOME"] as [String : Any]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_event, param: params,methodType:.post,showLoader: false) { responseObject, error in
             
             if error == nil {

@@ -160,7 +160,7 @@ private func navigationHeader() -> some View {
                 .foregroundColor(Color(UIColor.label))
                 .padding()
         }
-        Text("Transaction History")
+        Text("Order Details")
             .font(.custom("Manrope-Bold", size: 20.0))
             .foregroundColor(Color(UIColor.label))
         Spacer()
@@ -232,9 +232,9 @@ private func detailsCard() -> some View {
             let date = Date(timeIntervalSince1970: TimeInterval(convertTimestamp(isoDateString: transaction?.paymentTransaction?.createdAt ?? "")))
 
             detailRow(title: "Name", value: "\(transaction?.package?.name ?? "")")
-            detailRow(title: "Category", value:"\(transaction?.package?.category ?? "")")
+          //  detailRow(title: "Category", value:"\(transaction?.package?.category ?? "")")
             detailRow(title: "Location", value: "\(transaction?.paymentTransaction?.city ?? "")")
-            detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") Ads")
+            detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") clicks")
 
             detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
             detailRow(title: "Date", value: getConvertedDateFromDate(date: date))

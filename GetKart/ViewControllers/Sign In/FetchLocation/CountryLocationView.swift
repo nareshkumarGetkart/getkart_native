@@ -225,7 +225,9 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             Spacer()
         }
             .onAppear{
-                fetchCountryListing()
+                if arrCountries.count == 0{
+                    fetchCountryListing()
+                }
                 if isFirstTime == true {
                     
                     if locationManager.isCurrentLocationEnabled(){
@@ -292,7 +294,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
         
         if popType == .home || popType == .signUp{
             
-            Local.shared.saveUserLocation(city: "", state:  "", country: "", latitude: "",longitude: "", timezone: "")
+            Local.shared.saveUserLocation(city: "", state:  "", country: "", latitude: "0",longitude: "0", timezone: "")
         }
         
         for vc in self.navigationController?.viewControllers ?? [] {
@@ -347,7 +349,6 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     
     
     func placeApiLocSelected(selLoc:SelectedPlace) {
-        
         
          let data: [String: Any] = [
                         "city": selLoc.city ?? "",
@@ -482,10 +483,9 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                     "city": locationManager.city,
                     "state": locationManager.state,
                     "country": locationManager.country,
-                               "latitude": locationManager.latitude,
-                               "longitude": locationManager.longitude,
-                               "locality": "",
-                            ]
+                    "latitude": locationManager.latitude,
+                    "longitude": locationManager.longitude,
+                    "locality": locationManager.locality]
                 
                 if vc.isKind(of: UIHostingController<ChooseLocationBannerView>.self) == true{
                     

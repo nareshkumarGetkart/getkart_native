@@ -226,7 +226,8 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         controller.state = state
         controller.latitude = latitude
         controller.longitude = longitude
-        
+        controller.paymentFor = .adsPlan
+
         controller.callbackPaymentSuccess = { [weak self](isSuccess) -> Void in
             
             if controller.sheetViewController?.options.useInlineMode == true {

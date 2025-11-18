@@ -35,6 +35,7 @@ struct SettingsModel: Codable {
     let instagramLink: String?
     let googleMapIframeLink, appStoreLink, playStoreLink: String?
     let footerDescription, webThemeColor, firebaseProjectID: String?
+    let bannerScrollInterval:Int?
     let companyAddress, gecodeXyzAPIKey: String?
     let placeholderImage, webLogo: String?
     let serviceFile: String?
@@ -52,6 +53,7 @@ struct SettingsModel: Codable {
     let iosPlaceKey:String?
     
     enum CodingKeys: String, CodingKey {
+        case bannerScrollInterval
         case companyName = "company_name"
         case currencySymbol = "currency_symbol"
         case iosVersion = "ios_version"

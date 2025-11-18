@@ -941,6 +941,8 @@ extension AppDelegate : ATAppUpdaterDelegate{
                 Local.shared.companyEmail = obj.data?.companyEmail ?? "support@getkart.com"
                 Local.shared.companyTelelphone1 = obj.data?.companyTel1 ?? "8800957957"
                 Local.shared.placeApiKey = obj.data?.iosPlaceKey ?? ""
+                Local.shared.bannerScrollInterval = obj.data?.bannerScrollInterval ?? 3
+               // print(" \( Local.shared.bannerScrollInterval) bannerScrollInterval val = \(obj.data?.bannerScrollInterval ?? 0)")
                 
                 if (obj.data?.iosPlaceKey ?? "").count > 0{
                     GMSPlacesClient.provideAPIKey(obj.data?.iosPlaceKey ?? "")

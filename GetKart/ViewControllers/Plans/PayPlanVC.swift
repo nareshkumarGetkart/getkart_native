@@ -11,6 +11,15 @@ import PhonePePayment
 import StoreKit
 import SwiftUI
 
+
+enum PaymentForEnum{
+    
+    case adsPlan
+    case bannerPromotion
+    case bannerPromotionDraft
+    
+}
+
 class PayPlanVC: UIViewController {
     
     private var merchantId = ""
@@ -32,6 +41,9 @@ class PayPlanVC: UIViewController {
     
     var campaign_banner_id:Int?
 
+    var paymentFor:PaymentForEnum? = .adsPlan
+    var banner_id:Int = 0
+    var payment_transaction_id:Int = 0
     
     var categoryId = 0
     var categoryName = ""
@@ -40,12 +52,13 @@ class PayPlanVC: UIViewController {
     var state = ""
     var latitude = ""
     var longitude = ""
-    var isBannerPromotionPay = false
+   // var isBannerPromotionPay = false
     var radius = 10
     var area = ""
     var pincode = ""
     var selectedImage:UIImage?
     var strUrl = ""
+    
     
     //MARK: Controller life cycle methods
     
@@ -53,7 +66,7 @@ class PayPlanVC: UIViewController {
         super.viewDidLoad()
         btnPay.layer.cornerRadius = 8.0
         btnPay.clipsToBounds = true
-        if isBannerPromotionPay{
+        if paymentFor == .bannerPromotion || paymentFor == .bannerPromotionDraft{
             lblDesc.text = "You've selected the \(planObj?.name ?? "") Plan"
             lblPrice.text = "Let's Get You More Views & Sales"
             btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
@@ -84,9 +97,16 @@ class PayPlanVC: UIViewController {
             self.IAPPaymentForm()
         }else if payment_method_type == 3 {//Phone Pay
             
-            if isBannerPromotionPay{
+            //  if isBannerPromotionPay{
+                
+            if paymentFor == .bannerPromotion{
                 
                 getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
+           
+            } else if paymentFor == .bannerPromotionDraft{
+                
+                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
+                
             }else{
                 self.createPhonePayOrder(package_id: planObj?.id ?? 0)
 
@@ -191,7 +211,49 @@ class PayPlanVC: UIViewController {
     
     
 
+  
+    
+    func revokeCampaignPaymentApi(package_id:Int){
+        
+        let params = ["banner_id":banner_id,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
 
+        URLhandler.sharedinstance.makeCall(url:  Constant.shared.revoke_campaign_payment, param: params, showLoader: true) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                            self?.campaign_banner_id = campaign_banner_id
+                        }
+                        
+                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                            
+                            if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                let token  = payment_gateway_response["token"] as? String ?? ""
+                                self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                            }
+                        }
+                    }
+                    
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
+    }
+
+    
     func getIntentForBannerPromotions(package_id:Int){
 
     

@@ -20,7 +20,7 @@ final class Local {
     var currencySymbol:String = "₹"
     var companyEmail:String = "support@getkart.com"
     var companyTelelphone1:String = "8800957957"
-   
+    var bannerScrollInterval = 3
     var placeApiKey:String = ""
 
 
@@ -107,12 +107,12 @@ final class Local {
     
     func getUserLatitude() -> String{
         
-        return UserDefaults.standard.value(forKey: LocalKeys.latitude.rawValue) as? String ?? ""
+        return UserDefaults.standard.value(forKey: LocalKeys.latitude.rawValue) as? String ?? "0"
     }
     
     func getUserLongitude() -> String{
         
-        return UserDefaults.standard.value(forKey: LocalKeys.longitude.rawValue) as? String ?? ""
+        return UserDefaults.standard.value(forKey: LocalKeys.longitude.rawValue) as? String ?? "0"
     }
     
     func getUserTimeZone() -> String{

@@ -118,9 +118,9 @@ struct BannerPromotionsView: View {
                 }.padding(.leading)
                 
                 VStack(alignment:.leading){
-                    Text("Location & Radius").font(.manrope(.semiBold, size: 15.0)).foregroundColor(Color(.label))
+                    Text("Select Location & Radius").font(.manrope(.semiBold, size: 15.0)).foregroundColor(Color(.label))
                     if (strAddress.count > 0){
-                        Text("\(strAddress)/ \(radius)km").font(.manrope(.regular, size: 14.0)).foregroundColor(Color(.label))
+                        Text("\(strAddress)/ \(radius) km").font(.manrope(.regular, size: 14.0)).foregroundColor(Color(.label))
                     }
                 }.padding([.top,.bottom],5)
                 
@@ -377,7 +377,7 @@ struct BannerPromotionsView: View {
         let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
         as! PayPlanVC
         controller.planObj = planObj
-        controller.isBannerPromotionPay = true
+       // controller.isBannerPromotionPay = true
         controller.categoryId = 0
         controller.categoryName = ""
         controller.radius = radius
@@ -389,6 +389,8 @@ struct BannerPromotionsView: View {
         controller.latitude = "\(latitude)"
         controller.longitude = "\(longitude)"
         controller.strUrl = strUrl
+        controller.paymentFor = .bannerPromotion
+
         
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
