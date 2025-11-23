@@ -70,6 +70,9 @@ struct TransactionModel: Codable,Identifiable {
     let package: Package?
     let paymentTransaction: PaymentTransaction?
     let banners: [Banner]?
+    let invoiceNo :String?
+    let invoiceId: Int?
+
 
 
 
@@ -88,6 +91,8 @@ struct TransactionModel: Codable,Identifiable {
         case remainingItemLimit = "remaining_item_limit"
         case user, package
         case paymentTransaction = "payment_transaction"
+        case invoiceNo = "invoice_no"
+        case invoiceId = "invoice_id"
 
     }
 }

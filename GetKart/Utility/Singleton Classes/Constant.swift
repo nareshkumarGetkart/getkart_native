@@ -16,8 +16,8 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
-var ISDEBUG = false
+var devEnvironment: DevEnvironment = .staging
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -54,6 +54,14 @@ final class Constant: NSObject {
     }
     
     
+    
+    
+    
+    var  invoice_download:String {
+        get {
+            return "\(baseURL)/v1/invoice-download"
+        }
+    }
     var  campaign_event:String {
         get {
             return "\(baseURL)/v1/campaign-event"

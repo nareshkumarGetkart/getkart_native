@@ -103,6 +103,8 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
             let pageWidth = scrollView.frame.width
             let currentPage = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth)
             pageControl.currentPage = currentPage
+            self.x = currentPage + 1
+
         }
         
         // (Optional) Update pageControl when programmatic scroll happens (e.g., auto-scroll)
@@ -110,6 +112,8 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
             let pageWidth = scrollView.frame.width
             let currentPage = Int((scrollView.contentOffset.x + pageWidth / 2) / pageWidth)
             pageControl.currentPage = currentPage
+            self.x = currentPage + 1
+
         }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

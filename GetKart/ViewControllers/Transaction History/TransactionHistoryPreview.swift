@@ -6,79 +6,131 @@
 //
 
 import SwiftUI
+import PDFKit
+import QuickLook
 
 struct TransactionHistoryPreview: View {
     
     let transaction: TransactionModel?
     var navController:UINavigationController?
-
-  var body: some View {
-      
-      navigationHeader() .frame(height: 44)
-
-        VStack(spacing: 0) {
+    @State private var pdfUrlString = ""
+    @State private var isDownloading = false
+    @State private var downloadProgress: Double = 0
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var downloadedFileURL: URL? = nil
+    @State private var showPDF = false
+    
+    var body: some View {
+        ZStack {
             
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
-                 
-                    VStack{
-                        
-                        Image("success")
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                            .padding(.vertical, 5)
-                        
-                        Text("Payment successful")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(Color(UIColor.label))
-                        
-                        Text("Successfully paid \(Local.shared.currencySymbol) \( (transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
-                            .foregroundColor(.gray)
-                            .font(Font.manrope(.regular, size: 16.0))
+            VStack(spacing: 0) {
+                navigationHeader().frame(height: 44)
 
-                        
-                        HStack{ }.frame(height:10)
-                    }
-                    
-                    HStack{
-                        Text("Payment methods")
-                            .font(Font.manrope(.bold, size: 16.0))
-                        Spacer()
-                    }
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 10) {
 
-                    if transaction?.package?.type == "campaign"{
-                        bannerAnalyticsdetailsCard()
+                        // ---- Your existing content ----
+                        VStack {
+                            Image("success")
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                                .padding(.vertical, 5)
 
-                    }else{
-                        detailsCard()
+                            Text("Payment successful")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+
+                            Text("Successfully paid \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
+                                .foregroundColor(.gray)
+                                .font(Font.manrope(.regular, size: 16.0))
+
+                            HStack{}.frame(height: 10)
+                        }
+
+                        HStack{
+                            Text("Payment methods")
+                                .font(Font.manrope(.bold, size: 16.0))
+                            Spacer()
+                        }
+
+                        if transaction?.package?.type == "campaign" {
+                            bannerAnalyticsdetailsCard()
+                        } else {
+                            detailsCard()
+                        }
+
+                        Button(action: {}) {
+                            Text("Total Cost \(Local.shared.currencySymbol)\((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
+                                .font(Font.manrope(.bold, size: 18.0))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .cornerRadius(24)
+                        }
+                        .padding(.horizontal)
+
+                        Button(action: {
+                            getPdfUrlFromView()
+
+                        }) {
+                            Text("Download Invoice")
+                                .font(Font.manrope(.bold, size: 18.0))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color(.systemGray3))
+                                .cornerRadius(24)
+                        }
+                        .padding(.horizontal)
 
                     }
-                    
-                    Button(action: {}) {
-                        Text("Total Cost \(Local.shared.currencySymbol) \((transaction?.paymentTransaction?.amount ?? 0.0).formatNumber())")
-                            .font(Font.manrope(.bold, size: 18.0))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .cornerRadius(24)
-                    }
-                    .padding(.horizontal)
+                    .padding(.vertical)
+                    .padding()
+                    .background(Color(UIColor.systemBackground))
+                    .cornerRadius(16)
+                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                 }
-                .padding(.vertical)
-                .padding()
-                .background(Color(UIColor.systemBackground))
-                .cornerRadius(16)
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                .padding([.horizontal,.top],10)
+                .cornerRadius(10)
+                .background(Color(.systemGray6))
+            }
+            .navigationBarHidden(true)
+
+            // ---- TOP TOAST FIX ----
+            if showToast {
+                ToastView(message: toastMessage) {
+                    // handle tap
+                    showToast = false
+                    //showPDF = true
+                    if let url = downloadedFileURL {
+                        let viewPdf = UIHostingController(rootView: PDFViewerWithActions(url: url))
+                        self.navController?.pushViewController(viewPdf, animated: true)
+                    }
+                    
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)  // ⬅ PIN TO TOP
+                .padding(.top, 10)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(20)
             }
             
-            .padding([.horizontal,.top],10)
-            .cornerRadius(10)
-            .background(Color(.systemGray6))
-            
-        }.navigationBarHidden(true)
-        //.padding(.top)
+           
+        } // PDF full-screen sheet
+        .sheet(isPresented: $showPDF) {
+            if let url = downloadedFileURL {
+                PDFViewer(url: url)
+               // QuickLookPDF(url: url)
+                
+                
+
+            } else {
+                Text("Could not find the file.")
+            }
+        }
+        .animation(.spring(), value: showToast)
     }
 
     
@@ -278,8 +330,265 @@ private func detailsCard() -> some View {
       
         
     }
+    
+    // MARK: SAVE TO FILES
+       func saveToFiles(url: URL) {
+           let controller = UIDocumentPickerViewController(forExporting: [url])
+           controller.allowsMultipleSelection = false
+           UIApplication.shared.windows.first?.rootViewController?
+               .present(controller, animated: true)
+       }
+    
+    func getPdfUrlFromView(){
+        
+      
+        if let invoiceId = transaction?.invoiceId {
+            URLhandler.sharedinstance.makeCall(url: "\(Constant.shared.invoice_download)/\(invoiceId)", param: nil,methodType: .get) { responseObject, error in
+                
+                if error == nil {
+                    
+                    
+                 
+               
+                      if  let result = responseObject{
+                        if let data = result["data"] as? String{
+                            pdfUrlString = data
+                            
+                            self.toastMessage = "Invoice downloaded successfully."
+                            self.showToast = true
+                            //  startDownload()
+                            if let pdfUlr = URL(string: data){
+                                
+                                downloadedFileURL = pdfUlr
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Download logic
+       
+        
+       
+    
+
+    func downloadPDF(from urlString: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        guard let url = URL(string: urlString) else  {
+            completion(.failure(URLError(.badURL)))
+            return
+        }
+
+        let task = URLSession.shared.downloadTask(with: url) { localURL, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let localURL = localURL else {
+                completion(.failure(URLError(.cannotCreateFile)))
+                return
+            }
+
+            // Move the downloaded file to a permanent location
+            do {
+                let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let destinationURL = documentsDirectory.appendingPathComponent(url.lastPathComponent)
+
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+
+                try FileManager.default.moveItem(at: localURL, to: destinationURL)
+                completion(.success(destinationURL))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        task.resume()
+    }
+
 }
 
 #Preview {
     TransactionHistoryPreview(transaction: nil)
+}
+
+
+
+// MARK: - Toast View
+struct ToastView: View {
+    let message: String
+    var onTap: () -> Void
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Image("Logo") // optional small app logo, replace with system image if not present
+                    .resizable()
+                    .frame(width: 60, height: 20)
+                    .cornerRadius(3)
+                    .padding(.leading, 8)
+                   // .opacity(0.0) // hide by default; keep placeholder so it matches layout if you add a logo
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Download Complete")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("Your invoice was downloaded. Tap here to see it.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+                Text(Date(), style: .time)
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                    .padding(.trailing, 8)
+            }
+            .padding(12)
+            .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.systemBackground)).shadow(radius: 6))
+            .padding(.horizontal)
+            .onTapGesture {
+                onTap()
+            }
+            
+            Spacer()
+        }
+        .padding(.top, 8)
+    }
+}
+
+
+
+
+// MARK: - PDF Viewer (PDFKit wrapper)
+struct PDFViewer: UIViewRepresentable {
+    let url: URL
+    
+    func makeUIView(context: Context) -> PDFView {
+        let v = PDFView()
+        v.autoScales = true
+        v.displayMode = .singlePageContinuous
+        v.displayDirection = .vertical
+        v.backgroundColor = .systemGroupedBackground
+        
+        if let doc = PDFDocument(url: url) {
+            v.document = doc
+        } else {
+            // if not a PDF, try to show image
+            if let img = UIImage(contentsOfFile: url.path) {
+                let data = img.pngData()
+                if let data = data, let doc = PDFDocument(data: data) {
+                    v.document = doc
+                }
+            }
+        }
+        return v
+    }
+    
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
+
+// MARK: - URLSession Delegate for progress
+class SessionDelegate: NSObject, URLSessionDownloadDelegate {
+    private let progressHandler: (Double) -> Void
+    
+    init(progressHandler: @escaping (Double) -> Void) {
+        self.progressHandler = progressHandler
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        guard totalBytesExpectedToWrite > 0 else { return }
+        let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+        DispatchQueue.main.async {
+            self.progressHandler(progress)
+        }
+    }
+    
+    func urlSession(_ session: URLSession,
+                    downloadTask: URLSessionDownloadTask,
+                    didFinishDownloadingTo location: URL) {
+
+        // Handle temp file "location"
+        print("File downloaded to: \(location)")
+    }
+
+}
+
+
+
+import SwiftUI
+import PDFKit
+
+struct PDFKitView: UIViewRepresentable {
+    let url: URL
+
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.autoScales = true
+        pdfView.document = PDFDocument(url: url)
+        return pdfView
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
+//PDFKitView(url: Bundle.main.url(forResource: "sample", withExtension: "pdf")!)
+
+
+struct PDFViewerWithActions: View {
+    let url: URL
+    
+    @State private var showShareSheet = false
+    
+    var body: some View {
+        VStack {
+            PDFKitView(url: url)
+        }
+        .navigationBarTitle("Invoice", displayMode: .inline)
+        .toolbar {
+            
+            // SHARE BUTTON
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showShareSheet = true
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+            
+            // DOWNLOAD BUTTON
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    saveToFiles(url: url)
+                } label: {
+                    Image(systemName: "arrow.down.circle")
+                }
+            }
+        }.navigationBarHidden(false)
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(items: [url])
+        }
+    }
+    
+    // MARK: SAVE TO FILES
+    func saveToFiles(url: URL) {
+        let controller = UIDocumentPickerViewController(forExporting: [url])
+        controller.allowsMultipleSelection = false
+        UIApplication.shared.windows.first?.rootViewController?
+            .present(controller, animated: true)
+    }
+}
+
+
+struct ShareSheet: UIViewControllerRepresentable {
+    var items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

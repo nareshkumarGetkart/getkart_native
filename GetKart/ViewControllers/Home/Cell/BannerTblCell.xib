@@ -35,7 +35,7 @@
                         </connections>
                     </collectionView>
                     <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="2" translatesAutoresizingMaskIntoConstraints="NO" id="sqc-7P-RvC">
-                        <rect key="frame" x="132.33333333333334" y="144" width="55.333333333333343" height="26"/>
+                        <rect key="frame" x="132.33333333333334" y="148" width="55.333333333333343" height="26"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="pageIndicatorTintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="currentPageIndicatorTintColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -47,7 +47,7 @@
                     <constraint firstAttribute="bottom" secondItem="o4L-vF-hCw" secondAttribute="bottom" id="h7J-mG-K6u"/>
                     <constraint firstAttribute="trailing" secondItem="o4L-vF-hCw" secondAttribute="trailing" id="o6M-eu-NHN"/>
                     <constraint firstItem="o4L-vF-hCw" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="peL-hv-peu"/>
-                    <constraint firstAttribute="bottom" secondItem="sqc-7P-RvC" secondAttribute="bottom" constant="5" id="tSP-S1-9iG"/>
+                    <constraint firstAttribute="bottom" secondItem="sqc-7P-RvC" secondAttribute="bottom" constant="1" id="tSP-S1-9iG"/>
                     <constraint firstItem="sqc-7P-RvC" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="wZx-Kn-YBI"/>
                 </constraints>
             </tableViewCellContentView>

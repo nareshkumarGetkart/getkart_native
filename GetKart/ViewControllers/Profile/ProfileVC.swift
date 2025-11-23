@@ -25,11 +25,11 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var btnSetting:UIButton!
     @IBOutlet weak var lblAppVersion:UILabel!
 
-  /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
+  /*  let titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History & Invoices","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy","Delete Account","Logout"]
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     //,"Banner Promotions"
-    var titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+    var titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History & Invoices","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
 //,"mediaPromotion"
     var iconArray =  ["","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
@@ -443,7 +443,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             }else if titleArray[indexPath.row] == "Share this App"{
                 ShareMedia.shareMediafrom(type: .appShare, mediaId: "", controller: self)
                 
-            }else if titleArray[indexPath.row] ==  "Order History"{
+            }else if titleArray[indexPath.row] ==  "Order History & Invoices"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
