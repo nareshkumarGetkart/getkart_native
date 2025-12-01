@@ -81,7 +81,7 @@ struct PromotionPackageCell:View {
             Spacer()
             if (obj.discountInPercentage ?? "0") != "0"{
 
-                Text(" \(obj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.manrope(.medium, size: 13)).background(Color(.systemYellow))
+                Text(" \(obj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.manrope(.medium, size: 13)).background(Color(hexString: "#FF9900"))
                 
                 
                 let originalPrice = "\(obj.price ?? "0")".formatNumberWithComma()

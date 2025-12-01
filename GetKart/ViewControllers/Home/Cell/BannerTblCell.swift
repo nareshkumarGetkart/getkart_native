@@ -26,7 +26,11 @@ class BannerTblCell: UITableViewCell {
         pageControl.currentPage = 0
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = Themes.sharedInstance.themeColor
-        //startTimer()
+        
+        // Add long press gesture
+            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+            longPress.minimumPressDuration = 0.2   // Adjust sensitivity
+            collctnView.addGestureRecognizer(longPress)
     }
     
     
@@ -73,6 +77,23 @@ class BannerTblCell: UITableViewCell {
     }
     
  
+    
+    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            // User pressed & holding — stop auto-scroll
+            timer?.invalidate()
+            timer = nil
+
+        case .ended, .cancelled, .failed:
+            // User released finger — start auto-scroll again
+            startTimer()
+
+        default:
+            break
+        }
+    }
+
 
 }
 
@@ -97,7 +118,7 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
         return CGSize(width: self.collctnView.frame.size.width, height: 175)
         
     }
-    
+  /*
   // Update pageControl when scrolling ends
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
             let pageWidth = scrollView.frame.width
@@ -114,8 +135,33 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
             pageControl.currentPage = currentPage
             self.x = currentPage + 1
 
-        }
+        }*/
     
+    
+    // MARK: - Scroll Handling
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.frame.width
+        let currentPage = Int((scrollView.contentOffset.x + pageWidth/2) / pageWidth)
+        pageControl.currentPage = currentPage
+        self.x = currentPage + 1
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        startTimer()
+    }
+
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.frame.width
+        let currentPage = Int((scrollView.contentOffset.x + pageWidth/2) / pageWidth)
+        pageControl.currentPage = currentPage
+        self.x = currentPage + 1
+    }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BannerCell", for: indexPath) as! BannerCell
         if let obj = listArray?[indexPath.item]{

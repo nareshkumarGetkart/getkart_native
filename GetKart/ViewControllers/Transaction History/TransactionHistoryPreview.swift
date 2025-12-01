@@ -72,19 +72,22 @@ struct TransactionHistoryPreview: View {
                         }
                         .padding(.horizontal)
 
-                        Button(action: {
-                            getPdfUrlFromView()
+                        if  let id  = transaction?.invoiceId{
+                            Button(action: {
+                                getPdfUrlFromView()
 
-                        }) {
-                            Text("Download Invoice")
-                                .font(Font.manrope(.bold, size: 18.0))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color(.systemGray3))
-                                .cornerRadius(24)
+                            }) {
+                                Text("Download Invoice")
+                                    .font(Font.manrope(.bold, size: 18.0))
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color(.systemGray3))
+                                    .cornerRadius(24)
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
+                     
 
                     }
                     .padding(.vertical)
@@ -106,7 +109,7 @@ struct TransactionHistoryPreview: View {
                     showToast = false
                     //showPDF = true
                     if let url = downloadedFileURL {
-                        let viewPdf = UIHostingController(rootView: PDFViewerWithActions(url: url))
+                        let viewPdf = UIHostingController(rootView: PDFViewerWithActions(url: url,stringUrl: pdfUrlString))
                         self.navController?.pushViewController(viewPdf, animated: true)
                     }
                     
@@ -332,12 +335,19 @@ private func detailsCard() -> some View {
     }
     
     // MARK: SAVE TO FILES
-       func saveToFiles(url: URL) {
-           let controller = UIDocumentPickerViewController(forExporting: [url])
-           controller.allowsMultipleSelection = false
-           UIApplication.shared.windows.first?.rootViewController?
-               .present(controller, animated: true)
-       }
+    func saveToFiles(url: URL) {
+                   let controller = UIDocumentPickerViewController(forExporting: [url])
+                   controller.allowsMultipleSelection = false
+                   UIApplication.shared.windows.first?.rootViewController?
+                       .present(controller, animated: true)
+        
+        
+//        let picker = UIDocumentPickerViewController(forExporting: [url])
+//        picker.shouldShowFileExtensions = true
+//        picker.allowsMultipleSelection = false
+//        picker.delegate = self
+//        self.navController.present(picker, animated: true)
+    }
     
     func getPdfUrlFromView(){
         
@@ -411,6 +421,8 @@ private func detailsCard() -> some View {
     }
 
 }
+
+
 
 #Preview {
     TransactionHistoryPreview(transaction: nil)
@@ -537,58 +549,153 @@ struct PDFKitView: UIViewRepresentable {
 }
 //PDFKitView(url: Bundle.main.url(forResource: "sample", withExtension: "pdf")!)
 
+import SwiftUI
+import PDFKit
+import UIKit
+
+import SwiftUI
+import PDFKit
 
 struct PDFViewerWithActions: View {
-    let url: URL
     
+    let url: URL
+    let stringUrl: String
+    
+    @Environment(\.dismiss) var dismiss
+    
+    @State private var downloadedURL: URL?
     @State private var showShareSheet = false
     
     var body: some View {
-        VStack {
-            PDFKitView(url: url)
-        }
-        .navigationBarTitle("Invoice", displayMode: .inline)
-        .toolbar {
+        VStack(spacing: 0) {
             
-            // SHARE BUTTON
-            ToolbarItem(placement: .navigationBarTrailing) {
+            // ----------- CUSTOM HEADER -----------
+            HStack {
+                
+                // BACK BUTTON
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title3)
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 6)
+                }
+                
+                Spacer()
+                
+                Text("Invoice")
+                    .font(.headline)
+                
+                Spacer()
+                
+                // SHARE BUTTON
                 Button {
-                    showShareSheet = true
+                    downloadFileLocal(from: stringUrl,
+                                      fileName: "invoice.pdf") { fileURL, _ in
+                        if let fileURL = fileURL {
+                            downloadedURL = fileURL
+                            showShareSheet = true
+                        }
+                    }
                 } label: {
                     Image(systemName: "square.and.arrow.up")
+                        .font(.title3)
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 6)
                 }
-            }
-            
-            // DOWNLOAD BUTTON
-            ToolbarItem(placement: .navigationBarTrailing) {
+                
+                // DOWNLOAD BUTTON
                 Button {
-                    saveToFiles(url: url)
+                    
+                    downloadFileLocal(from: stringUrl,
+                                      fileName: "invoice.pdf") { fileURL, _ in
+                        if let fileURL = fileURL {
+                            //downloadedURL = fileURL
+                            //showShareSheet = true
+                            self.saveToFiles(url: fileURL)
+                        }
+                    }
+                   // downloadPDF(from: stringUrl, istoDownload: true)
                 } label: {
                     Image(systemName: "arrow.down.circle")
+                        .font(.title3)
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 6)
                 }
             }
-        }.navigationBarHidden(false)
+            .frame(height: 50)
+            .padding(.horizontal)
+            .background(Color.white)
+            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+            
+            // ----------- PDF VIEWER -----------
+            PDFKitView(url: url)
+                .edgesIgnoringSafeArea(.bottom)
+            
+        }
         .sheet(isPresented: $showShareSheet) {
-            ShareSheet(items: [url])
+            if let fileURL = downloadedURL {
+                ShareSheet(items: [fileURL])
+            }
         }
     }
     
-    // MARK: SAVE TO FILES
     func saveToFiles(url: URL) {
-        let controller = UIDocumentPickerViewController(forExporting: [url])
-        controller.allowsMultipleSelection = false
-        UIApplication.shared.windows.first?.rootViewController?
-            .present(controller, animated: true)
-    }
+           let controller = UIDocumentPickerViewController(forExporting: [url])
+           controller.allowsMultipleSelection = false
+           UIApplication.shared.windows.first?.rootViewController?
+               .present(controller, animated: true)
+       }
 }
 
 
+extension PDFViewerWithActions {
+    func downloadFileLocal(from urlString: String,
+                           fileName: String,
+                           completion: @escaping (URL?, Error?) -> Void) {
+        
+        guard let url = URL(string: urlString) else {
+            completion(nil, NSError(domain: "Invalid URL", code: -1))
+            return
+        }
+        
+        URLSession.shared.downloadTask(with: url) { tempURL, _, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            guard let tempURL = tempURL else {
+                completion(nil, NSError(domain: "Temp URL missing", code: -1))
+                return
+            }
+            
+            let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let destURL = docs.appendingPathComponent(fileName)
+            
+            try? FileManager.default.removeItem(at: destURL)
+            
+            do {
+                try FileManager.default.moveItem(at: tempURL, to: destURL)
+                DispatchQueue.main.async { completion(destURL, nil) }
+            } catch {
+                DispatchQueue.main.async { completion(nil, error) }
+            }
+        }.resume()
+    }
+}
+
+// MARK: - Share Sheet
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
-
+    
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: items, applicationActivities: nil)
     }
 
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+    func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - Make URL Identifiable for sheet(item:)
+extension URL: Identifiable {
+    public var id: String { absoluteString }
 }

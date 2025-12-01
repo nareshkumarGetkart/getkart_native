@@ -944,9 +944,12 @@ extension AppDelegate : ATAppUpdaterDelegate{
                 Local.shared.bannerScrollInterval = obj.data?.bannerScrollInterval ?? 3
                // print(" \( Local.shared.bannerScrollInterval) bannerScrollInterval val = \(obj.data?.bannerScrollInterval ?? 0)")
                 
+                Local.shared.iosNudityThreshold = obj.data?.iosNudityThreshold ?? 0.15
+                
                 if (obj.data?.iosPlaceKey ?? "").count > 0{
                     GMSPlacesClient.provideAPIKey(obj.data?.iosPlaceKey ?? "")
                 }
+                
             }
             
         }

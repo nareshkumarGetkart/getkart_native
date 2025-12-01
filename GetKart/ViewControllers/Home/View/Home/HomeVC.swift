@@ -35,7 +35,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         refreshControl.tintColor = UIColor.systemYellow
         return refreshControl
     }()
-    private  var sheet: SheetViewController?
     
     private var homeVModel:HomeViewModel?
 
@@ -151,18 +150,62 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
     }
-    /*  self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
-                                                               subtitle: "Upgrade your listing for better exposure and faster response.",
-                                                               description: "<ul>                                                <li>Your item is currently listed as a Free Post.</li>                                                <li>Free posts have limited reach and visibility.</li>                                                <li>Upgrade to a premium package to get more views and responses.</li>                                                <li>Premium listings appear at the top and reach more interested buyers.</li>                                                <li>Click 'Boost Now' to enhance your item's performance.</li>                                            </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
-                                                               buttonTitle: "Okay",
-                                                               type: 1, itemID: 49625))
+    
+    
+    
+    func dummyPopupCheck(togetvalues:Int){
+        
+        
+        if togetvalues == 0{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
+                                                                          subtitle: "Upgrade your listing for better exposure and faster response.",
+                                                                          description: "<ul><li>Never share OTPs, passwords, or bank details with anyone.</li> <li>Avoid clicking on unknown or suspicious links.</li>        <li>Always meet in safe, public places for transactions.</li>                 <li>Do not transfer any advance amount before you check the product in person. </li> <li>Report any suspicious behavior or fraud attempts immediately.</li></ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
+                                                                          buttonTitle: "Okay",
+                                                                          type: 1, itemID: 49625))
+              
+        }else if togetvalues == 1{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title: "Highlight your ad at the top and boost sales",
+                                                                      subtitle: "Promotional Alert Description",
+                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/11/69257d29e64ab6.019290581764064553.png", mandatoryClick: false,
+                                                                      buttonTitle: "Okay",
+                                                                      type: 5, itemID: 49625))
+        }else if togetvalues == 2{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title: "",
+                                                                      subtitle: "",
+                                                                      description: "For a limited time, enjoying posting <strong>3 ads \ncomplete FREE - </strong> no charges", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/11/692423ef7c64b7.388776791763976175.png", mandatoryClick: false,
+                                                                      buttonTitle: "Post Now",
+                                                                      type: 5, itemID: 49625))
             
+        }else if togetvalues == 3{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title: "You have draft items pending!",
+                                                                      subtitle: "Complete your draft item and publish it to reach more people.",
+                                                                      description: "<ul><li>You have items saved as draft that are not visible to others.</li>                                            <li>Complete the required details to make your item live.</li>                                            <li>Publishing your item increases visibility and chances of response.</li>                                            <li>Make sure the images and description are clear and accurate.</li>                                            <li>Click 'Publish Now' to make your draft item available to others.</li>                                        </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
+                                                                      buttonTitle: "Publish Now",
+                                                                      type: 1, itemID: 49625))
             
-            return*/
+        }
+            
+    
+        
+        /*  self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
+                                                                   subtitle: "Upgrade your listing for better exposure and faster response.",
+                                                                   description: "<ul>                                                <li>Your item is currently listed as a Free Post.</li>                                                <li>Free posts have limited reach and visibility.</li>                                                <li>Upgrade to a premium package to get more views and responses.</li>                                                <li>Premium listings appear at the top and reach more interested buyers.</li>                                                <li>Click 'Boost Now' to enhance your item's performance.</li>                                            </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
+                                                                   buttonTitle: "Okay",
+                                                                   type: 1, itemID: 49625))
+                
+                
+                return*/
+           
+    }
+  
 
     //MARK: Api methods
     func getpopupApi(){
-   
+
+     
+//     dummyPopupCheck(togetvalues: 1)
+//        return
+//      
  
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
@@ -192,18 +235,129 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                             AppDelegate.sharedInstance.navigationController?.present(destVc, animated: false)
                         }
                     }
-                } else if (obj.data.type ?? 0) == 1 || (obj.data.type ?? 0) == 2 || (obj.data.type ?? 0) == 3  || (obj.data.type ?? 0) == 4{
+                } else if (obj.data.type ?? 0) == 1 || (obj.data.type ?? 0) == 2 || (obj.data.type ?? 0) == 3  || (obj.data.type ?? 0) == 4 || (obj.data.type ?? 0) == 5 {
                     self?.presentHostingController(objPopup: obj.data)
                 }
             }
         }
     }
     
+  
+    
     func presentHostingController(objPopup:PopupModel){
+        
+        
+        let controller = UIHostingController(
+            rootView: BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in }))
+       
+        
+        let useInlineMode = view != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+              
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        
+        
+        
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        
+        if (objPopup.mandatoryClick ?? false){
+            
+            sheet.dismissOnOverlayTap = false
+            sheet.dismissOnPull = false
+            sheet.allowPullingPastMaxHeight = false
+            sheet.allowPullingPastMinHeight = false
+            sheet.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.allowGestureThroughOverlay = false
+            sheet.sheetViewController?.dismissOnPull = false
+            sheet.allowPullingPastMinHeight = false
+        }
+     
+        let settingView =  BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: { [weak self] (obj,dismissOnly) in
+            
+            //self?.dismiss(animated: true)
+            //  self?.sheet.attemptDismiss(animated: true)   // <-- correct now
+            
+            if sheet.options.useInlineMode == true {
+                sheet.attemptDismiss(animated: true)
+            } else {
+               sheet.dismiss(animated: true, completion: nil)
+            }
+            
+            
+            if dismissOnly{
+                
+            }else{
+                if (obj.type ?? 0) == 1  {
+                    self?.pushToMyAdsScreen()
+                }else if (obj.type ?? 0) == 2  || (obj.type ?? 0) == 3  && (obj.itemID ?? 0) > 0{
+                    /*
+                     If any add in Draft message will get popped up to Buy Plans type = 1
+                     If user has Free Approved Add then pop up message to Buy  Plan type = 2
+                     If user has Paid Ad from Listing Plan then Pop up message to Boost Plan type = 3
+                     type == 5 banner promotion
+                     */
+                    let siftUIview = ItemDetailView(navController:  self?.navigationController, itemId: objPopup.itemID ?? 0, itemObj: nil, slug: "")
+                    let hostingController = UIHostingController(rootView:siftUIview)
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self?.navigationController?.pushViewController(hostingController, animated: true)
+                    
+                }else if (obj.type ?? 0) == 4  {
+                    //If User has just registered and not posted any ad than Pop up message to Run Ad  type = 4
+                    
+                    if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                        destVC.hidesBottomBarWhenPushed = true
+                        destVC.popType = .createPost
+                        self?.navigationController?.pushViewController(destVC, animated: true)
+                    }
+                }else if (obj.type ?? 0) == 5  {
+                    //5 banner promotion
+                    let destVC = UIHostingController(rootView:  BannerPromotionsView(navigationController: self?.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
+                    self?.navigationController?.pushViewController(destVC, animated: true)
+                }
+            }
+        })
+
+        
+        controller.rootView = settingView
+        
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+        
+        
+      
+   
+        
+    }
+    
+
+
+    
+  /*  func presentHostingController(objPopup:PopupModel){
         
         let controller = UIHostingController(rootView: BottomSheetPopupView(objPopup: objPopup, pushToScreenFromPopup: { [weak self] (obj,dismissOnly) in
 
-            self?.sheet?.attemptDismiss(animated: true)
+            self?.sheet.attemptDismiss(animated: true)
             if dismissOnly{
                 
             }else{
@@ -214,6 +368,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                  If any add in Draft message will get popped up to Buy Plans type = 1
                  If user has Free Approved Add then pop up message to Buy  Plan type = 2
                  If user has Paid Ad from Listing Plan then Pop up message to Boost Plan type = 3
+                 type == 5 banner promotion
                 */
                     let siftUIview = ItemDetailView(navController:  self?.navigationController, itemId: objPopup.itemID ?? 0, itemObj: nil, slug: "")
                     let hostingController = UIHostingController(rootView:siftUIview)
@@ -228,6 +383,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                         destVC.popType = .createPost
                         self?.navigationController?.pushViewController(destVC, animated: true)
                     }
+                }else if (obj.type ?? 0) == 5  {
+                    //5 banner promotion
+                    let destVC = UIHostingController(rootView:  BannerPromotionsView(navigationController: self?.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
+                    self?.navigationController?.pushViewController(destVC, animated: true)
                 }
             }
         }))
@@ -237,7 +397,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         controller.navigationController?.navigationBar.isHidden = true
         
         let nav = UINavigationController(rootViewController: controller)
-        var fixedSize = 510
+        var fixedSize = 550
         
         if (objPopup.image?.count ?? 0) == 0{
             fixedSize = fixedSize - 150
@@ -255,35 +415,38 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         
         
         sheet = SheetViewController(
-            controller: nav,
-            sizes: [.fixed(CGFloat(fixedSize)),.intrinsic],
-            options: SheetOptions(presentingViewCornerRadius : 20 , useInlineMode: useInlineMode))
-        sheet?.allowGestureThroughOverlay = false
-        sheet?.cornerRadius = 20
-        sheet?.dismissOnOverlayTap = true
-        sheet?.dismissOnPull = false
-        sheet?.gripColor = .clear
+            controller: controller,
+           //sizes: [.fixed(CGFloat(fixedSize)),.intrinsic],
+            sizes: [.intrinsic],
+
+            options: SheetOptions(presentingViewCornerRadius : 20 , useInlineMode: true))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 20
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
         
         if (objPopup.mandatoryClick ?? false){
             
-            sheet?.dismissOnOverlayTap = false
-            sheet?.dismissOnPull = false
-            sheet?.allowPullingPastMaxHeight = false
-            sheet?.allowPullingPastMinHeight = false
-            sheet?.shouldRecognizePanGestureWithUIControls = false
-            sheet?.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
-            sheet?.sheetViewController?.allowGestureThroughOverlay = false
-            sheet?.sheetViewController?.dismissOnPull = false
-            sheet?.allowPullingPastMinHeight = false
+            sheet.dismissOnOverlayTap = false
+            sheet.dismissOnPull = false
+            sheet.allowPullingPastMaxHeight = false
+            sheet.allowPullingPastMinHeight = false
+            sheet.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.allowGestureThroughOverlay = false
+            sheet.sheetViewController?.dismissOnPull = false
+            sheet.allowPullingPastMinHeight = false
         }
         if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
-            sheet?.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
         } else {
             guard let sh = sheet else{ return }
             self.navigationController?.present(sh, animated: true, completion: nil)
         }
+      
     }
-    
+    */
     
     
     func pushToMyAdsScreen(){
@@ -358,14 +521,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     //MARK: UIButton Action
     
     @IBAction func locationBtnAction(_ sender : UIButton){
-     
+/*
 //        let swiftUIView = CreateAdSecondView(navigationController: self.navigationController)
 //        let destVC = UIHostingController(rootView: swiftUIView)
 //        destVC.hidesBottomBarWhenPushed = true
 //        self.navigationController?.pushViewController(destVC, animated: true)
 //      return
 //        
-        
+        */
         var rootView = CountryLocationView(popType: .home, navigationController: self.navigationController)
         rootView.delLocationSelected = self
            let vc = UIHostingController(rootView:rootView)
@@ -807,4 +970,8 @@ extension HomeVC {
         }
     }
 }
+
+
+
+
 

@@ -22,6 +22,7 @@ final class Local {
     var companyTelelphone1:String = "8800957957"
     var bannerScrollInterval = 3
     var placeApiKey:String = ""
+    var iosNudityThreshold = 0.15
 
 
     var isLogout = false

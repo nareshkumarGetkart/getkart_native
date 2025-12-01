@@ -333,6 +333,8 @@ extension PostAdFinalVC: MKMapViewDelegate,LocationSelectedDelegate {
             url = Constant.shared.update_itemURL
         }
         
+        params["isPostValidate"] = isPostValidate
+        
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: imgData ?? Data(), imageName: imgName, imagesData: gallery_images, imageNames: gallery_imageNames, url: url, params: self.params, completionHandler: { responseObject, error in
 
             if error == nil {

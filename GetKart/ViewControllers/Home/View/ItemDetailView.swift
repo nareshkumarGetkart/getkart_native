@@ -127,7 +127,6 @@ struct ItemDetailView: View {
                                                     .padding(.horizontal, 5)
                                                     .onAppear {
                                                         extractDominantColor(from: image)
-                                                        
                                                     }
                                             } placeholder: {
                                                 Image("getkartplaceholder")
@@ -144,7 +143,7 @@ struct ItemDetailView: View {
                                 }
                             }
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                            .frame(width: widthScreen - 20, height: 200)
+                            .frame(width: widthScreen - 25, height: 200)
                             .background(backgroundColor.opacity(0.4))
                             .cornerRadius(10)
                             // Custom Dot Indicator

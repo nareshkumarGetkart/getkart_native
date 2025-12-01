@@ -27,6 +27,7 @@ pod 'SVGKit'
 pod 'PhonePePayment'
 pod 'Mantis'
 pod 'GooglePlaces'
+pod 'NSFWDetector'
 
   target 'GetKartTests' do
     inherit! :search_paths

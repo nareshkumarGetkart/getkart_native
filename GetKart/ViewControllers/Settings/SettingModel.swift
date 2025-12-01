@@ -20,6 +20,7 @@ struct SettingsParse: Codable {
 // MARK: - DataClass
 struct SettingsModel: Codable {
     
+    let iosNudityThreshold:Double?
     var currencySymbol:String = "₹"
     let companyName, iosVersion, defaultLanguage: String?
     let forceUpdate, androidVersion, numberWithSuffix, maintenanceMode: String?
@@ -53,7 +54,7 @@ struct SettingsModel: Codable {
     let iosPlaceKey:String?
     
     enum CodingKeys: String, CodingKey {
-        case bannerScrollInterval
+        case bannerScrollInterval,iosNudityThreshold
         case companyName = "company_name"
         case currencySymbol = "currency_symbol"
         case iosVersion = "ios_version"

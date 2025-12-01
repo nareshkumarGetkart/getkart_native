@@ -8,7 +8,10 @@
 import UIKit
 import SwiftUI
 import PhotosUI
-
+import NSFWDetector
+import UIKit
+import CoreML
+import Vision
 enum AddKeys: String{
     
     case name
@@ -30,6 +33,8 @@ enum AddKeys: String{
     case area
 
 }
+
+var isPostValidate = 0
 
 class CreateAddDetailVC: UIViewController {
     
@@ -320,6 +325,17 @@ class CreateAddDetailVC: UIViewController {
             //            showErrorMsg = true
             
         } else {
+            
+            
+            if popType == .createPost {
+                
+            }else{
+                if itemObj?.status != "approved"{
+                    isPostValidate = 0
+                }
+            }
+
+            
             showErrorMsg = false
             self.params["slug"] = self.generateSlug(self.params[AddKeys.name.rawValue] as? String ?? "")
            
@@ -871,6 +887,7 @@ extension CreateAddDetailVC:  PHPickerViewControllerDelegate{
                 result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
                     if let pickedImage = object as? UIImage {
                         print("Selected image: \(pickedImage)")
+                        self.checkNudityOfiMages(pickedImage: pickedImage)
 
                         if self.isImgData{
                             DispatchQueue.main.async {
@@ -939,9 +956,142 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
   
   
 
+    func detectNudity(in image: UIImage, completion: @escaping (Bool, VNConfidence?) -> Void) {
+        guard let ciImage = CIImage(image: image) else {
+            completion(false, nil)
+            return
+        }
+
+        do {
+            let configuration = MLModelConfiguration()
+            let coreMLModel = try OpenNSFW(configuration: configuration).model
+            let vnModel = try VNCoreMLModel(for: coreMLModel)
+
+            let request = VNCoreMLRequest(model: vnModel) { request, error in
+                guard let results = request.results as? [VNClassificationObservation] else {
+                    completion(false, nil)
+                    return
+                }
+
+                let explicitKeywords = ["nsfw", "nudity", "porn", "sexual", "explicit"]
+                var maxConfidence: VNConfidence = 0.0
+                var isExplicit = false
+
+                for result in results {
+                    let label = result.identifier.lowercased()
+                    if explicitKeywords.contains(where: { label.contains($0) }) {
+                        isExplicit = true
+                        maxConfidence = max(maxConfidence, result.confidence)
+                    }
+                }
+
+                completion(isExplicit, maxConfidence)
+            }
+
+            let handler = VNImageRequestHandler(ciImage: ciImage)
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try handler.perform([request])
+                } catch {
+                    print("Failed to perform VN request: \(error)")
+                    completion(false, nil)
+                }
+            }
+
+        } catch {
+            print("Failed to load Core ML model: \(error)")
+            completion(false, nil)
+        }
+    }
+
+
+
+    
+    func checkNudityOfiMages(pickedImage: UIImage) {
+        
+        if Float(Local.shared.iosNudityThreshold) > 0 {
+            
+            detectNudity(in: pickedImage) { isExplicit, confidence in
+                if isExplicit {
+                    print("Nudity detected with confidence: \(confidence!)")
+                    DispatchQueue.main.async {
+                        
+                        if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+                            isPostValidate = 0
+                            /* AlertView.sharedManager.displayMessageWithAlert(
+                             title: "!Alert",
+                             msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+                             )*/
+                        }else{
+                            isPostValidate = 1
+                        }
+                    }
+                } else {
+                    isPostValidate = 1
+                    print("Image is safe")
+                }
+            }
+        }
+
+        
+        return
+//        pickedImage.checkNSFW() { result, confidence in
+//       
+//            print(" confidence == \(confidence)")
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .sfw:
+//                       // isPostValidate = 1
+//
+//                case .nsfw:
+//                    if confidence > 0.5 {
+//                        isPostValidate = 0
+//                        AlertView.sharedManager.displayMessageWithAlert(
+//                            title: "!Alert",
+//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                        )
+//                    } else {
+//                       // isPostValidate = 1
+//                    }
+//                case .unknown:
+//                    isPostValidate = 0
+//                }
+//            }
+//        }
+
+//        NSFWDetector.shared.check(image: pickedImage) { result in
+//            switch result {
+//            case let .success(nsfwConfidence: confidence):
+//
+//                print(" confidence == \(confidence)")
+//                DispatchQueue.main.async {   // <-- FIX IS HERE
+//                    if confidence > 0.05 {
+//                        isPostValidate = 0
+//                        AlertView.sharedManager.displayMessageWithAlert(
+//                            title: "!Alert",
+//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                        )
+//                    } else {
+//                        isPostValidate = 1
+//                    }
+//                }
+//
+//            default:
+//                break
+//            }
+//        }
+    }
+
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        
+        
         if let pickedImage = info[.originalImage] as? UIImage {
+            
+            checkNudityOfiMages(pickedImage: pickedImage)
+           
+
             if isImgData == true {
                 
                 imgData = pickedImage.wxCompress().jpegData(compressionQuality: 1.0)
@@ -998,6 +1148,8 @@ extension CreateAddDetailVC: UIImagePickerControllerDelegate, UINavigationContro
         dismiss(animated: true, completion: nil)
         
     }
+    
+    
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         // Handle the user canceling the image picker, if needed.
@@ -1144,5 +1296,21 @@ extension String{
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: number)) ?? ""
+    }
+}
+
+
+
+
+
+
+
+
+extension UIImage {
+    var cgImageSafe: CGImage? {
+        if let cg = self.cgImage { return cg }
+        let ci = CIImage(image: self)
+        let context = CIContext()
+        return ci.flatMap { context.createCGImage($0, from: $0.extent) }
     }
 }
