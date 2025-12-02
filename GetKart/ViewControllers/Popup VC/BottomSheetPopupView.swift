@@ -102,7 +102,7 @@ struct BottomSheetPopupView: View {
             }
             
             // TEXT CONTENT
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 if let title = objPopup.title {
                     
                     if title.isHTML{
@@ -146,7 +146,8 @@ struct BottomSheetPopupView: View {
             Button {
                 pushToScreenFromPopup(objPopup, false)
             } label: {
-                Text(objPopup.buttonTitle ?? "Okay")
+                let strTitle = (objPopup.buttonTitle ?? "").count > 0 ?  objPopup.buttonTitle ?? "Okay" : "Okay"
+                Text(strTitle)
                     .foregroundColor(.white)
                     .font(.manrope(.semiBold, size: 17))
                     .frame(maxWidth: .infinity, minHeight: 50)
@@ -154,7 +155,7 @@ struct BottomSheetPopupView: View {
                     .cornerRadius(10)
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+            .padding(.bottom, 25)
         }
     }
     
@@ -165,11 +166,12 @@ struct BottomSheetPopupView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 170, maxHeight: 250)
+                    .padding(.top)
             } placeholder: {
                 Image("getkartplaceholder")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity).padding(.top)
             }
             
             if !(objPopup.mandatoryClick ?? false) {
@@ -177,7 +179,7 @@ struct BottomSheetPopupView: View {
                     .padding(.top, 20)
                     .padding(.trailing, 10)
             }
-        }.padding(.top)
+        }
     }
     
     private var closeButton: some View {
@@ -447,8 +449,8 @@ extension String {
         
         
         // Convert <li> into bullet lines
-          html = html.replacingOccurrences(of: "<li>", with: "• ")
-          html = html.replacingOccurrences(of: "</li>", with: "<br>")
+        //  html = html.replacingOccurrences(of: "<li>", with: "• ")
+         // html = html.replacingOccurrences(of: "</li>", with: "<br>")
 
         // Trim accidental spaces inside tags
         html = html.replacingOccurrences(of: "<strong> ", with: "<strong>")

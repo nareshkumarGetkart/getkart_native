@@ -159,14 +159,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         if togetvalues == 0{
             self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
                                                                           subtitle: "Upgrade your listing for better exposure and faster response.",
-                                                                          description: "<ul><li>Never share OTPs, passwords, or bank details with anyone.</li> <li>Avoid clicking on unknown or suspicious links.</li>        <li>Always meet in safe, public places for transactions.</li>                 <li>Do not transfer any advance amount before you check the product in person. </li> <li>Report any suspicious behavior or fraud attempts immediately.</li></ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
+                                                                          description: "<ul><li>You have items saved as draft that are not visible to others.</li>                                            <li>Complete the required details to make your item live.</li>                                            <li>Publishing your item increases visibility and chances of response.</li>                                            <li>Make sure the images and description are clear and accurate.</li>                                            <li>Click 'Publish Now' to make your draft item available to others.</li>                                        </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
                                                                           buttonTitle: "Okay",
                                                                           type: 1, itemID: 49625))
               
         }else if togetvalues == 1{
             self.presentHostingController(objPopup: PopupModel(userID:639, title: "Highlight your ad at the top and boost sales",
-                                                                      subtitle: "Promotional Alert Description",
-                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/11/69257d29e64ab6.019290581764064553.png", mandatoryClick: false,
+                                                                      subtitle: "",
+                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692d8387443e45.785661921764590471.png", mandatoryClick: false,
                                                                       buttonTitle: "Okay",
                                                                       type: 5, itemID: 49625))
         }else if togetvalues == 2{
@@ -198,14 +198,12 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
            
     }
   
-
+/*
+ dummyPopupCheck(togetvalues: 0)
+    return
+ */
     //MARK: Api methods
     func getpopupApi(){
-
-     
-//     dummyPopupCheck(togetvalues: 1)
-//        return
-//      
  
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
@@ -245,7 +243,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
   
     
     func presentHostingController(objPopup:PopupModel){
-        
         
         let controller = UIHostingController(
             rootView: BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in }))
@@ -290,9 +287,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         }
      
         let settingView =  BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: { [weak self] (obj,dismissOnly) in
-            
-            //self?.dismiss(animated: true)
-            //  self?.sheet.attemptDismiss(animated: true)   // <-- correct now
             
             if sheet.options.useInlineMode == true {
                 sheet.attemptDismiss(animated: true)
