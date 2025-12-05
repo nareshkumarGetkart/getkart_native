@@ -19,10 +19,18 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var lblBoost:UILabel!
     @IBOutlet weak var imgVwIconSeen:UIImageView!
     @IBOutlet weak var imgVwIconLike:UIImageView!
+    
+    
+    @IBOutlet weak var bgViewRejectedReason:UIView!
+    @IBOutlet weak var lblRejectedReason:UILabel!
+
 
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        bgViewRejectedReason.backgroundColor = UIColor(hexString: "#ea0001", alpha: 1).withAlphaComponent(0.1)
+        
         btnAdStatus.layer.cornerRadius = btnAdStatus.frame.height/2.0
         btnAdStatus.clipsToBounds = true
         
@@ -61,7 +69,8 @@ class AdsTblCell: UITableViewCell {
         lblViewCount.text = "Views:\(itemObj.clicks ?? 0)"
         btnAdStatus.setTitle((itemObj.status ?? "").capitalized, for: .normal)
         lblBoost.isHidden = ((itemObj.isFeature ?? false) == true) ? false : true
-        
+        bgViewRejectedReason.isHidden = true
+     
         switch itemObj.status ?? ""{
             
         case "approved":
@@ -72,6 +81,7 @@ class AdsTblCell: UITableViewCell {
         case "rejected":
             btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
             btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            bgViewRejectedReason.isHidden = false
             break
             
         case "inactive":
@@ -110,6 +120,8 @@ class AdsTblCell: UITableViewCell {
             self.bgView.layer.borderColor = UIColor.separator.cgColor
             self.bgView.layer.borderWidth = 0.5
             self.bgView.clipsToBounds = true
+            self.bgViewRejectedReason.roundCorners(corners: [.bottomRight,.bottomLeft], radius: 5)
+
         }
     }
     

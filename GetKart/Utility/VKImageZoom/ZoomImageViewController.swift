@@ -2,7 +2,7 @@
 //  ZoomImageViewController.swift
 
 //
-
+/*
 import UIKit
 import Kingfisher
 import SwiftUI
@@ -248,5 +248,271 @@ extension ZoomImageViewController : UIScrollViewDelegate {
             })
             
         }
+    }
+}
+*/
+
+
+import UIKit
+import Photos
+import Kingfisher
+
+class ZoomImageViewController: UIViewController {
+
+    @IBOutlet weak var btnBack: UIButton!
+    @IBOutlet weak var parentZoomingScrollView : UIScrollView!
+    @IBOutlet weak var pager:UIPageControl!
+    @IBOutlet weak var btnDownload: UIButton!
+
+    private var childZoomingScrollView : UIScrollView!
+    var currentTag: Int = 0
+    var imageArrayUrl: [GalleryImage] = []
+    
+    private var imageZoom : UIImageView!
+    private var imageColor: UIColor = .black
+
+    //MARK: Controller life cycle methods
+    override func loadView() {
+        super.loadView()
+        self.navigationController?.isNavigationBarHidden = true
+        self.view.backgroundColor = imageColor
+     
+
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        zoomAction(tappedIndex: currentTag)
+        btnBack.setImageColor(color: Themes.sharedInstance.themeColor)
+        btnDownload.setImageColor(color: Themes.sharedInstance.themeColor)
+        pager.isHidden = imageArrayUrl.count <= 1
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture(gesture:)))
+        swipeDown.direction = .down
+        swipeDown.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(swipeDown)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = true
+    }
+
+    // MARK: Button Actions
+    @IBAction func downloadBtnAction(_ sender: UIButton) {
+
+        if imageArrayUrl.count > pager.currentPage {
+            if let url = URL(string: imageArrayUrl[pager.currentPage].image ?? "") {
+                self.downloadAndSaveToPhotos(url: url)
+            }
+        }
+    }
+
+    @IBAction func btnBackAction(_ sender: UIButton) {
+        self.navigationController?.popViewController(animated: true)
+    }
+
+    // MARK: Swipe Gesture
+    @objc func handleGesture(gesture: UISwipeGestureRecognizer) {
+        if gesture.direction == .down {
+            setNeedsStatusBarAppearanceUpdate()
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+
+    // MARK: DOUBLE-TAP ZOOM (toggle zoom)
+    @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+
+        guard let scroll = parentZoomingScrollView.viewWithTag(888888) as? UIScrollView,
+              let childScroll = scroll.viewWithTag(90000 + currentTag) as? UIScrollView else {
+            return
+        }
+
+        let currentScale = childScroll.zoomScale
+        let minScale = childScroll.minimumZoomScale
+        let maxScale = childScroll.maximumZoomScale
+
+        if currentScale > minScale * 1.3 {
+            // 🔵 RESET ZOOM
+            childScroll.setZoomScale(minScale, animated: true)
+        } else {
+            // 🔵 ZOOM IN
+            let newScale = min(maxScale, currentScale * 2.0)
+            let zoomRect = self.zoomRect(forScale: newScale,
+                                         withCenter: gesture.location(in: gesture.view))
+            childScroll.zoom(to: zoomRect, animated: true)
+        }
+    }
+
+    // MARK: SETUP ZOOM VIEW
+    func zoomAction(tappedIndex: Int) {
+
+        let SCREEN_WIDTH = UIScreen.main.bounds.width
+        let SCREEN_HEIGHT = UIScreen.main.bounds.height
+        
+        var X: CGFloat = 0
+        
+        parentZoomingScrollView.isUserInteractionEnabled = true
+        parentZoomingScrollView.tag = 888888
+        parentZoomingScrollView.delegate = self
+
+        for i in 0..<imageArrayUrl.count {
+
+            childZoomingScrollView = UIScrollView(
+                frame: CGRect(
+                    x: X,
+                    y: 0,
+                    width: SCREEN_WIDTH,
+                    height: SCREEN_HEIGHT - 160
+                )
+            )
+            childZoomingScrollView.isUserInteractionEnabled = true
+            childZoomingScrollView.tag = 90000 + i
+            childZoomingScrollView.delegate = self
+            childZoomingScrollView.minimumZoomScale = 1.0
+            childZoomingScrollView.maximumZoomScale = 5.0
+            childZoomingScrollView.zoomScale = 1.0
+            parentZoomingScrollView.addSubview(childZoomingScrollView)
+
+            imageZoom = UIImageView(
+                frame: CGRect(
+                    x: 0,
+                    y: 0,
+                    width: SCREEN_WIDTH,
+                    height: SCREEN_HEIGHT - 160
+                )
+            )
+            imageZoom.contentMode = .scaleAspectFit
+            imageZoom.isUserInteractionEnabled = true
+            imageZoom.tag = 10
+            
+            if let urlString = imageArrayUrl[i].image, let url = URL(string: urlString) {
+                imageZoom.kf.setImage(with: url,options: [.waitForCache])
+            }
+
+            childZoomingScrollView.addSubview(imageZoom)
+            childZoomingScrollView.contentSize = imageZoom.frame.size
+
+            let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
+            doubleTap.numberOfTapsRequired = 2
+            imageZoom.addGestureRecognizer(doubleTap)
+
+            X += SCREEN_WIDTH
+        }
+
+        parentZoomingScrollView.contentSize = CGSize(width: X, height: SCREEN_HEIGHT)
+        parentZoomingScrollView.isPagingEnabled = true
+        pager.numberOfPages = imageArrayUrl.count
+        pager.currentPage = tappedIndex
+
+        parentZoomingScrollView.contentOffset = CGPoint(x: SCREEN_WIDTH * CGFloat(tappedIndex), y: 0)
+    }
+
+    // MARK: Zoom Helpers
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        if let childScroll = scrollView.viewWithTag(90000 + currentTag) as? UIScrollView {
+            return childScroll.viewWithTag(10) as? UIImageView
+        }
+        return nil
+    }
+
+    func zoomRect(forScale scale: CGFloat, withCenter center: CGPoint) -> CGRect {
+        let scroll = parentZoomingScrollView.viewWithTag(888888) as! UIScrollView
+        let childScroll = scroll.viewWithTag(90000 + currentTag) as! UIScrollView
+
+        var zoomRect = CGRect.zero
+        zoomRect.size.height = childScroll.frame.size.height / scale
+        zoomRect.size.width = childScroll.frame.size.width / scale
+
+        zoomRect.origin.x = center.x - (zoomRect.size.width / 2.0)
+        zoomRect.origin.y = center.y - (zoomRect.size.height / 2.0)
+
+        return zoomRect
+    }
+    
+    private func popWithGesture() {
+        self.view.alpha = 1
+        UIView.animate(withDuration: 0.18, animations: {
+            self.view.alpha = 0
+        }) { _ in
+            self.navigationController?.popViewController(animated: false)
+        }
+    }
+
+ 
+
+}
+
+// MARK: ScrollView Delegate
+extension ZoomImageViewController: UIScrollViewDelegate {
+
+   /* func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.tag == 888888 {
+            let pageWidth = parentZoomingScrollView.frame.size.width
+            let page = Int(floor((parentZoomingScrollView.contentOffset.x - pageWidth/2) / pageWidth) + 1)
+            currentTag = page
+            pager.currentPage = page
+        }
+    }
+    */
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.tag == 888888 else { return }
+
+        let pageWidth = scrollView.frame.width
+        let offsetX = scrollView.contentOffset.x
+        let maxOffsetX = pageWidth * CGFloat(imageArrayUrl.count - 1)
+
+        // Normal page calculation
+        let page = Int(round(offsetX / pageWidth))
+        currentTag = page
+        pager.currentPage = page
+
+        // 👉 Swipe left when on first page
+        if offsetX < -70 { // overscroll threshold
+            popWithGesture()
+        }
+
+        // 👉 Swipe right when on last page
+        if offsetX > maxOffsetX + 60 {
+            popWithGesture()
+        }
+    }
+
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if scrollView.tag == 888888 {
+            // Reset zoom when moving to next image
+            if let childScroll = scrollView.viewWithTag(90000 + currentTag) as? UIScrollView {
+                childScroll.setZoomScale(childScroll.minimumZoomScale, animated: false)
+            }
+        }
+    }
+
+    // MARK: Download Logic
+    func downloadAndSaveToPhotos(url: URL) {
+        DispatchQueue.main.async {
+            Themes.sharedInstance.activityView(uiView: self.view)
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, let image = UIImage(data: data) else {
+                DispatchQueue.main.async {
+                    Themes.sharedInstance.removeActivityView(uiView: self.view)
+                }
+                return
+            }
+
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .authorized {
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                        AlertView.sharedManager.showToast(message: "Downloaded successfully")
+                    } else {
+                        AlertView.sharedManager.showToast(message: "Permission denied")
+                    }
+                    Themes.sharedInstance.removeActivityView(uiView: self.view)
+                }
+            }
+        }.resume()
     }
 }

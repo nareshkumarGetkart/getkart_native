@@ -135,9 +135,9 @@ struct ItemDetailView: View {
                                                     .padding(.horizontal, 5)
                                             }
                                             .tag(index)
-                                            .onTapGesture {
-                                                navigateToPager()
-                                            }
+//                                            .onTapGesture {
+//                                                navigateToPager()
+//                                            }
                                         }
                                     }
                                 }
@@ -146,6 +146,32 @@ struct ItemDetailView: View {
                             .frame(width: widthScreen - 25, height: 200)
                             .background(backgroundColor.opacity(0.4))
                             .cornerRadius(10)
+                            .onTapGesture {
+                                
+                                if  (objVM.galleryImgArray.count) > 0 {
+                                    
+                                    if selectedIndex == nil{ selectedIndex = 0}
+                                    if let index = selectedIndex{
+                                        
+                                        if let img = objVM.galleryImgArray[index].image {
+                                            
+                                            let isLast = (index + 1) == objVM.galleryImgArray.count
+                                            let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
+                                            let bothConditionTrue = isLast && isVideoAvailable
+                                            if  bothConditionTrue {
+                                                
+                                            }else{
+                                                navigateToPager()
+
+                                            }
+                                        }
+                                    }
+                                  
+                                }
+                            }
+                          
+                                    
+                            
                             // Custom Dot Indicator
                             HStack(spacing: 8) {
                                 
@@ -204,13 +230,14 @@ struct ItemDetailView: View {
                     
                 }
                 
+
                 
                 if Local.shared.getUserId() == itemUserId {
                     
                     HStack {
                         HStack {
                             Image(systemName: "eye")
-                            Text("\(objVM.itemObj?.clicks ?? 0)")
+                            Text("Views: \(objVM.itemObj?.clicks ?? 0)")
                         }.padding()
                             .frame(maxWidth: .infinity,maxHeight:40)
                             .overlay(
@@ -220,7 +247,7 @@ struct ItemDetailView: View {
                         Spacer(minLength: 20)
                         HStack {
                             Image(systemName: "heart")
-                            Text("\(objVM.itemObj?.totalLikes ?? 0)")
+                            Text("Like: \(objVM.itemObj?.totalLikes ?? 0)")
                         }
                         .padding()
                         .frame(maxWidth: .infinity,maxHeight:40)
@@ -232,6 +259,11 @@ struct ItemDetailView: View {
                     .padding([.horizontal,.top],5)
                     .foregroundColor(.gray)
                 }
+                
+                if Local.shared.getUserId() == itemUserId && (objVM.itemObj?.rejectedReason?.count  ?? 0) > 0 {
+                    RejectedReasonView(rejectedReason: objVM.itemObj?.rejectedReason ?? "")
+                }
+
                 
                 Text(objVM.itemObj?.name ?? "")
                     .font(Font.manrope(.medium, size: 16))
@@ -771,7 +803,7 @@ struct ItemDetailView: View {
                 }
                 .padding(.horizontal).padding(.bottom)
                 
-            }else  if ((objVM.itemObj?.status ?? "") == "sold out")  ||  ((objVM.itemObj?.status ?? "") == "rejected") ||   ((objVM.itemObj?.status ?? "") == "inactive"){
+            }else  if ((objVM.itemObj?.status ?? "") == "sold out")  ||   ((objVM.itemObj?.status ?? "") == "inactive"){
                 
                 Button(action: {
                     showConfirmDialog = true
@@ -799,7 +831,60 @@ struct ItemDetailView: View {
                     Text("After removing, ads will be deleted.")
                 }
                 
-            }else{
+            }else if ((objVM.itemObj?.status ?? "") == "rejected"){
+                
+                HStack{
+                    
+                    Button(action: {
+                        showConfirmDialog = true
+                        
+                    }) {
+                        Text("Remove").font(.manrope(.semiBold, size: 16.0))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }.frame(height: 40)
+                    //.padding([.leading,.trailing])
+                    
+                    .confirmationDialog("Confirm Remove",
+                                        isPresented: $showConfirmDialog,
+                                        titleVisibility: .visible) {
+                        Button("Confirm", role: .destructive) {
+                            // Confirm logic
+                            self.objVM.deleteItemApi(nav: navController)
+                            
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("After removing, ads will be deleted.")
+                    }
+                    
+                    Button(action: {
+
+                        if let vc = StoryBoard.postAdd.instantiateViewController(identifier: "CreateAddDetailVC") as? CreateAddDetailVC {
+                             vc.itemObj = objVM.itemObj
+                             vc.popType = .editPost
+                             self.navController?.pushViewController(vc, animated: true)
+                         }
+                        
+                    }) {
+                        Text("Edit").font(.manrope(.semiBold, size: 16.0))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(.systemGray5))
+                            .foregroundColor(Color(.label))
+                            .cornerRadius(10)
+                    }.frame(height: 40)
+                    //.padding([.leading,.trailing])
+                    
+                    
+                   }
+                .padding(.horizontal).padding(.bottom)
+           
+                
+            } else{
                 
                 HStack {
                     Button(action: {
@@ -1232,9 +1317,11 @@ struct ItemDetailView: View {
     func extractYouTubeID(from urlString: String) -> String {
         let patterns = [
             "youtube\\.com/watch\\?v=([\\w-]{11})",
+            "m\\.youtube\\.com/watch\\?v=([\\w-]{11})",
             "youtu\\.be/([\\w-]{11})",
             "youtube\\.com/embed/([\\w-]{11})"
         ]
+
 
         for pattern in patterns {
             
@@ -1351,6 +1438,33 @@ struct InfoView: View {
 }
 
 
+
+struct RejectedReasonView:View {
+    let rejectedReason:String
+    var body: some View {
+        // MARK: - Rejected Banner
+        HStack{
+            Rectangle()
+                .fill(Color.red)
+                .frame(width: 4)
+                .cornerRadius(2)
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text("REJECTED REASONS")
+                    .font(.manrope(.bold, size: 14.0))
+                    .foregroundColor(.red)
+                
+                Text(rejectedReason)
+                    .font(.manrope(.regular, size: 13.0))
+            }
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.red.opacity(0.1))
+        .cornerRadius(8)
+    }
+}
 
 
 struct SellerInfoView: View {
@@ -1618,31 +1732,64 @@ extension UIImage {
 import SwiftUI
 import WebKit
 
+import SwiftUI
+import WebKit
+
 struct WebVideoView: UIViewRepresentable {
     let videoURL: String
 
     func makeUIView(context: Context) -> WKWebView {
-        return WKWebView()
+        let webView = WKWebView()
+        webView.configuration.allowsInlineMediaPlayback = true
+        return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        let embedHTML = """
-               <html>
-               <head>
-                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-               </head>
-               <body style="margin:0;padding:0;">
-                   <iframe src="https://www.facebook.com/plugins/video.php?href=\(videoURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&show_text=false&width=560"
-                       width="100%" height="100%" style="border:none;overflow:hidden" scrolling="no" frameborder="0"
-                       allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-                   </iframe>
-               </body>
-               </html>
-               """
-               webView.loadHTMLString(embedHTML, baseURL: nil)
+
+        let html: String
+
+        if videoURL.contains("facebook.com") || videoURL.contains("fb.watch") {
+            // -------- FACEBOOK EMBED --------
+            let encoded = videoURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            html = """
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="margin:0;padding:0;">
+                <iframe 
+                    src="https://www.facebook.com/plugins/video.php?href=\(encoded)&show_text=false&width=560"
+                    width="100%" 
+                    height="100%" 
+                    style="border:none;overflow:hidden" 
+                    scrolling="no" 
+                    frameborder="0"
+                    allowfullscreen="true" 
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+                </iframe>
+            </body>
+            </html>
+            """
+        } else {
+            // -------- NORMAL MP4 VIDEO --------
+            html = """
+            <html>
+            <head>
+            <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+            </head>
+            <body style="margin:0; padding:0; background:black;">
+                <video width="100%" height="100%" controls playsinline autoplay>
+                    <source src="\(videoURL)" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </body>
+            </html>
+            """
+        }
+
+        webView.loadHTMLString(html, baseURL: nil)
     }
 }
-
 
 
 struct YouTubeWebView: UIViewRepresentable {
@@ -1684,7 +1831,65 @@ struct YouTubeWebView: UIViewRepresentable {
        }
 }
 
+/*
 
+struct YouTubeWebView: UIViewRepresentable {
+    let videoID: String
+    @Binding var isVisible: Bool
+
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
+        config.mediaTypesRequiringUserActionForPlayback = []
+        
+        let webView = WKWebView(frame: .zero, configuration: config)
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        let html = """
+        <html>
+        <body style="margin:0;padding:0;">
+            <div id="player"></div>
+
+            <script>
+                var tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                var firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                var player;
+                function onYouTubeIframeAPIReady() {
+                    player = new YT.Player('player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: '\(videoID)',
+                        playerVars: {
+                            'playsinline': 1,
+                            'autoplay': 1
+                        }
+                    });
+                }
+
+                function pauseVideo() {
+                    if (player && player.pauseVideo) {
+                        player.pauseVideo();
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        """
+
+        webView.loadHTMLString(html, baseURL: nil)
+
+        // Pause when not visible
+        if !isVisible {
+            webView.evaluateJavaScript("pauseVideo();")
+        }
+    }
+}
+ */
 
 
 
@@ -1802,65 +2007,12 @@ struct TextSizeReader: View {
     }
 }
 
-/*
-
-struct AutoScrollBannerAdsView: View {
-    @State var sliderArray: [SliderModel]
-    @State var currentIndex = 0
-    let navController:UINavigationController?
-    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
-
-    
-    var body: some View {
-        VStack {
-            TabView(selection: $currentIndex) {
-                ForEach(sliderArray.indices, id: \.self) { index in
-                    let slider = sliderArray[index]
-                    
-                    ZStack { // ✅ Wrapper to apply radius & spacing properly
-                        AsyncImage(url: URL(string: slider.image ?? "")) { image in
-                            image.resizable()
-                               // .scaledToFill()
-                                .cornerRadius(10)
-                              //.frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .clipped()
-                        } placeholder: {
-                            ProgressView()
-                        }.onTapGesture {
-                            
-                            BannerNavigation.navigateToScreen(index: index, sliderObj: slider, navigationController: navController,viewType: "AD_DETAIL")
-                        }
-                    }
-                    .frame(height: 170)
-                    .background(Color.clear)
-                   // .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous)) // ✅ Now works
-                   // .padding(.horizontal, 12) // ✅ Visible spacing between pages
-                   // .shadow(radius: 3) // Optional: card effect
-                    .tag(index)
-                    //.cornerRadius(20)
-                }
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(height: 185)
-//            .cornerRadius(20)
-//            .clipped()
-            // Page Indicator
-            HStack(spacing: 5) {
-                ForEach(sliderArray.indices, id: \.self) { index in
-                    Capsule()
-                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
-                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
-                        .animation(.easeInOut, value: currentIndex)
-                }
-            }
-            .padding(.top, -5)
-        }
-    }
-}
 
 
-import SwiftUI
-*/
+
+
+
+
 struct AutoScrollBannerAdsView: View {
     @State var sliderArray: [SliderModel]
     @State var currentIndex = 0
@@ -1924,3 +2076,65 @@ struct AutoScrollBannerAdsView: View {
         }
     }
 }
+
+
+
+/*
+
+struct AutoScrollBannerAdsView: View {
+    @State var sliderArray: [SliderModel]
+    @State var currentIndex = 0
+    let navController:UINavigationController?
+    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+
+    
+    var body: some View {
+        VStack {
+            TabView(selection: $currentIndex) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    let slider = sliderArray[index]
+                    
+                    ZStack { // ✅ Wrapper to apply radius & spacing properly
+                        AsyncImage(url: URL(string: slider.image ?? "")) { image in
+                            image.resizable()
+                               // .scaledToFill()
+                                .cornerRadius(10)
+                              //.frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                        } placeholder: {
+                            ProgressView()
+                        }.onTapGesture {
+                            
+                            BannerNavigation.navigateToScreen(index: index, sliderObj: slider, navigationController: navController,viewType: "AD_DETAIL")
+                        }
+                    }
+                    .frame(height: 170)
+                    .background(Color.clear)
+                   // .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous)) // ✅ Now works
+                   // .padding(.horizontal, 12) // ✅ Visible spacing between pages
+                   // .shadow(radius: 3) // Optional: card effect
+                    .tag(index)
+                    //.cornerRadius(20)
+                }
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 185)
+//            .cornerRadius(20)
+//            .clipped()
+            // Page Indicator
+            HStack(spacing: 5) {
+                ForEach(sliderArray.indices, id: \.self) { index in
+                    Capsule()
+                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
+                        .animation(.easeInOut, value: currentIndex)
+                }
+            }
+            .padding(.top, -5)
+        }
+    }
+}
+
+
+import SwiftUI
+*/

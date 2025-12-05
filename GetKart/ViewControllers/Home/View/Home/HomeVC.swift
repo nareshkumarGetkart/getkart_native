@@ -170,9 +170,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       buttonTitle: "Okay",
                                                                       type: 5, itemID: 49625))
         }else if togetvalues == 2{
-            self.presentHostingController(objPopup: PopupModel(userID:639, title: "",
+            self.presentHostingController(objPopup: PopupModel(userID:639, title:"<span style=\"color:#808080;\">For a limited time, enjoy posting </span><span style=\"color:#000000;\"><strong>3 ads completely FREE</strong></span><span style=\"color:#808080;\"> — no charges</span>"
+                                                             ,
                                                                       subtitle: "",
-                                                                      description: "For a limited time, enjoying posting <strong>3 ads \ncomplete FREE - </strong> no charges", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/11/692423ef7c64b7.388776791763976175.png", mandatoryClick: false,
+                                                                      description:""
+                                                                , image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692e8a4ce04351.605374521764657740.png", mandatoryClick: false,
                                                                       buttonTitle: "Post Now",
                                                                       type: 5, itemID: 49625))
             
@@ -197,8 +199,13 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                 return*/
            
     }
+    
+    
   
 /*
+ ""
+<p style="text-align:center;">For a limited time, enjoying posting <strong>3 ads completely FREE</strong> — no charges</p>
+""
  dummyPopupCheck(togetvalues: 0)
     return
  */

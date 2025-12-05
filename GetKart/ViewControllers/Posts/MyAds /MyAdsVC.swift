@@ -363,13 +363,13 @@ class MyAdsVC: UIViewController {
 extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
    
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if apiStatus == "banner details"{
-            return 155
-
-        }
-        return 140
-    }
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        if apiStatus == "banner details"{
+//            return 155
+//
+//        }
+//        return  140
+//    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if apiStatus == "banner details"{
