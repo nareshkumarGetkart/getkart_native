@@ -96,3 +96,42 @@ extension UIFont {
     }
 }
 
+
+
+
+extension Font {
+    enum InterFont {
+        
+        case semiBold
+        case bold
+        case medium
+        case regular
+        case extraBold
+        
+        case custom(String)
+        
+        var value: String {
+            
+            switch self {
+                
+            case .semiBold:
+                return "Inter-SemiBold"
+                
+            case .custom(let name):
+                return name
+            case .bold:
+                return "Inter-Bold"
+            case .medium:
+                return "Inter-Medium"
+            case .regular:
+                return "Inter-Regular"
+            case .extraBold:
+                return "Manrope-Black"
+            }
+        }
+        
+    }
+    static func inter(_ type: InterFont, size: CGFloat = 16) -> Font {
+        return .custom(type.value, size: size)
+    }
+}

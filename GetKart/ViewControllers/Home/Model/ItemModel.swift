@@ -60,6 +60,7 @@ struct ItemModel: Codable,Identifiable {
     let id: Int?
     let name, slug, description: String?
     let price: Double?
+    let specialPrice:Double?
     let image: String?
     let watermarkImage: String?
     let latitude, longitude: Double?
@@ -91,10 +92,13 @@ struct ItemModel: Codable,Identifiable {
     let isPurchased: Int?
     var itemOffers:[ItemOffers]?
     let usedPackage:String?
+    let outbondUrl:String?
     
     enum CodingKeys: String, CodingKey {
         case id, name, slug, description, image
         case price
+        case specialPrice = "special_price"
+        case outbondUrl = "outbond_url"
         case watermarkImage = "watermark_image"
         case latitude, longitude, address, contact
         case showOnlyToPremium = "show_only_to_premium"

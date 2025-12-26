@@ -14,7 +14,8 @@ struct ReportAdsView: View {
     @State private var listArray = [ReportModel]()
     @State private var selectedReasonId: Int? = nil
     var itemId = 0
-
+    var isToReportBoard = false
+    
     var onReportSubmit: (Bool) -> Void  // Callback for offer submission
 
     var body: some View {
@@ -105,14 +106,27 @@ struct ReportAdsView: View {
         }
     }
     
-    
+    /*
+     curl --location 'https://admin.gupsup.com/api/v1/add-board-reports' \
+ --header 'Authorization: Bearer 574243|1tSZQsT8DkP31CgFFdDw65dSKo4uhnQRgxJvcWDn347e3840' \
+ --header 'Accept: application/json' \
+ --header 'x-api-key: ceJkfqnlFEgqWvcc8ymVTEe7gUKpZ84iaUztsklz' \
+ --header 'x-device-id: khusyal' \
+ --form 'board_id="126555"' \
+ --form 'report_reason_id="6"' \
+ --form 'other_message=""'
+     */
     
     func reportItemApi(reportedReasonId:Int){
         
-        let params = ["report_reason_id":reportedReasonId,"item_id":itemId] as [String : Any]
+        var params = ["report_reason_id":reportedReasonId,"item_id":itemId] as [String : Any]
+        var strUrl =  Constant.shared.add_reports
+        if isToReportBoard{
+            strUrl =  Constant.shared.add_board_reports
+            params = ["report_reason_id":reportedReasonId,"board_id":itemId,"other_message":""] as [String : Any]
+        }
         
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.add_reports, param: params,methodType: .post) {  responseObject, error in
+        URLhandler.sharedinstance.makeCall(url:strUrl, param: params,methodType: .post) {  responseObject, error in
             
             
             if(error != nil)

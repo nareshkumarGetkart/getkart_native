@@ -48,7 +48,7 @@ struct SearchWithSortView: View {
         }.frame(height:44).background(Color(.systemBackground))
         
             .onAppear{
-                objVM.isDataLoading = false
+//               objVM.isDataLoading = false
 
                 if isByDefaultOpenSearch{
                     pushToSearchSuggestionScreen()
@@ -58,6 +58,9 @@ struct SearchWithSortView: View {
                     getCustomFieldsListApi(category_ids: objVM.categroryId)
                 }
             }
+//            .onDisappear{
+//                objVM.isDataLoading = false
+//            }
         
         VStack {
             HStack {
@@ -175,6 +178,11 @@ struct SearchWithSortView: View {
             
         }.background(Color(UIColor.systemGray6))
             .navigationBarHidden(true)
+            .overlay {
+                if objVM.isDataLoading {
+                    ActivityIndicator(color:UIColor.systemOrange)
+                }
+            }
     }
     
     
@@ -250,7 +258,7 @@ struct SearchWithSortView: View {
     }
     
     func pushToDetailScreen(id:Int,item:ItemModel){
-        objVM.isDataLoading = true
+       // objVM.isDataLoading = true
         
         var destView = ItemDetailView(navController:  self.navigationController, itemId:id,itemObj: item, isMyProduct:false, slug: item.slug)
         destView.returnValue = { value in
@@ -302,7 +310,7 @@ struct SearchWithSortView: View {
         let lastItem = objVM.items.last
         let isLastItem = lastItem?.id == item.id
         let isNotLoading = !objVM.isDataLoading
-        if isLastItem && isNotLoading {
+        if isLastItem && isNotLoading  &&  objVM.items.count > 6{
             objVM.getSearchItemApi(srchTxt: srchTxt)
         }
     }
@@ -381,7 +389,7 @@ extension SearchWithSortView {
             strUrl.append("&longitude=\(longitude)")
         }
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {
             (obj:CustomFieldsParse) in
             
             if obj.data != nil {
@@ -476,4 +484,19 @@ struct BottomSheetHost: View {
 
         }
     }
+}
+
+
+struct ActivityIndicator: UIViewRepresentable {
+
+    let color: UIColor
+
+    func makeUIView(context: Context) -> UIActivityIndicatorView {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = color
+        indicator.startAnimating()
+        return indicator
+    }
+
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {}
 }

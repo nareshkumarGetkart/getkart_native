@@ -15,7 +15,7 @@ struct SafetyTipsView: View {
 
     var body: some View {
         
-        ZStack {
+       // ZStack {
             
             VStack {
                 
@@ -30,25 +30,30 @@ struct SafetyTipsView: View {
                     .font(.title2)
                     .bold()
                     .padding(.top, 5)
-                    .foregroundColor(Color(UIColor.label)).padding(.bottom,30)
+                    .foregroundColor(Color(UIColor.label)).padding(.bottom,20)
                 
-                VStack(alignment: .leading, spacing: 10) {
-                    
-                    ForEach(listArray) { obj in
+                 Spacer()
+                ScrollView{
+                    VStack(alignment: .leading, spacing: 10) {
+                        
+                        ForEach(listArray) { obj in
+                            Divider()
+                            SafetyTipRow(obj.description ?? "",icon: obj.icon ?? "")
+                            
+                            
+                        }
                         Divider()
-                        SafetyTipRow(obj.description ?? "",icon: obj.icon ?? "")
                     }
-                   
+                    .padding([.horizontal,.bottom],15)
                 }
-                .padding([.horizontal,.bottom],20)
                 
-                
+              
                 Button(btnTitle) {
 
                     presentationMode.wrappedValue.dismiss()
                     onContinueOfferTap?()
 
-                }
+                }.font(.manrope(.semiBold, size: 16.0))
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.orange)
@@ -61,14 +66,13 @@ struct SafetyTipsView: View {
             } .edgesIgnoringSafeArea(.all)
                 .background(Color(UIColor.systemBackground))
     
-        }.onAppear{
+       // }
+        .onAppear{
             if listArray.count == 0{
                 getSafetyTipsApi()
             }
         }
-        
-        .onDisappear {
-        }
+      
     }
     
     

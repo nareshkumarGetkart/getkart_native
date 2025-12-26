@@ -24,7 +24,7 @@ struct TransactionHistoryView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     .padding()
             }
-            Text("Order History").font(.custom("Manrope-Bold", size: 20.0))
+            Text("Order History & Invoices").font(Font.manrope(.medium, size: 18.0))
                 .foregroundColor(Color(UIColor.label))
             
             Spacer()
@@ -50,7 +50,7 @@ struct TransactionHistoryView: View {
                 ScrollView(.vertical, showsIndicators: false) {
 
                     HStack{ Spacer() }.frame(height: 5)
-                    LazyVStack(spacing: 15) {
+                    LazyVStack(spacing: 8) {
                         ForEach(transactions,id: \.id) { transaction in
                             TransactionRow(transaction: transaction)//.background((Color(UIColor.systemBackground)))
                                 //.cornerRadius(10)
@@ -81,7 +81,7 @@ struct TransactionHistoryView: View {
                 }
             }
                         
-        }.padding([.leading,.trailing],10).background(Color(.systemGray6))
+        }.padding([.leading,.trailing],8).background(Color(.systemGray6))
             .onAppear{
                 if transactions.count == 0{
                     getTransactionHistory()
@@ -161,84 +161,84 @@ struct TransactionRow: View {
     let transaction: TransactionModel
     
     var body: some View {
-        HStack {
+        HStack(spacing:3) {
             
             AsyncImage(url: URL(string: transaction.package?.icon ?? "")) { img in
                 
-                img.resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60)
+                img.resizable().aspectRatio(contentMode: .fit).frame(width:45,height: 45)
                     .background(Color(hex: "#FEF6E9")).cornerRadius(6)
             } placeholder: {
-                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:60,height: 60).background(Color(hex: "#FEF6E9")).cornerRadius(6)
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:45,height: 45).background(Color(hex: "#FEF6E9")).cornerRadius(6)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 5) {
                 
                 Text(transaction.package?.name ?? "")
-                    .font(Font.manrope(.medium, size: 16))
-                    .foregroundColor(Color(UIColor.label))
+                    .font(Font.manrope(.semiBold, size: 16))
+                    .foregroundColor(Color(.label))
+                
+                if  (transaction.package?.name ?? "").count == 0 && ((transaction.transactionPackage?.name?.count ?? 0) > 0){
+                    Text(transaction.transactionPackage?.name ?? "")
+                        .font(Font.manrope(.semiBold, size: 16))
+                        .foregroundColor(Color(.label))
+                }
                 
                 Text("Purchased from \(transaction.paymentTransaction?.paymentGateway?.capitalized ?? "")" )
-                    .font(Font.manrope(.regular, size: 16))
-                    .foregroundColor(Color(UIColor.label))
+                    .font(Font.manrope(.medium, size: 15))
+                    .foregroundColor(Color(.label))
 
                 Button(action: {
                     UIPasteboard.general.string = transaction.paymentTransaction?.orderID
                     AlertView.sharedManager.showToast(message: "Copied successfully")
 
                 }) {
-                    Text("Transaction ID").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                    Text("Transaction Id").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
                     Image("ic_baseline-content-copy")
-                        .renderingMode(.template)
-                        .frame(width: 10, height: 10, alignment: .center)
-                        .foregroundColor(.gray).padding(.leading,10)
+                        .renderingMode(.template).resizable()
+                        .frame(width: 15, height: 15, alignment: .center)
+                        .foregroundColor(.gray).padding(.leading,3)
                 }
                 
-                Text(transaction.paymentTransaction?.orderID ?? "")
+                Text(transaction.paymentTransaction?.orderID ?? "").lineLimit(1)
                     .font(Font.manrope(.regular, size: 13))
-                    .foregroundColor(Color(UIColor.label))
+                    .foregroundColor(Color(UIColor.gray))
                 
             }.padding(5)
             Spacer()
             
-           
-
-            VStack(alignment: .trailing){
+            VStack(alignment: .trailing, spacing: 5){
                 
                 Text("\(Local.shared.currencySymbol) \((transaction.paymentTransaction?.amount ?? 0.0).formatNumber())")
-                    .font(.headline)
+                    .font(Font.manrope(.semiBold, size: 15))
                     .foregroundColor(Color(UIColor.label)).padding(.trailing,10)
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""
                
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
                 Text(displayStatus.capitalized)
-                    .font(Font.manrope(.medium, size: 15))
+                    .font(Font.manrope(.medium, size: 14))
                     .foregroundColor(titleColor)
                     .padding(.horizontal)
-                    .frame(height: 30)
+                    .frame(height: 26)
                     .background(bgColor)
-                    .cornerRadius(15)
+                    .cornerRadius(13)
                 
                 
                 let date = Date(timeIntervalSince1970: TimeInterval(self.convertTimestamp(isoDateString: transaction.paymentTransaction?.createdAt ?? "")))
              
                 
                 Text(getConvertedDateFromDate(date: date))
+                    .font(Font.manrope(.regular, size: 14))
                     .foregroundColor(.gray).padding(.trailing,10)
                 
                 Text(getConvertedTimeFromDate(date: date))
+                    .font(Font.manrope(.regular, size: 14))
                     .foregroundColor(.gray).padding(.trailing,10)
                 
             }
         }
-        .padding([.top,.bottom,.horizontal],10)
-//        .background(Color(UIColor.systemBackground))//.cornerRadius(10)
-//        .clipped()
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 10)
-//                .stroke(Color(UIColor.separator), lineWidth: 1.0)
-//        )
-//        
+        .padding([.top,.bottom,.horizontal],8).padding(.vertical,8)
+ 
         
         .background(
             RoundedRectangle(cornerRadius: 10)
@@ -249,7 +249,6 @@ struct TransactionRow: View {
                 .stroke(Color(UIColor.separator), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        //.shadow(color: Color(UIColor.label).opacity(0.05), radius: 5, x: 0, y: 2)
         
     }
     

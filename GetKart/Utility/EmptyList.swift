@@ -7,8 +7,18 @@
 //
 
 import UIKit
+import SwiftUICore
 
 
+protocol EmptyListDelegate{
+    func navigationButtonClicked()
+}
+
+extension EmptyListDelegate{
+    func navigationButtonClicked(){
+        
+    }
+}
 class EmptyList: UIView {
     
     var selectedImage = String()
@@ -17,6 +27,8 @@ class EmptyList: UIView {
     var bgView:UIView?
     var lblMsg:UILabel?
     var subHeadline:UILabel?
+    var btnNavigation:UIButton?
+    var delegate:EmptyListDelegate?
 
 
     override init(frame: CGRect) {
@@ -28,7 +40,7 @@ class EmptyList: UIView {
         self.addSubview(bgView!)
         bgView?.backgroundColor = .clear //.systemBackground
         
-        imageView = UIImageView(frame: CGRect(x:(bgView?.frame.size.width)!/2.0 - 85, y: (bgView?.frame.size.height)!/2.0 - 150, width: 170, height: 170))
+        imageView = UIImageView(frame: CGRect(x:(bgView?.frame.size.width)!/2.0 - 85, y: (bgView?.frame.size.height)!/2.0 - 180, width: 170, height: 170))
         bgView?.addSubview(imageView!)
         imageView?.contentMode = .scaleAspectFill
         
@@ -46,14 +58,34 @@ class EmptyList: UIView {
         subHeadline?.textColor = .label
         subHeadline?.font = UIFont.Manrope.regular(size: 16.0).font
         subHeadline?.text = ""
+        
+        //Button
+        btnNavigation = UIButton(frame:  CGRect(x:(bgView?.frame.size.width)!/2.0 - 100, y: (subHeadline?.frame.origin.y)! + (subHeadline?.frame.size.height)! + 10, width: 200, height: 45))
+        btnNavigation?.layer.cornerRadius = 1.0
+        btnNavigation?.clipsToBounds = true
+        btnNavigation?.backgroundColor = UIColor.systemOrange
+        btnNavigation?.setTitleColor(.label, for: .normal)
+        btnNavigation?.titleLabel?.font =  UIFont.Manrope.semiBold(size: 16).font
+        btnNavigation?.addTarget(self, action: #selector(clickedBtn), for: .touchUpInside)
+        bgView?.addSubview(btnNavigation!)
+        btnNavigation?.isHidden = true
+
     }
     
-    
+    @objc func clickedBtn(){
+        self.delegate?.navigationButtonClicked()
+    }
     func setImage(imageStr:String) -> Void {
         
         imageView?.image = UIImage(named:imageStr)
 
     }
+    
+    func setTitleToBUtton(strTitle:String) -> Void {
+        btnNavigation?.setTitle(strTitle, for: .normal)
+        btnNavigation?.isHidden = false
+    }
+
     func setMsg(msg:String) -> Void {
         
         lblMsg?.text = msg as String

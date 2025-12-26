@@ -35,20 +35,18 @@ class ProductCell: UICollectionViewCell {
         
         btnLike.layer.cornerRadius = btnLike.frame.size.height/2.0
         btnLike.clipsToBounds = true
-        btnLike.addShadow(shadowRadius: 5.0)
+        btnLike.addShadow(shadowRadius: 3.0)
         
         
         btnIsVerified.layer.cornerRadius = btnIsVerified.frame.size.height/2.0
         btnIsVerified.clipsToBounds = true
-        btnIsVerified.addShadow(shadowRadius: 5.0)
+        btnIsVerified.addShadow(shadowRadius: 3.0)
         
         if let originalImage = UIImage(named: "location-outline") {
             let tintedImage = originalImage.tinted(with: .label)
             imgViewLoc.image = tintedImage
         }
-        
         imgViewitem.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
-
     }
    
     

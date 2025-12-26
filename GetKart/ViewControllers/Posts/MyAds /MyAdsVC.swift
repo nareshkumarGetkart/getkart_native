@@ -39,7 +39,6 @@ class MyAdsVC: UIViewController {
         return refreshControl
     }()
     
-    
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,21 +58,16 @@ class MyAdsVC: UIViewController {
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
-
     }
-    
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             // Appearance (light/dark mode) has changed
             print("Appearance mode changed: \(traitCollection.userInterfaceStyle == .dark ? "Dark" : "Light")")
-            
             // Update your UI manually here if needed
         }
     }
-    
     
     // MARK: - Setup
        private func setupUI() {
@@ -89,6 +83,7 @@ class MyAdsVC: UIViewController {
                self.emptyView?.lblMsg?.text = ""
                self.emptyView?.imageView?.image = UIImage(named: "no_data_found_illustrator")
                self.tblView.addSubview(self.emptyView!)
+               self.emptyView?.delegate = self
            }
            setupFilterButtons()
        }
@@ -174,6 +169,10 @@ class MyAdsVC: UIViewController {
         (self.view.viewWithTag(selectedIndex) as? UIButton)?.setTitleColor(.white, for: .normal)
     }
     
+    @IBAction func backButtonAction(_ sender : UIButton){
+        self.navigationController?.popViewController(animated: true)
+    }
+    
     @objc func filterBtnAction(_ btn : UIButton){
         
       
@@ -237,6 +236,8 @@ class MyAdsVC: UIViewController {
         
     }
 
+    
+    
     
     func refreshMyAds(){
         if  self.isDataLoading == false{
@@ -306,9 +307,25 @@ class MyAdsVC: UIViewController {
 
             }
             
-            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
-            self.emptyView?.lblMsg?.text = "No Ads Found"
-            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+//            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+//            self.emptyView?.lblMsg?.text = "No Ads Found"
+//            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+            
+            if (self.listArray.count) > 0 {
+                self.emptyView?.isHidden = true
+
+            }else{
+                if self.apiStatus.count == 0{
+                    self.emptyView?.btnNavigation?.isHidden = false
+                    self.emptyView?.setTitleToBUtton(strTitle: "Start Selling")
+                }else{
+                    self.emptyView?.btnNavigation?.isHidden = true
+                }
+                self.emptyView?.isHidden = false
+                self.emptyView?.lblMsg?.text = "No Ads Found"
+                self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+
+            }
 
         }
     }
@@ -348,9 +365,17 @@ class MyAdsVC: UIViewController {
 
             }
             
-            self.emptyView?.isHidden = (self.userBannerArray.count) > 0 ? true : false
-            self.emptyView?.lblMsg?.text = "No Banners Found"
-            self.emptyView?.subHeadline?.text = "There are currently no banners available. Start by creating your first banner now"
+            
+           
+            if (self.userBannerArray.count) > 0 {
+                self.emptyView?.isHidden = true
+
+            }else{
+                self.emptyView?.setTitleToBUtton(strTitle: "Start Promotion")
+                self.emptyView?.isHidden = false
+                self.emptyView?.lblMsg?.text = "No Banners Found"
+                self.emptyView?.subHeadline?.text = "There are currently no banners available. Start by creating your first banner now"
+            }
 
         }
     }
@@ -358,6 +383,25 @@ class MyAdsVC: UIViewController {
     
 }
 
+extension MyAdsVC:EmptyListDelegate{
+    
+    func navigationButtonClicked() {
+        
+        if apiStatus == "banner details"{
+            let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController:  self.navigationController))
+            destvc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destvc, animated: true)
+            
+        }else{
+            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                destVC.hidesBottomBarWhenPushed = true
+                destVC.popType = .createPost
+                self.navigationController?.pushViewController(destVC, animated: true)
+            }
+        }
+        
+    }
+}
 
 
 extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{

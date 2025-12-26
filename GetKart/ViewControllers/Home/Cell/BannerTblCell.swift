@@ -46,7 +46,7 @@ class BannerTblCell: UITableViewCell {
     }
     
     func configure(with banners: [SliderModel]) {
-        guard self.listArray?.count != banners.count else { return }
+      //  guard self.listArray?.count != banners.count else { return }
         self.listArray = banners
         self.pageControl.numberOfPages = banners.count
         self.pageControl.currentPage = 0

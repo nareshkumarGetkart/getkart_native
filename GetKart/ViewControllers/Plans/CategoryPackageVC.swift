@@ -17,6 +17,8 @@ class CategoryPackageVC: UIViewController {
     @IBOutlet weak var lblSelectedLoc:UILabel!
     @IBOutlet weak var lblSelectedCategory:UILabel!
     @IBOutlet weak var collectionViewBanner:UICollectionView!
+    @IBOutlet weak var lblOfferingTitle:UILabel!
+
     
     var categoryId = 0
     var categoryName = ""
@@ -25,6 +27,7 @@ class CategoryPackageVC: UIViewController {
     var state = ""
     var latitude = ""
     var longitude = ""
+    var itemId:Int?
 
     var planListArray = [[PlanModel]]()
     var bannerArray = [String]()
@@ -37,7 +40,7 @@ class CategoryPackageVC: UIViewController {
         cnstrntHtNavBar.constant = self.getNavBarHt
         tblView.register(UINib(nibName: "PackageCell", bundle: nil), forCellReuseIdentifier: "PackageCell")
         collectionViewBanner.register(UINib(nibName: "BannerCell", bundle: nil), forCellWithReuseIdentifier: "BannerCell")
-
+        lblOfferingTitle.isHidden = true
         self.lblSelectedCategory.text = "Category: \(categoryName)"
         self.lblSelectedLoc.text = "Location: \(city + ", " + state + ", " + country)"
         getPackagesBannersApi()
@@ -70,6 +73,7 @@ class CategoryPackageVC: UIViewController {
             if obj.code == 200 {
                 self.planListArray.append(contentsOf: obj.data ?? [])
                 self.tblView.reloadData()
+                self.lblOfferingTitle.isHidden = false
             }
         }
     }
@@ -82,6 +86,8 @@ class CategoryPackageVC: UIViewController {
             if obj.code == 200 {
                 self.bannerArray.append(contentsOf: obj.data ?? [])
                 self.collectionViewBanner.reloadData()
+                self.lblOfferingTitle.isHidden = false
+
             }
         }
     }
@@ -227,7 +233,7 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         controller.latitude = latitude
         controller.longitude = longitude
         controller.paymentFor = .adsPlan
-
+        controller.itemId = itemId
         controller.callbackPaymentSuccess = { [weak self](isSuccess) -> Void in
             
             if controller.sheetViewController?.options.useInlineMode == true {

@@ -68,7 +68,6 @@ class LoginVC: UIViewController {
         btnContinueEmail.layer.borderColor = UIColor.label.cgColor
         btnContinueGmail.layer.borderColor = UIColor.label.cgColor
         btnContinueApple.layer.borderColor = UIColor.label.cgColor
-        
         btnContinueEmail.setImageTintColor(color: .label)
         btnContinueApple.setImageTintColor(color: .label)
     }
@@ -86,6 +85,13 @@ class LoginVC: UIViewController {
     }
     
     //MARK: UIButton Action Methods
+    
+    @IBAction func needHelpInSignInButton(_ sender : UIButton){
+        let destVC = UIHostingController(rootView: ContactUsView(navigationController:self.navigationController))
+        destVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(destVC, animated: true)
+    }
+
     
     @IBAction func loginWithEmailButton(_ sender : UIButton){
         
@@ -155,7 +161,6 @@ class LoginVC: UIViewController {
             
         }else if txtEmailPhone.text?.isValidPhone() == true {
             self.saltGeneratorApi()
-                // self.sendOTPApi()
             
         }else {
             txtEmailPhone.layer.borderColor = UIColor.red.cgColor
@@ -173,13 +178,9 @@ class LoginVC: UIViewController {
 
          let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
         
-      
-      //  let strUrl = Constant.shared.salt_handler + "?deviceid=\(UIDevice.getDeviceUIDid())&plateform=ios&authtype=basic&appversion=\(UIDevice.appVersion)&mobile=\(txtEmailPhone.text ?? "")&countryCode=\(countryCode)"
-        
-        
-        
-//        'http://localhost/api/v1/salt-handler?deviceid=123&plateform=ios&authtype=basic&appversion=1.2&mobile=9312069552&countryCode=%2B91' \
-        
+     /*
+        let strUrl = Constant.shared.salt_handler + "?deviceid=\(UIDevice.getDeviceUIDid())&plateform=ios&authtype=basic&appversion=\(UIDevice.appVersion)&mobile=\(txtEmailPhone.text ?? "")&countryCode=\(countryCode)"
+        'http://localhost/api/v1/salt-handler?deviceid=123&plateform=ios&authtype=basic&appversion=1.2&mobile=9312069552&countryCode=%2B91' */
         
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.salt_handler , param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in

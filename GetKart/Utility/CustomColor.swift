@@ -14,6 +14,9 @@ final class CustomColor {
    
     let themeColor = UIColor(hexString: "#CC3263")
     
+    let priceColor = UIColor(hexString: "#008838")
+
+    
 
 }
 

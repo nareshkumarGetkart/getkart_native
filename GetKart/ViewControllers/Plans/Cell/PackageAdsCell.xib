@@ -30,13 +30,13 @@
                         <rect key="frame" x="10" y="5" width="300" height="50"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="01 Ad" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ttd-LV-E6R">
-                                <rect key="frame" x="10" y="15" width="42.333333333333336" height="20"/>
+                                <rect key="frame" x="10" y="15" width="43" height="20"/>
                                 <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="₹ 799" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PFZ-9l-Wa8">
-                                <rect key="frame" x="250.33333333333329" y="15" width="39.666666666666657" height="20"/>
+                                <rect key="frame" x="247.33333333333329" y="15" width="42.666666666666657" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="100" id="iBt-vB-bFS"/>
                                 </constraints>
@@ -45,7 +45,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="₹ 1,699" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vh3-Oh-USb">
-                                <rect key="frame" x="194" y="15" width="46.333333333333343" height="20"/>
+                                <rect key="frame" x="191" y="15" width="46.333333333333343" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="70" id="21D-JX-6uQ"/>
                                 </constraints>
@@ -54,13 +54,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="79% Savings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ClC-Jr-red">
-                                <rect key="frame" x="109" y="14.666666666666668" width="75" height="21.000000000000004"/>
+                                <rect key="frame" x="102" y="12.666666666666668" width="79" height="25.000000000000004"/>
                                 <color key="backgroundColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="75" id="Xdp-9o-0ei"/>
-                                    <constraint firstAttribute="height" constant="21" id="vvT-Xo-a4W"/>
+                                    <constraint firstAttribute="width" constant="79" id="Xdp-9o-0ei"/>
+                                    <constraint firstAttribute="height" constant="25" id="vvT-Xo-a4W"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="11"/>
+                                <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="12"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>

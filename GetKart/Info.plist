@@ -79,6 +79,11 @@
 		<string>Manrope-Medium.ttf</string>
 		<string>Manrope-Regular.ttf</string>
 		<string>Manrope-SemiBold.ttf</string>
+        <string>Inter-Regular.otf</string>
+        <string>Inter-Bold.otf</string>
+        <string>Inter-Medium.otf</string>
+        <string>Inter-SemiBold.otf</string>
+        <string>Inter-Black.otf</string>
 	</array>
 </dict>
 </plist>

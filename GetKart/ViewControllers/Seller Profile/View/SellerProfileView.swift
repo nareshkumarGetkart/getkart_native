@@ -27,7 +27,6 @@ struct SellerProfileView: View {
 
                 }
                 
-                
                 Text("Seller Profile")
                     .font(.custom("Manrope-Bold", size: 20.0))
                         .foregroundColor(.black)
@@ -84,6 +83,12 @@ struct SellerProfileView: View {
                                 }
                             }),
                             
+                                .default(Text(("Report user")), action: {
+                                    reportUserPush()
+                                   
+                                  
+                                }),
+                                
                                 .cancel()
                         ])
                     }
@@ -275,6 +280,13 @@ struct SellerProfileView: View {
                 .foregroundColor(.gray)
         }
         .frame(maxWidth: .infinity)
+    }
+    
+    
+    func reportUserPush(){
+        
+        let hostingController = UIHostingController(rootView:ReportUserView(roportUserId:userId))
+        self.navController?.pushViewController(hostingController, animated: true)
     }
 }
 

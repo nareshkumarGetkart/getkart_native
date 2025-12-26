@@ -386,7 +386,12 @@ class ZoomImageViewController: UIViewController {
             imageZoom.tag = 10
             
             if let urlString = imageArrayUrl[i].image, let url = URL(string: urlString) {
-                imageZoom.kf.setImage(with: url,options: [.waitForCache])
+               // imageZoom.kf.setImage(with: url)
+                
+                
+                imageZoom.kf.setImage(with: url, options: nil, progressBlock: nil) { response in
+                    // self.view.backgroundColor = self.imageZoom.image?.getAverageColour
+                }
             }
 
             childZoomingScrollView.addSubview(imageZoom)

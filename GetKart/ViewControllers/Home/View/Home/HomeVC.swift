@@ -13,6 +13,7 @@ import Foundation
 import CommonCrypto
 
 extension HomeVC: UIGestureRecognizerDelegate {
+    
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return self.navigationController?.viewControllers.count ?? 0 > 1
     }
@@ -164,19 +165,30 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                           type: 1, itemID: 49625))
               
         }else if togetvalues == 1{
-            self.presentHostingController(objPopup: PopupModel(userID:639, title: "Highlight your ad at the top and boost sales",
+            
+      
+   
+
+            self.presentHostingController(objPopup: PopupModel(userID:639, title:
+                                                                     """
+                                                                     <span style='display:block; text-align:center; color:#000000; font-size:23px; font-family:Inter; font-weight:500; word-wrap:break-word;'>
+                                                                         Highlight your ad at the top<br/>and boost sales
+                                                                     </span>
+                                                                     """,
                                                                       subtitle: "",
                                                                       description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692d8387443e45.785661921764590471.png", mandatoryClick: false,
                                                                       buttonTitle: "Okay",
                                                                       type: 5, itemID: 49625))
         }else if togetvalues == 2{
-            self.presentHostingController(objPopup: PopupModel(userID:639, title:"<span style=\"color:#808080;\">For a limited time, enjoy posting </span><span style=\"color:#000000;\"><strong>3 ads completely FREE</strong></span><span style=\"color:#808080;\"> — no charges</span>"
-                                                             ,
-                                                                      subtitle: "",
-                                                                      description:""
-                                                                , image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692e8a4ce04351.605374521764657740.png", mandatoryClick: false,
-                                                                      buttonTitle: "Post Now",
-                                                                      type: 5, itemID: 49625))
+            self.presentHostingController(objPopup: PopupModel(userID:639, title:"""
+<span style="color:#808080; font-size:24px;">For a limited time, enjoy posting </span><span style="color:#000000; font-size:23px;"><strong>3 ads completely FREE</strong></span><span style="color:#808080; font-size:24px;"> — no charges</span>
+"""
+                                                               ,
+                                                               subtitle: "",
+                                                               description:""
+                                                               , image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692e8a4ce04351.605374521764657740.png", mandatoryClick: false,
+                                                               buttonTitle: "Post Now",
+                                                               type: 5, itemID: 49625))
             
         }else if togetvalues == 3{
             self.presentHostingController(objPopup: PopupModel(userID:639, title: "You have draft items pending!",
@@ -185,9 +197,32 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       buttonTitle: "Publish Now",
                                                                       type: 1, itemID: 49625))
             
-        }
+        }else if togetvalues == 4{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title: 
+                                                                      """
+                                                                      <div style="text-align: center"><span style="color: #C80B66; font-size: 22px; font-family: Inter; font-weight: 600; word-wrap: break-word">Awesome!</span><span style="color: black; font-size: 22px; font-family: Inter; font-weight: 600; word-wrap: break-word"> </span><span style="color: #1D1D1D; font-size: 22px; font-family: Inter; font-weight: 600; word-wrap: break-word">Your </span><span style="color: #C80B66; font-size: 22px; font-family: Inter; font-weight: 600; word-wrap: break-word">Ad</span><span style="color: #1D1D1D; font-size: 22px; font-family: Inter; font-weight: 600; word-wrap: break-word"> is live. Boost to get<br/>more buyers and sell fast.</span></div>
+                                                                      """
+                                                                      ,
+                                                                      subtitle: "",
+                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
+                                                                      buttonTitle: "Publish Now",
+                                                                      type: 1, itemID: 49625))
             
-    
+        }else if togetvalues == 5{
+            self.presentHostingController(objPopup: PopupModel(userID:639, title:
+                                                                      """
+                                                                      <center>
+                                                                          <b><font color="#000000">Boost Your Post For Just &#8377;35</font></b>
+                                                                      </center>
+                                                                      """
+                                                                      ,
+                                                                      subtitle: " <font color='#424243'>Get 5x more views &amp; reach more buyers instantly.</font><br><font color='#424243'>• Lowest Price &nbsp; • Top of List &nbsp; • 30 days Visibility</font>",
+                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
+                                                                      buttonTitle: "Publish Now",
+                                                                      type: 1, itemID: 49625))
+            
+        }
+          
         
         /*  self.presentHostingController(objPopup: PopupModel(userID:639, title: "Boost Your Free Item's Visibility",
                                                                    subtitle: "Upgrade your listing for better exposure and faster response.",
@@ -211,7 +246,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
  */
     //MARK: Api methods
     func getpopupApi(){
- 
+//        
+//        dummyPopupCheck(togetvalues: 5)
+//           return
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
             if obj.code == 200,obj.error == false{
@@ -306,7 +344,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                 
             }else{
                 if (obj.type ?? 0) == 1  {
+                    
                     self?.pushToMyAdsScreen()
+                    
                 }else if (obj.type ?? 0) == 2  || (obj.type ?? 0) == 3  && (obj.itemID ?? 0) > 0{
                     /*
                      If any add in Draft message will get popped up to Buy Plans type = 1
@@ -344,10 +384,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         } else {
             self.navigationController?.present(sheet, animated: true, completion: nil)
         }
-        
-        
-      
-   
         
     }
     
@@ -495,11 +531,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
-      
+        
         if !AppDelegate.sharedInstance.isInternetConnected{
             homeVModel?.isDataLoading = false
             AlertView.sharedManager.showToast(message: "No internet connection")
-      
+            
         }else if !(homeVModel?.isDataLoading ?? false) {
             homeVModel?.page = 1
             homeVModel?.itemObj?.data = nil
@@ -508,9 +544,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             homeVModel?.featuredObj?.removeAll()
             self.tblView.reloadData()
             homeVModel?.getProductListApi()
-          //  if (homeVModel?.sliderArray?.count ?? 0) == 0{
-                homeVModel?.getSliderListApi()
-          //  }
+            homeVModel?.getSliderListApi()
             if (homeVModel?.categoryObj?.data?.count ?? 0) == 0{
                 homeVModel?.getCategoriesListApi()
             }
@@ -667,7 +701,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 //Horizontal && increase width
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.istoIncreaseWidth = true
-                cell.cnstrntHeightSeeAllView.constant = 35
+                cell.cnstrntHeightSeeAllView.constant = 30
                 cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
@@ -690,7 +724,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
                 cell.collctnView.collectionViewLayout.invalidateLayout()
                 cell.istoIncreaseWidth = false
-                cell.cnstrntHeightSeeAllView.constant = 35
+                cell.cnstrntHeightSeeAllView.constant = 30
                 cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.listArray = obj?.sectionData
@@ -713,7 +747,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
                 cell.istoIncreaseWidth = false
-                cell.cnstrntHeightSeeAllView.constant = 35
+                cell.cnstrntHeightSeeAllView.constant = 30
                 cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cllctnView.isScrollEnabled = false
                 cell.cellTypes = .product
@@ -736,7 +770,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
                 //Horizontal && increase width
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as! HomeHorizontalCell
-                cell.cnstrntHeightSeeAllView.constant = 35
+                cell.cnstrntHeightSeeAllView.constant = 30
                 cell.btnSeeAll.setTitle("See All", for: .normal)
                 cell.cellTypes = .product
                 cell.istoIncreaseWidth = true
@@ -762,7 +796,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         }else if indexPath.section == 3{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
-            cell.cnstrntHeightSeeAllView.constant = 35 //0
+            cell.cnstrntHeightSeeAllView.constant = 30 //0
             cell.btnSeeAll.setTitle("", for: .normal)
             cell.cllctnView.isScrollEnabled = false
             cell.lblTtitle.text = "Suggested for You"
@@ -841,6 +875,7 @@ extension HomeVC: RefreshScreen{
     func refreshBannerList(){
         
         tblView.reloadSections(IndexSet(integer: 0), with: .none)
+
     }
     func refreshCategoriesList(){
         
@@ -950,6 +985,7 @@ extension HomeVC {
 
         updateLocationLabel(city: city, state: state, country: country,locality: locality)
     }
+    
 
     func updateLocationLabel(city: String, state: String, country: String,locality:String) {
         var locStr = city

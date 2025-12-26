@@ -20,7 +20,8 @@ class AdsTblCell: UITableViewCell {
     @IBOutlet weak var imgVwIconSeen:UIImageView!
     @IBOutlet weak var imgVwIconLike:UIImageView!
     
-    
+    @IBOutlet weak var lblLocation:UILabel!
+    @IBOutlet weak var imgVwLocIcon:UIImageView!
     @IBOutlet weak var bgViewRejectedReason:UIView!
     @IBOutlet weak var lblRejectedReason:UILabel!
 
@@ -43,22 +44,22 @@ class AdsTblCell: UITableViewCell {
         lblBoost.textColor = UIColor.white
         lblBoost.font = UIFont.Manrope.medium(size: 13.0).font
 
-      
         bgView.layer.cornerRadius = 8.0
         bgView.clipsToBounds = true
         
-        lblItem.font = UIFont.Manrope.medium(size: 16.0).font
-        lblPrice.font = UIFont.Manrope.medium(size: 16.0).font
+        lblItem.font = UIFont.Manrope.semiBold(size: 15.0).font
+        lblPrice.font = UIFont.Manrope.bold(size: 15.0).font
         lblLikeCount.font = UIFont.Manrope.regular(size: 13.0).font
         lblViewCount.font = UIFont.Manrope.regular(size: 13.0).font
         btnAdStatus.titleLabel?.font = UIFont.Manrope.regular(size: 13.0).font
+        lblLocation.font = UIFont.Manrope.regular(size: 12.0).font
         
+        lblPrice.textColor = CustomColor.sharedInstance.priceColor
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
-        // Configure the view for the selected state
     }
     
     
@@ -69,12 +70,13 @@ class AdsTblCell: UITableViewCell {
         lblViewCount.text = "Views:\(itemObj.clicks ?? 0)"
         btnAdStatus.setTitle((itemObj.status ?? "").capitalized, for: .normal)
         lblBoost.isHidden = ((itemObj.isFeature ?? false) == true) ? false : true
+        lblLocation.text = itemObj.address ?? ""
         bgViewRejectedReason.isHidden = true
      
         switch itemObj.status ?? ""{
             
         case "approved":
-            btnAdStatus.setTitleColor(UIColor(hexString: "#32b983"), for: .normal)
+            btnAdStatus.setTitleColor(UIColor(hexString: "#008838"), for: .normal)
             btnAdStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
             break
 
@@ -111,6 +113,7 @@ class AdsTblCell: UITableViewCell {
         default:
             break
         }
+      
         imgVwAds.kf.setImage(with:  URL(string: itemObj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         
         DispatchQueue.main.async {
@@ -121,7 +124,6 @@ class AdsTblCell: UITableViewCell {
             self.bgView.layer.borderWidth = 0.5
             self.bgView.clipsToBounds = true
             self.bgViewRejectedReason.roundCorners(corners: [.bottomRight,.bottomLeft], radius: 5)
-
         }
     }
     

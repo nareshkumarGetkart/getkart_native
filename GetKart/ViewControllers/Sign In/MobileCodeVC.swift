@@ -126,7 +126,7 @@ extension MobileCodeVC : UITableViewDataSource,UITableViewDelegate{
         countryCell.selectionStyle = .none
         countryCell.countryNameLabel.text = (searchCountrys[indexPath.row]["en"] as! String)
     
-        countryCell.countryNameLabel.font = UIFont(name: "Inter-Medium", size: 16.5)
+        countryCell.countryNameLabel.font = UIFont(name: "Manrope-Medium", size: 16.5)
         countryCell.countryNameLabel.textColor = UIColor.black
         
         let path = Bundle(for: type(of: self)).resourcePath! + "/CountryPicker.bundle"
@@ -134,7 +134,7 @@ extension MobileCodeVC : UITableViewDataSource,UITableViewDelegate{
         countryCell.countryImageView.image = UIImage(named: "\(searchCountrys[indexPath.row]["locale"] as! String)", in:  CABundle, compatibleWith: nil)
         
         countryCell.phoneCodeLabel.text = "+\(searchCountrys[indexPath.row]["code"] as! NSNumber)"
-        countryCell.phoneCodeLabel.font = UIFont(name: "Inter-Medium", size: 16.5)
+        countryCell.phoneCodeLabel.font = UIFont(name: "Manrope-Medium", size: 16.5)
         countryCell.phoneCodeLabel.textColor = UIColor.black
         
         return countryCell

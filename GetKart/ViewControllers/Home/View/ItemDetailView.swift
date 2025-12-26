@@ -13,6 +13,8 @@ import MessageUI
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import AVKit
+import AVFoundation
+import _AVKit_SwiftUI
 
 struct ItemDetailView: View {
     
@@ -153,7 +155,7 @@ struct ItemDetailView: View {
                                     if selectedIndex == nil{ selectedIndex = 0}
                                     if let index = selectedIndex{
                                         
-                                        if let img = objVM.galleryImgArray[index].image {
+                                        if objVM.galleryImgArray[index].image != nil {
                                             
                                             let isLast = (index + 1) == objVM.galleryImgArray.count
                                             let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
@@ -230,8 +232,6 @@ struct ItemDetailView: View {
                     
                 }
                 
-
-                
                 if Local.shared.getUserId() == itemUserId {
                     
                     HStack {
@@ -261,7 +261,11 @@ struct ItemDetailView: View {
                 }
                 
                 if Local.shared.getUserId() == itemUserId && (objVM.itemObj?.rejectedReason?.count  ?? 0) > 0 {
-                    RejectedReasonView(rejectedReason: objVM.itemObj?.rejectedReason ?? "")
+                    
+                    
+                    if ((objVM.itemObj?.status ?? "") == "rejected"){
+                        RejectedReasonView(rejectedReason: objVM.itemObj?.rejectedReason ?? "")
+                    }
                 }
 
                 
@@ -274,7 +278,7 @@ struct ItemDetailView: View {
                     
                     Text("\(Local.shared.currencySymbol) \((objVM.itemObj?.price ?? 0.0).formatNumber())")
                         .font(Font.manrope(.bold, size: 16))
-                        .foregroundColor(Color(.systemGreen))
+                        .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
                         //.foregroundColor(Color(hex: "#FF9900"))
                         .padding(5)
                         .padding(.bottom,10)
@@ -405,10 +409,10 @@ struct ItemDetailView: View {
                 VStack(alignment:.leading) {
                     Divider().padding(.top)
                     Text("About this item").font(Font.manrope(.semiBold, size: 16))
-//                    Text(objVM.itemObj?.description ?? "")
-//                    .font(Font.manrope(.regular, size: 15))
-//                    .foregroundColor(.gray)
-//                    
+                    /*Text(objVM.itemObj?.description ?? "")
+                    .font(Font.manrope(.regular, size: 15))
+                    .foregroundColor(.gray)*/
+                    
                     ExpandableTextView(
                         text: objVM.itemObj?.description ?? "",
                         lineLimit: 5
@@ -449,7 +453,7 @@ struct ItemDetailView: View {
                         let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
                         let hostingController = UIHostingController(rootView: swiftUIview)
                         self.navController?.pushViewController(hostingController, animated: true)
-                    } .frame(height: 200)
+                    } .frame(height: 180)
                         .cornerRadius(10)
                 }
                 
@@ -458,92 +462,41 @@ struct ItemDetailView: View {
                     
                     let isReported = objVM.itemObj?.isAlreadyReported ?? false
                     if isReported == false {
-                    VStack(alignment: .leading, spacing: 15) {
-                        HStack {
-                            Circle()
-                                .frame(width: 8, height: 8)
-                                .foregroundColor(.red)
-                            Text("Did you find any problem?").font(Font.manrope(.semiBold, size: 16))
-                                .font(.subheadline)
-                                .foregroundColor(Color(UIColor.label))
-                        }
-                        
-                        
-                        Text("Report this Ad")
-                            .font(.subheadline)
-                            .foregroundColor(.orange).frame(width: 130, height: 30)
+                        //Reporting ads
+                        reportingAdsView
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .clipped()
+                            .background(Color(.secondarySystemBackground))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.gray, lineWidth: 0.5)
-                            ) .background(.yellow.opacity(0.1)).cornerRadius(15.0)
-                            .onTapGesture {
-                                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                                    let reportAds =  ReportAdsView(itemId:(objVM.itemObj?.id ?? 0)) {bool in
-                                        objVM.itemObj?.isAlreadyReported = bool
-                                    }
-                                    let destVC = UIHostingController(rootView:reportAds)
-                                    destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
-                                    destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
-                                    destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
-                                    self.navController?.present(destVC, animated: true, completion: nil)
-                                }
-                                
-                            }
-                    }.padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
-                        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                        .padding(.top, 5)
-                    
-                }
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray, lineWidth: 0.2)
+                            )
+                            .cornerRadius(10.0)
+                            .clipped()
+                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .padding(.top, 5)
+                    }
                 }
                 
-               
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    
+                
+                LazyVStack(alignment: .leading, spacing: 10) {
+                  
                     if objVM.relatedDataItemArray.count > 0 {
                         HStack{
                             Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
                             Spacer()
-                        }//.padding(.bottom)
-                        
+                        }
                     }
                     
                     if !objVM.bannerAdsArray.isEmpty {
                         AutoScrollBannerAdsView(sliderArray: objVM.bannerAdsArray, currentIndex: 0,navController:self.navController)
-                            .frame(height: 200)
+                            //.frame(height: 180)
                     }
                     
-                    /*  ScrollView(.horizontal, showsIndicators: false) {
-                     //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
-                     HStack(spacing: 10) {
-                     ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
-                     ProductCard(objItem: $item)
-                     .onTapGesture {
-                     var swiftUIview = ItemDetailView(
-                     navController: self.navController,
-                     itemId: item.id ?? 0,
-                     itemObj: item,
-                     slug: item.slug
-                     )
-                     swiftUIview.returnValue = { value in
-                     if let obj = value {
-                     updateItemInList(obj)
-                     }
-                     }
-                     let hostingController = UIHostingController(rootView:swiftUIview)
-                     self.navController?.pushViewController(hostingController, animated: true)
-                     }
-                     }
-                     }
-                     .padding([.bottom])
-                     }.id("related-scroll")
-                     */
+                   
                     RelatedItemsRow(
-                        items:  $objVM.relatedDataItemArray, //.map { $0 },
+                        items:  $objVM.relatedDataItemArray,
                         onItemTapped: { item in
                             var swiftUIview = ItemDetailView(
                                 navController: self.navController,
@@ -562,34 +515,7 @@ struct ItemDetailView: View {
                             updateItemInList(likedObj)
                             
                         }
-                    
                 }
-                
-              /*  ScrollView(.horizontal, showsIndicators: false) {
-                  //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 15))], spacing: 10) {
-                    HStack(spacing: 10) {
-                        ForEach($objVM.relatedDataItemArray,id: \.id) { $item in
-                            ProductCard(objItem: $item)
-                                .onTapGesture {
-                                    var swiftUIview = ItemDetailView(
-                                        navController: self.navController,
-                                        itemId: item.id ?? 0,
-                                        itemObj: item,
-                                        slug: item.slug
-                                    )
-                                    swiftUIview.returnValue = { value in
-                                        if let obj = value {
-                                            updateItemInList(obj)
-                                        }
-                                    }
-                                    let hostingController = UIHostingController(rootView:swiftUIview)
-                                    self.navController?.pushViewController(hostingController, animated: true)
-                                }
-                        }
-                    }
-                   .padding([.bottom])
-                }.id("related-scroll")
-                */
             }.padding(.vertical)
             .padding(.horizontal)
                
@@ -605,8 +531,6 @@ struct ItemDetailView: View {
                         selectedIndex = 0
                     }
                }
-              
-                
             }else{
               //  if objVM.sellerObj == nil {
                 if objVM.itemObj?.user == nil || objVM.relatedDataItemArray.count == 0 {
@@ -894,13 +818,7 @@ struct ItemDetailView: View {
                             self.navController?.pushViewController(vc, animated: true)
                         }
                     }) {
-//                        Text("Edit")
-//                            .frame(maxWidth: .infinity)
-//                            .padding()
-//                            .background(Color.orange)
-//                            .foregroundColor(.white)
-//                            .cornerRadius(10)
-                        
+                 
                         Text("Edit").font(.manrope(.semiBold, size: 16.0))
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -1068,15 +986,8 @@ struct ItemDetailView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }.frame(height: 40)
-                   // .padding([.leading,.trailing])
-                    
-                   
-                    
                 }.padding([.leading,.trailing])
             }
-      
-            
-            
         }
     }
     
@@ -1183,6 +1094,42 @@ struct ItemDetailView: View {
         }
     }
     
+    
+    @ViewBuilder
+    private var reportingAdsView: some View {
+        
+        HStack(spacing:5) {
+                Circle()
+                    .frame(width: 8, height: 8)
+                    .foregroundColor(.red)
+                Text("Did you find any problem?").font(Font.manrope(.medium, size: 14))
+                    .font(.subheadline)
+                    .foregroundColor(Color(UIColor.label))
+                
+                Spacer()
+                Text("Report this Ad")
+                    .font(Font.manrope(.semiBold, size: 15))
+                    .foregroundColor(.red).frame(width: 127, height: 30)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.gray, lineWidth: 0.5)
+                    ) .background(Color.red.opacity(0.1)).cornerRadius(15.0)
+                    .onTapGesture {
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            let reportAds =  ReportAdsView(itemId:(objVM.itemObj?.id ?? 0)) {bool in
+                                objVM.itemObj?.isAlreadyReported = bool
+                            }
+                            let destVC = UIHostingController(rootView:reportAds)
+                            destVC.modalPresentationStyle = .overFullScreen // Full-screen modal
+                            destVC.modalTransitionStyle = .crossDissolve   // Fade-in effect
+                            destVC.view.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Semi-transparent background
+                            self.navController?.present(destVC, animated: true, completion: nil)
+                        }
+                        
+                    }
+
+            }
+    }
     
     @ViewBuilder
     private var headerBar: some View {
@@ -1322,7 +1269,6 @@ struct ItemDetailView: View {
             "youtube\\.com/embed/([\\w-]{11})"
         ]
 
-
         for pattern in patterns {
             
             if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
@@ -1342,12 +1288,9 @@ struct ItemDetailView: View {
         if Local.shared.getUserId() == itemUserId {
             return 0
         } else {
-//            return objVM.sellerObj?.mobileVisibility ?? 0
             return objVM.itemObj?.user?.mobileVisibility ?? 0
-
         }
     }
-    
 }
 
 
@@ -1356,15 +1299,12 @@ struct ItemDetailView: View {
 }
 
 
-
-
 struct InfoView: View {
     let icon: String
     let text: String
     let value:String
     var navController:UINavigationController?
 
-    
     var body: some View {
         HStack {
             
@@ -1375,23 +1315,22 @@ struct InfoView: View {
                       .cornerRadius(7.0)
                       .clipped()
             } else {
-
-                    AsyncImage(url: URL(string: icon)) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width:30, height: 30)
-                            .cornerRadius(7.0)
-                        
-                    }placeholder: {
-                        
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width:30, height: 30)
-                            .cornerRadius(7.0)
-
-                    }
+                
+                AsyncImage(url: URL(string: icon)) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width:30, height: 30)
+                        .cornerRadius(7.0)
+                    
+                }placeholder: {
+                    
+                    Image("getkartplaceholder")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width:30, height: 30)
+                        .cornerRadius(7.0)
+                }
             }
        
             VStack(alignment: .leading,spacing: 0){
@@ -1432,9 +1371,6 @@ struct InfoView: View {
         .padding(.horizontal)
         .padding(.bottom)
     }
-    
-    
-    
 }
 
 
@@ -1450,7 +1386,7 @@ struct RejectedReasonView:View {
                 .cornerRadius(2)
             
             VStack(alignment: .leading, spacing: 3) {
-                Text("REJECTED REASONS")
+                Text("REJECTED REASON")
                     .font(.manrope(.bold, size: 14.0))
                     .foregroundColor(.red)
                 
@@ -1566,11 +1502,6 @@ struct SellerInfoView: View {
     }
 }
 
-
-
-
-
-
 struct RelatedItemsRow: View {
     @Binding var items: [ItemModel]
     var onItemTapped: (ItemModel) -> Void
@@ -1579,40 +1510,17 @@ struct RelatedItemsRow: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 10) {
-                
-                
-          //  LazyHGrid(rows: [GridItem(.fixed(widthScreen / 2.0 - 30))], spacing: 10) {
-
                 ForEach($items, id: \.id) { $item in
-                    ProductCard(objItem: $item,onItemLikeDislike: { likedObj in
-                      //  updateItemInList(likedObj)
-                       // onItemLikedTapped(likedObj)
-                        
-                    }) // Use constant binding to avoid update issues
-                        .onTapGesture {
-                            onItemTapped(item)
-                        }
-                        
+                    ProductCard(objItem: $item,onItemLikeDislike: { likedObj in })
+                    .onTapGesture {  onItemTapped(item) }
                 }
             }.padding([.bottom])
-           // .padding(.horizontal)
         }
-       // .frame(height: widthScreen / 2.0 + 30)
     }
-    
-    
-//    private func updateItemInList(_ value: ItemModel) {
-//        if let index = items.firstIndex(where: { $0.id == value.id }) {
-//            items[index] = value
-//        }
-//    }
 }
 
 
-import SwiftUI
-import MapKit
-import AVFoundation
-import _AVKit_SwiftUI
+
 
 struct PinnedMapView: View {
     var coordinate: CLLocationCoordinate2D
@@ -1649,7 +1557,7 @@ struct PresentationModifier: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
             content
-                .presentationDetents([.fraction(0.65)])
+                .presentationDetents([.fraction(0.80)])
                 .presentationDragIndicator(.visible)
         } else {
             content // No special presentation on iOS 15
@@ -1831,66 +1739,6 @@ struct YouTubeWebView: UIViewRepresentable {
        }
 }
 
-/*
-
-struct YouTubeWebView: UIViewRepresentable {
-    let videoID: String
-    @Binding var isVisible: Bool
-
-    func makeUIView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        config.allowsInlineMediaPlayback = true
-        config.mediaTypesRequiringUserActionForPlayback = []
-        
-        let webView = WKWebView(frame: .zero, configuration: config)
-        return webView
-    }
-
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        let html = """
-        <html>
-        <body style="margin:0;padding:0;">
-            <div id="player"></div>
-
-            <script>
-                var tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                var firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-                var player;
-                function onYouTubeIframeAPIReady() {
-                    player = new YT.Player('player', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: '\(videoID)',
-                        playerVars: {
-                            'playsinline': 1,
-                            'autoplay': 1
-                        }
-                    });
-                }
-
-                function pauseVideo() {
-                    if (player && player.pauseVideo) {
-                        player.pauseVideo();
-                    }
-                }
-            </script>
-        </body>
-        </html>
-        """
-
-        webView.loadHTMLString(html, baseURL: nil)
-
-        // Pause when not visible
-        if !isVisible {
-            webView.evaluateJavaScript("pauseVideo();")
-        }
-    }
-}
- */
-
 
 
 
@@ -2013,6 +1861,7 @@ struct TextSizeReader: View {
 
 
 
+
 struct AutoScrollBannerAdsView: View {
     @State var sliderArray: [SliderModel]
     @State var currentIndex = 0
@@ -2051,7 +1900,7 @@ struct AutoScrollBannerAdsView: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(height: 185)
+            .frame(height: 170)
             .onReceive(timer) { _ in
                 // Auto-scroll every 3 seconds
                 withAnimation {
@@ -2063,78 +1912,20 @@ struct AutoScrollBannerAdsView: View {
                 }
             }
             
-            // Page Indicator
-            HStack(spacing: 5) {
-                ForEach(sliderArray.indices, id: \.self) { index in
-                    Capsule()
-                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
-                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
-                        .animation(.easeInOut, value: currentIndex)
-                }
-            }
-            .padding(.top, -5)
-        }
-    }
-}
-
-
-
-/*
-
-struct AutoScrollBannerAdsView: View {
-    @State var sliderArray: [SliderModel]
-    @State var currentIndex = 0
-    let navController:UINavigationController?
-    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
-
-    
-    var body: some View {
-        VStack {
-            TabView(selection: $currentIndex) {
-                ForEach(sliderArray.indices, id: \.self) { index in
-                    let slider = sliderArray[index]
-                    
-                    ZStack { // ✅ Wrapper to apply radius & spacing properly
-                        AsyncImage(url: URL(string: slider.image ?? "")) { image in
-                            image.resizable()
-                               // .scaledToFill()
-                                .cornerRadius(10)
-                              //.frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .clipped()
-                        } placeholder: {
-                            ProgressView()
-                        }.onTapGesture {
-                            
-                            BannerNavigation.navigateToScreen(index: index, sliderObj: slider, navigationController: navController,viewType: "AD_DETAIL")
-                        }
+            if sliderArray.count > 1{
+                // Page Indicator
+                HStack(spacing: 5) {
+                    ForEach(sliderArray.indices, id: \.self) { index in
+                        Capsule()
+                            .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                            .frame(width: currentIndex == index ? 18 : 8, height: 6)
+                            .animation(.easeInOut, value: currentIndex)
                     }
-                    .frame(height: 170)
-                    .background(Color.clear)
-                   // .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous)) // ✅ Now works
-                   // .padding(.horizontal, 12) // ✅ Visible spacing between pages
-                   // .shadow(radius: 3) // Optional: card effect
-                    .tag(index)
-                    //.cornerRadius(20)
                 }
+                .padding(.top, -8)
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(height: 185)
-//            .cornerRadius(20)
-//            .clipped()
-            // Page Indicator
-            HStack(spacing: 5) {
-                ForEach(sliderArray.indices, id: \.self) { index in
-                    Capsule()
-                        .fill(currentIndex == index ? Color.orange : Color.gray.opacity(0.4))
-                        .frame(width: currentIndex == index ? 18 : 8, height: 6)
-                        .animation(.easeInOut, value: currentIndex)
-                }
-            }
-            .padding(.top, -5)
         }
     }
 }
 
 
-import SwiftUI
-*/

@@ -29,13 +29,18 @@ class ProfileVC: UIViewController {
       
     let iconArray =  ["","promoted","subscription","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy","delete_account","logout"]*/
     //,"Banner Promotions"
-    var titleArray =  ["Anonymous","My Boost Ads","Buy Packages","Order History & Invoices","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+   /* var titleArray =  ["Anonymous","My Ads","My Boards","My Boost Ads","Buy Packages","Order History & Invoices","Dark Theme","Notifications","Blogs","Favorites","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
 //,"mediaPromotion"
-    var iconArray =  ["","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
+    var iconArray =  ["","myAdsIcon","gridOpaque","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
+    */
+    
+    var titleArray =  ["Anonymous","My Ads","My Boards","Buy Packages","My Boost Ads","Favorites","Order History & Invoices","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+      
+    var iconArray =  ["","myAdsIcon","gridOpaque","buyPackages","promoted","like_fill","transaction","dark_theme","notification","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
       
     var verifiRejectedReason:String = ""
-    var verifiSttaus:String = ""
+    var verifyStatus:String = ""
     var isBannerPromotion = 0
     
     private  lazy var topRefreshControl: UIRefreshControl = {
@@ -113,7 +118,7 @@ class ProfileVC: UIViewController {
                     
                     if let data = result["data"] as? Dictionary<String, Any>{
                         self.verifiRejectedReason = data["rejection_reason"] as? String ?? ""
-                        self.verifiSttaus = data["status"] as? String ?? ""
+                        self.verifyStatus = data["status"] as? String ?? ""
                         self.tblView.reloadData()
                         Local.shared.isToRefreshVerifiedStatusApi = false
                     }
@@ -166,8 +171,8 @@ class ProfileVC: UIViewController {
                                
                             }else{
                                 if !self.titleArray.contains(strToCheck){
-                                    self.titleArray.insert(strToCheck, at: 3)
-                                    self.iconArray.insert("mediaPromotion", at: 3)
+                                    self.titleArray.insert(strToCheck, at: 4)
+                                    self.iconArray.insert("mediaPromotion", at: 4)
                                 }
                             }
                        
@@ -225,22 +230,22 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 cell.lblEmail.text =  objLoggedInUser.email ?? ""
                 cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
                                 
-                if verifiSttaus.lowercased() == "pending"{
-                    cell.lblStatus.text =  "Under review" //verifiSttaus.capitalized
+                if verifyStatus.lowercased() == "pending"{
+                    cell.lblStatus.text =  "Under review" //verifyStatus.capitalized
                     cell.lblStatus.backgroundColor = Themes.sharedInstance.themeColor
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = true
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = true
 
-                }else if verifiSttaus.lowercased() == "rejected"{
-                    cell.lblStatus.text =  verifiSttaus.capitalized
+                }else if verifyStatus.lowercased() == "rejected"{
+                    cell.lblStatus.text =  verifyStatus.capitalized
                     cell.lblStatus.backgroundColor = UIColor.red
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = false
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = true
-                }else if verifiSttaus.lowercased() == "approved"{
+                }else if verifyStatus.lowercased() == "approved"{
                     
                     cell.btnGetVerifiedBadge.isHidden = true
                     cell.bgViewVerified.isHidden = false
@@ -347,6 +352,20 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             if titleArray[indexPath.row] == "Contact us"{
                 
                 let destVC = UIHostingController(rootView: ContactUsView(navigationController:self.navigationController))
+                destVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(destVC, animated: true)
+                
+            } else if titleArray[indexPath.row] == "My Ads"{
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+                    destVC.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(destVC, animated: true)
+                }
+                
+            } else if titleArray[indexPath.row] == "My Boards"{
+                //My Boards
+                let destVC = UIHostingController(rootView: MyBoardsView(navigationController:self.navigationController))
                 destVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destVC, animated: true)
                 
@@ -562,7 +581,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     @objc func statusTapped(){
         
-        if verifiSttaus.lowercased() == "rejected"{
+        if verifyStatus.lowercased() == "rejected"{
             if verifiRejectedReason.count > 0{
                 AlertView.sharedManager.displayMessageWithAlert(title: "Rejected Reason", msg: verifiRejectedReason)
             }

@@ -32,7 +32,7 @@ struct Blogsview: View {
      
         ScrollView{
            VStack(spacing:0){
-                HStack{Spacer()}
+              //  HStack{Spacer()}
 
                 ForEach(blogsArray) { blog in
                     BlogCell(obj:blog)
@@ -50,14 +50,15 @@ struct Blogsview: View {
                             
                         }
                 }
-                Spacer()
+               // Spacer()
             }.onAppear()
             {
                 if blogsArray.count == 0{
                     blogslistApi()
                 }
             }
-        }.background(Color(UIColor.systemGroupedBackground)).navigationBarHidden(true)
+        }.background(Color(UIColor.systemGroupedBackground))
+            .navigationBarHidden(true)
     }
     
     func blogslistApi(){

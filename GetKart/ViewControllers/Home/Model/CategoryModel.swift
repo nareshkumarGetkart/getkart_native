@@ -44,7 +44,7 @@ struct CategoryModelClass: Codable {
 }
 
 // MARK: - Datum
-struct CategoryModel: Codable {
+struct CategoryModel: Codable,Identifiable {
     let id, sequence: Int?
     let name: String?
     let image: String?
@@ -56,9 +56,10 @@ struct CategoryModel: Codable {
     let translatedName: String?
     let translations: [JSONAny]?
     let subcategories: [Subcategory]?
-
+    var is_favourite:Bool?
+    
     enum CodingKeys: String, CodingKey {
-        case id, sequence, name, image
+        case id, sequence, name, image,is_favourite
         case parentCategoryID = "parent_category_id"
         case description, status
         case createdAt = "created_at"
@@ -68,6 +69,7 @@ struct CategoryModel: Codable {
         case allItemsCount = "all_items_count"
         case translatedName = "translated_name"
         case translations, subcategories
+        
     }
 }
 

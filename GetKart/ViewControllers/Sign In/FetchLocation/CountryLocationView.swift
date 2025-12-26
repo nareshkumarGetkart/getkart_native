@@ -15,84 +15,34 @@ struct CountryLocationView: View, LocationSelectedDelegate{
     @State var popType:PopType?
     @State var isFirstTime = true
     @State var strCurrentLocagtion = "Fetch current location"
+    @State private var showSearch:Bool = false
+    @State private var showAlert = false
     var locationManager = LocationManager()
     var navigationController: UINavigationController?
     var delLocationSelected:LocationSelectedDelegate!
-    @State private var showSearch:Bool = false
-    @State private var showAlert = false
+    
+   private let recentLocationArray = RecentLocationManager.shared.fetch()
 
     var body: some View {
+        HStack{
+            
+            Button {
+                self.navigationController?.popViewController(animated: true)
+            } label: {
+                Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+            }.frame(width: 40,height: 40)
+            
+            Text("Location")
+                .font(Font.manrope(.bold, size: 20.0))
+                .foregroundColor(Color(UIColor.label))
+            Spacer()
+        }.frame(height:44).background(Color(UIColor.systemBackground))
         
         VStack(spacing: 0) {
             
-            HStack{
-                
-                Button {
-                    self.navigationController?.popViewController(animated: true)
-                } label: {
-                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
-                }.frame(width: 40,height: 40)
-                
-                Text("Location")
-                    .font(Font.manrope(.bold, size: 20.0))
-                    .foregroundColor(Color(UIColor.label))
-                Spacer()
-            }.frame(height:44).background(Color(UIColor.systemBackground))
-           
-            /*
-            // MARK: - Search Bar
-            HStack {
-                HStack {
-                    Image("search").resizable().frame(width: 20,height: 20).padding(.leading,10)
-                    TextField("Search Country", text: $searchText)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .padding(.horizontal, 5)
-                        .frame(height: 45)
-
-                        .onChange(of: searchText) { newValue in
-                            print(newValue)
-                            searchCountry(strCountry:newValue)
-                        }
-                    
-                    if searchText.count > 0 {
-                        Button("Clear") {
-                            searchText = ""
-                        }.padding(.horizontal).foregroundColor(.black)
-                    }
-                }.background(Color.white).frame(height: 45).overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray, lineWidth: 1)
-                }
-                
-                if popType == .filter {
-                    // Icon button on the right (for settings or any other action)
-                    Button(action: {
-                        // Action for icon button
-                        var rootView = SelectLocationRangeView(navigationController: self.navigationController, popType: self.popType)
-                        rootView.delLocationSelected = self
-                        let vc = UIHostingController(rootView:rootView )
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }) {
-                        Image("symbolShareLocation")
-                            .foregroundColor(.gray)
-                            .frame(width: 40,height:40)
-                            .foregroundColor(.orange)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .padding(.leading, 8)
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            */
-           // Divider()
-            
             // MARK: - Current Location Row
             VStack(alignment:.leading){
-                
                 if Local.shared.placeApiKey.count > 0 {
-                    
                     ZStack{
                         HStack {
                             Image("search").resizable().frame(width: 20,height: 20)
@@ -102,38 +52,39 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                                 .frame(height: 36)
                                 .tint(Color(Themes.sharedInstance.themeColor)).disabled(true)
                             
-                        }.background(Color(UIColor.systemBackground)).padding().frame(height: 45).overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray, lineWidth: 1)
-                            
-                            Button(action: {
-                                showSearch = true
-                            }) {
-                                Color.clear
+                        }.background(Color(UIColor.systemBackground)).padding()
+                            .frame(height: 45).overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                                
+                                Button(action: {
+                                    showSearch = true
+                                }) {
+                                    Color.clear
+                                }
+                                .contentShape(Rectangle())
+                                
                             }
-                            .contentShape(Rectangle())
-                            
-                        }
                         
-                    }.padding()
+                    }.padding(.horizontal)
                         .sheet(isPresented: $showSearch) {
                             PlaceSearchView { selected in
                                 print("User picked: \(selected)")
-                                
                                 
                                 if popType == .createPost || popType == .buyPackage {
                                     
                                     if (selected.city?.count ?? 0) == 0{
                                         showAlert = true
                                     }else{
+                                        savedLocation(selLoc: selected)
                                         placeApiLocSelected(selLoc: selected)
                                     }
                                     
                                 }else{
+                                    savedLocation(selLoc: selected)
                                     placeApiLocSelected(selLoc: selected)
                                 }
                                 
-                                //  self.navigationController?.popViewController(animated: true)
                                 
                             }
                         }.alert("", isPresented: $showAlert) {
@@ -143,60 +94,34 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                         }
                     
                 }
-                    // Icon button on the right (for settings or any other action)
-                  /*  Button(action: {
-                        // Action for icon button
+                VStack(alignment:.leading){
+                    HStack {
                         
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(.gray)
-                            .padding(.leading, 8)
-                    }*/
-                
-                
-                //
-                HStack {
-                    
-                    Button(action: {
-                        // Enable location action
-                        findMyLocationAction(isToUpdate: true)
-                    }) {
+                        Button(action: {
+                            // Enable location action
+                            findMyLocationAction(isToUpdate: true)
+                        }) {
+                            
+                            Image("currentLocation")
+                                .foregroundColor(.orange)
+                            Text("Use Current Location")
+                                .font(Font.manrope(.medium, size: 15))
+                                .foregroundColor(.orange)
+                        }.padding(.leading, 20)
                         
-                        Image("currentLocation")
-                            .foregroundColor(.orange)
-                        Text("Use Current Location")
-                            .font(Font.manrope(.medium, size: 15))
-                            .foregroundColor(.orange)
-                    }.padding(.leading, 20)
-                    
-                    Spacer()
-                }
-            Text(strCurrentLocagtion).padding(.leading,50)
-                    .font(Font.manrope(.regular, size: 14))
-                    .foregroundColor(Color(UIColor.label))
-            }.padding(.top, 10)
-        
-            Divider().padding([.top,.bottom],10)
-
+                        Spacer()
+                    }
+                    Text(strCurrentLocagtion).padding(.leading,50)
+                        .font(Font.manrope(.regular, size: 14))
+                        .foregroundColor(Color(UIColor.label))
+                }.padding(.bottom,5)
+               
+            }//.padding(.top, 1)
+            
+            Divider().padding([.top,.bottom],5).padding(.horizontal,10)
+            
             // MARK: - List of Countries
             ScrollView{
-              /*  if popType == .filter || popType == .home{
-                    CountryRow(strTitle:"All Countries")
-                        .frame(height: 40)//.padding(.horizontal)
-                        .onTapGesture{
-                            self.allCountrySelected()
-                        }
-                    Divider()
-                }
-                */
-                
-                /*else {
-                    CountryRow(strTitle:"Choose Country")
-                        .frame(height: 40)//.padding(.horizontal)
-                        .onTapGesture{
-                        }
-                    Divider()
-                }*/
                 
                 if searchText.count == 0 {
                     ForEach(arrCountries) { country in
@@ -205,7 +130,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                             .onTapGesture{
                                 self.navigateToStateListing(country: country)
                             }
-                        Divider()
+                        Divider()//.padding(.horizontal,10)
                     }
                     
                 }else {
@@ -217,29 +142,82 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                                 
                                 self.navigateToStateListing(country: country)
                             }
-                        Divider()
+                        Divider()//.padding(.horizontal,10)
                     }
                 }
-            }
+                
+               
+                if recentLocationArray.count > 0{
+                    VStack(alignment:.leading){
+                        Text("Recents").font(Font.manrope(.medium, size: 15))
+                            .foregroundColor(.gray).padding([.top])
+                        Divider()
+                        ForEach(recentLocationArray) { location in
+                           
+                            HStack {
+                                Text("\(location.fullAddress)")
+                                    .font(Font.manrope(.medium, size: 15))
+                                Spacer()
+                                
+                            }
+                            .contentShape(Rectangle()).onTapGesture {
+                                
+                                selectedLocationRecent(location:location)
+
+
+                            }
+                            Divider()
+                        }
+                    }//.padding(.horizontal,10)
+                  
+
+                    
+                }
+            }.padding(.horizontal,10)
             
             Spacer()
         }
-            .onAppear{
-                if arrCountries.count == 0{
-                    fetchCountryListing()
+        .onAppear{
+            if arrCountries.count == 0{
+                fetchCountryListing()
+            }
+            if isFirstTime == true {
+                
+                if locationManager.isCurrentLocationEnabled(){
+                    findMyLocationAction(isToUpdate: false)
                 }
-                if isFirstTime == true {
-                    
-                    if locationManager.isCurrentLocationEnabled(){
-                        findMyLocationAction(isToUpdate: false)
-                    }
-                }
+            }
         }
         .navigationTitle("Location")
         .navigationBarBackButtonHidden()
         .navigationBarHidden(true)
     }
     
+    
+    func selectedLocationRecent(location:RecentLocation){
+        let name = ""
+        let city = location.city
+        let state = location.state
+        let country = location.country
+        let locality = location.area
+        let lat = location.latitude
+        let lon = location.longitude
+        let addr = location.fullAddress
+
+        let selectedPlace = SelectedPlace(
+            name: name,
+            city: city,
+            state: state,
+            country: country,
+            locality: locality,
+            latitude: lat,
+            longitude: lon,
+            formattedAddress: addr
+        )
+
+        placeApiLocSelected(selLoc: selectedPlace)
+
+    }
    
     func findMyLocationAction(isToUpdate:Bool){
         
@@ -259,6 +237,12 @@ struct CountryLocationView: View, LocationSelectedDelegate{
             print("Unknown Location")
         }*/
         
+    }
+    
+    func savedLocation(selLoc:SelectedPlace){
+        
+        RecentLocationManager.shared.save(location: RecentLocation(latitude: selLoc.latitude, longitude: selLoc.longitude, city: selLoc.city ?? "", state: selLoc.state  ?? "", area: selLoc.locality  ?? "", country: selLoc.country  ?? "", fullAddress: selLoc.formattedAddress  ?? ""))
+
     }
     
     func searchCountry(strCountry:String){
@@ -358,6 +342,7 @@ struct CountryLocationView: View, LocationSelectedDelegate{
                         "longitude": "\(selLoc.longitude)",
                         "locality": selLoc.locality ?? "",
                      ]
+        
         
         if popType == .home || popType == .signUp{
             Local.shared.saveUserLocation(city: selLoc.city ?? "", state: selLoc.state ?? "", country: selLoc.country ?? "", latitude: "\(selLoc.latitude)", longitude:  "\(selLoc.longitude)", timezone: "",locality: selLoc.locality ?? "")
@@ -588,4 +573,67 @@ protocol LocationSelectedDelegate{
 extension LocationSelectedDelegate {
     func savePostLocation(latitude:String, longitude:String,  city:String, state:String, country:String,locality:String){}
     func savePostLocationWithRange(latitude:String, longitude:String,  city:String, state:String, country:String, range:Double){}
+}
+
+
+
+
+
+struct RecentLocation: Codable, Equatable,Identifiable {
+    let id = UUID()
+    let latitude: Double
+    let longitude: Double
+    let city: String
+    let state: String
+    let area: String
+    let country: String
+    let fullAddress: String
+    
+}
+
+
+class RecentLocationManager {
+    private let key = "recent_locations"
+
+    static let shared = RecentLocationManager()
+
+    func save(location: RecentLocation) {
+        var list = fetch()
+
+        
+        // Remove if same address already exists
+        list.removeAll { $0.fullAddress == location.fullAddress }
+        
+        // Remove existing entry if same location already present
+        if let index = list.firstIndex(of: location) {
+            list.remove(at: index)
+        }
+
+        // Add new at top
+        list.insert(location, at: 0)
+
+        // Keep max 4
+        if list.count > 4 {
+            list = Array(list.prefix(4))
+        }
+
+        // Save to UserDefaults
+        if let data = try? JSONEncoder().encode(list) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+    
+
+
+    func fetch() -> [RecentLocation] {
+        if let data = UserDefaults.standard.data(forKey: key),
+           let obj = try? JSONDecoder().decode([RecentLocation].self, from: data) {
+            return obj
+        }
+        return []
+    }
+
+    func clearAll() {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
 }

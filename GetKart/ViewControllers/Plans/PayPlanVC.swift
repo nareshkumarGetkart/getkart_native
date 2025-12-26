@@ -17,6 +17,7 @@ enum PaymentForEnum{
     case adsPlan
     case bannerPromotion
     case bannerPromotionDraft
+    case boostBoard
     
 }
 
@@ -58,7 +59,8 @@ class PayPlanVC: UIViewController {
     var pincode = ""
     var selectedImage:UIImage?
     var strUrl = ""
-    
+    var itemId:Int?
+
     
     //MARK: Controller life cycle methods
     
@@ -179,7 +181,12 @@ class PayPlanVC: UIViewController {
     func updateOrderApi(){
         
         let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
-        let params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId]
+        var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId]
+        
+        if let postItemId = itemId{
+            params["item_id"] = postItemId
+        }
+        
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post,showLoader: true) { responseObject, error in
             

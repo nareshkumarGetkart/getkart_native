@@ -152,6 +152,7 @@ struct NotificationRow: View {
             Spacer()
         }
         .padding()
+        .frame(height:110)
         .background(Color(UIColor.systemBackground)).cornerRadius(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)

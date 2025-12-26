@@ -78,77 +78,9 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        
-        
-      /*  if cellTypes == .categories{
-          
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
-           
-            if (listArray?.count ?? 0) == indexPath.item{
-                cell.imgView.image = UIImage(named:"moreHor")
-                cell.lblTitle.text = "More"
-                cell.imgView.layer.borderColor = UIColor.lightGray.cgColor
-                cell.imgView.layer.borderWidth = 1.0
-                cell.imgView.isHidden = false
-                cell.threeDotImgView.isHidden = false
-                cell.imgView.image = nil
-                
-            }else if let obj = listArray?[indexPath.item] as? CategoryModel{
-                cell.lblTitle.text = obj.name
-                cell.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
-                cell.imgView.layer.borderColor = UIColor.clear.cgColor
-                cell.imgView.layer.borderWidth = 0.0
-                cell.imgView.contentMode = .scaleAspectFill
-                cell.imgView.isHidden = false
-                cell.threeDotImgView.isHidden = true
-            }
-            
-            cell.imgView.layer.cornerRadius = 10.0
-            cell.imgView.clipsToBounds = true
-            return cell
-            
-        }else  if cellTypes == .product{
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
-            cell.bgView.addShadow()
-            
-            if indexPath.item < listArray?.count ?? 0{
-                if let obj = listArray?[indexPath.item] as? ItemModel{
-                    cell.lblItem.text = obj.name
-                    cell.lblAddress.text = obj.address
-                    cell.lblPrice.text =  "\(Local.shared.currencySymbol) \((obj.price ?? 0.0).formatNumber())"
-                    let imgName = (obj.isLiked ?? false) ? "like_fill" : "like"
-                    cell.btnLike.setImage(UIImage(named: imgName), for: .normal)
-                    cell.btnLike.tag = indexPath.item
-                    cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
-                    cell.btnLike.backgroundColor = .systemBackground
-                    cell.lblBoost.isHidden = ((obj.isFeature ?? false) == true) ? false : true
-
-                    if let originalImage = UIImage(named: "location-outline") {
-                        let tintedImage = originalImage.tinted(with: .label)
-                        cell.imgViewLoc.image = tintedImage
-                    }
-                    
-                    let processor = DownsamplingImageProcessor(size: cell.imgViewitem.bounds.size)
-                    
-                    cell.imgViewitem.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"), options: [
-                        .processor(processor),
-                        .scaleFactor(UIScreen.main.scale)
-                    ])
-                }
-            }
-            
-            return cell
-            
-        }
-        
-        return UICollectionViewCell()
-        */
-        
-        
         if cellTypes == .categories {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCell", for: indexPath) as! CategoriesCell
             cell.prepareForReuse()
-            
             if indexPath.item == listArray?.count {
                 cell.configureAsMoreCell()
             } else if let obj = listArray?[indexPath.item] as? CategoryModel {

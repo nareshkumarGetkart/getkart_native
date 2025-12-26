@@ -113,6 +113,8 @@ struct AdNotPostedView: View {
             destvc.state =  self.itemObj?.state ?? ""
             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+            destvc.itemId =  self.itemObj?.id ?? 0
+
             navigationController?.pushViewController(destvc, animated: true)
         }
     }

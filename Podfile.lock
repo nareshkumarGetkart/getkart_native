@@ -138,6 +138,7 @@ PODS:
     - IQKeyboardToolbar/Placeholderable
   - Kingfisher (7.12.0)
   - Mantis (2.23.2)
+  - MarqueeLabel (4.5.3)
   - MMMaterialDesignSpinner (0.2.5)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -173,6 +174,7 @@ DEPENDENCIES:
   - IQKeyboardManagerSwift
   - Kingfisher (~> 7.0)
   - Mantis
+  - MarqueeLabel
   - MMMaterialDesignSpinner
   - NSFWDetector
   - PhonePePayment
@@ -215,6 +217,7 @@ SPEC REPOS:
     - IQTextView
     - Kingfisher
     - Mantis
+    - MarqueeLabel
     - MMMaterialDesignSpinner
     - nanopb
     - NSFWDetector
@@ -261,6 +264,7 @@ SPEC CHECKSUMS:
   IQTextView: ae13b4922f22e6f027f62c557d9f4f236b19d5c7
   Kingfisher: 53a10ea35051a436b5fb626ca2dd8f3144d755e9
   Mantis: 8a6fa3823be4551b3ab6f4a07964f55e2eecf2c2
+  MarqueeLabel: 0c57d4c6634e04a6d015af79f7c9a175b2309525
   MMMaterialDesignSpinner: a548042720c2e5f04212048483085d7942ac3e81
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NSFWDetector: d6eca9759743b5e43778818078d53711576e929f
@@ -274,6 +278,6 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: 29775046d453bc7199cf53db509805f575b308aa
+PODFILE CHECKSUM: e5850b261f5bfee49fa5eddc1552e0039ff136d7
 
 COCOAPODS: 1.16.2

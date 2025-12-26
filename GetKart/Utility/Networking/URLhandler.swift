@@ -12,6 +12,7 @@ import UIKit
 import Alamofire
 import SystemConfiguration
 import AVKit
+import SwiftUI
 
 
 class URLhandler: NSObject{
@@ -28,6 +29,7 @@ class URLhandler: NSObject{
         return urlhandler
     }()
        
+    private var isLogoutPresented = false
     
     func isConnectedToNetwork() -> Bool {
         return (UIApplication.shared.delegate as! AppDelegate).isInternetConnected
@@ -131,10 +133,15 @@ class URLhandler: NSObject{
                         }
                     }
                     
-//                    if response.response?.statusCode == 404{
+//                    if response.response?.statusCode == 401{
 //                         AppDelegate.sharedInstance.logoutFromApp()
 //                         return
 //                     }
+                    
+                    if response.response?.statusCode == 401{
+                        URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)
+                         return
+                     }
                     
                     self.respDictionary = [:]
                  
@@ -163,6 +170,32 @@ class URLhandler: NSObject{
         }
     }
     
+    
+    func checkAndLogout(responseCode:Int){
+       
+        
+        if responseCode == 401  && !isLogoutPresented{
+            isLogoutPresented = true
+            AppDelegate.sharedInstance.checkUserStatusApi()
+            
+            AlertView.sharedManager.presentAlertWith(title: "Login Issue", msg: "Your session has expired or your account may be restricted.\n Please Login again or contact Getkart Support.", buttonTitles: ["Contact Support","Login","Cancel"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
+                self.isLogoutPresented = false
+                if index == 0{
+                    Local.shared.removeUserData()
+                    //Contact Support"
+                    let destVC = UIHostingController(rootView: ContactUsView(navigationController:AppDelegate.sharedInstance.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
+                    AppDelegate.sharedInstance.navigationController?.pushViewController(destVC, animated: true)
+                }else if index == 1{
+                    //Login
+                    Local.shared.removeUserData()
+                    AppDelegate.sharedInstance.showLoginScreen()
+                }else{
+                    
+                }
+            }
+        }
+    }
     
     func uploadArrayOfMediaWithParameters(mediaArray : [UIImage],mediaName:String, url:String, params:Dictionary<String, Any> ,method:HTTPMethod = .post, showLoader:Bool = true, completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
         if isConnectedToNetwork() == true {
@@ -248,7 +281,7 @@ class URLhandler: NSObject{
                     Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                 }
                 
-//                if response.response?.statusCode == 404{
+//                if response.response?.statusCode == 401{
 //                     AppDelegate.sharedInstance.logoutFromApp()
 //                     return
 //                 }
@@ -307,7 +340,7 @@ class URLhandler: NSObject{
             })
             .response{ response in
                 
-//                if response.response?.statusCode == 404{
+//                if response.response?.statusCode == 401{
 //                     AppDelegate.sharedInstance.logoutFromApp()
 //                     return
 //                 }
@@ -401,7 +434,7 @@ class URLhandler: NSObject{
         }
     }
     
-    func uploadImageArrayWithParameters(imageData:Data, imageName:String, imagesData : Array<Data>, imageNames:Array<String>, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
+    func uploadImageArrayWithParameters(imageData:Data?, imageName:String, imagesData : Array<Data>, imageNames:Array<String>, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
     
         if isConnectedToNetwork() == true {
             if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
@@ -416,8 +449,8 @@ class URLhandler: NSObject{
             AF.upload(multipartFormData: { (multipartFormData) in
                 
                 
-                if imageData.count > 0 {
-                    multipartFormData.append(imageData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
+                if let imgData = imageData{
+                    multipartFormData.append(imgData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
                 }
                 
                 
@@ -612,7 +645,7 @@ class URLhandler: NSObject{
                     Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                 }
                 
-//                if response.response?.statusCode == 404{
+//                if response.response?.statusCode == 401{
 //                     AppDelegate.sharedInstance.logoutFromApp()
 //                     return
 //                 }

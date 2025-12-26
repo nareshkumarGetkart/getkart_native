@@ -112,13 +112,18 @@ class ItemDetailViewModel:ObservableObject{
         }
     }
     
-    
+    //
     func setItemTotalApi(){
         //   let strUrl = "\(Constant.shared.set_item_total_click)?item_id=\(itemId)"
-        let params = ["item_id":"\(itemObj?.id ?? 0)"]
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.set_item_total_click, param: params,methodType:.post, showLoader: false) { responseObject, error in
+        if (itemObj?.user?.id ?? 0) == Local.shared.getUserId(){
+            //For my product don't call ony other
+        }else{
+            let params = ["item_id":"\(itemObj?.id ?? 0)"]
             
+            URLhandler.sharedinstance.makeCall(url: Constant.shared.set_item_total_click, param: params,methodType:.post, showLoader: false) { responseObject, error in
+                
+            }
         }
     }
     
@@ -211,6 +216,7 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
                             destvc.isAdvertisement = true
+                            destvc.itemId =  self.itemObj?.id ?? 0
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }
@@ -259,6 +265,8 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.state =  self.itemObj?.state ?? ""
                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                            destvc.itemId =  self.itemObj?.id ?? 0
+
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }
@@ -333,6 +341,8 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.state =  self.itemObj?.state ?? ""
                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                            destvc.itemId =  self.itemObj?.id ?? 0
+
                            nav?.pushViewController(destvc, animated: true)
                         }
                     }
@@ -374,6 +384,8 @@ class ItemDetailViewModel:ObservableObject{
                             destvc.state =  self.itemObj?.state ?? ""
                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                            destvc.itemId =  self.itemObj?.id ?? 0
+
                             nav?.pushViewController(destvc, animated: true)
                         }
                     }

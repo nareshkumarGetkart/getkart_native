@@ -61,28 +61,34 @@ struct ProductCard: View {
                 }.padding(.bottom)
                 
                 
-                VStack(alignment: .leading){
-                    Text("\(Local.shared.currencySymbol) \((objItem.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).lineLimit(1)
-                        .font(.headline).foregroundColor(Color(.systemGreen))
-                       // .foregroundColor(Color(hex: "#FF9900"))
-                    Text(objItem.name ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
-                        .font(.subheadline)
-                    HStack{
+                VStack(alignment: .leading,spacing: 4){
+                    Text("\(Local.shared.currencySymbol) \((objItem.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading)
+                        .lineLimit(1)
+                        .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
+                        .font(Font.manrope(.bold, size: 15))
+                    
+                    Text(objItem.name ?? "").foregroundColor(Color(UIColor.label))
+                        .multilineTextAlignment(.leading).lineLimit(1)
+                        .font(Font.manrope(.semiBold, size: 14))
+
+                    HStack(spacing: 1){
                         Image("location-outline")
-                            .renderingMode(.template)
+                            .renderingMode(.template).frame(width: 13,height:13)
                             .foregroundColor(Color(UIColor.label))
-                        Text(objItem.address ?? "").foregroundColor(Color(UIColor.label)).multilineTextAlignment(.leading).lineLimit(1)
-                            .font(.caption)
+                        Text(objItem.address ?? "").foregroundColor(Color(UIColor.label))
+                            .multilineTextAlignment(.leading).lineLimit(1)
+                            .font(Font.manrope(.regular, size: 12))
                             .foregroundColor(.gray)
+                        Spacer(minLength: 0)
                     }
                     
-                }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20)
+                }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20,alignment:.leading)
                 
                 
             }
             .background(Color(UIColor.systemBackground))
             .cornerRadius(10)
-            .shadow(radius: 2)
+            .shadow(radius: 1)
             .contentShape(Rectangle())
             
             HStack{

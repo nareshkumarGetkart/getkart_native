@@ -43,19 +43,26 @@
                                         </constraints>
                                     </imageView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="XIo-7j-9Zw">
-                                        <rect key="frame" x="130" y="36.666666666666657" width="160" height="74"/>
+                                        <rect key="frame" x="130" y="26.666666666666671" width="160" height="94"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="ooL-5t-yqv">
                                                 <rect key="frame" x="0.0" y="0.0" width="160" height="24"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rs 900" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B0u-Ur-BB8">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B0u-Ur-BB8">
                                                         <rect key="frame" x="0.0" y="0.0" width="66" height="24"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="61" id="F7h-V7-Db0"/>
                                                             <constraint firstAttribute="height" constant="24" id="NRB-L1-YOe"/>
                                                         </constraints>
-                                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="13"/>
-                                                        <color key="textColor" systemColor="systemGreenColor"/>
+                                                        <attributedString key="attributedText">
+                                                            <fragment content="Rs 900">
+                                                                <attributes>
+                                                                    <color key="NSColor" systemColor="systemGreenColor"/>
+                                                                    <font key="NSFont" size="15" name="Manrope-Bold"/>
+                                                                    <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                                </attributes>
+                                                            </fragment>
+                                                        </attributedString>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xxb-IM-XjH">
@@ -73,17 +80,44 @@
                                                     </button>
                                                 </subviews>
                                             </stackView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="JJ" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y91-nc-pag">
-                                                <rect key="frame" x="0.0" y="27" width="11.333333333333334" height="20"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y91-nc-pag">
+                                                <rect key="frame" x="0.0" y="27" width="14" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="20" id="vKg-h0-ZpF"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
-                                                <nil key="textColor"/>
+                                                <attributedString key="attributedText">
+                                                    <fragment content="JJ">
+                                                        <attributes>
+                                                            <font key="NSFont" size="14" name="Manrope-SemiBold"/>
+                                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                        </attributes>
+                                                    </fragment>
+                                                </attributedString>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="qbc-9D-xff">
+                                                <rect key="frame" x="0.0" y="50" width="160" height="17"/>
+                                                <subviews>
+                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location-outline" translatesAutoresizingMaskIntoConstraints="NO" id="W1i-FM-zjB">
+                                                        <rect key="frame" x="0.0" y="3.0000000000000009" width="11.333333333333334" height="11.333333333333336"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="11.33" id="95F-XG-7jj"/>
+                                                            <constraint firstAttribute="width" constant="11.33" id="et2-wB-Se7"/>
+                                                        </constraints>
+                                                    </imageView>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=".." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gbo-Qh-zAv">
+                                                        <rect key="frame" x="12.333333333333343" y="0.0" width="147.66666666666666" height="17"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="17" id="Qh8-15-bZT"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="11"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="YgT-p3-wlR">
-                                                <rect key="frame" x="0.0" y="50" width="148.66666666666666" height="24"/>
+                                                <rect key="frame" x="0.0" y="70" width="148.66666666666666" height="24"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mp4-pu-18C">
                                                         <rect key="frame" x="0.0" y="0.0" width="69" height="24"/>
@@ -146,6 +180,8 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="ooL-5t-yqv" secondAttribute="trailing" id="FiJ-0T-kAs"/>
+                                            <constraint firstItem="qbc-9D-xff" firstAttribute="leading" secondItem="XIo-7j-9Zw" secondAttribute="leading" id="M5k-MY-9hM"/>
+                                            <constraint firstAttribute="trailing" secondItem="qbc-9D-xff" secondAttribute="trailing" id="XXl-mV-abf"/>
                                             <constraint firstItem="ooL-5t-yqv" firstAttribute="leading" secondItem="XIo-7j-9Zw" secondAttribute="leading" id="izl-tP-EhN"/>
                                         </constraints>
                                     </stackView>
@@ -232,9 +268,11 @@
                 <outlet property="imgVwAds" destination="Vx7-7E-hS2" id="DgO-0f-hQ0"/>
                 <outlet property="imgVwIconLike" destination="jDH-Jy-YuJ" id="OBL-2Y-7Yg"/>
                 <outlet property="imgVwIconSeen" destination="b1J-HU-BTw" id="W3O-YE-8nJ"/>
+                <outlet property="imgVwLocIcon" destination="W1i-FM-zjB" id="Dpa-fD-2iE"/>
                 <outlet property="lblBoost" destination="ZpA-jM-uk5" id="prh-hD-f5g"/>
                 <outlet property="lblItem" destination="Y91-nc-pag" id="OK8-zO-9dR"/>
                 <outlet property="lblLikeCount" destination="T4O-Hr-3eU" id="Y1E-6M-0gs"/>
+                <outlet property="lblLocation" destination="Gbo-Qh-zAv" id="m6v-mY-R8l"/>
                 <outlet property="lblPrice" destination="B0u-Ur-BB8" id="3OG-iJ-5LR"/>
                 <outlet property="lblRejectedReason" destination="rbu-n6-SaV" id="cBJ-EB-7Fj"/>
                 <outlet property="lblViewCount" destination="pLU-0V-Q0b" id="m7p-ws-eeZ"/>
@@ -246,6 +284,7 @@
         <image name="eye" width="22" height="22"/>
         <image name="getkartplaceholder" width="251" height="147"/>
         <image name="heart" width="22" height="22"/>
+        <image name="location-outline" width="11.333333015441895" height="11.333333015441895"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

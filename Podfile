@@ -28,6 +28,7 @@ pod 'PhonePePayment'
 pod 'Mantis'
 pod 'GooglePlaces'
 pod 'NSFWDetector'
+pod 'MarqueeLabel'
 
   target 'GetKartTests' do
     inherit! :search_paths

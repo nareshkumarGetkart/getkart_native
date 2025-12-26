@@ -21,6 +21,7 @@ struct AreaLocationView: View {
     @State private var isSearching = false
     @State var arrAreas:Array<AreaModal> = []
     @State private var searchText = ""
+    
 
     var body: some View {
         
@@ -94,8 +95,8 @@ struct AreaLocationView: View {
                             .padding(.horizontal)
                         
                             .onTapGesture{
-                                
-                                self.areaSelected(area: AreaModal(id: nil, name: nil, cityID: nil, stateID: nil, stateCode: nil, countryID: nil, createdAt: nil, updatedAt: nil))
+
+                                self.areaSelected(area: AreaModal(id: nil, name: nil, cityID: nil, stateID: nil, stateCode: nil, countryID: nil, createdAt: nil, updatedAt: nil,latitude: city.latitude ?? "",longitude: city.longitude ?? ""))
                             }
                     }else {
                         CountryRow(strTitle:"Choose City",isArrowNeeded:false)

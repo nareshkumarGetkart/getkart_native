@@ -72,8 +72,7 @@ struct TransactionModel: Codable,Identifiable {
     let banners: [Banner]?
     let invoiceNo :String?
     let invoiceId: Int?
-
-
+    let transactionPackage:TransactionPackage?
 
 
     enum CodingKeys: String, CodingKey {
@@ -93,9 +92,29 @@ struct TransactionModel: Codable,Identifiable {
         case paymentTransaction = "payment_transaction"
         case invoiceNo = "invoice_no"
         case invoiceId = "invoice_id"
+        case transactionPackage = "transaction_package"
 
     }
 }
+
+struct TransactionPackage:Codable{
+    
+    let id: Int?
+    let createdAt: String?
+    let description: String?
+    let name: String?
+    let price: Int?
+    let status: Int?
+    let type: String?
+    let updatedAt: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id,name,price,type,status,description
+        case updatedAt = "updated_at"
+        case createdAt = "created_at"
+    }
+}
+
 
 // MARK: - Package
 struct Package: Codable {

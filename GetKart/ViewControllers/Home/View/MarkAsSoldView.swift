@@ -71,6 +71,22 @@ struct MarkAsSoldView: View {
             
             Divider()
             
+            HStack{
+                Text("Scammers may ask you to mark SOLD before payment - never scan QR codes or send advance money")
+                    .font(.manrope(.medium, size: 14.0))
+                Spacer()
+                
+                Button {
+                    clickToWebsite()
+                    
+                } label: {
+                    Image("information")
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.red.opacity(0.1))
+            
             // User List
             List(listArray) { user in
                 HStack {
@@ -196,6 +212,17 @@ struct MarkAsSoldView: View {
         }
     }
     
+    func clickToWebsite(){
+        guard let url = URL(string: "https://www.getkart.com/fraud-scam") else {
+            print("Invalid URL")
+            return
+        }
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("Cannot open URL")
+        }
+    }
 }
 
 #Preview {

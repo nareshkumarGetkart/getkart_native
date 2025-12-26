@@ -10,6 +10,7 @@ import IQKeyboardManagerSwift
 import MobileCoreServices
 import SwiftUI
 import Photos
+import MarqueeLabel
 
 class ChatVC: UIViewController {
     
@@ -24,6 +25,10 @@ class ChatVC: UIViewController {
     @IBOutlet weak var btnAudioRecordStarted: UIButton!
     @IBOutlet weak var btnImgMicBlink: UIButton!
     @IBOutlet weak var btnCall: UIButton!
+    
+    @IBOutlet weak var lblMarquee: MarqueeLabel!
+    @IBOutlet weak var bgViewMarquee: UIView!
+
 
     var isbeginVoiceRecord = false
     var playTime:Int = 0
@@ -162,7 +167,11 @@ class ChatVC: UIViewController {
                 self.getMessageList()
             }
         })
+        
+        setUpMarqueeLabel()
     }
+    
+    
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -187,6 +196,20 @@ class ChatVC: UIViewController {
         NotificationCenter.default.removeObserver(self)
         typingTimer?.invalidate()
         typingOtherTimer?.invalidate()
+    }
+    
+    
+    
+    func setUpMarqueeLabel(){
+        // Source - https://stackoverflow.com/a
+        bgViewMarquee.backgroundColor = UIColor(hexString: "#ea0001", alpha: 1).withAlphaComponent(0.1)
+        lblMarquee.text = "Never scan QR code or share your OTP with anyone"
+        lblMarquee.type = .continuous
+        lblMarquee.scrollDuration = 5.0
+        lblMarquee.animationCurve = .easeInOut
+        lblMarquee.fadeLength = 10.0
+        lblMarquee.leadingBuffer = 25.0
+        lblMarquee.trailingBuffer = 1.0
     }
     
     func updateUserData(){
@@ -239,6 +262,20 @@ class ChatVC: UIViewController {
       
     
     //MARK: UIButton Action Methods
+    
+    @IBAction func btnInfoMarqueeAction(sender : UIButton){
+        
+        guard let url = URL(string: "https://www.getkart.com/fraud-scam") else {
+            print("Invalid URL")
+            return
+        }
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("Cannot open URL")
+        }
+    }
+    
     
     @IBAction func suggestionShowHideButtonAction(sender : UIButton){
         self.view.endEditing(true)
@@ -422,10 +459,14 @@ class ChatVC: UIViewController {
             let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             actionSheetAlertController.addAction(cancelActionButton)
             
-            //        let report = UIAlertAction(title: "Report", style: .default) { (action) in
-            //            self.reportUser()
-            //        }
-            //actionSheetAlertController.addAction(report)
+            let report = UIAlertAction(title: "Report user", style: .default) { (action) in
+                
+                let hostingController = UIHostingController(rootView:ReportUserView(roportUserId:self.userId))
+
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                
+            }
+            actionSheetAlertController.addAction(report)
 
             let block = UIAlertAction(title: "Block", style: .default) { (action) in
                 

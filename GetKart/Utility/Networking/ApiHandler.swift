@@ -56,10 +56,12 @@ class ApiHandler:NSObject{
                         }
                     }
                     
-//                    if response.response?.statusCode == 404{
-//                         AppDelegate.sharedInstance.logoutFromApp()
-//                         return
-//                     }
+                    if response.response?.statusCode == 401{
+                        URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)
+                         return
+                     }
+                    
+                    
                     
                     switch response.result{
                         
@@ -130,11 +132,15 @@ class ApiHandler:NSObject{
                             Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                         }
                     }
-//                    if response.response?.statusCode == 404{
+//                    if response.response?.statusCode == 401{
 //                         AppDelegate.sharedInstance.logoutFromApp()
 //                         return
 //                     }
                      
+                    if response.response?.statusCode == 401{
+                        URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)
+                         return
+                     }
                     
                     switch response.result{
                         

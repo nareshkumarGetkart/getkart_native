@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import FittedSheets
 
 
 
@@ -29,9 +30,11 @@ class HomeBaseVC: UITabBarController {
         delegate = self
         self.setViewControllers(getControllers(), animated: false)
         
-        let images = ["home","chat","","myads","profile"]
-        let imagesSel = ["home_active","chat_active","","myads_active","profile_active"]
+//        let images = ["home","chat","","myads","profile"]
+//        let imagesSel = ["home_active","chat_active","","myads_active","profile_active"]
         
+        let images = ["home","gridUnSel","","chat","profile"]
+        let imagesSel = ["home_active","gridSel","","chat_active","profile_active"]
         guard let items = self.tabBar.items else {
             return
         }
@@ -40,11 +43,18 @@ class HomeBaseVC: UITabBarController {
             tabBar.items?[x].image = nil
             tabBar.items?[x].image = UIImage(named: images[x])?.withRenderingMode(.alwaysTemplate)
             items[x].selectedImage = UIImage(named:imagesSel[x])?.withRenderingMode(.alwaysOriginal)
+           
         }
         setupMiddleButton()
         setupDoubleTapGesture()
         
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+        
+        
+        
+  
+        addNewBadgeOnBoardTab()
+
 
     }
    
@@ -108,8 +118,11 @@ class HomeBaseVC: UITabBarController {
     
     @objc func middleButtonTapped() {
         print("Middle button tapped!")
+        
+        presentHostingController()
+        
         // Handle action (e.g., present a modal view)
-        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+       /* if AppDelegate.sharedInstance.isUserLoggedInRequest(){
             if let selectedVC =  self.selectedViewController as? UINavigationController {
                 print(selectedVC)
                 if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
@@ -118,7 +131,7 @@ class HomeBaseVC: UITabBarController {
                     selectedVC.pushViewController(destVC, animated: true)
                 }
             }        
-        }
+        }*/
     }
     
     
@@ -127,13 +140,15 @@ class HomeBaseVC: UITabBarController {
         let homeVc = StoryBoard.main.instantiateViewController(withIdentifier: "HomeVC") as! HomeVC
         homeVc.tabBarItem = UITabBarItem(title: "Home", image: UIImage(named: "home")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"home_active")?.withRenderingMode(.alwaysOriginal))
 
-        
+        let boardVc = UIHostingController(rootView: BoardView(navigationController: self.navigationController))
+        boardVc.tabBarItem = UITabBarItem(title: "Board", image: UIImage(named: "gridUnSel")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"gridSel")?.withRenderingMode(.alwaysOriginal))
+
         let chatVc = StoryBoard.main.instantiateViewController(withIdentifier: "ChatListVC") as! ChatListVC
         chatVc.tabBarItem = UITabBarItem(title: "Chat", image: UIImage(named: "chat")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"chat_active")?.withRenderingMode(.alwaysOriginal))
 
-        let adsVc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+       /* let adsVc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
         adsVc.tabBarItem = UITabBarItem(title: "My ads", image: UIImage(named: "myads")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"myads_active")?.withRenderingMode(.alwaysOriginal))
-
+        */
         let profileVc = StoryBoard.main.instantiateViewController(withIdentifier: "ProfileVC") as! ProfileVC
          profileVc.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "profile")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"profile_active")?.withRenderingMode(.alwaysOriginal))
         
@@ -146,8 +161,9 @@ class HomeBaseVC: UITabBarController {
         dummyNav.navigationBar.isHidden = true
 
         let vc1 = UINavigationController(rootViewController: homeVc)
-        let vc2 = UINavigationController(rootViewController: chatVc)
-        let vc3 = UINavigationController(rootViewController: adsVc)
+        let vc2 = UINavigationController(rootViewController: boardVc)
+//      let vc3 = UINavigationController(rootViewController: adsVc)
+        let vc3 = UINavigationController(rootViewController: chatVc)
         let vc4 = UINavigationController(rootViewController: profileVc)
         
         vc1.navigationBar.isHidden = true
@@ -156,12 +172,224 @@ class HomeBaseVC: UITabBarController {
         vc4.navigationBar.isHidden = true
         
         vc1.title = "Home"
-        vc2.title = "Chat"
-        vc3.title = "My ads"
+        vc2.title = "Board"
+        vc3.title = "Chat"
         vc4.title = "Profile"
         
         return [vc1,vc2,dummyNav,vc3,vc4]
     }
+    
+    
+  
+
+    func presentPostOptions(from controller: UIViewController) {
+        let sheetVC = UIHostingController(rootView:
+            PostOptionsSheet(
+                onBoardTap: {
+                    print("Board tapped")
+                },
+                onAdsTap: {
+                    print("Ads tapped")
+                    if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                         if let selectedVC =  self.selectedViewController as? UINavigationController {
+                             print(selectedVC)
+                             if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                                 destVC.hidesBottomBarWhenPushed = true
+                                 destVC.popType = .createPost
+                                 selectedVC.pushViewController(destVC, animated: true)
+                             }
+                         }
+                     }
+                },
+                onBannerTap: {
+                    print("Banner tapped")
+                },
+                onClose: {
+                    controller.dismiss(animated: true)
+                }
+            )
+        )
+        
+        sheetVC.modalPresentationStyle = .overFullScreen
+        sheetVC.view.backgroundColor = .clear   // important
+        
+        controller.present(sheetVC, animated: true)
+    }
+
+    
+    func presentHostingController(){
+        
+        let controller = UIHostingController(
+            rootView: PostOptionsSheet(onBoardTap: {}, onAdsTap: {}, onBannerTap: {}, onClose: {}))
+        
+        
+        let useInlineMode = view != nil
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+        
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 30
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        
+        
+        
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 30
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        /* if (objPopup.mandatoryClick ?? false){
+         
+         sheet.dismissOnOverlayTap = false
+         sheet.dismissOnPull = false
+         sheet.allowPullingPastMaxHeight = false
+         sheet.allowPullingPastMinHeight = false
+         sheet.shouldRecognizePanGestureWithUIControls = false
+         sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+         sheet.sheetViewController?.allowGestureThroughOverlay = false
+         sheet.sheetViewController?.dismissOnPull = false
+         sheet.allowPullingPastMinHeight = false
+         }*/
+        
+        
+        let settingView = PostOptionsSheet(
+            
+            
+            onBoardTap: {
+                print("Board tapped")
+                if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    if let selectedVC =  self.selectedViewController as? UINavigationController {
+                        
+                        let destvc = UIHostingController(rootView: CreateBoardView(navigationController: selectedVC))
+                        destvc.hidesBottomBarWhenPushed = true
+                        selectedVC.pushViewController(destvc, animated: true)
+                    }
+                    }
+                
+                
+            },
+            onAdsTap: {
+                print("Ads tapped")
+                if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    if let selectedVC =  self.selectedViewController as? UINavigationController {
+                        print(selectedVC)
+                        if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+                            destVC.hidesBottomBarWhenPushed = true
+                            destVC.popType = .createPost
+                            selectedVC.pushViewController(destVC, animated: true)
+                        }
+                    }
+                }
+            },
+            onBannerTap: {
+                if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                print("Banner tapped")
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    if let selectedVC =  self.selectedViewController as? UINavigationController {
+                        
+                        let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController: selectedVC))
+                        destvc.hidesBottomBarWhenPushed = true
+                        selectedVC.pushViewController(destvc, animated: true)
+                    }
+                    
+                }
+            },
+            onClose: {
+                if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                controller.dismiss(animated: true)
+            }
+        )
+        
+        controller.rootView = settingView
+        
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+    func addNewBadgeOnBoardTab() {
+        // Board tab index = 1
+        let boardIndex = 1
+        let badgeTag = 7777
+
+        // Remove if already added
+        tabBar.viewWithTag(badgeTag)?.removeFromSuperview()
+
+        let tabBarButtons = tabBar.subviews
+            .filter { $0 is UIControl }
+            .sorted { $0.frame.minX < $1.frame.minX }
+
+        guard boardIndex < tabBarButtons.count else { return }
+
+        let boardButton = tabBarButtons[boardIndex]
+
+        let badgeImageView = UIImageView(image: UIImage(named: "NEW"))
+        badgeImageView.tag = badgeTag
+        badgeImageView.contentMode = .scaleAspectFit
+
+        // Adjust size for "thin" look
+        let badgeWidth: CGFloat = 22
+        let badgeHeight: CGFloat = 10
+
+        badgeImageView.frame = CGRect(
+            x: boardButton.frame.width / 2 + 8,
+            y: 6,
+            width: badgeWidth,
+            height: badgeHeight
+        )
+
+        boardButton.addSubview(badgeImageView)
+    }
+
+    func removeNewBadgeFromBoardTab() {
+        tabBar.viewWithTag(7777)?.removeFromSuperview()
+    }
+
+    
+    /*
+     func tabBarController(_ tabBarController: UITabBarController,
+                           didSelect viewController: UIViewController) {
+
+         if let index = viewControllers?.firstIndex(of: viewController),
+            index == 1 {
+             removeNewBadgeFromBoardTab()
+         }
+     }
+
+     */
 }
 
 
@@ -172,15 +400,47 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         
        // let str = count > 10 ? "10+" : "\(count)"
        // tabBar.items?[1].badgeValue = str
-        self.showSmallRedDot(at: 1, tabBar: self.tabBar)
+        self.showSmallRedDot(at: 4, tabBar: self.tabBar)
     }
     
     func removeChatUnreadCountRedDot(){
        // tabBar.items?[1].badgeValue = nil
-        self.removeSmallRedDot(at: 1, tabBar: self.tabBar)
+        self.removeSmallRedDot(at: 4, tabBar: self.tabBar)
     }
-    
-   
+    private func showSmallRedDot(at index: Int, tabBar: UITabBar) {
+        let dotTag = 9999 + index
+
+        // Remove existing dot
+        tabBar.viewWithTag(dotTag)?.removeFromSuperview()
+
+        // Get only visible tab bar buttons
+        let tabBarButtons = tabBar.subviews
+            .compactMap { $0 as? UIControl }
+            .sorted { $0.frame.minX < $1.frame.minX }
+
+        guard index < tabBarButtons.count else { return }
+
+        let itemView = tabBarButtons[index]
+
+        let dotSize: CGFloat = 9
+
+        let dot = UIView()
+        dot.frame = CGRect(
+            x: itemView.bounds.midX + 7,
+            y: 5,
+            width: dotSize,
+            height: dotSize
+        )
+
+        dot.backgroundColor = .systemRed
+        dot.layer.cornerRadius = dotSize / 2
+        dot.clipsToBounds = true
+        dot.tag = dotTag
+
+        itemView.addSubview(dot)
+    }
+
+   /*
     private func showSmallRedDot(at index: Int, tabBar: UITabBar) {
         let dotTag = 9999 + index
 
@@ -206,7 +466,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
 
         itemView.addSubview(dot)
     }
-
+*/
     private func removeSmallRedDot(at index: Int, tabBar: UITabBar) {
         let dotTag = 9999 + index
         tabBar.viewWithTag(dotTag)?.removeFromSuperview()
@@ -252,7 +512,9 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         if index == 0{
             return true
        
-        }else if index == 1 || index == 3 {
+//        }else if index == 1 || index == 3 {
+        }else if  index == 3 {
+
             if AppDelegate.sharedInstance.isUserLoggedInRequest() == false {
                 return false
             }

@@ -11,7 +11,7 @@ import Foundation
 class SearchViewModel:ObservableObject{
     
     @Published var items = [ItemModel]()
-    @Published var isDataLoading = false
+    @Published var isDataLoading = true
     var dictCustomFields:Dictionary<String,Any> = [:]
     var city = ""
     var country = ""
@@ -78,7 +78,7 @@ class SearchViewModel:ObservableObject{
             }
         }else {
             
-            for (ind,key) in dictCustomFields.keys.enumerated(){
+            for (_,key) in dictCustomFields.keys.enumerated(){
  
                 if let value = dictCustomFields[key]{
                    
@@ -148,9 +148,8 @@ class SearchViewModel:ObservableObject{
             strUrl.append("&search=\(srchTxt)")
         }
     
- 
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) { (obj:ItemParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:ItemParse) in
 
             if obj.code == 200{
               

@@ -105,7 +105,7 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
             
         }else  if cellTypes == .product{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
-            cell.bgView.addShadow()
+            //cell.bgView.addShadow()
             if let obj = listArray?[indexPath.item] as? ItemModel{
                 cell.lblItem.text = obj.name
                 cell.lblAddress.text = obj.address

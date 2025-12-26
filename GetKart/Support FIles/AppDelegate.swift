@@ -58,6 +58,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         registerForRemoteNotification(application: application)
         
             
+        // Define the desired large font
+      if let largeFont = UIFont(name: "Inter-Regular", size: 12) {
+
+
+             let appearance = UITabBarAppearance()
+             
+             // Apply the font to the normal state
+             appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+                 NSAttributedString.Key.font: largeFont
+             ]
+             
+             // Apply the same (or different) font to the selected state
+             appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+                 NSAttributedString.Key.font: largeFont
+             ]
+             
+             // Assign the appearance to the tab bar
+             UITabBar.appearance().standardAppearance = appearance
+             
+             // For iOS 15+ to ensure the appearance is used everywhere (e.g., when scrolling)
+             if #available(iOS 15.0, *) {
+                 UITabBar.appearance().scrollEdgeAppearance = appearance
+             }
+             
+         }
+
 
         // Handle notification if app was launched by tapping a push notification
         if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
@@ -375,8 +401,8 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC{
 
                 // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
-                if tabBarController.selectedIndex == 1, // update with your actual chat tab index
-                   let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                if tabBarController.selectedIndex == 3, // update with your actual chat tab index
+                   let navController = tabBarController.viewControllers?[3] as? UINavigationController,
                    let topVC = navController.topViewController as? ChatVC {
                     
                     // Now we know ChatVC is visible
@@ -401,7 +427,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 } else {
                     
                     // Chat tab not selected, switch to Chat tab and push ChatVC
-                    tabBarController.selectedIndex = 1 // Update with actual index
+                    tabBarController.selectedIndex = 3 // Update with actual index
                     DispatchQueue.main.async {
                         
                         if let navController = tabBarController.selectedViewController as? UINavigationController {
@@ -415,6 +441,8 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     }
                 }
             }
+            
+            
 
         case "payment":
             
@@ -423,11 +451,18 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 hostingController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(hostingController, animated: true)
             }
+        case "board-update":
+            do {
+                
+                let hostingController = UIHostingController(rootView: MyBoardsView(navigationController: self.navigationController))
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
             
-        case "item-update":
+        case "item-update","draftItemReminder":
             do{
              
-                for controller in self.navigationController?.viewControllers ?? []{
+               /* for controller in self.navigationController?.viewControllers ?? []{
                     
                     if let destvc =  controller as? HomeBaseVC{
                         
@@ -461,6 +496,31 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                             if  let thirdVC = navController.viewControllers.first as? MyAdsVC {
                                 thirdVC.refreshMyAds()
                                 break
+                            }
+                        }
+                    }
+                }*/
+                
+                
+                if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC{
+
+                    // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
+                    if tabBarController.selectedIndex == 4, // update with your actual chat tab index
+                       let navController = tabBarController.viewControllers?[4] as? UINavigationController,
+                       let topVC = navController.topViewController as? MyAdsVC {
+                        topVC.refreshMyAds()
+
+                                            
+                    } else {
+                        
+                        // Chat tab not selected, switch to Chat tab and push ChatVC
+                        tabBarController.selectedIndex = 4 // Update with actual index
+                        DispatchQueue.main.async {
+                            if let navController = tabBarController.selectedViewController as? UINavigationController {
+                                let vc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+                                vc.hidesBottomBarWhenPushed = true
+                                navController.popToRootViewController(animated: false)
+                                navController.pushViewController(vc, animated: true)
                             }
                         }
                     }
@@ -548,12 +608,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
                         }
                         
-                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
+                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
 
                         }
                         
-                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                        if let navController = destvc.viewControllers?[2] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
 
                         }
@@ -562,9 +622,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                             navController.popToRootViewController(animated: false)
                         }
                         
-                        destvc.selectedIndex = 1
+                        destvc.selectedIndex = 3
                         
-                        if let navController = destvc.viewControllers?[1] as? UINavigationController {
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
                           
                             navController.popToRootViewController(animated: false)
                             
@@ -579,7 +639,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 }
             }
       
-        case "draftItemReminder":
+       /* case "draftItemReminder":
             do{
                 
                 for controller in self.navigationController?.viewControllers ?? []{
@@ -602,7 +662,7 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
 
                         }
                         
-                        if let navController = destvc.viewControllers?[4] as? UINavigationController {
+                        if let navController = destvc.viewControllers?[3] as? UINavigationController {
                             navController.popToRootViewController(animated: false)
                         }
                         
@@ -621,11 +681,11 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     }
                 }
             }
-      
+      */
         case "campaign-update":
             do{
                 
-                for controller in self.navigationController?.viewControllers ?? []{
+               /* for controller in self.navigationController?.viewControllers ?? []{
                     
                     if let destvc =  controller as? HomeBaseVC{
                         
@@ -663,7 +723,32 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                             }
                         }
                     }
+                }*/
+                
+                if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC{
+
+                    // Check if Chat tab is selected (e.g., assuming Chat tab is at index 2)
+                    if tabBarController.selectedIndex == 4, // update with your actual chat tab index
+                       let navController = tabBarController.viewControllers?[4] as? UINavigationController,
+                       let topVC = navController.topViewController as? MyAdsVC {
+                        topVC.refreshMyAds()
+
+                                            
+                    } else {
+                        
+                        // Chat tab not selected, switch to Chat tab and push ChatVC
+                        tabBarController.selectedIndex = 4 // Update with actual index
+                        DispatchQueue.main.async {
+                            if let navController = tabBarController.selectedViewController as? UINavigationController {
+                                let vc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+                                vc.hidesBottomBarWhenPushed = true
+                                navController.popToRootViewController(animated: false)
+                                navController.pushViewController(vc, animated: true)
+                            }
+                        }
+                    }
                 }
+
             }
         default:
             break
@@ -756,9 +841,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 
                 if (tabBarController.viewControllers?.count ?? 0) > 1{
                     
-                    if tabBarController.selectedIndex == 1, // update with your actual chat tab index
+                    if tabBarController.selectedIndex == 3, // update with your actual chat tab index
                        
-                       let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                       let navController = tabBarController.viewControllers?[3] as? UINavigationController,
                        let topVC = navController.topViewController as? ChatVC {
                         
                         // Now we know ChatVC is visible
@@ -955,6 +1040,21 @@ extension AppDelegate : ATAppUpdaterDelegate{
         }
     }
 
+    func checkUserStatusApi(){
+        let strUrl = Constant.shared.device_refresh + "/\(Local.shared.getUserId())"
+        URLhandler.sharedinstance.makeCall(url: strUrl, param: nil,methodType: .get) { responseObject, error in
+            
+            if error == nil {
+                if  let result = responseObject{
+                    if let data = result["data"] as? Dictionary<String, Any>{
+                    }
+                }
+            }
+        }
+    }
+
+    
+    
 }
 
 

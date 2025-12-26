@@ -38,7 +38,8 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
 
     var categoryName = ""
     var category_id = 0
-    
+    var itemId:Int?
+
     
      //MARK: Controller life cycle methods
      override func viewDidLoad() {
@@ -214,6 +215,7 @@ class CategoryPlanVC: UIViewController, LocationSelectedDelegate{
                 destvc.state = state
                 destvc.latitude = latitude
                 destvc.longitude = longitude
+                destvc.itemId = itemId
                 self.navigationController?.pushViewController(destvc, animated: true)
             }
         }else{

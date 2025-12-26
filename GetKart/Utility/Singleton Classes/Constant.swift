@@ -17,7 +17,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = false
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -54,9 +54,136 @@ final class Constant: NSObject {
     }
     
     
+    var  user_status:String {
+        get {
+            return "\(baseURL)/v1/user-status"
+        }
+    }
+    
+    var  clear_board_search:String {
+        get {
+            return "\(baseURL)/v1/clear-board-search"
+        }
+    }
+
+    var  board_suggestion_search:String {
+        get {
+            return "\(baseURL)/v1/board-suggestion-search"
+        }
+    }
+    
+    var  get_related_boards:String {
+        get {
+            return "\(baseURL)/v1/get-related-boards"
+        }
+    }
+        
+    var  get_board_analytics:String {
+        get {
+            return "\(baseURL)/v1/get-board-analytics"
+        }
+    }
+    
+    var  manage_board_favourite:String {
+        get {
+            return "\(baseURL)/v1/manage-board-favourite"
+        }
+    }
+    
+    var  board_outbond_click:String {
+        get {
+            return "\(baseURL)/v1/board-outbond-click"
+        }
+    }
+    
+    var  board_click:String {
+        get {
+            return "\(baseURL)/v1/board-click"
+        }
+    }
+    
+    var  get_board_package:String {
+        get {
+            return "\(baseURL)/v1/get-board-package"
+        }
+    }
+    
+    var manage_favourite_category:String{
+        get{
+            return "\(baseURL)/v1/manage-favourite-category"
+        }
+    }
+    
+    var  delete_board:String {
+        get {
+            return "\(baseURL)/v1/delete-board"
+        }
+    }
+    
+    
+    var  update_board_status:String {
+        get {
+            return "\(baseURL)/v1/update-board-status"
+        }
+    }
+    
+    
+    var  get_favourite_board:String {
+        get {
+            return "\(baseURL)/v1/get-favourite-board"
+        }
+    }
+    
+    var  get_public_board:String {
+        get {
+            return "\(baseURL)/v1/get-public-board"
+        }
+    }
+    
+    
+    var  get_my_board:String {
+        get {
+            return "\(baseURL)/v1/get-my-board"
+        }
+    }
+    
+    
+    var  get_myboard_details:String {
+        get {
+            return "\(baseURL)/v1/get-myboard-details"
+        }
+    }
+
+    
+    var  create_board:String {
+        get {
+            return "\(baseURL)/v1/create-board"
+        }
+    }
+    
+    
+    var  update_board:String {
+        get {
+            return "\(baseURL)/v1/update-board"
+        }
+    }
     
     
     
+    var  get_user_report_reasons:String {
+        get {
+            return "\(baseURL)/v1/get-user-report-reasons"
+        }
+    }
+    
+    var  add_user_reports:String {
+        get {
+            return "\(baseURL)/v1/add-user-reports"
+        }
+    }
+    
+    
+ 
     var  invoice_download:String {
         get {
             return "\(baseURL)/v1/invoice-download"
@@ -476,6 +603,7 @@ final class Constant: NSObject {
     }
     
     
+    
     var blocked_users:String{
         get {
             return "\(Constant.shared.baseURL)/blocked-users"
@@ -548,6 +676,14 @@ final class Constant: NSObject {
     }
     
     
+    var board_payment_intent:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/board-payment-intent"
+        }
+    }
+    
+    
+    
     var getPaymentSettings:String{
         get {
             return "\(Constant.shared.baseURL)/get-payment-settings"
@@ -590,6 +726,13 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/add-reports"
         }
     }
+    
+    var add_board_reports:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/add-board-reports"
+        }
+    }
+    
     
     var get_followers:String{
         get {
@@ -787,8 +930,11 @@ enum NotificationKeys:String,CaseIterable{
     case noInternet = "noInternet"
     case refreshAdsScreen = "refreshAdsScreen"
     case refreshBannerAdsScreen = "refreshBannerAdsScreen"
-
     case refreshChatTblViewScreen = "refreshChatTblViewScreen"
+    
+    
+    case refreshMyBoardsScreen = "refreshMyBoardsScreen"
+
 
     
 }
