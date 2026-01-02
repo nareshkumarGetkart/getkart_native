@@ -167,28 +167,44 @@ struct CreateBoardView: View {
                
                 VStack(alignment:.leading,spacing: 8){
                     Text("Title").font(.inter(.regular, size: 16.0))
-                    TextField("Add your board title", text: $strTitle).autocapitalization(.sentences).padding(.horizontal).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55).background(
+                    VStack(alignment:.leading,spacing: 1){
                         
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(.systemBackground))
+                        TextField("Add your board title", text: $strTitle).autocapitalization(.sentences).padding(.horizontal).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemBackground)
+                                         )
+                                    .onChange(of: strTitle) { newValue in
+                                        if newValue.count > 30 {
+                                            strTitle = String(newValue.prefix(30))   // ✅ restrict input
+                                        }
+                                    }
+                                
+                            ).keyboardType(.default).tint(Color(.systemOrange)).autocapitalization(.none)
                         
-                    ).keyboardType(.default).tint(Color(.systemOrange)).autocapitalization(.none)
+                        HStack{
+                            Spacer()
+                            Text("\(strTitle.count)/30").font(.inter(.regular, size: 10))
+                        }
+                    }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
                     
                     Text("Description")
                         .font(.inter(.regular, size: 16))
-
-                    ZStack(alignment: .topLeading) {
-
+                   
+                    VStack(alignment: .leading, spacing: 1) {
+                    
+                        ZStack(alignment: .topLeading) {
+                        
                         if strDescription.isEmpty {
                             Text("Add your board description")
                                 .foregroundColor(.gray.opacity(0.6))
                                 .padding(.top, 14)       // aligns perfectly
                                 .padding(.leading, 20)
                         }
-
+                        
                         TextEditor(text: $strDescription)
                             .scrollContentBackground(.hidden)   // 🔥 VERY IMPORTANT
                             .padding(.horizontal, 12)
@@ -199,15 +215,20 @@ struct CreateBoardView: View {
                             .autocapitalization(.none)
                             .lineLimit(3)
                             .onChange(of: strDescription) { newValue in
-                                strDescription = String(newValue.prefix(100))
+                                strDescription = String(newValue.prefix(150))
                             }
                         
                     }
-                    .frame(minHeight: 95, maxHeight: 95)
+                    .frame(minHeight: 115, maxHeight: 115)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.systemBackground))
                     )
+                    HStack{
+                        Spacer()
+                        Text("\(strDescription.count)/150").font(.inter(.regular, size: 10))
+                    }
+                }
                 }
 
                 
@@ -217,6 +238,9 @@ struct CreateBoardView: View {
                         
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.systemBackground))
+                            .onChange(of: strPrice) { newValue in
+                                strPrice = String(newValue.prefix(9))
+                            }
                         
                     ).keyboardType(.numberPad).tint(Color(.systemOrange)).autocapitalization(.none)
                 }
@@ -228,6 +252,10 @@ struct CreateBoardView: View {
                         TextField("00", text: $strOfferPrice).padding(.horizontal)
                             .onChange(of: strOfferPrice) { newValue in
                             // Allow only numbers
+                                if strPrice.count == 0{
+                                    strOfferPrice = ""
+                                    return
+                                }
                             let filtered = newValue.filter { $0.isNumber }
                             if filtered != newValue {
                                 strOfferPrice = filtered
@@ -238,8 +266,8 @@ struct CreateBoardView: View {
                                   let offer = Int(filtered) else { return }
 
                             // Prevent offer price > actual price
-                            if offer > price {
-                                strOfferPrice = String(price)
+                            if offer >= price {
+                                strOfferPrice =  "" //String(price)
                             }
                         }
                         Spacer()
@@ -281,9 +309,9 @@ struct CreateBoardView: View {
                 let isFilled =  (isFromEdit) ? true : ((selectedImage != nil) ? true : false)
                Button {
                    
-                   if isFilled{
+                 //  if isFilled{
                        validateField()
-                   }
+                   //}
                } label: {
                    let strText = (isFromEdit) ? "Update" : "Submit"
                    Text(strText).font(.inter(.medium, size: 18.0)).foregroundColor(isFilled ? .white : .gray)
@@ -365,20 +393,31 @@ struct CreateBoardView: View {
     
     func validateField(){
         UIApplication.shared.endEditing()
+       
         if selectedImage == nil && !isFromEdit {
+            
             AlertView.sharedManager.showToast(message: "Please upload board image")
+            
         }else if selectedCategoryId == nil {
+            
             AlertView.sharedManager.showToast(message: "Please select category of board")
-        }else if strTitle.count == 0 {
-            AlertView.sharedManager.showToast(message: "Please enter board title")
-        }else if strDescription.count <= 3{
-            AlertView.sharedManager.showToast(message: "Please enter description")
-        }else if strPrice.count == 0{
+            
+        }else if strTitle.count < 3 || strTitle.count > 30 {
+            // 3 to 30 characters
+            AlertView.sharedManager.showToast(
+                message: "Board title must be between 3 and 30 characters."
+            )
+        } else if strDescription.count < 20 || strDescription.count > 150 {
+            // 50 to 150 characters
+            AlertView.sharedManager.showToast(
+                message: "Description must be between 20 and 150 characters."
+            )
+        } else if strPrice.count == 0{
             AlertView.sharedManager.showToast(message: "Please enter price")
-        }else if strUrl.count == 0 && !strUrl.isValidWebsiteURL() {
+            
+        }else if strUrl.count == 0 || !strUrl.isValidWebsiteURL() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your board")
         }else{
-            
             uploadFIleToServer()
             //showSheetpackages = true
         }
@@ -392,7 +431,6 @@ struct CreateBoardView: View {
             strPrice = "\((boardObj?.price ?? 0.0).formatNumber())".replacingOccurrences(of: ",", with: "")
             if (boardObj?.specialPrice ?? 0.0) > 0{
                 strOfferPrice = "\((boardObj?.specialPrice ?? 0.0).formatNumber())".replacingOccurrences(of: ",", with: "")
-
             }else{
                 strOfferPrice = ""
             }
@@ -407,16 +445,13 @@ struct CreateBoardView: View {
             
             if obj.code == 200
             {
-                
                 if obj.data != nil  {
                     if let board = obj.data?.first{
                         DispatchQueue.main.async {
                             self.boardObj = board
                             self.updateDetails()
                         }
-                        
                     }
-                    
                 }
                 
             }else{
@@ -428,12 +463,14 @@ struct CreateBoardView: View {
     func uploadFIleToServer(){
       
         var params:Dictionary<String,Any> = [:]
+       
         params["name"] = strTitle
         params["category_id"] = selectedCategoryId ?? 0
         params["price"] = strPrice
         params["description"] = strDescription
         params["outbond_url"] = strUrl
         params["special_price"] = strOfferPrice
+        
         var strUrl = Constant.shared.create_board
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
@@ -447,18 +484,14 @@ struct CreateBoardView: View {
                 let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-            
                 
                 if code == 200{
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
                     AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
                         self.navigationController?.popViewController(animated: true)
                     }
-
-                    
                 }else{
                     AlertView.sharedManager.showToast(message: message)
-
                 }
             }
         })

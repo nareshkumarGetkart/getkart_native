@@ -27,7 +27,7 @@ struct FavoriteAdsView: View {
                 
                 ScrollView {
                     
-                    HStack{ Spacer() }.frame(height: 10)
+                  //  HStack{ Spacer() }.frame(height: 10)
                     
                     LazyVStack(spacing: 10) {
                         ForEach($objVM.listArray) { $item in

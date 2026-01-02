@@ -11,11 +11,15 @@ import Kingfisher
 struct BoardInterestView: View {
     var navigationController:UINavigationController?
     @StateObject private var objViewModel:CategoryViewModel = CategoryViewModel(type: 2)
+    @State private var isChanged:Bool = false
     
     var body: some View {
         HStack{
             Button {
                 navigationController?.popViewController(animated: true)
+                if isChanged{
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshInterestChangeBoardScreen.rawValue), object: nil, userInfo: nil)
+                }
             } label: {
                 Image("arrow_left").renderingMode(.template)
                     .foregroundColor(Color(UIColor.label))
@@ -46,6 +50,7 @@ struct BoardInterestView: View {
                             $0.id == updatedObj.id
                         }) {
                             objViewModel.listArray?[index] = updatedObj
+                            isChanged = true
                         }
                     }
                 }
@@ -107,7 +112,7 @@ struct BoardCategoryCell: View {
                                 .resizable()
                                 .frame(width: 40, height: 40)
                         }
-                        .padding(10)
+                        .padding(5)
                     }
                 }
             }
@@ -115,7 +120,7 @@ struct BoardCategoryCell: View {
             Text(obj.name ?? "")
                 .font(.inter(.medium, size: 15))
                 .multilineTextAlignment(.center)
-                .frame(height: 35)
+                .frame(height: 40)
         }
         .onAppear {
             isSelected = obj.is_favourite ?? false

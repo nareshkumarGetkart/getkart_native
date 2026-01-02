@@ -110,7 +110,7 @@ struct BannerAlalyticsView: View {
                         
                         HStack{
                             
-                            Text(objBanner?.url ?? "")
+                            Text(objBanner?.url ?? "").lineLimit(2)
                                 .font(.manrope(.regular, size: 15.0))
                             
                             Spacer()

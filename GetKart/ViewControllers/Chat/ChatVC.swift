@@ -1941,7 +1941,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
 
         
-            for match in matches {
+          /*  for match in matches {
                 if NSLocationInRange(index, match.range),
                    let url = match.url {
                     
@@ -1974,7 +1974,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                         }
                  
                 }
-            }
+            }*/
         }
     
     

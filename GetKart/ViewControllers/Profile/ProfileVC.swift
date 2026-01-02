@@ -35,9 +35,9 @@ class ProfileVC: UIViewController {
     var iconArray =  ["","myAdsIcon","gridOpaque","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
     */
     
-    var titleArray =  ["Anonymous","My Ads","My Boards","Buy Packages","My Boost Ads","Favorites","Order History & Invoices","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+    var titleArray =  ["Anonymous","My Ads","My Boards","Buy Packages","Favorites","Order History & Invoices","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
-    var iconArray =  ["","myAdsIcon","gridOpaque","buyPackages","promoted","like_fill","transaction","dark_theme","notification","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
+    var iconArray =  ["","myAdsIcon","gridOpaque","buyPackages","like_fill","transaction","dark_theme","notification","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
       
     var verifiRejectedReason:String = ""
     var verifyStatus:String = ""
@@ -85,6 +85,8 @@ class ProfileVC: UIViewController {
                 getVerificationStatusApi()
             }
                 self.btnSetting.isHidden = false
+                
+                showPopupUpdateProfileRemainder()
 
             }else{
                 self.btnSetting.isHidden = true
@@ -183,6 +185,44 @@ class ProfileVC: UIViewController {
                 }
             }
         }
+    }
+    
+    
+    
+    func showPopupUpdateProfileRemainder(){
+        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        if (objLoggedInUser.name ?? "").lowercased() == "guest user"{
+           
+            if ProfilePopupManager.shouldShowPopup() {
+             let hostingVc = UIHostingController(rootView:  ProfileUpdateRemainderPopup(
+             onClose: {
+            // ProfilePopupManager.markAsShown()
+             },
+             onCompleteProfile: {
+              // ProfilePopupManager.markAsShown()
+             // Navigate to profile screen
+                 self.pushToProfileScreen()
+             }
+             
+             ))
+             hostingVc.modalPresentationStyle = .overFullScreen
+             hostingVc.view.backgroundColor = .clear
+             
+             // Optional animation
+             hostingVc.modalTransitionStyle = .crossDissolve
+             
+             self.navigationController?.present(hostingVc, animated: true)
+             
+             ProfilePopupManager.markAsShown()
+             }
+        }
+    }
+    
+   
+    func pushToProfileScreen(){
+        let destVC = UIHostingController(rootView: ProfileEditView(navigationController:self.navigationController))
+        destVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(destVC, animated: true)
     }
 }
 
@@ -332,10 +372,12 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
               
                 
                 cell.btnSwitch.isOn = (theme == .dark) ? true : false
-                
+                cell.bgviewArrow.isHidden = true
             }else{
                 cell.imgVwArrow.isHidden = false
                 cell.btnSwitch.isHidden = true
+                cell.bgviewArrow.isHidden = false
+
             }
             
             return cell
@@ -369,7 +411,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 destVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destVC, animated: true)
                 
-            }else if titleArray[indexPath.row] == "My Boost Ads"{
+            }
+          /*  else if titleArray[indexPath.row] == "My Boost Ads"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     let destVC = UIHostingController(rootView: MyBoostAdsView(navigation: self.navigationController))
@@ -377,7 +420,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }
                 
-            } else if titleArray[indexPath.row] == "Buy Packages"{
+            }*/
+            else if titleArray[indexPath.row] == "Buy Packages"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     

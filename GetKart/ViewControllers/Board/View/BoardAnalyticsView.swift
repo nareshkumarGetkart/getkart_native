@@ -33,7 +33,7 @@ struct BoardAnalyticsView: View {
             Spacer()
             
           
-          if (objAnalytics?.board?.isActive ?? 0) == 1{
+        //  if (objAnalytics?.board?.isActive ?? 0) == 1{
                 
                 Button {
                     pushToEditBanner()
@@ -43,8 +43,8 @@ struct BoardAnalyticsView: View {
                     Image("editWithBg")
                     
                 }//.padding(.horizontal,5)
-            }
-            if (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
+          //  }
+//            if (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
                 
                 Button {
                     openActionSheet()
@@ -53,7 +53,7 @@ struct BoardAnalyticsView: View {
                     Image("more")
                     
                 }.padding(.trailing)
-            }
+            //}
             
          }.frame(height:44).background(Color(UIColor.systemBackground))
         
@@ -63,18 +63,7 @@ struct BoardAnalyticsView: View {
         
         ScrollView{
             VStack(alignment: .leading,spacing: 15){
-               // Text("Banner image").font(.inter(.bold, size: 20.0))
-              /*  AsyncImage(url: URL(string: objAnalytics?.board?.image ?? "")) { img in
-                    img.resizable().frame(maxWidth:.infinity,minHeight:130, maxHeight: 130).cornerRadius(10)
-                } placeholder: {
-                    Image("getkartplaceholder")
-                        .frame(maxWidth:.infinity,maxHeight: 130)
-                }
-
-            //    Image("getkartplaceholder")
-                .frame(maxWidth:.infinity,minHeight:130, maxHeight: 130)
-                
-                */
+      
                 
                 HStack{
                     
@@ -103,20 +92,7 @@ struct BoardAnalyticsView: View {
                     
                     Spacer()
                 }.padding(.top)
-                
-                
-//                HStack{
-//                    Spacer()
-//                    Spacer()
-//                }
-//                
-                
-               /* if (objAnalytics?.status ?? "") == "draft" {
-                 
-                    Text("Your banner is still in draft.Please complete the required details to publish it.").multilineTextAlignment(.center).foregroundColor(Color(.systemRed)).font(.inter(.regular, size: 16.0))
-
-                }
-                */
+ 
                 if (objAnalytics?.board?.rejectionReason?.count ?? 0) > 0{
                     Text(objAnalytics?.board?.rejectionReason ?? "").foregroundColor(Color(.systemRed)).font(.inter(.regular, size: 16.0))
                 }
@@ -128,7 +104,7 @@ struct BoardAnalyticsView: View {
                         
                         HStack{
                             
-                            Text(objAnalytics?.board?.outbondURL ?? "")
+                            Text(objAnalytics?.board?.outbondURL ?? "").lineLimit(2)
                                 .font(.inter(.regular, size: 15.0))
                             
                             Spacer()
@@ -157,15 +133,7 @@ struct BoardAnalyticsView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(.systemBackground))
                             )
-                        /*  Text(objAnalytics?.url ?? "")
-                         .font(.inter(.regular, size: 14.0))
-                         .padding(.horizontal)
-                         .frame(maxWidth: .infinity, minHeight: 55, maxHeight: 55, alignment: .leading) // ✅ keeps text left-aligned
-                         .background(
-                         RoundedRectangle(cornerRadius: 8)
-                         .fill(Color(.systemBackground))
-                         )
-                         */
+                        
                         Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 12.0)).foregroundColor(Color(.gray))
                         
                     }
@@ -211,7 +179,8 @@ struct BoardAnalyticsView: View {
                         RoundedRectangle(cornerRadius: 8.0).strokeBorder(Color(.gray),lineWidth: 0.5)
                     }
                 
-                if (objAnalytics?.board?.isActive ?? 0) == 1 && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
+                
+                if (objAnalytics?.board?.isFeature ?? false) == false && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
                     Button {
                         showSheetpackages = true
                     } label: {
@@ -233,7 +202,8 @@ struct BoardAnalyticsView: View {
                 
                 selectedPkgObj = selPkgObj
                 paymentGatewayOpen()
-            }).cornerRadius(25)
+            }).cornerRadius(20)
+            
             .presentationDetents([.medium])
             .presentationDragIndicator(.hidden)
          
@@ -308,13 +278,22 @@ struct BoardAnalyticsView: View {
             preferredStyle: .actionSheet
         )
 
-        let strText = ((objAnalytics?.board?.isActive ?? 0) == 1) ? "Deactivate" : "Activate"
-        sheet.addAction(UIAlertAction(title: strText, style: .default, handler: { action in
-            self.updateBoardStatus()
-        }))
+        if (objAnalytics?.board?.status ?? "").lowercased() == "approved" || (objAnalytics?.board?.status ?? "").lowercased() == "inactive"{
+            
+            let strText = ((objAnalytics?.board?.isActive ?? 0) == 1) ? "Deactivate" : "Activate"
+            sheet.addAction(UIAlertAction(title: strText, style: .default, handler: { action in
+                
+                if strText == "Deactivate"{
+                    deactivateConfirmation()
+                }else{
+                    self.updateBoardStatus()
+
+                }
+            }))
+        }
         
-        sheet.addAction(UIAlertAction(title: "Remove", style: .default, handler: { action in
-            AlertView.sharedManager.presentAlertWith(title: "", msg: "Are you sure want to remove?" as NSString, buttonTitles: ["No","Yes"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
+        sheet.addAction(UIAlertAction(title: "Remove your board", style: .default, handler: { action in
+            AlertView.sharedManager.presentAlertWith(title: "Remove", msg: "Are you sure want to remove?" as NSString, buttonTitles: ["Cancel","Confirm"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
 
                 if index == 1{
                     deleteBoardApi()
@@ -332,9 +311,16 @@ struct BoardAnalyticsView: View {
             .present(sheet, animated: true)
     }
     
-    func deleteConfirmation(){
+    func deactivateConfirmation(){
        
+        AlertView.sharedManager.presentAlertWith(title: "Deactivate your board", msg: " Are you sure you want to deactivate this board? You can reactivate it anytime." as NSString, buttonTitles: ["Cancel","Confirm"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
+
+            if index == 1{
+                updateBoardStatus()
+            }
+        }
         
+       
     }
     
     func deleteBoardApi(){
@@ -387,6 +373,7 @@ struct BoardAnalyticsView: View {
                 
                 if code == 200{
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+                    
                     var obj =  self.objAnalytics?.board
                     obj?.isActive = ((objAnalytics?.board?.isActive ?? 0) == 1) ? 0 : 1
                     self.objAnalytics?.board = obj

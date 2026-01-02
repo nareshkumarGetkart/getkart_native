@@ -51,9 +51,13 @@ struct NotificationDetailView: View {
             VStack(alignment: .leading,spacing: 5){
                 Text("\(notification?.title ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                 Text("\(notification?.message ?? "")").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                
             }.padding()
+            
 
             Spacer()
+         
+         
             
         }.navigationBarHidden(true)
     }

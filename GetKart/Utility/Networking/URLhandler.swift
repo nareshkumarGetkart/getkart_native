@@ -29,7 +29,7 @@ class URLhandler: NSObject{
         return urlhandler
     }()
        
-    private var isLogoutPresented = false
+     var isLogoutPresented = false
     
     func isConnectedToNetwork() -> Bool {
         return (UIApplication.shared.delegate as! AppDelegate).isInternetConnected
@@ -178,7 +178,7 @@ class URLhandler: NSObject{
             isLogoutPresented = true
             AppDelegate.sharedInstance.checkUserStatusApi()
             
-            AlertView.sharedManager.presentAlertWith(title: "Login Issue", msg: "Your session has expired or your account may be restricted.\n Please Login again or contact Getkart Support.", buttonTitles: ["Contact Support","Login","Cancel"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
+          /*  AlertView.sharedManager.presentAlertWith(title: "Login Issue", msg: "Your session has expired or your account may be restricted.\n Please Login again or contact Getkart Support.", buttonTitles: ["Contact Support","Login","Cancel"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
                 self.isLogoutPresented = false
                 if index == 0{
                     Local.shared.removeUserData()
@@ -193,7 +193,7 @@ class URLhandler: NSObject{
                 }else{
                     
                 }
-            }
+            }*/
         }
     }
     

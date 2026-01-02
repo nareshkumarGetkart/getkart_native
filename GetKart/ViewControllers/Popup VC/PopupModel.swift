@@ -31,6 +31,8 @@ struct PopupModel: Codable {
     let mandatoryClick: Bool?
     let buttonTitle: String?
     let type, itemID: Int?
+    let secondButtonTitle:String?
+    
 
     enum CodingKeys: String, CodingKey {
         case userID = "user_id"
@@ -38,5 +40,6 @@ struct PopupModel: Codable {
         case mandatoryClick = "mandatory_click"
         case buttonTitle, type
         case itemID = "item_id"
+        case secondButtonTitle
     }
 }

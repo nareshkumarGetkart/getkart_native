@@ -340,7 +340,7 @@ class HomeBaseVC: UITabBarController {
     }
     
     
-    func addNewBadgeOnBoardTab() {
+   /* func addNewBadgeOnBoardTab() {
         // Board tab index = 1
         let boardIndex = 1
         let badgeTag = 7777
@@ -365,13 +365,47 @@ class HomeBaseVC: UITabBarController {
         let badgeHeight: CGFloat = 10
 
         badgeImageView.frame = CGRect(
-            x: boardButton.frame.width / 2 + 8,
+            x: boardButton.frame.width / 2 + 2,
             y: 6,
             width: badgeWidth,
             height: badgeHeight
         )
 
         boardButton.addSubview(badgeImageView)
+    }*/
+
+    func addNewBadgeOnBoardTab() {
+        let boardIndex = 1
+        let badgeTag = 7777
+
+        tabBar.viewWithTag(badgeTag)?.removeFromSuperview()
+
+        let tabBarButtons = tabBar.subviews
+            .filter { $0 is UIControl }
+            .sorted { $0.frame.minX < $1.frame.minX }
+
+        guard boardIndex < tabBarButtons.count else { return }
+
+        let boardButton = tabBarButtons[boardIndex]
+
+        let badgeImageView = UIImageView(image: UIImage(named: "NEW"))
+        badgeImageView.tag = badgeTag
+        badgeImageView.contentMode = .scaleAspectFit
+
+        let badgeWidth: CGFloat = 22
+        let badgeHeight: CGFloat = 10
+
+        // ❗ Convert button frame to tabBar coordinate system
+        let buttonFrameInTabBar = boardButton.convert(boardButton.bounds, to: tabBar)
+
+        badgeImageView.frame = CGRect(
+            x: buttonFrameInTabBar.midX + 0,
+            y: 6, // fixed relative to tabBar
+            width: badgeWidth,
+            height: badgeHeight
+        )
+
+        tabBar.addSubview(badgeImageView)
     }
 
     func removeNewBadgeFromBoardTab() {

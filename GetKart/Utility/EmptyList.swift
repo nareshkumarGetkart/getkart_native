@@ -64,7 +64,7 @@ class EmptyList: UIView {
         btnNavigation?.layer.cornerRadius = 1.0
         btnNavigation?.clipsToBounds = true
         btnNavigation?.backgroundColor = UIColor.systemOrange
-        btnNavigation?.setTitleColor(.label, for: .normal)
+        btnNavigation?.setTitleColor(.white, for: .normal)
         btnNavigation?.titleLabel?.font =  UIFont.Manrope.semiBold(size: 16).font
         btnNavigation?.addTarget(self, action: #selector(clickedBtn), for: .touchUpInside)
         bgView?.addSubview(btnNavigation!)

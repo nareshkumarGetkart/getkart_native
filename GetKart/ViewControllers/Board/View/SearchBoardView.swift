@@ -42,7 +42,6 @@ struct SearchBoardView: View {
             }.frame(width: 40,height: 40)
             
             
-            
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.orange)
@@ -82,7 +81,8 @@ struct SearchBoardView: View {
         VStack(spacing: 0) {
             
             HStack {
-                Text("Recent search")
+                let strMsg = (viewModel.searchText.count) == 0 ? "Recent search" : "Search result"
+                Text(strMsg)
                     .font(.headline)
                     .foregroundColor(.gray)
                 Spacer()
@@ -93,7 +93,7 @@ struct SearchBoardView: View {
             // List of Recent Items
             ScrollView {
                 
-                VStack(spacing: 14) {
+                VStack(spacing: 8) {
                     
                     ForEach(Array(viewModel.items.enumerated()), id: \.offset) { index, item in
                         
@@ -119,13 +119,12 @@ struct SearchBoardView: View {
                             }
                             // Text
                             Text(item.keyword ?? "")
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(.label))
                                 .font(.system(size: 16))
                             
                             Spacer()
                             
                             if viewModel.searchText.count == 0{
-                                
                                 // ❌ Delete Button
                                 Button {
                                     withAnimation {

@@ -10,14 +10,16 @@ import SwiftUI
 struct SearchBoardResultView: View {
     let navigationController:UINavigationController?
     @State  var isByDefaultOpenSearch:Bool
-    @State private var selected = "All"
+  /*  @State private var selected = "All"
     @State private var selectedCategoryId = 0
     @State private var listArray:Array<ItemModel> = [ItemModel]()
     @State private var page = 1
-    @State private var isDataLoading = true
+    @State private var isDataLoading = true*/
     @State private var searchText = ""
+    @State private var selected = "All"
 
-    
+    @StateObject private var vm = SearchBoardResultViewModel()
+
   /*  let sampleProducts: [Product] = [
         Product(title: "Lakmé Foundation",
                 subtitle: "Lakmé 9 to 5 Complexion Care Face Cream Foundation",
@@ -111,12 +113,20 @@ struct SearchBoardResultView: View {
                 
                 
                 
-                CategoryTabs(selected: $selected, selectedCategoryId: $selectedCategoryId)
+               // CategoryTabs(selected: $selected, selectedCategoryId: $selectedCategoryId)
                 //.padding([.top,.bottom], 7)
+                
+                CategoryTabs(
+                    selected: $selected,
+                    selectedCategoryId: Binding(
+                        get: { vm.selectedCategoryId },
+                        set: { vm.categoryChanged($0) }
+                    )
+                )
                 
             } .background(Color(.systemBackground))
             
-            if listArray.count == 0 && !isDataLoading {
+            if vm.items.count == 0 && !vm.isLoading {
                 HStack{
                     Spacer()
                     VStack(spacing: 20){
@@ -130,7 +140,48 @@ struct SearchBoardResultView: View {
                 }
             }else{
                 
-            ScrollView(showsIndicators: false) {
+                
+                    ScrollView {
+                        LazyVStack {
+                            StaggeredGrid(columns: 2, spacing: 5) {
+                                ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                                    ProductCardStaggered1(
+                                        product: item,
+                                        imgHeight: CGFloat(150 + (index % 2) * 50)
+                                    ) { isLiked, boardId in
+                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    }
+                                    .onTapGesture {
+                                        pushToDetailScreen(item: item)
+                                    }
+                                    .onAppear {
+                                        vm.loadNextPageIfNeeded(currentIndex: index)
+                                    }
+                                }
+                            }
+                            .padding(5)
+
+                            // 👇 bottom detector (NO layout impact)
+                               GeometryReader { geo in
+                                   Color.clear
+                                       .preference(
+                                           key: ScrollBottomKey.self,
+                                           value: geo.frame(in: .global).maxY
+                                       )
+                               }
+                               .frame(height: 0)
+                            
+                            if vm.isLoading {
+                                ProgressView().padding()
+                            }
+                        }
+                    }
+                    .onPreferenceChange(ScrollBottomKey.self) { bottomY in
+                        vm.handleScrollBottom(bottomY: bottomY)
+                    }
+                
+                
+          /*  ScrollView(showsIndicators: false) {
                 StaggeredGrid(columns: 2, spacing: 5) {
                     ForEach(Array(listArray.enumerated()), id: \.element.id) { index, product in
                         ProductCardStaggered(
@@ -155,20 +206,25 @@ struct SearchBoardResultView: View {
                     
                 }
                 .padding(5)
-            }
+            }*/
+                
+                
         }
             // CustomTabBar()
         }
         .background(Color(.systemGray6))
         //.edgesIgnoringSafeArea(.bottom)
-        .onAppear {
+        
+       
+       /* .onAppear {
             if listArray.isEmpty && !isByDefaultOpenSearch{
                 getBoardListApi()
             }
-        }.onChange(of: selectedCategoryId) { _ in
+        }
+        .onChange(of: selectedCategoryId) { _ in
             self.page = 1
             getBoardListApi()
-        }
+        }*/
         .onAppear{
             if isByDefaultOpenSearch{
                 let hostingVC = UIHostingController(rootView: SearchBoardView(navigationController: self.navigationController,isToCloseToSearchResultScreen:isByDefaultOpenSearch,searchedItem: { srchTxt in
@@ -179,7 +235,27 @@ struct SearchBoardResultView: View {
                 self.navigationController?.pushViewController(hostingVC, animated: true)
                 isByDefaultOpenSearch = false
             }
+            
+            //if vm.items.count == 0{
+            vm.searchText = searchText
+                vm.loadInitial()
+            //}
         }
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
+            )
+        ) { notification in
+
+            guard let dict = notification.object as? [String: Any] else { return }
+
+            let isLike  = dict["isLike"] as? Bool ?? false
+            let count  = dict["count"] as? Int ?? 0
+            let boardId = dict["boardId"] as? Int ?? 0
+
+            vm.update(likeCount: count, isLike: isLike, boardId: boardId)
+        }
+
     }
     
     func pushToDetailScreen(item:ItemModel){
@@ -190,7 +266,7 @@ struct SearchBoardResultView: View {
     
     
     //MARK: Api methods
-    func getBoardListApi(){
+   /* func getBoardListApi(){
         
         if self.page == 1{
             self.listArray.removeAll()
@@ -218,7 +294,7 @@ struct SearchBoardResultView: View {
 
             }
         }
-    }
+    }*/
 }
 
 //#Preview {

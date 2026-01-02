@@ -37,7 +37,7 @@ class PopupVC: UIViewController {
     @IBOutlet weak var bgView:UIViewX!
    // var respDict:Dictionary<String,Any> = [:]
 
-    var objPopup:PopupModel = PopupModel(userID: 0, title: "", subtitle: "", description: "", image: "", mandatoryClick: true, buttonTitle: "", type: 0, itemID: 0)
+    var objPopup:PopupModel = PopupModel(userID: 0, title: "", subtitle: "", description: "", image: "", mandatoryClick: true, buttonTitle: "", type: 0, itemID: 0, secondButtonTitle: "")
 
     //MARK: Controller Life cycle Methods
     override func viewDidLoad() {

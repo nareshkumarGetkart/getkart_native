@@ -340,7 +340,7 @@ func extractHTMLColor(_ html: String) -> Color {
                 style.lineHeightMultiple = 1
                 style.minimumLineHeight = 0
                 style.maximumLineHeight = 0
-
+                style.alignment = .center
                 // ✅ Keep HTML alignment if present, otherwise center
                 if value == nil {
                     style.alignment = .center

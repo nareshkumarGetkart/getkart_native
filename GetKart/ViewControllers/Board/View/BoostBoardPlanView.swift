@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct BoostBoardPlanView: View {
-    
     @Environment(\.dismiss) private var dismiss
     @State private var planListArray:Array<PlanModel>?
     let categoryId:Int
@@ -20,7 +19,7 @@ struct BoostBoardPlanView: View {
             header
             
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
+                VStack(spacing: 10) {
                     
                     ForEach(planListArray ?? [], id: \.id) { pkgObj in
                         PlanCardView(planObj: pkgObj).onTapGesture {
@@ -28,14 +27,33 @@ struct BoostBoardPlanView: View {
                             packageSelectedPressed?(pkgObj)
                         }
                     }
+                    
+                    HStack{
+                        Spacer()
+                        Button {
+                            dismiss()
+
+                            if let url = URL(string: Constant.shared.BOARDBOOST_DEMO){
+                                let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BOARDBOOST_DEMO,istoApplyPadding:true))
+                                AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+
+                            }
+                        } label: {
+                            Text("How It Benefits You").underline() .font(.inter(.medium, size: 14)).foregroundColor(Color(hex:"#192E73")).padding(.top,8)
+                        }
+                        
+                        Spacer()
+
+                    }
                 }
                 .padding(.bottom, 30)
             }
         }
         .padding(.horizontal)
         .padding(.top, 12)
-        .background(Color.white)
-        .cornerRadius(24, corners: [.topLeft, .topRight])
+        .background(Color(.systemBackground))
+        .cornerRadius(20, corners: [.topLeft, .topRight])
+        .clipped()
         .onAppear {
             if (planListArray ?? []).isEmpty{
                 getPackagesApi()
@@ -76,16 +94,11 @@ struct BoostBoardPlanView: View {
 struct PlanCardView: View {
 
     let planObj:PlanModel
-//    let title: String
-//    let price: String
-//    var originalPrice: String? = nil
-//    var badge: String? = nil
-//    let duration: String
     let clicks: String = "10"
     let impressions: String = "20"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(spacing: 12) {
 
             HStack {
                 Text(planObj.name ?? "")
@@ -93,21 +106,11 @@ struct PlanCardView: View {
 
                 Spacer()
 
-//                if let badge {
-//                    Text(badge)
-//                        .font(.inter(.regular, size: 12))
-//                        .padding(.horizontal, 8)
-//                        .padding(.vertical, 4)
-//                        .background(Color.orange)
-//                        .foregroundColor(.white)
-//                        .cornerRadius(6)
-//                }
-
-                HStack(spacing: 6) {
+               // HStack(spacing: 5) {
                     
                     if (planObj.discountInPercentage ?? "0") != "0"{
 
-                        Text(" \(planObj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.inter(.medium, size: 13)).background(Color(hexString: "#FF9900"))
+                        Text(" \(planObj.discountInPercentage ?? "0")% Savings ").frame(height:20).font(.inter(.medium, size: 13)).background(Color(hexString: "#FF9900")).foregroundColor(.white)
                         
                         
                         let originalPrice = "\(planObj.price ?? "0")".formatNumberWithComma()
@@ -123,35 +126,27 @@ struct PlanCardView: View {
                         let amt = "\(planObj.price ?? "0")".formatNumberWithComma()
                         Text("\(Local.shared.currencySymbol) \(amt)").font(.inter(.regular, size: 16)).padding(.trailing)
                     }
-                    
-                    
-//                    
-//                    if let originalPrice {
-//                        Text(originalPrice)
-//                            .font(.inter(.regular, size: 14))
-//                            .foregroundColor(.gray)
-//                            .strikethrough()
-//                    }
-//
-//                    Text("\(Local.shared.currencySymbol) \(planObj.price ?? 0)")
-//                        .font(.inter(.semiBold, size: 16))
-                }
+              //  }
             }
 
-            VStack(alignment: .leading, spacing: 6) {
-                HTMLContentView(html: planObj.description ?? "")
-            }
+           
 
             HStack {
+                VStack(alignment: .leading, spacing: 5) {
+                    HTMLContentView(html: planObj.description ?? "")
+                }
                 Spacer()
-                Text("For \(planObj.duration ?? "") days")
-                    .font(.inter(.regular, size: 14))
+                VStack(alignment:.leading) {
+                    Spacer()
+                    Text("For \(planObj.duration ?? "") days")
+                        .font(.inter(.regular, size: 14))
+                }.padding(.trailing)
             }
         }
-        .padding()
+        .padding(10)
         .background(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.orange, lineWidth: 1.2)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.orange, lineWidth: 1)
         )
     }
 
@@ -166,36 +161,6 @@ struct PlanCardView: View {
     
 }
 
-
-
-/*
- 
- PlanCardView(
-     title: "Simple plan",
-     price: "₹ 75",
-     duration: "For 7 days",
-     clicks: "5 - 25",
-     impressions: "500 - 750"
- )
-
- PlanCardView(
-     title: "Basic plan",
-     price: "₹ 375",
-     duration: "For 14 days",
-     clicks: "5 - 125",
-     impressions: "500 - 3750"
- )
-
- PlanCardView(
-     title: "Standard plan",
-     price: "₹ 525",
-     originalPrice: "₹ 750",
-     badge: "30% Savings",
-     duration: "For 30 days",
-     clicks: "5 - 250",
-     impressions: "500 - 7500"
- )
- */
 
 
 struct HTMLContentView: View {

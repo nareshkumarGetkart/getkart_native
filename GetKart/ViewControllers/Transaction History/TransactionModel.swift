@@ -73,7 +73,7 @@ struct TransactionModel: Codable,Identifiable {
     let invoiceNo :String?
     let invoiceId: Int?
     let transactionPackage:TransactionPackage?
-
+    let items:[Item]?
 
     enum CodingKeys: String, CodingKey {
         case id,banners
@@ -93,10 +93,37 @@ struct TransactionModel: Codable,Identifiable {
         case invoiceNo = "invoice_no"
         case invoiceId = "invoice_id"
         case transactionPackage = "transaction_package"
+        case items
 
     }
 }
 
+
+struct Item: Codable,Identifiable {
+    let id:Int?
+    let startDate:String?
+    let endDate:String?
+    let packageId:Int?
+    let createdAt:String?
+    let updatedAt:String?
+    let itemId:Int?
+    let userPurchasedPackageId:Int?
+    enum CodingKeys:String,CodingKey{
+        
+        case id
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case packageId = "package_id"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case itemId = "item_id"
+        case userPurchasedPackageId = "user_purchased_package_id"
+    }
+
+}
+
+
+                
 struct TransactionPackage:Codable{
     
     let id: Int?
@@ -207,6 +234,8 @@ struct PaymentTransaction: Codable {
         case updatedAt = "updated_at"
     }
 }
+
+
 
 /*// MARK: - User
 struct User: Codable {

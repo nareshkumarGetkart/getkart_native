@@ -46,7 +46,7 @@ struct MyBoardsView: View {
                 }
             }else{
                 
-            LazyVStack{
+                LazyVStack(spacing:10){
                 
                 ForEach(listArray ,id: \.id) { myBroad in
                     MyBoardCell(itemObj: myBroad,onBoostTapped: { item, plan in
@@ -216,8 +216,7 @@ struct MyBoardCell:View {
                         )
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity).cornerRadius(5).padding(1)
-                    // .frame(width: 105,height: 120).cornerRadius(5)
+                        .frame(maxWidth: 105, maxHeight: 120).cornerRadius(5).clipped()//.padding(1)
                     
                     if (itemObj.isFeature ?? false) == true{
                         VStack(alignment:.leading){
@@ -236,48 +235,71 @@ struct MyBoardCell:View {
                 
                 
                 VStack(alignment: .leading, spacing: 5){
+                  
                     HStack{
-                        /*Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.semiBold, size: 16)).foregroundColor(Color(hexString: "#008838"))
-                        */
                         
-                        if (itemObj.specialPrice ?? 0.0) > 0{
-                            HStack{
-                                Text("\(Local.shared.currencySymbol) \((itemObj.specialPrice ?? 0.0).formatNumber())")
-                                    .font(.inter(.medium, size: 18))
-                                    .foregroundColor(Color(hex: "#008838"))
+                        VStack(alignment:.leading){
+                            if (itemObj.specialPrice ?? 0.0) > 0{
+                                HStack{
+                                    Text("\(Local.shared.currencySymbol) \((itemObj.specialPrice ?? 0.0).formatNumber())")
+                                        .font(.inter(.medium, size: 18))
+                                        .foregroundColor(Color(hex: "#008838"))
+                                    
+                                    Spacer()
+                                    
+                                    let status = itemObj.status ?? ""
+                                    let (bgColor, titleColor, displayStatus) = statusColors(for: status)
+                                    
+                                    Text(status.capitalized).font(Font.inter(.semiBold, size: 11))
+                                        .foregroundColor(titleColor)
+                                        .padding(5)
+                                        .frame(height:24)
+                                        .background(bgColor)
+                                    
+                                        .cornerRadius(12)
+                                        .clipped()
+                                        .padding(.trailing,5)
+                                    
+                                }
+                              
+                                HStack{
+                                    Text("\(Local.shared.currencySymbol)\((itemObj.price ?? 0.0).formatNumber())")
+                                        .font(.inter(.regular, size: 14))
+                                        .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
+                                    let per = (((itemObj.price ?? 0.0) - (itemObj.specialPrice ?? 0.0)) / (itemObj.price ?? 0.0)) * 100.0
+                                    Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
+                                        .foregroundColor(Color(hex: "#008838"))
+                                }
+                                // }
                                 
-                                Text("\(Local.shared.currencySymbol)\((itemObj.price ?? 0.0).formatNumber())")
-                                    .font(.inter(.regular, size: 14))
-                                    .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
-                                let per = (((itemObj.price ?? 0.0) - (itemObj.specialPrice ?? 0.0)) / (itemObj.price ?? 0.0)) * 100.0
-                                Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
-                                    .foregroundColor(Color(hex: "#008838"))
+                            }else{
+                                
+                                HStack{
+                                    Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
+                                    
+                                    Spacer()
+                                    
+                                    let status = itemObj.status ?? ""
+                                    let (bgColor, titleColor, displayStatus) = statusColors(for: status)
+                                    
+                                    Text(status.capitalized).font(Font.inter(.semiBold, size: 11))
+                                        .foregroundColor(titleColor)
+                                        .padding(5)
+                                        .frame(height:24)
+                                        .background(bgColor)
+                                    
+                                        .cornerRadius(12)
+                                        .clipped()
+                                        .padding(.trailing,5)
+                                }
                             }
-
-                        }else{
-                           
-                            Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
                         }
-                        
-                        
-                        Spacer()
-                        
-                        let status = itemObj.status ?? ""
-                        let (bgColor, titleColor, displayStatus) = statusColors(for: status)
-                        
-                        Text(status.capitalized).font(Font.inter(.semiBold, size: 12))
-                            .foregroundColor(titleColor)
-                            .padding()
-                            .frame(height:28)
-                            .background(bgColor)
-                        
-                            .cornerRadius(14)
-                            .clipped()
-                            .padding(.trailing,5)
-                        
                     }
+                    
                     Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
-                        .padding(.bottom,10).padding(.trailing)
+                        .padding(.bottom,10)
+                        .padding(.trailing)
+                    
                     if (itemObj.address ?? "").count > 0{
                         HStack(spacing:4){
                             Image("location-outline")
@@ -289,19 +311,19 @@ struct MyBoardCell:View {
                             Spacer()
                         }
                     }
-                    HStack(spacing:8){
+                    HStack(spacing:6){
                         
-                        HStack(spacing:4){
-                            Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 15, height: 15)
-                            Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 13)).foregroundColor(.gray)//.padding(.trailing)
+                        HStack(spacing:3){
+                            Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 13, height: 13)
+                            Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)//.padding(.trailing)
                         }
                         
-                        HStack(spacing:4){
-                            Image("heart").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 15, height: 15)
-                            Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 13)).foregroundColor(.gray)//.padding(.trailing)
+                        HStack(spacing:3){
+                            Image("heart").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 11, height: 11)
+                            Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)//.padding(.trailing)
                         }
                         Spacer()
-                        Text("More Details").font(Font.inter(.medium, size: 15)).foregroundColor(Color(.systemOrange)).padding(.trailing,5)
+                        Text("More Details").font(Font.inter(.medium, size: 14)).foregroundColor(Color(.systemOrange)).padding(.trailing,5)
                     }
                     
                 }.padding(.horizontal,2)//.padding([.top,.bottom],10)
@@ -339,7 +361,8 @@ struct MyBoardCell:View {
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
                 onBoostTapped(itemObj,selPkgObj)
-            }).cornerRadius(25)
+            }).cornerRadius(20)
+            
             .presentationDetents([.medium])
             .presentationDragIndicator(.hidden)
         }

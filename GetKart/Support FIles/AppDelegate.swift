@@ -264,7 +264,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         hostingController.hidesBottomBarWhenPushed = true
                         self.navigationController?.pushViewController(hostingController, animated: true)
                     }
+                }else  if myUrl?.range(of: "/board/") != nil {
+                    
+                    let boardId = (urlArray?.last ?? "")
+
+                   // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        
+                        self.getBoardDetailApi(boardId: Int(boardId) ?? 0)
+                    }
                 }
+            
         }else{
             
         }
@@ -280,7 +290,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("could not start reachability notifier")
         }
     }
-    
    
     @objc func reachabilityChanged(note: NSNotification) {
         
@@ -453,10 +462,41 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             }
         case "board-update":
             do {
-                
-                let hostingController = UIHostingController(rootView: MyBoardsView(navigationController: self.navigationController))
-                hostingController.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(hostingController, animated: true)
+            
+                if let tabBarController = self.navigationController?.topViewController as? HomeBaseVC {
+
+                    if tabBarController.selectedIndex == 4,
+                       let navController = tabBarController.viewControllers?[4] as? UINavigationController,
+                       let hostingVC = navController.topViewController as? UIHostingController<MyBoardsView> {
+
+                        // ✅ SwiftUI screen already visible
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+
+
+                    } else {
+
+                        // ❌ Not selected → switch tab and push SwiftUI view
+                        tabBarController.selectedIndex = 4
+
+                        DispatchQueue.main.async {
+                            if let navController = tabBarController.selectedViewController as? UINavigationController {
+
+                                let myBoardsView = MyBoardsView(navigationController:navController)
+                                let hostingVC = UIHostingController(rootView: myBoardsView)
+                                hostingVC.hidesBottomBarWhenPushed = true
+
+                                navController.popToRootViewController(animated: false)
+                                navController.pushViewController(hostingVC, animated: true)
+                            }
+                        }
+                    }
+                }
+
+//                
+//                
+//                let hostingController = UIHostingController(rootView: MyBoardsView(navigationController: self.navigationController))
+//                hostingController.hidesBottomBarWhenPushed = true
+//                self.navigationController?.pushViewController(hostingController, animated: true)
             }
             
         case "item-update","draftItemReminder":
@@ -1041,19 +1081,59 @@ extension AppDelegate : ATAppUpdaterDelegate{
     }
 
     func checkUserStatusApi(){
-        let strUrl = Constant.shared.device_refresh + "/\(Local.shared.getUserId())"
+        let strUrl = Constant.shared.user_status + "/\(Local.shared.getUserId())"
+        
+
         URLhandler.sharedinstance.makeCall(url: strUrl, param: nil,methodType: .get) { responseObject, error in
             
             if error == nil {
                 if  let result = responseObject{
                     if let data = result["data"] as? Dictionary<String, Any>{
+                        URLhandler.sharedinstance.isLogoutPresented = false
+                        
+                        if let isActive = data["is_active"] as? Int{
+                            
+                            if isActive == 0{
+                                Local.shared.removeUserData()
+                                AppDelegate.sharedInstance.showLoginScreen()
+                            }else{
+                                
+                            }
+                            
+                        }
+                      
                     }
                 }
             }
         }
     }
 
-    
+    private  func getBoardDetailApi(boardId:Int){
+      
+       let strUrl = Constant.shared.get_board_details + "?board_id=\(boardId)"
+        ///v1/get-board-details?board_id=126560'
+       ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:SingleItemParse) in
+           
+           if obj.code == 200
+           {
+               
+               if obj.data != nil  {
+                   if let board = obj.data?.first{
+                       DispatchQueue.main.async {
+                           
+                           let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: board))
+                           
+                           hostingVC.hidesBottomBarWhenPushed = true
+                           self.navigationController?.pushViewController(hostingVC, animated: true)
+                       }
+                   }
+               }
+               
+           }else{
+               
+           }
+       }
+   }
     
 }
 

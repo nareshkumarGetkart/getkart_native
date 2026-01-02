@@ -54,8 +54,7 @@ struct NotificationView: View {
                         
                             .onTapGesture{
                                 
-                                let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: notification))
-                                self.navigation?.pushViewController(hostingVC, animated: true)
+                                pushToDesiredView(obj: notification)
                             }
                         
                     }
@@ -87,7 +86,18 @@ struct NotificationView: View {
                     getNoticiationlistApi()
                 }
             }
+    }
+    
+    func pushToDesiredView(obj:NotificationModel){
         
+        if let itemId = obj.itemID{
+           let hostingVC = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId:itemId, itemObj: nil, slug: ""))
+            self.navigation?.pushViewController(hostingVC, animated: true)
+
+        }else{
+            let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: obj))
+             self.navigation?.pushViewController(hostingVC, animated: true)
+        }
     }
     
     func getNoticiationlistApi(){

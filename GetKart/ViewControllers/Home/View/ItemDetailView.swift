@@ -308,15 +308,13 @@ struct ItemDetailView: View {
                         .font(Font.manrope(.medium, size: 16))
                         Spacer()
                     }
-                  
                     
                     Text(getFormattedCreatedDate())
                         .font(Font.manrope(.medium, size: 15))
                 }.padding(5)
                 .padding(.bottom,10)
                 
-                
-                if (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft"{
+                if (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft" {
                     
                     HStack{
                         Spacer()
@@ -1922,7 +1920,7 @@ struct AutoScrollBannerAdsView: View {
                             .animation(.easeInOut, value: currentIndex)
                     }
                 }
-                .padding(.top, -8)
+                .padding(.top, -3)
             }
         }
     }

@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-
+/*
 struct FavoriteBoardView: View {
     let navigationController:UINavigationController?
-    
+    @StateObject private var vm = FavoriteBoardViewModel()
+
     @State private var listArray:Array<ItemModel> = [ItemModel]()
     @State private var page = 1
     @State private var isDataLoading = true
@@ -115,7 +116,104 @@ struct FavoriteBoardView: View {
         }
     }
 }
-
+*/
 #Preview {
     FavoriteBoardView(navigationController: nil)
 }
+
+
+struct FavoriteBoardView: View {
+
+    let navigationController: UINavigationController?
+    @StateObject private var vm = FavoriteBoardViewModel()
+
+    var body: some View {
+        VStack(spacing: 0) {
+
+            if vm.items.isEmpty && !vm.isLoading {
+                HStack{
+                    Spacer()
+                    VStack(spacing: 20){
+                        Spacer()
+                        Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
+                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            } else {
+                ScrollView {
+                    LazyVStack {
+                        StaggeredGrid(columns: 2, spacing: 5) {
+                            ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                                ProductCardStaggered1(
+                                    product: item,
+                                    imgHeight: CGFloat(150 + (index % 2) * 50)
+                                ) { isLiked, boardId in
+                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                }
+                                .onTapGesture {
+                                    pushToDetailScreen(item: item)
+                                }
+                                .onAppear {
+                                    vm.loadNextPageIfNeeded(currentIndex: index)
+                                }
+                            }
+                        }
+                        .padding(5)
+
+                        // 👇 bottom detector (NO layout impact)
+                           GeometryReader { geo in
+                               Color.clear
+                                   .preference(
+                                       key: ScrollBottomKey.self,
+                                       value: geo.frame(in: .global).maxY
+                                   )
+                           }
+                           .frame(height: 0)
+                        
+                        if vm.isLoading {
+                            ProgressView().padding()
+                        }
+                    }
+                }
+                .onPreferenceChange(ScrollBottomKey.self) { bottomY in
+                    vm.handleScrollBottom(bottomY: bottomY)
+                }
+            }
+        }
+        .background(Color(.systemGray6))
+        .onAppear {
+            if vm.items.count == 0{
+                vm.loadInitial()
+            }
+        }
+        .refreshable {
+            if !vm.isLoading{
+                vm.loadInitial()
+            }
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
+            )
+        ) { notification in
+
+            guard let dict = notification.object as? [String: Any] else { return }
+
+            let isLike  = dict["isLike"] as? Bool ?? false
+            let count  = dict["count"] as? Int ?? 0
+            let boardId = dict["boardId"] as? Int ?? 0
+
+            vm.update(likeCount: count, isLike: isLike, boardId: boardId)
+        }
+
+    }
+    
+    func pushToDetailScreen(item:ItemModel){
+        let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
+        self.navigationController?.pushViewController(hostingVC, animated: true)
+    }
+}
+

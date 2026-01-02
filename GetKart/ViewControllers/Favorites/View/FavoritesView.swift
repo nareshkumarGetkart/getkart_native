@@ -21,7 +21,7 @@ struct FavoritesView: View {
             HeaderView(navigation: navigation)
 
             // Tabs
-            tabBar
+            tabBar.padding(.bottom,5)
 
             // Swipe Content
             TabView(selection: $selectedTab) {
@@ -51,9 +51,9 @@ extension FavoritesView {
                 VStack(spacing: 8) {
 
                     Text(tab.title)
-                        .font(Font.inter((selectedTab == tab ? .semiBold : .semiBold), size: 15))
+                        .font(Font.inter((selectedTab == tab ? .medium : .medium), size: 15))
 
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(.label))
 
                     Rectangle()
                         .fill(selectedTab == tab ? Color.orange : Color.clear)

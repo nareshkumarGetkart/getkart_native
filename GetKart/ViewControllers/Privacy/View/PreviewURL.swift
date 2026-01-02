@@ -12,7 +12,8 @@ import SwiftUI
 struct PreviewURL: View {
     @Environment(\.presentationMode) var presentationMode
     var fileURLString: String
-
+    var istoApplyPadding:Bool = false
+    
     var body: some View {
         VStack(spacing: 0) {
             // Custom Back Button
@@ -20,23 +21,26 @@ struct PreviewURL: View {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
                 }) {
-                    HStack {
-                        Image(systemName: "chevron.left").foregroundColor(Color(UIColor.label))
-                        Text("Back").foregroundColor(Color(UIColor.label))
-                    }
+                  //  HStack {
+                        Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                       // Text("Back").foregroundColor(Color(UIColor.label))
+                   // }
                 }
                 .padding()
                 Spacer()
             }
             .background(Color(UIColor.systemGray6))
             .foregroundColor(Color(UIColor.label))
+            .frame(height:40)
 
             Divider()
 
             // WebView for Image or PDF
             if let url = URL(string: fileURLString) {
-                WebView(url: url)
-                    .edgesIgnoringSafeArea(.bottom)
+
+                WebView(url: url)//.padding(((istoApplyPadding == true) ? 10 : 0))
+                
+                  //  .edgesIgnoringSafeArea(.bottom)
             } else {
                 Text("Invalid URL")
                     .foregroundColor(.red)
@@ -49,9 +53,9 @@ struct PreviewURL: View {
 
 
 
-#Preview {
-    PreviewURL(fileURLString: "")
-}
+//#Preview {
+//    PreviewURL(fileURLString: "")
+//}
 
 
 

@@ -57,13 +57,14 @@ struct BoardDetailView: View{
                 
                 VerticalPager(
                     pages: listArray.map { ReelPostView(post: $0,
-                                                        sendLikeDislikeObject: { isLiked, boardId in
+                                                        sendLikeDislikeObject: { isLiked, boardId,likeCount  in
                         
                         if let index = listArray.firstIndex(where: { $0.id == boardId }) {
                             // index is Int
                             print("Found at index:", index)
                             var obj = listArray[index]
                             obj.isLiked = isLiked
+                            obj.totalLikes = likeCount
                             listArray[index] = obj
                         }
                         
@@ -75,7 +76,7 @@ struct BoardDetailView: View{
                             print("====\(currentIndex)")
                             boardClickApi(post: listArray[index])
 
-                        }).id(listArray.count)
+                        })//.id(listArray.last?.id ?? 0) //.id(listArray.count)
                     
                     .onChange(of:currentIndex) { newIndex in
                         if newIndex == listArray.count - 1 {
@@ -90,8 +91,8 @@ struct BoardDetailView: View{
         .onAppear {
            // UIScrollView.appearance().isPagingEnabled = true
             if listArray.count == 0{
-                boardClickApi(post: itemObj)
                 getBoardListApi()
+                boardClickApi(post: itemObj)
             }
         }
         
@@ -114,6 +115,7 @@ struct BoardDetailView: View{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    
                 }else{
                 }
             }
@@ -134,15 +136,28 @@ struct BoardDetailView: View{
             if obj.code == 200 {
                 
 
-                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
+               /* if obj.data != nil , (obj.data?.data ?? []).count > 0 {
                     self.listArray.append(contentsOf:  obj.data?.data ?? [])
                         
                 }
                                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                     self.isDataLoading = false
                     self.page += 1
-                })
+                })*/
+                
+                DispatchQueue.main.async {
+                    let newItems = obj.data?.data ?? []
+                    guard !newItems.isEmpty else {
+                        self.isDataLoading = false
+                        
+                        return }
+
+                    self.listArray.append(contentsOf: newItems)
+                    self.page += 1
+                    self.isDataLoading = false
+                }
+                
 
             }else{
                 self.isDataLoading = false
@@ -195,7 +210,7 @@ struct BoardDetailView: View{
 struct ReelPostView: View {
     @State var post: ItemModel
     @State private var showShareSheet = false
-    var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int) -> Void
+    var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int, _ likeCount:Int) -> Void
 
     var body: some View {
 
@@ -209,17 +224,24 @@ struct ReelPostView: View {
                         .scaledToFill()
                         .frame(width: geo.size.width, height: geo.size.height)
                         .clipped()
+                        .cornerRadius(10)
+                        .shadow(
+                            color: Color.black.opacity(0.10),
+                            radius: 7,
+                            x: 0,
+                            y: 2
+                        )
                 } placeholder: {
                     Color.black
                 }
             }
-            .cornerRadius(16)
+            .cornerRadius(10)
 
             // BOTTOM CARD (ALWAYS VISIBLE)
             bottomCard.padding()
         }
             .background(Color(.systemBackground))
-            .cornerRadius(16)
+            .cornerRadius(10)
             .padding(8)
     }
 
@@ -231,7 +253,7 @@ struct ReelPostView: View {
                         post.isLiked?.toggle()
                         manageLikeDislikeApi()
                     } label: {
-                        let imgStr = (post.isLiked == true) ? "like_fill" : "heart"
+                        let imgStr = (post.isLiked == true) ? "like_fill" : "like"
                         Image(imgStr).foregroundColor(Color(.label))
                     }
                     
@@ -241,7 +263,7 @@ struct ReelPostView: View {
                 Button {
                     showShareSheet = true
                 } label: {
-                    Image("share").foregroundColor(Color(.label))
+                    Image("Share-outline")//.renderingMode(.template).foregroundColor(Color(hex: "#818181"))
                 }
                 .actionSheet(isPresented: $showShareSheet) {
                     ActionSheet(
@@ -249,35 +271,34 @@ struct ReelPostView: View {
                         message: nil,
                         buttons: [
                             .default(Text("Copy Link"), action: {
-                                UIPasteboard.general.string = ShareMedia.itemUrl + "\(post.slug ?? "")?share=true"
+                                UIPasteboard.general.string = ShareMedia.itemUrl + "/board/\(post.id ?? 0)"
                                 AlertView.sharedManager.showToast(message: "Copied successfully.")
                             }),
                             .default(Text("Share"), action: {
-                                ShareMedia.shareMediafrom(type: .item, mediaId: "\(post.slug ?? "")", controller: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+                                
+                                ShareMedia.shareMediafrom(type: .board, mediaId: "\(post.id ?? 0)", controller: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
                             }),
                             .cancel()
                         ]
                     )
                 }
+                
                 Spacer()
                 if (post.isFeature ?? false){
-                    Text("Sponsered")
+                    Text("Sponsered").font(.inter(.medium, size: 16)).foregroundColor(Color(.gray))
                 }
             }
-          
             
-            
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(post.name ?? "")
                     .font(.inter(.medium, size: 18))
                     .foregroundColor(Color(.label))
                 Text(post.description ?? "") .font(.inter(.regular, size: 14))
                
-                //optional done by me
                 
                 if (post.specialPrice ?? 0.0) > 0{
                     HStack{
-                        Text("\(Local.shared.currencySymbol) \((post.specialPrice ?? 0.0).formatNumber())")
+                        Text("\(Local.shared.currencySymbol)\((post.specialPrice ?? 0.0).formatNumber())")
                             .font(.inter(.medium, size: 18))
                             .foregroundColor(Color(hex: "#008838"))
                         Text("\(Local.shared.currencySymbol)\((post.price ?? 0.0).formatNumber())")
@@ -287,13 +308,13 @@ struct ReelPostView: View {
                         Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
                             .foregroundColor(Color(hex: "#008838"))
                         
-                    }
+                    }.padding(.top,5)
 
                 }else{
                    
                     Text("\(Local.shared.currencySymbol) \((post.price ?? 0.0).formatNumber())")
                         .font(.inter(.medium, size: 18))
-                        .foregroundColor(Color(hex: "#008838"))
+                        .foregroundColor(Color(hex: "#008838")).padding(.top,5)
                 }
             }
             
@@ -373,8 +394,20 @@ struct ReelPostView: View {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    self.sendLikeDislikeObject(post.isLiked ?? false, post.id ?? 0)
+                    
+                    if let  data = result["data"] as? Dictionary<String,Any>{
+                     
+                        if let favouriteCount = data["favourite_count"] as? Int{
+                            
+                            post.totalLikes = favouriteCount
+                          
+                            self.sendLikeDislikeObject(post.isLiked ?? false, post.id ?? 0, favouriteCount)
+                            
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshLikeDislikeBoard.rawValue), object:  ["isLike":post.isLiked ?? false,"count":favouriteCount,"boardId":self.post.id ?? 0], userInfo: nil)
 
+
+                        }
+                    }
                     
                 }else{
                     
@@ -392,13 +425,94 @@ struct VerticalPager<Content: View>: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> PagerVC {
         let vc = PagerVC()
         vc.onPageChange = onPageChange
-        vc.pages = pages.map { UIHostingController(rootView: $0) }
+        vc.setPages(pages)
+
+        //vc.pages = pages.map { UIHostingController(rootView: $0) }
         return vc
     }
 
-    func updateUIViewController(_ uiViewController: PagerVC, context: Context) {}
+    func updateUIViewController(_ uiViewController: PagerVC, context: Context) {
+        
+        uiViewController.setPages(pages)
+    }
 }
 
+class PagerVC: UIViewController, UIScrollViewDelegate {
+
+    private(set) var pages: [UIViewController] = []
+    let scrollView = UIScrollView()
+
+    private var lastIndex = 0
+    var onPageChange: ((Int) -> Void)?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        scrollView.isPagingEnabled = true
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.delegate = self
+        scrollView.bounces = false
+
+        view.addSubview(scrollView)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        layoutPages()
+    }
+
+    // 🔥 APPEND-SAFE PAGE UPDATE
+    func setPages(_ newPages: [some View]) {
+        guard newPages.count >= pages.count else { return }
+
+        let oldCount = pages.count
+        let currentOffset = scrollView.contentOffset
+
+        for index in oldCount..<newPages.count {
+            let vc = UIHostingController(rootView: newPages[index])
+            addChild(vc)
+            scrollView.addSubview(vc.view)
+            vc.didMove(toParent: self)
+            pages.append(vc)
+        }
+
+        layoutPages()
+        scrollView.contentOffset = currentOffset   // 🔒 preserve position
+    }
+
+    private func layoutPages() {
+        scrollView.frame = view.bounds
+
+        let pageHeight = view.bounds.height
+        let pageWidth = view.bounds.width
+
+        scrollView.contentSize = CGSize(
+            width: pageWidth,
+            height: pageHeight * CGFloat(pages.count)
+        )
+
+        for (i, vc) in pages.enumerated() {
+            vc.view.frame = CGRect(
+                x: 0,
+                y: pageHeight * CGFloat(i),
+                width: pageWidth,
+                height: pageHeight
+            )
+        }
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let index = Int(round(scrollView.contentOffset.y / view.bounds.height))
+        if index != lastIndex {
+            lastIndex = index
+            onPageChange?(index)
+        }
+    }
+}
+
+
+
+/*
 class PagerVC: UIViewController, UIScrollViewDelegate {
 
     var pages: [UIViewController] = []
@@ -469,7 +583,7 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
            }
        }
 }
-
+*/
 struct PostImagesCarousel: View {
     let images: [String]
 

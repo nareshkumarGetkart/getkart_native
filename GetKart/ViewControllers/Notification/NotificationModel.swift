@@ -58,15 +58,15 @@ struct NotificationModel: Codable,Identifiable {
     let createdAt, title, message: String?
     let image: String?
     let sendTo, userID: String?
-    let itemID: JSONNull?
+    let itemID: Int?
 
     enum CodingKeys: String, CodingKey {
         case id
         case createdAt
         case title, message, image
-        case sendTo
-        case userID
-        case itemID
+        case sendTo = "send_to"
+        case userID = "user_id"
+        case itemID = "item_id"
     }
 }
 

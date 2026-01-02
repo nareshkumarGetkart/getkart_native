@@ -16,6 +16,7 @@ class ProfileListTblCell: UITableViewCell {
     @IBOutlet weak var btnSwitch:UISwitch!
     @IBOutlet weak var lblSubTitle:UILabel!
     @IBOutlet weak var bgviewIcon:UIView!
+    @IBOutlet weak var bgviewArrow:UIView!
 
     
     override func awakeFromNib() {

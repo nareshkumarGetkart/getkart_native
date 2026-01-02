@@ -54,8 +54,13 @@ struct TransactionHistoryPreview: View {
                                 .font(Font.manrope(.bold, size: 16.0))
                             Spacer()
                         }
-
-                        if transaction?.package?.type == "campaign" {
+                        
+                        if  transaction?.package?.type == "board"{
+                            //Board
+                            boardAnalyticsdetailsCard()
+                            
+                        }else if transaction?.package?.type == "campaign" {
+                            //Banner
                             bannerAnalyticsdetailsCard()
                         } else {
                             detailsCard()
@@ -323,6 +328,48 @@ private func detailsCard() -> some View {
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
 
+    
+    @ViewBuilder
+    private func boardAnalyticsdetailsCard() -> some View {
+        VStack(spacing: 12) {
+            let date = Date(timeIntervalSince1970: TimeInterval(convertTimestamp(isoDateString: transaction?.paymentTransaction?.createdAt ?? "")))
+
+            detailRow(title: "Name", value: "\(transaction?.package?.name ?? "")")
+          //  detailRow(title: "Category", value:"\(transaction?.package?.category ?? "")")
+           // detailRow(title: "Location", value: "\(transaction?.paymentTransaction?.city ?? "")")
+            detailRow(title: "Bought pack", value: "\(transaction?.package?.itemLimit ?? "") clicks")
+            detailRow(title: "Transaction ID", value: transaction?.paymentTransaction?.orderID ?? "", isCopyable: true)
+            detailRow(title: "Date", value: getConvertedDateFromDate(date: date))
+            detailRow(title: "Purchase from", value: "\(transaction?.paymentTransaction?.paymentGateway?.capitalized ?? "")")
+           
+          //  BannerAnalyticCell(title: "Status", value: "", isActive: true)
+            
+            
+                HStack {
+                   
+                    Spacer()
+                    
+                    Button(action:{
+                        pushToBoardAnalytics()
+                    },label:{
+                        
+                        Text("Board analytics").foregroundColor(.blue).underline().font(.manrope(.regular, size: 17))
+                    })
+                    
+                    Spacer()
+                }.padding(.top,10).padding(.bottom,10)
+         
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(hex:"#DADADA"), lineWidth: 0.5)
+        )
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+
 
     func pushToBannerAnalytics(){
         if let bannerId = transaction?.banners?.first?.id{
@@ -330,8 +377,15 @@ private func detailsCard() -> some View {
             let destVC = UIHostingController(rootView: swiftView)
             self.navController?.pushViewController(destVC, animated: true)
         }
-      
-        
+    }
+    
+    
+    func pushToBoardAnalytics(){
+        if let boarId = transaction?.items?.first?.itemId{
+            let swiftView = BoardAnalyticsView(navigationController: self.navController, boardId: boarId)
+            let destVC = UIHostingController(rootView: swiftView)
+            self.navController?.pushViewController(destVC, animated: true)
+        }
     }
     
     // MARK: SAVE TO FILES

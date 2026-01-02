@@ -20,13 +20,11 @@ class SeeAllItemVC: UIViewController {
     private var objViewModel:SeeAllViewModel?
     private var emptyView:EmptyList?
     
-    
     var city = ""
     var state = ""
     var country = ""
     var latitude = ""
     var longitude = ""
-    
 
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -58,9 +56,7 @@ class SeeAllItemVC: UIViewController {
             objViewModel?.delegate = self
             objViewModel?.getItemListApi()
         }
-        
-        
-        
+    
     }
     
     
@@ -104,7 +100,7 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCell", for: indexPath) as! ProductCell
-        cell.bgView.addShadow()
+       // cell.bgView.addShadow()
         
         if let obj = objViewModel?.listArray?[indexPath.item] as? ItemModel{
             cell.lblItem.text = obj.name

@@ -61,7 +61,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                 #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
                                                object: nil)
-        
       
        
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
@@ -69,26 +68,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         
         
         if Local.shared.getUserId() > 0{
-                
                 getpopupApi()
         }
-        /*
-        print("appVersion == \(UIDevice.appVersion)")
-        
-        // Example usage
-        let salt = "MySecretSalt123" // store securely
-        let customValue = "User123"
-        
-        let customValue = "Gr8@98qwmlx"
-        let salt = "GetkartIndia"
-         
-        let shortKey = generateShortKeyWithSalt(customValue: customValue, salt: salt)
-        print("Generated key: \(shortKey)")
-         
-        // Verify later
-        let sameKey = generateShortKeyWithSalt(customValue: customValue, salt: salt)
-        print("Matches: \(sameKey == shortKey)") // true
-        */
+     
   }
     
    
@@ -153,7 +135,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
     
     
-    
+
+
+
     func dummyPopupCheck(togetvalues:Int){
         
         
@@ -162,7 +146,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                           subtitle: "Upgrade your listing for better exposure and faster response.",
                                                                           description: "<ul><li>You have items saved as draft that are not visible to others.</li>                                            <li>Complete the required details to make your item live.</li>                                            <li>Publishing your item increases visibility and chances of response.</li>                                            <li>Make sure the images and description are clear and accurate.</li>                                            <li>Click 'Publish Now' to make your draft item available to others.</li>                                        </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892ea49d25f30.982046931754458697.png", mandatoryClick: false,
                                                                           buttonTitle: "Okay",
-                                                                          type: 1, itemID: 49625))
+                                                               type: 1, itemID: 49625, secondButtonTitle: ""))
               
         }else if togetvalues == 1{
             
@@ -178,7 +162,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       subtitle: "",
                                                                       description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692d8387443e45.785661921764590471.png", mandatoryClick: false,
                                                                       buttonTitle: "Okay",
-                                                                      type: 5, itemID: 49625))
+                                                               type: 5, itemID: 49625, secondButtonTitle: ""))
         }else if togetvalues == 2{
             self.presentHostingController(objPopup: PopupModel(userID:639, title:"""
 <span style="color:#808080; font-size:24px;">For a limited time, enjoy posting </span><span style="color:#000000; font-size:23px;"><strong>3 ads completely FREE</strong></span><span style="color:#808080; font-size:24px;"> — no charges</span>
@@ -188,14 +172,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                description:""
                                                                , image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/692e8a4ce04351.605374521764657740.png", mandatoryClick: false,
                                                                buttonTitle: "Post Now",
-                                                               type: 5, itemID: 49625))
+                                                               type: 5, itemID: 49625, secondButtonTitle: ""))
             
         }else if togetvalues == 3{
             self.presentHostingController(objPopup: PopupModel(userID:639, title: "You have draft items pending!",
                                                                       subtitle: "Complete your draft item and publish it to reach more people.",
                                                                       description: "<ul><li>You have items saved as draft that are not visible to others.</li>                                            <li>Complete the required details to make your item live.</li>                                            <li>Publishing your item increases visibility and chances of response.</li>                                            <li>Make sure the images and description are clear and accurate.</li>                                            <li>Click 'Publish Now' to make your draft item available to others.</li>                                        </ul>", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
                                                                       buttonTitle: "Publish Now",
-                                                                      type: 1, itemID: 49625))
+                                                               type: 1, itemID: 49625, secondButtonTitle: ""))
             
         }else if togetvalues == 4{
             self.presentHostingController(objPopup: PopupModel(userID:639, title: 
@@ -206,7 +190,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       subtitle: "",
                                                                       description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
                                                                       buttonTitle: "Publish Now",
-                                                                      type: 1, itemID: 49625))
+                                                               type: 1, itemID: 49625, secondButtonTitle: ""))
             
         }else if togetvalues == 5{
             self.presentHostingController(objPopup: PopupModel(userID:639, title:
@@ -219,8 +203,16 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       subtitle: " <font color='#424243'>Get 5x more views &amp; reach more buyers instantly.</font><br><font color='#424243'>• Lowest Price &nbsp; • Top of List &nbsp; • 30 days Visibility</font>",
                                                                       description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png", mandatoryClick: false,
                                                                       buttonTitle: "Publish Now",
-                                                                      type: 1, itemID: 49625))
+                                                               type: 5, itemID: 49625, secondButtonTitle: ""))
             
+        }else if togetvalues == 6{
+            
+            self.showBoostYourBoardPopup(obj:PopupModel(userID:639, title: ""
+                                                                      ,
+                                                                      subtitle: "",
+                                                                      description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/6954d90b924726.419396251767168267.png", mandatoryClick: false,
+                                                                      buttonTitle: "Boost for ₹75",
+                                                               type: 6, itemID: 10497, secondButtonTitle: "Maybe Later"))
         }
           
         
@@ -246,8 +238,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
  */
     //MARK: Api methods
     func getpopupApi(){
-//        
-//        dummyPopupCheck(togetvalues: 5)
+//        dummyPopupCheck(togetvalues: 6)
 //           return
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
@@ -280,6 +271,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                     }
                 } else if (obj.data.type ?? 0) == 1 || (obj.data.type ?? 0) == 2 || (obj.data.type ?? 0) == 3  || (obj.data.type ?? 0) == 4 || (obj.data.type ?? 0) == 5 {
                     self?.presentHostingController(objPopup: obj.data)
+               
+                }else if (obj.data.type ?? 0) == 6{
+                    //Boost board
+                    self?.showBoostYourBoardPopup(obj: obj.data)
+                    
                 }
             }
         }
@@ -372,6 +368,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                     let destVC = UIHostingController(rootView:  BannerPromotionsView(navigationController: self?.navigationController))
                     destVC.hidesBottomBarWhenPushed = true
                     self?.navigationController?.pushViewController(destVC, animated: true)
+                    
+                }else if (obj.type ?? 0) == 6  {
+                    //Boost board
+                    
                 }
             }
         })
@@ -387,6 +387,34 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         
     }
     
+    
+    func showBoostYourBoardPopup(obj:PopupModel) {
+
+        let popupView = BoostYourBoardPopupView(
+            onBoost: {
+                print("Boost tapped")
+                if (obj.itemID ?? 0) > 0{
+                    let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: obj.itemID ?? 0))
+                    self.navigationController?.pushViewController(destVC, animated: true)
+                }else{
+                    let destVC = UIHostingController(rootView: MyBoardsView(navigationController: self.navigationController))
+                    self.navigationController?.pushViewController(destVC, animated: true)
+                }
+            },
+            onLater: {
+                print("Later tapped")
+            },
+            onClose: {
+                self.dismiss(animated: true)
+            },
+            objPopup:obj
+        )
+
+        let hostingVC = UIHostingController(rootView: popupView)
+        hostingVC.modalPresentationStyle = .overFullScreen
+        hostingVC.view.backgroundColor = .clear
+        present(hostingVC, animated: false)
+    }
 
 
     
@@ -488,7 +516,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     
     func pushToMyAdsScreen(){
         
-        for controller in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
+        
+       /* for controller in AppDelegate.sharedInstance.navigationController?.viewControllers ?? []{
             
             if let destvc =  controller as? HomeBaseVC{
                 
@@ -514,7 +543,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                 
                 destvc.selectedIndex = 3
                 
-                if let navController = destvc.viewControllers?[3] as? UINavigationController {
+                if let navController = destvc.viewControllers?[4] as? UINavigationController {
                   
                     navController.popToRootViewController(animated: false)
 
@@ -525,7 +554,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                     }
                 }
             }
-        }
+        }*/
+        
+            let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+            destVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destVC, animated: true)
     }
     
     

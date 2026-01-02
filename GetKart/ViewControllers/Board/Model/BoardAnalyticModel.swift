@@ -48,6 +48,7 @@ struct BoardDetail: Codable {
     let rejectionReason: String?
     let status: String?
     var isActive:Int?
+    var isFeature: Bool?
 
     enum CodingKeys: String, CodingKey {
         case id, name, image, description
@@ -59,7 +60,7 @@ struct BoardDetail: Codable {
         case rejectionReason = "rejected_reason"
         case status
         case isActive = "is_active"
-
+        case isFeature = "is_feature"
     }
 }
 

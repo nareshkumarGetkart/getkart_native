@@ -17,7 +17,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -53,6 +53,10 @@ final class Constant: NSObject {
         }
     }
     
+    
+   let BOOSTED_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
+   let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
+     
     
     var  user_status:String {
         get {
@@ -154,6 +158,12 @@ final class Constant: NSObject {
         }
     }
 
+    
+    var  get_board_details:String {
+        get {
+            return "\(baseURL)/v1/get-board-details"
+        }
+    }
     
     var  create_board:String {
         get {
@@ -850,6 +860,7 @@ enum MediaShareType{
     case item
     case profile
     case appShare
+    case board
    
 }
 
@@ -888,7 +899,17 @@ class ShareMedia{
             activityController.excludedActivityTypes = excludedActivities
             controller.present(activityController, animated: true)
             
-        }else if type == .appShare{
+        }else if type == .board{
+            
+            baseUrl = "\(baseUrl)/board/\(mediaId)"
+                        
+            print("Deep link ==\(baseUrl)")
+            let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
+            let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
+            activityController.excludedActivityTypes = excludedActivities
+            controller.present(activityController, animated: true)
+            
+        } else if type == .appShare{
             
             baseUrl = "Getkart \n https://apps.apple.com/in/app/getkart-buy-sell/id1488570846 \n\n Buy and Sell Easily."
             let activityController = UIActivityViewController(activityItems: [baseUrl, ActionExtensionBlockerItem()], applicationActivities: nil)
@@ -924,6 +945,7 @@ class ShareMedia{
 
 
 
+
 enum NotificationKeys:String,CaseIterable{
     
     case reconnectInternet = "reconnectInternet"
@@ -931,14 +953,11 @@ enum NotificationKeys:String,CaseIterable{
     case refreshAdsScreen = "refreshAdsScreen"
     case refreshBannerAdsScreen = "refreshBannerAdsScreen"
     case refreshChatTblViewScreen = "refreshChatTblViewScreen"
-    
-    
     case refreshMyBoardsScreen = "refreshMyBoardsScreen"
+    case refreshLikeDislikeBoard = "refreshLikeDislikeBoard"
+    case refreshInterestChangeBoardScreen = "refreshInterestChangeBoardScreen"
 
-
-    
 }
-
 
 
 enum NotiKeysLocSelected:String,CaseIterable{
@@ -947,8 +966,6 @@ enum NotiKeysLocSelected:String,CaseIterable{
     case createPostNewLocation = "createPostNewLocation"
     case buyPackageNewLocation = "buyPackageNewLocation"
     case bannerPromotionNewLocation = "bannerPromotionNewLocation"
-
-    
 }
 
 
@@ -956,10 +973,6 @@ enum ImageName {
     static let userPlaceHolder = UIImage(named: "user-circle")
     static let getKartplaceHolder = UIImage(named: "getkartplaceholder")
 }
-
-
-
-
 
 extension UIDevice{
     
