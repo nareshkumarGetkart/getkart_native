@@ -15,6 +15,8 @@ struct MyBoardsView: View {
     @State private var page = 1
     @State private var isDataLoading = false
     @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var hasMoreData = true
+    @State private var hasUserScrolled = false
 
     var body: some View {
         HStack{
@@ -56,18 +58,32 @@ struct MyBoardsView: View {
                     .onTapGesture {
                         pushToBoardAnalytics(myBroad: myBroad)
                     }
-                    .onAppear{
-                        if let lastItem = listArray.last, lastItem.id == myBroad.id {
-                            self.getAdsListApi()
+                    .onAppear {
+                        if myBroad.id == listArray.last?.id {
+                            loadNextPageIfAllowed()
                         }
                     }
                 }
                 Spacer()
                 
+//                    if hasMoreData {
+//                        Color.clear
+//                            .frame(height: 1).hid
+//                            .onAppear {
+//                                loadNextPage()
+//                            }
+//                    }
+                
+
             }.padding(8)
             
         }
-        }
+        }.simultaneousGesture(
+            DragGesture()
+                .onChanged { _ in
+                    hasUserScrolled = true   // ✅ REAL scroll detected
+                }
+        )
     .background(Color(.systemGray6))
             .refreshable {
                 print("call api here")
@@ -97,60 +113,100 @@ struct MyBoardsView: View {
         self.navigationController?.pushViewController(destVC, animated: true)
          
     }
+    func loadNextPageIfAllowed() {
+        guard
+            hasUserScrolled,        // ✅ user actually scrolled
+            !isDataLoading,
+            hasMoreData
+        else { return }
+
+        getAdsListApi()
+    }
+
     
+    func loadMoreIfNeeded(currentItem: ItemModel) {
+        guard
+            currentItem.id == listArray.last?.id,
+            !isDataLoading,
+            hasMoreData
+        else { return }
+
+        isDataLoading = true
+        getAdsListApi()
+    }
+
     //MARK: Api methods
-    func getAdsListApi(){
+    func getAdsListApi() {
         guard !isDataLoading else { return }
-        
+        isDataLoading = true
+
+        let strUrl = Constant.shared.get_my_board + "?page=\(page)"
+
+        ApiHandler.sharedInstance.makeGetGenericData(
+            isToShowLoader: page == 1,
+            url: strUrl,
+            loaderPos: .mid
+        ) { (obj: ItemParse) in
+
+            DispatchQueue.main.async {
+                let newItems = obj.data?.data ?? []
+
+                if self.page == 1 {
+                    self.listArray = newItems
+                } else {
+                    self.listArray.append(contentsOf: newItems)
+                }
+
+                self.hasMoreData = !newItems.isEmpty
+                self.isDataLoading = false
+                self.page += 1
+            }
+        }
+    }
+
+  /*  func getAdsListApi(){
+        guard !isDataLoading else { return }
+      
         self.isDataLoading = true
         
-        if self.page == 1{
+        if self.page == 1 {
+            hasMoreData = true
             self.listArray.removeAll()
         }
         
         let strUrl = Constant.shared.get_my_board + "?page=\(page)"
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
             
             if obj.code == 200 {
                 
-                
-                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
-                    self.listArray.append(contentsOf:  obj.data?.data ?? [])
+              //  DispatchQueue.main.async {
+                    let newItems = obj.data?.data ?? []
                     
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    if newItems.isEmpty {
+                        self.hasMoreData = false
+                    } else {
+                        self.listArray.append(contentsOf: newItems)
+                    }
                     self.isDataLoading = false
                     self.page += 1
-                })
+              //  }
+                
+               /* if obj.data != nil , (obj.data?.data ?? []).count > 0 {
+                    self.listArray.append(contentsOf:  obj.data?.data ?? [])
+                }
+               
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                    self.isDataLoading = false
+                    self.page += 1
+               })
+                */
                 
             }else{
                 self.isDataLoading = false
-                
             }
-            
-            //            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
-            //            self.emptyView?.lblMsg?.text = "No Ads Found"
-            //            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
-            
-            /*   if (self.listArray.count) > 0 {
-             self.emptyView?.isHidden = true
-             
-             }else{
-             if self.apiStatus.count == 0{
-             self.emptyView?.btnNavigation?.isHidden = false
-             self.emptyView?.setTitleToBUtton(strTitle: "Start Selling")
-             }else{
-             self.emptyView?.btnNavigation?.isHidden = true
-             }
-             self.emptyView?.isHidden = false
-             self.emptyView?.lblMsg?.text = "No Ads Found"
-             self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
-             
-             }
-             */
         }
     }
+    */
     
     func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
 
@@ -221,12 +277,12 @@ struct MyBoardCell:View {
                     if (itemObj.isFeature ?? false) == true{
                         VStack(alignment:.leading){
                             HStack{
-                                Text("Featured")
-                                    .frame(width:75,height:20)
+                                Text("Sponsered")
+                                    .frame(width:85,height:22)
                                     .background(.orange)
                                     .cornerRadius(5)
-                                    .foregroundColor(Color(UIColor.white))
-                                    .font(.inter(.regular, size: 14))
+                                    .foregroundColor(Color(.white))
+                                    .font(.inter(.medium, size: 14))
                             }.padding(.top,5)
                             Spacer()
                         }
@@ -247,12 +303,11 @@ struct MyBoardCell:View {
                                     
                                     Spacer()
                                     
-                                    let status = itemObj.status ?? ""
-                                    let (bgColor, titleColor, displayStatus) = statusColors(for: status)
+                                    let (bgColor, titleColor, displayStatus) = statusColors(for: itemObj.status ?? "")
                                     
-                                    Text(status.capitalized).font(Font.inter(.semiBold, size: 11))
+                                    Text(displayStatus.capitalized).font(Font.inter(.semiBold, size: 11))
                                         .foregroundColor(titleColor)
-                                        .padding(5)
+                                        .padding()
                                         .frame(height:24)
                                         .background(bgColor)
                                     
@@ -270,7 +325,6 @@ struct MyBoardCell:View {
                                     Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
                                         .foregroundColor(Color(hex: "#008838"))
                                 }
-                                // }
                                 
                             }else{
                                 
@@ -279,12 +333,12 @@ struct MyBoardCell:View {
                                     
                                     Spacer()
                                     
-                                    let status = itemObj.status ?? ""
-                                    let (bgColor, titleColor, displayStatus) = statusColors(for: status)
                                     
-                                    Text(status.capitalized).font(Font.inter(.semiBold, size: 11))
+                                    let (bgColor, titleColor, displayStatus) = statusColors(for: itemObj.status ?? "")
+                                    
+                                    Text(displayStatus.capitalized).font(Font.inter(.semiBold, size: 11))
                                         .foregroundColor(titleColor)
-                                        .padding(5)
+                                        .padding()
                                         .frame(height:24)
                                         .background(bgColor)
                                     
@@ -361,10 +415,13 @@ struct MyBoardCell:View {
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
                 onBoostTapped(itemObj,selPkgObj)
-            }).cornerRadius(20)
+            }).cornerRadius(25)
             
-            .presentationDetents([.medium])
+            .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)
+            .presentationCornerRadius(20)   // ✅ THIS
+            .presentationBackground(Color(.systemBackground)) // ✅ sheet background
+
         }
         }
     

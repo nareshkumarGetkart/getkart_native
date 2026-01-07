@@ -407,9 +407,12 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 
             } else if titleArray[indexPath.row] == "My Boards"{
                 //My Boards
-                let destVC = UIHostingController(rootView: MyBoardsView(navigationController:self.navigationController))
-                destVC.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destVC, animated: true)
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    
+                    let destVC = UIHostingController(rootView: MyBoardsView(navigationController:self.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(destVC, animated: true)
+                }
                 
             }
           /*  else if titleArray[indexPath.row] == "My Boost Ads"{

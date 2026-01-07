@@ -104,7 +104,9 @@ struct BoardCategoryCell: View {
                     HStack {
                         Spacer()
                         Button {
-                            toggleFavourite()
+                            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                toggleFavourite()
+                            }
                         } label: {
                             Image(isSelected
                                   ? "add-square-check-rounded"

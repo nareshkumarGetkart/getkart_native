@@ -171,12 +171,12 @@ class ItemDetailViewModel:ObservableObject{
     
     func makeItemFeaturd(nav:UINavigationController?){
         
-        AlertView.sharedManager.presentAlertWith(title: "", msg: "Are you sure to create this item as Boost ad?", buttonTitles: ["Cancel","OK"], onController: (nav?.topViewController)!, tintColor: .black) { title, index in
-            if index == 1{
-                self.makeItemFeaturedApi(nav: nav)
-            }else{
-            }
-        }
+//        AlertView.sharedManager.presentAlertWith(title: "", msg: "Are you sure to create this item as Boost ad?", buttonTitles: ["Cancel","OK"], onController: (nav?.topViewController)!, tintColor: .black) { title, index in
+//            if index == 1{
+               makeItemFeaturedApi(nav: nav)
+//            }else{
+//            }
+       // }
     }
     
     

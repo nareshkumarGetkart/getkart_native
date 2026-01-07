@@ -10,6 +10,24 @@ import SwiftUI
 import FittedSheets
 
 
+class CustomTabBar: UITabBar {
+
+    weak var middleButton: UIButton?
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard let middleButton = middleButton else {
+            return super.hitTest(point, with: event)
+        }
+
+        let convertedPoint = middleButton.convert(point, from: self)
+
+        if middleButton.bounds.contains(convertedPoint) {
+            return middleButton
+        }
+
+        return super.hitTest(point, with: event)
+    }
+}
 
 class HomeBaseVC: UITabBarController {
     
@@ -46,6 +64,14 @@ class HomeBaseVC: UITabBarController {
            
         }
         setupMiddleButton()
+        
+               /* let customTabBar = CustomTabBar()
+                setValue(customTabBar, forKey: "tabBar")
+                setupMiddleButton()
+                customTabBar.middleButton = middleButton*/
+        
+        
+        
         setupDoubleTapGesture()
         
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
@@ -236,17 +262,16 @@ class HomeBaseVC: UITabBarController {
             sizes: [.intrinsic],
             options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: useInlineMode))
         sheet.allowGestureThroughOverlay = false
-        sheet.cornerRadius = 30
+        sheet.cornerRadius = 18
         sheet.dismissOnPull = false
         sheet.gripColor = .clear
-        
-        
-        
+    
         sheet.allowGestureThroughOverlay = false
-        sheet.cornerRadius = 30
+        sheet.cornerRadius = 18
         sheet.dismissOnOverlayTap = true
         sheet.dismissOnPull = false
         sheet.gripColor = .clear
+      
         /* if (objPopup.mandatoryClick ?? false){
          
          sheet.dismissOnOverlayTap = false

@@ -81,6 +81,10 @@ final class SearchBoardResultViewModel: ObservableObject {
 
     // MARK: - Category Change
     func categoryChanged(_ id: Int) {
+        
+        if selectedCategoryId == id{
+            return
+        }
         isLoading = false
         hasMoreData = true
         didUserScroll = false   // 🔥 reset

@@ -152,7 +152,7 @@ struct FavoriteBoardView: View {
                                     imgHeight: CGFloat(150 + (index % 2) * 50)
                                 ) { isLiked, boardId in
                                     vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
+                                }.contentShape(Rectangle())
                                 .onTapGesture {
                                     pushToDetailScreen(item: item)
                                 }

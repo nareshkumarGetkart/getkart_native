@@ -27,13 +27,13 @@ struct PostOptionsSheet: View {
                     Spacer()   // Title
                     Text("Start Posting Now")
                         .font(.inter(.medium, size: 18))
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(.label))
                         .padding(.top, 10)
                     Spacer()
                     Button(action: onClose) {
                         Image(systemName: "xmark")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(.label))
                             .padding(.top, 10)
                     }
                 }
@@ -42,9 +42,9 @@ struct PostOptionsSheet: View {
               
                 
                 // 3 Options
-                HStack(spacing: 35) {
-                    optionButton(icon: "gridOpaque", title: "Board", action: onBoardTap)
+                HStack(spacing: 25) {
                     optionButton(icon: "add-circle", title: "Ads", action: onAdsTap)
+                    optionButton(icon: "gridOpaque", title: "Board", action: onBoardTap)
                     optionButton(icon: "megaphone", title: "Banner", action: onBannerTap)
                 }
                 .padding(.vertical, 10)
@@ -54,8 +54,8 @@ struct PostOptionsSheet: View {
             .padding(.top, 15)
             .frame(maxWidth: .infinity)
             .frame(height: 240)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 30))
+            .background(Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
             .shadow(radius: 5)
             .clipped()
            // .padding(.horizontal, 8)
@@ -77,7 +77,7 @@ struct PostOptionsSheet: View {
             }
             Text(title)
                 .font(.inter(.medium, size: 15))
-                .foregroundColor(.black)
+                .foregroundColor(Color(.label))
         }
         .onTapGesture { action() }
     }

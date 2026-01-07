@@ -50,7 +50,7 @@ struct BoardAnalyticsView: View {
                     openActionSheet()
                 } label: {
                     
-                    Image("more")
+                    Image("more").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     
                 }.padding(.trailing)
             //}
@@ -112,10 +112,10 @@ struct BoardAnalyticsView: View {
                                 
                                 if var urlString = objAnalytics?.board?.outbondURL {
                                     // Add scheme if missing
-                                    if !urlString.lowercased().hasPrefix("http") {
-                                        urlString = "https://" + urlString
-                                    }
-                                    
+                                    if !urlString.lowercased().hasPrefix("http://") &&
+                                          !urlString.lowercased().hasPrefix("https://") {
+                                           urlString = "https://" + urlString
+                                       }
                                     if let url = URL(string: urlString) {
                                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
                                     } else {
@@ -134,7 +134,7 @@ struct BoardAnalyticsView: View {
                                     .fill(Color(.systemBackground))
                             )
                         
-                        Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 12.0)).foregroundColor(Color(.gray))
+                        Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 11.0)).foregroundColor(Color(.gray))
                         
                     }
                     
@@ -152,7 +152,9 @@ struct BoardAnalyticsView: View {
                         BoardAnalyticCell(title: "Board Status", value: "", isActive: true)
 
                     }else{
-                        BoardAnalyticWithStatusGrayCell(title: "Board Status", value: "\(objAnalytics?.board?.status?.capitalized ?? "")")
+                        let status = ((objAnalytics?.board?.status ?? "").lowercased() == "review") ? "Under review" : objAnalytics?.board?.status ?? ""
+                        
+                        BoardAnalyticWithStatusGrayCell(title: "Board Status", value: "\(status.capitalized )")
                     }
           
                     
@@ -167,28 +169,53 @@ struct BoardAnalyticsView: View {
                    
                     BoardAnalyticCell(title: "Impressions", value: "\(objAnalytics?.analytics?.impressions ?? 0)", isActive: false)
 
-                    BoardAnalyticCell(title: "Board clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
+                    BoardAnalyticCell(title: "Board Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
                     BoardAnalyticCell(title: "Favorites", value: "\(objAnalytics?.analytics?.favorites ?? 0)", isActive: false)
                     BoardAnalyticCell(title: "Outbound Click", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
-                  
-              
-                    
+                                      
                 }.padding()
-                    .background(Color(.systemBackground))
+                
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(.systemBackground))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 0.5)
+                    )
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 8)
+                    )
+                   /* .background(Color(.systemBackground))
+                    .clipped()
                     .overlay {
                         RoundedRectangle(cornerRadius: 8.0).strokeBorder(Color(.gray),lineWidth: 0.5)
-                    }
+                    }*/
                 
                 
                 if (objAnalytics?.board?.isFeature ?? false) == false && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
-                    Button {
+                  /*  Button {
                         showSheetpackages = true
                     } label: {
                         
                         Text("Boost Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white)
                           
                     }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                         .background(Color(hexString: "#FF9900")) .cornerRadius(27.5)
+                         .background(Color(hexString: "#FF9900")) .cornerRadius(27.5)*/
+                    
+                    
+                    Button(action: {
+                        showSheetpackages = true
+                    }) {
+                        Text("Boost Now")
+                            .font(.inter(.semiBold, size: 16))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 55)
+                            .background(Color(hexString: "#FF9900"))
+                            .cornerRadius(27.5)
+                    }
+                    .buttonStyle(.plain)
+
                }
 
             }
@@ -202,10 +229,12 @@ struct BoardAnalyticsView: View {
                 
                 selectedPkgObj = selPkgObj
                 paymentGatewayOpen()
-            }).cornerRadius(20)
+            })
             
-            .presentationDetents([.medium])
+            .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)
+            .presentationCornerRadius(20)   // ✅ THIS
+
          
         }.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue))) { notification in
             getBoardAnanlytics()
@@ -292,7 +321,7 @@ struct BoardAnalyticsView: View {
             }))
         }
         
-        sheet.addAction(UIAlertAction(title: "Remove your board", style: .default, handler: { action in
+        sheet.addAction(UIAlertAction(title: "Remove", style: .default, handler: { action in
             AlertView.sharedManager.presentAlertWith(title: "Remove", msg: "Are you sure want to remove?" as NSString, buttonTitles: ["Cancel","Confirm"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in
 
                 if index == 1{

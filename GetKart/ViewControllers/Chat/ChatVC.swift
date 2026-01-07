@@ -168,7 +168,7 @@ class ChatVC: UIViewController {
             }
         })
         
-        setUpMarqueeLabel()
+      //  setUpMarqueeLabel()
     }
     
     
@@ -191,6 +191,13 @@ class ChatVC: UIViewController {
         self.sendtypinStatus(status: false)
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        setUpMarqueeLabel()
+    }
+
     
     deinit {
         NotificationCenter.default.removeObserver(self)

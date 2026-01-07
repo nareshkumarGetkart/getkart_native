@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 
-
 final class BoardViewModel: ObservableObject {
 
     // MARK: - Published (UI State)
@@ -22,8 +21,6 @@ final class BoardViewModel: ObservableObject {
     private let preloadOffset = 4   // 🔥 KEY
     private var didUserScroll = false   // 🔥 KEY
     private var lastTriggeredCount = 0
-    
-    
     private let preloadDistance: CGFloat = 200
     private var lastTriggerPage = 0
 
@@ -70,6 +67,9 @@ final class BoardViewModel: ObservableObject {
         guard !isLoading, hasMoreData else { return }
 
         let threshold = max(items.count - preloadOffset, 0)
+      
+        guard threshold >= 0 else { return }
+
         guard currentIndex >= threshold else { return }
 
         guard lastTriggeredCount != items.count else { return }
@@ -81,6 +81,10 @@ final class BoardViewModel: ObservableObject {
 
     // MARK: - Category Change
     func categoryChanged(_ id: Int) {
+        
+        if selectedCategoryId == id{
+            return
+        }
         isLoading = false
         hasMoreData = true
         didUserScroll = false   // 🔥 reset
@@ -112,12 +116,13 @@ final class BoardViewModel: ObservableObject {
 
         isLoading = true
 
+        
         let url =
         Constant.shared.get_public_board +
         "?page=\(page)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
 
         ApiHandler.sharedInstance.makeGetGenericData(
-            isToShowLoader: showLoader,
+            isToShowLoader: true,
             url: url,
             loaderPos: .mid
         ) { (obj: ItemParse) in
@@ -127,7 +132,11 @@ final class BoardViewModel: ObservableObject {
                    let data = obj.data?.data,
                    !data.isEmpty {
 
-                    self.items.append(contentsOf: data)
+                    if self.page == 1{
+                        self.items = data
+                    }else{
+                        self.items.append(contentsOf: data)
+                    }
                     self.page += 1
                     self.hasMoreData = true
                 } else {

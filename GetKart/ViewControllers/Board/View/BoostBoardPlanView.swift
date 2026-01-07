@@ -70,8 +70,8 @@ struct BoostBoardPlanView: View {
             Button {
                 dismiss()
             } label: {
-                Image(systemName: "xmark")
-                    .foregroundColor(.black)
+                Image(systemName: "xmark").renderingMode(.template)
+                    .foregroundColor(Color(.label))
                     .padding(8)
             }
         }
@@ -105,8 +105,6 @@ struct PlanCardView: View {
                     .font(.inter(.medium, size: 16))
 
                 Spacer()
-
-               // HStack(spacing: 5) {
                     
                     if (planObj.discountInPercentage ?? "0") != "0"{
 
@@ -121,12 +119,11 @@ struct PlanCardView: View {
                                        .strikethrough(true, color: .gray)
                         
                         let amt = "\(planObj.finalPrice ?? "0")".formatNumberWithComma()
-                        Text("\(Local.shared.currencySymbol) \(amt)").font(.inter(.regular, size: 16)).padding(.trailing)
+                        Text("\(Local.shared.currencySymbol) \(amt)").font(.inter(.regular, size: 16))//.padding(.trailing)
                     }else{
                         let amt = "\(planObj.price ?? "0")".formatNumberWithComma()
-                        Text("\(Local.shared.currencySymbol) \(amt)").font(.inter(.regular, size: 16)).padding(.trailing)
+                        Text("\(Local.shared.currencySymbol) \(amt)").font(.inter(.regular, size: 16))//.padding(.trailing)
                     }
-              //  }
             }
 
            
@@ -140,14 +137,24 @@ struct PlanCardView: View {
                     Spacer()
                     Text("For \(planObj.duration ?? "") days")
                         .font(.inter(.regular, size: 14))
-                }.padding(.trailing)
+                }//.padding(.trailing)
             }
         }
-        .padding(10)
+       // .padding(10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+        )
+        .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.orange, lineWidth: 1)
         )
+        .clipShape(
+            RoundedRectangle(cornerRadius: 12)
+        )
+
     }
 
     private func bullet(_ text: String) -> some View {

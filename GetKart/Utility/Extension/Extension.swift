@@ -202,11 +202,17 @@ extension UIColor {
 
 //MARK: UIButton
 extension UIButton {
-    
-    func setImageTintColor(color:UIColor){
-        self.imageView?.image = self.imageView?.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
+  
+    func setImageTintColor(color:UIColor) {
+        guard let image = self.image(for: state) else { return }
+        let templatedImage = image.withRenderingMode(.alwaysTemplate)
+        self.setImage(templatedImage, for: .normal)
         self.tintColor = color
     }
+//    func setImageTintColor(color:UIColor){
+//        self.imageView?.image = self.imageView?.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
+//        self.tintColor = color
+//    }
 
     
 func addShadow(shadowColor: CGColor = UIColor.black.cgColor,

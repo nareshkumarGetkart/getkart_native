@@ -103,7 +103,7 @@ struct BannerPromotionsView: View {
                     }
                 }
               
-                Text("Allowed file types: PNG, JPG, JPEG").font(.manrope(.regular, size: 14.0)).foregroundColor(Color.red)
+                Text("Allowed file types: PNG, JPG, JPEG").font(.manrope(.regular, size: 12.0)).foregroundColor(Color.red)
             }
             
             HStack{
@@ -533,5 +533,31 @@ extension String {
         }
 
         return true
+    }
+
+//not checking prefix will pass go.in like
+    func isValidURLFormat() -> Bool {
+        let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmed.isEmpty else { return false }
+
+        // Add scheme ONLY for parsing (not validation requirement)
+        let testString: String
+        if trimmed.contains("://") {
+            testString = trimmed
+        } else {
+            testString = "https://" + trimmed
+        }
+
+        guard let url = URL(string: testString),
+              let host = url.host else {
+            return false
+        }
+
+        // Host must contain at least one dot and valid characters
+        let hostRegex = #"^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"#
+        let predicate = NSPredicate(format: "SELF MATCHES %@", hostRegex)
+
+        return predicate.evaluate(with: host)
     }
 }

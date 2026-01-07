@@ -54,7 +54,7 @@ struct BoardView: View {
                                     imgHeight: CGFloat(160 + (index % 2) * 50)
                                 ) { isLiked, boardId in
                                     vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
+                                }.contentShape(Rectangle())
                                 .onTapGesture {
                                     pushToDetail(item: item)
                                 }
@@ -81,12 +81,13 @@ struct BoardView: View {
                     }.padding(.top,0)
                     
                 }
-            }.padding(.top,-10)
+            }.padding(.top,-15)
             .refreshable {
                 if !vm.isLoading{
                     vm.loadInitial()
                 }
-            }
+            }.tint(.orange)
+                
             .onPreferenceChange(ScrollBottomKey.self) { bottomY in
                 vm.handleScrollBottom(bottomY: bottomY)
             }
@@ -100,7 +101,7 @@ struct BoardView: View {
         }
         .background(Color(.systemGray6))
         .onAppear {
-            if vm.items.count == 0{
+            if vm.items.count == 0 && !vm.isLoading{
                 vm.loadInitial()
             }
         }
@@ -492,14 +493,17 @@ struct ProductCardStaggered1: View {
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
         .clipShape(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-        )
+        ).contentShape(Rectangle())
         
     }
     
     
     private func manageLike(boardId: Int) {
-        let newState = !(product.isLiked ?? false)
-        sendLikeUnlikeObject(newState, boardId)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let newState = !(product.isLiked ?? false)
+            sendLikeUnlikeObject(newState, boardId)
+        }
     }
     
     func outboundClickApi(strURl:String,boardId:Int){
@@ -521,7 +525,13 @@ struct ProductCardStaggered1: View {
             }
         }
         
-        if let url = URL(string: strURl)  {
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+              !urlString.lowercased().hasPrefix("https://") {
+               urlString = "https://" + urlString
+           }
+        
+        if let url = URL(string: urlString)  {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {

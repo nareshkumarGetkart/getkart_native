@@ -100,6 +100,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                 </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="5up-7S-QRp" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="H6s-is-prF"/>
                     <constraint firstAttribute="bottom" secondItem="5up-7S-QRp" secondAttribute="bottom" constant="5" id="UwD-wT-TRm"/>
@@ -108,7 +109,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="bgView" destination="5up-7S-QRp" id="2dI-wq-ydi"/>
                 <outlet property="lblAmount" destination="PFZ-9l-Wa8" id="8ec-hS-lc6"/>

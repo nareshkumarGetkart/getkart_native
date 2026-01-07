@@ -39,11 +39,11 @@ struct BuyPromotionPackageView: View {
                 if (selPkgObj?.discountInPercentage ?? "0") != "0"{
 
                     let amt = "\(selPkgObj?.finalPrice ?? "0")".formatNumberWithComma()
-                    Text("Pay \(Local.shared.currencySymbol) \(amt)").foregroundColor(.white)
+                    Text("Pay \(Local.shared.currencySymbol)\(amt)").foregroundColor(.white)
 
                 }else{
                     let amt = "\(selPkgObj?.price ?? "0")".formatNumberWithComma()
-                    Text("Pay \(Local.shared.currencySymbol) \(amt)").foregroundColor(.white)
+                    Text("Pay \(Local.shared.currencySymbol)\(amt)").foregroundColor(.white)
                 }
                 
             }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)

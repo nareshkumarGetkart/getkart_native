@@ -118,7 +118,8 @@ struct BannerAlalyticsView: View {
                                 
                                 if var urlString = objBanner?.url {
                                     // Add scheme if missing
-                                    if !urlString.lowercased().hasPrefix("http") {
+                                    if !urlString.lowercased().hasPrefix("http://") &&
+                                        !urlString.lowercased().hasPrefix("https://") {
                                         urlString = "https://" + urlString
                                     }
                                     
@@ -196,11 +197,18 @@ struct BannerAlalyticsView: View {
                     BannerAnalyticCell(title: "Location", value: "\(objBanner?.location ?? "")", isActive: false)
                     
                 }.padding()
-                    .background(Color(.systemBackground))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8.0).strokeBorder(Color(.gray),lineWidth: 0.5)
-                    }
                 
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(.systemBackground))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray, lineWidth: 0.5)
+                    )
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 8)
+                    )
                 
                 
                 if (objBanner?.status ?? "") == "draft" {

@@ -13,43 +13,43 @@ struct PromotionPackagesView: View {
     var packageSelectedPressed: ((_ selPkgObj:PlanModel)->Void)?
     @State private var planListArray:Array<PlanModel>?
     var body: some View {
-        HStack{
-            Text("Promotion Pakages").font(.manrope(.medium, size: 20))
-            
-            Spacer()
-            Button {
-                self.navigationController?.dismiss(animated: true)
-            } label: {
-                Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
-            }
-            
-        }.frame(height:30).padding([.leading,.trailing,.top])
-        
-        VStack(spacing:15){
-            
-            Divider()
-
-            Text("Want more product views? Banner Ads bring users straight to you.")
-            ScrollView{
-                VStack(alignment:.leading, spacing:10){
-                    
-                    
-                    ForEach(planListArray ?? [], id: \.id) { pkgObj in
-                           PromotionPackageCell(obj: pkgObj)
-                               .onTapGesture {
-                                   self.navigationController?.dismiss(animated: true)
-                                   packageSelectedPressed?(pkgObj)
-                               }
-                       }
-                   
-                    Spacer()
-
+        VStack(alignment:.leading, spacing:0){
+            HStack{
+                Text("Promotion Pakages").font(.manrope(.medium, size: 18))
+                
+                Spacer()
+                Button {
+                    self.navigationController?.dismiss(animated: true)
+                } label: {
+                    Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }
                 
-            }.onAppear() {
-                getPackagesApi()
-            }
-        }.padding()
+            }.frame(height:35).padding(8)
+            
+            VStack(alignment:.leading, spacing:5){
+                
+                Divider()
+                
+                Text("Want more product views? Banner Ads bring users straight to you.").font(.manrope(.regular, size: 14))
+                ScrollView{
+                    VStack(alignment:.leading, spacing:8){
+                        
+                        ForEach(planListArray ?? [], id: \.id) { pkgObj in
+                            PromotionPackageCell(obj: pkgObj)
+                                .onTapGesture {
+                                    self.navigationController?.dismiss(animated: true)
+                                    packageSelectedPressed?(pkgObj)
+                                }
+                        }
+                        Spacer()
+                    }
+                    
+                }.scrollIndicators(.hidden, axes: .vertical)
+                .onAppear() {
+                    getPackagesApi()
+                }
+            }.padding(.horizontal)
+        } .background(Color(.systemGray6))
         
     }
     
@@ -86,24 +86,40 @@ struct PromotionPackageCell:View {
                 
                 let originalPrice = "\(obj.price ?? "0")".formatNumberWithComma()
 
-                Text("\(Local.shared.currencySymbol) \(originalPrice)")
+                Text("\(Local.shared.currencySymbol)\(originalPrice)")
                                .font(.subheadline)
                                .foregroundColor(.gray)
                                .strikethrough(true, color: .gray)
                 
                 let amt = "\(obj.finalPrice ?? "0")".formatNumberWithComma()
-                Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
+                Text("\(Local.shared.currencySymbol)\(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
             }else{
                 let amt = "\(obj.price ?? "0")".formatNumberWithComma()
-                Text("\(Local.shared.currencySymbol) \(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
+                Text("\(Local.shared.currencySymbol)\(amt)").font(.manrope(.regular, size: 16)).padding(.trailing)
             }
         
           
-        }.frame(height:55).overlay{
+        }.frame(height:55)
+       /* .overlay{
             
             RoundedRectangle(cornerRadius: 8.0).stroke(Color.gray,lineWidth: 0.6)
-        }.contentShape(Rectangle())
-
+        }
+        .contentShape(Rectangle())
+        
+        */
+//            .padding(.horizontal, 12)
+//            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 8.0)
+                    .fill(Color(.systemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8.0)
+                    .stroke(Color.gray, lineWidth: 0.6)
+            )
+            .clipShape(
+                RoundedRectangle(cornerRadius: 8.0)
+            )
         
     }
 }

@@ -32,11 +32,24 @@ struct SearchBoardView: View {
         HStack {
             Button {
                 // if isToCloseToSearchResultScreen{
-                navigationController?.popToRootViewController(animated: true)
+              //  navigationController?.popToRootViewController(animated: true)
                 //                    }else{
                 //                        navigationController?.popViewController(animated: true)
                 //                    }
+                var isPopped = false
                 
+                if let nav = navigationController,
+                   let boardVC = nav.viewControllers.first(where: {
+                       guard let hostingVC = $0 as? UIHostingController<AnyView> else { return false }
+                       return String(describing: type(of: hostingVC.rootView)) == "BoardView"
+                   }) {
+                    nav.popToViewController(boardVC, animated: true)
+                    isPopped = true
+                }
+                if !isPopped{
+                    navigationController?.popViewController(animated: true)
+                }
+
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)

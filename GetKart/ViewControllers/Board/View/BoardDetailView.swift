@@ -89,12 +89,20 @@ struct BoardDetailView: View{
             Spacer()
         }
         .onAppear {
-           // UIScrollView.appearance().isPagingEnabled = true
+
             if listArray.count == 0{
                 getBoardListApi()
                 boardClickApi(post: itemObj)
             }
         }
+        
+        .background(
+            NavigationConfigurator { nav in
+                nav.interactivePopGestureRecognizer?.isEnabled = true
+                nav.interactivePopGestureRecognizer?.delegate = nil
+            }
+        ) //Added for swipe pop navigation
+
         
         
     }
@@ -250,8 +258,10 @@ struct ReelPostView: View {
             HStack{
                 HStack(spacing:3){
                     Button {
-                        post.isLiked?.toggle()
-                        manageLikeDislikeApi()
+                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                            post.isLiked?.toggle()
+                            manageLikeDislikeApi()
+                        }
                     } label: {
                         let imgStr = (post.isLiked == true) ? "like_fill" : "like"
                         Image(imgStr).foregroundColor(Color(.label))
@@ -351,7 +361,12 @@ struct ReelPostView: View {
             }
         }
         
-        if let url = URL(string: strURl)  {
+         var urlString = strURl
+         if !urlString.lowercased().hasPrefix("http://") &&
+               !urlString.lowercased().hasPrefix("https://") {
+                urlString = "https://" + urlString
+            }
+        if let url = URL(string: urlString)  {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
@@ -437,6 +452,9 @@ struct VerticalPager<Content: View>: UIViewControllerRepresentable {
     }
 }
 
+
+
+
 class PagerVC: UIViewController, UIScrollViewDelegate {
 
     private(set) var pages: [UIViewController] = []
@@ -447,13 +465,14 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         scrollView.isPagingEnabled = true
         scrollView.showsVerticalScrollIndicator = false
         scrollView.delegate = self
         scrollView.bounces = false
-
+        
         view.addSubview(scrollView)
+
     }
 
     override func viewDidLayoutSubviews() {
@@ -510,6 +529,39 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
     }
 }
 
+
+
+struct PostImagesCarousel: View {
+    let images: [String]
+
+    var body: some View {
+        TabView {
+            ForEach(images, id: \.self) { img in
+                
+                if let url = URL(string: img){
+                    
+                    
+                    AsyncImage(url: url) { img in
+                        img.resizable()
+                            .resizable()
+                            .scaledToFit()
+                         .frame(maxWidth: UIScreen.ft_width())
+                            .clipped()
+                    } placeholder: {
+                        Image("getkartplaceholder")
+                            .resizable()
+                            .scaledToFit()
+                            .clipped()
+                    }
+                }
+
+            }
+        }
+        .tabViewStyle(PageTabViewStyle())
+        .frame(maxHeight: 400) // match your UI
+        .clipped()
+    }
+}
 
 
 /*
@@ -584,35 +636,20 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
        }
 }
 */
-struct PostImagesCarousel: View {
-    let images: [String]
 
-    var body: some View {
-        TabView {
-            ForEach(images, id: \.self) { img in
-                
-                if let url = URL(string: img){
-                    
-                    
-                    AsyncImage(url: url) { img in
-                        img.resizable()
-                            .resizable()
-                            .scaledToFit()
-                         .frame(maxWidth: UIScreen.ft_width())
-                            .clipped()
-                    } placeholder: {
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .scaledToFit()
-                        //  .frame(maxWidth: UIScreen.ft_width(), maxHeight: .infinity)
-                            .clipped()
-                    }
-                }
 
+struct NavigationConfigurator: UIViewControllerRepresentable {
+    var configure: (UINavigationController) -> Void
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        let vc = UIViewController()
+        DispatchQueue.main.async {
+            if let nav = vc.navigationController {
+                configure(nav)
             }
         }
-        .tabViewStyle(PageTabViewStyle())
-        .frame(maxHeight: 400) // match your UI
-        .clipped()
+        return vc
     }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }

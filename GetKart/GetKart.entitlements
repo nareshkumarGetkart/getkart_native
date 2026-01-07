@@ -11,6 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:getkart.com</string>
+		<string>applinks:www.getkart.com</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array/>

@@ -142,7 +142,11 @@ struct ReportAdsView: View {
                 if status == 200{
                     AlertView.sharedManager.showToast(message: message)
                    presentationMode.wrappedValue.dismiss()
-                    onReportSubmit(true) // Pass the offer back
+                    onReportSubmit(true) // Pass the report back
+                }else{
+                    presentationMode.wrappedValue.dismiss()
+                    AlertView.sharedManager.showToast(message: message)
+
                 }
             }
         }

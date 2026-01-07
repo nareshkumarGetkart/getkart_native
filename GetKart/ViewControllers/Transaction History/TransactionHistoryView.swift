@@ -203,7 +203,7 @@ struct TransactionRow: View {
                     .font(Font.manrope(.regular, size: 13))
                     .foregroundColor(Color(UIColor.gray))
                 
-            }.padding(5)
+            }//.padding(5)
             Spacer()
             
             VStack(alignment: .trailing, spacing: 5){
@@ -216,12 +216,12 @@ struct TransactionRow: View {
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
                 Text(displayStatus.capitalized)
-                    .font(Font.manrope(.medium, size: 14))
+                    .font(Font.manrope(.medium, size: 13))
                     .foregroundColor(titleColor)
                     .padding(.horizontal)
-                    .frame(height: 26)
+                    .frame(height: 24)
                     .background(bgColor)
-                    .cornerRadius(13)
+                    .cornerRadius(12)
                 
                 
                 let date = Date(timeIntervalSince1970: TimeInterval(self.convertTimestamp(isoDateString: transaction.paymentTransaction?.createdAt ?? "")))

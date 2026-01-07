@@ -238,9 +238,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
  */
     //MARK: Api methods
     func getpopupApi(){
-//        dummyPopupCheck(togetvalues: 6)
-//           return
-        
+
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
             if obj.code == 200,obj.error == false{
@@ -395,9 +393,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                 print("Boost tapped")
                 if (obj.itemID ?? 0) > 0{
                     let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: obj.itemID ?? 0))
+                    destVC.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }else{
                     let destVC = UIHostingController(rootView: MyBoardsView(navigationController: self.navigationController))
+                    destVC.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }
             },
@@ -413,6 +413,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         let hostingVC = UIHostingController(rootView: popupView)
         hostingVC.modalPresentationStyle = .overFullScreen
         hostingVC.view.backgroundColor = .clear
+
         present(hostingVC, animated: false)
     }
 

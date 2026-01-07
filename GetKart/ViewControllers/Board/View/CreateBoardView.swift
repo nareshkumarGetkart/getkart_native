@@ -26,6 +26,7 @@ struct CreateBoardView: View {
     @State private var showCategoryPopup = false
     @State private var selectedCategory: String?
     @State private var selectedCategoryId: Int?
+    @State private var isDataUploading: Bool = false
 
     var isFromEdit:Bool = false
     @State private var boardObj:ItemModel?
@@ -212,7 +213,7 @@ struct CreateBoardView: View {
                             .background(Color.clear)
                             .keyboardType(.default)
                             .tint(Color(.systemOrange))
-                            .autocapitalization(.none)
+                           // .autocapitalization(.none)
                             .lineLimit(3)
                             .onChange(of: strDescription) { newValue in
                                 strDescription = String(newValue.prefix(150))
@@ -310,7 +311,9 @@ struct CreateBoardView: View {
                Button {
                    
                  //  if isFilled{
+                   if !isDataUploading{
                        validateField()
+                   }
                    //}
                } label: {
                    let strText = (isFromEdit) ? "Update" : "Submit"
@@ -415,10 +418,14 @@ struct CreateBoardView: View {
         } else if strPrice.count == 0{
             AlertView.sharedManager.showToast(message: "Please enter price")
             
-        }else if strUrl.count == 0 || !strUrl.isValidWebsiteURL() {
+        }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your board")
         }else{
+            isDataUploading = true
             uploadFIleToServer()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+                self.isDataUploading = false
+            })
             //showSheetpackages = true
         }
     }
@@ -462,6 +469,7 @@ struct CreateBoardView: View {
     
     func uploadFIleToServer(){
       
+        
         var params:Dictionary<String,Any> = [:]
        
         params["name"] = strTitle

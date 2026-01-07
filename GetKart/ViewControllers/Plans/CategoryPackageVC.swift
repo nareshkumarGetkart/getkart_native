@@ -147,7 +147,7 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         
         let obj = planListArray[indexPath.section][indexPath.row]
         cell.lblTitle.text = obj.name
-        cell.lblAmount.text = "\(Local.shared.currencySymbol) \(obj.finalPrice ?? "0")"
+        cell.lblAmount.text = "\(Local.shared.currencySymbol)\(obj.finalPrice ?? "0")"
         if (obj.discountInPercentage ?? "0") == "0"{
             cell.lblPercentOff.text = ""
             cell.imgVwPercentageOffIcon.isHidden = true
@@ -156,7 +156,7 @@ extension CategoryPackageVC: UITableViewDelegate,UITableViewDataSource{
         }else{
             cell.lblPercentOff.text = "\(obj.discountInPercentage ?? "0") % off"
             cell.imgVwPercentageOffIcon.isHidden = false
-            cell.lblOriginalAmount.attributedText = "\(Local.shared.currencySymbol) \(obj.price ?? "0")".setStrikeText(color: .gray)
+            cell.lblOriginalAmount.attributedText = "\(Local.shared.currencySymbol)\(obj.price ?? "0")".setStrikeText(color: .gray)
         }
         
        

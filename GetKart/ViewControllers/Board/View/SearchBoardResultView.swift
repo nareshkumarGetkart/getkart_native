@@ -151,6 +151,7 @@ struct SearchBoardResultView: View {
                                     ) { isLiked, boardId in
                                         vm.updateLike(boardId: boardId, isLiked: isLiked)
                                     }
+                                    .contentShape(Rectangle())
                                     .onTapGesture {
                                         pushToDetailScreen(item: item)
                                     }
