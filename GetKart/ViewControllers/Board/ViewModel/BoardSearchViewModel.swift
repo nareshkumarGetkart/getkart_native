@@ -15,6 +15,8 @@ class BoardSearchViewModel: ObservableObject {
     private var debounceTimer: AnyCancellable?
     var page = 1
     var istoSearch = true
+    var isEmptySearched = true
+    
     
     init() {
         $searchText
@@ -34,17 +36,18 @@ class BoardSearchViewModel: ObservableObject {
     
     
     func getSearchSuggestionApi(){
-        
+        self.items.removeAll()
         var strUrl = Constant.shared.board_suggestion_search
         if searchText.count > 0{
             strUrl.append("?search=\(searchText)")
         }
         
         AF.cancelAllRequests()
-
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:SearchSuggestion) in
          
             if obj.code == 200 {
+                self.isEmptySearched = (self.searchText.count == 0)
                 self.items = obj.data ?? []
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                     self.isDataLoading = false

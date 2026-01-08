@@ -9,6 +9,7 @@ import SwiftUI
 
 
 struct BoardDetailView: View{
+    
     @State private var currentIndex: Int = 0
     var navigationController:UINavigationController?
     @State private var listArray:Array<ItemModel> = [ItemModel]()
@@ -28,8 +29,7 @@ struct BoardDetailView: View{
                       Image("arrow_left")
                           .renderingMode(.template)
                           .foregroundColor(Color(UIColor.label))
-                  }
-                  .frame(width: 40, height: 40)
+                  }.frame(width: 40, height: 40)
 
                   Spacer()
                   
@@ -54,7 +54,6 @@ struct BoardDetailView: View{
 
             if !listArray.isEmpty {
                 
-                
                 VerticalPager(
                     pages: listArray.map { ReelPostView(post: $0,
                                                         sendLikeDislikeObject: { isLiked, boardId,likeCount  in
@@ -77,12 +76,17 @@ struct BoardDetailView: View{
                             boardClickApi(post: listArray[index])
 
                         })//.id(listArray.last?.id ?? 0) //.id(listArray.count)
-                    
+                   .padding(5)
+//                .cornerRadius(10)
+//                .clipped()
+//                .background(Color(.systemGray6))
+               
                     .onChange(of:currentIndex) { newIndex in
                         if newIndex == listArray.count - 1 {
                             getBoardListApi()
                         }
-                        
+                           
+
                         
                     }
             }
@@ -96,14 +100,16 @@ struct BoardDetailView: View{
             }
         }
         
-        .background(
+       .background(
+            
             NavigationConfigurator { nav in
                 nav.interactivePopGestureRecognizer?.isEnabled = true
                 nav.interactivePopGestureRecognizer?.delegate = nil
             }
         ) //Added for swipe pop navigation
-
         
+        .background(Color(.systemGray6))
+
         
     }
 
@@ -211,14 +217,13 @@ struct BoardDetailView: View{
                 .present(sheet, animated: true)
         }
     }
-    
-    
-    
 }
+
 struct ReelPostView: View {
     @State var post: ItemModel
     @State private var showShareSheet = false
     var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int, _ likeCount:Int) -> Void
+    @State private var avgColor: Color = Color(.systemBackground)
 
     var body: some View {
 
@@ -226,22 +231,40 @@ struct ReelPostView: View {
 
             // IMAGE
             GeometryReader { geo in
-                AsyncImage(url: URL(string: post.image ?? "")) { img in
-                    img
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .cornerRadius(10)
-                        .shadow(
-                            color: Color.black.opacity(0.10),
-                            radius: 7,
-                            x: 0,
-                            y: 2
-                        )
-                } placeholder: {
-                    Color.black
-                }
+                ZStack(alignment:.top){
+                    avgColor   // 🔥 background from image
+
+                    AsyncImage(url: URL(string: post.image ?? "")) { img in
+                        img
+                            .resizable()
+                            .scaledToFit()
+                            //.frame(width: geo.size.width, height: geo.size.height)
+                            .frame(maxWidth: .infinity)
+                        // .clipped()
+//                            .cornerRadius(10)
+//                            .shadow(
+//                                color: Color.black.opacity(0.10),
+//                                radius: 7,
+//                                x: 0,
+//                                y: 2
+//                            )
+                            . padding(0)
+                            .onAppear {
+                                extractAverageColor(from: img)
+                            }
+                    } placeholder: {
+                        Color.black
+                    }
+                }//.background(Color(.systemBackground))
+                    .frame(width: geo.size.width, height: geo.size.height)
+                
+                .cornerRadius(10)
+                    .shadow(
+                        color: Color.black.opacity(0.10),
+                        radius: 7,
+                        x: 2,
+                        y: 6
+                    )
             }
             .cornerRadius(10)
 
@@ -249,12 +272,23 @@ struct ReelPostView: View {
             bottomCard.padding()
         }
             .background(Color(.systemBackground))
-            .cornerRadius(10)
-            .padding(8)
+            //.cornerRadius(10)
+            .clipped()
+            //.padding(0)
     }
 
+    
+    private func extractAverageColor(from image: Image) {
+            let renderer = ImageRenderer(content: image)
+            renderer.scale = UIScreen.main.scale
+
+            if let uiImage = renderer.uiImage,
+               let color = uiImage.averageColor {
+                avgColor = Color(color)
+            }
+        }
     private var bottomCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack{
                 HStack(spacing:3){
                     Button {
@@ -281,7 +315,7 @@ struct ReelPostView: View {
                         message: nil,
                         buttons: [
                             .default(Text("Copy Link"), action: {
-                                UIPasteboard.general.string = ShareMedia.itemUrl + "/board/\(post.id ?? 0)"
+                                UIPasteboard.general.string = ShareMedia.boardUrl + "\(post.id ?? 0)"
                                 AlertView.sharedManager.showToast(message: "Copied successfully.")
                             }),
                             .default(Text("Share"), action: {
@@ -332,12 +366,11 @@ struct ReelPostView: View {
                 outboundClickApi(strURl: post.outbondUrl ?? "")
             } label: {
                 
-                Text("Buy Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white)
+                Text("Buy Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
                   
-            }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                .background(Color(hexString: "#FF9900")) .cornerRadius(8).padding([.bottom,.top])
+            }.background(Color(hexString: "#FF9900"))
+             .cornerRadius(8).padding([.bottom,.top])
         }
-        
     }
     
     
@@ -470,7 +503,10 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.delegate = self
         scrollView.bounces = false
-        
+       
+        view.layer.cornerRadius = 10
+        view.layer.masksToBounds = true   // 🔥 IMPORTANT
+
         view.addSubview(scrollView)
 
     }
@@ -652,4 +688,51 @@ struct NavigationConfigurator: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+
+
+import UIKit
+import CoreImage
+
+extension UIImage {
+
+    func averageColorNew() -> UIColor? {
+        guard let ciImage = CIImage(image: self) else { return nil }
+
+        let extent = ciImage.extent
+        let context = CIContext(options: [.workingColorSpace: kCFNull!])
+
+        let filter = CIFilter(
+            name: "CIAreaAverage",
+            parameters: [
+                kCIInputImageKey: ciImage,
+                kCIInputExtentKey: CIVector(
+                    x: extent.origin.x,
+                    y: extent.origin.y,
+                    z: extent.size.width,
+                    w: extent.size.height
+                )
+            ]
+        )
+
+        guard let outputImage = filter?.outputImage else { return nil }
+
+        var bitmap = [UInt8](repeating: 0, count: 4)
+        context.render(
+            outputImage,
+            toBitmap: &bitmap,
+            rowBytes: 4,
+            bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+            format: .RGBA8,
+            colorSpace: nil
+        )
+
+        return UIColor(
+            red: CGFloat(bitmap[0]) / 255,
+            green: CGFloat(bitmap[1]) / 255,
+            blue: CGFloat(bitmap[2]) / 255,
+            alpha: 1
+        )
+    }
 }

@@ -16,7 +16,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -870,7 +870,8 @@ class ShareMedia{
     static var profileUrl = "https://getkart.com/seller/"
     static var itemUrl = "https://getkart.com/product-details/"
 
-    
+    static var boardUrl = "https://getkart.com/board/"
+
     
   
     

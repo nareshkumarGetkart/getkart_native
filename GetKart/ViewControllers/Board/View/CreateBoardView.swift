@@ -176,8 +176,8 @@ struct CreateBoardView: View {
                                     .fill(Color(.systemBackground)
                                          )
                                     .onChange(of: strTitle) { newValue in
-                                        if newValue.count > 30 {
-                                            strTitle = String(newValue.prefix(30))   // ✅ restrict input
+                                        if newValue.count > 50 {
+                                            strTitle = String(newValue.prefix(50))   // ✅ restrict input
                                         }
                                     }
                                 
@@ -185,7 +185,7 @@ struct CreateBoardView: View {
                         
                         HStack{
                             Spacer()
-                            Text("\(strTitle.count)/30").font(.inter(.regular, size: 10))
+                            Text("\(strTitle.count)/50").font(.inter(.regular, size: 10))
                         }
                     }
                 }
@@ -345,18 +345,39 @@ struct CreateBoardView: View {
                        }
                    }
                 
-            .fullScreenCover(isPresented: $showCropper) {
+            /*.fullScreenCover(isPresented: $showCropper) {
                        if let img = selectedImage {
                            ImageCropperView(
                                image: img,
-                              cropAspectRatio: CGSize(width: 1180, height: 1500)
+                               cropAspectRatio: CGSize(width: img.size.width, height: img.size.height)
                            ) { croppedImage in
                                self.selectedImage = croppedImage
                                self.showCropper = false
                            }
                        }
-                   }
+                   }*/
                
+        
+           
+        
+        
+            .fullScreenCover(isPresented: $showCropper) {
+                if let img = selectedImage {
+                    
+                    ImageCropperBoardView(
+                        image: img,
+                        onCropped: { croppedImage in
+                            self.selectedImage = croppedImage
+                            showCropper = false
+                        },
+                        onCancel: {
+                            showCropper = false
+                        }
+                    )
+                }
+            }
+
+        
         
             .sheet(isPresented: $showSheetpackages) {
                 if #available(iOS 16.0, *) {
@@ -405,10 +426,10 @@ struct CreateBoardView: View {
             
             AlertView.sharedManager.showToast(message: "Please select category of board")
             
-        }else if strTitle.count < 3 || strTitle.count > 30 {
-            // 3 to 30 characters
+        }else if strTitle.count < 3 || strTitle.count > 50 {
+            // 3 to 50 characters
             AlertView.sharedManager.showToast(
-                message: "Board title must be between 3 and 30 characters."
+                message: "Board title must be between 3 and 50 characters."
             )
         } else if strDescription.count < 20 || strDescription.count > 150 {
             // 50 to 150 characters

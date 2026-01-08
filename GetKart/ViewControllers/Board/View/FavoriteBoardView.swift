@@ -146,10 +146,12 @@ struct FavoriteBoardView: View {
                 ScrollView {
                     LazyVStack {
                         StaggeredGrid(columns: 2, spacing: 5) {
-                            ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                            //ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                                ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+
                                 ProductCardStaggered1(
                                     product: item,
-                                    imgHeight: CGFloat(150 + (index % 2) * 50)
+                                   // imgHeight: CGFloat(150 + (index % 2) * 50)
                                 ) { isLiked, boardId in
                                     vm.updateLike(boardId: boardId, isLiked: isLiked)
                                 }.contentShape(Rectangle())

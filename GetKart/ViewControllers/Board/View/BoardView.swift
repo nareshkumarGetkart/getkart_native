@@ -16,23 +16,24 @@ struct BoardView: View {
     @StateObject private var vm = BoardViewModel()
 
     var body: some View {
-        
+        ScrollViewReader { verticalProxy in   // 👈 ADD THIS
+
         VStack(spacing: 0) {
             
            // headerView
-            
-            
-            ScrollViewReader { verticalProxy in   // 👈 ADD THIS
 
                 headerView(
                     onCategoryTap: {
-                        withAnimation(.easeInOut) {
-                            verticalProxy.scrollTo("TOP", anchor: .top)
-                        }
+                        scrollToTop(verticalProxy)
+
+//                        withAnimation(.easeInOut) {
+//                            verticalProxy.scrollTo("TOP", anchor: .top)
+//                        }
                     }
                 )
                
-            ScrollView {
+            
+               ScrollView {
                 
                 // 🔥 TOP ANCHOR
                          Color.clear
@@ -46,57 +47,88 @@ struct BoardView: View {
                     
                 } else {
                     
-                    LazyVStack {
+                    LazyVStack(spacing:0) {
                         StaggeredGrid(columns: 2, spacing: 5) {
-                            ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                           // ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                                
+                           ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+
+//                               let isEven: Bool = {
+//                                   guard let id = item.id else { return false }
+//                                   return id.hashValue % 2 == 0
+//                               }()
+//
+//                               let height: CGFloat = isEven ? 210 : 160
+                               
                                 ProductCardStaggered1(
                                     product: item,
-                                    imgHeight: CGFloat(160 + (index % 2) * 50)
+                                    //imgHeight: height //CGFloat(160 + (index % 2) * 50)
                                 ) { isLiked, boardId in
                                     vm.updateLike(boardId: boardId, isLiked: isLiked)
                                 }.contentShape(Rectangle())
                                 .onTapGesture {
                                     pushToDetail(item: item)
                                 }
-                                .onAppear {
-                                    vm.loadNextPageIfNeeded(currentIndex: index)
-                                }
+                               // .onAppear {
+                                  //  vm.loadNextPageIfNeeded(currentIndex: index)
+                                    
+                                    
+                                    
+                                    //
+                               // }
                             }
                         }
-                        .padding(5)
+                        .padding(.horizontal, 5)
+                        .padding(.top, 0)
                         
-                        // 👇 bottom detector (NO layout impact)
-                        GeometryReader { geo in
+                        //  bottom detector (NO layout impact)
+                      /*  GeometryReader { geo in
                             Color.clear
                                 .preference(
                                     key: ScrollBottomKey.self,
                                     value: geo.frame(in: .global).maxY
                                 )
                         }
-                        .frame(height: 0)
+                        .frame(height: 0)*/
                         
                         if vm.isLoading {
-                            ProgressView().padding()
+                            ProgressView().padding()//.transaction { $0.animation = nil }
                         }
                     }.padding(.top,0)
                     
                 }
-            }.padding(.top,-15)
+                   
+                   // 👇 MUST be inside ScrollView, after content
+                       ScrollDetector {
+                           vm.loadNextPage()
+                       }
+            }
+             
+            .scrollIndicators(.hidden)
+           
             .refreshable {
                 if !vm.isLoading{
                     vm.loadInitial()
                 }
             }.tint(.orange)
                 
-            .onPreferenceChange(ScrollBottomKey.self) { bottomY in
-                vm.handleScrollBottom(bottomY: bottomY)
-            }
-            .scrollIndicators(.hidden, axes: .vertical)
-            .scrollIndicators(.hidden, axes: .horizontal)
-            
-            // 🔥 EXPOSE PROXY TO CATEGORY TABS
+//            .onPreferenceChange(ScrollBottomKey.self) { bottomY in
+//                vm.handleScrollBottom(bottomY: bottomY)
+//            }
             .environment(\.scrollToTopProxy, verticalProxy)
-            // }
+        }
+            
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.refreshInterestChangeBoardScreen.rawValue)
+            )
+        ) { notification in
+            scrollToTop(verticalProxy)
+            vm.selectedCategoryId = 0
+            selected = "All"
+           // vm.categoryChanged(0)
+            vm.loadInitial()
+
         }
         }
         .background(Color(.systemGray6))
@@ -121,18 +153,18 @@ struct BoardView: View {
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
         }
         
-        .onReceive(
-            NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.refreshInterestChangeBoardScreen.rawValue)
-            )
-        ) { notification in
-            
-            vm.categoryChanged(0)
-            selected = "All"
-        }
+        
         
     }
     
+    private func scrollToTop(_ proxy: ScrollViewProxy) {
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                proxy.scrollTo("TOP", anchor: .top)
+            }
+        }
+    }
+
     
     func headerView(onCategoryTap: @escaping () -> Void) -> some View {
         VStack {
@@ -151,11 +183,11 @@ struct BoardView: View {
                 selectedCategoryId: Binding(
                     get: { vm.selectedCategoryId },
                     set: {
-                        vm.categoryChanged($0)
                         onCategoryTap()   // 🔥 SCROLL TO TOP HERE
+                        vm.categoryChanged($0)
                     }
                 )
-            )
+            ).padding(.bottom,0)
         }
         .background(Color(.systemBackground))
         
@@ -190,13 +222,14 @@ struct CategoryTabs: View {
     var body: some View {
         VStack(spacing: 0) {
 
-            ScrollViewReader { proxy in      // 🔥 ADD THIS
+            ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
 
-                    HStack(spacing: 26) {
+                    HStack(spacing: 20) {
                         ForEach(objViewModel.listArray ?? [], id: \.id) { catObj in
                             categoryTab(catObj)
-                                .id(catObj.id)   // 🔥 IMPORTANT
+                                .id(catObj.id)
+                                
                                 .onTapGesture {
                                     withAnimation(.easeInOut) {
                                         selectedCategoryId = catObj.id ?? 0
@@ -204,32 +237,15 @@ struct CategoryTabs: View {
 
                                         proxy.scrollTo(catObj.id,
                                                        anchor: .center)
-                                        // 🔥 vertical scroll to top
+                                        // vertical scroll to top
                                         scrollProxy?.scrollTo("TOP", anchor: .top)
                                     }
                                 }
                         }
                     }
-                    .padding(.horizontal)
-                    //.padding(.top, 6)
+                    .padding(.horizontal,12)
+                    .padding(.vertical, 0)
                 }
-                // 🔥 Direction lock gesture
-                 /*     .simultaneousGesture(
-                          DragGesture(minimumDistance: 5)
-                              .onChanged { value in
-                                  let horizontal = abs(value.translation.width)
-                                  let vertical = abs(value.translation.height)
-
-                                  // lock only horizontal drags
-                                  isHorizontalDrag = horizontal > vertical
-                              }
-                              .onEnded { _ in
-                                  isHorizontalDrag = false
-                              }
-                      )
-                      // 🔥 disable vertical parent scroll while horizontal dragging
-                      .scrollDisabled(isHorizontalDrag == false ? false : false)
-                */
              
                 // 🔥 Auto-scroll when selection changes (API / default)
                 .onChange(of: selectedCategoryId) { newValue in
@@ -242,7 +258,7 @@ struct CategoryTabs: View {
             Rectangle()
                 .fill(Color(.systemGray5))
                 .frame(height: 1)
-        }.padding(.bottom,0)
+        }.padding(.bottom, 0)
 
         // When categories load
         .onChange(of: objViewModel.listArray?.count ?? 0) { _ in
@@ -407,9 +423,10 @@ private extension BoardView {
 struct ProductCardStaggered1: View {
     
     let product: ItemModel
-    let imgHeight: CGFloat
+   // let imgHeight: CGFloat
     let sendLikeUnlikeObject: (Bool, Int) -> Void
-    
+    @State private var imageRatio: CGFloat = 3/4 // fallback ratio
+
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             
@@ -417,11 +434,20 @@ struct ProductCardStaggered1: View {
                 if let url = URL(string: product.image ?? "") {
                     
                     
-                    GeometryReader { geo in
+                   // GeometryReader { geo in
                         KFImage(url)
                             .resizable()
-                            .scaledToFill()
-                            .frame(width: geo.size.width,height:imgHeight)
+                           // .scaledToFill()
+                            //.frame(width: geo.size.width,height:imgHeight)
+                            //.aspectRatio(3/4, contentMode: .fill)
+                            .onSuccess { result in
+                                            let size = result.image.size
+                                            if size.height > 0 {
+                                                imageRatio = size.width / size.height
+                                            }
+                                        }
+                                        .scaledToFill()
+                                        .aspectRatio(imageRatio, contentMode: .fill)
                             .clipped()
                             .cornerRadius(8)
                             .shadow(
@@ -430,8 +456,8 @@ struct ProductCardStaggered1: View {
                                 x: 0,
                                 y: 2
                             )
-                    }
-                    .frame(height: imgHeight)
+//                    }
+//                    .frame(height: imgHeight)
                 }
                 
                 Button {
@@ -637,6 +663,10 @@ struct StaggeredGrid: Layout {
         }
     }
 }
+
+
+
+
 /*
 private extension BoardView {
 
@@ -1079,3 +1109,76 @@ extension NumberFormatter {
     }()
 }
 
+import UIKit
+
+struct ScrollDetector: UIViewRepresentable {
+
+    var onScrollToBottom: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onScrollToBottom: onScrollToBottom)
+    }
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        DispatchQueue.main.async {
+            attachScrollView(from: view, coordinator: context.coordinator)
+        }
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
+
+    private func attachScrollView(
+        from view: UIView,
+        coordinator: Coordinator
+    ) {
+        var parent = view.superview
+        while parent != nil {
+            if let scrollView = parent as? UIScrollView {
+                scrollView.delegate = coordinator
+                return
+            }
+            parent = parent?.superview
+        }
+    }
+
+    // MARK: - Coordinator
+    final class Coordinator: NSObject, UIScrollViewDelegate {
+
+        let onScrollToBottom: () -> Void
+
+        private var isTriggered = false
+        private var lastContentHeight: CGFloat = 0   // 🔥 KEY
+
+        init(onScrollToBottom: @escaping () -> Void) {
+            self.onScrollToBottom = onScrollToBottom
+        }
+
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
+            let offsetY = scrollView.contentOffset.y
+            let contentHeight = scrollView.contentSize.height
+            let height = scrollView.frame.size.height
+
+            // 🔥 RESET on content shrink (category change)
+            if contentHeight < lastContentHeight {
+                isTriggered = false
+            }
+
+            // 🔥 RESET when new data added
+            if contentHeight > lastContentHeight {
+                isTriggered = false
+                lastContentHeight = contentHeight
+            }
+
+            if offsetY > contentHeight - height - 200 {
+                if !isTriggered {
+                    isTriggered = true
+                    onScrollToBottom()
+                }
+            }
+        }
+
+    }
+}

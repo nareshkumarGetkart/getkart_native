@@ -47,7 +47,7 @@ struct SearchBoardView: View {
                     isPopped = true
                 }
                 if !isPopped{
-                    navigationController?.popViewController(animated: true)
+                    navigationController?.popToRootViewController(animated: true)
                 }
 
             } label: {
@@ -85,6 +85,7 @@ struct SearchBoardView: View {
             if  viewModel.searchText.count > 0{
                 Button("Cancel") {
                     viewModel.searchText = ""
+                    viewModel.items.removeAll()
                 }
                 .foregroundColor(Color(.label))
                 .padding(.leading, 8)
@@ -112,7 +113,7 @@ struct SearchBoardView: View {
                         
                         HStack(spacing: 15) {
                             
-                            if viewModel.searchText.count == 0{
+                            if viewModel.searchText.count == 0 && viewModel.isEmptySearched == true  {
                                 KFImage(URL(string:  item.categoryImage ?? ""))
                                     .placeholder {
                                         Image("getkartplaceholder")

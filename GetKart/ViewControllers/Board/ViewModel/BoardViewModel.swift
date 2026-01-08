@@ -21,11 +21,14 @@ final class BoardViewModel: ObservableObject {
     private let preloadOffset = 4   // 🔥 KEY
     private var didUserScroll = false   // 🔥 KEY
     private var lastTriggeredCount = 0
-    private let preloadDistance: CGFloat = 200
+    private let preloadDistance: CGFloat =  200
     private var lastTriggerPage = 0
 
     func handleScrollBottom(bottomY: CGFloat) {
         let screenHeight = UIScreen.main.bounds.height
+
+        print("screenHeight=\(screenHeight)\n")
+        print("screenHeight + preloadDistance =\(screenHeight + preloadDistance)")
 
         guard bottomY < screenHeight + preloadDistance else { return }
         guard !isLoading, hasMoreData else { return }
@@ -63,7 +66,7 @@ final class BoardViewModel: ObservableObject {
     // MARK: - NEXT PAGE CALL (🔥 THIS IS THE FIX)
  
     func loadNextPageIfNeeded(currentIndex: Int) {
-        guard didUserScroll else { return }
+        //guard didUserScroll else { return }
         guard !isLoading, hasMoreData else { return }
 
         let threshold = max(items.count - preloadOffset, 0)
@@ -74,13 +77,18 @@ final class BoardViewModel: ObservableObject {
 
         guard lastTriggeredCount != items.count else { return }
         lastTriggeredCount = items.count
+        
+        let objItem =  items[currentIndex]
+        let lastItem = items.last
+        if (objItem.id == lastItem?.id){
+            fetchBoards()
+        }
 
-        fetchBoards()
     }
 
 
     // MARK: - Category Change
-    func categoryChanged(_ id: Int) {
+  /*  func categoryChanged(_ id: Int) {
         
         if selectedCategoryId == id{
             return
@@ -90,6 +98,24 @@ final class BoardViewModel: ObservableObject {
         didUserScroll = false   // 🔥 reset
         selectedCategoryId = id
         loadInitial()
+    }
+*/
+    func categoryChanged(_ id: Int) {
+
+        guard selectedCategoryId != id else { return }
+
+        // 🔥 FULL RESET
+        page = 1
+        lastTriggerPage = 0
+        lastTriggeredCount = 0
+        hasMoreData = true
+        isLoading = false
+        didUserScroll = false
+
+        items.removeAll()
+        selectedCategoryId = id
+
+        fetchBoards(showLoader: false)
     }
 
     // MARK: - Like Update
@@ -114,7 +140,7 @@ final class BoardViewModel: ObservableObject {
     private func fetchBoards(showLoader: Bool = false) {
         guard !isLoading else { return }
 
-        isLoading = true
+        self.isLoading = true
 
         
         let url =
@@ -122,7 +148,7 @@ final class BoardViewModel: ObservableObject {
         "?page=\(page)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
 
         ApiHandler.sharedInstance.makeGetGenericData(
-            isToShowLoader: true,
+            isToShowLoader: showLoader,
             url: url,
             loaderPos: .mid
         ) { (obj: ItemParse) in
@@ -135,6 +161,9 @@ final class BoardViewModel: ObservableObject {
                     if self.page == 1{
                         self.items = data
                     }else{
+//                        withTransaction(Transaction(animation: nil)) {
+//                                self.items.append(contentsOf: data)
+//                            }
                         self.items.append(contentsOf: data)
                     }
                     self.page += 1
@@ -143,8 +172,8 @@ final class BoardViewModel: ObservableObject {
                     self.hasMoreData = false
                 }
 
-                
-                self.isLoading = false
+                    self.isLoading = false
+
             }
         }
     }

@@ -30,6 +30,7 @@ struct Search: Codable {
     let categoryName: String?
     let categoryImage: String?
     let keyword: String?
+    
 
     enum CodingKeys: String, CodingKey {
         case categoryID = "category_id"

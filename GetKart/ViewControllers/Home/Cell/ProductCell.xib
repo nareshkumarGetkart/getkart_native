@@ -88,7 +88,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Delhi India" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Hi-BM-ZQM">
-                                <rect key="frame" x="19" y="179" width="121" height="15"/>
+                                <rect key="frame" x="21" y="179" width="119" height="15"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="15" id="YSg-qf-pe7"/>
                                 </constraints>
@@ -97,10 +97,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location-outline" translatesAutoresizingMaskIntoConstraints="NO" id="YJj-rV-5eX">
-                                <rect key="frame" x="5" y="180.66666666666666" width="12" height="12"/>
+                                <rect key="frame" x="5" y="179.66666666666666" width="14" height="14"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="12" id="EdG-es-FQ9"/>
-                                    <constraint firstAttribute="height" constant="12" id="WEJ-sV-L00"/>
+                                    <constraint firstAttribute="width" constant="14" id="EdG-es-FQ9"/>
+                                    <constraint firstAttribute="height" constant="14" id="WEJ-sV-L00"/>
                                 </constraints>
                             </imageView>
                         </subviews>
