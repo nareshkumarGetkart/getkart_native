@@ -216,18 +216,18 @@ struct CreateBoardView: View {
                            // .autocapitalization(.none)
                             .lineLimit(3)
                             .onChange(of: strDescription) { newValue in
-                                strDescription = String(newValue.prefix(150))
+                                strDescription = String(newValue.prefix(400))
                             }
                         
                     }
-                    .frame(minHeight: 115, maxHeight: 115)
+                    .frame(minHeight: 115, maxHeight: 190)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.systemBackground))
                     )
                     HStack{
                         Spacer()
-                        Text("\(strDescription.count)/150").font(.inter(.regular, size: 10))
+                        Text("\(strDescription.count)/400").font(.inter(.regular, size: 10))
                     }
                 }
                 }
@@ -297,15 +297,17 @@ struct CreateBoardView: View {
                 
                 VStack(alignment:.leading,spacing: 8){
                     Text("Add URL").font(.inter(.regular, size: 16.0))
-                    TextField("Website", text: $strUrl).padding(.horizontal).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55).background(
-                        
+                    TextField("Website", text: $strUrl).padding(.horizontal).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                    .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.systemBackground))
-                        
-                    ).keyboardType(.URL).tint(Color(.systemOrange)).autocapitalization(.none)
+                    ).keyboardType(.URL)
+                      .tint(Color(.systemOrange))
+                      .autocapitalization(.none)
+                      .disableAutocorrection(true)
+                      .textInputAutocapitalization(.never)
                     Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 12.0))
                 }
-               
                 
                 let isFilled =  (isFromEdit) ? true : ((selectedImage != nil) ? true : false)
                Button {
@@ -431,22 +433,22 @@ struct CreateBoardView: View {
             AlertView.sharedManager.showToast(
                 message: "Board title must be between 3 and 50 characters."
             )
-        } else if strDescription.count < 20 || strDescription.count > 150 {
+        } else if strDescription.count < 20 || strDescription.count > 400 {
             // 50 to 150 characters
             AlertView.sharedManager.showToast(
-                message: "Description must be between 20 and 150 characters."
+                message: "Description must be between 20 and 400 characters."
             )
-        } else if strPrice.count == 0{
-            AlertView.sharedManager.showToast(message: "Please enter price")
+        } else if strPrice.count == 0 || ((Int(strPrice) ?? 0) <= 0) || strPrice.hasPrefix("0"){
+            AlertView.sharedManager.showToast(message: "Please enter valid price")
             
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your board")
         }else{
             isDataUploading = true
             uploadFIleToServer()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
-                self.isDataUploading = false
-            })
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+//                self.isDataUploading = false
+//            })
             //showSheetpackages = true
         }
     }
@@ -489,7 +491,6 @@ struct CreateBoardView: View {
     }
     
     func uploadFIleToServer(){
-      
         
         var params:Dictionary<String,Any> = [:]
        
@@ -509,13 +510,17 @@ struct CreateBoardView: View {
         let imgData =   (selectedImage != nil) ? selectedImage?.wxCompress().pngData() : nil
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: imgData, imageName: "image", imagesData: [], imageNames: [], url:strUrl , params: params, completionHandler: { responseObject, error in
 
+            self.isDataUploading = false
+
             if error == nil {
                 let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
                 if code == 200{
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+                    if self.isFromEdit{
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+                    }
                     AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
                         self.navigationController?.popViewController(animated: true)
                     }

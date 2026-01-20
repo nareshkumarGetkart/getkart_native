@@ -68,6 +68,10 @@ class CategoryPackageVC: UIViewController {
             strURL.append("&type=advertisement")
         }
         
+        if let id = itemId, id > 0{
+            strURL.append("&item_id=\(id)")
+        }
+        
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strURL) { (obj:Plan) in
             
             if obj.code == 200 {

@@ -473,14 +473,14 @@ extension ZoomImageViewController: UIScrollViewDelegate {
         pager.currentPage = page
 
         // 👉 Swipe left when on first page
-        if offsetX < -70 { // overscroll threshold
+      /*  if offsetX < -70 { // overscroll threshold
             popWithGesture()
         }
 
         // 👉 Swipe right when on last page
         if offsetX > maxOffsetX + 60 {
             popWithGesture()
-        }
+        }*/
     }
 
 

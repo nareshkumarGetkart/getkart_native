@@ -34,7 +34,8 @@ class HomeBaseVC: UITabBarController {
     // MARK: - Actions
    var controllers: [UIViewController]?
    private let middleButton = UIButton()
-    
+   private var lastSelectedIndex: Int = 0
+
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -47,10 +48,7 @@ class HomeBaseVC: UITabBarController {
         tabBar.unselectedItemTintColor = UIColor.label
         delegate = self
         self.setViewControllers(getControllers(), animated: false)
-        
-//        let images = ["home","chat","","myads","profile"]
-//        let imagesSel = ["home_active","chat_active","","myads_active","profile_active"]
-        
+
         let images = ["home","gridUnSel","","chat","profile"]
         let imagesSel = ["home_active","gridSel","","chat_active","profile_active"]
         guard let items = self.tabBar.items else {
@@ -64,24 +62,9 @@ class HomeBaseVC: UITabBarController {
            
         }
         setupMiddleButton()
-        
-               /* let customTabBar = CustomTabBar()
-                setValue(customTabBar, forKey: "tabBar")
-                setupMiddleButton()
-                customTabBar.middleButton = middleButton*/
-        
-        
-        
-        setupDoubleTapGesture()
-        
+       /*setupDoubleTapGesture()*/
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
-        
-        
-        
-  
         addNewBadgeOnBoardTab()
-
-
     }
    
     
@@ -165,9 +148,15 @@ class HomeBaseVC: UITabBarController {
                 
         let homeVc = StoryBoard.main.instantiateViewController(withIdentifier: "HomeVC") as! HomeVC
         homeVc.tabBarItem = UITabBarItem(title: "Home", image: UIImage(named: "home")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"home_active")?.withRenderingMode(.alwaysOriginal))
-
-        let boardVc = UIHostingController(rootView: BoardView(navigationController: self.navigationController))
+    
+     /*  let boardVc = UIHostingController(rootView: BoardView(navigationController: self.navigationController))
         boardVc.tabBarItem = UITabBarItem(title: "Board", image: UIImage(named: "gridUnSel")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"gridSel")?.withRenderingMode(.alwaysOriginal))
+       */
+         
+        let boardVc = UIHostingController(rootView: PublicBoardView(tabBarController: self))
+        boardVc.tabBarItem = UITabBarItem(title: "Board", image: UIImage(named: "gridUnSel")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"gridSel")?.withRenderingMode(.alwaysOriginal))
+        
+
 
         let chatVc = StoryBoard.main.instantiateViewController(withIdentifier: "ChatListVC") as! ChatListVC
         chatVc.tabBarItem = UITabBarItem(title: "Chat", image: UIImage(named: "chat")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"chat_active")?.withRenderingMode(.alwaysOriginal))
@@ -191,6 +180,8 @@ class HomeBaseVC: UITabBarController {
 //      let vc3 = UINavigationController(rootViewController: adsVc)
         let vc3 = UINavigationController(rootViewController: chatVc)
         let vc4 = UINavigationController(rootViewController: profileVc)
+        
+        
         
         vc1.navigationBar.isHidden = true
         vc2.navigationBar.isHidden = true
@@ -542,7 +533,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
             for (index, button) in tabBarButtons.enumerated() {
                 if index == 2 { continue } // Skip dummy middle tab
 
-                if index == 0 {
+                if index == 0 || index == 1{
                     button.gestureRecognizers?.removeAll()
                     
                     let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
@@ -560,7 +551,15 @@ extension HomeBaseVC: UITabBarControllerDelegate {
            let nav = viewControllers?[index] as? UINavigationController,
            let homeVC = nav.topViewController as? HomeVC {
             homeVC.scrollToTop()
+            return
         }
+        // BOARD TAB (SwiftUI)
+            if index == 1, index == selectedIndex {
+                NotificationCenter.default.post(
+                    name: Notification.Name(NotificationKeys.scrollBoardToTop),
+                    object: nil
+                )
+            }
     }
     
     
@@ -584,8 +583,36 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         return true
     }
     
-    func tabBarController(_ tabBarController: UITabBarController,
-                          didSelect viewController: UIViewController) {
+//    func tabBarController(_ tabBarController: UITabBarController,
+//                          didSelect viewController: UIViewController) {
+//    
+//    }
     
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        didSelect viewController: UIViewController
+    ) {
+
+        let currentIndex = tabBarController.selectedIndex
+
+        // SAME tab tapped again = double tap
+        if currentIndex == lastSelectedIndex {
+
+            if currentIndex == 0,
+               let nav = viewControllers?[0] as? UINavigationController,
+               let homeVC = nav.topViewController as? HomeVC {
+                homeVC.scrollToTop()
+            }
+
+            if currentIndex == 1 {
+                NotificationCenter.default.post(
+                    name: Notification.Name(NotificationKeys.scrollBoardToTop),
+                    object: nil
+                )
+            }
+        }
+
+        lastSelectedIndex = currentIndex
     }
+
 }

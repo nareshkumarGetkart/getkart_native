@@ -71,16 +71,17 @@ struct ProductCard: View {
                         .multilineTextAlignment(.leading).lineLimit(1)
                         .font(Font.manrope(.semiBold, size: 14))
 
-                    HStack(spacing: 1){
-                        Image("location-outline")
-                            .renderingMode(.template).frame(width: 13,height:13)
+                    HStack(spacing: 2){
+                        Image("location-outline").resizable()
+                            .renderingMode(.template).frame(width: 15,height:15)
                             .foregroundColor(Color(UIColor.label))
                         Text(objItem.address ?? "").foregroundColor(Color(UIColor.label))
-                            .multilineTextAlignment(.leading).lineLimit(1)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(1)
                             .font(Font.manrope(.regular, size: 12))
                             .foregroundColor(.gray)
                         Spacer(minLength: 0)
-                    }
+                    }.padding(.horizontal,0)
                     
                 }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20,alignment:.leading)
                 

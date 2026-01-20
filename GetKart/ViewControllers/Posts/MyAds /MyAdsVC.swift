@@ -21,6 +21,8 @@ class MyAdsVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnScrollView:UIScrollView!
+    @IBOutlet weak var btnBack:UIButton!
+
     private  var selectedIndex = 500
     private var apiStatus = ""
     private var page = 1
@@ -29,6 +31,8 @@ class MyAdsVC: UIViewController {
     private var emptyView:EmptyList?
     private var isDataLoading = true
     private var userBannerArray = [UserBannerModel]()
+    
+    
     
     private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -71,6 +75,7 @@ class MyAdsVC: UIViewController {
     
     // MARK: - Setup
        private func setupUI() {
+           btnBack.setImageColor(color: .label)
            cnstrntHtNavBar.constant = getNavBarHt
            tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
            tblView.register(UINib(nibName: "BannerDetailTblCell", bundle: nil), forCellReuseIdentifier: "BannerDetailTblCell")

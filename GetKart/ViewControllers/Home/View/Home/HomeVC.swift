@@ -212,7 +212,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                                       subtitle: "",
                                                                       description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/6954d90b924726.419396251767168267.png", mandatoryClick: false,
                                                                       buttonTitle: "Boost for ₹75",
-                                                               type: 6, itemID: 10497, secondButtonTitle: "Maybe Later"))
+                                                               type: 6, itemID: 10530, secondButtonTitle: "Maybe Later"))
         }
           
         
@@ -238,7 +238,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
  */
     //MARK: Api methods
     func getpopupApi(){
-
+        
+       
+    
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { [weak self](obj:PopupParseModel) in
             
             if obj.code == 200,obj.error == false{
@@ -278,14 +280,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             }
         }
     }
-    
-  
-    
+        
     func presentHostingController(objPopup:PopupModel){
         
         let controller = UIHostingController(
             rootView: BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in }))
-       
         
         let useInlineMode = view != nil
         controller.title = ""
@@ -303,9 +302,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         sheet.cornerRadius = 15
         sheet.dismissOnPull = false
         sheet.gripColor = .clear
-        
-        
-        
+                
         sheet.allowGestureThroughOverlay = false
         sheet.cornerRadius = 15
         sheet.dismissOnOverlayTap = true
@@ -391,8 +388,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         let popupView = BoostYourBoardPopupView(
             onBoost: {
                 print("Boost tapped")
+                self.dismiss(animated: true)
+
                 if (obj.itemID ?? 0) > 0{
-                    let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: obj.itemID ?? 0))
+                    let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: obj.itemID ?? 0,isFromBoostPopup: true))
                     destVC.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }else{
@@ -403,6 +402,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             },
             onLater: {
                 print("Later tapped")
+                self.dismiss(animated: true)
+
             },
             onClose: {
                 self.dismiss(animated: true)

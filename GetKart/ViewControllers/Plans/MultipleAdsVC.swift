@@ -68,7 +68,7 @@ class MultipleAdsVC: UIViewController {
         }
         
         if let url = URL(string: Constant.shared.BOOSTEDADS_DEMO){
-            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BOOSTEDADS_DEMO,istoApplyPadding:true))
+            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BOOSTEDADS_DEMO))
             AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
 
         }

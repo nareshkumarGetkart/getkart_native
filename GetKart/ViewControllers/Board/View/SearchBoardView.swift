@@ -10,11 +10,11 @@ import SwiftUI
 import Alamofire
 import Kingfisher
 
-struct RecentSearchItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let image: String
-}
+//struct RecentSearchItem: Identifiable {
+//    let id = UUID()
+//    let title: String
+//    let image: String
+//}
 
 struct SearchBoardView: View {
 
@@ -31,24 +31,8 @@ struct SearchBoardView: View {
         
         HStack {
             Button {
-                // if isToCloseToSearchResultScreen{
-              //  navigationController?.popToRootViewController(animated: true)
-                //                    }else{
-                //                        navigationController?.popViewController(animated: true)
-                //                    }
-                var isPopped = false
-                
-                if let nav = navigationController,
-                   let boardVC = nav.viewControllers.first(where: {
-                       guard let hostingVC = $0 as? UIHostingController<AnyView> else { return false }
-                       return String(describing: type(of: hostingVC.rootView)) == "BoardView"
-                   }) {
-                    nav.popToViewController(boardVC, animated: true)
-                    isPopped = true
-                }
-                if !isPopped{
-                    navigationController?.popToRootViewController(animated: true)
-                }
+                navigationController?.popToRootViewController(animated: true)
+               // goBackToBoard()
 
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
@@ -65,6 +49,7 @@ struct SearchBoardView: View {
                     .onSubmit {
                         
                         if  viewModel.searchText.count > 0{
+                            AF.cancelAllRequests()
                             viewModel.istoSearch = false
                             isFocused = false
                             searchedItem(viewModel.searchText)
@@ -138,7 +123,7 @@ struct SearchBoardView: View {
                             
                             Spacer()
                             
-                            if viewModel.searchText.count == 0{
+                            if viewModel.searchText.count == 0 && viewModel.isEmptySearched == true {
                                 // ❌ Delete Button
                                 Button {
                                     withAnimation {
@@ -156,6 +141,8 @@ struct SearchBoardView: View {
                         .cornerRadius(14)
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                         .onTapGesture {
+                            AF.cancelAllRequests()
+                            viewModel.istoSearch = false
                             searchedItem(item.keyword ?? "")
                             self.navigationController?.popViewController(animated: true)
                         }
@@ -183,4 +170,12 @@ struct SearchBoardView: View {
             
         }
     }
+   
 }
+
+
+#Preview {
+    SearchBoardView(navigationController: nil, searchedItem: {srchTxt in })
+}
+
+

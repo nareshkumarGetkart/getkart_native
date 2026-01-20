@@ -36,12 +36,12 @@ class LoginVC: UIViewController {
     private var socialName:String = ""
     private  var socialEmail:String = ""
     private  var firebaseIdEmail:String = ""
-
     private  var loginType:SocialMediaLoginType = SocialMediaLoginType.apple
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
+     
         
         if self.navigationController?.viewControllers.count ?? 0 > 1 {
             self.navigationController?.viewControllers.remove(at: 0)

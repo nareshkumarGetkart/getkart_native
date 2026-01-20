@@ -850,6 +850,41 @@ extension UIFont{
     
 
 
+extension UIFont{
+    
+    enum Inter{
+        
+        case regular(size: CGFloat)
+        case medium(size: CGFloat)
+        case semiBold(size: CGFloat)
+        case bold(size: CGFloat)
+        case extraBold(size: CGFloat)
+        
+        var font:UIFont!{
+            switch self{
+                
+            case .regular(size: let size):
+                return UIFont(name: "Inter-Regular", size: size)
+                
+            case .medium(size: let size):
+                return UIFont(name: "Inter-Medium", size: size)
+                
+            case .semiBold(size: let size):
+                return UIFont(name: "Inter-SemiBold", size: size)
+                
+            case .bold(size: let size):
+                return UIFont(name: "Inter-Bold", size: size)
+                
+            case .extraBold(size: let size):
+                return UIFont(name: "Inter-Black", size: size)
+            }
+            
+        }
+    }
+}
+    
+
+
 
 
 
@@ -861,6 +896,7 @@ enum MediaShareType{
     case profile
     case appShare
     case board
+    case normalShare
    
 }
 
@@ -917,6 +953,12 @@ class ShareMedia{
             let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
             activityController.excludedActivityTypes = excludedActivities
             controller.present(activityController, animated: true)
+        }else if type == .normalShare{
+            //Share mnormal url in mediaId
+            let activityController = UIActivityViewController(activityItems: [mediaId, ActionExtensionBlockerItem()], applicationActivities: nil)
+            let excludedActivities = [UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToWeibo, UIActivity.ActivityType.print, UIActivity.ActivityType.assignToContact, UIActivity.ActivityType.postToFlickr, UIActivity.ActivityType.postToVimeo, UIActivity.ActivityType.postToTencentWeibo]
+            activityController.excludedActivityTypes = excludedActivities
+            controller.present(activityController, animated: true)
         }
     }
 }
@@ -957,6 +999,8 @@ enum NotificationKeys:String,CaseIterable{
     case refreshMyBoardsScreen = "refreshMyBoardsScreen"
     case refreshLikeDislikeBoard = "refreshLikeDislikeBoard"
     case refreshInterestChangeBoardScreen = "refreshInterestChangeBoardScreen"
+    static let scrollBoardToTop = "scrollBoardToTop"
+
 
 }
 

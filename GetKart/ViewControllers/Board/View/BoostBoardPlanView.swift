@@ -34,7 +34,7 @@ struct BoostBoardPlanView: View {
                             dismiss()
 
                             if let url = URL(string: Constant.shared.BOARDBOOST_DEMO){
-                                let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BOARDBOOST_DEMO,istoApplyPadding:true))
+                                let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BOARDBOOST_DEMO))
                                 AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
 
                             }

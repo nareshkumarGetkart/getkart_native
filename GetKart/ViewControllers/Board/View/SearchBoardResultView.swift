@@ -10,50 +10,10 @@ import SwiftUI
 struct SearchBoardResultView: View {
     let navigationController:UINavigationController?
     @State  var isByDefaultOpenSearch:Bool
-  /*  @State private var selected = "All"
-    @State private var selectedCategoryId = 0
-    @State private var listArray:Array<ItemModel> = [ItemModel]()
-    @State private var page = 1
-    @State private var isDataLoading = true*/
     @State private var searchText = ""
     @State private var selected = "All"
-
     @StateObject private var vm = SearchBoardResultViewModel()
-
-  /*  let sampleProducts: [Product] = [
-        Product(title: "Lakmé Foundation",
-                subtitle: "Lakmé 9 to 5 Complexion Care Face Cream Foundation",
-                price: "402",
-                image: "https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png",
-                isSponsored: true,
-                likes: 215,
-                imageHeight: 200),
-        
-        Product(title: "Gabriel - elegant shoes",
-                subtitle: "Our items are ideal for every occasion",
-                price: "7,327.95",
-                image: "https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png",
-                isSponsored: true,
-                likes: 215,
-                imageHeight: 180),
-        
-        Product(title: "Luminize (Skin Glow)",
-                subtitle: "Achieve radiant skin with a glutathione formula",
-                price: "1,230",
-                image: "https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png",
-                isSponsored: true,
-                likes: 215,
-                imageHeight: 200),
-        
-        Product(title: "Black Two-Piece Suit",
-                subtitle: "Trending Modern Prom Suit Styles",
-                price: "4,202",
-                image: "https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2025/08/6892f2a328ee10.794870231754460835.png",
-                isSponsored: true,
-                likes: 215,
-                imageHeight: 180),
-    ]
-*/
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -68,8 +28,6 @@ struct SearchBoardResultView: View {
                     } label: {
                         Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     }.frame(width: 40,height: 40)
-                    
-                    
                     
                     // MARK: - Search Bar
                     HStack(spacing: 8) {
@@ -89,10 +47,14 @@ struct SearchBoardResultView: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                         .onTapGesture {
                             
-                            let hostingVC = UIHostingController(rootView: SearchBoardView(searchText:searchText, navigationController: self.navigationController,searchedItem: { srchTxt in
+                            let hostingVC = UIHostingController(rootView: SearchBoardView(searchText:searchText, navigationController: self.navigationController, searchedItem: { srchTxt in
                                 
                                 if searchText != srchTxt{
                                     searchText = srchTxt
+                                    vm.searchText = searchText
+                                    // if !vm.isLoading{
+                                    vm.loadInitial()
+                                    //}
                                 }
                             }))
                             self.navigationController?.pushViewController(hostingVC, animated: false)
@@ -111,10 +73,6 @@ struct SearchBoardResultView: View {
                 }
                 .padding(.horizontal)
                 
-                
-                
-               // CategoryTabs(selected: $selected, selectedCategoryId: $selectedCategoryId)
-                //.padding([.top,.bottom], 7)
                 
                 CategoryTabs(
                     selected: $selected,
@@ -141,165 +99,96 @@ struct SearchBoardResultView: View {
             }else{
                 
                 
-                    ScrollView {
-                        LazyVStack {
-                            StaggeredGrid(columns: 2, spacing: 5) {
-                               //ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
-                                    ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
-
-                                    ProductCardStaggered1(
-                                        product: item,
-                                       // imgHeight: CGFloat(150 + (index % 2) * 50)
-                                    ) { isLiked, boardId in
-                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        pushToDetailScreen(item: item)
-                                    }
-                                    .onAppear {
-                                        vm.loadNextPageIfNeeded(currentIndex: index)
-                                    }
+                ScrollView {
+                    
+                    
+                    
+                    LazyVStack {
+                        StaggeredGrid(columns: 2, spacing: 5) {
+                            //ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+                                
+                                ProductCardStaggered1(
+                                    product: item,
+                                    // imgHeight: CGFloat(150 + (index % 2) * 50)
+                                ) { isLiked, boardId in
+                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    pushToDetailScreen(item: item)
+                                }
+                                .onAppear {
+                                    vm.loadNextPageIfNeeded(currentIndex: index)
                                 }
                             }
-                            .padding(5)
-
-                            // 👇 bottom detector (NO layout impact)
-                               GeometryReader { geo in
-                                   Color.clear
-                                       .preference(
-                                           key: ScrollBottomKey.self,
-                                           value: geo.frame(in: .global).maxY
-                                       )
-                               }
-                               .frame(height: 0)
-                            
-                            if vm.isLoading {
-                                ProgressView().padding()
-                            }
+                        }
+                        .padding(5)
+                        
+                        // 👇 bottom detector (NO layout impact)
+                        GeometryReader { geo in
+                            Color.clear
+                                .preference(
+                                    key: ScrollBottomKey.self,
+                                    value: geo.frame(in: .global).maxY
+                                )
+                        }
+                        .frame(height: 0)
+                        
+                        if vm.isLoading {
+                            ProgressView().padding()
                         }
                     }
-                    .onPreferenceChange(ScrollBottomKey.self) { bottomY in
-                        vm.handleScrollBottom(bottomY: bottomY)
-                    }
-                
-                
-          /*  ScrollView(showsIndicators: false) {
-                StaggeredGrid(columns: 2, spacing: 5) {
-                    ForEach(Array(listArray.enumerated()), id: \.element.id) { index, product in
-                        ProductCardStaggered(
-                            product: product,
-                            imgHeight: CGFloat(150 + (index % 2) * 50)
-                        ) { isLiked, boardId in
-                            
-                            print("Liked:", isLiked, "BoardId:", boardId)
-                            
-                            if let index = listArray.firstIndex(where: { $0.id == boardId }) {
-                                listArray[index].isLiked = isLiked
-                            }
-                        }
-                        .onTapGesture {
-                            pushToDetailScreen(item:product)
-                        }.onAppear{
-                            if let lastItem = listArray.last, lastItem.id == product.id {
-                                //   self.getBoardListApi()
-                            }
-                        }
-                    }
-                    
                 }
-                .padding(5)
-            }*/
-                
-                
-        }
-            // CustomTabBar()
-        }
-        .background(Color(.systemGray6))
-        //.edgesIgnoringSafeArea(.bottom)
-        
-       
-       /* .onAppear {
-            if listArray.isEmpty && !isByDefaultOpenSearch{
-                getBoardListApi()
+                .onPreferenceChange(ScrollBottomKey.self) { bottomY in
+                    vm.handleScrollBottom(bottomY: bottomY)
+                }
             }
         }
-        .onChange(of: selectedCategoryId) { _ in
-            self.page = 1
-            getBoardListApi()
-        }*/
+        .background(Color(.systemGray6))
+        
         .onAppear{
             if isByDefaultOpenSearch{
-                let hostingVC = UIHostingController(rootView: SearchBoardView(navigationController: self.navigationController,isToCloseToSearchResultScreen:isByDefaultOpenSearch,searchedItem: { srchTxt in
+                let hostingVC = UIHostingController(rootView: SearchBoardView(navigationController: self.navigationController, isToCloseToSearchResultScreen:isByDefaultOpenSearch,searchedItem: { srchTxt in
                     if searchText != srchTxt{
                         searchText = srchTxt
+                        vm.searchText = searchText
+                        if !vm.isLoading{
+                            vm.loadInitial()
+                        }
                     }
                 }))
                 self.navigationController?.pushViewController(hostingVC, animated: true)
                 isByDefaultOpenSearch = false
             }
             
-            //if vm.items.count == 0{
-            vm.searchText = searchText
-                vm.loadInitial()
-            //}
+            //            if vm.items.count == 0 && !vm.isLoading{
+            //               vm.searchText = searchText
+            //               vm.loadInitial()
+            //            }
         }
         .onReceive(
             NotificationCenter.default.publisher(
                 for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
             )
         ) { notification in
-
+            
             guard let dict = notification.object as? [String: Any] else { return }
-
+            
             let isLike  = dict["isLike"] as? Bool ?? false
             let count  = dict["count"] as? Int ?? 0
             let boardId = dict["boardId"] as? Int ?? 0
-
+            
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
         }
-
     }
     
     func pushToDetailScreen(item:ItemModel){
         let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
         self.navigationController?.pushViewController(hostingVC, animated: true)
     }
-    
-    
-    
-    //MARK: Api methods
-   /* func getBoardListApi(){
-        
-        if self.page == 1{
-            self.listArray.removeAll()
-        }
-
-        let strUrl = Constant.shared.get_public_board + "?page=\(page)&search=\(searchText)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
-
-        self.isDataLoading = true
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
-            
-            if obj.code == 200 {
-                
-
-                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
-                    self.listArray.append(contentsOf:  obj.data?.data ?? [])
-                }
-                                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                    self.isDataLoading = false
-                    self.page += 1
-                })
-
-            }else{
-                self.isDataLoading = false
-
-            }
-        }
-    }*/
 }
 
-//#Preview {
-//    SearchBoardResultView(navigationController: nil)
-//}
+#Preview {
+    SearchBoardResultView(navigationController: nil, isByDefaultOpenSearch: false)
+}

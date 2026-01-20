@@ -407,7 +407,7 @@ private func detailsCard() -> some View {
         
       
         if let invoiceId = transaction?.invoiceId {
-            URLhandler.sharedinstance.makeCall(url: "\(Constant.shared.invoice_download)/\(invoiceId)", param: nil,methodType: .get) { responseObject, error in
+            URLhandler.sharedinstance.makeCall(url: "\(Constant.shared.invoice_download)/\(invoiceId)", param: nil,methodType: .get,showLoader: true) { responseObject, error in
                 
                 if error == nil {
                     

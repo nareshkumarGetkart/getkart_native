@@ -172,8 +172,7 @@ final class BoardViewModel: ObservableObject {
                     self.hasMoreData = false
                 }
 
-                    self.isLoading = false
-
+                self.isLoading = false
             }
         }
     }

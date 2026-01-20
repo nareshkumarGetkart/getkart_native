@@ -42,13 +42,12 @@ struct SearchWithSortView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
            
-            Text(categoryName).font(.custom("Manrope-Bold", size: 20.0))
+            Text(categoryName).font(.manrope(.bold, size: 18))
                 .foregroundColor(Color(UIColor.label))
             Spacer()
         }.frame(height:44).background(Color(.systemBackground))
         
             .onAppear{
-//               objVM.isDataLoading = false
 
                 if isByDefaultOpenSearch{
                     pushToSearchSuggestionScreen()
@@ -58,11 +57,8 @@ struct SearchWithSortView: View {
                     getCustomFieldsListApi(category_ids: objVM.categroryId)
                 }
             }
-//            .onDisappear{
-//                objVM.isDataLoading = false
-//            }
-        
-        VStack {
+
+        VStack(spacing:0) {
             HStack {
                 ZStack{
                     HStack{
@@ -71,12 +67,10 @@ struct SearchWithSortView: View {
                             .padding(.leading,10)
                         TextField("Search any item...", text: $srchTxt).frame(height:40)
                             .background(Color(.systemGray6))
-                           // .cornerRadius(6)
+                            .font(.manrope(.regular, size: 14))
                             .tint(Color(Themes.sharedInstance.themeColor))
                         
                     }.background(Color(.systemGray6))
-                        //.cornerRadius(6)
-                       
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color(.separator), lineWidth: 1)
@@ -135,7 +129,7 @@ struct SearchWithSortView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding([.bottom,.top], 5)
+                .padding([.bottom,.top], 4)
             }
             .background(Color(.systemGray5))
             
@@ -155,7 +149,7 @@ struct SearchWithSortView: View {
                 // Listings
                 ScrollViewReader { scrollProxy in
                     ScrollView {
-                        Color.clear.id("top")
+                        Color.clear.id("top").frame(height:0)
                                      
                         if isGridView {
                             gridView
@@ -291,10 +285,10 @@ struct SearchWithSortView: View {
     }
 
     private var listView: some View {
-        LazyVStack(spacing: 10) {
+        LazyVStack(spacing: 8) {
             ForEach($objVM.items, id: \.id) { $item in
                 FavoritesCell(itemObj: $item)
-                    .padding(.horizontal)
+                    .padding(.horizontal,5)
                     .onTapGesture {
                         let itemId = item.id ?? 0
                         self.pushToDetailScreen(id: itemId, item: item)
@@ -432,17 +426,13 @@ struct FilterChip: View {
     var body: some View {
         HStack {
             if let icon = icon {
-               
-                Image(icon).renderingMode(.template).foregroundColor(.gray)
-                Text(title)
-                
+                Image(icon).renderingMode(.template).foregroundColor(Color(.label))
+                Text(title).font(.manrope(.regular, size: 12))
             }else{
-                Text(title)
+                Text(title).font(.manrope(.regular, size: 12))
                 if isBorder{
                     Button {
-                        
                         getSelectedRemoveIndex(index ?? 0)
-
                     } label: {
                         Image("close-small").renderingMode(.template).foregroundColor(.gray)
                     }
@@ -455,10 +445,10 @@ struct FilterChip: View {
             .font(.caption)
             .background(isBorder ? Color.orange.opacity(0.1) : Color(.systemGray6))
             .foregroundColor(Color(.label))
-            .cornerRadius(7)
+            .cornerRadius(6)
             .overlay(
-                RoundedRectangle(cornerRadius: 7)
-                    .stroke(((icon?.count ?? 0) > 0) ? Color.clear : (isBorder ? Color.orange : Color(.lightGray)), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(((icon?.count ?? 0) > 0) ? Color.clear : (isBorder ? Color.orange : Color(.lightGray)), lineWidth: 0.5)
             )
     }
 }

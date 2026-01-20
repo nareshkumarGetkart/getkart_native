@@ -7,8 +7,97 @@
 
 import SwiftUI
 
-struct TransactionHistoryView: View {
+
+enum TransactionHistoryTab:Int,CaseIterable{
+   
+    case recentOrders = 0
+    case activePlans = 1
+    var title:String{
+        switch self{
+        case .recentOrders : return "Recent Orders"
+        case .activePlans : return "Active Plans"
+        }
+    }
+}
+
+extension TransactionHistoryView {
+
+    var tabBar: some View {
+        HStack {
+            ForEach(TransactionHistoryTab.allCases, id: \.self) { tab in
+                VStack(spacing: 8) {
+
+                    Text(tab.title)
+                        .font(Font.inter((selectedTab == tab ? .medium : .medium), size: 15))
+
+                        .foregroundColor(Color(.label))
+
+                    Rectangle()
+                        .fill(selectedTab == tab ? Color.orange : Color.clear)
+                        .frame(height: 2)
+                }
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation {
+                        selectedTab = tab
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+        .background(Color(UIColor.systemBackground))
+    }
+}
+
+struct TransactionHistoryView:View{
     
+    @State private var selectedTab: TransactionHistoryTab = .recentOrders
+    var  navigation:UINavigationController?
+   
+
+    var body: some View {
+        VStack(spacing: 0) {
+
+            // Header
+            HStack {
+             
+                Button(action: {
+                    // Action to go back
+                    navigation?.popViewController(animated: true)
+                }) {
+                    Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                        .padding()
+                }
+                Text("Order History & Invoices").font(Font.manrope(.medium, size: 18.0))
+                    .foregroundColor(Color(UIColor.label))
+                
+                Spacer()
+            }.frame(height: 44).background(Color(UIColor.systemBackground))
+
+            // Tabs
+            tabBar//.padding(.bottom,5)
+
+            // Swipe Content
+            TabView(selection: $selectedTab) {
+
+                RecentOrderView(navigation:navigation)
+                    .tag(TransactionHistoryTab.recentOrders)
+
+                ActivePlansView(navigation: navigation)
+                    .tag(TransactionHistoryTab.activePlans)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .background(Color(.systemGroupedBackground))
+    }
+    
+   
+}
+
+/*struct TransactionHistoryView: View {
+    
+    @State private var selectedTab: TransactionHistoryTab = .recentOrders
     var  navigation:UINavigationController?
     @State private var page = 1
     @State var transactions = [TransactionModel]()
@@ -138,7 +227,7 @@ struct TransactionHistoryView: View {
             }
         }
     }
-}
+}*/
 
 #Preview {
     TransactionHistoryView(navigation:nil)

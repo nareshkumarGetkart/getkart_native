@@ -132,8 +132,10 @@ struct BoostAdsCell: View {
             
             VStack(alignment:.leading,spacing: 2){
                 HStack{
-                    Text("\(Local.shared.currencySymbol) \((itemObj?.price ?? 0.0).formatNumber())").font(.custom("Manrope-Regular", size: 16.0))
+                    Text("\(Local.shared.currencySymbol) \((itemObj?.price ?? 0.0).formatNumber())").font(.manrope(.semiBold, size: 15))
                         .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
+                    
+                   
                       //  .foregroundColor(.orange)
                     Spacer()
                    
@@ -146,7 +148,7 @@ struct BoostAdsCell: View {
                 }
                 
                 Text(itemObj?.name ?? "")
-                    .font(.custom("Manrope-Regular", size: 14.0))
+                font(.manrope(.bold, size: 14))
                     .multilineTextAlignment(.leading)
                     .foregroundColor(Color(UIColor.label))
 
@@ -154,7 +156,7 @@ struct BoostAdsCell: View {
                     Image("location-outline")
                         .renderingMode(.template)
                         .foregroundColor(Color.gray)
-                    Text(itemObj?.address ?? "" ).font(.custom("Manrope-Regular", size: 12.0))
+                    Text(itemObj?.address ?? "" ).font(.manrope(.regular, size: 12))
                         .foregroundColor(Color.gray)
                 }.padding(.bottom,10)
             }

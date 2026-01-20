@@ -20,8 +20,10 @@ struct BoardAnalyticsView: View {
 
     //'draft','approved','paused','expired','rejected','pending'
     
+    @State var isFromBoostPopup:Bool = false
+    
     var body: some View {
-        HStack{
+        HStack(spacing:5){
             Button {
                 navigationController?.popViewController(animated: true)
                 
@@ -33,7 +35,6 @@ struct BoardAnalyticsView: View {
             Spacer()
             
           
-        //  if (objAnalytics?.board?.isActive ?? 0) == 1{
                 
                 Button {
                     pushToEditBanner()
@@ -42,10 +43,7 @@ struct BoardAnalyticsView: View {
             
                     Image("editWithBg")
                     
-                }//.padding(.horizontal,5)
-          //  }
-//            if (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
-                
+                }
                 Button {
                     openActionSheet()
                 } label: {
@@ -53,12 +51,12 @@ struct BoardAnalyticsView: View {
                     Image("more").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     
                 }.padding(.trailing)
-            //}
             
          }.frame(height:44).background(Color(UIColor.systemBackground))
         
             .onAppear {
             getBoardAnanlytics()
+                
             }
         
         ScrollView{
@@ -186,24 +184,10 @@ struct BoardAnalyticsView: View {
                     .clipShape(
                         RoundedRectangle(cornerRadius: 8)
                     )
-                   /* .background(Color(.systemBackground))
-                    .clipped()
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8.0).strokeBorder(Color(.gray),lineWidth: 0.5)
-                    }*/
-                
+                  
                 
                 if (objAnalytics?.board?.isFeature ?? false) == false && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
-                  /*  Button {
-                        showSheetpackages = true
-                    } label: {
-                        
-                        Text("Boost Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white)
-                          
-                    }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                         .background(Color(hexString: "#FF9900")) .cornerRadius(27.5)*/
-                    
-                    
+                 
                     Button(action: {
                         showSheetpackages = true
                     }) {
@@ -226,7 +210,7 @@ struct BoardAnalyticsView: View {
         .sheet(isPresented: $showSheetpackages) {
             
             BoostBoardPlanView(categoryId:objAnalytics?.board?.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
-                
+                self.showSheetpackages = false
                 selectedPkgObj = selPkgObj
                 paymentGatewayOpen()
             })
@@ -272,12 +256,8 @@ struct BoardAnalyticsView: View {
     }
     
     func pushToEditBanner(){
-       /* let destVC = UIHostingController(rootView: EditBanerPromotionView(navigationController: self.navigationController,objAnalytics:objAnalytics))
-        self.navigationController?.pushViewController(destVC, animated: true)*/
-        
-           let destVC = UIHostingController(rootView: CreateBoardView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
-            self.navigationController?.pushViewController(destVC, animated: true)
-       
+        let destVC = UIHostingController(rootView: CreateBoardView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
+        self.navigationController?.pushViewController(destVC, animated: true)
     }
     
     func getBoardAnanlytics(){
@@ -288,6 +268,14 @@ struct BoardAnalyticsView: View {
             
             if obj.code == 200{
                 self.objAnalytics = obj.data
+                
+                if self.isFromBoostPopup{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                        self.showSheetpackages = true
+                        self.isFromBoostPopup = false
+                    })
+                }
+
             }else{
                 
                 AlertView.sharedManager.presentAlertWith(title: "", msg: obj.message as NSString, buttonTitles: ["Ok"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in

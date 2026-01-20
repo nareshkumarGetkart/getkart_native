@@ -122,6 +122,7 @@ struct FavoritesCell:View {
                 
                     .resizable()
                     .scaledToFit()
+                    .clipped()
                     .frame(width: 120,height: 115).cornerRadius(5)
                     .padding(1)
                 
@@ -164,11 +165,11 @@ struct FavoritesCell:View {
                     }
                 }
                 
-                Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.manrope(.semiBold, size: 15)).foregroundColor(Color(UIColor.label))
+                Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.manrope(.semiBold, size: 14)).foregroundColor(Color(UIColor.label))
                     .padding(.bottom,10).padding(.trailing)
                 
-                HStack(spacing:5){
-                    Image("location-outline").resizable().renderingMode(.template).frame(width: 13, height: 13).foregroundColor(.gray)
+                HStack(spacing:2){
+                    Image("location-outline").resizable().renderingMode(.template).frame(width: 15, height: 15).foregroundColor(.gray)
                     Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
                     Spacer()
                     
@@ -176,7 +177,8 @@ struct FavoritesCell:View {
                         Button {
                             AppDelegate.sharedInstance.presentVerifiedInfoView()
                         } label: {
-                            Image( "verifiedIcon").resizable().aspectRatio(contentMode: .fit)
+                            Image("verifiedIcon").resizable()
+                                .aspectRatio(contentMode: .fit)
                                 .foregroundColor(.gray)
                                 .padding(3)
                                 .background(Color(UIColor.systemBackground))
@@ -187,9 +189,7 @@ struct FavoritesCell:View {
                         .frame(width: 30,height: 30)
                         .padding([.trailing], 15)
                         .allowsHitTesting(true)
-                        
                     }
-
                 }
                 
             }.padding([.top,.bottom],10)
@@ -217,9 +217,6 @@ struct FavoritesCell:View {
             }
         }
     }
-  
-   
-
 }
 
 

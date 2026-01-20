@@ -74,35 +74,35 @@ struct ItemDetailView: View {
     
     var body: some View {
    
-        headerBar
-        
-        Divider()
-   
-        ScrollView(.vertical, showsIndicators: false) {
-           
-            LazyVStack(alignment: .leading) {
+        VStack(spacing:0){
+            headerBar
+            Divider()
+            
+            ScrollView(.vertical, showsIndicators: false) {
                 
-                let isFeatured = objVM.itemObj?.isFeature ?? false
-                let itemUserId = objVM.itemObj?.userID ?? 0
-                
-                ZStack(alignment: .topTrailing) {
+                LazyVStack(alignment: .leading,spacing: 5) {
                     
-                    if  (objVM.galleryImgArray.count) > 0 {
-                      
-                        VStack(spacing: 10) {
-                            TabView(selection: $selectedIndex) {
-                                ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
-                                    if let img = objVM.galleryImgArray[index].image {
-                                        
-                                        let isLast = (index + 1) == objVM.galleryImgArray.count
-                                        let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
-                                        let bothConditionTrue = isLast && isVideoAvailable
-                                        if  bothConditionTrue {
+                    let isFeatured = objVM.itemObj?.isFeature ?? false
+                    let itemUserId = objVM.itemObj?.userID ?? 0
+                    
+                    ZStack (alignment: .topTrailing) {
+                        
+                        if  (objVM.galleryImgArray.count) > 0 {
+                            
+                            VStack(spacing: 10) {
+                                TabView(selection: $selectedIndex) {
+                                    ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
+                                        if let img = objVM.galleryImgArray[index].image {
+                                            
+                                            let isLast = (index + 1) == objVM.galleryImgArray.count
+                                            let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
+                                            let bothConditionTrue = isLast && isVideoAvailable
+                                            if  bothConditionTrue {
                                                 
                                                 if img.contains("youtube.com"){
                                                     YouTubeWebView(videoID:extractYouTubeID(from: img), isVisible: $isVideoVisible).frame(height: 200)
                                                         .cornerRadius(10)
-                                                        .padding(.horizontal, 5)
+                                                        //.padding(.horizontal, 5)
                                                         .onAppear {
                                                             // When the video is on screen, make sure it's playing
                                                             self.isVideoVisible = true
@@ -112,413 +112,410 @@ struct ItemDetailView: View {
                                                             self.isVideoVisible = false
                                                         } .tag(index)
                                                 }else{
-                                                  
+                                                    
                                                     WebVideoView(videoURL:img)
                                                         .frame(height: 200)
                                                         .cornerRadius(10)
-                                                        .padding(.horizontal, 5) .tag(index)
+                                                        //.padding(.horizontal, 5)
+                                                        .tag(index)
                                                 }
-  
-                                        } else {
-                                            
-                                            AsyncImage(url: URL(string: img)) { image in
-                                                image
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(height: 200)
-                                                    .padding(.horizontal, 5)
-                                                    .onAppear {
-                                                        extractDominantColor(from: image)
-                                                    }
-                                            } placeholder: {
-                                                Image("getkartplaceholder")
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(height: 200)
-                                                    .padding(.horizontal, 5)
-                                            }
-                                            .tag(index)
-//                                            .onTapGesture {
-//                                                navigateToPager()
-//                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                            .frame(width: widthScreen - 25, height: 200)
-                            .background(backgroundColor.opacity(0.4))
-                            .cornerRadius(10)
-                            .onTapGesture {
-                                
-                                if  (objVM.galleryImgArray.count) > 0 {
-                                    
-                                    if selectedIndex == nil{ selectedIndex = 0}
-                                    if let index = selectedIndex{
-                                        
-                                        if objVM.galleryImgArray[index].image != nil {
-                                            
-                                            let isLast = (index + 1) == objVM.galleryImgArray.count
-                                            let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
-                                            let bothConditionTrue = isLast && isVideoAvailable
-                                            if  bothConditionTrue {
                                                 
-                                            }else{
-                                                navigateToPager()
-
+                                            } else {
+                                                
+                                                AsyncImage(url: URL(string: img)) { image in
+                                                    image
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fit)
+                                                        .frame(height: 200)
+                                                        //.padding(.horizontal, 5)
+                                                        .onAppear {
+                                                            extractDominantColor(from: image)
+                                                        }
+                                                } placeholder: {
+                                                    Image("getkartplaceholder")
+                                                        .aspectRatio(contentMode: .fit)
+                                                        .frame(height: 200)
+                                                       // .padding(.horizontal, 5)
+                                                }
+                                                .tag(index)
+                                                
                                             }
                                         }
                                     }
-                                  
+                                }
+                                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                                .frame(width: widthScreen - 20, height: 200)
+                                .background(backgroundColor.opacity(0.4))
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    
+                                    if  (objVM.galleryImgArray.count) > 0 {
+                                        
+                                        if selectedIndex == nil{ selectedIndex = 0}
+                                        if let index = selectedIndex{
+                                            
+                                            if objVM.galleryImgArray[index].image != nil {
+                                                
+                                                let isLast = (index + 1) == objVM.galleryImgArray.count
+                                                let isVideoAvailable = (objVM.itemObj?.videoLink?.count ?? 0) > 0
+                                                let bothConditionTrue = isLast && isVideoAvailable
+                                                if  bothConditionTrue {
+                                                    
+                                                }else{
+                                                    navigateToPager()
+                                                    
+                                                }
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                
+                                
+                                if objVM.galleryImgArray.count > 1{
+                                    
+                                    // Custom Dot Indicator
+                                    HStack(spacing: 6) {
+                                        
+                                        ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
+                                            Circle()
+                                                .fill(selectedIndex == index ? Color.orange : Color.gray.opacity(0.4))
+                                                .frame(width: 6, height: 6)
+                                                .onTapGesture {
+                                                    selectedIndex = index // manually change page
+                                                }
+                                        }
+                                    }
                                 }
                             }
-                          
-                                    
                             
-                            // Custom Dot Indicator
-                            HStack(spacing: 8) {
+                        }else{
+                            Image("getkartplaceholder").frame(width:widthScreen-20,height: 200)
+                                .cornerRadius(10)
+                        }
+                        
+                        HStack{
+                            
+                            if (objVM.itemObj?.isFeature ?? false) == true{
+                                Text("Featured").frame(width:75,height:20)
+                                    .background(.orange)
+                                    .cornerRadius(5)
+                                    .foregroundColor(Color(UIColor.white))
+                                    .padding(.horizontal).padding(.top,5)
+                                    .font(.manrope(.regular, size: 13))
                                 
-                               if objVM.galleryImgArray.count > 1{
+                            }
+                            
+                            Spacer()
+                            
+                            if itemUserId != Local.shared.getUserId(){
+                                Button(action: {
+                                    if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                        
+                                        objVM.addToFavourite()
+                                    }
+                                }) {
                                     
-                                   ForEach(objVM.galleryImgArray.indices, id: \.self) { index in
-                                       Circle()
-                                           .fill(selectedIndex == index ? Color.orange : Color.gray.opacity(0.4))
-                                           .frame(width: 8, height: 8)
-                                           .onTapGesture {
-                                               selectedIndex = index // manually change page
-                                           }
-                                   }
+                                    let isLike = (objVM.itemObj?.isLiked ?? false)
+                                    Image( isLike ? "like_fill" : "like")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                       // .foregroundColor(isLike ? .red : .gray)
+                                        .padding()
                                 }
-                             
+                                
                             }
                         }
-
-                    }else{
-                        Image("getkartplaceholder").frame(width:widthScreen-20,height: 200)
-                            .cornerRadius(10)
+                        
                     }
                     
-                    HStack{
+                    if Local.shared.getUserId() == itemUserId {
                         
-                        if (objVM.itemObj?.isFeature ?? false) == true{
-                            Text("Featured").frame(width:75,height:20)
-                                .background(.orange)
-                                .cornerRadius(5)
-                                .foregroundColor(Color(UIColor.white))
-                                .padding(.horizontal).padding(.top,5)
-                                .font(.manrope(.regular, size: 13))
-
-                        }
-                        
-                        Spacer()
-                        
-                        if itemUserId != Local.shared.getUserId(){
-                            Button(action: {
-                                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                                    
-                                    objVM.addToFavourite()
-                                }
-                            }) {
-                                
-                                let isLike = (objVM.itemObj?.isLiked ?? false)
-                                Image( isLike ? "like_fill" : "like")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundColor(isLike ? .red : .gray)
-                                    .padding()
-                            }
-
-                        }
-                    }
-                    
-                }
-                
-                if Local.shared.getUserId() == itemUserId {
-                    
-                    HStack {
                         HStack {
-                            Image(systemName: "eye")
-                            Text("Views: \(objVM.itemObj?.clicks ?? 0)")
-                        }.padding()
+                            HStack {
+                                Image(systemName: "eye")
+                                Text("Views: \(objVM.itemObj?.clicks ?? 0)")
+                            }.padding()
+                                .frame(maxWidth: .infinity,maxHeight:40)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
+                            Spacer(minLength: 20)
+                            HStack {
+                                Image(systemName: "heart")
+                                Text("Like: \(objVM.itemObj?.totalLikes ?? 0)")
+                            }
+                            .padding()
                             .frame(maxWidth: .infinity,maxHeight:40)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray, lineWidth: 1)
                             )
-                        Spacer(minLength: 20)
-                        HStack {
-                            Image(systemName: "heart")
-                            Text("Like: \(objVM.itemObj?.totalLikes ?? 0)")
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity,maxHeight:40)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray, lineWidth: 1)
-                        )
+                        .padding([.horizontal,.top],5)
+                        .foregroundColor(.gray)
                     }
-                    .padding([.horizontal,.top],5)
-                    .foregroundColor(.gray)
-                }
-                
-                if Local.shared.getUserId() == itemUserId && (objVM.itemObj?.rejectedReason?.count  ?? 0) > 0 {
                     
-                    
-                    if ((objVM.itemObj?.status ?? "") == "rejected"){
-                        RejectedReasonView(rejectedReason: objVM.itemObj?.rejectedReason ?? "")
+                    if Local.shared.getUserId() == itemUserId && (objVM.itemObj?.rejectedReason?.count  ?? 0) > 0 {
+                        
+                        
+                        if ((objVM.itemObj?.status ?? "") == "rejected"){
+                            RejectedReasonView(rejectedReason: objVM.itemObj?.rejectedReason ?? "")
+                        }
                     }
-                }
-
-                
-                Text(objVM.itemObj?.name ?? "")
-                    .font(Font.manrope(.medium, size: 16))
-                    .padding(.top, 10)
-                    .padding(5)
-                
-                HStack{
                     
-                    Text("\(Local.shared.currencySymbol) \((objVM.itemObj?.price ?? 0.0).formatNumber())")
-                        .font(Font.manrope(.bold, size: 16))
-                        .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
-                        //.foregroundColor(Color(hex: "#FF9900"))
+                    
+                    Text(objVM.itemObj?.name ?? "")
+                        .font(Font.manrope(.semiBold, size: 16))
+                        .padding(.top, 10)
                         .padding(5)
-                        .padding(.bottom,10)
-                    
-                    Spacer()
-                    if Local.shared.getUserId() == itemUserId {
-                        
-                        
-                        let status = objVM.itemObj?.status ?? ""
-                        let (bgColor, titleColor, displayStatus) = statusColors(for: status)
-                        
-                        Text(displayStatus.capitalized)
-                            .font(Font.manrope(.medium, size: 14))
-                            .foregroundColor(titleColor)
-                            .padding(.horizontal)
-                            .frame(height: 30)
-                            .background(bgColor)
-                            .cornerRadius(15)
-                    }
-                }
-                
-                HStack{
-                    HStack{
-                        Image("location_icon").renderingMode(.template).foregroundColor(.orange)
-                        Text(objVM.itemObj?.address ?? "")
-                        .lineLimit(1)
-                        .font(Font.manrope(.medium, size: 16))
-                        Spacer()
-                    }
-                    
-                    Text(getFormattedCreatedDate())
-                        .font(Font.manrope(.medium, size: 15))
-                }.padding(5)
-                .padding(.bottom,10)
-                
-                if (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft" {
                     
                     HStack{
-                        Spacer()
-                        Image("create_add").padding(5)
-                        VStack{
-                            Spacer()
-                            Text("Post your ad, attract more clients and sell faster")
-                                .font(.manrope(.regular, size: 16.0))
-                                .padding(.top,10)
-                            
-                            HStack{
-                                Button(action: {
-                                   self.objVM.postNowApi(nav: self.navController)
-                                }) {
-                                    Text("Post Now").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
-                                        .foregroundColor(.white)
-                                        .background(Color.orange)
-                                        .cornerRadius(8)
-                                }.padding([.bottom,.leading],10)
-                                Spacer()
-                                
-                            }
-                            Spacer()
-                            
-                        }
-                        Spacer()
                         
+                        Text("\(Local.shared.currencySymbol) \((objVM.itemObj?.price ?? 0.0).formatNumber())")
+                            .font(Font.manrope(.bold, size: 16))
+                            .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
+                            .padding(5)
+                           // .padding(.bottom,5)
+                        
+                        Spacer()
+                        if Local.shared.getUserId() == itemUserId {
+                            
+                            
+                            let status = objVM.itemObj?.status ?? ""
+                            let (bgColor, titleColor, displayStatus) = statusColors(for: status)
+                            
+                            Text(displayStatus.capitalized)
+                                .font(Font.manrope(.medium, size: 14))
+                                .foregroundColor(titleColor)
+                                .padding(.horizontal,5)
+                                .frame(height: 26)
+                                .background(bgColor)
+                                .cornerRadius(13)
+                        }
                     }
-                    .background(Color.yellow.opacity(0.2))
-                    .cornerRadius(10)
-                    .padding(.bottom)
-                }
-                if !isFeatured && (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status == "approved"{
                     
                     HStack{
-                        Spacer()
-                        Image("create_add").padding(5)
-                        VStack{
-                            Spacer()
-                            Text("Boost your ad, attract more clients and sell faster")
-                                .font(.manrope(.regular, size: 16.0))
-                                .padding(.top,10)
-                            
-                            HStack{
-                                Button(action: {
-//                                    self.objVM.getLimitsApi(nav: self.navController)
-                                    self.objVM.makeItemFeaturd(nav: self.navController)
-
-                                }) {
-                                    Text("Create Boost Ad").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
-                                        .foregroundColor(.white)
-                                        .background(Color.orange)
-                                        .cornerRadius(8)
-                                }.padding([.bottom,.leading],10)
-                                Spacer()
-                                
-                            }
-                            Spacer()
-                            
-                        }
-                        Spacer()
-                        
-                    }
-                    .background(Color.yellow.opacity(0.2))
-                    .cornerRadius(10)
-                    .padding(.bottom)
-                }
-                
-                
-                let columns = [
-                    GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
-                    GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
-                ]
-                
-                LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
-                    if let arr = objVM.itemObj?.customFields{
-                        ForEach(arr){obj in
-                            
-                            if (obj.value?.count ?? 0) > 0 {
-                                InfoView(icon: obj.image ?? "",
-                                         text: obj.name ?? "",
-                                         value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),
-                                         navController: self.navController)
-                            }
-                        }
-                    }
-                }
-                
-                
-                VStack(alignment:.leading) {
-                    Divider().padding(.top)
-                    Text("About this item").font(Font.manrope(.semiBold, size: 16))
-                    /*Text(objVM.itemObj?.description ?? "")
-                    .font(Font.manrope(.regular, size: 15))
-                    .foregroundColor(.gray)*/
-                    
-                    ExpandableTextView(
-                        text: objVM.itemObj?.description ?? "",
-                        lineLimit: 5
-                    )
-
-                    
-                    Divider()
-                  
-                    
-                    let sellerName = objVM.itemObj?.user?.name ?? ""
-                    let sellerPic = objVM.itemObj?.user?.profile ?? ""
-                    let sellerMob = objVM.itemObj?.user?.mobile ?? ""
-                    let sellerIsVerified = objVM.itemObj?.user?.isVerified ?? 0
-                    let sellerId = objVM.itemObj?.user?.id ?? 0
-
-                    
-                    SellerInfoView(name: sellerName, email: "", image:sellerPic,mobile: sellerMob,mobileVisibility:isVisibleContact,isverified:sellerIsVerified)
-                         .onTapGesture {
-                         
-                         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: sellerId))
-                         self.navController?.pushViewController(hostingController, animated: true)
-                     }
-                    
-                    Text("Location").font(Font.manrope(.semiBold, size: 16))
-                }
-                
-                HStack{
-                    Image("location_icon").renderingMode(.template)
-                    .foregroundColor(.orange)
-                    Text(objVM.itemObj?.address ?? "").font(Font.manrope(.medium, size: 16))
-
-                    Spacer()
-                }
-                
-                if let lat = objVM.itemObj?.latitude, let lon = objVM.itemObj?.longitude {
-                    
-                    PinnedMapView(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
-                        let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
-                        let hostingController = UIHostingController(rootView: swiftUIview)
-                        self.navController?.pushViewController(hostingController, animated: true)
-                    } .frame(height: 180)
-                        .cornerRadius(10)
-                }
-                
-                
-                if (Local.shared.getUserId() != itemUserId) {
-                    
-                    let isReported = objVM.itemObj?.isAlreadyReported ?? false
-                    if isReported == false {
-                        //Reporting ads
-                        reportingAdsView
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .clipped()
-                            .background(Color(.secondarySystemBackground))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray, lineWidth: 0.2)
-                            )
-                            .cornerRadius(10.0)
-                            .clipped()
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                            .padding(.top, 5)
-                    }
-                }
-                
-                
-                LazyVStack(alignment: .leading, spacing: 10) {
-                  
-                    if objVM.relatedDataItemArray.count > 0 {
                         HStack{
-                            Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
+                            Image("location_icon").renderingMode(.template).foregroundColor(.orange)
+                            Text(objVM.itemObj?.address ?? "")
+                                .lineLimit(1)
+                                .font(Font.manrope(.medium, size: 16))
                             Spacer()
                         }
+                        
+                        Text(getFormattedCreatedDate())
+                            .font(Font.manrope(.medium, size: 15))
+                    }.padding(5)
+                    //.padding(.bottom,5)
+                    
+                    if (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status?.lowercased() == "draft" {
+                        
+                        HStack{
+                            Spacer()
+                            Image("create_add").padding(5)
+                            VStack{
+                                Spacer()
+                                Text("Post your ad, attract more clients and sell faster")
+                                    .font(.manrope(.regular, size: 16.0))
+                                    .padding(.top,10)
+                                
+                                HStack{
+                                    Button(action: {
+                                        self.objVM.postNowApi(nav: self.navController)
+                                    }) {
+                                        Text("Post Now").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
+                                            .foregroundColor(.white)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
+                                    }.padding([.bottom,.leading],10)
+                                    Spacer()
+                                    
+                                }
+                                Spacer()
+                                
+                            }
+                            Spacer()
+                            
+                        }
+                        .background(Color.yellow.opacity(0.2))
+                        .cornerRadius(10)
+                        .padding(.bottom)
+                    }
+                    if !isFeatured && (Local.shared.getUserId() == itemUserId) && objVM.itemObj?.status == "approved"{
+                        
+                        HStack{
+                            Spacer()
+                            Image("create_add").padding(5)
+                            VStack{
+                                Spacer()
+                                Text("Boost your ad, attract more clients and sell faster")
+                                    .font(.manrope(.regular, size: 16.0))
+                                    .padding(.top,10)
+                                
+                                HStack{
+                                    Button(action: {
+                                        //                                    self.objVM.getLimitsApi(nav: self.navController)
+                                        self.objVM.makeItemFeaturd(nav: self.navController)
+                                        
+                                    }) {
+                                        Text("Create Boost Ad").font(.manrope(.semiBold, size: 16.0)).frame(width: 145, height: 40, alignment: .center)
+                                            .foregroundColor(.white)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
+                                    }.padding([.bottom,.leading],10)
+                                    Spacer()
+                                    
+                                }
+                                Spacer()
+                                
+                            }
+                            Spacer()
+                            
+                        }
+                        .background(Color.yellow.opacity(0.2))
+                        .cornerRadius(10)
+                        .padding(.bottom)
                     }
                     
-                    if !objVM.bannerAdsArray.isEmpty {
-                        AutoScrollBannerAdsView(sliderArray: objVM.bannerAdsArray, currentIndex: 0,navController:self.navController)
-                            //.frame(height: 180)
-                    }
-                    
-                   
-                    RelatedItemsRow(
-                        items:  $objVM.relatedDataItemArray,
-                        onItemTapped: { item in
-                            var swiftUIview = ItemDetailView(
-                                navController: self.navController,
-                                itemId: item.id ?? 0,
-                                itemObj: item,
-                                slug: item.slug
-                            )
-                            swiftUIview.returnValue = { value in
-                                if let obj = value {
-                                    updateItemInList(obj)
+                    if (objVM.itemObj?.customFields ?? []).count > 0 {
+                        
+                        let columns = [
+                            GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
+                            GridItem(.adaptive(minimum: 100, maximum: widthScreen/2.0-10)),
+                        ]
+                        
+                        LazyVGrid(columns: columns, alignment:.leading, spacing: 5) {
+                        if let arr = objVM.itemObj?.customFields{
+                            ForEach(arr){obj in
+                                
+                                if (obj.value?.count ?? 0) > 0 {
+                                    InfoView(icon: obj.image ?? "",
+                                             text: obj.name ?? "",
+                                             value:(((obj.value?.count ?? 0) > 0 ? obj.value?.first ?? "" : "") ?? ""),
+                                             navController: self.navController)
                                 }
                             }
+                        }
+                    }
+                }
+                    
+                    VStack(alignment:.leading) {
+                        Divider().padding(.top)
+                        Text("About this item").font(Font.manrope(.semiBold, size: 16))
+                        /*Text(objVM.itemObj?.description ?? "")
+                         .font(Font.manrope(.regular, size: 15))
+                         .foregroundColor(.gray)*/
+                        
+                        ExpandableTextView(
+                            text: objVM.itemObj?.description ?? "",
+                            lineLimit: 5
+                        )
+                        
+                        Divider()
+                        
+                        let sellerName = objVM.itemObj?.user?.name ?? ""
+                        let sellerPic = objVM.itemObj?.user?.profile ?? ""
+                        let sellerMob = objVM.itemObj?.user?.mobile ?? ""
+                        let sellerIsVerified = objVM.itemObj?.user?.isVerified ?? 0
+                        let sellerId = objVM.itemObj?.user?.id ?? 0
+                        
+                        
+                        SellerInfoView(name: sellerName, email: "", image:sellerPic,mobile: sellerMob,mobileVisibility:isVisibleContact,isverified:sellerIsVerified)
+                            .onTapGesture {
+                                
+                                let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: sellerId))
+                                self.navController?.pushViewController(hostingController, animated: true)
+                            }
+                        
+                        Text("Location").font(Font.manrope(.semiBold, size: 16))
+                    }
+                    
+                    HStack{
+                        Image("location_icon").renderingMode(.template)
+                            .foregroundColor(.orange)
+                        Text(objVM.itemObj?.address ?? "").font(Font.manrope(.medium, size: 16))
+                        
+                        Spacer()
+                    }
+                    
+                    if let lat = objVM.itemObj?.latitude, let lon = objVM.itemObj?.longitude {
+                        
+                        PinnedMapView(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)) {
+                            let swiftUIview = MapLocationView(latitude: objVM.itemObj?.latitude ?? 0.0, longitude: objVM.itemObj?.longitude ?? 0.0, address: objVM.itemObj?.address ?? "", navController: self.navController)
                             let hostingController = UIHostingController(rootView: swiftUIview)
                             self.navController?.pushViewController(hostingController, animated: true)
-                        }) { likedObj in
-                            updateItemInList(likedObj)
-                            
+                        } .frame(height: 160)
+                            .cornerRadius(10)
+                    }
+                    
+                    
+                    if (Local.shared.getUserId() != itemUserId) {
+                        
+                        let isReported = objVM.itemObj?.isAlreadyReported ?? false
+                        if isReported == false {
+                            //Reporting ads
+                            reportingAdsView
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .clipped()
+                                .background(Color(.secondarySystemBackground))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray, lineWidth: 0.2)
+                                )
+                                .cornerRadius(10.0)
+                                .clipped()
+                                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                                .padding(.top, 5)
                         }
-                }
-            }.padding(.vertical)
-            .padding(.horizontal)
-               
-        }
-        .navigationBarHidden(true)
+                    }
+                    
+                    
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        
+                        if objVM.relatedDataItemArray.count > 0 {
+                            HStack{
+                                Text("Related Ads").foregroundColor(Color(UIColor.label)).font(Font.manrope(.semiBold, size: 16))
+                                Spacer()
+                            }
+                        }
+                        
+                        if !objVM.bannerAdsArray.isEmpty {
+                            AutoScrollBannerAdsView(sliderArray: objVM.bannerAdsArray, currentIndex: 0,navController:self.navController)
+                            //.frame(height: 180)
+                        }
+                        
+                        
+                        RelatedItemsRow(
+                            items:  $objVM.relatedDataItemArray,
+                            onItemTapped: { item in
+                                var swiftUIview = ItemDetailView(
+                                    navController: self.navController,
+                                    itemId: item.id ?? 0,
+                                    itemObj: item,
+                                    slug: item.slug
+                                )
+                                swiftUIview.returnValue = { value in
+                                    if let obj = value {
+                                        updateItemInList(obj)
+                                    }
+                                }
+                                let hostingController = UIHostingController(rootView: swiftUIview)
+                                self.navController?.pushViewController(hostingController, animated: true)
+                            }) { likedObj in
+                                updateItemInList(likedObj)
+                                
+                            }
+                    }
+                }//.padding(.vertical)
+                .padding(.horizontal,8)
+                .padding(.top,5)
+                
+            }
+            .navigationBarHidden(true)
+        }.padding(0)
         .onAppear{
             
             if objVM.itemObj == nil{
@@ -1542,7 +1539,7 @@ struct PinnedMapView: View {
         ) { item in
             MapMarker(coordinate: item.coordinate, tint: .red)
         }
-        .frame(height: 200)
+        .frame(height: 160)
         .cornerRadius(12)
         .contentShape(Rectangle())
         .onTapGesture {

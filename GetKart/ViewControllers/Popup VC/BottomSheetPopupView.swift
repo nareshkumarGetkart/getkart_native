@@ -23,7 +23,7 @@ struct BottomSheetPopupView: View {
     }
     
     private var content: some View {
-        VStack(spacing: 15) {
+        VStack(spacing: 10) {
             // IMAGE OR CLOSE BUTTON
             if let imageUrl = objPopup.image, !imageUrl.isEmpty {
                 popupImage
@@ -36,12 +36,12 @@ struct BottomSheetPopupView: View {
                 if let title = objPopup.title {
                     
                     if title.isHTML{
-                        HTMLOrTextView(htmlContent: title, defaultFont:UIFont(name: "Manrope-SemiBold", size: 20.0) ?? UIFont.systemFont(ofSize: 20, weight: .medium))
+                        HTMLOrTextView(htmlContent: title, defaultFont:UIFont.Inter.semiBold(size: 22.0).font ?? UIFont.systemFont(ofSize: 22, weight: .medium))
                             .fixedSize(horizontal: false, vertical: true)
                     }else{
                         
                         Text(title).foregroundColor(.black)
-                            .font(.manrope(.semiBold, size: 18))
+                            .font(.inter(.semiBold, size: 18))
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -53,11 +53,11 @@ struct BottomSheetPopupView: View {
                 if let subtitle = objPopup.subtitle {
                     
                     if subtitle.isHTML{
-                        HTMLOrTextView(htmlContent: subtitle, defaultFont:UIFont(name: "Manrope-Medium", size: 17.0) ?? UIFont.systemFont(ofSize: 16, weight: .medium))
+                        HTMLOrTextView(htmlContent: subtitle, defaultFont:UIFont.Inter.medium(size: 17.0).font ?? UIFont.systemFont(ofSize: 17, weight: .medium))
                             .fixedSize(horizontal: false, vertical: true)
                     }else{
                         Text(subtitle).foregroundColor(.black)
-                            .font(.manrope(.medium, size: 17))
+                            .font(.inter(.medium, size: 17))
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                         
@@ -79,7 +79,7 @@ struct BottomSheetPopupView: View {
                 let strTitle = (objPopup.buttonTitle ?? "").count > 0 ?  objPopup.buttonTitle ?? "Okay" : "Okay"
                 Text(strTitle)
                     .foregroundColor(.white)
-                    .font(.manrope(.semiBold, size: 17))
+                    .font(.inter(.semiBold, size: 18))
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color(hexString: "#FF9900"))
                     .cornerRadius(10)
@@ -89,28 +89,61 @@ struct BottomSheetPopupView: View {
         }
     }
     
+//    private var popupImage: some View {
+//        ZStack(alignment: .topTrailing) {
+//            AsyncImage(url: URL(string: objPopup.image ?? "")) { image in
+//                image.resizable()
+//                    .aspectRatio(contentMode: .fit)
+//                    .frame(maxWidth: .infinity)
+//                    .frame(minHeight: 170, maxHeight: 250)
+//                    //.padding(.top,1)
+//                    .clipped()
+//            } placeholder: {
+//                Image("getkartplaceholder")
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fit)
+//                    .frame(minHeight: 170, maxHeight: 250)//.padding(.top,1)
+//                    .clipped()
+//            }
+//            
+//            if !(objPopup.mandatoryClick ?? false) {
+//                closeButton
+//                    .padding(.top, 15)
+//                    .padding(.trailing, 10)
+//            }
+//        }
+//    }
+    
     private var popupImage: some View {
         ZStack(alignment: .topTrailing) {
+
             AsyncImage(url: URL(string: objPopup.image ?? "")) { image in
-                image.resizable()
-                    .aspectRatio(contentMode: .fit)
+                image
+                    .resizable()
+                    .scaledToFit()
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 170, maxHeight: 250)
-                    .padding(.top,1)
+                    .frame(minHeight: 160, maxHeight: 250)
+                   // .padding(.top,1)
+                
             } placeholder: {
                 Image("getkartplaceholder")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity).padding(.top,1)
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 160, maxHeight: 250)
+                  //  .padding(.top,1)
+                
             }
-            
+
             if !(objPopup.mandatoryClick ?? false) {
                 closeButton
-                    .padding(.top, 15)
-                    .padding(.trailing, 10)
+                    .padding(.top, 10)
+                    .padding(.trailing, 12)
             }
-        }
+        }    .ignoresSafeArea(.container, edges: .top)   // ✅ ONLY HERE
+
     }
+
     
     private var closeButton: some View {
         Button {
@@ -125,29 +158,12 @@ struct BottomSheetPopupView: View {
     }
 }
 
-// MARK: - HostingController that reports SwiftUI content size dynamically
-class IntrinsicHostingController<Content: View>: UIHostingController<Content> {
-    
-    private var lastReportedSize: CGSize = .zero
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updatePreferredContentSize()
-    }
-    
-    private func updatePreferredContentSize() {
-        let targetSize = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        guard lastReportedSize != targetSize else { return }
-        lastReportedSize = targetSize
-        preferredContentSize = targetSize
-        view.invalidateIntrinsicContentSize()
-    }
-}
+
 
 
 struct HTMLTextView: UIViewRepresentable {
     let htmlContent: String
-    var defaultFont: UIFont = .Manrope.regular(size: 15).font
+    var defaultFont: UIFont = .Inter.regular(size: 15).font
     var horizontalPadding: CGFloat = 7
 
     func makeUIView(context: Context) -> UILabel {
@@ -188,6 +204,9 @@ struct HTMLTextView: UIViewRepresentable {
         // Constrain UILabel width to screen width minus padding
         let screenWidth = UIScreen.main.bounds.width
         uiView.preferredMaxLayoutWidth = screenWidth - (horizontalPadding * 2)
+        
+        uiView.setContentHuggingPriority(.required, for: .vertical)
+        uiView.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 }
 
@@ -284,7 +303,7 @@ func extractHTMLColor(_ html: String) -> Color {
 
  struct HTMLOrTextView: UIViewRepresentable {
     let htmlContent: String
-    var defaultFont: UIFont //= .Manrope.regular(size: 17).font
+    var defaultFont: UIFont = .Inter.regular(size: 17).font
     var horizontalPadding: CGFloat = 8
 
     func makeUIView(context: Context) -> UILabel {
@@ -365,10 +384,10 @@ func extractHTMLColor(_ html: String) -> Color {
         // Constrain UILabel width
         let screenWidth = UIScreen.main.bounds.width
         uiView.preferredMaxLayoutWidth = screenWidth - (horizontalPadding * 2)
+       
+        uiView.setContentHuggingPriority(.required, for: .vertical)
+        uiView.setContentCompressionResistancePriority(.required, for: .vertical)
     }
-     
-     
-     
 }
 
 extension NSMutableAttributedString {
@@ -403,245 +422,3 @@ extension String {
 
 
 
-// MARK: - Presenting function
-/*func presentHostingController(objPopup: PopupModel, from vc: UIViewController) {
-    
-    let hostingController = IntrinsicHostingController(
-        rootView: BottomSheetPopupView(objPopup: objPopup, pushToScreenFromPopup: { obj, dismissOnly in
-            vc.dismiss(animated: true)
-            // handle your navigation here
-        })
-    )
-    
-    hostingController.view.backgroundColor = .clear
-    hostingController.view.layoutIfNeeded()
-    
-    // Present FittedSheet with intrinsic height
-    let sheet = SheetViewController(
-        controller: hostingController,
-        sizes: [.intrinsic],
-        options: SheetOptions(presentingViewCornerRadius: 20)
-    )
-    
-    sheet.cornerRadius = 20
-    sheet.dismissOnOverlayTap = !(objPopup.mandatoryClick ?? false)
-    sheet.dismissOnPull = false
-    sheet.allowGestureThroughOverlay = false
-    sheet.gripColor = .clear
-    
-    vc.present(sheet, animated: true, completion: nil)
-}
-*/
-
-/*
-struct BottomSheetPopupView: View {
-    var objPopup: PopupModel
-    var pushToScreenFromPopup: (_ obj: PopupModel, _ dismissOnly: Bool) -> Void
-
-    var body: some View {
-        GeometryReader { geo in
-            VStack(spacing: 0) {
-                content
-            }
-            .padding(.horizontal, 10)   // ✅ horizontal padding applied
-            .padding(.bottom, 5)
-            .background(Color.white)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: UIScreen.main.bounds.width - 20) // constrain width
-   // ❤️ CRITICAL
-        }
-        .frame(maxHeight: .infinity, alignment: .bottom)
-    }
-
-    private var content: some View {
-        VStack(spacing: 0) {
-
-            // Banner — full width, ignores horizontal padding
-            if let imageUrl = objPopup.image, !imageUrl.isEmpty {
-                ZStack(alignment: .topTrailing) {
-                    AsyncImage(url: URL(string: imageUrl)) { image in
-                        image.resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: .infinity)
-                            .frame(minHeight: 150, maxHeight: 220)// ✅ full screen width
-                    } placeholder: {
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .frame(minHeight: 150, maxHeight: 220)
-
-                    if !(objPopup.mandatoryClick ?? false) {
-                        closeButton
-                            .padding(.top)
-                    }
-                } .frame(maxWidth: .infinity)
-            }
-
-            // Content — padded text/buttons
-            VStack(spacing: 15) {
-                Text(objPopup.title ?? "")
-                    .font(.manrope(.semiBold, size: 17))
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(objPopup.subtitle ?? "")
-                    .font(.manrope(.regular, size: 16))
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if let html = objPopup.description, !html.isEmpty {
-                    HTMLTextView(htmlContent: html)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Button {
-                    pushToScreenFromPopup(objPopup, false)
-                } label: {
-                    Text(objPopup.buttonTitle ?? "Okay")
-                        .foregroundColor(.white)
-                        .font(.manrope(.semiBold, size: 17))
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color(hexString: "#FF9900"))
-                        .cornerRadius(10)
-                }
-            }.padding(.top,10)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
-        }
-        .background(Color.white)
-        .fixedSize(horizontal: false, vertical: true)
-
-    }
-
-    // MARK: - Subviews
-
-    private var popupImage: some View {
-        ZStack(alignment: .topTrailing) {
-            AsyncImage(url: URL(string: objPopup.image ?? "")) { image in
-                image.resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 170, maxHeight: 250)
-
-            } placeholder: {
-                Image("getkartplaceholder")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-            }
-
-            if !(objPopup.mandatoryClick ?? false) {
-                closeButton
-            }
-        }
-        .padding(.bottom, 10)
-    }
-
-    private var closeButton: some View {
-        Button {
-            pushToScreenFromPopup(objPopup, true)
-        } label: {
-           
-                Image("Cross")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 25, height: 25)
-                 //   .padding(8)
-            
-          
-        }
-    }
-}
-
-#Preview {
-    BottomSheetPopupView(objPopup: PopupModel(userID:639, title: "items saved as draft that",
-                                              subtitle: "items saved as draft that",
-                                              description: "<ul><li>You have items saved as draft that are not visible to others.</li>  <li>Complete the required details to make your item live.</li>    <li>Publishing your item increases visibility and chances of response.</li>   <li>Make sure the images and description are clear and accurate.</li>        <li>Click 'Publish Now' to make your draft item available to others.</li>     </ul>", image:"https://d25frd65ud7bv8.cloudfront.net/getkart/chat/2025/07/687dcf6b83e234.645584041753075563.png", mandatoryClick: true,
-                                              buttonTitle: "Okay",
-                                              type: 1, itemID: 49625), pushToScreenFromPopup: {(obj,dismissOnly) in
-        
-    })
-}
-
-
-
-import SwiftUI
-
-struct HTMLTextView: UIViewRepresentable {
-    let htmlContent: String
-    var defaultFont: UIFont = .systemFont(ofSize: 15)
-    var horizontalPadding: CGFloat = 8
-
-    func makeUIView(context: Context) -> UILabel {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
-        label.textAlignment = .center
-        return label
-    }
-
-    func updateUIView(_ uiView: UILabel, context: Context) {
-        guard let data = htmlContent.sanitizedHTML.data(using: .utf8) else { return }
-
-        if let attributed = try? NSMutableAttributedString(
-            data: data,
-            options: [
-                .documentType: NSAttributedString.DocumentType.html,
-                .characterEncoding: String.Encoding.utf8.rawValue
-            ],
-            documentAttributes: nil
-        ) {
-            // Set default font if missing
-            attributed.enumerateAttribute(.font, in: NSRange(location: 0, length: attributed.length), options: []) { value, range, _ in
-                if let oldFont = value as? UIFont {
-                    let newFont = oldFont.withSize(max(oldFont.pointSize, defaultFont.pointSize))
-                    attributed.addAttribute(.font, value: newFont, range: range)
-                } else {
-                    attributed.addAttribute(.font, value: defaultFont, range: range)
-                }
-            }
-
-            uiView.attributedText = attributed
-        } else {
-            uiView.text = htmlContent
-            uiView.font = defaultFont
-        }
-
-        // Constrain UILabel width to screen width minus padding
-        let screenWidth = UIScreen.main.bounds.width
-        uiView.preferredMaxLayoutWidth = screenWidth - (horizontalPadding * 2)
-    }
-}
-
-
-
-
-import UIKit
-
-extension NSMutableAttributedString {
-    func applyFont(_ font: UIFont) {
-        beginEditing()
-        enumerateAttribute(.font, in: NSRange(location: 0, length: length)) { value, range, _ in
-            guard let oldFont = value as? UIFont else { return }
-            let newFont = UIFont(descriptor: font.fontDescriptor, size: oldFont.pointSize)
-            addAttribute(.font, value: newFont, range: range)
-        }
-        endEditing()
-    }
-}
-
-
-
-
-
-class AutoSizingTextView: UITextView {
-    override var contentSize: CGSize {
-        didSet { invalidateIntrinsicContentSize() }
-    }
-
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: UIView.noIntrinsicMetric, height: contentSize.height)
-    }
-}
-*/

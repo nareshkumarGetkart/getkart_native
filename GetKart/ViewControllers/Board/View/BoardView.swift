@@ -10,7 +10,7 @@ import Kingfisher
 
 
 struct BoardView: View {
-
+    weak var tabBarController: UITabBarController?
     let navigationController: UINavigationController?
     @State private var selected = "All"
     @StateObject private var vm = BoardViewModel()
@@ -25,7 +25,6 @@ struct BoardView: View {
                 headerView(
                     onCategoryTap: {
                         scrollToTop(verticalProxy)
-
 //                        withAnimation(.easeInOut) {
 //                            verticalProxy.scrollTo("TOP", anchor: .top)
 //                        }
@@ -245,6 +244,7 @@ struct CategoryTabs: View {
                     }
                     .padding(.horizontal,12)
                     .padding(.vertical, 0)
+                    .padding(.top,4)
                 }
              
                 // 🔥 Auto-scroll when selection changes (API / default)
@@ -375,16 +375,33 @@ private extension BoardView {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .onTapGesture {
-            let vc = UIHostingController(
+           /* let vc = UIHostingController(
                 rootView: SearchBoardResultView(
                     navigationController: navigationController,
                     isByDefaultOpenSearch: true
                 )
             )
-            navigationController?.pushViewController(vc, animated: false)
+            navigationController?.pushViewController(vc, animated: false)*/
+            pushSearchBoard()
         }
+        
+       
     }
 
+    func pushSearchBoard() {
+       guard let tabBar = tabBarController,
+             let boardNav = tabBar.viewControllers?[1] as? UINavigationController else { return }
+       
+       let vc = UIHostingController(
+           rootView: SearchBoardResultView(
+               navigationController: boardNav,
+               isByDefaultOpenSearch: true
+           )
+       )
+       vc.hidesBottomBarWhenPushed = true
+       boardNav.pushViewController(vc, animated: false)
+   }
+    
     var interestButton: some View {
         Button {
             let vc = UIHostingController(
@@ -421,7 +438,8 @@ private extension BoardView {
 
 
 struct ProductCardStaggered1: View {
-    
+    @State private var showSafari = false
+
     let product: ItemModel
    // let imgHeight: CGFloat
     let sendLikeUnlikeObject: (Bool, Int) -> Void
@@ -436,6 +454,11 @@ struct ProductCardStaggered1: View {
                     
                    // GeometryReader { geo in
                         KFImage(url)
+                        .setProcessor(
+                              DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                          )
+                          .scaleFactor(UIScreen.main.scale)
+                          .cacheOriginalImage(false)
                             .resizable()
                            // .scaledToFill()
                             //.frame(width: geo.size.width,height:imgHeight)
@@ -461,6 +484,7 @@ struct ProductCardStaggered1: View {
                 }
                 
                 Button {
+                    showSafari = true
                     outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
                 } label: {
                     HStack(spacing:2){
@@ -484,8 +508,10 @@ struct ProductCardStaggered1: View {
                         .frame(width: 24, height: 24)
                 }
                 
-                Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
-                    .font(Font.inter(.regular, size: 12))
+                if (product.totalLikes ?? 0) > 0{
+                    Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
+                        .font(Font.inter(.regular, size: 12))
+                }
                 Spacer()
                 
                 if (product.isFeature ?? false) {
@@ -521,6 +547,14 @@ struct ProductCardStaggered1: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
         
+            .fullScreenCover(isPresented: $showSafari) {
+              
+                if let url = URL(string:getUrlValid(strURl: product.outbondUrl ?? ""))  {
+                    
+                    SafariView(url:url)
+                }
+            }
+        
     }
     
     
@@ -530,6 +564,16 @@ struct ProductCardStaggered1: View {
             let newState = !(product.isLiked ?? false)
             sendLikeUnlikeObject(newState, boardId)
         }
+    }
+    
+    
+    func getUrlValid(strURl:String) ->String{
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+              !urlString.lowercased().hasPrefix("https://") {
+               urlString = "https://" + urlString
+           }
+        return urlString
     }
     
     func outboundClickApi(strURl:String,boardId:Int){
@@ -550,20 +594,26 @@ struct ProductCardStaggered1: View {
                 }
             }
         }
-        
-        var urlString = strURl
+
+      /*  var urlString = strURl
         if !urlString.lowercased().hasPrefix("http://") &&
               !urlString.lowercased().hasPrefix("https://") {
                urlString = "https://" + urlString
            }
         
         if let url = URL(string: urlString)  {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                print("Cannot open URL")
-            }
-        }
+            showSafari = true
+            
+//            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:urlString,isCopyUrl:true))
+//            vc.hidesBottomBarWhenPushed = true
+//            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+            
+//            if UIApplication.shared.canOpenURL(url) {
+//                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+//            } else {
+//                print("Cannot open URL")
+//            }
+        }*/
     }
 }
 

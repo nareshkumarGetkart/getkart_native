@@ -98,7 +98,7 @@ struct HeaderView: View {
             }) {
                 Image("arrow_left").renderingMode(.template)
                     .foregroundColor(Color(UIColor.label))
-                    .padding()
+                    .padding(.leading)
             }
             Text("Favorites").font(Font.inter(.semiBold, size: 18))
                 .foregroundColor(Color(UIColor.label))

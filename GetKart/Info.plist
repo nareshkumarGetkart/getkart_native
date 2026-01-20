@@ -64,6 +64,9 @@
 		<string>credpay</string>
 		<string>amazonpay</string>
 		<string>bhim</string>
+        <string>instagram</string>
+        <string>whatsapp</string>
+        <string>fb</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

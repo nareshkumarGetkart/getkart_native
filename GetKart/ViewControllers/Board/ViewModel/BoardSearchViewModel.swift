@@ -42,7 +42,7 @@ class BoardSearchViewModel: ObservableObject {
             strUrl.append("?search=\(searchText)")
         }
         
-        AF.cancelAllRequests()
+       AF.cancelAllRequests()
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) { (obj:SearchSuggestion) in
          

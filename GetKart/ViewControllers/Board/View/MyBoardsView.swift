@@ -254,17 +254,18 @@ struct MyBoardCell:View {
         VStack(spacing:0){
             HStack{
                 
-                ZStack{
+                ZStack(alignment:.bottomLeading){
                     
                     Rectangle()
                         .fill(Color.gray.opacity(0.5))
                         .frame(width: 105,height: 120)
-                        .cornerRadius(10, corners: [.topRight, .bottomRight])
+                        .cornerRadius(10)
+                      //  .cornerRadius(10, corners: [.topRight, .bottomRight])
                     
                     KFImage(URL(string:  itemObj.image ?? ""))
                         .placeholder {
                             Image("getkartplaceholder")
-                                .frame(width: 105,height: 120).aspectRatio(contentMode: .fit).cornerRadius(5)
+                                .frame(width: 105,height: 120).aspectRatio(contentMode: .fit).cornerRadius(10)
                         }
                         .setProcessor(
                             DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
@@ -272,22 +273,24 @@ struct MyBoardCell:View {
                         )
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: 105, maxHeight: 120).cornerRadius(5).clipped()//.padding(1)
+                        .frame(maxWidth: 105, maxHeight: 120).cornerRadius(10).clipped()//.padding(1)
                     
                     if (itemObj.isFeature ?? false) == true{
-                        VStack(alignment:.leading){
-                            HStack{
+                      //  VStack(alignment:.leading){
+                           HStack{
+                               Spacer()
                                 Text("Sponsered")
-                                    .frame(width:85,height:22)
-                                    .background(.orange)
-                                    .cornerRadius(5)
+                                    .frame(height:22)
+                                   // .background(.orange)
+                                   // .cornerRadius(5)
                                     .foregroundColor(Color(.white))
                                     .font(.inter(.medium, size: 14))
-                            }.padding(.top,5)
-                            Spacer()
-                        }
+                               Spacer()
+                            } .background(.orange)//.padding(.top,5)
+                            //Spacer()
+                       // }
                     }
-                }.frame(width: 105,height: 120).cornerRadius(5)
+                }.frame(width: 105,height: 120).cornerRadius(10)
                 
                 
                 VStack(alignment: .leading, spacing: 5){
@@ -383,9 +386,9 @@ struct MyBoardCell:View {
                 }.padding(.horizontal,2)//.padding([.top,.bottom],10)
                 
             }.frame(height: 120)
-                .background(Color(UIColor.systemBackground)).cornerRadius(15)
+                .background(Color(UIColor.systemBackground)).cornerRadius(10)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 15)
+                    RoundedRectangle(cornerRadius: 10)
                         .stroke(Color(hex: "#E0E8F299"), lineWidth: 0.5)
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
@@ -415,7 +418,7 @@ struct MyBoardCell:View {
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
                 onBoostTapped(itemObj,selPkgObj)
-            }).cornerRadius(25)
+            })//.cornerRadius(25)
             
             .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)

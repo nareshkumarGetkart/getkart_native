@@ -24,17 +24,28 @@ struct PostOptionsSheet: View {
             VStack(spacing: 25) {
                 // Close button
                 HStack {
-                    Spacer()   // Title
-                    Text("Start Posting Now")
-                        .font(.inter(.medium, size: 18))
-                        .foregroundColor(Color(.label))
-                        .padding(.top, 10)
-                    Spacer()
+                    //THis is hidden to maintain balance
                     Button(action: onClose) {
                         Image(systemName: "xmark")
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(Color(.label))
-                            .padding(.top, 10)
+                            .padding(.top, 5)
+                    }.hidden()
+                    
+                    Spacer()
+                    // Title
+                    Text("Start Posting Now")
+                        .font(.inter(.medium, size: 18))
+                        .foregroundColor(Color(.label))
+                        .padding(.top, 5)
+                    
+                    Spacer()
+                    
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(Color(.label))
+                            .padding(.top, 5)
                     }
                 }
                 .padding(.horizontal)

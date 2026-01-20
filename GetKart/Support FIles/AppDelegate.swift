@@ -57,6 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         reachabilityListener()
         registerForRemoteNotification(application: application)
         
+        
+        //by me kingfisher
+        setupImageCache()
             
         // Define the desired large font
       if let largeFont = UIFont(name: "Inter-Regular", size: 12) {
@@ -126,6 +129,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     
+
+    func setupImageCache() {
+
+        let cache = ImageCache.default
+
+        // 🔒 HARD MEMORY LIMIT (MOST IMPORTANT)
+        cache.memoryStorage.config.totalCostLimit = 1204 * 1024 * 1024 // 120 MB
+        cache.memoryStorage.config.countLimit = 150
+
+        // 🧊 Disk cache (safe)
+        cache.diskStorage.config.sizeLimit = 300 * 1024 * 1024
+     
+    }
+
     private func navigateToHomeOrLogin(){
         
         if Local.shared.getUserId() > 0{
@@ -451,8 +468,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                 }
             }
             
-            
-
         case "payment":
             
            do {
@@ -1026,7 +1041,9 @@ extension AppDelegate : ATAppUpdaterDelegate{
             if error == nil {
                 if  let result = responseObject{
                     if let data = result["data"] as? Dictionary<String, Any>{
-                        Constant.shared.xApiKey = data["key"] as? String ?? ""
+                        if (data["key"] as? String ?? "").count > 0{
+                            Constant.shared.xApiKey = data["key"] as? String ?? ""
+                        }
                        DispatchQueue.main.async {
                            self?.navigateToHomeOrLogin()
                         }
@@ -1049,12 +1066,16 @@ extension AppDelegate : ATAppUpdaterDelegate{
             if error == nil {
                 if  let result = responseObject{
                     if let data = result["data"] as? Dictionary<String, Any>{
-                        Constant.shared.xApiKey = data["key"] as? String ?? ""
+                        print("device_refresh== api == \(data)")
+                        if (data["key"] as? String ?? "").count > 0{
+                            Constant.shared.xApiKey = data["key"] as? String ?? ""
+                        }
                     }
                 }
             }
         }
     }
+    
     
     func getSettingsApi(){
 
