@@ -14,121 +14,97 @@ struct BoardView: View {
     let navigationController: UINavigationController?
     @State private var selected = "All"
     @StateObject private var vm = BoardViewModel()
-
+    @State private var paymentGateway: PaymentGatewayCentralized?
+    
     var body: some View {
-        ScrollViewReader { verticalProxy in   // 👈 ADD THIS
-
-        VStack(spacing: 0) {
-            
-           // headerView
-
+        
+        ScrollViewReader { verticalProxy in   //ADD THIS
+            VStack(spacing: 0) {
+                
                 headerView(
                     onCategoryTap: {
                         scrollToTop(verticalProxy)
-//                        withAnimation(.easeInOut) {
-//                            verticalProxy.scrollTo("TOP", anchor: .top)
-//                        }
                     }
                 )
-               
-            
-               ScrollView {
-                
-                // 🔥 TOP ANCHOR
-                         Color.clear
-                             .frame(height: 0)
-                             .id("TOP").hidden()
-                
-                if vm.items.isEmpty && !vm.isLoading {
+                ScrollView {
+                    //  TOP ANCHOR
+                    Color.clear.frame(height: 0)
+                        .id("TOP").hidden()
                     
-                    
-                    emptyView.padding(.top,100)
-                    
-                } else {
-                    
-                    LazyVStack(spacing:0) {
-                        StaggeredGrid(columns: 2, spacing: 5) {
-                           // ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
-                                
-                           ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
-
-//                               let isEven: Bool = {
-//                                   guard let id = item.id else { return false }
-//                                   return id.hashValue % 2 == 0
-//                               }()
-//
-//                               let height: CGFloat = isEven ? 210 : 160
-                               
-                                ProductCardStaggered1(
-                                    product: item,
-                                    //imgHeight: height //CGFloat(160 + (index % 2) * 50)
-                                ) { isLiked, boardId in
-                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }.contentShape(Rectangle())
-                                .onTapGesture {
-                                    pushToDetail(item: item)
+                    if vm.items.isEmpty && !vm.isLoading {
+                        
+                        
+                        emptyView.padding(.top,100)
+                        
+                    } else {
+                        
+                        LazyVStack(spacing:0) {
+                            StaggeredGrid(columns: 2, spacing: 5) {
+                                ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+                                    
+                                    //                                    ProductCardStaggered1(
+                                    //                                        product: item,
+                                    //                                        onTapBoostButton:{
+                                    //                                            paymentGatewayOpen(product:item)
+                                    //                                        }
+                                    //                                    ) { isLiked, boardId in
+                                    //                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    //                                    }.contentShape(Rectangle())
+                                    //                                        .onTapGesture {
+                                    //                                            pushToDetail(item: item)
+                                    //                                        }
+                                    
+                                    
+                                    ProductCardStaggered1(
+                                        product: item,
+                                        sendLikeUnlikeObject: { isLiked, boardId in
+                                            vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                        },
+                                        onTapBoostButton: {
+                                            paymentGatewayOpen(product: item)
+                                        }
+                                    ).contentShape(Rectangle())
+                                        .onTapGesture {
+                                            pushToDetail(item: item)
+                                        }
                                 }
-                               // .onAppear {
-                                  //  vm.loadNextPageIfNeeded(currentIndex: index)
-                                    
-                                    
-                                    
-                                    //
-                               // }
                             }
-                        }
-                        .padding(.horizontal, 5)
-                        .padding(.top, 0)
+                            .padding(.horizontal, 5)
+                            .padding(.top, 0)
+                            
+                            if vm.isLoading {
+                                ProgressView().padding()
+                            }
+                        }.padding(.top,0)
                         
-                        //  bottom detector (NO layout impact)
-                      /*  GeometryReader { geo in
-                            Color.clear
-                                .preference(
-                                    key: ScrollBottomKey.self,
-                                    value: geo.frame(in: .global).maxY
-                                )
-                        }
-                        .frame(height: 0)*/
-                        
-                        if vm.isLoading {
-                            ProgressView().padding()//.transaction { $0.animation = nil }
-                        }
-                    }.padding(.top,0)
-                    
+                    }
+                    //  MUST be inside ScrollView, after content
+                    ScrollDetector {
+                        vm.loadNextPage()
+                    }
                 }
-                   
-                   // 👇 MUST be inside ScrollView, after content
-                       ScrollDetector {
-                           vm.loadNextPage()
-                       }
-            }
-             
-            .scrollIndicators(.hidden)
-           
-            .refreshable {
-                if !vm.isLoading{
-                    vm.loadInitial()
-                }
-            }.tint(.orange)
                 
-//            .onPreferenceChange(ScrollBottomKey.self) { bottomY in
-//                vm.handleScrollBottom(bottomY: bottomY)
-//            }
-            .environment(\.scrollToTopProxy, verticalProxy)
-        }
+                .scrollIndicators(.hidden)
+                
+                .refreshable {
+                    if !vm.isLoading{
+                        vm.loadInitial()
+                    }
+                }.tint(.orange)
+                    .environment(\.scrollToTopProxy, verticalProxy)
+            }
             
-        .onReceive(
-            NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.refreshInterestChangeBoardScreen.rawValue)
-            )
-        ) { notification in
-            scrollToTop(verticalProxy)
-            vm.selectedCategoryId = 0
-            selected = "All"
-           // vm.categoryChanged(0)
-            vm.loadInitial()
-
-        }
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.refreshInterestChangeBoardScreen.rawValue)
+                )
+            ) { notification in
+                scrollToTop(verticalProxy)
+                vm.selectedCategoryId = 0
+                selected = "All"
+                vm.loadInitial()
+                
+            }
         }
         .background(Color(.systemGray6))
         .onAppear {
@@ -142,18 +118,15 @@ struct BoardView: View {
                 for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
             )
         ) { notification in
-
+            
             guard let dict = notification.object as? [String: Any] else { return }
-
+            
             let isLike  = dict["isLike"] as? Bool ?? false
             let count  = dict["count"] as? Int ?? 0
             let boardId = dict["boardId"] as? Int ?? 0
-
+            
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
         }
-        
-        
-        
     }
     
     private func scrollToTop(_ proxy: ScrollViewProxy) {
@@ -163,35 +136,63 @@ struct BoardView: View {
             }
         }
     }
-
     
     func headerView(onCategoryTap: @escaping () -> Void) -> some View {
         VStack {
             HStack {
-                Text("For you")
-                    .underline()
-                    .font(.manrope(.medium, size: 15))
-
+                //                Text("For you")
+                //                    .underline()
+                //                    .font(.manrope(.medium, size: 15))
+                
                 searchBar
                 interestButton
             }
             .padding(.horizontal, 10)
-
+            
             CategoryTabs(
                 selected: $selected,
                 selectedCategoryId: Binding(
                     get: { vm.selectedCategoryId },
                     set: {
-                        onCategoryTap()   // 🔥 SCROLL TO TOP HERE
+                        onCategoryTap()  // SCROLL TO TOP HERE
                         vm.categoryChanged($0)
                     }
                 )
             ).padding(.bottom,0)
         }
         .background(Color(.systemBackground))
-        
     }
-
+    
+    func paymentGatewayOpen(product:ItemModel) {
+        
+        paymentGateway = PaymentGatewayCentralized()
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+        
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                navigationController?.present(vc, animated: true)
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":product.id ?? 0], userInfo: nil)
+                
+            }
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
+    }
 }
 
 #Preview {
@@ -439,20 +440,18 @@ private extension BoardView {
 
 struct ProductCardStaggered1: View {
     @State private var showSafari = false
-
+    @State private var paymentGateway: PaymentGatewayCentralized?
     let product: ItemModel
-   // let imgHeight: CGFloat
     let sendLikeUnlikeObject: (Bool, Int) -> Void
     @State private var imageRatio: CGFloat = 3/4 // fallback ratio
+    let onTapBoostButton: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             
             ZStack(alignment:.bottomTrailing) {
                 if let url = URL(string: product.image ?? "") {
-                    
-                    
-                   // GeometryReader { geo in
+                 
                         KFImage(url)
                         .setProcessor(
                               DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
@@ -460,9 +459,6 @@ struct ProductCardStaggered1: View {
                           .scaleFactor(UIScreen.main.scale)
                           .cacheOriginalImage(false)
                             .resizable()
-                           // .scaledToFill()
-                            //.frame(width: geo.size.width,height:imgHeight)
-                            //.aspectRatio(3/4, contentMode: .fill)
                             .onSuccess { result in
                                             let size = result.image.size
                                             if size.height > 0 {
@@ -479,41 +475,46 @@ struct ProductCardStaggered1: View {
                                 x: 0,
                                 y: 2
                             )
-//                    }
-//                    .frame(height: imgHeight)
                 }
-                
-                Button {
-                    showSafari = true
-                    outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
-                } label: {
-                    HStack(spacing:2){
-                        Text("Buy Now")
-                            .font(.inter(.medium, size: 11))
-                            .foregroundColor(.white)
-                        Image("upRight")
-                    }
-                }.padding(.vertical, 3)
-                    .padding(.horizontal, 8)
-                    .background(Color.orange)
-                    .cornerRadius(5)
-                    .padding(5)
+                if (product.user?.id ?? 0) != Local.shared.getUserId(){
+                    
+                    Button {
+                        showSafari = true
+                        outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
+                    } label: {
+                        HStack(spacing:2){
+                            Text("Buy Now")
+                                .font(.inter(.medium, size: 11))
+                                .foregroundColor(.white)
+                            Image("upRight")
+                        }
+                    }.padding(.vertical, 3)
+                        .padding(.horizontal, 8)
+                        .background(Color.orange)
+                        .cornerRadius(5)
+                        .padding(5)
+                }
             }
             
             HStack(spacing:2) {
-                Button {
-                    manageLike(boardId: product.id ?? 0)
-                } label: {
-                    Image(product.isLiked == true ? "like_fill" : "like")
-                        .frame(width: 24, height: 24)
-                }
                 
-                if (product.totalLikes ?? 0) > 0{
-                    Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
-                        .font(Font.inter(.regular, size: 12))
+                if (product.user?.id ?? 0) == Local.shared.getUserId(){
+                    Spacer()
+
+                }else{
+                    Button {
+                        manageLike(boardId: product.id ?? 0)
+                    } label: {
+                        Image(product.isLiked == true ? "like_fill" : "like")
+                            .frame(width: 24, height: 24)
+                    }
+                    
+                    if (product.totalLikes ?? 0) > 0{
+                        Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
+                            .font(Font.inter(.regular, size: 12))
+                    }
+                    Spacer()
                 }
-                Spacer()
-                
                 if (product.isFeature ?? false) {
                     Text("Sponsored")
                         .font(.inter(.medium, size: 11))
@@ -540,6 +541,38 @@ struct ProductCardStaggered1: View {
                 specialPrice: product.specialPrice ?? 0.0,
                 currencySymbol: Local.shared.currencySymbol
             ).padding([.bottom],8).padding(.horizontal,8).padding(.top,2)
+            
+            if (product.user?.id ?? 0) == Local.shared.getUserId(){
+                
+                if product.isFeature == false {
+                    Button {
+                        // Boost action
+                        onTapBoostButton()
+                       // paymentGatewayOpen()
+                    } label: {
+                        Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
+                            .font(.inter(.semiBold, size: 14))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 30)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.65, blue: 0.15), // light orange
+                                        Color(red: 0.95, green: 0.45, blue: 0.05) // dark orange
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .cornerRadius(5)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 10)
+                }
+
+
+            }
+
         }
         .background(Color(.systemBackground))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
@@ -594,26 +627,39 @@ struct ProductCardStaggered1: View {
                 }
             }
         }
+    }
+    
+    
+    func paymentGatewayOpen() {
 
-      /*  var urlString = strURl
-        if !urlString.lowercased().hasPrefix("http://") &&
-              !urlString.lowercased().hasPrefix("https://") {
-               urlString = "https://" + urlString
-           }
-        
-        if let url = URL(string: urlString)  {
-            showSafari = true
+        paymentGateway = PaymentGatewayCentralized()  //  STRONG REFERENCE
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: AppDelegate.sharedInstance.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                AppDelegate.sharedInstance.navigationController?.present(vc, animated: true)
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":self.product.id ?? 0], userInfo: nil)
+            }
             
-//            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:urlString,isCopyUrl:true))
-//            vc.hidesBottomBarWhenPushed = true
-//            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-            
-//            if UIApplication.shared.canOpenURL(url) {
-//                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-//            } else {
-//                print("Cannot open URL")
-//            }
-        }*/
+            //  RELEASE
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
     }
 }
 

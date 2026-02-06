@@ -169,8 +169,6 @@ extension UIImageView{
 }
 //MARK: UICOlor
 extension UIColor {
-    
-    
         
     convenience init(hexString: String, alpha: CGFloat = 1.0) {
         let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
@@ -189,6 +187,7 @@ extension UIColor {
         let blue  = CGFloat(b) / 255.0
         self.init(red:red, green:green, blue:blue, alpha:alpha)
     }
+    
     func toHexString() -> String {
         var r:CGFloat = 0
         var g:CGFloat = 0
@@ -209,12 +208,7 @@ extension UIButton {
         self.setImage(templatedImage, for: .normal)
         self.tintColor = color
     }
-//    func setImageTintColor(color:UIColor){
-//        self.imageView?.image = self.imageView?.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
-//        self.tintColor = color
-//    }
 
-    
 func addShadow(shadowColor: CGColor = UIColor.black.cgColor,
                    shadowOffset: CGSize = CGSize(width: 1.0, height: 2.0),
                    shadowOpacity: Float = 0.4,

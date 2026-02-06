@@ -36,7 +36,8 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         refreshControl.tintColor = UIColor.systemYellow
         return refreshControl
     }()
-    
+    private  var paymentGateway: PaymentGatewayCentralized?
+
     private var homeVModel:HomeViewModel?
 
     //MARK: Controller life cycle methods
@@ -62,6 +63,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue),
                                                object: nil)
       
+        NotificationCenter.default.addObserver(self, selector:
+                                                #selector(refreshList), name: .init(NotificationKeys.refreshAdsScreen.rawValue),
+                                               object: nil)
+
        
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
@@ -98,6 +103,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
         tblView.register(UINib(nibName: "HomeHorizontalCell", bundle: nil), forCellReuseIdentifier: "HomeHorizontalCell")
         tblView.register(UINib(nibName: "BannerTblCell", bundle: nil), forCellReuseIdentifier: "BannerTblCell")
+        tblView.register(UINib(nibName: "BoostUserAdTblCell", bundle: nil), forCellReuseIdentifier: "BoostUserAdTblCell")
     }
     
     func scrollToTop() {
@@ -133,6 +139,14 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         homeVModel?.isDataLoading = false
         AlertView.sharedManager.showToast(message: "No internet connection")
     }
+    
+    @objc func refreshList(notification:Notification?){
+        //refrsh my ads screen
+        if homeVModel?.isDataLoading == false{
+            homeVModel?.getMyAdsApi()
+        }
+    }
+
     
     
 
@@ -577,13 +591,17 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             homeVModel?.featuredObj = nil
             homeVModel?.itemObj?.data?.removeAll()
             homeVModel?.featuredObj?.removeAll()
+            homeVModel?.myAdsArray?.removeAll()
+
             self.tblView.reloadData()
-            homeVModel?.getProductListApi()
+            homeVModel?.getFeaturedListApi()
             homeVModel?.getSliderListApi()
             if (homeVModel?.categoryObj?.data?.count ?? 0) == 0{
                 homeVModel?.getCategoriesListApi()
             }
-            homeVModel?.getFeaturedListApi()
+            homeVModel?.getProductListApi()
+            homeVModel?.getMyAdsApi()
+
         }
         refreshControl.endRefreshing()
     }
@@ -623,13 +641,10 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     }
     
     @IBAction func filterBtnAction(_ sender : UIButton){
-        
-        
         let swiftUIview = SearchWithSortView(categroryId: 0, navigationController:self.navigationController, categoryName:  "", categoryIds: "", categoryImg: "",pushToSuggestion:false,pushToFilter:true)
         let vc = UIHostingController(rootView: swiftUIview)
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: true)
-        
     }
     
     
@@ -650,7 +665,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         
-        return 4
+        return 5
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -658,6 +673,11 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 135 : 0
         }
         if indexPath.section == 2{
+            if (homeVModel?.myAdsArray?.count ?? 0) > 0{
+                return 180
+            }else{return 0}
+        }
+        if indexPath.section == 3{
             
             if (homeVModel?.featuredObj?.count ?? 0) == 0{
                 return 0
@@ -685,16 +705,19 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         case 1:
             //Category
             return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 1 : 0
-            
+        
         case 2:
+            //My ads to boost
+            return  (homeVModel?.myAdsArray?.count ?? 0) > 0 ? 1 : 0
+
+        case 3:
             //Featured
             return  (homeVModel?.featuredObj?.count ?? 0) > 0 ? (homeVModel?.featuredObj?.count ?? 0) : 0
-        case 3:
+        case 4:
             //Items
             return (homeVModel?.itemObj?.data?.count ?? 0) > 0 ? 1 : 0
         default:
             return 0
-            
         }
     }
     
@@ -714,7 +737,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 //            cell.updateConstraints()
             return cell
             
-        } else if indexPath.section == 1 {
+        }  else if indexPath.section == 1 {
             guard let cell = tblView.dequeueReusableCell(withIdentifier: "HomeHorizontalCell") as? HomeHorizontalCell else { return UITableViewCell() }
             cell.cnstrntHeightSeeAllView.constant = 0
             cell.btnSeeAll.setTitle("", for: .normal)
@@ -729,7 +752,36 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             return cell
         
             
-        }else if indexPath.section == 2{
+        }else if indexPath.section == 2 {
+            //My Ads to boost
+            let cell = tableView.dequeueReusableCell(withIdentifier: "BoostUserAdTblCell") as! BoostUserAdTblCell
+            cell.listArray = homeVModel?.myAdsArray
+            cell.layoutIfNeeded()
+            cell.updateConstraints()
+            cell.delegate = self
+            cell.section = indexPath.section
+            cell.rowIndex = indexPath.row            
+            cell.layoutIfNeeded()
+            cell.updateConstraints()
+            cell.collectionView.updateConstraints()
+            cell.collectionView.reloadData()
+            
+            cell.btnClose.addTarget(self, action: #selector(closeBoostViewAction), for: .touchUpInside)
+            cell.navigationController = self.navigationController
+            
+            let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+            let theme = AppTheme(rawValue: savedTheme) ?? .system
+            
+            if theme == .dark{
+                cell.contentView.backgroundColor = UIColor.systemGray5
+            }else{
+                cell.contentView.backgroundColor = UIColor(hexString: "#dadada", alpha: 1)
+            }
+            
+            return cell
+            
+            
+        }else if indexPath.section == 3{
             let obj = homeVModel?.featuredObj?[indexPath.item]
             
             if (obj?.style == "style_1"){
@@ -828,7 +880,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             
             return UITableViewCell()
             
-        }else if indexPath.section == 3{
+        }else if indexPath.section == 4{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "HomeTblCell") as! HomeTblCell
             cell.cnstrntHeightSeeAllView.constant = 30 //0
@@ -856,7 +908,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
     
     @objc func selectedSeeAll(_ sender : UIButton){
         
-        let tag =  sender.tag  - 2
+        let tag =  sender.tag - 3 // - 2
         
         let sectionObj =  homeVModel?.featuredObj?[tag]
         if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "SeeAllItemVC") as? SeeAllItemVC {
@@ -891,6 +943,14 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
+    
+    @objc func closeBoostViewAction(){
+        self.homeVModel?.myAdsArray?.removeAll()
+        self.tblView.reloadData()
+        tblView.setNeedsLayout()
+        tblView.layoutIfNeeded()
+        self.homeVModel?.removeBoostUserAdsView()
+    }
 }
 
 
@@ -903,7 +963,7 @@ extension HomeVC: RefreshScreen{
             self.tblView.reloadData()
             
         }else{
-            tblView.reloadSections(IndexSet(integer: 2), with: .none)
+            tblView.reloadSections(IndexSet(integer: 3), with: .none)
         }
     }
     
@@ -924,10 +984,18 @@ extension HomeVC: RefreshScreen{
     }
     
     
+    func refreshMyAdsList(){
+        self.tblView.reloadData()
+        tblView.setNeedsLayout()
+        tblView.layoutIfNeeded()
+       // tblView.reloadSections(IndexSet(integer: 2), with: .none)
+        
+    }
+    
     func newItemRecieve(newItemArray:[Any]?){
         guard let newItems = newItemArray as? [ItemModel], !newItems.isEmpty else { return }
         
-        let section = 3
+        let section = 4
         let oldCount = homeVModel?.itemObj?.data?.count ?? 0
         homeVModel?.itemObj?.data?.append(contentsOf: newItems)
         let newCount = homeVModel?.itemObj?.data?.count ?? 0
@@ -965,12 +1033,15 @@ extension HomeVC:UPdateListDelegate{
         case 1: break
             //Category
             
-        case 2:
+        case 2: break
+            //My ads
+
+        case 3:
             //Featured
             if let selObj = obj as? ItemModel{
                 homeVModel?.featuredObj?[rowIndex].sectionData?[arrIndex] = selObj
             }
-        case 3:
+        case 4:
             //Items
             if let selObj = obj as? ItemModel{
                 homeVModel?.itemObj?.data?[rowIndex] = selObj
@@ -1045,5 +1116,125 @@ extension HomeVC {
 
 
 
+
+extension HomeVC:myAdsBoostDelegate{
+    func boostedItemId(itemObj:ItemModel){
+        
+        if (itemObj.alreadyPurchased ?? false){
+            self.makeItemFeaturedApi(itemObj: itemObj)
+        }else{
+            self.paymentGatewayOpen(itemObj: itemObj)
+          /*  if let index = homeVModel?.myAdsArray?.firstIndex(where: { item in
+                item.id == itemObj.id
+            }){
+                if ((homeVModel?.myAdsArray?.count ?? 0) > index){
+                    
+                    
+                    //               homeVModel?.myAdsArray?.remove(at: index)
+                    //               self.tblView.reloadSections(IndexSet(integer: 2), with: .none)
+                }
+            }*/
+        }
+        
+    }
+    
+
+    func paymentGatewayOpen(itemObj:ItemModel) {
+        paymentGateway = PaymentGatewayCentralized()
+        paymentGateway?.selectedPlanId = itemObj.package?.id ?? 0
+        paymentGateway?.categoryId = itemObj.categoryID ?? 0
+        paymentGateway?.itemId = itemObj.id ?? 0
+        paymentGateway?.paymentFor = .adsPlan
+        paymentGateway?.selIOSProductID = itemObj.package?.iosProductID ?? ""
+        paymentGateway?.city = itemObj.city ?? ""
+        paymentGateway?.state = itemObj.state ?? ""
+        paymentGateway?.country = itemObj.country ?? ""
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                
+                self.navigationController?.present(vc, animated: true)
+                
+                if let index = self.homeVModel?.myAdsArray?.firstIndex(where: { item in
+                      item.id == itemObj.id
+                  }){
+                    if ((self.homeVModel?.myAdsArray?.count ?? 0) > index){
+//                        self.homeVModel?.myAdsArray?[index].isFeature = true
+                        self.homeVModel?.myAdsArray?.remove(at: index)
+                       self.tblView.reloadData()
+                      }
+                  }
+            }
+            
+            //  RELEASE
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
+    }
+    
+    
+    private func makeItemFeaturedApi(itemObj:ItemModel){
+         
+         let params = ["item_id":"\(itemObj.id ?? 0)"]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.make_item_featured, param: params,showLoader:true) { responseObject, error in
+             
+             if(error != nil)
+             {
+                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                 print(error ?? "defaultValue")
+                 
+             }else{
+                 
+                 let result = responseObject! as NSDictionary
+                 let status = result["code"] as? Int ?? 0
+                 let message = result["message"] as? String ?? ""
+                 
+                 if status == 200 {
+                  
+                     if let index = self.homeVModel?.myAdsArray?.firstIndex(where: { item in
+                           item.id == itemObj.id
+                       }){
+                         if ((self.homeVModel?.myAdsArray?.count ?? 0) > index){
+                           //  self.homeVModel?.myAdsArray?[index].isFeature = true
+                             self.homeVModel?.myAdsArray?.remove(at: index)
+
+                            self.tblView.reloadData()
+                           }
+                       }
+                     AlertView.sharedManager.showToast(message: message)
+                 }else{
+                     AlertView.sharedManager.showToast(message: message)
+                     
+                     /*if (self.itemObj?.city?.count ?? 0) > 0 && (self.itemObj?.categoryID ?? 0) > 0 {
+                         
+                         if  let destvc = StoryBoard.chat.instantiateViewController(identifier: "CategoryPackageVC") as? CategoryPackageVC{
+                             destvc.hidesBottomBarWhenPushed = true
+                             destvc.categoryId = self.itemObj?.categoryID ?? 0
+                             destvc.categoryName = self.itemObj?.category?.name ?? ""
+                             destvc.city = self.itemObj?.city ?? ""
+                             destvc.country =  self.itemObj?.country ?? ""
+                             destvc.state =  self.itemObj?.state ?? ""
+                             destvc.latitude = "\(self.itemObj?.latitude ?? 0.0)"
+                             destvc.longitude = "\(self.itemObj?.longitude ?? 0.0)"
+                             destvc.isAdvertisement = true
+                             destvc.itemId =  self.itemObj?.id ?? 0
+                            nav?.pushViewController(destvc, animated: true)
+                         }
+                     }*/
+                 }
+             }
+         }
+     }
+    
+}
 
 

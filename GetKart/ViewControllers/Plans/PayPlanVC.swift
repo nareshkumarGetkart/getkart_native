@@ -96,7 +96,13 @@ class PayPlanVC: UIViewController {
     
     @IBAction func payBtnAction(_ sender:UIButton){
         if payment_method_type == 1 {//In App
-            self.IAPPaymentForm()
+            if paymentFor == .bannerPromotion{
+                inAppCampaignPaymentIntent()
+            }else{
+                self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+
+            }
+            
         }else if payment_method_type == 3 {//Phone Pay
             
             //  if isBannerPromotionPay{
@@ -111,7 +117,6 @@ class PayPlanVC: UIViewController {
                 
             }else{
                 self.createPhonePayOrder(package_id: planObj?.id ?? 0)
-
             }
 
         }
@@ -202,6 +207,13 @@ class PayPlanVC: UIViewController {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    
+                    if let postItemId = self.itemId{
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
+
+                    }
                     self.callbackPaymentSuccess?(true)
                     if self.sheetViewController?.options.useInlineMode == true {
                         self.sheetViewController?.attemptDismiss(animated: true)
@@ -262,7 +274,6 @@ class PayPlanVC: UIViewController {
 
     
     func getIntentForBannerPromotions(package_id:Int){
-
     
         let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
@@ -395,10 +406,70 @@ class PayPlanVC: UIViewController {
 
 
 extension PayPlanVC {
-    
-    func updateInAppPurchaseOrderApi(transactionId:String){
+    //MARK: For campaign banner intent
+
+    func inAppCampaignPaymentIntent(){
+        
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"apple","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        
+        guard let img = selectedImage?.wxCompress() else{ return }
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.inapp_campaign_payment_intent, params: params) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                            self?.campaign_banner_id = campaign_banner_id
+                        }
+                        
+                        if let payment_transaction = dataDict["payment_transaction"] as? Dictionary<String, Any>  {
+                            
+                            let orderId = payment_transaction["order_id"] as? String ?? ""
+                            let id = payment_transaction["id"] as? Int ?? 0
+                            let user_id = payment_transaction["user_id"] as? Int ?? 0
+                            
+                            self?.IAPPaymentForm(order_id: orderId, user_id: user_id, id: id)
+                        }
+                    }
+                    
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
+    }
+    private  func updateInAppPurchaseOrderApi(transactionId:String,order_id:String,user_id:Int,id:Int){
+
+   // func updateInAppPurchaseOrderApi(transactionId:String){
         //
-        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city]
+        let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
+
+        var params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
+        
+        if let postItemId = itemId{
+            params["item_id"] = postItemId
+        }
+        
+        if order_id.count > 0{
+            params["order_id"] = order_id
+        }
+      
+       
+        if user_id > 0{
+            params["user_id"] = user_id
+        }
+      
+        if id > 0{
+            params["id"] = id
+        }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
@@ -413,7 +484,14 @@ extension PayPlanVC {
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
+                
                 if status == 200{
+                    if let postItemId = self.itemId{
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
+
+                    }
                     self.callbackPaymentSuccess?(true)
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
@@ -424,8 +502,8 @@ extension PayPlanVC {
     }
     
     
-    internal func IAPPaymentForm(){
-        
+    internal func IAPPaymentForm(order_id:String,user_id:Int,id:Int){
+
         if self.planObj != nil {
             let productIDs:Array<String> = [self.planObj?.iosProductID ?? ""]
             //let productIDs:Array<String> = ["ads_bronze_package"]
@@ -456,7 +534,9 @@ extension PayPlanVC {
                             print("payment_id \(transaction?.transactionIdentifier ?? "")")
                             let transactionId = transaction?.transactionIdentifier ?? ""
                             self?.getInAppReceipt()
-                            self?.updateInAppPurchaseOrderApi(transactionId: transactionId)
+                           // self?.updateInAppPurchaseOrderApi(transactionId: transactionId)
+                            self?.updateInAppPurchaseOrderApi(transactionId: transactionId, order_id: order_id, user_id: user_id, id: id)
+
                         }
                         //Show payment successfull messsage
                     }

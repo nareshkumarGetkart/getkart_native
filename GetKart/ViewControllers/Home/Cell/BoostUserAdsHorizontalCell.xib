@@ -25,91 +25,101 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="BoostUserAdsHorizontalCell" customModule="GetKart" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="110"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="BoostUserAdsHorizontalCell" id="gTV-IL-0wX" customClass="BoostUserAdsHorizontalCell" customModule="GetKart" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="130"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="110"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="130"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3VI-EY-Hdm">
-                        <rect key="frame" x="2.6666666666666572" y="2.6666666666666643" width="315" height="105"/>
+                        <rect key="frame" x="2.6666666666666572" y="2.6666666666666714" width="315" height="125"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="getkartplaceholder" translatesAutoresizingMaskIntoConstraints="NO" id="Pce-R5-PGB">
-                                <rect key="frame" x="0.0" y="0.0" width="115" height="105"/>
+                                <rect key="frame" x="0.0" y="0.0" width="130" height="125"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="115" id="LdS-hA-KRz"/>
+                                    <constraint firstAttribute="width" constant="130" id="LdS-hA-KRz"/>
                                 </constraints>
                             </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="QKa-2r-5My">
+                                <rect key="frame" x="140" y="15" width="165" height="62"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xdw-7m-1uy">
+                                        <rect key="frame" x="0.0" y="0.0" width="39.333333333333336" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="7ix-QF-3A0"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Manrope-Bold" family="Manrope" pointSize="15"/>
+                                        <color key="textColor" red="0.0" green="0.53333333329999999" blue="0.21960784310000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bjf-71-7pp">
+                                        <rect key="frame" x="0.0" y="20.999999999999996" width="36" height="20.000000000000004"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="OJg-Di-3Nd"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="14"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lGc-6v-DrQ">
+                                        <rect key="frame" x="0.0" y="42" width="155" height="20"/>
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location-outline" translatesAutoresizingMaskIntoConstraints="NO" id="Xhh-8a-xUQ">
+                                                <rect key="frame" x="0.0" y="2" width="16" height="16"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="16" id="IAk-Ow-xp2"/>
+                                                    <constraint firstAttribute="width" constant="16" id="fq4-1W-ucn"/>
+                                                </constraints>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Delhi India" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ltc-3h-OZi">
+                                                <rect key="frame" x="18" y="1" width="136" height="18"/>
+                                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="ltc-3h-OZi" firstAttribute="leading" secondItem="Xhh-8a-xUQ" secondAttribute="trailing" constant="2" id="J0f-ch-JeW"/>
+                                            <constraint firstAttribute="trailing" secondItem="ltc-3h-OZi" secondAttribute="trailing" constant="1" id="aVY-UU-WxG"/>
+                                            <constraint firstItem="Xhh-8a-xUQ" firstAttribute="leading" secondItem="lGc-6v-DrQ" secondAttribute="leading" id="eAD-iR-WJa"/>
+                                            <constraint firstItem="Xhh-8a-xUQ" firstAttribute="centerY" secondItem="ltc-3h-OZi" secondAttribute="centerY" id="fvH-EQ-3k5"/>
+                                            <constraint firstAttribute="bottom" secondItem="ltc-3h-OZi" secondAttribute="bottom" constant="1" id="jB9-4T-ANS"/>
+                                            <constraint firstAttribute="height" constant="20" id="oD7-8Q-s3A"/>
+                                            <constraint firstItem="ltc-3h-OZi" firstAttribute="top" secondItem="lGc-6v-DrQ" secondAttribute="top" constant="1" id="vTR-yh-hKl"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0PU-fw-xcm">
-                                <rect key="frame" x="120" y="72" width="150" height="30"/>
+                                <rect key="frame" x="140" y="85" width="165" height="30"/>
                                 <color key="backgroundColor" systemColor="systemOrangeColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="7ul-77-Uze"/>
-                                    <constraint firstAttribute="width" constant="150" id="Rn0-hx-TqL"/>
+                                    <constraint firstAttribute="width" constant="165" id="Z17-Tj-dQb"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Inter-Medium" family="Inter" pointSize="14"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Boost Now"/>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bjf-71-7pp">
-                                <rect key="frame" x="120" y="29" width="190" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="OJg-Di-3Nd"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="Manrope-SemiBold" family="Manrope" pointSize="14"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="location-outline" translatesAutoresizingMaskIntoConstraints="NO" id="Xhh-8a-xUQ">
-                                <rect key="frame" x="120" y="52.333333333333336" width="14" height="14.000000000000007"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="14" id="7jF-7f-eTw"/>
-                                    <constraint firstAttribute="width" constant="14" id="TKL-ZD-csJ"/>
-                                </constraints>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Delhi India" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ltc-3h-OZi">
-                                <rect key="frame" x="136" y="52" width="174" height="15"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="15" id="srh-ej-fT3"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xdw-7m-1uy">
-                                <rect key="frame" x="120" y="10" width="190" height="18"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="18" id="7ix-QF-3A0"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="Manrope-Bold" family="Manrope" pointSize="15"/>
-                                <color key="textColor" red="0.0" green="0.53333333329999999" blue="0.21960784310000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="ltc-3h-OZi" firstAttribute="top" secondItem="Bjf-71-7pp" secondAttribute="bottom" constant="3" id="1Lv-LI-fhL"/>
-                            <constraint firstAttribute="trailing" secondItem="xdw-7m-1uy" secondAttribute="trailing" constant="5" id="4UF-sh-A0z"/>
-                            <constraint firstItem="Xhh-8a-xUQ" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="5" id="BcX-PN-bxE"/>
                             <constraint firstAttribute="bottom" secondItem="Pce-R5-PGB" secondAttribute="bottom" id="Bpj-pW-LDT"/>
-                            <constraint firstItem="ltc-3h-OZi" firstAttribute="leading" secondItem="Xhh-8a-xUQ" secondAttribute="trailing" constant="2" id="K4c-bC-zdF"/>
-                            <constraint firstItem="0PU-fw-xcm" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="5" id="R4c-ug-LBJ"/>
+                            <constraint firstItem="0PU-fw-xcm" firstAttribute="top" secondItem="QKa-2r-5My" secondAttribute="bottom" constant="8" id="Gde-Je-NZs"/>
+                            <constraint firstItem="0PU-fw-xcm" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="10" id="LeA-6a-WgZ"/>
                             <constraint firstItem="Pce-R5-PGB" firstAttribute="top" secondItem="3VI-EY-Hdm" secondAttribute="top" id="au8-TJ-3BP"/>
-                            <constraint firstItem="xdw-7m-1uy" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="5" id="bnG-A7-o2e"/>
+                            <constraint firstItem="QKa-2r-5My" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="10" id="fgl-5b-aBN"/>
+                            <constraint firstAttribute="trailing" secondItem="QKa-2r-5My" secondAttribute="trailing" constant="10" id="g7b-t3-2Hc"/>
                             <constraint firstItem="Pce-R5-PGB" firstAttribute="leading" secondItem="3VI-EY-Hdm" secondAttribute="leading" id="gbR-cL-jNs"/>
-                            <constraint firstItem="Bjf-71-7pp" firstAttribute="leading" secondItem="Pce-R5-PGB" secondAttribute="trailing" constant="5" id="j4O-Vr-BCO"/>
-                            <constraint firstItem="Xhh-8a-xUQ" firstAttribute="centerY" secondItem="ltc-3h-OZi" secondAttribute="centerY" id="kBj-Ze-ehp"/>
-                            <constraint firstItem="0PU-fw-xcm" firstAttribute="top" secondItem="ltc-3h-OZi" secondAttribute="bottom" constant="5" id="lKT-AP-ZDQ"/>
-                            <constraint firstAttribute="trailing" secondItem="ltc-3h-OZi" secondAttribute="trailing" constant="5" id="m4Z-Dk-uYc"/>
-                            <constraint firstItem="xdw-7m-1uy" firstAttribute="top" secondItem="3VI-EY-Hdm" secondAttribute="top" constant="10" id="rnm-GB-dhi"/>
-                            <constraint firstItem="Bjf-71-7pp" firstAttribute="top" secondItem="xdw-7m-1uy" secondAttribute="bottom" constant="1" id="wFe-WW-6Ao"/>
-                            <constraint firstAttribute="trailing" secondItem="Bjf-71-7pp" secondAttribute="trailing" constant="5" id="yRC-6a-Pnb"/>
+                            <constraint firstAttribute="bottom" secondItem="0PU-fw-xcm" secondAttribute="bottom" constant="10" id="mOB-XB-wGP"/>
                         </constraints>
                     </view>
                 </subviews>
             </view>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="3VI-EY-Hdm" secondAttribute="trailing" constant="2.5" id="aIy-N2-wLa"/>
                 <constraint firstItem="3VI-EY-Hdm" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="2.5" id="eeb-2e-Jvc"/>

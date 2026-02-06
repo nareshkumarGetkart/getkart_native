@@ -210,7 +210,7 @@ struct MyBoardsView: View {
     
     func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
 
-        paymentGateway = PaymentGatewayCentralized()   // ✅ STRONG REFERENCE
+        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
         paymentGateway?.planObj = selPlan
         paymentGateway?.categoryId = item.categoryID ?? 0
         paymentGateway?.itemId = item.id ?? 0
@@ -230,7 +230,7 @@ struct MyBoardsView: View {
                 self.navigationController?.present(vc, animated: true)
             }
             
-            // ✅ RELEASE
+            //  RELEASE
                self.paymentGateway = nil
         }
 
@@ -279,7 +279,7 @@ struct MyBoardCell:View {
                       //  VStack(alignment:.leading){
                            HStack{
                                Spacer()
-                                Text("Sponsered")
+                                Text("Sponsored")
                                     .frame(height:22)
                                    // .background(.orange)
                                    // .cornerRadius(5)

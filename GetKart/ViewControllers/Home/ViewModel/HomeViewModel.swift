@@ -13,6 +13,7 @@ protocol RefreshScreen:AnyObject{
     func refreshBannerList()
     func refreshCategoriesList()
     func newItemRecieve(newItemArray:[Any]?)
+    func refreshMyAdsList()
 }
 
 extension RefreshScreen{
@@ -21,6 +22,7 @@ extension RefreshScreen{
     func refreshBannerList(){}
     func refreshCategoriesList(){}
     func newItemRecieve(newItemArray:[Any]?){}
+    func refreshMyAdsList(){}
 
 }
 
@@ -33,6 +35,9 @@ class HomeViewModel:ObservableObject{
     weak var delegate:RefreshScreen?
     var page = 1
     var isDataLoading = false
+    
+    var myAdsArray:[ItemModel]?
+
    
     var city = ""
     var state = ""
@@ -56,6 +61,9 @@ class HomeViewModel:ObservableObject{
         getSliderListApi()
         getCategoriesListApi()
         getFeaturedListApi()
+        if Local.shared.getUserId() > 0{
+            getMyAdsApi()
+        }
     }
     
     
@@ -220,6 +228,29 @@ class HomeViewModel:ObservableObject{
  //   }
     
     */
+    
+    
+    
+    
+    func getMyAdsApi(){
+
+        self.myAdsArray?.removeAll()
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_my_ad) {[weak self] (obj:ItemParse) in
+            if obj.code == 200 {
+                self?.myAdsArray = obj.data?.data ?? []
+                self?.delegate?.refreshMyAdsList()                
+            }else{
+
+            }
+        }
+    }
+    
+    func removeBoostUserAdsView(){
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.dismiss_boost_ad, param: nil) { responseObject, error in
+            
+        }
+    }
     
     
 }

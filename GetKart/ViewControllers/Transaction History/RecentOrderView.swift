@@ -24,7 +24,7 @@ struct RecentOrderView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     .padding()
             }
-            Text("Order History & Invoices").font(Font.manrope(.medium, size: 18.0))
+            Text("Order History & Plans").font(Font.manrope(.medium, size: 18.0))
                 .foregroundColor(Color(UIColor.label))
             
             Spacer()
@@ -47,12 +47,9 @@ struct RecentOrderView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
 
-                    HStack{ Spacer() }.frame(height: 5)
-                    LazyVStack(spacing: 8) {
+                    LazyVStack(spacing: 5) {
                         ForEach(transactions,id: \.id) { transaction in
-                            TransactionRow(transaction: transaction)//.background((Color(UIColor.systemBackground)))
-                                //.cornerRadius(10)
-                                //.shadow(radius: 2)
+                            TransactionRow(transaction: transaction)
                                 .onAppear{
                                     
                                     let lastId = transactions.last?.id  ?? 0
@@ -63,12 +60,11 @@ struct RecentOrderView: View {
                                 }
                                 .onTapGesture {
                                     self.pushToDesiredScreen(transObj: transaction)
-                                   
+                                    
                                 }
                         }
-                        
-                     //  Spacer()
-                    }
+
+                    }.padding(.top,8)
                    
 
                 }.refreshable {
@@ -77,6 +73,10 @@ struct RecentOrderView: View {
                         getTransactionHistory()
                     }
                 }
+            }
+            
+            if isDataLoading {
+                ProgressView().padding(.vertical, 12)
             }
                         
         }.padding([.leading,.trailing],8).background(Color(.systemGray6))
@@ -106,13 +106,13 @@ struct RecentOrderView: View {
         }
         isDataLoading = true
         let strURl = "\(Constant.shared.payment_transactions)?page=\(page)"
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strURl) { (obj:TransactionParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: (self.page == 1), url: strURl) { (obj:TransactionParse) in
             if obj.code == 200 {
                 
                 if self.page == 1{
                     self.transactions.removeAll()
                 }
-//                self.transactions.append(contentsOf: obj.data?.data ?? [])
+              // self.transactions.append(contentsOf: obj.data?.data ?? [])
                 
                 
                 var arr = obj.data?.data ?? []

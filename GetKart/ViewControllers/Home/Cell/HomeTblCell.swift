@@ -35,7 +35,6 @@ class HomeTblCell: UITableViewCell {
     var listArray:[Any]?
     var istoIncreaseWidth = false
     var navigationController: UINavigationController?
-    
     var section = 0
     var rowIndex = 0
     weak var delegateUpdateList:UPdateListDelegate?
@@ -118,6 +117,16 @@ extension HomeTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UIColl
                 cell.btnLike.tag = indexPath.item
                 cell.btnLike.addTarget(self, action: #selector(likebtnAction), for: .touchUpInside)
                 cell.btnLike.backgroundColor = .systemBackground
+                
+                
+                
+                if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
+                    cell.lblCapacity.isHidden = false
+                    cell.lblCapacity.text = callSpecificValueBasedOnCategory(catId:matchedCatId, list: obj.customFields ?? [])
+                }else{
+                    cell.lblCapacity.text = ""
+                    cell.lblCapacity.isHidden = true
+                }
 
                 if let originalImage = UIImage(named: "location-outline") {
                     let tintedImage = originalImage.tinted(with: .label)

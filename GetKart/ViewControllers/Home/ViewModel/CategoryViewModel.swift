@@ -48,7 +48,7 @@ class CategoryViewModel:ObservableObject{
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                     self?.isDataLoading = false
-                  //  self?.page += 1
+                    self?.page += 1
                     
                 })
             }

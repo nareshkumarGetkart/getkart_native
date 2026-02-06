@@ -16,7 +16,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -57,6 +57,28 @@ final class Constant: NSObject {
    let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
      
+    
+    
+    
+    
+    var  dismiss_boost_ad:String {
+        get {
+            return "\(baseURL)/v1/dismiss-boost-ad"
+        }
+    }
+
+    
+    var  get_active_plans:String {
+        get {
+            return "\(baseURL)/v1/get-active-plans"
+        }
+    }
+    
+    var  get_my_ad:String {
+        get {
+            return "\(baseURL)/v1/get-my-ad"
+        }
+    }
     
     var  user_status:String {
         get {
@@ -719,6 +741,14 @@ final class Constant: NSObject {
         }
     }
     
+    
+    
+    var inapp_campaign_payment_intent:String{
+        get {
+            return "\(Constant.shared.baseURL)/v1/inapp-campaign-payment-intent"
+        }
+    }
+    
     var in_app_purchase:String{
         get {
             return "\(Constant.shared.baseURL)/v1/in-app-purchase"
@@ -1000,7 +1030,7 @@ enum NotificationKeys:String,CaseIterable{
     case refreshLikeDislikeBoard = "refreshLikeDislikeBoard"
     case refreshInterestChangeBoardScreen = "refreshInterestChangeBoardScreen"
     static let scrollBoardToTop = "scrollBoardToTop"
-
+    case boardBoostedRefresh = "boardBoostedRefresh"
 
 }
 

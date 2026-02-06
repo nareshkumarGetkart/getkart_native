@@ -16,7 +16,7 @@ struct PublicBoardView: View {
     @State private var selectedName: String = ""
     let tabBarController: UITabBarController?
     @StateObject private var categoryVM = CategoryViewModel(type: 2,isToShowLoader: false)
-    @StateObject private var boardStore = BoardStore()   // ✅ STORE
+    @StateObject private var boardStore = BoardStore()   //  STORE
     @State private var loadedCategoryIds: Set<Int> = []
 
     var body: some View {
@@ -32,54 +32,54 @@ struct PublicBoardView: View {
             )        .background(Color(.systemBackground))
             
             if selectedCategoryId > 0{
-         /*   TabView(selection: $selectedCategoryId) {
+                /*   TabView(selection: $selectedCategoryId) {
+                 
+                 ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
+                 BoardListView(
+                 vm: boardStore.vm(for: cat.id ?? 0),
+                 navigationController: navigationController
+                 )
+                 .tag(cat.id ?? 0)
+                 }
+                 }
+                 .tabViewStyle(.page(indexDisplayMode: .never))
+                 .transaction { tx in
+                 tx.animation = nil   //  CRITICAL
+                 }*/
                 
-                ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
-                    BoardListView(
-                        vm: boardStore.vm(for: cat.id ?? 0),
-                        navigationController: navigationController
-                    )
-                    .tag(cat.id ?? 0)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .transaction { tx in
-                tx.animation = nil   // 🔥 CRITICAL
-            }*/
-                
-             ZStack {
-               
-                  let boardNav = tabBarController?.viewControllers?[1] as? UINavigationController
+                ZStack {
+                    
+                    let boardNav = tabBarController?.viewControllers?[1] as? UINavigationController
                     ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
                         if loadedCategoryIds.contains(cat.id ?? 0) {
-
-                        BoardListView(
-                            vm: boardStore.vm(for: cat.id ?? 0),
-                            navigationController: boardNav
-                        )
-                        .opacity(selectedCategoryId == cat.id ? 1 : 0)
-                        .allowsHitTesting(selectedCategoryId == cat.id)
-                    }
+                            
+                            BoardListView(
+                                vm: boardStore.vm(for: cat.id ?? 0),
+                                navigationController: boardNav
+                            )
+                            .opacity(selectedCategoryId == cat.id ? 1 : 0)
+                            .allowsHitTesting(selectedCategoryId == cat.id)
+                        }
                     }
                 }
-                // ✅ High priority horizontal swipe gesture
+                //  High priority horizontal swipe gesture
                 .simultaneousGesture(
                     DragGesture(minimumDistance: 15)
                         .onEnded { value in
                             let horizontal = value.translation.width
                             let vertical = value.translation.height
-
+                            
                             // Only trigger horizontal swipes
                             guard abs(horizontal) > abs(vertical) else { return }
-
-                            if horizontal < -50 {
+                            
+                            if horizontal < -70 {
                                 swipeCategory(left: true)   // next tab
-                            } else if horizontal > 50 {
+                            } else if horizontal > 70 {
                                 swipeCategory(left: false)  // previous tab
                             }
                         }
                 )        }
-           
+            
             Spacer()
         }.onChange(of: selectedCategoryId) { newId in
             markTabLoaded(newId)
@@ -89,16 +89,16 @@ struct PublicBoardView: View {
         }
         .background(Color(.systemGray6))
         
-        // 🔥 NOTIFICATION OBSERVER HERE
-                .onReceive(
-                    NotificationCenter.default.publisher(
-                        for: Notification.Name(
-                            NotificationKeys.refreshInterestChangeBoardScreen.rawValue
-                        )
-                    )
-                ) { _ in
-                    handleInterestRefresh()
-                }
+        //  NOTIFICATION OBSERVER HERE
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(
+                    NotificationKeys.refreshInterestChangeBoardScreen.rawValue
+                )
+            )
+        ) { _ in
+            handleInterestRefresh()
+        }
     }
     
     private func markTabLoaded(_ id: Int) {
@@ -134,7 +134,7 @@ struct PublicBoardView: View {
 
         let newCat = list[newIndex]
 
-        withAnimation(.easeInOut) {
+        withAnimation(.none) {
             selectedCategoryId = newCat.id ?? 0
             selectedName = newCat.name ?? ""
         }
@@ -147,7 +147,7 @@ final class BoardStore: ObservableObject {
     
     @Published private(set) var boardVMs: [Int: BoardViewModelNew] = [:]
 
-    @MainActor
+  /*  @MainActor
     func vm(for categoryId: Int) -> BoardViewModelNew {
         if let vm = boardVMs[categoryId] {
             return vm
@@ -157,17 +157,32 @@ final class BoardStore: ObservableObject {
         boardVMs[categoryId] = vm
         return vm
     }
+    */
+    @MainActor
+    func vm(for categoryId: Int) -> BoardViewModelNew {
+        if let vm = boardVMs[categoryId] {
+            return vm
+        }
+
+        let vm = BoardViewModelNew(categoryId: categoryId)
+
+        DispatchQueue.main.async {
+            self.boardVMs[categoryId] = vm
+        }
+
+        return vm
+    }
+
 }
+
 struct CategoryTabsNew: View {
 
     @Binding var selected: String
     @Binding var selectedCategoryId: Int
     @ObservedObject var categoryVM: CategoryViewModel
-
     @State private var didSetupDefault = false
-
     @Environment(\.scrollToTopProxy) private var scrollToTopProxy
-    @State private var categoryScrollProxy: ScrollViewProxy?   // ✅ CORRECT PROXY
+    @State private var categoryScrollProxy: ScrollViewProxy?   // CORRECT PROXY
 
     var body: some View {
         VStack(spacing: 0) {
@@ -188,7 +203,7 @@ struct CategoryTabsNew: View {
                     .padding(.top)
                 }
                 .onAppear {
-                    categoryScrollProxy = proxy   // 🔥 SAVE HORIZONTAL PROXY
+                    categoryScrollProxy = proxy   //  SAVE HORIZONTAL PROXY
                 }
             }
 
@@ -197,7 +212,7 @@ struct CategoryTabsNew: View {
         .onChange(of: categoryVM.listArray?.count) { _ in
             setupDefaultAll()
         }
-        // 🔥 THIS FIXES SWIPE → MID SCROLL
+        //  THIS FIXES SWIPE → MID SCROLL
         .onChange(of: selectedCategoryId) { newId in
                 scrollCategoryToCenter(newId)
         }
@@ -304,64 +319,101 @@ struct BoardListView: View {
 
     @ObservedObject var vm: BoardViewModelNew
     let navigationController: UINavigationController?
+    @State private var userDidScroll = false  //  User intent + safety locks
+    @State private var paginationConsumed = false
+    @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    private let prefetchOffset = 4   //  call API before 4 items
+    @State private var paymentGateway: PaymentGatewayCentralized?
 
     var body: some View {
-        
-        ScrollViewReader { proxy in     // ✅ added
-            
+
+        ScrollViewReader { proxy in
             ScrollView {
-                // 🔝 TOP ANCHOR (harmless)
-                if vm.items.isEmpty && !vm.isLoading {
-                    
-                    
-                    emptyView.padding(.top,100)
-                    
+
+                if vm.items.isEmpty && !vm.isLoading && vm.hasLoadedOnce{
+                   emptyView.padding(.top, 100)
+
                 } else {
-                    
+
                     Color.clear
                         .frame(height: 0)
                         .id("TOP")
-                    LazyVStack {
-                        
-                        StaggeredGrid(columns: 2, spacing: 6) {
-                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
-                                
-                                ProductCardStaggered(product: item) { isLiked, boardId in
-                                    vm.updateLikeTo(boardId: boardId, isLiked: isLiked)
+
+                    let columns = splitColumns()
+
+                    HStack(alignment: .top, spacing: 6) {
+
+                        // LEFT COLUMN
+                        LazyVStack(spacing: 6) {
+                            ForEach(columns.left.indices, id: \.self) { index in
+                                let item = columns.left[index]
+
+                                CardItemView(
+                                    item: item,
+                                    onLike: { isLiked, boardId in
+                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    },
+                                    onTap: { pushToDetail(item: item) },
+                                    onTapBoostButton:{
+                                        paymentGatewayOpen(product: item)
+                                        
+                                    }
+                                )
+                                .measureHeight(id: item.id ?? 0)
+                                .onAppear {
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
                                 }
-                                .onTapGesture {
-                                    pushToDetail(item: item)
-                                }
-                                
                             }
                         }
-                        .padding(.horizontal, 5).padding(.top,0)
-                        
-                        // 🔥 SINGLE PAGINATION TRIGGER (FOOTER)
-                        if !vm.isLastPage {
-                            PaginationFooter()
+
+                        // RIGHT COLUMN
+                        LazyVStack(spacing: 6) {
+                            ForEach(columns.right.indices, id: \.self) { index in
+                                let item = columns.right[index]
+
+                                CardItemView(
+                                    item: item,
+                                    onLike: { isLiked, boardId in
+                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    },
+                                    onTap: { pushToDetail(item: item) },
+                                    onTapBoostButton:{
+                                        paymentGatewayOpen(product: item)
+                                    }
+                                )
+                                .measureHeight(id: item.id ?? 0)
                                 .onAppear {
-                                    guard !vm.isLoading else { return }
-                                    vm.loadNextPage()
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
                                 }
+                            }
                         }
-                        
-                        
-                        // 🔥 Bottom loading indicator
-                        if vm.isLoading && !vm.items.isEmpty {
-                            ProgressView()
-                                .padding(.vertical, 24)
-                        }
-                    }.transaction { tx in
-                        tx.animation = nil   // 🔥 CRITICAL
                     }
+                    .padding(.horizontal, 5)
                 }
-            }
+
+                if vm.isLoading {
+                    ProgressView().padding(.vertical, 12)
+                }
+            }.ignoresSafeArea(.container, edges: [.bottom,.top])
+
+            //  Detect REAL user scroll
+            .simultaneousGesture(
+                DragGesture()
+                    .onEnded { _ in
+                        userDidScroll = true
+                        paginationConsumed = false
+                    }
+            )
+
             .refreshable {
                 await vm.refresh()
+                userDidScroll = false
+                paginationConsumed = false
+                itemHeights.removeAll()
             }
-            .onAppear {
-                if vm.items.count == 0{
+
+            .task {
+                if vm.items.isEmpty {
                     vm.loadIfNeeded()
                 }
             }
@@ -379,36 +431,142 @@ struct BoardListView: View {
                 
                 vm.update(likeCount: count, isLike: isLike, boardId: boardId)
             }
-            
             .onReceive(
                 NotificationCenter.default.publisher(
                     for: Notification.Name(NotificationKeys.scrollBoardToTop)
                 )
             ) { _ in
-                print("SCROLL TO TOP TRIGGERED")
-                DispatchQueue.main.async {
-                    
-                    withAnimation(.easeInOut) {
-                        
-                        proxy.scrollTo("TOP", anchor: .top)
-                    }
+                withAnimation(.easeInOut) {
+                    proxy.scrollTo("TOP", anchor: .top)
                 }
             }
+            
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.boardBoostedRefresh.rawValue)
+                )
+            ) { notification in
+               guard let dict = notification.object as? [String: Any] else { return }
+                let boardId = dict["boardId"] as? Int ?? 0
+                
+                vm.updateBoost(isBoosted: true, boardId: boardId)
+            }
+
+            
+            //  Capture measured heights
+            .onPreferenceChange(ItemHeightKey.self) { value in
+                itemHeights.merge(value) { $1 }
+            }
+            
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue)
+                )
+            ) { _ in
+                Task {
+                    await vm.refresh()
+                    userDidScroll = false
+                    paginationConsumed = false
+                    itemHeights.removeAll()
+                }
+            }
+
         }
     }
 
-    var emptyView: some View {
+    
+    
+    func paymentGatewayOpen(product:ItemModel) {
+
+        paymentGateway = PaymentGatewayCentralized()
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                navigationController?.present(vc, animated: true)                
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":product.id ?? 0], userInfo: nil)
+
+            }
+            
+      
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
+    }
+
+    // MARK: -  Prefetch Logic (FINAL & SAFE)
+    private func handlePrefetch(itemIndex: Int?) {
+
+        guard let index = itemIndex else { return }
+
+        let triggerIndex = max(vm.items.count - prefetchOffset, 0)
+
+        guard index >= triggerIndex else { return }
+        guard userDidScroll else { return }
+        guard !paginationConsumed else { return }
+        guard !vm.isLoading else { return }
+        guard !vm.isLastPage else { return }
+
+        paginationConsumed = true
+        userDidScroll = false
+
+        vm.tryLoadNextPage()
+    }
+
+    // MARK: - Split into 2 staggered columns
+    private func splitColumns() -> (left: [ItemModel], right: [ItemModel]) {
+
+        var left: [ItemModel] = []
+        var right: [ItemModel] = []
+
+        var leftHeight: CGFloat = 0
+        var rightHeight: CGFloat = 0
+
+        for item in vm.items {
+            let h = itemHeights[item.id ?? 0] ?? 200
+
+            if leftHeight <= rightHeight {
+                left.append(item)
+                leftHeight += h
+            } else {
+                right.append(item)
+                rightHeight += h
+            }
+        }
+
+        return (left, right)
+    }
+
+    private func globalIndex(of item: ItemModel) -> Int? {
+        vm.items.firstIndex { $0.id == item.id }
+    }
+
+    // MARK: - Empty View
+    private var emptyView: some View {
         VStack(spacing: 20) {
-            Spacer()
             Image("no_data_found_illustrator")
             Text("No Data Found")
                 .foregroundColor(.orange)
-            Spacer()
         }
     }
-    
+
+    // MARK: - Navigation
     private func pushToDetail(item: ItemModel) {
-       
         let vc = UIHostingController(
             rootView: BoardDetailView(
                 navigationController: navigationController,
@@ -416,31 +574,52 @@ struct BoardListView: View {
             )
         )
         vc.hidesBottomBarWhenPushed = true
-
         navigationController?.pushViewController(vc, animated: true)
     }
 }
 
-struct PaginationFooter: View {
+struct CardItemView: View {
+    let item: ItemModel
+    let onLike: (Bool, Int) -> Void
+    let onTap: () -> Void
+    let onTapBoostButton: () -> Void
+
+
+    var body: some View {
+        ProductCardStaggered(product: item, sendLikeUnlikeObject: onLike, onTapBoostButton: onTapBoostButton)
+            .onTapGesture(perform: onTap)
+    }
+}
+
+extension View {
+    func measureHeight(id: Int) -> some View {
+        background(
+            GeometryReader { geo in
+                Color.clear.preference(
+                    key: ItemHeightKey.self,
+                    value: [id: geo.size.height]
+                )
+            }
+        )
+    }
+}
+
+struct ItemHeightKey: PreferenceKey {
+    static var defaultValue: [Int: CGFloat] = [:]
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
+    }
+}
+
+
+
+struct PrefetchTriggerView: View {
     var body: some View {
         Color.clear
-            .frame(height: 1) // invisible but stable
+            .frame(height: 1)
     }
 }
 
-struct ScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-struct ContentHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
 
 
 
@@ -448,9 +627,9 @@ extension PublicBoardView{
     
     var headerView: some View {
         HStack {
-            Text("For you")
+           /* Text("For you")
                 .underline()
-                .font(.manrope(.medium, size: 15))
+                .font(.manrope(.medium, size: 15))*/
             
             searchBar
             
@@ -528,10 +707,11 @@ extension PublicBoardView{
 struct ProductCardStaggered: View {
 
     @State private var showSafari = false
-
+//    @State private var paymentGateway: PaymentGatewayCentralized?
     let product: ItemModel
     let sendLikeUnlikeObject: (Bool, Int) -> Void
     @State private var imageRatio: CGFloat = 1
+    let onTapBoostButton: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
@@ -555,36 +735,44 @@ struct ProductCardStaggered: View {
                                 y: 2
                             )
                 
-                Button {
-                    showSafari = true
-                    outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
-                } label: {
-                    HStack(spacing:2){
-                        Text("Buy Now")
-                            .font(.inter(.medium, size: 11))
-                            .foregroundColor(.white)
-                        Image("upRight")
-                    }
-                }.padding(.vertical, 3)
-                    .padding(.horizontal, 8)
-                    .background(Color.orange)
-                    .cornerRadius(5)
-                    .padding(5)
+                if (product.user?.id ?? 0) != Local.shared.getUserId(){
+                    
+                    Button {
+                        showSafari = true
+                        outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
+                    } label: {
+                        HStack(spacing:2){
+                            Text("Buy Now")
+                                .font(.inter(.medium, size: 11))
+                                .foregroundColor(.white)
+                            Image("upRight")
+                        }
+                    }.padding(.vertical, 3)
+                        .padding(.horizontal, 8)
+                        .background(Color.orange)
+                        .cornerRadius(5)
+                        .padding(5)
+                }
             }
             
             HStack(spacing:2) {
-                Button {
-                    manageLike(boardId: product.id ?? 0)
-                } label: {
-                    Image(product.isLiked == true ? "like_fill" : "like")
-                        .frame(width: 24, height: 24)
-                 
+                if (product.user?.id ?? 0) == Local.shared.getUserId(){
+                    Spacer()
+
+                }else{
+                    Button {
+                        manageLike(boardId: product.id ?? 0)
+                    } label: {
+                        Image(product.isLiked == true ? "like_fill" : "like")
+                            .frame(width: 24, height: 24)
+                        
+                    }
+                    if (product.totalLikes ?? 0) > 0{
+                        Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
+                            .font(Font.inter(.regular, size: 12))
+                    }
+                    Spacer()
                 }
-                if (product.totalLikes ?? 0) > 0{
-                    Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
-                        .font(Font.inter(.regular, size: 12))
-                }
-                Spacer()
                 
                 if (product.isFeature ?? false) {
                     Text("Sponsored")
@@ -612,6 +800,39 @@ struct ProductCardStaggered: View {
                 specialPrice: product.specialPrice ?? 0.0,
                 currencySymbol: Local.shared.currencySymbol
             ).padding([.bottom],8).padding(.horizontal,8).padding(.top,2)
+            
+            
+            if (product.user?.id ?? 0) == Local.shared.getUserId(){
+                
+                if product.isFeature == false {
+                    Button {
+                        // Boost action
+                        onTapBoostButton()
+                     
+                        //paymentGatewayOpen()
+                    } label: {
+                        Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
+                            .font(.inter(.semiBold, size: 14))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 30)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.65, blue: 0.15), // light orange
+                                        Color(red: 0.95, green: 0.45, blue: 0.05) // dark orange
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .cornerRadius(5)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 10)
+                }
+
+
+            }
         }
         .background(Color(.systemBackground))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
@@ -619,7 +840,8 @@ struct ProductCardStaggered: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
         
-            .fullScreenCover(isPresented: $showSafari) {
+           
+        .fullScreenCover(isPresented: $showSafari) {
               
                 if let url = URL(string:getUrlValid(strURl: product.outbondUrl ?? ""))  {
                     
@@ -641,7 +863,6 @@ struct ProductCardStaggered: View {
     
     private func manageLike(boardId: Int) {
         if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-            
             
             let newState = !(product.isLiked ?? false)
             sendLikeUnlikeObject(newState, boardId)
@@ -667,7 +888,438 @@ struct ProductCardStaggered: View {
             }
         }
     }
+    
+    
+   /* func paymentGatewayOpen() {
+
+        paymentGateway = PaymentGatewayCentralized()  
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: AppDelegate.sharedInstance.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                AppDelegate.sharedInstance.navigationController?.present(vc, animated: true)
+                
+                
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":self.product.id ?? 0], userInfo: nil)
+
+            }
+            
+      
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
+    }*/
 }
 
 
 
+
+/*
+struct BoardListView: View {
+
+    @ObservedObject var vm: BoardViewModelNew
+    let navigationController: UINavigationController?
+
+    var body: some View {
+        
+        ScrollViewReader { proxy in     //  added
+            
+            ScrollView {
+                // 🔝 TOP ANCHOR (harmless)
+                if vm.items.isEmpty && !vm.isLoading {
+                    
+                    
+                    emptyView.padding(.top,100)
+                    
+                } else {
+                    
+                    Color.clear
+                        .frame(height: 0)
+                        .id("TOP")
+                    LazyVStack {
+                        
+                        StaggeredGrid(columns: 2, spacing: 6) {
+                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+                                
+                                ProductCardStaggered(product: item) { isLiked, boardId in
+                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                }
+                                .onTapGesture {
+                                    pushToDetail(item: item)
+                                }
+                                
+                            }
+                        }
+                        .padding(.horizontal, 5).padding(.top,0)
+                        
+                        //  SINGLE PAGINATION TRIGGER (FOOTER)
+                        if !vm.isLastPage {
+                            PaginationFooter()
+                                .onAppear {
+                                    guard !vm.isLoading else { return }
+                                    vm.loadNextPage()
+                                }
+                        }
+                        
+                        
+                        //  Bottom loading indicator
+                        if vm.isLoading && !vm.items.isEmpty {
+                            ProgressView()
+                                .padding(.vertical, 24)
+                        }
+                    }.transaction { tx in
+                        tx.animation = nil   // CRITICAL
+                    }
+                    
+                }
+            }
+           
+            .refreshable {
+                await vm.refresh()
+            }
+            .task {
+                if vm.items.count == 0{
+                    vm.loadIfNeeded()
+                }
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
+                )
+            ) { notification in
+                
+                guard let dict = notification.object as? [String: Any] else { return }
+                
+                let isLike  = dict["isLike"] as? Bool ?? false
+                let count  = dict["count"] as? Int ?? 0
+                let boardId = dict["boardId"] as? Int ?? 0
+                
+                vm.update(likeCount: count, isLike: isLike, boardId: boardId)
+            }
+            
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.scrollBoardToTop)
+                )
+            ) { _ in
+                print("SCROLL TO TOP TRIGGERED")
+                DispatchQueue.main.async {
+                    
+                    withAnimation(.easeInOut) {
+                        
+                        proxy.scrollTo("TOP", anchor: .top)
+                    }
+                }
+            }
+        }
+    }
+
+    var emptyView: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image("no_data_found_illustrator")
+            Text("No Data Found")
+                .foregroundColor(.orange)
+            Spacer()
+        }
+    }
+    
+    private func pushToDetail(item: ItemModel) {
+       
+        let vc = UIHostingController(
+            rootView: BoardDetailView(
+                navigationController: navigationController,
+                itemObj: item
+            )
+        )
+        vc.hidesBottomBarWhenPushed = true
+
+        navigationController?.pushViewController(vc, animated: true)
+    }
+}
+*/
+
+/*import SwiftUI
+
+struct BoardListView: View {
+
+    @ObservedObject var vm: BoardViewModelNew
+    let navigationController: UINavigationController?
+
+    // Track scroll intent
+    @State private var isUserScrolling = false
+
+    var body: some View {
+
+        ScrollViewReader { proxy in
+            ScrollView {
+
+                // MARK: - CONTENT
+                LazyVStack(spacing: 0) {
+
+                    // Empty state
+                    if vm.items.isEmpty && !vm.isLoading {
+                        emptyView
+                            .padding(.top, 120)
+                    } else {
+
+                        Color.clear
+                            .frame(height: 0)
+                            .id("TOP")
+
+                        StaggeredGrid(columns: 2, spacing: 6) {
+                            ForEach(vm.items, id: \.id) { item in
+                                ProductCardStaggered(product: item) { isLiked, boardId in
+                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                }
+                                .onTapGesture {
+                                    pushToDetail(item: item)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 5)
+
+                        //  BOTTOM SENTINEL (pagination trigger)
+                                                Color.clear
+                                                    .frame(height: 1)
+                                                    .background(
+                                                        GeometryReader { geo in
+                                                            Color.clear
+                                                                .onChange(of: geo.frame(in: .global).minY) { minY in
+                                                                    let screenHeight = UIScreen.main.bounds.height
+
+                                                                    // Trigger BEFORE reaching bottom (~100px)
+                                                                    if minY < screenHeight + 100 {
+                                                                        vm.tryLoadNextPage()
+                                                                    }
+                                                                }
+                                                        }
+                                                    )
+
+                        // Loader
+                        if vm.isLoading {
+                            ProgressView()
+                                .padding(.vertical, 24)
+                        }
+                    }
+                }
+                .transaction { tx in
+                    tx.animation = nil
+                }
+            }
+            // 🔑 Detect USER SCROLL (arms pagination)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 5)
+                    .onChanged { _ in
+                        vm.isScrollArmed = true
+                    }
+            )
+            .refreshable {
+                await vm.refresh()
+            }
+            .task {
+                vm.loadIfNeeded()
+            }
+            // Scroll to top notification
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.scrollBoardToTop)
+                )
+            ) { _ in
+                withAnimation(.easeInOut) {
+                    proxy.scrollTo("TOP", anchor: .top)
+                }
+            }
+        }
+    }
+
+    // MARK: - Empty View
+    private var emptyView: some View {
+        VStack(spacing: 20) {
+            Image("no_data_found_illustrator")
+            Text("No Data Found")
+                .foregroundColor(.orange)
+        }
+    }
+
+    // MARK: - Navigation
+    private func pushToDetail(item: ItemModel) {
+        let vc = UIHostingController(
+            rootView: BoardDetailView(
+                navigationController: navigationController,
+                itemObj: item
+            )
+        )
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+}
+*/
+
+
+/*
+
+struct BoardListView: View {
+
+    @ObservedObject var vm: BoardViewModelNew
+    let navigationController: UINavigationController?
+
+    // 🔒 Prevent duplicate page calls
+    @State private var nextPageLock: Int? = nil
+
+    // 🔑 User scroll intent (MOST IMPORTANT)
+    @State private var userDidScroll = false
+    @State private var paginationConsumed = false
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 0) {
+
+                    if vm.items.isEmpty && !vm.isLoading {
+                        emptyView
+                            .padding(.top, 120)
+                    } else {
+
+                        Color.clear
+                            .frame(height: 0)
+                            .id("TOP")
+
+                        StaggeredGrid(columns: 2, spacing: 6) {
+                            ForEach(vm.items.indices, id: \.self) { index in
+                                let item = vm.items[index]
+
+                                ProductCardStaggered(product: item) { isLiked, boardId in
+                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                }
+                                .onTapGesture {
+                                    pushToDetail(item: item)
+                                }
+                            
+                                // Pagination trigger (position based)
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear.frame(height:0)
+                                            .onChange(
+                                                of: geo.frame(in: .global).maxY
+                                            ) { y in
+                                                checkIfShouldLoadNextPage(
+                                                    itemPosition: y
+                                                )
+                                            }
+                                    }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 5)
+
+                        if vm.isLoading {
+                            ProgressView()
+                                .padding(.vertical, 24)
+                        }
+                    }
+                }.transaction { tx in
+                    tx.animation = nil
+                }
+            }
+            //  Detect REAL user scroll (NOT inertia)
+            .simultaneousGesture(
+                DragGesture()
+                    .onChanged { _ in
+                        userDidScroll = true
+                    }
+            )
+            .refreshable {
+                await vm.refresh()
+                nextPageLock = nil
+                userDidScroll = false
+            }
+            .task {
+                vm.loadIfNeeded()
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(
+                        NotificationKeys.scrollBoardToTop
+                    )
+                )
+            ) { _ in
+                withAnimation(.easeInOut) {
+                    proxy.scrollTo("TOP", anchor: .top)
+                }
+            }
+            
+            .simultaneousGesture(
+                DragGesture()
+                    .onEnded { _ in
+                        paginationConsumed = false
+                        nextPageLock = nil   //  ONLY arm pagination AFTER scroll ends
+                    }
+            )
+
+        }
+    }
+
+    // MARK: - Pagination logic (SAFE)
+    private func checkIfShouldLoadNextPage(itemPosition: CGFloat) {
+        let screenHeight = UIScreen.main.bounds.height
+        let nextPage = vm.page + 1
+
+        guard userDidScroll else { return }
+        guard vm.hasMorePages else { return }
+        guard !vm.isLoading else { return }
+        guard nextPageLock != nextPage else { return }
+        guard !paginationConsumed else { return }   //  FINAL SAFETY
+
+        if itemPosition < screenHeight + 100 {
+
+            paginationConsumed = true    // consume immediately
+            userDidScroll = false
+            nextPageLock = nextPage
+
+           // DispatchQueue.main.async {
+                vm.tryLoadNextPage()
+           // }
+        }
+    }
+    
+   
+
+
+    // MARK: - Empty view
+    private var emptyView: some View {
+        VStack(spacing: 20) {
+            Image("no_data_found_illustrator")
+            Text("No Data Found")
+                .foregroundColor(.orange)
+        }
+    }
+
+    // MARK: - Navigation
+    private func pushToDetail(item: ItemModel) {
+        let vc = UIHostingController(
+            rootView: BoardDetailView(
+                navigationController: navigationController,
+                itemObj: item
+            )
+        )
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+}
+*/

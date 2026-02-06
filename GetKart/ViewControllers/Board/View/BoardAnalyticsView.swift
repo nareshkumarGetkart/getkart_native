@@ -17,7 +17,9 @@ struct BoardAnalyticsView: View {
     @State private var showSheetpackages = false
     @State private var selectedPkgObj:PlanModel?
     @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var showSafari = false
 
+    
     //'draft','approved','paused','expired','rejected','pending'
     
     @State var isFromBoostPopup:Bool = false
@@ -107,8 +109,8 @@ struct BoardAnalyticsView: View {
                             
                             Spacer()
                             Button {
-                                
-                                if var urlString = objAnalytics?.board?.outbondURL {
+                                showSafari = true
+                              /*  if var urlString = objAnalytics?.board?.outbondURL {
                                     // Add scheme if missing
                                     if !urlString.lowercased().hasPrefix("http://") &&
                                           !urlString.lowercased().hasPrefix("https://") {
@@ -119,7 +121,7 @@ struct BoardAnalyticsView: View {
                                     } else {
                                         print("Invalid URL: \(urlString)")
                                     }
-                                }
+                                }*/
 
                             } label: {
                                 Image("globe")//.frame(width: 40, height: 40)//.aspectRatio(contentMode: .fill)
@@ -223,12 +225,29 @@ struct BoardAnalyticsView: View {
         }.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue))) { notification in
             getBoardAnanlytics()
         }
+        .fullScreenCover(isPresented: $showSafari) {
+            
+            if let url = URL(string:getUrlValid(strURl: objAnalytics?.board?.outbondURL ?? ""))  {
+                
+                SafariView(url:url)
+            }
+        }
+    }
+    
+    
+    func getUrlValid(strURl:String) ->String{
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+            !urlString.lowercased().hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
+        return urlString
     }
     
     
     func paymentGatewayOpen() {
 
-        paymentGateway = PaymentGatewayCentralized()   // ✅ STRONG REFERENCE
+        paymentGateway = PaymentGatewayCentralized()
         paymentGateway?.planObj = selectedPkgObj
         paymentGateway?.categoryId = objAnalytics?.board?.categoryID ?? 0
         paymentGateway?.itemId = objAnalytics?.board?.id ?? 0
@@ -248,7 +267,6 @@ struct BoardAnalyticsView: View {
                 self.navigationController?.present(vc, animated: true)
             }
             
-            // ✅ RELEASE
                self.paymentGateway = nil
         }
 
@@ -386,7 +404,6 @@ struct BoardAnalyticsView: View {
              let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
-            
                 
                 if code == 200{
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)

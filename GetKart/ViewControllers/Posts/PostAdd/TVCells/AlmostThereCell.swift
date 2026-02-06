@@ -28,7 +28,7 @@ class AlmostThereCell: UITableViewCell {
     
         guard let fontManrope = UIFont.Manrope.regular(size: 15.0).font else{ return}
         let firstAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.black,
+            .foregroundColor: UIColor.label,
             .font:fontManrope
         ]
 

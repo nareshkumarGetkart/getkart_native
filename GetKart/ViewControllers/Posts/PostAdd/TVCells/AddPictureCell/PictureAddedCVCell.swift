@@ -20,6 +20,8 @@ class PictureAddedCVCell: UICollectionViewCell {
         viewBack.layer.cornerRadius = 5.0
         viewBack.layer.borderWidth = 1.0
         viewBack.layer.borderColor = UIColor.lightGray.cgColor
+        
+        btnRemove.setImageTintColor(color: .label)
     }
 
 }

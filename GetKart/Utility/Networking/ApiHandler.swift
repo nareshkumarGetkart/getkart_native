@@ -56,6 +56,11 @@ class ApiHandler:NSObject{
                         }
                     }
                     
+                    if response.response?.statusCode == 409{
+                        AppDelegate.sharedInstance.deviceRefreshApi()
+                        return
+                    }
+                    
                     if response.response?.statusCode == 401{
                         URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)
                          return
@@ -136,6 +141,11 @@ class ApiHandler:NSObject{
 //                         AppDelegate.sharedInstance.logoutFromApp()
 //                         return
 //                     }
+                    
+                    if response.response?.statusCode == 409{
+                        AppDelegate.sharedInstance.deviceRefreshApi()
+                        return
+                    }
                      
                     if response.response?.statusCode == 401{
                         URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)

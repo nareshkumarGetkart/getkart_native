@@ -239,20 +239,24 @@ struct ReelPostView: View {
             bottomCard
                 .padding(.horizontal)
                 .padding(.top, 10)
-
-            // 🔹 BUY NOW
-            Button {
-                showSafari = true
-                outboundClickApi(strURl: post.outbondUrl ?? "")
-            } label: {
-                Text("Buy Now")
-                    .font(.inter(.semiBold, size: 16))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, minHeight: 55)
+           
+             if (post.user?.id ?? 0) != Local.shared.getUserId(){
+              
+                // 🔹 BUY NOW
+                Button {
+                    showSafari = true
+                    outboundClickApi(strURl: post.outbondUrl ?? "")
+                } label: {
+                    Text("Buy Now")
+                        .font(.inter(.semiBold, size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, minHeight: 55)
+                }
+                .background(Color(hexString: "#FF9900"))
+                .cornerRadius(10)
+                .padding()
             }
-            .background(Color(hexString: "#FF9900"))
-            .cornerRadius(10)
-            .padding()
+            
         }.background(Color(.systemBackground))
         
             .sheet(isPresented: $showSeeMore) {
@@ -295,22 +299,25 @@ struct ReelPostView: View {
     private var bottomCard: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack{
-                HStack(spacing:3){
-                    Button {
-                        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                            post.isLiked?.toggle()
-                            manageLikeDislikeApi()
+                
+                if (post.user?.id ?? 0) != Local.shared.getUserId(){
+              
+                    HStack(spacing:3){
+                        Button {
+                            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                                post.isLiked?.toggle()
+                                manageLikeDislikeApi()
+                            }
+                        } label: {
+                            let imgStr = (post.isLiked == true) ? "like_fill" : "like"
+                            Image(imgStr).foregroundColor(Color(.label))
                         }
-                    } label: {
-                        let imgStr = (post.isLiked == true) ? "like_fill" : "like"
-                        Image(imgStr).foregroundColor(Color(.label))
-                    }
-                    if (post.totalLikes ?? 0) > 0{
-                        
-                        Text("\(post.totalLikes ?? 0)").font(Font.inter(.regular, size: 14)).foregroundColor(Color(.label))
+                        if (post.totalLikes ?? 0) > 0{
+                            
+                            Text("\(post.totalLikes ?? 0)").font(Font.inter(.regular, size: 14)).foregroundColor(Color(.label))
+                        }
                     }
                 }
-                
                 Button {
                     showShareSheet = true
                 } label: {
@@ -336,7 +343,7 @@ struct ReelPostView: View {
                 
                 Spacer()
                 if (post.isFeature ?? false){
-                    Text("Sponsered").font(.inter(.medium, size: 16)).foregroundColor(Color(.gray))
+                    Text("Sponsored").font(.inter(.medium, size: 16)).foregroundColor(Color(.gray))
                 }
             }
             

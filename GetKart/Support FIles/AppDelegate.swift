@@ -220,10 +220,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    
     }
     
+    private var isBackgroundCalled = false
+    private var backgroundCalledTime:TimeInterval = 0
+
     func applicationDidEnterBackground(_ application: UIApplication){
         print("applicationDidEnterBackground")
+        isBackgroundCalled = true
+        backgroundCalledTime = Date().timeIntervalSince1970
     }
-        
+    
     func applicationWillEnterForeground(_ application: UIApplication){
         print("applicationWillEnterForeground")
     }
@@ -240,8 +245,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         if isDeviceRegistered{
-            
-            self.deviceRefreshApi()
+            if isBackgroundCalled{
+                
+                guard backgroundCalledTime > 0 else { return }
+                let now = Date().timeIntervalSince1970
+                
+                if (now - backgroundCalledTime) >= (1 * 60 * 60){
+                    self.deviceRefreshApi()
+                }
+            }else{
+                self.deviceRefreshApi()
+            }
+            //  self.deviceRefreshApi()
         }
     }
     
@@ -858,7 +873,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
     }
     
- 
     
     //This is key callback to present notification while the app is in foreground
 
@@ -928,7 +942,6 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             }
          
             completionHandler([.banner, .list, .sound])
-            
         }
     }
     

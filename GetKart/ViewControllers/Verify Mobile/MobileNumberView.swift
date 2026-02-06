@@ -42,7 +42,7 @@ struct MobileNumberView: View {
                             .padding(.horizontal, 5)
                             .background(Color(.systemGray6)) // matches background
                             .offset(y: -10) // move it into border line
-                            .foregroundColor(.black).padding(.leading,6)
+                            .foregroundColor(Color(.label)).padding(.leading,6)
                     }
                     
                     TextField("", text: $phoneNumber)

@@ -99,8 +99,11 @@ struct ItemDetailView: View {
                                             let bothConditionTrue = isLast && isVideoAvailable
                                             if  bothConditionTrue {
                                                 
-                                                if img.contains("youtube.com"){
-                                                    YouTubeWebView(videoID:extractYouTubeID(from: img), isVisible: $isVideoVisible).frame(height: 200)
+                                                if img.contains("youtube.com") || img.contains("youtu"){
+                                                    
+                                                    YouTubeFallbackView(videoID: extractYouTubeID(from: img)).frame(height: 200).cornerRadius(10).tag(index)
+                                                    
+                                                   /* YouTubeWebView(videoID:extractYouTubeID(from: img), isVisible: $isVideoVisible).frame(height: 200)
                                                         .cornerRadius(10)
                                                         //.padding(.horizontal, 5)
                                                         .onAppear {
@@ -110,7 +113,7 @@ struct ItemDetailView: View {
                                                         .onDisappear {
                                                             // When the video disappears, pause it
                                                             self.isVideoVisible = false
-                                                        } .tag(index)
+                                                        } .tag(index)*/
                                                 }else{
                                                     
                                                     WebVideoView(videoURL:img)
@@ -129,7 +132,7 @@ struct ItemDetailView: View {
                                                         .frame(height: 200)
                                                         //.padding(.horizontal, 5)
                                                         .onAppear {
-                                                            extractDominantColor(from: image)
+//                                                            extractDominantColor(from: image)
                                                         }
                                                 } placeholder: {
                                                     Image("getkartplaceholder")
@@ -448,6 +451,7 @@ struct ItemDetailView: View {
                             self.navController?.pushViewController(hostingController, animated: true)
                         } .frame(height: 160)
                             .cornerRadius(10)
+                            .id("static-map-\(lat)-\(lon)")
                     }
                     
                     
@@ -1255,8 +1259,25 @@ struct ItemDetailView: View {
         
     }
     
+    func extractYouTubeID(from url: String) -> String {
+        let patterns = [
+            "youtu.be/([^?&]+)",
+            "youtube.com/watch\\?v=([^?&]+)",
+            "youtube.com/embed/([^?&]+)"
+        ]
 
-    func extractYouTubeID(from urlString: String) -> String {
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern),
+               let match = regex.firstMatch(in: url, range: NSRange(url.startIndex..., in: url)),
+               let range = Range(match.range(at: 1), in: url) {
+                return String(url[range])
+            }
+        }
+        return ""
+    }
+
+
+   /* func extractYouTubeID(from urlString: String) -> String {
         let patterns = [
             "youtube\\.com/watch\\?v=([\\w-]{11})",
             "m\\.youtube\\.com/watch\\?v=([\\w-]{11})",
@@ -1275,7 +1296,7 @@ struct ItemDetailView: View {
 
         return ""
     }
-
+*/
     var isVisibleContact: Int {
      
         let itemUserId = objVM.itemObj?.userID ?? 0
@@ -1694,6 +1715,45 @@ struct WebVideoView: UIViewRepresentable {
     }
 }
 
+struct YouTubeFallbackView: View {
+    let videoID: String
+
+    var body: some View {
+        Button {
+            openYouTube()
+        } label: {
+            ZStack {
+                AsyncImage(
+                    url: URL(string: "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg")
+                ) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Color.black
+                }
+
+                Image(systemName: "play.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.white)
+            }
+            .frame(height: 200)
+            .cornerRadius(10)
+        }
+    }
+
+    private func openYouTube() {
+        let appURL = URL(string: "youtube://\(videoID)")!
+        let webURL = URL(string: "https://www.youtube.com/watch?v=\(videoID)")!
+
+        
+        if UIApplication.shared.canOpenURL(appURL) {
+            UIApplication.shared.open(appURL)
+        } else {
+            UIApplication.shared.open(webURL)
+        }
+    }
+}
+
 
 struct YouTubeWebView: UIViewRepresentable {
     let videoID: String
@@ -1811,10 +1871,6 @@ struct ExpandableTextView: View {
         }
     }
 }
-
-
-
-
 
 
 struct TextSizeReader: View {

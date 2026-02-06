@@ -70,7 +70,17 @@ struct ProductCard: View {
                     Text(objItem.name ?? "").foregroundColor(Color(UIColor.label))
                         .multilineTextAlignment(.leading).lineLimit(1)
                         .font(Font.manrope(.semiBold, size: 14))
-
+                    
+                    
+                    let matchedCatId = matchedCategoryId(from: objItem.allCategoryIDS ?? "") ?? 0
+                     
+                     if matchedCatId > 0{
+                         Text(callSpecificValueBasedOnCategory(catId:matchedCatId, list: objItem.customFields ?? []))
+                         .foregroundColor(Color(UIColor.label))
+                            .multilineTextAlignment(.leading).lineLimit(1)
+                            .font(Font.manrope(.regular, size: 12)).frame(height:12)
+                    }
+                        
                     HStack(spacing: 2){
                         Image("location-outline").resizable()
                             .renderingMode(.template).frame(width: 15,height:15)
@@ -82,6 +92,9 @@ struct ProductCard: View {
                             .foregroundColor(.gray)
                         Spacer(minLength: 0)
                     }.padding(.horizontal,0)
+                    if (matchedCatId == 0){
+                        Spacer(minLength: 12)
+                    }
                     
                 }.padding([.trailing,.leading,.bottom],10).frame(maxWidth: widthScreen/2.0 - 20,alignment:.leading)
                 
@@ -152,4 +165,160 @@ struct ProductCard: View {
         }
     }
 
+}
+
+
+
+//MARK: New api
+
+func callSpecificValueBasedOnCategory(catId:Int,list: [CustomField?]) -> String{
+    
+    switch catId {
+    case 229,226,242,237:
+        do{
+            //val propertyCategoryIds = listOf(229, 226,242,237)
+           return getBedBathText(list)
+        }
+    
+    default:
+        return getYearKmText(list)
+        
+    }
+    
+
+    
+}
+
+func matchedCategoryId(from categoryIds: String) -> Int? {
+    let checkIds: Set<Int> = [500, 130, 501, 229, 26, 226, 242, 237]
+
+    let categoryIdArray = categoryIds
+        .split(separator: ",")
+        .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+
+    // Return first matching category id
+    for id in categoryIdArray {
+        if checkIds.contains(id) {
+            return id
+        }
+    }
+
+    return nil
+}
+
+
+func getBedBathText(_ list: [CustomField?]) -> String {
+    var bedrooms = ""
+    var bathrooms = ""
+
+    for item in list {
+        guard let item else { continue }
+
+        let name = item.name?
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        let value = item.value?.first as? String ?? ""
+
+        if name.contains("bedroom") ||
+            name.contains("bedrooms") ||
+            name.contains("bed") ||
+            name.contains("bhk") {
+
+            bedrooms = value.trimmingCharacters(in: .whitespaces)
+
+        } else if name.contains("bathroom") ||
+                    name.contains("bath") ||
+                    name.contains("toilet") {
+
+            bathrooms = value.trimmingCharacters(in: .whitespaces)
+        }
+    }
+
+    if !bedrooms.isEmpty && !bathrooms.isEmpty {
+        return "\(bedrooms) BHK - \(bathrooms) Bathroom"
+    }
+
+    if !bedrooms.isEmpty {
+        return "\(bedrooms) BHK"
+    }
+
+    if !bathrooms.isEmpty {
+        return "\(bathrooms) Bathroom"
+    }
+    
+    
+
+    return ""
+}
+
+func getYearKmText(_ list: [CustomField?]) -> String {
+    var year = ""
+    var km = ""
+    var ram = ""
+    var storage = ""
+
+    for item in list {
+        guard let item = item else { continue }
+
+        let name = item.name?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let value = item.value?.first??.description.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        switch true {
+
+        // 🚗 Car fields
+        case name.contains("year"), name.contains("model"):
+            year = value
+
+        case name.contains("km"),
+             name.contains("kilometer"),
+             name.contains("kms"),
+             name.contains("driven"):
+            km = value
+
+        // 📱 Mobile fields
+        case name.contains("memory"), name.contains("ram"):
+            ram = value
+
+        case name.contains("storage"):
+            storage = value
+
+        default:
+            break
+        }
+    }
+
+    // 📱 Mobile text first (same priority as Kotlin)
+    if !ram.isEmpty || !storage.isEmpty {
+        if !ram.isEmpty && !storage.isEmpty {
+            return "\(ram) RAM - \(storage) Storage"
+        } else if !ram.isEmpty {
+            return "\(ram) RAM"
+        } else if !storage.isEmpty {
+            return "\(storage) Storage"
+        }
+        return ""
+    }
+
+    // 🚗 Car text
+    if !year.isEmpty && !km.isEmpty {
+        return "\(year) - \(formatKm(km)) KM"
+    } else if !year.isEmpty {
+        return year
+    } else if !km.isEmpty {
+        return "\(formatKm(km)) KM"
+    } else {
+        return ""
+    }
+}
+
+func formatKm(_ km: String) -> String {
+    let cleaned = km.replacingOccurrences(of: ",", with: "")
+    if let number = Double(cleaned) {
+        return NumberFormatter.localizedString(
+            from: NSNumber(value: number),
+            number: .decimal
+        )
+    }
+    return km
 }

@@ -108,6 +108,7 @@ struct PlanModel: Codable,Identifiable, Equatable {
                 title = try? container.decode(String.self, forKey: .title)
 
     }
+    
 }
 
 enum TypePlanEnum: String, Codable {

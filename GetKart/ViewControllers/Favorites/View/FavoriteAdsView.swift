@@ -168,6 +168,15 @@ struct FavoritesCell:View {
                 Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.manrope(.semiBold, size: 14)).foregroundColor(Color(UIColor.label))
                     .padding(.bottom,10).padding(.trailing)
                 
+                
+               let matchedCatId = matchedCategoryId(from: itemObj.allCategoryIDS ?? "") ?? 0
+                
+                if matchedCatId > 0{
+                    Text(callSpecificValueBasedOnCategory(catId:matchedCatId, list: itemObj.customFields ?? [])).foregroundColor(Color(UIColor.label))
+                        .multilineTextAlignment(.leading).lineLimit(1)
+                        .font(Font.manrope(.regular, size: 12))//.frame(height:12)
+                }
+                
                 HStack(spacing:2){
                     Image("location-outline").resizable().renderingMode(.template).frame(width: 15, height: 15).foregroundColor(.gray)
                     Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
@@ -191,6 +200,9 @@ struct FavoritesCell:View {
                         .allowsHitTesting(true)
                     }
                 }
+//                if (matchedCatId == 0){
+//                    Spacer(minLength: 12)
+//                }
                 
             }.padding([.top,.bottom],10)
             

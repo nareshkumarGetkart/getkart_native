@@ -100,9 +100,10 @@ struct TransactionHistoryPreview: View {
                     .background(Color(UIColor.systemBackground))
                     .cornerRadius(16)
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                }
-                .padding([.horizontal,.top],10)
-                .cornerRadius(10)
+                    .padding([.horizontal,.top],10)
+                }.padding(.top,0)
+              //  .padding([.horizontal,.top],10)
+                //.cornerRadius(10)
                 .background(Color(.systemGray6))
             }
             .navigationBarHidden(true)
@@ -218,10 +219,10 @@ private func navigationHeader() -> some View {
             Image("arrow_left")
                 .renderingMode(.template)
                 .foregroundColor(Color(UIColor.label))
-                .padding()
-        }
+                
+        }.padding(.leading)
         Text("Order Details")
-            .font(.custom("Manrope-Bold", size: 20.0))
+            .font(.inter(.semiBold, size: 18.0))
             .foregroundColor(Color(UIColor.label))
         Spacer()
     }

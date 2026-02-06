@@ -124,6 +124,14 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             cell.btnIsVerified.isHidden = (obj.user?.isVerified ?? 0) == 1 ? false : true
             cell.btnIsVerified.tag = indexPath.item
             cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
+          
+            if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
+                cell.lblCapacity.isHidden = false
+                cell.lblCapacity.text = callSpecificValueBasedOnCategory(catId:matchedCatId, list: obj.customFields ?? [])
+            }else{
+                cell.lblCapacity.text = ""
+                cell.lblCapacity.isHidden = true
+            }
         }
         
         return cell

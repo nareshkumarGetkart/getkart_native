@@ -89,12 +89,13 @@ class HomeBaseVC: UITabBarController {
         let buttonRadius: CGFloat = buttonSize / 2
         
         // Configure button appearance
-        middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -25, width: buttonSize, height: buttonSize)
+        middleButton.frame = CGRect(x: (view.bounds.width / 2) - buttonRadius, y: -20, width: buttonSize, height: buttonSize)
         middleButton.layer.cornerRadius = buttonRadius
         middleButton.backgroundColor = .clear
         middleButton.setImage(UIImage(named: "plus_button"), for: .normal)
         middleButton.tintColor = .white
         middleButton.addTarget(self, action: #selector(middleButtonTapped), for: .touchUpInside)
+        middleButton.titleLabel?.font = .Manrope.medium(size: 15.0).font
         
         // Add shadow
         middleButton.layer.shadowColor = UIColor.black.cgColor
@@ -229,7 +230,6 @@ class HomeBaseVC: UITabBarController {
         
         sheetVC.modalPresentationStyle = .overFullScreen
         sheetVC.view.backgroundColor = .clear   // important
-        
         controller.present(sheetVC, animated: true)
     }
 

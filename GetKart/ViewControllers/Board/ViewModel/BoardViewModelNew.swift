@@ -340,26 +340,19 @@ final class BoardViewModelNew: ObservableObject {
 }
 */
 
+
 @MainActor
 final class BoardViewModelNew: ObservableObject {
 
+    // MARK: - Published
     @Published private(set) var items: [ItemModel] = []
     @Published var isLoading = false
     @Published var isLastPage = false
-    private var lastTriggerTime: TimeInterval = 0
+    @Published var hasLoadedOnce = false
 
+    // MARK: - Pagination
     private var currentPage = 0
-    private var isRequestInProgress = false
-
-    /// 🔒 Absolute pagination lock (per page)
-    private var didTriggerForCurrentPage = false
-
-    /// 🔥 Pagination tuning
-    private let preloadDistance: CGFloat = 600   // px before bottom
-
-    /// 🔥 Scroll tracking
-     var contentHeight: CGFloat = 0
-     var scrollOffset: CGFloat = 0
+    private var requestedPages: Set<Int> = []
 
     let categoryId: Int
 
@@ -367,70 +360,33 @@ final class BoardViewModelNew: ObservableObject {
         self.categoryId = categoryId
     }
 
-    // MARK: - Initial Load
+    // ✅ Expose read-only pagination info
+    var page: Int { currentPage }
+    var hasMorePages: Bool { !isLastPage }
+
+    // MARK: - Initial load
     func loadIfNeeded() {
         guard items.isEmpty else { return }
-        loadNextPage()
+        loadPage(1)
     }
 
-    // MARK: - Refresh
-    func refresh() async {
-        reset()
-        loadNextPage()
+    // MARK: - Trigger next page
+    func tryLoadNextPage() {
+        let nextPage = currentPage + 1
+        guard !isLoading, !isLastPage, !requestedPages.contains(nextPage) else { return }
+
+        requestedPages.insert(nextPage)
+        loadPage(nextPage)
     }
 
- 
-
-    func updateContentHeight(_ height: CGFloat) {
-        contentHeight = height
-    }
-
-
-    // MARK: - SCROLL INPUTS (CALL FROM VIEW)
-    func updateScrollOffset(_ offset: CGFloat) {
-        scrollOffset = offset
-        checkPaginationIfNeeded()
-    }
-
-    // MARK: - PAGINATION LOGIC (FIXED)
-     func checkPaginationIfNeeded() {
-        guard !isLoading,
-              !isLastPage,
-              !isRequestInProgress else { return }
-
-        let screenHeight = UIScreen.main.bounds.height
-        let visibleBottom = -scrollOffset + screenHeight  // bottom of visible area
-        let distanceToBottom = contentHeight - visibleBottom
-
-        // Trigger preload if within preloadDistance
-        guard distanceToBottom < preloadDistance else { return }
-
-        // Only trigger once per page
-        guard !didTriggerForCurrentPage else { return }
-
-        didTriggerForCurrentPage = true
-        loadNextPage()
-    }
-
-
-
-    // MARK: - Load Next Page
-     func loadNextPage() {
-        guard !isRequestInProgress else { return }
-
-        isRequestInProgress = true
+    // MARK: - Page loader
+    private func loadPage(_ page: Int) {
+        guard !isLoading else { return }
         isLoading = true
 
-        let nextPage = currentPage + 1
-        fetchBoards(page: nextPage)
-    }
-
-    // MARK: - API
-    private func fetchBoards(page: Int) {
-
         let url =
-        Constant.shared.get_public_board +
-        "?page=\(page)&category_id=\(categoryId != 55555 ? "\(categoryId)" : "")"
+            Constant.shared.get_public_board +
+            "?page=\(page)&category_id=\(categoryId != 55555 ? "\(categoryId)" : "")"
 
         URLhandler.sharedinstance.makeCall(
             url: url,
@@ -440,9 +396,12 @@ final class BoardViewModelNew: ObservableObject {
             guard let self else { return }
 
             DispatchQueue.main.async {
+                defer {
+                    
+                    self.isLoading = false
+                    self.hasLoadedOnce = true   // 👈 important
 
-                self.isLoading = false
-                self.isRequestInProgress = false
+                } // 🔒 Unlock only after processing
 
                 guard
                     let dict = responseObject as? NSDictionary,
@@ -466,44 +425,53 @@ final class BoardViewModelNew: ObservableObject {
                 }
 
                 withAnimation(.none) {
+                    
                     self.items.append(contentsOf: newItems)
                 }
-
-                self.currentPage = page
-                self.didTriggerForCurrentPage = false   // 🔓 unlock next page
-
-                let current = dataDict["current_page"] as? Int ?? page
+                self.currentPage = dataDict["current_page"] as? Int ?? page
                 let last = dataDict["last_page"] as? Int ?? page
-                self.isLastPage = current >= last
+                self.isLastPage = self.currentPage >= last
             }
         }
     }
 
-    // MARK: - Reset
-    private func reset() {
+    // MARK: - Refresh
+    func refresh() async {
         currentPage = 0
         isLastPage = false
-        isRequestInProgress = false
-        didTriggerForCurrentPage = false
         items.removeAll()
+        requestedPages.removeAll()
+        loadPage(1)
     }
 
-    // MARK: - Like Update
-    func updateLikeTo(boardId: Int, isLiked: Bool) {
+    // MARK: - Like update
+    func updateLike(boardId: Int, isLiked: Bool) {
         if let index = items.firstIndex(where: { $0.id == boardId }) {
             items[index].isLiked = isLiked
-            manageLikeDislikeApi(boardId: boardId, isLiked: isLiked)
+            self.manageLikeDislikeApi(boardId: boardId, isLiked: isLiked)
         }
     }
-
-    func update(likeCount: Int, isLike: Bool, boardId: Int) {
+  
+    
+    func update(likeCount:Int,isLike:Bool,boardId:Int){
+        
         if let index = items.firstIndex(where: { $0.id == boardId }) {
             items[index].isLiked = isLike
             items[index].totalLikes = likeCount
         }
+       
+    }
+    
+    
+    func updateBoost(isBoosted:Bool,boardId:Int){
+        
+        if let index = items.firstIndex(where: { $0.id == boardId }) {
+            items[index].isFeature = isBoosted
+        }
+       
     }
 
-    // MARK: - Like / Unlike
+    // MARK: - Like / Unlike (unchanged)
     func manageLikeDislikeApi(boardId: Int, isLiked: Bool) {
         guard let index = items.firstIndex(where: { $0.id == boardId }) else { return }
 

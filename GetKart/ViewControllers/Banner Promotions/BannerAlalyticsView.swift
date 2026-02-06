@@ -15,7 +15,8 @@ struct BannerAlalyticsView: View {
     @State private var objBanner:AnalyticsModel?
     @State private var showSheetpackages = false
     @State private var selectedPkgObj:PlanModel?
-
+    @State private var showSafari = false
+    
     //'draft','approved','paused','expired','rejected','pending'
     var body: some View {
         HStack{
@@ -115,8 +116,8 @@ struct BannerAlalyticsView: View {
                             
                             Spacer()
                             Button {
-                                
-                                if var urlString = objBanner?.url {
+                                showSafari = true
+                                /*if var urlString = objBanner?.url {
                                     // Add scheme if missing
                                     if !urlString.lowercased().hasPrefix("http://") &&
                                         !urlString.lowercased().hasPrefix("https://") {
@@ -128,7 +129,7 @@ struct BannerAlalyticsView: View {
                                     } else {
                                         print("Invalid URL: \(urlString)")
                                     }
-                                }
+                                }*/
 
                             } label: {
                                 Image("globe")//.frame(width: 40, height: 40)//.aspectRatio(contentMode: .fill)
@@ -242,7 +243,25 @@ struct BannerAlalyticsView: View {
                 // Fallback on earlier versions
             }   // ⬆️ Optional drag handle
         }
+        
+        .fullScreenCover(isPresented: $showSafari) {
+            
+            if let url = URL(string:getUrlValid(strURl: objBanner?.url ?? ""))  {
+                
+                SafariView(url:url)
+            }
+        }
     }
+    
+    func getUrlValid(strURl:String) ->String{
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+            !urlString.lowercased().hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
+        return urlString
+    }
+    
     
     func presentPayView(planObj:PlanModel){
         

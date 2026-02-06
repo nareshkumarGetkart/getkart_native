@@ -34,7 +34,7 @@ struct SearchWithSortView: View {
     var body: some View {
         
         
-        HStack{
+        HStack(spacing:0){
             Button {
                 navigationController?.popViewController(animated: true)
                 
@@ -326,6 +326,9 @@ struct SearchWithSortView: View {
         }
         return count > 0 ? " (\(count))" : ""
     }
+    
+   
+
 }
 
 

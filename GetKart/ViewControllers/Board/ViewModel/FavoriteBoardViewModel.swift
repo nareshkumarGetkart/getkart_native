@@ -103,6 +103,14 @@ final class FavoriteBoardViewModel: ObservableObject {
         }
        
     }
+    
+    func updateBoost(isBoosted:Bool,boardId:Int){
+        
+        if let index = items.firstIndex(where: { $0.id == boardId }) {
+            items[index].isFeature = isBoosted
+        }
+       
+    }
     // MARK: - API
     private func fetchBoards(showLoader: Bool = false) {
         guard !isLoading else { return }

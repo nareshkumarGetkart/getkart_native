@@ -138,7 +138,12 @@ class URLhandler: NSObject{
 //                         return
 //                     }
                     
-                    if response.response?.statusCode == 401{
+                    if response.response?.statusCode == 409{
+                        AppDelegate.sharedInstance.deviceRefreshApi()
+                        return
+                    }
+                    
+                     if response.response?.statusCode == 401{
                         URLhandler.sharedinstance.checkAndLogout(responseCode:  response.response?.statusCode ?? 0)
                          return
                      }
@@ -286,6 +291,11 @@ class URLhandler: NSObject{
 //                     return
 //                 }
                 
+                if response.response?.statusCode == 409{
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
+                
                 if response.error == nil{
                     do{
                         self.respDictionary = try JSONSerialization.jsonObject(
@@ -344,7 +354,12 @@ class URLhandler: NSObject{
 //                     AppDelegate.sharedInstance.logoutFromApp()
 //                     return
 //                 }
-//                
+                
+                if response.response?.statusCode == 409{
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
+
                 if response.error == nil{
                     do{
                         self.respDictionary = try JSONSerialization.jsonObject(
@@ -412,6 +427,12 @@ class URLhandler: NSObject{
                     
                     Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                 }
+                
+                if response.response?.statusCode == 409{
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
+                
                 if response.error == nil{
                     do{
                         self.respDictionary = try JSONSerialization.jsonObject(
@@ -519,6 +540,10 @@ class URLhandler: NSObject{
                     Themes.sharedInstance.removeActivityView(uiView:AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView())
                 }
                 
+                if response.response?.statusCode == 409{
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
                 
                 if response.error == nil{
                     do{
@@ -649,6 +674,11 @@ class URLhandler: NSObject{
 //                     AppDelegate.sharedInstance.logoutFromApp()
 //                     return
 //                 }
+                
+                if response.response?.statusCode == 409{
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
                 
                 if response.error == nil{
                     do{

@@ -28,9 +28,9 @@ extension TransactionHistoryView {
                 VStack(spacing: 8) {
 
                     Text(tab.title)
-                        .font(Font.inter((selectedTab == tab ? .medium : .medium), size: 15))
-
-                        .foregroundColor(Color(.label))
+                        .font(Font.inter((selectedTab == tab ? .medium : .medium), size: 14))
+                        .foregroundColor(Color(hex: "#36393E"))
+                     //   .foregroundColor(Color(.label))
 
                     Rectangle()
                         .fill(selectedTab == tab ? Color.orange : Color.clear)
@@ -67,9 +67,9 @@ struct TransactionHistoryView:View{
                     navigation?.popViewController(animated: true)
                 }) {
                     Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
-                        .padding()
-                }
-                Text("Order History & Invoices").font(Font.manrope(.medium, size: 18.0))
+                        
+                }.padding(.leading)
+                Text("Order History & Plans").font(Font.inter(.medium, size: 18.0))
                     .foregroundColor(Color(UIColor.label))
                 
                 Spacer()
@@ -113,7 +113,7 @@ struct TransactionHistoryView:View{
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
                     .padding()
             }
-            Text("Order History & Invoices").font(Font.manrope(.medium, size: 18.0))
+            Text("Order History & Plans").font(Font.manrope(.medium, size: 18.0))
                 .foregroundColor(Color(UIColor.label))
             
             Spacer()
@@ -250,46 +250,46 @@ struct TransactionRow: View {
     let transaction: TransactionModel
     
     var body: some View {
-        HStack(spacing:3) {
+        HStack(spacing:5) {
             
             AsyncImage(url: URL(string: transaction.package?.icon ?? "")) { img in
                 
-                img.resizable().aspectRatio(contentMode: .fit).frame(width:45,height: 45)
-                    .background(Color(hex: "#FEF6E9")).cornerRadius(6)
+                img.resizable().aspectRatio(contentMode: .fit).frame(width:50,height: 50)
+                    .background(Color(hex: "#FEF6E9")).cornerRadius(12)
             } placeholder: {
-                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:45,height: 45).background(Color(hex: "#FEF6E9")).cornerRadius(6)
+                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:50,height: 50).background(Color(hex: "#FEF6E9")).cornerRadius(12)
             }
 
             VStack(alignment: .leading, spacing: 5) {
                 
                 Text(transaction.package?.name ?? "")
-                    .font(Font.manrope(.semiBold, size: 16))
+                    .font(Font.inter(.semiBold, size: 16))
                     .foregroundColor(Color(.label))
                 
                 if  (transaction.package?.name ?? "").count == 0 && ((transaction.transactionPackage?.name?.count ?? 0) > 0){
                     Text(transaction.transactionPackage?.name ?? "")
-                        .font(Font.manrope(.semiBold, size: 16))
+                        .font(Font.inter(.semiBold, size: 16))
                         .foregroundColor(Color(.label))
                 }
                 
                 Text("Purchased from \(transaction.paymentTransaction?.paymentGateway?.capitalized ?? "")" )
-                    .font(Font.manrope(.medium, size: 15))
-                    .foregroundColor(Color(.label))
+                    .font(Font.inter(.regular, size: 14))
+                    .foregroundColor(Color(.darkGray))
 
                 Button(action: {
                     UIPasteboard.general.string = transaction.paymentTransaction?.orderID
                     AlertView.sharedManager.showToast(message: "Copied successfully")
 
                 }) {
-                    Text("Transaction Id").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                    Text("Transaction Id").font(Font.inter(.regular, size: 13)).foregroundColor(.gray)
                     Image("ic_baseline-content-copy")
                         .renderingMode(.template).resizable()
                         .frame(width: 15, height: 15, alignment: .center)
-                        .foregroundColor(.gray).padding(.leading,3)
+                        .foregroundColor(Color(.label)).padding(.leading,3)
                 }
                 
                 Text(transaction.paymentTransaction?.orderID ?? "").lineLimit(1)
-                    .font(Font.manrope(.regular, size: 13))
+                    .font(Font.inter(.regular, size: 13))
                     .foregroundColor(Color(UIColor.gray))
                 
             }//.padding(5)
@@ -298,14 +298,14 @@ struct TransactionRow: View {
             VStack(alignment: .trailing, spacing: 5){
                 
                 Text("\(Local.shared.currencySymbol) \((transaction.paymentTransaction?.amount ?? 0.0).formatNumber())")
-                    .font(Font.manrope(.semiBold, size: 15))
+                    .font(Font.inter(.semiBold, size: 15))
                     .foregroundColor(Color(UIColor.label)).padding(.trailing,10)
                 let status = transaction.paymentTransaction?.paymentStatus ?? ""
                
                 let (bgColor, titleColor, displayStatus) = statusColors(for: status)
 
                 Text(displayStatus.capitalized)
-                    .font(Font.manrope(.medium, size: 13))
+                    .font(Font.inter(.medium, size: 13))
                     .foregroundColor(titleColor)
                     .padding(.horizontal)
                     .frame(height: 24)
@@ -317,11 +317,11 @@ struct TransactionRow: View {
              
                 
                 Text(getConvertedDateFromDate(date: date))
-                    .font(Font.manrope(.regular, size: 14))
+                    .font(Font.inter(.regular, size: 14))
                     .foregroundColor(.gray).padding(.trailing,10)
                 
                 Text(getConvertedTimeFromDate(date: date))
-                    .font(Font.manrope(.regular, size: 14))
+                    .font(Font.inter(.regular, size: 14))
                     .foregroundColor(.gray).padding(.trailing,10)
                 
             }

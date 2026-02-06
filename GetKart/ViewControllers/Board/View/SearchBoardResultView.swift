@@ -13,7 +13,8 @@ struct SearchBoardResultView: View {
     @State private var searchText = ""
     @State private var selected = "All"
     @StateObject private var vm = SearchBoardResultViewModel()
-    
+    @State private var paymentGateway: PaymentGatewayCentralized?
+
     
     var body: some View {
         VStack(spacing: 0) {
@@ -108,12 +109,25 @@ struct SearchBoardResultView: View {
                             //ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
                             ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
                                 
-                                ProductCardStaggered1(
+                                
+                             /*   ProductCardStaggered1(
                                     product: item,
                                     // imgHeight: CGFloat(150 + (index % 2) * 50)
+                                    onTapBoostButton:{
+                                        paymentGatewayOpen(product: item)
+                                        
+                                    }
                                 ) { isLiked, boardId in
                                     vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
+                                }*/
+                                ProductCardStaggered1(
+                                    product: item,
+                                    sendLikeUnlikeObject: { isLiked, boardId in
+                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    }, onTapBoostButton: {
+                                        paymentGatewayOpen(product: item)
+                                    }
+                                )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     pushToDetailScreen(item: item)
@@ -181,8 +195,51 @@ struct SearchBoardResultView: View {
             
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
         }
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.boardBoostedRefresh.rawValue)
+            )
+        ) { notification in
+           guard let dict = notification.object as? [String: Any] else { return }
+            let boardId = dict["boardId"] as? Int ?? 0
+            
+            vm.updateBoost(isBoosted: true, boardId: boardId)
+        }
+
     }
     
+    func paymentGatewayOpen(product:ItemModel) {
+
+        paymentGateway = PaymentGatewayCentralized()
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                navigationController?.present(vc, animated: true)
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":product.id ?? 0], userInfo: nil)
+
+            }
+            
+      
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
+    }
     func pushToDetailScreen(item:ItemModel){
         let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
         self.navigationController?.pushViewController(hostingVC, animated: true)

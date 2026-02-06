@@ -13,15 +13,16 @@ import StoreKit
 import SwiftUI
 
 class PaymentGatewayCentralized{
+    
     private var ppPayment = PPPayment()
     private var merchantId = ""
     private var api_key = ""
     private var phonePeAppId = ""
-    var planObj:PlanModel?
     private  var paymentIntentId = ""
     private  var payment_method = ""
     private  var payment_method_type = 0
     private   var InAppReceipt = ""
+    var planObj:PlanModel?
     var campaign_banner_id:Int?
     var paymentFor:PaymentForEnum? = .adsPlan
     var banner_id:Int = 0
@@ -41,11 +42,17 @@ class PaymentGatewayCentralized{
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     var itemId:Int?
    
+    var selectedPlanId = 0
+    var selIOSProductID = ""
+    
     //MARK: Initialization Methods
     func initializeDefaults(){
-        
+        if selectedPlanId == 0{
+            //Done this because not want to add dependency of passing planmodel object only id is sufficient
+            selectedPlanId = planObj?.id ?? 0
+            selIOSProductID = planObj?.iosProductID ?? ""
+        }
         getPaymentSettings()
-        
     }
     
     
@@ -78,9 +85,12 @@ class PaymentGatewayCentralized{
                         if self?.payment_method_type == 1 {
                             //IN App Purchase
                           //  DispatchQueue.main.async {
-                                self?.openPaymentPay()
+                               // self?.openPaymentPay()
 
                            // }
+                            
+                            self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+
                             
                         }else if self?.payment_method_type == 3 {//Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
@@ -127,22 +137,37 @@ class PaymentGatewayCentralized{
     
     
   private  func openPaymentPay(){
-        if payment_method_type == 1 {//In App
-            self.IAPPaymentForm()
-        }else if payment_method_type == 3 {//Phone Pay
+      if payment_method_type == 1 {//In App
+          
+          if paymentFor == .bannerPromotion{
+              self.inAppCampaignPaymentIntent()
+          }else{
+              self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+          }
+          
+      }else if payment_method_type == 3 {//Phone Pay
             
             //  if isBannerPromotionPay{
                 
             if paymentFor == .bannerPromotion{
                 
-                getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
+//                getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
+                getIntentForBannerPromotions(package_id: selectedPlanId)
+
+                
            
             } else if paymentFor == .bannerPromotionDraft{
                 
-                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
+//                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
+                
+                revokeCampaignPaymentApi(package_id: selectedPlanId)
+
                 
             }else{
-                self.createPhonePayOrder(package_id: planObj?.id ?? 0)
+                
+//                self.createPhonePayOrder(package_id: planObj?.id ?? 0)
+
+                self.createPhonePayOrder(package_id: selectedPlanId)
 
             }
 
@@ -172,6 +197,12 @@ class PaymentGatewayCentralized{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    
+                    if let postItemId = self.itemId{
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
+                    }
                     self.callbackPaymentSuccess?(true)
 //                    if self.sheetViewController?.options.useInlineMode == true {
 //                        self.sheetViewController?.attemptDismiss(animated: true)
@@ -192,7 +223,7 @@ class PaymentGatewayCentralized{
     
     private func revokeCampaignPaymentApi(package_id:Int){
         
-        let params = ["banner_id":banner_id,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
+        let params = ["banner_id":banner_id,"payment_method":"PhonePe","package_id":selectedPlanId,"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
 
         URLhandler.sharedinstance.makeCall(url:  Constant.shared.revoke_campaign_payment, param: params, showLoader: true) {[weak self] responseObject, error in
             
@@ -234,7 +265,7 @@ class PaymentGatewayCentralized{
     private func getIntentForBannerPromotions(package_id:Int){
 
     
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(selectedPlanId),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
         guard let img = selectedImage?.wxCompress() else{ return }
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
@@ -368,11 +399,71 @@ class PaymentGatewayCentralized{
         }
     }
     
-    
-  private  func updateInAppPurchaseOrderApi(transactionId:String){
-        //
-        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city]
+    //MARK: For campaign banner intent
+    func inAppCampaignPaymentIntent(){
         
+        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"apple","package_id":selectedPlanId,"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        
+        guard let img = selectedImage?.wxCompress() else{ return }
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.inapp_campaign_payment_intent, params: params) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                            self?.campaign_banner_id = campaign_banner_id
+                        }
+                        
+                        if let payment_transaction = dataDict["payment_transaction"] as? Dictionary<String, Any>  {
+                            
+                            let orderId = payment_transaction["order_id"] as? String ?? ""
+                            let id = payment_transaction["id"] as? Int ?? 0
+                            let user_id = payment_transaction["user_id"] as? Int ?? 0
+                            
+                            self?.IAPPaymentForm(order_id: orderId, user_id: user_id, id: id)
+                        }
+                    }
+                    
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
+    }
+    
+    private  func updateInAppPurchaseOrderApi(transactionId:String,order_id:String,user_id:Int,id:Int){
+        //
+//        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city]
+//      
+      let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
+
+      var params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
+      
+       if let postItemId = itemId{
+          params["item_id"] = postItemId
+       }
+        
+        if order_id.count > 0{
+            params["order_id"] = order_id
+        }
+      
+       
+        if user_id > 0{
+            params["user_id"] = user_id
+        }
+      
+        if id > 0{
+            params["id"] = id
+        }
+    
         URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
             if(error != nil)
@@ -387,6 +478,12 @@ class PaymentGatewayCentralized{
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
+                    
+                    if let postItemId = self.itemId{
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
+                    }
                     self.callbackPaymentSuccess?(true)
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
@@ -397,10 +494,13 @@ class PaymentGatewayCentralized{
     }
     
     
-    internal func IAPPaymentForm(){
-        
-        if self.planObj != nil {
-            let productIDs:Array<String> = [self.planObj?.iosProductID ?? ""]
+    internal func IAPPaymentForm(order_id:String,user_id:Int,id:Int){
+        if  selIOSProductID.count > 0 {
+
+//        if self.planObj != nil || iosProductID != nil  {
+//            let productIDs:Array<String> = [self.planObj?.iosProductID ?? ""]
+            let productIDs:Array<String> = [self.selIOSProductID]
+
             //let productIDs:Array<String> = ["ads_bronze_package"]
             
             var productsArray:Array<SKProduct> = Array()
@@ -429,7 +529,8 @@ class PaymentGatewayCentralized{
                             print("payment_id \(transaction?.transactionIdentifier ?? "")")
                             let transactionId = transaction?.transactionIdentifier ?? ""
                             self?.getInAppReceipt()
-                            self?.updateInAppPurchaseOrderApi(transactionId: transactionId)
+                         //   self?.updateInAppPurchaseOrderApi(transactionId: transactionId,)
+                            self?.updateInAppPurchaseOrderApi(transactionId: transactionId, order_id: order_id, user_id: user_id, id: id)
                         }
                         //Show payment successfull messsage
                     }

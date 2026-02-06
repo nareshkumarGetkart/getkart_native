@@ -146,15 +146,28 @@ struct FavoriteBoardView: View {
                 ScrollView {
                     LazyVStack {
                         StaggeredGrid(columns: 2, spacing: 5) {
-                            //ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
-                                ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
 
-                                ProductCardStaggered1(
-                                    product: item,
-                                   // imgHeight: CGFloat(150 + (index % 2) * 50)
-                                ) { isLiked, boardId in
-                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }.contentShape(Rectangle())
+                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+
+                                    /*ProductCardStaggered1(
+                                        product: item,
+                                       // imgHeight: CGFloat(150 + (index % 2) * 50)
+                                        onTapBoostButton:{
+                                           // paymentGatewayOpen(product: item)
+                                            
+                                        }
+                                    ) { isLiked, boardId in
+                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                    }*/
+                                    
+                                    ProductCardStaggered1(
+                                        product: item,
+                                        sendLikeUnlikeObject: { isLiked, boardId in
+                                            vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                        },
+                                        onTapBoostButton: { }
+                                    )
+                                .contentShape(Rectangle())
                                 .onTapGesture {
                                     pushToDetailScreen(item: item)
                                 }
@@ -165,7 +178,7 @@ struct FavoriteBoardView: View {
                         }
                         .padding(5)
 
-                        // 👇 bottom detector (NO layout impact)
+                        //  bottom detector (NO layout impact)
                            GeometryReader { geo in
                                Color.clear
                                    .preference(
@@ -209,6 +222,17 @@ struct FavoriteBoardView: View {
             let boardId = dict["boardId"] as? Int ?? 0
 
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
+        }
+
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.boardBoostedRefresh.rawValue)
+            )
+        ) { notification in
+           guard let dict = notification.object as? [String: Any] else { return }
+            let boardId = dict["boardId"] as? Int ?? 0
+            
+            vm.updateBoost(isBoosted: true, boardId: boardId)
         }
 
     }

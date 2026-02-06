@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import SafariServices
 
 class BannerTblCell: UITableViewCell {
     
@@ -229,6 +230,9 @@ extension BannerTblCell{
         }
         
         if UIApplication.shared.canOpenURL(url) {
+            
+         /* let vc =   SFSafariViewController(url: url)
+            self.navigationController?.present(vc, animated: true)*/
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         } else {
             print("Cannot open URL")

@@ -93,6 +93,8 @@ struct ItemModel: Codable,Identifiable {
     var itemOffers:[ItemOffers]?
     let usedPackage:String?
     let outbondUrl:String?
+    let alreadyPurchased:Bool?
+    let package:Package?
     
     enum CodingKeys: String, CodingKey {
         case id, name, slug, description, image
@@ -128,7 +130,8 @@ struct ItemModel: Codable,Identifiable {
         case isPurchased = "is_purchased"
         case itemOffers = "item_offers"
         case usedPackage
-
+        case package = "package_info"
+        case alreadyPurchased = "already_purchased"
     }
 }
 

@@ -19,6 +19,8 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var imgViewLoc:UIImageView!
     @IBOutlet weak var lblBoost:UILabel!
     @IBOutlet weak var btnIsVerified:UIButton!
+    @IBOutlet weak var lblCapacity:UILabel!
+
 
     override func awakeFromNib() {
         super.awakeFromNib()

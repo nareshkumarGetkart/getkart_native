@@ -23,7 +23,7 @@ struct FollowerListView: View {
             }.frame(width: 40,height: 40)
             
             let strTitle = ((isFollower == true) ? "Followers" : "Following")
-            Text(strTitle).font(.custom("Manrope-Bold", size: 20.0))
+            Text(strTitle).font(.custom("Manrope-Bold", size: 18))
                 .foregroundColor(Color(UIColor.label))
             Spacer()
         }.frame(height:44).background(Color(UIColor.systemBackground))
