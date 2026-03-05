@@ -53,17 +53,17 @@ class HomeViewModel:ObservableObject{
         country = Local.shared.getUserCountry()
         state = Local.shared.getUserState()
         area = Local.shared.getUserLocality()
-
-       // if state.count > 0 || city.count > 0{
-            latitude = Local.shared.getUserLatitude()
-            longitude = Local.shared.getUserLongitude()
-//        }
+        
+        // if state.count > 0 || city.count > 0{
+        latitude = Local.shared.getUserLatitude()
+        longitude = Local.shared.getUserLongitude()
+        //        }
         getSliderListApi()
         getCategoriesListApi()
-        getFeaturedListApi()
         if Local.shared.getUserId() > 0{
             getMyAdsApi()
         }
+        getFeaturedListApi()
     }
     
     

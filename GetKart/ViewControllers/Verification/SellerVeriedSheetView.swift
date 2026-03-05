@@ -13,7 +13,7 @@ struct SellerVeriedSheetView: View {
 
     var body: some View {
         VStack(spacing: 10){
-            HStack{ Spacer()}.frame(height: 5)
+          //  HStack{ Spacer()}.frame(height: 5)
             Spacer()
             Text("Verified Seller").font(.title)
             VStack(alignment: .leading){

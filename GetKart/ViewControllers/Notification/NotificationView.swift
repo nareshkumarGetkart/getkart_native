@@ -27,7 +27,7 @@ struct NotificationView: View {
                     .foregroundColor(Color(UIColor.label))
                     .padding()
             }
-            Text("Notifications").font(.custom("Manrope-Bold", size: 20.0))
+            Text("Notifications").font(.manrope(.medium, size: 18.0)) 
                 .foregroundColor(Color(UIColor.label))
             
             Spacer()
@@ -36,12 +36,12 @@ struct NotificationView: View {
         
         
         VStack{
-            HStack{Spacer()}
+           // HStack{Spacer()}
             
             ScrollView {
                 
-                HStack{  }.frame(height: 5)
-                LazyVStack(spacing: 10) {
+               HStack{  }.frame(height: 5)
+                LazyVStack(spacing: 8) {
                     ForEach(listArray) { notification in
                         NotificationRow(notification: notification)
                           

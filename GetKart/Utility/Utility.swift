@@ -107,6 +107,11 @@ extension Font {
         case medium
         case regular
         case extraBold
+        case inter_18pt_Italic
+        case inter_18pt_BoldItalic
+        case inter_18pt_ExtraBoldItalic
+
+        
         
         case custom(String)
         
@@ -127,6 +132,13 @@ extension Font {
                 return "Inter-Regular"
             case .extraBold:
                 return "Manrope-Black"
+            case .inter_18pt_Italic:
+                return "Inter_18pt-Italic"
+            case .inter_18pt_BoldItalic:
+                return "Inter_18pt-BoldItalic"
+            case .inter_18pt_ExtraBoldItalic:
+                return "Inter_18pt-ExtraBoldItalic"
+                                
             }
         }
         

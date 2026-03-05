@@ -15,27 +15,24 @@ struct FavoriteAdsView: View {
     
     var body: some View {
         
-      //  HeaderView(navigation:navigation).frame(height: 44)
         
         VStack{
             
             if objVM.listArray.count == 0 && !objVM.isDataLoading{
-            
+                
                 NoDataView()
                 
             }else{
                 
                 ScrollView {
                     
-                  //  HStack{ Spacer() }.frame(height: 10)
-                    
-                    LazyVStack(spacing: 10) {
+                    LazyVStack(spacing: 8) {
                         ForEach($objVM.listArray) { $item in
-
+                            
                             FavoritesCell(itemObj: $item)
                                 .onTapGesture {
                                     
-                                   var destView = ItemDetailView(navController:  self.navigation, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
+                                    var destView = ItemDetailView(navController:  self.navigation, itemId:item.id ?? 0,itemObj: item,slug: item.slug)
                                     destView.returnValue = { value in
                                         if let obj = value {
                                             
@@ -63,7 +60,7 @@ struct FavoriteAdsView: View {
                 .scrollIndicators(.hidden, axes: .vertical)
                 .padding(.horizontal, 10)
             }
-                        
+            
         }.navigationBarHidden(true).background(Color(.systemGray6))
             .onAppear{
                 
@@ -92,8 +89,6 @@ struct FavoriteAdsView: View {
 }
 
 
-
-
 struct FavoritesCell:View {
     
     @Binding var itemObj:ItemModel
@@ -105,25 +100,24 @@ struct FavoritesCell:View {
              
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
-                 .frame(width: 120,height: 115)
-                    .cornerRadius(10, corners: [.topRight, .bottomRight])
+                 .frame(width: 120,height: 120)
+                    .cornerRadius(15, corners: [.topRight, .bottomRight])
                 
                 
                 KFImage(URL(string:  itemObj.image ?? ""))
                     .placeholder {
                         Image("getkartplaceholder")
-                        .frame(width: 120,height: 115).aspectRatio(contentMode: .fit).cornerRadius(5)
+                        .frame(width: 120,height: 120).aspectRatio(contentMode: .fit).cornerRadius(15)
                     }
                     .setProcessor(
                         DownsamplingImageProcessor(size: CGSize(width: widthScreen / 2.0 - 15,
                                                                 height: widthScreen / 2.0 - 15))
                     )
-                    //.resizable().frame(width: 120,height: 115).cornerRadius(5)
                 
                     .resizable()
                     .scaledToFit()
                     .clipped()
-                    .frame(width: 120,height: 115).cornerRadius(5)
+                    .frame(width: 120,height: 120).cornerRadius(15)
                     .padding(1)
                 
                 if (itemObj.isFeature ?? false) == true{
@@ -141,11 +135,10 @@ struct FavoritesCell:View {
                 }
             }
             
-            VStack(alignment: .leading, spacing: 5){
+            VStack(alignment: .leading, spacing: 1){
                 HStack{
                     Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.manrope(.bold, size: 15)).foregroundColor(Color(CustomColor.sharedInstance.priceColor))
                         
-                        //.foregroundColor(Color(hex: "#FF9900"))
                     Spacer()
                     Button {
                         if AppDelegate.sharedInstance.isUserLoggedInRequest(){
@@ -154,8 +147,7 @@ struct FavoritesCell:View {
                     } label: {
                         let isLike = (itemObj.isLiked ?? false)
 
-                        Image(isLike ? "like_fill" : "like").renderingMode(.template).frame(width: 20, height: 20, alignment: .center)
-                            //.foregroundColor(.gray)
+                        Image(isLike ? "like_fill" : "like").renderingMode(.template).frame(width: 19, height: 19, alignment: .center)
                             .foregroundColor(isLike ? Color(.systemOrange) : .gray)
                             .padding(5)
                             .background(Color(UIColor.systemBackground))
@@ -166,20 +158,21 @@ struct FavoritesCell:View {
                 }
                 
                 Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.manrope(.semiBold, size: 14)).foregroundColor(Color(UIColor.label))
-                    .padding(.bottom,10).padding(.trailing)
-                
+                    .padding(.trailing)
                 
                let matchedCatId = matchedCategoryId(from: itemObj.allCategoryIDS ?? "") ?? 0
                 
                 if matchedCatId > 0{
                     Text(callSpecificValueBasedOnCategory(catId:matchedCatId, list: itemObj.customFields ?? [])).foregroundColor(Color(UIColor.label))
                         .multilineTextAlignment(.leading).lineLimit(1)
-                        .font(Font.manrope(.regular, size: 12))//.frame(height:12)
+                        .font(Font.manrope(.regular, size: 12))
                 }
                 
                 HStack(spacing:2){
-                    Image("location-outline").resizable().renderingMode(.template).frame(width: 15, height: 15).foregroundColor(.gray)
-                    Text(itemObj.address ?? "").multilineTextAlignment(.leading).font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
+                    Image("location-outline").resizable().renderingMode(.template)
+                        .frame(width: 15, height: 15).foregroundColor(.gray)
+                    Text(itemObj.address ?? "").multilineTextAlignment(.leading).lineLimit(1)
+                        .font(Font.manrope(.regular, size: 12)).foregroundColor(.gray).padding(.trailing)
                     Spacer()
                     
                     if (itemObj.user?.isVerified ?? 0) == 1{
@@ -206,14 +199,15 @@ struct FavoritesCell:View {
                 
             }.padding([.top,.bottom],10)
             
-        }.frame(height: 115)
+        }.frame(height: 120)
            
             .background(Color(UIColor.systemBackground)).cornerRadius(15)
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                     .stroke(Color.gray, lineWidth: 0.5)
             )
-            .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.05), radius:15, x: 0, y: 2)
+            .clipped()
         
     }
     

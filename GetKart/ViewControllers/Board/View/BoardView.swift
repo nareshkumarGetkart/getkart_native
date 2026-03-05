@@ -483,7 +483,7 @@ struct ProductCardStaggered1: View {
                         outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
                     } label: {
                         HStack(spacing:2){
-                            Text("Buy Now")
+                            Text(product.ctaLabel ?? "Buy Now")
                                 .font(.inter(.medium, size: 11))
                                 .foregroundColor(.white)
                             Image("upRight")

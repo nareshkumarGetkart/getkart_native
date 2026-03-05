@@ -224,19 +224,24 @@ extension BannerTblCell{
         }
     }else if (sliderObj?.thirdPartyLink?.count ?? 0) > 0{
         
-        guard let url = URL(string: sliderObj?.thirdPartyLink ?? "") else {
-            print("Invalid URL")
-            return
-        }
-        
-        if UIApplication.shared.canOpenURL(url) {
-            
-         /* let vc =   SFSafariViewController(url: url)
-            self.navigationController?.present(vc, animated: true)*/
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else {
-            print("Cannot open URL")
-        }
+        var finalString = sliderObj?.thirdPartyLink?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+         if !finalString.lowercased().hasPrefix("http://") &&
+            !finalString.lowercased().hasPrefix("https://") {
+             finalString = "https://" + finalString
+         }
+
+     guard let url = URL(string: finalString) else {
+         print("Invalid URL")
+         return
+     }
+     
+     if UIApplication.shared.canOpenURL(url) {
+       //  if sliderObj?.
+         UIApplication.shared.open(url, options: [:], completionHandler: nil)
+     } else {
+         print("Cannot open URL")
+     }
     }else if sliderObj?.modelType?.contains("Category") == true {
 
         

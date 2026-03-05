@@ -41,7 +41,7 @@ struct Seller: Codable {
     let showPersonalDetails, isVerified: Int?
     var isFollowing: Bool?
     let averageRating: String?
-    var followersCount, followingCount, items: Int?
+    var followersCount, followingCount, items, boards: Int?
     var isBlock: Int?
 
     enum CodingKeys: String, CodingKey {
@@ -61,7 +61,7 @@ struct Seller: Codable {
         case isFollowing
         case averageRating = "average_rating"
         case followersCount, followingCount, items
-        case isBlock
+        case isBlock,boards
     }
 }
 

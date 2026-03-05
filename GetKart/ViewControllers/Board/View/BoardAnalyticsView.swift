@@ -274,8 +274,28 @@ struct BoardAnalyticsView: View {
     }
     
     func pushToEditBanner(){
-        let destVC = UIHostingController(rootView: CreateBoardView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
-        self.navigationController?.pushViewController(destVC, animated: true)
+        
+         if objAnalytics?.board?.boardType  == 1{
+             
+             let destVC = UIHostingController(rootView: CreatePromotionalAdsView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
+             self.navigationController?.pushViewController(destVC, animated: true)
+             
+         }else  if objAnalytics?.board?.boardType  == 2{
+             
+             let destVC = UIHostingController(rootView: CreatePromotionalVideoAdsView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
+             self.navigationController?.pushViewController(destVC, animated: true)
+             
+         }else  if objAnalytics?.board?.boardType  == 3{
+             
+             let destVC = UIHostingController(rootView: CreateIdeaView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
+             self.navigationController?.pushViewController(destVC, animated: true)
+             
+         }else{
+             
+             let destVC = UIHostingController(rootView: CreateBoardView(navigationController: self.navigationController, isFromEdit: true, boardId: boardId))
+             self.navigationController?.pushViewController(destVC, animated: true)
+             
+         }
     }
     
     func getBoardAnanlytics(){

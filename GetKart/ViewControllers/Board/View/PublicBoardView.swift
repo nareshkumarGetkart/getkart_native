@@ -18,6 +18,9 @@ struct PublicBoardView: View {
     @StateObject private var categoryVM = CategoryViewModel(type: 2,isToShowLoader: false)
     @StateObject private var boardStore = BoardStore()   //  STORE
     @State private var loadedCategoryIds: Set<Int> = []
+    @State private var openSafari: Bool = false
+    @State private var outboundUrlClicked: String = ""
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,7 +32,7 @@ struct PublicBoardView: View {
                 selected: $selectedName,
                 selectedCategoryId: $selectedCategoryId,
                 categoryVM: categoryVM
-            )        .background(Color(.systemBackground))
+            ).background(Color(.systemBackground))
             
             if selectedCategoryId > 0{
                 /*   TabView(selection: $selectedCategoryId) {
@@ -55,7 +58,8 @@ struct PublicBoardView: View {
                             
                             BoardListView(
                                 vm: boardStore.vm(for: cat.id ?? 0),
-                                navigationController: boardNav
+                                navigationController: boardNav,
+                                isActive: selectedCategoryId == cat.id
                             )
                             .opacity(selectedCategoryId == cat.id ? 1 : 0)
                             .allowsHitTesting(selectedCategoryId == cat.id)
@@ -81,8 +85,24 @@ struct PublicBoardView: View {
                 )        }
             
             Spacer()
-        }.onChange(of: selectedCategoryId) { newId in
-            markTabLoaded(newId)
+        }
+//        .onChange(of: selectedCategoryId) { newId in
+//            markTabLoaded(newId)
+//        }
+        
+        .onChange(of: selectedCategoryId) { newId in
+           
+              FeedVideoManager.shared.pauseAll()
+                FeedVideoManager.shared.muteAll()
+                markTabLoaded(newId)
+            // 2️⃣ Clear all video frames (important)
+//            NotificationCenter.default.post(
+//                name: Notification.Name("PauseAllVideos"),
+//                object: nil
+//            )
+//            
+//            // 3️⃣ Load tab
+//            markTabLoaded(newId)
         }
         .onAppear {
             markTabLoaded(selectedCategoryId)
@@ -115,12 +135,15 @@ struct PublicBoardView: View {
             selectedName = "All"
 
             // 2️⃣ Get ALL category VM
-            let allVM = boardStore.vm(for: 55555)
+           // let allVM = boardStore.vm(for: 55555)
 
             // 3️⃣ Refresh ONLY that VM
-            Task {
-                await allVM.refresh()
-            }
+//            Task {
+//                await allVM.refresh()
+//                
+//            }
+            
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
         }
     
     private func swipeCategory(left: Bool) {
@@ -146,18 +169,6 @@ struct PublicBoardView: View {
 final class BoardStore: ObservableObject {
     
     @Published private(set) var boardVMs: [Int: BoardViewModelNew] = [:]
-
-  /*  @MainActor
-    func vm(for categoryId: Int) -> BoardViewModelNew {
-        if let vm = boardVMs[categoryId] {
-            return vm
-        }
-
-        let vm = BoardViewModelNew(categoryId: categoryId)
-        boardVMs[categoryId] = vm
-        return vm
-    }
-    */
     @MainActor
     func vm(for categoryId: Int) -> BoardViewModelNew {
         if let vm = boardVMs[categoryId] {
@@ -183,7 +194,7 @@ struct CategoryTabsNew: View {
     @State private var didSetupDefault = false
     @Environment(\.scrollToTopProxy) private var scrollToTopProxy
     @State private var categoryScrollProxy: ScrollViewProxy?   // CORRECT PROXY
-
+    
     var body: some View {
         VStack(spacing: 0) {
 
@@ -293,26 +304,26 @@ struct CategoryTabsNew: View {
 }
 
 
-struct BoardPageView: View {
-
-    let categoryId: Int
-    let navigationController: UINavigationController?
-
-    @StateObject private var vm: BoardViewModelNew
-
-    init(categoryId: Int, navigationController: UINavigationController?) {
-        self.categoryId = categoryId
-        self.navigationController = navigationController
-        _vm = StateObject(wrappedValue: BoardViewModelNew(categoryId: categoryId))
-    }
-
-    var body: some View {
-        BoardListView(
-            vm: vm,
-            navigationController: navigationController
-        )
-    }
-}
+//struct BoardPageView: View {
+//
+//    let categoryId: Int
+//    let navigationController: UINavigationController?
+//
+//    @StateObject private var vm: BoardViewModelNew
+//
+//    init(categoryId: Int, navigationController: UINavigationController?) {
+//        self.categoryId = categoryId
+//        self.navigationController = navigationController
+//        _vm = StateObject(wrappedValue: BoardViewModelNew(categoryId: categoryId))
+//    }
+//
+//    var body: some View {
+//        BoardListView(
+//            vm: vm,
+//            navigationController: navigationController
+//        )
+//    }
+//}
 
 
 struct BoardListView: View {
@@ -322,22 +333,47 @@ struct BoardListView: View {
     @State private var userDidScroll = false  //  User intent + safety locks
     @State private var paginationConsumed = false
     @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    //  ADD THESE
+    @State private var lastItemCount: Int = 0
+    @State private var scrollTick: Int = 0
+    @State private var lastScrollTick: Int = 0
+    
     private let prefetchOffset = 4   //  call API before 4 items
     @State private var paymentGateway: PaymentGatewayCentralized?
+
+
+    @State private var videoFrames: [Int: CGRect] = [:]
+   // @ObservedObject private var manager = FeedVideoManager.shared
+    @State private var visibilityWorkItem: DispatchWorkItem?
+    let isActive: Bool   //  ADD THIS
+    
+    @State private var openSafari: Bool = false
+    @State private var outboundUrlClicked: String = ""
 
     var body: some View {
 
         ScrollViewReader { proxy in
             ScrollView {
+                Color.clear
+                    .frame(height: 0)
+                    .id("TOP")
 
+                    .overlay(
+                        GeometryReader { geo in
+                            Color.clear
+                                .onChange(of: geo.frame(in: .global).minY) { _ in
+                                    scrollTick += 1
+                                }
+                        }
+                    )
+
+                
                 if vm.items.isEmpty && !vm.isLoading && vm.hasLoadedOnce{
                    emptyView.padding(.top, 100)
 
                 } else {
 
-                    Color.clear
-                        .frame(height: 0)
-                        .id("TOP")
+                  
 
                     let columns = splitColumns()
 
@@ -345,9 +381,102 @@ struct BoardListView: View {
 
                         // LEFT COLUMN
                         LazyVStack(spacing: 6) {
-                            ForEach(columns.left.indices, id: \.self) { index in
-                                let item = columns.left[index]
+//                            ForEach(columns.left.indices, id: \.self) { index in
+//                                let item = columns.left[index]
+                                
+                                ForEach(columns.left, id: \.id) { item in
 
+                                if item.boardType == 2 {
+                                    SmartVideoPlayerView(
+                                        item: item,
+                                        onTapBottomButton: {
+                                        //Tapped video
+                                            if (item.outbondUrl ?? "").count > 0{
+                                                outboundUrlClicked =  item.outbondUrl ?? ""
+                                                openSafari = true
+                                            }
+                                        }
+                                    )
+                                        .background(
+                                            GeometryReader { geo in
+                                                Color.clear
+                                                    .onAppear {
+                                                        videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    }
+                                                    .onChange(of: geo.frame(in: .global)) { frame in
+                                                        videoFrames[item.id ?? 0] = frame
+                                                    }
+                                            }
+                                        )
+                                        .measureHeight(id: item.id ?? 0)
+                                        .onAppear {
+                                            handlePrefetch(itemIndex: globalIndex(of: item))
+                                        }
+                                } else {
+                                    CardItemView(
+                                        item: item,
+                                        onLike: { isLiked, boardId in
+                                            vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                        },
+                                        onTap: { pushToDetail(item: item) },
+                                        onTapBoostButton:{
+                                            if item.boardType == 1{
+                                                //Clicking on bottom prmotional
+                                                if (item.outbondUrl ?? "").count > 0{
+
+                                                    outboundUrlClicked =  item.outbondUrl ?? ""
+                                                    openSafari = true
+                                                }
+                                            }else{
+                                                paymentGatewayOpen(product: item)
+                                            }
+                                            
+                                        }
+                                    )
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                        handlePrefetch(itemIndex: globalIndex(of: item))
+                                    }
+                                }
+                            }
+                        }
+
+                        // RIGHT COLUMN
+                        LazyVStack(spacing: 6) {
+                          //  ForEach(columns.right.indices, id: \.self) { index in
+                                
+                                ForEach(columns.right, id: \.id) { item in
+                              //  let item = columns.right[index]
+                                
+                                if item.boardType == 2 {
+                                   
+                                    SmartVideoPlayerView(
+                                        item: item,
+                                        onTapBottomButton: {
+                                        //Tapped vide
+                                            if (item.outbondUrl ?? "").count > 0{
+
+                                                outboundUrlClicked =  item.outbondUrl ?? ""
+                                                openSafari = true
+                                            }
+                                        }
+                                    )
+                                        .background(
+                                            GeometryReader { geo in
+                                                Color.clear
+                                                    .onAppear {
+                                                        videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    }
+                                                    .onChange(of: geo.frame(in: .global)) { frame in
+                                                        videoFrames[item.id ?? 0] = frame
+                                                    }
+                                            }
+                                        )
+                                        .measureHeight(id: item.id ?? 0)
+                                        .onAppear {
+                                            handlePrefetch(itemIndex: globalIndex(of: item))
+                                        }
+                                } else {
                                 CardItemView(
                                     item: item,
                                     onLike: { isLiked, boardId in
@@ -355,8 +484,16 @@ struct BoardListView: View {
                                     },
                                     onTap: { pushToDetail(item: item) },
                                     onTapBoostButton:{
-                                        paymentGatewayOpen(product: item)
                                         
+                                        if item.boardType == 1{
+                                            //Tapped on prmotional button
+                                            if (item.outbondUrl ?? "").count > 0{
+                                                outboundUrlClicked =  item.outbondUrl ?? ""
+                                                openSafari = true
+                                            }
+                                        }else{
+                                            paymentGatewayOpen(product: item)
+                                        }
                                     }
                                 )
                                 .measureHeight(id: item.id ?? 0)
@@ -364,27 +501,6 @@ struct BoardListView: View {
                                     handlePrefetch(itemIndex: globalIndex(of: item))
                                 }
                             }
-                        }
-
-                        // RIGHT COLUMN
-                        LazyVStack(spacing: 6) {
-                            ForEach(columns.right.indices, id: \.self) { index in
-                                let item = columns.right[index]
-
-                                CardItemView(
-                                    item: item,
-                                    onLike: { isLiked, boardId in
-                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                    },
-                                    onTap: { pushToDetail(item: item) },
-                                    onTapBoostButton:{
-                                        paymentGatewayOpen(product: item)
-                                    }
-                                )
-                                .measureHeight(id: item.id ?? 0)
-                                .onAppear {
-                                    handlePrefetch(itemIndex: globalIndex(of: item))
-                                }
                             }
                         }
                     }
@@ -396,20 +512,40 @@ struct BoardListView: View {
                 }
             }.ignoresSafeArea(.container, edges: [.bottom,.top])
 
+                .onDisappear {
+                    FeedVideoManager.shared.pauseAll()
+
+                }
+              
             //  Detect REAL user scroll
-            .simultaneousGesture(
-                DragGesture()
-                    .onEnded { _ in
-                        userDidScroll = true
-                        paginationConsumed = false
-                    }
-            )
+                .simultaneousGesture(
+                        DragGesture()
+                            .onEnded { _ in
+                                
+                                userDidScroll = true
+                                paginationConsumed = false
+                                
+                                scheduleVisibilityUpdate()
+                            }
+                    )
+                
+
+            .onChange(of: vm.items.count) { _ in
+                paginationConsumed = false
+            }
 
             .refreshable {
                 await vm.refresh()
                 userDidScroll = false
                 paginationConsumed = false
                 itemHeights.removeAll()
+                
+                // ADD
+                  lastItemCount = 0
+                  lastScrollTick = scrollTick
+               
+                FeedVideoManager.shared.reset()
+                videoFrames.removeAll()
             }
 
             .task {
@@ -451,7 +587,13 @@ struct BoardListView: View {
                 
                 vm.updateBoost(isBoosted: true, boardId: boardId)
             }
+            
+            .onChange(of: isActive) { active in
+                if !active {
+                    FeedVideoManager.shared.pauseAll()
 
+                }
+            }
             
             //  Capture measured heights
             .onPreferenceChange(ItemHeightKey.self) { value in
@@ -468,13 +610,90 @@ struct BoardListView: View {
                     userDidScroll = false
                     paginationConsumed = false
                     itemHeights.removeAll()
+                    
+                    // ADD
+                      lastItemCount = 0
+                      lastScrollTick = scrollTick
+                    
+                    FeedVideoManager.shared.reset()
+                    videoFrames.removeAll()
+                }
+            }
+            
+           /* .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name("PauseAllVideos")
+                )
+            ) { _ in
+                
+                FeedVideoManager.shared.visibleVideoIDs = []
+                FeedVideoManager.shared.soundVideoID = nil
+                videoFrames.removeAll()
+            }*/
+            
+            .fullScreenCover(isPresented: $openSafari) {
+              
+                if let url = URL(string:outboundUrlClicked.getValidUrl())  {
+                    
+                    SafariView(url:url)
                 }
             }
 
         }
     }
-
     
+    
+    func getUrlValid(strURl:String) ->String{
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+            !urlString.lowercased().hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
+        return urlString
+    }
+
+    private func scheduleVisibilityUpdate() {
+        
+        visibilityWorkItem?.cancel()
+        
+        let work = DispatchWorkItem {
+            calculateVisibleVideos()
+        }
+        
+        visibilityWorkItem = work
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
+ 
+    private func calculateVisibleVideos() {
+        
+        guard isActive else {
+            FeedVideoManager.shared.pauseAll()
+            return
+        }
+
+        let screenHeight = UIScreen.main.bounds.height
+        var visibleSet: Set<Int> = []
+
+        for (id, frame) in videoFrames {
+
+            if frame.maxY <= 0 || frame.minY >= screenHeight {
+                continue
+            }
+
+            let visibleHeight =
+                min(frame.maxY, screenHeight)
+                - max(frame.minY, 0)
+
+            let percent = visibleHeight / frame.height
+
+            if percent >= 0.3 {
+                visibleSet.insert(id)
+            }
+        }
+
+        FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
+    }
     
     func paymentGatewayOpen(product:ItemModel) {
 
@@ -510,7 +729,7 @@ struct BoardListView: View {
     }
 
     // MARK: -  Prefetch Logic (FINAL & SAFE)
-    private func handlePrefetch(itemIndex: Int?) {
+   /* private func handlePrefetch(itemIndex: Int?) {
 
         guard let index = itemIndex else { return }
 
@@ -526,7 +745,36 @@ struct BoardListView: View {
         userDidScroll = false
 
         vm.tryLoadNextPage()
+    }*/
+    
+    private func handlePrefetch(itemIndex: Int?) {
+
+        guard let index = itemIndex else { return }
+
+        let triggerIndex = max(vm.items.count - prefetchOffset, 0)
+
+        // 1️⃣ Near bottom
+        guard index >= triggerIndex else { return }
+
+        // 2️⃣ Real scroll happened (works on all devices)
+        guard scrollTick > lastScrollTick else { return }
+
+        // 3️⃣ Prevent re-trigger for same data set
+        guard vm.items.count > lastItemCount else { return }
+
+        // 4️⃣ Safety guards
+        guard !vm.isLoading else { return }
+        guard !vm.isLastPage else { return }
+
+        paginationConsumed = true
+        userDidScroll = false
+
+        lastItemCount = vm.items.count
+        lastScrollTick = scrollTick
+
+        vm.tryLoadNextPage()
     }
+
 
     // MARK: - Split into 2 staggered columns
     private func splitColumns() -> (left: [ItemModel], right: [ItemModel]) {
@@ -578,6 +826,7 @@ struct BoardListView: View {
     }
 }
 
+
 struct CardItemView: View {
     let item: ItemModel
     let onLike: (Bool, Int) -> Void
@@ -586,8 +835,23 @@ struct CardItemView: View {
 
 
     var body: some View {
-        ProductCardStaggered(product: item, sendLikeUnlikeObject: onLike, onTapBoostButton: onTapBoostButton)
-            .onTapGesture(perform: onTap)
+        
+        if item.boardType == 1{
+            //Image ads view
+            PromotionalAdsCardStaggered(product: item, onTapBottomtButton: onTapBoostButton)
+        }
+//        else if item.boardType == 2{
+//            //Video ads
+//            SmartVideoPlayerView(item: item)
+//
+//        }
+        else if item.boardType == 3{
+            //Idea View
+            IdeaCardStaggered(product: item).onTapGesture(perform: onTap)
+        }else{
+            ProductCardStaggered(product: item, sendLikeUnlikeObject: onLike, onTapBoostButton: onTapBoostButton)
+                .onTapGesture(perform: onTap)
+        }
     }
 }
 
@@ -620,7 +884,15 @@ struct PrefetchTriggerView: View {
     }
 }
 
+// MARK: - PreferenceKey for Video Frames
+struct VideoFramePreferenceKey: PreferenceKey {
+    static var defaultValue: [Int: CGRect] = [:]
 
+    static func reduce(value: inout [Int: CGRect],
+                       nextValue: () -> [Int: CGRect]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
 
 
 extension PublicBoardView{
@@ -707,7 +979,6 @@ extension PublicBoardView{
 struct ProductCardStaggered: View {
 
     @State private var showSafari = false
-//    @State private var paymentGateway: PaymentGatewayCentralized?
     let product: ItemModel
     let sendLikeUnlikeObject: (Bool, Int) -> Void
     @State private var imageRatio: CGFloat = 1
@@ -742,7 +1013,8 @@ struct ProductCardStaggered: View {
                         outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
                     } label: {
                         HStack(spacing:2){
-                            Text("Buy Now")
+                           
+                            Text(product.ctaLabel ?? "Buy Now")
                                 .font(.inter(.medium, size: 11))
                                 .foregroundColor(.white)
                             Image("upRight")
@@ -781,6 +1053,7 @@ struct ProductCardStaggered: View {
                 }
             } .padding(.horizontal,4)
             
+           
             VStack(alignment: .leading,spacing: 0){
                 
                 Text(product.name ?? "").foregroundColor(Color(.label))
@@ -809,7 +1082,6 @@ struct ProductCardStaggered: View {
                         // Boost action
                         onTapBoostButton()
                      
-                        //paymentGatewayOpen()
                     } label: {
                         Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
                             .font(.inter(.semiBold, size: 14))
@@ -851,7 +1123,6 @@ struct ProductCardStaggered: View {
         
     }
     
-    
     func getUrlValid(strURl:String) ->String{
         var urlString = strURl
         if !urlString.lowercased().hasPrefix("http://") &&
@@ -888,45 +1159,139 @@ struct ProductCardStaggered: View {
             }
         }
     }
-    
-    
-   /* func paymentGatewayOpen() {
-
-        paymentGateway = PaymentGatewayCentralized()  
-        paymentGateway?.selectedPlanId = product.package?.id ?? 0
-        paymentGateway?.categoryId = product.categoryID ?? 0
-        paymentGateway?.itemId = product.id ?? 0
-        paymentGateway?.paymentFor = .boostBoard
-        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
-
-        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
-
-            if isSuccess {
-                let vc = UIHostingController(
-                    rootView: PlanBoughtSuccessView(
-                        navigationController: AppDelegate.sharedInstance.navigationController
-                    )
-                )
-                vc.modalPresentationStyle = .overFullScreen
-                vc.modalTransitionStyle = .crossDissolve
-                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-                AppDelegate.sharedInstance.navigationController?.present(vc, animated: true)
-                
-                
-                
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":self.product.id ?? 0], userInfo: nil)
-
-            }
-            
-      
-               self.paymentGateway = nil
-        }
-
-        paymentGateway?.initializeDefaults()
-    }*/
 }
 
 
+struct IdeaCardStaggered: View {
+
+    let product: ItemModel
+    @State private var imageRatio: CGFloat = 1
+
+    var body: some View {
+            
+            ZStack(alignment:.bottomTrailing) {
+
+                    KFImage(URL(string: product.image ?? ""))
+                      .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        )
+                        .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                        .cornerRadius(10)
+                            .shadow(
+                                color: Color.black.opacity(0.10),
+                                radius: 7,
+                                x: 0,
+                                y: 2
+                            )
+            }
+         
+        .background(Color(.systemBackground))
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .clipShape(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+        ).contentShape(Rectangle())
+        
+      }
+        
+    
+    
+    func getUrlValid(strURl:String) ->String{
+        var urlString = strURl
+        if !urlString.lowercased().hasPrefix("http://") &&
+              !urlString.lowercased().hasPrefix("https://") {
+               urlString = "https://" + urlString
+           }
+        return urlString
+    }
+    
+   
+    func outboundClickApi(strURl:String,boardId:Int){
+        
+        let params = ["board_id":boardId]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
+            
+            if error == nil{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                _ = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                }else{
+                }
+            }
+        }
+    }
+
+}
+
+
+struct PromotionalAdsCardStaggered: View {
+
+    let product: ItemModel
+    @State private var imageRatio: CGFloat = 1
+    let onTapBottomtButton: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            
+            ZStack(alignment:.topTrailing) {
+
+                    KFImage(URL(string: product.image ?? ""))
+                      .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        )
+                        .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                        //.cornerRadius(10)
+                            .shadow(
+                                color: Color.black.opacity(0.10),
+                                radius: 7,
+                                x: 0,
+                                y: 2
+                            )
+            }
+            
+            // CTA (Attached like screenshot)
+            
+            HStack {
+                Text(product.ctaLabel ?? "Learn more")
+                    .foregroundColor(.white)
+                    .font(.system(size: 14, weight: .medium))
+                
+                Spacer()
+                
+                Image(systemName: "arrow.up.right")
+                    .foregroundColor(.white)
+                    .font(.system(size: 12))
+            }
+            .padding(.horizontal, 10)
+            .frame(height: 35)
+            .frame(maxWidth: .infinity)
+            .background(Color.orange)
+            .onTapGesture {
+                onTapBottomtButton()
+            }
+         
+        }
+        .background(Color(.systemBackground))
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .clipShape(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+        ).contentShape(Rectangle())
+       
+        
+    }
+}
 
 
 /*

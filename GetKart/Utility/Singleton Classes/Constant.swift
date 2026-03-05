@@ -53,10 +53,116 @@ final class Constant: NSObject {
         }
     }
     
-    
    let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
+  
+    
+    
+    
+    var edit_comment:String{
+        get{
+            return "\(baseURL)/v2/edit-comment"
+        }
+    }
+    
+    
+    var edit_reply:String{
+        get{
+            return "\(baseURL)/v2/edit-reply"
+        }
+    }
+    
+    var delete_reply:String{
+        get{
+            return "\(baseURL)/v2/delete-reply"
+        }
+    }
+
+    
+    var get_comments:String{
+        get{
+            return "\(baseURL)/v2/get-comments"
+        }
+    }
+    
+    var add_comment:String{
+        get{
+            return "\(baseURL)/v2/add-comment"
+        }
+    }
+    
+    var add_reply:String{
+        get{
+            return "\(baseURL)/v2/add-reply"
+        }
+    }
+    
+    
+    var get_replies:String{
+        get{
+            return "\(baseURL)/v2/get-replies"
+        }
+    }
+    
+    
      
+    
+    var like_comment:String{
+        get{
+            return "\(baseURL)/v2/like-comment"
+        }
+    }
+    
+    var unlike_comment:String{
+        get{
+            return "\(baseURL)/v2/unlike-comment"
+        }
+    }
+    
+  
+    
+    
+    var delete_comment:String{
+        get{
+            return "\(baseURL)/v2/delete-comment"
+        }
+    }
+    var update_promotional_board:String{
+        
+        get{
+            return "\(baseURL)/v2/update-promotional-board"
+        }
+    }
+    
+    var create_promotional_board:String{
+        
+        get{
+            return "\(baseURL)/v2/create-promotional-board"
+        }
+    }
+    
+    
+    var create_ideas:String{
+        get{
+            return "\(baseURL)/v2/create-ideas"
+        }
+    }
+    
+    var update_ideas:String{
+        get{
+            return "\(baseURL)/v2/update-ideas"
+        }
+    }
+    
+    
+     
+    
+    var get_cta_options:String{
+        get {
+            //?type = : // 0=product,1=business,2=ideas
+            return "\(baseURL)/v1/get-cta-options"
+        }
+    }
     
     
     
@@ -189,14 +295,14 @@ final class Constant: NSObject {
     
     var  create_board:String {
         get {
-            return "\(baseURL)/v1/create-board"
+            return "\(baseURL)/v2/create-board"
         }
     }
     
     
     var  update_board:String {
         get {
-            return "\(baseURL)/v1/update-board"
+            return "\(baseURL)/v2/update-board"
         }
     }
     
@@ -399,6 +505,14 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var get_seller_item:String{
+        get {
+            return "\(Constant.shared.baseURL)/v2/get-seller-item"
+        }
+    }
+    
+
     
     var get_categories:String{
         get {

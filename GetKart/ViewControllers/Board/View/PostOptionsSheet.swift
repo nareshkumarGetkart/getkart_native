@@ -104,6 +104,7 @@ struct PostOptionsSheet: View {
     var onBoardTap: () -> Void = {}
     var onAdsTap: () -> Void = {}
     var onBannerTap: () -> Void = {}
+    var onIdeaTap: () -> Void = {}
     var onClose: () -> Void = {}
 
     var body: some View {
@@ -161,6 +162,14 @@ struct PostOptionsSheet: View {
                     subtitle: "For Sale New Products"
                 )
                 .onTapGesture { onBoardTap() }
+                
+                
+                PostingOptionRow(
+                    icon: "hugeicons_ai-idea",
+                    title: "Ideas",
+                    subtitle: "Discover & Share New Ideas"
+                )
+                .onTapGesture { onIdeaTap() }
 
                 PostingOptionRow(
                     icon: "megaphone",

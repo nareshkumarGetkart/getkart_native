@@ -125,18 +125,22 @@ extension SeeAllItemVC:UICollectionViewDelegate,UICollectionViewDataSource,UICol
             cell.btnIsVerified.tag = indexPath.item
             cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
           
-            if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
+           /* if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
                 cell.lblCapacity.isHidden = false
+                cell.emptyBottomBgViewForCapacity.isHidden = true
                 cell.lblCapacity.text = callSpecificValueBasedOnCategory(catId:matchedCatId, list: obj.customFields ?? [])
             }else{
                 cell.lblCapacity.text = ""
                 cell.lblCapacity.isHidden = true
-            }
+                cell.emptyBottomBgViewForCapacity.isHidden = false
+            }*/
+            cell.updateCapacityLabelWithText(obj: obj)
+
         }
         
         return cell
-        
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         

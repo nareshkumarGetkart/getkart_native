@@ -88,6 +88,8 @@ struct BottomSheetPopupView: View {
             .padding(.bottom, 25)
         }
     }
+  
+   
     
 //    private var popupImage: some View {
 //        ZStack(alignment: .topTrailing) {
@@ -157,8 +159,6 @@ struct BottomSheetPopupView: View {
         }
     }
 }
-
-
 
 
 struct HTMLTextView: UIViewRepresentable {

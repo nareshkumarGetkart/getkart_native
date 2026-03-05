@@ -161,7 +161,7 @@ struct BannerPromotionsView: View {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(.systemBackground))
                     
-                ).keyboardType(.URL).tint(Color(.systemOrange)).autocapitalization(.none)
+                ).keyboardType(.URL).tint(Color(.systemOrange)).autocapitalization(.none).textInputAutocapitalization(.never)
             Text("Add your business page link and let users discover you in just one click.").font(.manrope(.regular, size: 12.0))
             }
             Spacer()
@@ -444,8 +444,6 @@ struct BannerPromotionsView: View {
 }
 
 
-
-
 import PhotosUI
 import SwiftUI
 
@@ -488,6 +486,7 @@ struct ImagePickerPromotion: UIViewControllerRepresentable {
             }
         }
     }
+    
 
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
 }
@@ -500,7 +499,6 @@ struct PromotionSettingModel{
     var default_radius:Int
     var min_radius:Int
     var max_radius:Int
-
 }
 
 

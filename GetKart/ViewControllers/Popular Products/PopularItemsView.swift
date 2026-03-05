@@ -14,6 +14,18 @@ struct ProductCard: View {
     @Binding var objItem:ItemModel
     
     var onItemLikeDislike: (ItemModel) -> Void
+   
+    private var specialityText: String {
+        let matchedCatId = matchedCategoryId(from: objItem.allCategoryIDS ?? "") ?? 0
+
+        if matchedCatId > 0 {
+            return callSpecificValueBasedOnCategory(
+                catId: matchedCatId,
+                list: objItem.customFields ?? []
+            )
+        }
+        return ""
+    }
 
     var body: some View {
         
@@ -27,7 +39,7 @@ struct ProductCard: View {
                             Image("getkartplaceholder")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                                .frame(width: widthScreen / 2.0 - 12, height: widthScreen / 2.0 - 15)
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(10)
                         }
@@ -38,7 +50,7 @@ struct ProductCard: View {
                         .fade(duration: 0.25)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: widthScreen / 2.0 - 15, height: widthScreen / 2.0 - 15)
+                        .frame(width: widthScreen / 2.0 - 12, height: widthScreen / 2.0 - 15)
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(10)
                     
@@ -72,14 +84,13 @@ struct ProductCard: View {
                         .font(Font.manrope(.semiBold, size: 14))
                     
                     
-                    let matchedCatId = matchedCategoryId(from: objItem.allCategoryIDS ?? "") ?? 0
-                     
-                     if matchedCatId > 0{
-                         Text(callSpecificValueBasedOnCategory(catId:matchedCatId, list: objItem.customFields ?? []))
-                         .foregroundColor(Color(UIColor.label))
-                            .multilineTextAlignment(.leading).lineLimit(1)
-                            .font(Font.manrope(.regular, size: 12)).frame(height:12)
+                    if !specialityText.trim().isEmpty {
+                        Text(specialityText)
+                            .foregroundColor(Color(UIColor.label))
+                            .lineLimit(1)
+                            .font(Font.manrope(.regular, size: 12))
                     }
+
                         
                     HStack(spacing: 2){
                         Image("location-outline").resizable()
@@ -92,7 +103,8 @@ struct ProductCard: View {
                             .foregroundColor(.gray)
                         Spacer(minLength: 0)
                     }.padding(.horizontal,0)
-                    if (matchedCatId == 0){
+                    
+                    if specialityText.trim().isEmpty{
                         Spacer(minLength: 12)
                     }
                     
@@ -111,7 +123,8 @@ struct ProductCard: View {
                     Button {
                         AppDelegate.sharedInstance.presentVerifiedInfoView()
                     } label: {
-                        Image( "verifiedIcon").resizable().aspectRatio(contentMode: .fit)
+                        Image( "verifiedIcon")
+                            .resizable().aspectRatio(contentMode: .fit)
                             .foregroundColor(.gray)
                             .padding(3)
                             .background(Color(UIColor.systemBackground))
@@ -119,7 +132,7 @@ struct ProductCard: View {
                             .shadow(radius: 3)
                         
                     }
-                    .frame(width: 40,height: 40)
+                    .frame(width: 35,height: 35)
                     .padding([.leading], 15)
                     .allowsHitTesting(true)
                     
@@ -136,18 +149,19 @@ struct ProductCard: View {
                 } label: {
                     let islike = ((objItem.isLiked ?? false) == true)
                     Image( islike ? "like_fill" : "like")
+                        .resizable().aspectRatio(contentMode: .fit)
                         .foregroundColor(.gray)
-                        .padding(8)
+                        .padding(5)
                         .background(Color(UIColor.systemBackground))
                         .clipShape(Circle())
                         .shadow(radius: 3)
                     
                 }
-                .frame(width: 50,height: 50)
+                .frame(width: 35,height: 35)
                 .padding([.trailing], 15)
                 .allowsHitTesting(true)
                 
-            }.padding(.top,widthScreen / 2.0 - 108)
+            }.padding(.top,widthScreen / 2.0 - 130)
             
         }
     }
@@ -184,9 +198,6 @@ func callSpecificValueBasedOnCategory(catId:Int,list: [CustomField?]) -> String{
         return getYearKmText(list)
         
     }
-    
-
-    
 }
 
 func matchedCategoryId(from categoryIds: String) -> Int? {

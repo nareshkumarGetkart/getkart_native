@@ -46,7 +46,14 @@ struct BannerNavigation{
             }
         }else if (sliderObj?.thirdPartyLink?.count ?? 0) > 0{
             
-            guard let url = URL(string: sliderObj?.thirdPartyLink ?? "") else {
+               var finalString = sliderObj?.thirdPartyLink?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+                if !finalString.lowercased().hasPrefix("http://") &&
+                   !finalString.lowercased().hasPrefix("https://") {
+                    finalString = "https://" + finalString
+                }
+
+            guard let url = URL(string: finalString) else {
                 print("Invalid URL")
                 return
             }

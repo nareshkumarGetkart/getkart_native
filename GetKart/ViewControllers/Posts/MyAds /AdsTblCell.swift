@@ -38,8 +38,16 @@ class AdsTblCell: UITableViewCell {
         imgVwIconSeen.setImageTintColor(color: .label)
         imgVwIconLike.setImageTintColor(color: .label)
 
-        lblBoost.layer.cornerRadius = 5.0
-        lblBoost.clipsToBounds = true
+        
+//        lblBoost.layer.cornerRadius = 5.0
+//        lblBoost.clipsToBounds = true
+        lblBoost.layer.cornerRadius = 8
+        lblBoost.layer.maskedCorners = [
+            .layerMinXMaxYCorner,  // bottom-left
+            .layerMaxXMaxYCorner   // bottom-right
+        ]
+        lblBoost.layer.masksToBounds = true
+
         lblBoost.isHidden = true
         lblBoost.textColor = UIColor.white
         lblBoost.font = UIFont.Manrope.medium(size: 13.0).font
@@ -51,7 +59,7 @@ class AdsTblCell: UITableViewCell {
         lblPrice.font = UIFont.Manrope.bold(size: 15.0).font
         lblLikeCount.font = UIFont.Manrope.regular(size: 13.0).font
         lblViewCount.font = UIFont.Manrope.regular(size: 13.0).font
-        btnAdStatus.titleLabel?.font = UIFont.Manrope.regular(size: 13.0).font
+        btnAdStatus.titleLabel?.font = UIFont.Manrope.regular(size: 12.0).font
         lblLocation.font = UIFont.Manrope.regular(size: 12.0).font
         
         lblPrice.textColor = CustomColor.sharedInstance.priceColor
@@ -64,6 +72,7 @@ class AdsTblCell: UITableViewCell {
     
     
     func configureTblCellData(itemObj:ItemModel){
+        
         lblItem.text = itemObj.name
         lblPrice.text =  "\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())"
         lblLikeCount.text = "Like:\(itemObj.totalLikes ?? 0)"
@@ -90,11 +99,11 @@ class AdsTblCell: UITableViewCell {
             btnAdStatus.setTitleColor(UIColor(hexString: "#fe0002"), for: .normal)
             btnAdStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
             break
+       
         case "review":
             btnAdStatus.setTitleColor(UIColor(hexString: "#3e4c63"), for: .normal)
             btnAdStatus.backgroundColor = UIColor(hexString: "#e6eef5")
             btnAdStatus.setTitle(("Under review"), for: .normal)
-
             break
             
         case "sold out":

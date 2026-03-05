@@ -20,6 +20,7 @@ class ProductCell: UICollectionViewCell {
     @IBOutlet weak var lblBoost:UILabel!
     @IBOutlet weak var btnIsVerified:UIButton!
     @IBOutlet weak var lblCapacity:UILabel!
+    @IBOutlet weak var emptyBottomBgViewForCapacity:UIView!
 
 
     override func awakeFromNib() {
@@ -49,8 +50,20 @@ class ProductCell: UICollectionViewCell {
             imgViewLoc.image = tintedImage
         }
         imgViewitem.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
+        emptyBottomBgViewForCapacity.isHidden = true
     }
    
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+           super.traitCollectionDidChange(previousTraitCollection)
+
+           if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+               if let originalImage = UIImage(named: "location-outline") {
+                   let tintedImage = originalImage.tinted(with: .label)
+                   imgViewLoc.image = tintedImage
+               }
+           }
+       }
     
     
     override func prepareForReuse() {
@@ -68,6 +81,27 @@ class ProductCell: UICollectionViewCell {
 
 // Optimized ProductCell (in ProductCell.swift)
 extension ProductCell {
+    
+    //For capacity label empty view added at bottom
+    func updateCapacityLabelWithText(obj:ItemModel){
+        
+        if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
+            lblCapacity.isHidden = false
+            emptyBottomBgViewForCapacity.isHidden = true
+            lblCapacity.text = callSpecificValueBasedOnCategory(catId:matchedCatId, list: obj.customFields ?? [])
+            
+            if  lblCapacity.text?.count == 0{
+                lblCapacity.isHidden = true
+                emptyBottomBgViewForCapacity.isHidden = false
+            }
+        }else{
+            lblCapacity.text = ""
+            lblCapacity.isHidden = true
+            emptyBottomBgViewForCapacity.isHidden = false
+        }
+    }
+    
+
     func configure(with obj: ItemModel, index: Int, likeAction: Selector) {
         lblItem.text = obj.name
         lblAddress.text = obj.address

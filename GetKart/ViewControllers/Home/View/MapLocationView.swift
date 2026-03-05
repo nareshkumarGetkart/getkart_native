@@ -18,7 +18,7 @@ struct MapLocationView: View {
         
         VStack{
             ZStack{
-                MapView(latitude: latitude, longitude: longitude,address:address)
+                MapView(latitude:latitude,longitude:longitude,address:address)
                    .ignoresSafeArea()
                 
                 VStack{

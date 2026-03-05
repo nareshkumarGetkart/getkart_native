@@ -165,9 +165,7 @@ struct SubCategoriesView: View {
             let hostingController = UIHostingController(rootView: swiftUIView) // Wrap in UIHostingController
             navigationController?.pushViewController(hostingController, animated: true) //
         }
-    }
-    
-    
+    }    
 }
                 
    

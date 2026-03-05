@@ -98,13 +98,18 @@ extension HomeHorizontalCell:UICollectionViewDelegate,UICollectionViewDataSource
                     
                     cell.btnIsVerified.tag = indexPath.item
                     cell.btnIsVerified.addTarget(self, action: #selector(presentVerifiedView), for: .touchUpInside)
-                    if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
+                  /*  if  let matchedCatId = matchedCategoryId(from: obj.allCategoryIDS ?? ""){
                         cell.lblCapacity.isHidden = false
+                        cell.emptyBottomBgViewForCapacity.isHidden = true
                         cell.lblCapacity.text = callSpecificValueBasedOnCategory(catId:matchedCatId, list: obj.customFields ?? [])
+                      
                     }else{
                         cell.lblCapacity.text = ""
-                        cell.lblCapacity.isHidden = true
-                    }
+                        cell.lblCapacity.isHidden = false
+                        cell.emptyBottomBgViewForCapacity.isHidden = false
+                    }*/
+                    
+                    cell.updateCapacityLabelWithText(obj: obj)
                 }
             }
             return cell

@@ -89,7 +89,13 @@ class PaymentGatewayCentralized{
 
                            // }
                             
-                            self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+                            self?.openPaymentPay()
+//                            if paymentFor == .bannerPromotion{
+//                                inAppCampaignPaymentIntent()
+//                            }else{
+//                                
+//                                self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+//                            }
 
                             
                         }else if self?.payment_method_type == 3 {//Phone Pay
@@ -103,7 +109,10 @@ class PaymentGatewayCentralized{
                                     flowId = "\(Local.shared.getUserId())"
                                 }
                                 
-                                self?.payment_method = "PhonePe"
+                                if let method = PaymentMethod(rawValue: self?.payment_method_type ?? 3) {
+                                    self?.payment_method  = method.title
+                                }
+                              //  self?.payment_method = "PhonePe"
                                 
                                 if devEnvironment == .live {
                                     self?.ppPayment = PPPayment(environment: .production,
@@ -140,37 +149,33 @@ class PaymentGatewayCentralized{
       if payment_method_type == 1 {//In App
           
           if paymentFor == .bannerPromotion{
+              
               self.inAppCampaignPaymentIntent()
+          }
+          else if paymentFor == .bannerPromotionDraft{
+              revokeCampaignPaymentApi(package_id: selectedPlanId)
+              
+
           }else{
+              
               self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
           }
           
-      }else if payment_method_type == 3 {//Phone Pay
+      }else if payment_method_type == 3 {
+          //Phone Pay
             
-            //  if isBannerPromotionPay{
-                
             if paymentFor == .bannerPromotion{
                 
-//                getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
                 getIntentForBannerPromotions(package_id: selectedPlanId)
-
-                
            
             } else if paymentFor == .bannerPromotionDraft{
                 
-//                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
-                
                 revokeCampaignPaymentApi(package_id: selectedPlanId)
-
                 
             }else{
                 
-//                self.createPhonePayOrder(package_id: planObj?.id ?? 0)
-
                 self.createPhonePayOrder(package_id: selectedPlanId)
-
             }
-
         }
     }
     
@@ -223,8 +228,11 @@ class PaymentGatewayCentralized{
     
     private func revokeCampaignPaymentApi(package_id:Int){
         
-        let params = ["banner_id":banner_id,"payment_method":"PhonePe","package_id":selectedPlanId,"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
+        var params = ["banner_id":banner_id,"package_id":selectedPlanId,"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
 
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         URLhandler.sharedinstance.makeCall(url:  Constant.shared.revoke_campaign_payment, param: params, showLoader: true) {[weak self] responseObject, error in
             
             if error == nil {
@@ -240,14 +248,20 @@ class PaymentGatewayCentralized{
                             self?.campaign_banner_id = campaign_banner_id
                         }
                         
-                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                        if self?.payment_method_type == 1{
+                            self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+
+                        }else{
                             
-                            self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
-                            
-                            if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
-                                let orderId = payment_gateway_response["orderId"] as? String ?? ""
-                                let token  = payment_gateway_response["token"] as? String ?? ""
-                                self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                
+                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                                
+                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                    let token  = payment_gateway_response["token"] as? String ?? ""
+                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                }
                             }
                         }
                     }
@@ -265,8 +279,11 @@ class PaymentGatewayCentralized{
     private func getIntentForBannerPromotions(package_id:Int){
 
     
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(selectedPlanId),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":(selectedPlanId),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         guard let img = selectedImage?.wxCompress() else{ return }
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
             
@@ -336,6 +353,11 @@ class PaymentGatewayCentralized{
         if paymentFor == .boostBoard{
             strURL = Constant.shared.board_payment_intent
             params["board_id"] = itemId ?? 0
+        }else{
+            
+            if let postItemId = itemId{
+                params["item_id"] = postItemId
+            }
         }
         URLhandler.sharedinstance.makeCall(url: strURL, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
@@ -402,8 +424,11 @@ class PaymentGatewayCentralized{
     //MARK: For campaign banner intent
     func inAppCampaignPaymentIntent(){
         
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"apple","package_id":selectedPlanId,"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":selectedPlanId,"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         guard let img = selectedImage?.wxCompress() else{ return }
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.inapp_campaign_payment_intent, params: params) {[weak self] responseObject, error in
             
@@ -445,7 +470,7 @@ class PaymentGatewayCentralized{
 //      
       let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
 
-      var params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
+      var params:Dictionary<String, Any> = ["purchase_token":transactionId, "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
       
        if let postItemId = itemId{
           params["item_id"] = postItemId
@@ -462,6 +487,10 @@ class PaymentGatewayCentralized{
       
         if id > 0{
             params["id"] = id
+        }
+        
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
         }
     
         URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post,showLoader: true) { responseObject, error in

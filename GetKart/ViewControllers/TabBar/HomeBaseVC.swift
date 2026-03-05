@@ -237,7 +237,7 @@ class HomeBaseVC: UITabBarController {
     func presentHostingController(){
         
         let controller = UIHostingController(
-            rootView: PostOptionsSheet(onBoardTap: {}, onAdsTap: {}, onBannerTap: {}, onClose: {}))
+            rootView: PostOptionsSheet(onBoardTap: {}, onAdsTap: {}, onBannerTap: {}, onIdeaTap: {}, onClose: {}))
         
         
         let useInlineMode = view != nil
@@ -290,8 +290,8 @@ class HomeBaseVC: UITabBarController {
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     if let selectedVC =  self.selectedViewController as? UINavigationController {
-                        
-                        let destvc = UIHostingController(rootView: CreateBoardView(navigationController: selectedVC))
+                        let destvc = UIHostingController(rootView: UploadImageVideoView(navigationController: selectedVC))
+                       // let destvc = UIHostingController(rootView: CreateBoardView(navigationController: selectedVC))
                         destvc.hidesBottomBarWhenPushed = true
                         selectedVC.pushViewController(destvc, animated: true)
                     }
@@ -334,7 +334,28 @@ class HomeBaseVC: UITabBarController {
                     }
                     
                 }
-            },
+            }
+            , onIdeaTap: {
+                if sheet.options.useInlineMode == true {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                print("Banner tapped")
+                
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    if let selectedVC =  self.selectedViewController as? UINavigationController {
+                        
+//                       let destvc = UIHostingController(rootView: UploadImageVideoView(navigationController: selectedVC))
+                        let destvc = UIHostingController(rootView: CreateIdeaView(navigationController: selectedVC))
+
+                        destvc.hidesBottomBarWhenPushed = true
+                        selectedVC.pushViewController(destvc, animated: true)
+                    }
+                    
+                }
+            }
+            ,
             onClose: {
                 if sheet.options.useInlineMode == true {
                     sheet.attemptDismiss(animated: true)

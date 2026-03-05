@@ -443,6 +443,7 @@ struct ProfileEditView: View {
                     
                     if let data = result["data"] as? Dictionary<String,Any>{
                         
+                        
                         RealmManager.shared.updateUserData(dict: data)
                         AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["OK"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { title, index in
                             navigationController?.popViewController(animated: true)

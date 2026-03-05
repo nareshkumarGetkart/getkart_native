@@ -117,15 +117,24 @@ struct PreviewURL: View {
         
         sheet.addAction(UIAlertAction(title: "Open in browser", style: .default, handler: { action in
             
-            if let url = URL(string: fileURLString)  {
-              
-                if UIApplication.shared.canOpenURL(url) {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                } else {
-                    print("Cannot open URL")
-                }
-            }
-        }))
+            var finalString = fileURLString.trimmingCharacters(in: .whitespacesAndNewlines) 
+
+             if !finalString.lowercased().hasPrefix("http://") &&
+                !finalString.lowercased().hasPrefix("https://") {
+                 finalString = "https://" + finalString
+             }
+
+         guard let url = URL(string: finalString) else {
+             print("Invalid URL")
+             return
+         }
+         
+         if UIApplication.shared.canOpenURL(url) {
+           //  if sliderObj?.
+             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+         } else {
+             print("Cannot open URL")
+         }        }))
         
         sheet.addAction(UIAlertAction(title: "Copy link", style: .default, handler: { action in
             

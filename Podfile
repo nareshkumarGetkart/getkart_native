@@ -11,7 +11,7 @@ pod 'GoogleSignIn'
 pod 'GoogleSignInSwiftSupport'
 pod 'Alamofire'
 pod 'Kingfisher', '~> 7.0'
-pod 'GoogleMaps', '7.1.0'
+#pod 'GoogleMaps', '7.1.0'
 pod "MMMaterialDesignSpinner"
 pod 'Firebase/Messaging'
 pod 'FirebaseCore'
@@ -28,6 +28,7 @@ pod 'Mantis'
 pod 'GooglePlaces'
 pod 'NSFWDetector'
 pod 'MarqueeLabel'
+pod 'PayUIndia-CheckoutPro'  # For Checkout Pro SDK
 
   target 'GetKartTests' do
     inherit! :search_paths

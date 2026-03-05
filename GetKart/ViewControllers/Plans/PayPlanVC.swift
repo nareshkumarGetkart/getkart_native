@@ -12,6 +12,20 @@ import StoreKit
 import SwiftUI
 
 
+enum PaymentMethod: Int {
+    case phonePe = 3
+    case applePay = 1
+    
+    var title: String {
+        switch self {
+        case .phonePe:
+            return "PhonePe"
+        case .applePay:
+            return "apple"
+        }
+    }
+}
+
 enum PaymentForEnum{
     
     case adsPlan
@@ -95,18 +109,21 @@ class PayPlanVC: UIViewController {
     
     
     @IBAction func payBtnAction(_ sender:UIButton){
-        if payment_method_type == 1 {//In App
+        if payment_method_type == 1 {
+            //In App
             if paymentFor == .bannerPromotion{
                 inAppCampaignPaymentIntent()
+           
+            }else if paymentFor == .bannerPromotionDraft{
+                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
+
+
             }else{
                 self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
-
             }
             
-        }else if payment_method_type == 3 {//Phone Pay
-            
-            //  if isBannerPromotionPay{
-                
+        }else if payment_method_type == 3 {
+            //Phone Pay
             if paymentFor == .bannerPromotion{
                 
                 getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
@@ -149,6 +166,7 @@ class PayPlanVC: UIViewController {
                             
                         }else if self.payment_method_type == 3 {//Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
+                               
                                 self.api_key = PhonePeDict["api_key"] as? String ?? ""
                                 self.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
                                 
@@ -158,7 +176,10 @@ class PayPlanVC: UIViewController {
                                     flowId = "\(Local.shared.getUserId())"
                                 }
                                 
-                                self.payment_method = "PhonePe"
+                                if let method = PaymentMethod(rawValue: self.payment_method_type) {
+                                    self.payment_method = method.title
+                                }
+                               // self.payment_method = "PhonePe"
                                 
                                 if devEnvironment == .live {
                                     self.ppPayment = PPPayment(environment: .production,
@@ -234,8 +255,11 @@ class PayPlanVC: UIViewController {
     
     func revokeCampaignPaymentApi(package_id:Int){
         
-        let params = ["banner_id":banner_id,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
+        var params = ["banner_id":banner_id,"package_id":(planObj?.id ?? ""),"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
 
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         URLhandler.sharedinstance.makeCall(url:  Constant.shared.revoke_campaign_payment, param: params, showLoader: true) {[weak self] responseObject, error in
             
             if error == nil {
@@ -251,14 +275,20 @@ class PayPlanVC: UIViewController {
                             self?.campaign_banner_id = campaign_banner_id
                         }
                         
-                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                        if self?.payment_method_type == 1{
                             
-                            self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
-                            
-                            if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
-                                let orderId = payment_gateway_response["orderId"] as? String ?? ""
-                                let token  = payment_gateway_response["token"] as? String ?? ""
-                                self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                            self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+                       
+                        }else{
+                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                
+                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                                
+                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                    let token  = payment_gateway_response["token"] as? String ?? ""
+                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                }
                             }
                         }
                     }
@@ -275,7 +305,11 @@ class PayPlanVC: UIViewController {
     
     func getIntentForBannerPromotions(package_id:Int){
     
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"PhonePe","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         
         guard let img = selectedImage?.wxCompress() else{ return }
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
@@ -339,7 +373,12 @@ class PayPlanVC: UIViewController {
     
     func createPhonePayOrder(package_id:Int){
                 
-        let params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city,"state":state]
+        var params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city,"state":state]
+        
+        if let postItemId = itemId{
+            params["item_id"] = postItemId
+        }
+        
         URLhandler.sharedinstance.makeCall(url: Constant.shared.paymentIntent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
             
             
@@ -405,15 +444,20 @@ class PayPlanVC: UIViewController {
 
 
 
+
 extension PayPlanVC {
     //MARK: For campaign banner intent
 
     func inAppCampaignPaymentIntent(){
         
-        let params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"payment_method":"apple","package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         
         guard let img = selectedImage?.wxCompress() else{ return }
-        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.inapp_campaign_payment_intent, params: params) {[weak self] responseObject, error in
+        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.inapp_campaign_payment_intent, params: params) { [weak self] responseObject, error in
             
             if error == nil {
                 let result = responseObject! as NSDictionary
@@ -446,13 +490,14 @@ extension PayPlanVC {
             }
         }
     }
+    
     private  func updateInAppPurchaseOrderApi(transactionId:String,order_id:String,user_id:Int,id:Int){
 
    // func updateInAppPurchaseOrderApi(transactionId:String){
         //
         let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
 
-        var params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
+        var params:Dictionary<String, Any> = ["purchase_token":transactionId, "package_id":planObj?.id ?? 0, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
         
         if let postItemId = itemId{
             params["item_id"] = postItemId
@@ -469,6 +514,10 @@ extension PayPlanVC {
       
         if id > 0{
             params["id"] = id
+        }
+        
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
         }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.in_app_purchase, param: params,methodType: .post,showLoader: true) { responseObject, error in

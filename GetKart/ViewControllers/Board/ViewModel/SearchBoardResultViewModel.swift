@@ -18,11 +18,11 @@ final class SearchBoardResultViewModel: ObservableObject {
 
     // MARK: - Pagination
     private var page: Int = 1
-    private let preloadOffset = 4   // 🔥 KEY
-    private var didUserScroll = false   // 🔥 KEY
+    private let preloadOffset = 4   //  KEY
+    private var didUserScroll = false   //  KEY
     private var lastTriggeredCount = 0
     
-     var searchText = ""   // 🔥 KEY
+     var searchText = ""   //  KEY
 
     private let preloadDistance: CGFloat = 200
     private var lastTriggerPage = 0
@@ -63,7 +63,6 @@ final class SearchBoardResultViewModel: ObservableObject {
     }
 
     // MARK: - Pagination Trigger
-    // MARK: - NEXT PAGE CALL (🔥 THIS IS THE FIX)
  
     func loadNextPageIfNeeded(currentIndex: Int) {
         guard didUserScroll else { return }
@@ -87,7 +86,7 @@ final class SearchBoardResultViewModel: ObservableObject {
         }
         isLoading = false
         hasMoreData = true
-        didUserScroll = false   // 🔥 reset
+        didUserScroll = false   //  reset
         selectedCategoryId = id
         loadInitial()
     }

@@ -13,6 +13,7 @@ import Alamofire
 import SystemConfiguration
 import AVKit
 import SwiftUI
+import Alamofire
 
 
 class URLhandler: NSObject{
@@ -566,6 +567,119 @@ class URLhandler: NSObject{
         }
     }
     
+    
+
+    func uploadVideoArrayWithParameters(
+        videoAssets: [AVURLAsset],
+        videoParamName: String,
+        url: String,
+        params: [String: Any],
+        completionHandler: @escaping (_ responseObject: NSDictionary?, _ error: NSError?) -> ()?
+    ) {
+        
+        if isConnectedToNetwork() {
+            
+            if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
+                Themes.sharedInstance.showActivityViewTop(uiView: topView, position: .mid)
+            }
+            
+            if ISDEBUG {
+                print(url)
+                print(params)
+            }
+            
+            AF.upload(multipartFormData: { multipartFormData in
+                
+                // ✅ Append Videos
+                for (index, asset) in videoAssets.enumerated() {
+                    
+                    let fileURL = asset.url
+                    
+                    if let videoData = try? Data(contentsOf: fileURL) {
+                        
+                        multipartFormData.append(
+                            videoData,
+                            withName: videoParamName,
+                            fileName: "video\(index).mp4",
+                            mimeType: "video/mp4"
+                        )
+                    }
+                }
+                
+                // ✅ Append Other Parameters (same logic as yours)
+                for (key, value) in params {
+                    
+                    if let data = value as? Data {
+                        multipartFormData.append(data, withName: key)
+                        
+                    } else if let arr = value as? [String] {
+                        
+                        for i in 0..<arr.count {
+                            let keyObj = "\(key)[\(i)]"
+                            multipartFormData.append(
+                                arr[i].data(using: .utf8)!,
+                                withName: keyObj
+                            )
+                        }
+                        
+                    } else if let dict = value as? [String: Any] {
+                        
+                        if let jsonData = try? JSONSerialization.data(withJSONObject: dict),
+                           let jsonString = String(data: jsonData, encoding: .utf8) {
+                            
+                            multipartFormData.append(
+                                jsonString.data(using: .utf8)!,
+                                withName: key
+                            )
+                        }
+                        
+                    } else {
+                        
+                        multipartFormData.append(
+                            "\(value)".data(using: .utf8)!,
+                            withName: key
+                        )
+                    }
+                }
+                
+            }, to: url, method: .post, headers: self.getHeaderFields())
+            
+            .response { response in
+                
+                DispatchQueue.main.async {
+                    Themes.sharedInstance.removeActivityView(
+                        uiView: AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView()
+                    )
+                }
+                
+                if response.response?.statusCode == 409 {
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
+                
+                if response.error == nil {
+                    do {
+                        self.respDictionary = try JSONSerialization.jsonObject(
+                            with: response.data ?? Data(),
+                            options: .mutableContainers
+                        ) as? NSDictionary
+                        
+                        if ISDEBUG {
+                            print("\(url) Response received:", self.respDictionary ?? [:])
+                        }
+                        
+                        completionHandler(self.respDictionary, nil)
+                        
+                    } catch {
+                        completionHandler(nil, error as NSError)
+                    }
+                    
+                } else {
+                    completionHandler(nil, response.error as NSError?)
+                }
+            }
+        }
+    }
     deinit {
     }
     

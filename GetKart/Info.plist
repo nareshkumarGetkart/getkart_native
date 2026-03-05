@@ -87,6 +87,9 @@
         <string>Inter-Medium.otf</string>
         <string>Inter-SemiBold.otf</string>
         <string>Inter-Black.otf</string>
+        <string>Inter_18pt-Italic.ttf</string>
+        <string>Inter_18pt-BoldItalic.ttf</string>
+        <string>Inter_18pt-ExtraBoldItalic.ttf</string>
 	</array>
 </dict>
 </plist>

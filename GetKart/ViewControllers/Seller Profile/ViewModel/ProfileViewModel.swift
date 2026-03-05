@@ -15,10 +15,15 @@ class ProfileViewModel:ObservableObject{
     @Published var itemArray = [ItemModel]()
     @Published var isDataLoading = false
     var page = 1
+    var sellerId = 0
     var canLoadMorePages = true
+    var canLoadMoreBoardPage = true
 
-    init(){
-        
+    @Published var boardArray = [ItemModel]()
+    var boardPage = 1
+
+    init(userId:Int){
+        sellerId = userId
     }
     
 
@@ -46,7 +51,10 @@ class ProfileViewModel:ObservableObject{
 
         isDataLoading = true
         
-        let strUrl = "\(Constant.shared.get_item)?user_id=\(sellerId)&page=\(page)"
+        //let strUrl = "\(Constant.shared.get_item)?user_id=\(sellerId)&page=\(page)"
+        
+        let strUrl = Constant.shared.get_seller_item + "?user_id=\(sellerId)&page=\(page)&item_type=1"
+
         
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl) {[weak self] (obj:ItemParse) in
             if (obj.code ?? 0) == 200 {
@@ -130,6 +138,102 @@ class ProfileViewModel:ObservableObject{
                 let message = result["message"] as? String ?? ""
                 self.sellerObj?.isBlock = 1
                 AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+            }
+        }
+    }
+    
+    
+    //MARK: Board related api
+    
+    func getBoardListApi(){
+        /*
+         curl --location 'https://admin.gupsup.com/api/v2/get-seller-item?user_id=639&item_type=2' \
+         --header 'Accept: application/json' \
+         --header 'x-device-id: khusyal'
+          
+         item_type : 1 for normal ad and 2 for board
+         */
+       
+        let strUrl = Constant.shared.get_seller_item + "?user_id=\(sellerId)&page=\(boardPage)&item_type=2"
+ 
+        self.isDataLoading = true
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
+            if self.boardPage == 1{
+                self.boardArray.removeAll()
+            }
+            
+            if obj.code == 200 {
+             
+                DispatchQueue.main.async {
+                    let newItems = obj.data?.data ?? []
+                    guard !newItems.isEmpty else {
+                        self.isDataLoading = false
+                        
+                        return }
+
+                    self.boardArray.append(contentsOf: newItems)
+                    self.isDataLoading = false
+                    self.boardPage = self.boardPage + 1
+                    let currentPage = (obj.data?.currentPage as? Int ?? self.boardPage)
+                    let last = obj.data?.lastPage as? Int ?? self.boardPage
+                    self.canLoadMoreBoardPage = currentPage >= last
+                }
+                
+
+            }else{
+                self.isDataLoading = false
+            }
+        }
+    }
+    
+    // MARK: - Like update
+    func updateLike(boardId: Int, isLiked: Bool) {
+        if let index = boardArray.firstIndex(where: { $0.id == boardId }) {
+            boardArray[index].isLiked = isLiked
+            self.manageLikeDislikeApi(boardId: boardId, isLiked: isLiked)
+        }
+    }
+  
+    
+    func update(likeCount:Int,isLike:Bool,boardId:Int){
+        
+        if let index = boardArray.firstIndex(where: { $0.id == boardId }) {
+            boardArray[index].isLiked = isLike
+            boardArray[index].totalLikes = likeCount
+        }
+       
+    }
+    
+    
+    func updateBoost(isBoosted:Bool,boardId:Int){
+        
+        if let index = boardArray.firstIndex(where: { $0.id == boardId }) {
+            boardArray[index].isFeature = isBoosted
+        }
+       
+    }
+
+    // MARK: - Like / Unlike (unchanged)
+    func manageLikeDislikeApi(boardId: Int, isLiked: Bool) {
+        guard let index = boardArray.firstIndex(where: { $0.id == boardId }) else { return }
+
+        let params = ["board_id": boardId]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.manage_board_favourite,
+            param: params,
+            methodType: .post
+        ) { responseObject, error in
+            guard error == nil else { return }
+
+            let result = responseObject as? NSDictionary
+            let status = result?["code"] as? Int ?? 0
+
+            if status == 200,
+               let data = result?["data"] as? [String: Any],
+               let count = data["favourite_count"] as? Int {
+                DispatchQueue.main.async {
+                    self.boardArray[index].totalLikes = count
+                }
             }
         }
     }

@@ -65,6 +65,7 @@ extension BoostUserAdTblCell:UICollectionViewDelegate,UICollectionViewDataSource
         if (listArray?.count ?? 0) == 1{
             return CGSize(width: (self.collectionView.frame.size.width) , height: 130)
         }else{
+            
             return CGSize(width: (self.collectionView.frame.size.width - 11.0) , height: 130)
         }
     }

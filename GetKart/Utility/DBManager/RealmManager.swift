@@ -155,6 +155,7 @@ class RealmManager: ObservableObject {
     }
 
     func updateUserData(dict: [String: Any]) {
+        
         if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: dict["id"] as? Int ?? 0) {
             try? realm.write {
                 user.name = dict["name"] as? String ?? ""

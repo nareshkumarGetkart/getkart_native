@@ -95,8 +95,14 @@ struct ItemModel: Codable,Identifiable {
     let outbondUrl:String?
     let alreadyPurchased:Bool?
     let package:Package?
-    
+    let ctaLabel:String?
+    let ctaType:Int?
+    let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea 
+    let commentsCount:Int?
+    let lastComment:CommentModel?
+
     enum CodingKeys: String, CodingKey {
+        
         case id, name, slug, description, image
         case price
         case specialPrice = "special_price"
@@ -132,6 +138,13 @@ struct ItemModel: Codable,Identifiable {
         case usedPackage
         case package = "package_info"
         case alreadyPurchased = "already_purchased"
+        case boardType = "board_type"
+        case ctaLabel = "cta_label"
+        case ctaType = "cta_type"
+        case commentsCount = "comments_count"
+        case lastComment = "last_comment"
+        
+
     }
 }
 

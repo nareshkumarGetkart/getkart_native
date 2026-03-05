@@ -273,17 +273,7 @@ struct BannerAlalyticsView: View {
         controller.categoryName = ""
         controller.paymentFor = .bannerPromotionDraft
         controller.payment_transaction_id = objBanner?.paymentTransactions?.id ?? 0
-       // controller.payment_transaction_id = objBanner?.
-      /*  controller.radius = radius
-        controller.area = area
-        controller.selectedImage = selectedImage
-        controller.city = city
-        controller.country = country
-        controller.state = state
-        controller.latitude = "\(latitude)"
-        controller.longitude = "\(longitude)"
-        controller.strUrl = strUrl*/
-        
+      
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
             if controller.sheetViewController?.options.useInlineMode == true {

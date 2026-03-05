@@ -284,7 +284,6 @@ class ItemDetailViewModel:ObservableObject{
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.update_item_status, param: params,methodType: .post) {  responseObject, error in
             
-            
             if(error != nil)
             {
                 print(error ?? "defaultValue")
@@ -447,17 +446,24 @@ class ItemDetailViewModel:ObservableObject{
             }
         }else if (sliderObj?.thirdPartyLink?.count ?? 0) > 0{
             
-            guard let url = URL(string: sliderObj?.thirdPartyLink ?? "") else {
-                print("Invalid URL")
-                return
-            }
-            
-            if UIApplication.shared.canOpenURL(url) {
-              //  if sliderObj?.
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                print("Cannot open URL")
-            }
+            var finalString = sliderObj?.thirdPartyLink?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+             if !finalString.lowercased().hasPrefix("http://") &&
+                !finalString.lowercased().hasPrefix("https://") {
+                 finalString = "https://" + finalString
+             }
+
+         guard let url = URL(string: finalString) else {
+             print("Invalid URL")
+             return
+         }
+         
+         if UIApplication.shared.canOpenURL(url) {
+           //  if sliderObj?.
+             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+         } else {
+             print("Cannot open URL")
+         }
         }else if sliderObj?.modelType?.contains("Category") == true {
             
             

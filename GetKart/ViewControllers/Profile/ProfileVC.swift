@@ -60,6 +60,7 @@ class ProfileVC: UIViewController {
         tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
         
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
+        
         getUserProfileApi()
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
@@ -131,10 +132,7 @@ class ProfileVC: UIViewController {
     }
     
     func getUserProfileApi(){
-        
-//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-//        
-//        if objLoggedInUser.id != nil {
+
             
             if Local.shared.getUserId() > 0{
 
@@ -152,6 +150,11 @@ class ProfileVC: UIViewController {
                         
                         if let data = result["data"] as? Dictionary<String,Any>{
                             
+                            if let sellerDict = data["seller"] as? Dictionary<String,Any>{
+                                
+                                RealmManager.shared.updateUserData(dict: sellerDict)
+                            }
+
                             if let seller = data["seller"] as? Dictionary<String,Any>{
                                 
                                 if let intValue = seller["isBannerPromotion"] as? Int {
@@ -178,7 +181,6 @@ class ProfileVC: UIViewController {
                                 }
                             }
                        
-                            RealmManager.shared.updateUserData(dict: data)
                             self.tblView.reloadData()
                         }
                     }

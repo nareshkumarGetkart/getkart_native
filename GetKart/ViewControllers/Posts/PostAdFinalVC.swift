@@ -266,6 +266,7 @@ extension PostAdFinalVC:UITextFieldDelegate{
                     
                     if let data = result["data"] as? Dictionary<String,Any>{
                         
+                     
                         RealmManager.shared.updateUserData(dict: data)
                        
                     }

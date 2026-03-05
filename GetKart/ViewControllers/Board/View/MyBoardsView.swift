@@ -298,8 +298,19 @@ struct MyBoardCell:View {
                     HStack{
                         
                         VStack(alignment:.leading){
+                           /* if itemObj.boardType  == 1{
+                                
+                            }else  if itemObj.boardType  == 2{
+                                
+                            }else  if itemObj.boardType  == 3{
+                                
+                            }else{
+                                
+                                
+                            }*/
                             if (itemObj.specialPrice ?? 0.0) > 0{
                                 HStack{
+                                    
                                     Text("\(Local.shared.currencySymbol) \((itemObj.specialPrice ?? 0.0).formatNumber())")
                                         .font(.inter(.medium, size: 18))
                                         .foregroundColor(Color(hex: "#008838"))
@@ -310,10 +321,9 @@ struct MyBoardCell:View {
                                     
                                     Text(displayStatus.capitalized).font(Font.inter(.semiBold, size: 11))
                                         .foregroundColor(titleColor)
-                                        .padding()
+                                        .padding(8)
                                         .frame(height:24)
                                         .background(bgColor)
-                                    
                                         .cornerRadius(12)
                                         .clipped()
                                         .padding(.trailing,5)
@@ -332,7 +342,19 @@ struct MyBoardCell:View {
                             }else{
                                 
                                 HStack{
-                                    Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
+                                    if itemObj.boardType == 0{
+                                        Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
+                                    }else{
+                                        
+                                        if itemObj.boardType  == 1{
+                                            Text( "Your Promotional Ad Image").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                                                .padding(.trailing)
+                                        }else{
+                                            Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                                                    .padding(.bottom,10)
+                                                    .padding(.trailing)
+                                        }
+                                    }
                                     
                                     Spacer()
                                     
@@ -341,7 +363,7 @@ struct MyBoardCell:View {
                                     
                                     Text(displayStatus.capitalized).font(Font.inter(.semiBold, size: 11))
                                         .foregroundColor(titleColor)
-                                        .padding()
+                                        .padding(8)
                                         .frame(height:24)
                                         .background(bgColor)
                                     
@@ -353,9 +375,11 @@ struct MyBoardCell:View {
                         }
                     }
                     
-                    Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
-                        .padding(.bottom,10)
-                        .padding(.trailing)
+                    if itemObj.boardType  == 0{
+                        Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                            .padding(.bottom,10)
+                            .padding(.trailing)
+                    }
                     
                     if (itemObj.address ?? "").count > 0{
                         HStack(spacing:4){

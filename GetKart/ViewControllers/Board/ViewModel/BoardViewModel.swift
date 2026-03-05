@@ -227,21 +227,31 @@ final class BoardViewModel: ObservableObject {
                 _ = result["message"] as? String ?? ""
                 
                 if status == 200{
-
+                    
                 }else{
                 }
             }
         }
         
         
-        if let url = URL(string: strURl)  {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                print("Cannot open URL")
-            }
+        var finalString = strURl.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if !finalString.lowercased().hasPrefix("http://") &&
+            !finalString.lowercased().hasPrefix("https://") {
+            finalString = "https://" + finalString
         }
-      
+        
+        guard let url = URL(string: finalString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            //  if sliderObj?.
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("Cannot open URL")
+        }
     }
 
 }

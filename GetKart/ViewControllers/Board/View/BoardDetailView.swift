@@ -16,95 +16,417 @@ struct BoardDetailView: View{
     @State private var page = 1
     @State private var isDataLoading = true
     let itemObj:ItemModel
+    @State  private var isLastPage = false
+    
+    @State private var userDidScroll = false  //  User intent + safety locks
+    @State private var paginationConsumed = false
+    @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    //  ADD THESE
+    @State private var lastItemCount: Int = 0
+    @State private var scrollTick: Int = 0
+    @State private var lastScrollTick: Int = 0
+    
+    private let prefetchOffset = 4   //  call API before 4 items
+    @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var videoFrames: [Int: CGRect] = [:]
+    @State private var visibilityWorkItem: DispatchWorkItem?
+    @State private var openSafari: Bool = false
+    @State private var outboundUrlClicked: String = ""
 
     var body: some View {
         
-        VStack(spacing: 0) {
-            
-            // HEADER
-            HStack {
-                Button {
-                    navigationController?.popViewController(animated: true)
-                } label: {
-                    Image("arrow_left")
-                        .renderingMode(.template)
-                        .foregroundColor(Color(UIColor.label))
-                }.frame(width: 40, height: 40)
+        // HEADER
+        headerView.zIndex(1)
+        
+        ScrollViewReader { proxy in
+            ScrollView {
+                Color.clear
+                    .frame(height: 0)
+                    .id("TOP")
                 
-                Text(itemObj.category?.name ?? "").font(Font.inter(.semiBold, size: 16)).foregroundColor(Color(UIColor.label))
+                    .overlay(
+                        GeometryReader { geo in
+                            Color.clear
+                                .onChange(of: geo.frame(in: .global).minY) { _ in
+                                    scrollTick += 1
+                                }
+                        }
+                    )
+                        
+                        ReelPostView(post: itemObj,
+                                     sendLikeDislikeObject: { isLiked, boardId,likeCount  in
+                            if let index = listArray.firstIndex(where: { $0.id == boardId }) {
+                             // index is Int
+                             print("Found at index:", index)
+                             var obj = listArray[index]
+                             obj.isLiked = isLiked
+                             obj.totalLikes = likeCount
+                             listArray[index] = obj
+                             }
+                        },onClickedUserProfile: { user in
+                            self.pushToProfileScreen(user: user)
+                        }).padding([.horizontal],5)
+                        
+                        let columns = splitColumns()
+                        
+                        HStack(alignment: .top, spacing: 6) {
+                            
+                            // LEFT COLUMN
+                            LazyVStack(spacing: 6) {
+//                                ForEach(columns.left.indices, id: \.self) { index in
+//                                    let item = columns.left[index]
+                                    ForEach(columns.left, id: \.id) { item in
+
+                                        if item.boardType == 2 {
+                                            SmartVideoPlayerView(item: item,
+                                                                 onTapBottomButton: {
+                                                //Tapped vide
+                                                if (item.outbondUrl ?? "").count > 0{
+                                                    outboundUrlClicked =  item.outbondUrl ?? ""
+                                                    openSafari = true
+                                                }
+                                            })
+                                            .background(
+                                                GeometryReader { geo in
+                                                    Color.clear
+                                                        .onAppear {
+                                                            videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                        }
+                                                        .onChange(of: geo.frame(in: .global)) { frame in
+                                                            videoFrames[item.id ?? 0] = frame
+                                                        }
+                                                }
+                                            )
+                                            .measureHeight(id: item.id ?? 0)
+                                            .onAppear {
+                                                handlePrefetch(itemIndex: globalIndex(of: item))
+                                            }
+                                        } else {
+                                        CardItemView(
+                                            item: item,
+                                            onLike: { isLiked, boardId in
+                                           
+                                                updateLike(boardId: boardId, isLiked: isLiked)
+                                            },
+                                            onTap: { pushToDetail(item: item) },
+                                            onTapBoostButton:{
+                                                if item.boardType == 1{
+                                                    //Ckicking on bottom
+                                                    if (item.outbondUrl ?? "").count > 0{
+                                                        outboundUrlClicked =  item.outbondUrl ?? ""
+                                                        openSafari = true
+                                                    }
+                                                    
+                                                }else{
+                                                    paymentGatewayOpen(product: item)
+                                                }
+                                                
+                                            }
+                                        )
+                                        .measureHeight(id: item.id ?? 0)
+                                        .onAppear {
+                                            handlePrefetch(itemIndex: globalIndex(of: item))
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // RIGHT COLUMN
+                            LazyVStack(spacing: 6) {
+//                                ForEach(columns.right.indices, id: \.self) { index in
+//                                    let item = columns.right[index]
+                                    ForEach(columns.right, id: \.id) { item in
+
+                                        if item.boardType == 2 {
+                                            SmartVideoPlayerView(
+                                                item: item,
+                                                onTapBottomButton: {
+                                                    //Tapped vide
+                                                    if (item.outbondUrl ?? "").count > 0{
+                                                        outboundUrlClicked =  item.outbondUrl ?? ""
+                                                        openSafari = true
+                                                    }
+                                                })
+                                            .background(
+                                                GeometryReader { geo in
+                                                    Color.clear
+                                                        .onAppear {
+                                                            videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                        }
+                                                        .onChange(of: geo.frame(in: .global)) { frame in
+                                                            videoFrames[item.id ?? 0] = frame
+                                                        }
+                                                }
+                                            )
+                                            .measureHeight(id: item.id ?? 0)
+                                            .onAppear {
+                                                handlePrefetch(itemIndex: globalIndex(of: item))
+                                            }
+                                        } else {
+                                        CardItemView(
+                                            item: item,
+                                            onLike: { isLiked, boardId in
+                                             updateLike(boardId: boardId, isLiked: isLiked)
+                                            },
+                                            onTap: { pushToDetail(item: item) },
+                                            onTapBoostButton:{
+                                                paymentGatewayOpen(product: item)
+                                            }
+                                        )
+                                        .measureHeight(id: item.id ?? 0)
+                                        .onAppear {
+                                            handlePrefetch(itemIndex: globalIndex(of: item))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding([.horizontal], 5)
+           
                 Spacer()
+            }.background(Color(.systemGray6))
+            .scrollIndicators(.hidden, axes: .vertical)
+            .onAppear {
                 
-                if listArray.count > 0{
-                    if (listArray[currentIndex].user?.id ?? 0) != Local.shared.getUserId(){
-                        Button {
-                            openActionSheetToReportBoard(boardIndex: currentIndex)
-                        } label: {
-                            Image("more")
-                                .renderingMode(.template)
-                                .foregroundColor(Color(UIColor.label))
-                        }
-                        .frame(width: 40, height: 40)
-                    }
+                if listArray.count == 0{
+                    getBoardListApi()
+                    boardClickApi(post: itemObj)
                 }
             }
-            .padding(.horizontal,5)
-            .frame(height: 44)
-            .background(Color(.systemBackground))
-            .zIndex(1)
-            
-            
-            if !listArray.isEmpty {
+            //  Detect REAL user scroll
+                .simultaneousGesture(
+                        DragGesture()
+                            .onEnded { _ in
+                          
+                                scheduleVisibilityUpdate()
+                            }
+                    )
+        
+            .background(
                 
-                VerticalPager(
-                    pages: listArray.map { ReelPostView(post: $0,
-                                                        sendLikeDislikeObject: { isLiked, boardId,likeCount  in
-                        
-                        if let index = listArray.firstIndex(where: { $0.id == boardId }) {
-                            // index is Int
-                            print("Found at index:", index)
-                            var obj = listArray[index]
-                            obj.isLiked = isLiked
-                            obj.totalLikes = likeCount
-                            listArray[index] = obj
-                        }
-                    }) }
-                    ,
-                    onPageChange: { index in
-                        currentIndex = index
-                        print("====\(currentIndex)")
-                        boardClickApi(post: listArray[index])
-                        
-                    })
-                .padding(5)
-                .onChange(of:currentIndex) { newIndex in
-                    if newIndex == listArray.count - 1 {
-                        getBoardListApi()
-                    }
+                NavigationConfigurator { nav in
+                    nav.interactivePopGestureRecognizer?.isEnabled = true
+                    nav.interactivePopGestureRecognizer?.delegate = nil
+                }
+            ) //Added for swipe pop navigation
+            
+            .fullScreenCover(isPresented: $openSafari) {
+                
+                if let url = URL(string:outboundUrlClicked.getValidUrl())  {
+                    
+                    SafariView(url:url)
                 }
             }
-            Spacer()
         }
-        .onAppear {
-            
-            if listArray.count == 0{
-                getBoardListApi()
-                boardClickApi(post: itemObj)
-            }
-        }
-        
-        .background(
-            
-            NavigationConfigurator { nav in
-                nav.interactivePopGestureRecognizer?.isEnabled = true
-                nav.interactivePopGestureRecognizer?.delegate = nil
-            }
-        ) //Added for swipe pop navigation
-        
-        .background(Color(.systemGray6))
-        
     }
 
+
     
+    private func scheduleVisibilityUpdate() {
+        
+        visibilityWorkItem?.cancel()
+        
+        let work = DispatchWorkItem {
+            calculateVisibleVideos()
+        }
+        
+        visibilityWorkItem = work
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
+    
+    private func calculateVisibleVideos() {
+        
+//        guard isActive else {
+//            FeedVideoManager.shared.pauseAll()
+//            return
+//        }
+
+        let screenHeight = UIScreen.main.bounds.height
+        var visibleSet: Set<Int> = []
+
+        for (id, frame) in videoFrames {
+
+            if frame.maxY <= 0 || frame.minY >= screenHeight {
+                continue
+            }
+
+            let visibleHeight =
+                min(frame.maxY, screenHeight)
+                - max(frame.minY, 0)
+
+            let percent = visibleHeight / frame.height
+
+            if percent >= 0.3 {
+                visibleSet.insert(id)
+            }
+        }
+
+        FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
+    }
+    
+    func paymentGatewayOpen(product:ItemModel) {
+
+        paymentGateway = PaymentGatewayCentralized()
+        paymentGateway?.selectedPlanId = product.package?.id ?? 0
+        paymentGateway?.categoryId = product.categoryID ?? 0
+        paymentGateway?.itemId = product.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
+
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                navigationController?.present(vc, animated: true)
+                
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":product.id ?? 0], userInfo: nil)
+
+            }
+            
+      
+               self.paymentGateway = nil
+        }
+
+        paymentGateway?.initializeDefaults()
+    }
+    private var headerView: some View {
+        HStack {
+            Button {
+                navigationController?.popViewController(animated: true)
+            } label: {
+                Image("arrow_left")
+                    .renderingMode(.template)
+                    .foregroundColor(Color(UIColor.label))
+            }
+            .frame(width: 40, height: 40)
+
+            Text(itemObj.category?.name ?? "")
+                .font(Font.inter(.semiBold, size: 16))
+                .foregroundColor(Color(UIColor.label))
+
+            Spacer()
+
+            if listArray.count > 0,
+               (listArray[currentIndex].user?.id ?? 0) != Local.shared.getUserId() {
+
+                Button {
+                    openActionSheetToReportBoard(boardIndex: currentIndex)
+                } label: {
+                    Image("more")
+                        .renderingMode(.template)
+                        .foregroundColor(Color(UIColor.label))
+                }
+                .frame(width: 40, height: 40)
+            }
+        }
+        .padding(.horizontal, 5)
+        .frame(height: 44)
+        .background(Color(.systemBackground))
+    }
+  
+    
+    private func handlePrefetch(itemIndex: Int?) {
+
+        guard let index = itemIndex else { return }
+
+        let triggerIndex = max(listArray.count - prefetchOffset, 0)
+
+        // 1️⃣ Near bottom
+        guard index >= triggerIndex else { return }
+
+        // 2️⃣ Real scroll happened (works on all devices)
+        guard scrollTick > lastScrollTick else { return }
+
+        // 3️⃣ Prevent re-trigger for same data set
+        guard listArray.count > lastItemCount else { return }
+
+        // 4️⃣ Safety guards
+        guard !isDataLoading else { return }
+        guard !isLastPage else { return }
+
+        paginationConsumed = true
+        userDidScroll = false
+
+        lastItemCount = listArray.count
+        lastScrollTick = scrollTick
+
+        getBoardListApi()
+    }
+
+
+    // MARK: - Split into 2 staggered columns
+    private func splitColumns() -> (left: [ItemModel], right: [ItemModel]) {
+
+        var left: [ItemModel] = []
+        var right: [ItemModel] = []
+
+        var leftHeight: CGFloat = 0
+        var rightHeight: CGFloat = 0
+
+        for item in listArray {
+            let h = itemHeights[item.id ?? 0] ?? 200
+
+            if leftHeight <= rightHeight {
+                left.append(item)
+                leftHeight += h
+            } else {
+                right.append(item)
+                rightHeight += h
+            }
+        }
+
+        return (left, right)
+    }
+
+    private func globalIndex(of item: ItemModel) -> Int? {
+        listArray.firstIndex { $0.id == item.id }
+    }
+
+    // MARK: - Empty View
+    private var emptyView: some View {
+        VStack(spacing: 20) {
+            Image("no_data_found_illustrator")
+            Text("No Data Found")
+                .foregroundColor(.orange)
+        }
+    }
+
+    // MARK: - Navigation
+    private func pushToDetail(item: ItemModel) {
+        let vc = UIHostingController(
+            rootView: BoardDetailView(
+                navigationController: navigationController,
+                itemObj: item
+            )
+        )
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    
+    private func pushToProfileScreen(user: User) {
+        let vc = UIHostingController(
+            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
+        )
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    // MARK: - Like update
+    func updateLike(boardId: Int, isLiked: Bool) {
+        if let index = listArray.firstIndex(where: { $0.id == boardId }) {
+            listArray[index].isLiked = isLiked
+            self.manageLikeDislikeApi(boardId: boardId, isLiked: isLiked)
+        }
+    }
     //MARK: Api methods
     func boardClickApi(post:ItemModel){
         
@@ -117,12 +439,11 @@ struct BoardDetailView: View{
                 
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
+               // let message = result["message"] as? String ?? ""
                 
                 if status == 200{
                     
-                }else{
-                }
+                }else{ }
             }
         }
     }
@@ -130,7 +451,6 @@ struct BoardDetailView: View{
         
         if self.page == 1{
             self.listArray.removeAll()
-            self.listArray.append(itemObj)
         }
         let strUrl = Constant.shared.get_related_boards + "?page=\(page)&category_id=\(itemObj.categoryID ?? 0)&exclude_id=\(itemObj.id ?? 0)"
 
@@ -150,11 +470,45 @@ struct BoardDetailView: View{
                     self.listArray.append(contentsOf: newItems)
                     self.page += 1
                     self.isDataLoading = false
+                    
+                    
+                    let currentPage = obj.data?.currentPage as? Int ?? page
+                    let last = obj.data?.lastPage as? Int ?? page
+                    self.isLastPage = currentPage >= last
                 }
                 
 
             }else{
                 self.isDataLoading = false
+            }
+        }
+    }
+    
+    // MARK: - Like / Unlike (unchanged)
+    func manageLikeDislikeApi(boardId: Int, isLiked: Bool) {
+        guard let index = listArray.firstIndex(where: { $0.id == boardId }) else { return }
+
+        let params = ["board_id": boardId]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.manage_board_favourite,
+            param: params,
+            methodType: .post
+        ) { responseObject, error in
+            guard error == nil else { return }
+
+            if let result = responseObject{
+                let status = result["code"] as? Int ?? 0
+                
+                if status == 200,
+                   let data = result["data"] as? [String: Any],
+                   let count = data["favourite_count"] as? Int {
+                    DispatchQueue.main.async {
+                        self.listArray[index].totalLikes = count
+                    }
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshLikeDislikeBoard.rawValue), object:  ["isLike":isLiked,"count":count,"boardId":boardId], userInfo: nil)
+                    
+                }
             }
         }
     }
@@ -201,48 +555,114 @@ struct BoardDetailView: View{
 
 struct ReelPostView: View {
     @State var post: ItemModel
-    @State private var showShareSheet = false
     var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int, _ likeCount:Int) -> Void
-
     @State private var showSeeMore = false
     @State private var isTextTruncated = false
     @State private var showSafari = false
+    @State private var showComments = false
+    @State private var showCommentSeeMore = false
+    @State private var isCommentTextTruncated = false
+    @State private var showShareSheet = false
+    var onClickedUserProfile:(_ user:User) -> Void
 
-    
     var body: some View {
 
         VStack(spacing: 0) {
-
-            // IMAGE + CARD BEHIND IT
-            ZStack {
-
-                // 🔹 CARD BEHIND IMAGE
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.systemBackground))
-                    .shadow(
-                        color: Color(.label).opacity(0.18),
-                        radius: 7,
-                        x: 0,
-                        y: 5
-                    )
-
-                // 🔹 IMAGE
-                if let url = URL(string: post.image ?? "") {
-                    KFImage(url)
-                        .resizable()
-                        .scaledToFit()
-                       // .padding(12) // 👈 spacing from card edges
-                }
-            }
-
-            // 🔹 FLAT CONTENT (NO CARD)
+            PostImagesCarousel(images: post.galleryImages ?? [])
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(.systemBackground))
+                        .shadow(
+                            color: Color(.label).opacity(0.18),
+                            radius: 7,
+                            x: 0,
+                            y: 5
+                        )  )
+              
+            //  FLAT CONTENT (NO CARD)
             bottomCard
-                .padding(.horizontal)
+                .padding(.horizontal,8)
                 .padding(.top, 10)
+            
+            if (post.lastComment?.comment?.count ?? 0) > 0 {
+              
+                HStack{
+                 
+                    Button {
+                        
+                    } label: {
+                      
+                        AsyncImage(url: URL(string: post.lastComment?.user?.profile ?? "")) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 30,height:30)
+                                .clipped()
+                        } placeholder: {
+                            Image("getkartplaceholder")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30,height:30)
+                                .clipped()
+                        }.onTapGesture {
+                            if let obj = post.lastComment?.user{
+                                onClickedUserProfile(obj)
+                            }
+                        }
+                        
+                    }.frame(width: 30,height:30)
+                    .cornerRadius(15.0)
+                    
+                    VStack(alignment:.leading ,spacing: 0){
+                        Text(post.lastComment?.user?.name ?? "").font(.inter(.medium, size: 13)).lineLimit(1)
+                        HStack{
+                           
+                            // Spacer()
+                            if (post.commentsCount ?? 0) > 1{
+                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 11)).lineLimit(1)
+                                Text("...").font(.inter(.medium, size: 13)).foregroundColor(Color(.gray))
+                                Button {
+                                    showComments = true
+                                } label: {
+                                    
+                                    Text("See all comments")
+                                        .font(.inter(.bold, size: 14))
+                                        .foregroundColor(Color(.label))
+                                }
+                            }else{
+                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 11))
+                            }
+                        }
+                       
+//                        ZStack(alignment: .bottomTrailing) {
+//                            
+//                            TruncatableText(
+//                                text: post.lastComment?.comment ?? "",
+//                                lineLimit: 1,
+//                                font: .inter(.regular, size: 12)
+//                            ) { truncated in
+//                                isCommentTextTruncated = truncated
+//                            }.padding(.trailing, isCommentTextTruncated ? 125 : 0) //  space for "See more"
+//                            
+//                            if isCommentTextTruncated{
+//                                Button {
+//                                    showComments = true
+//                                } label: {
+//                                    Text("See all comments")
+//                                        .font(.inter(.bold, size: 14))
+//                                        .foregroundColor(Color(.label))
+//                                }
+//                            }
+//                        }
+                       // Text(post.lastComment?.comment ?? "").lineLimit(1)
+                    }
+                    Spacer()
+                }.padding()
+            }
            
              if (post.user?.id ?? 0) != Local.shared.getUserId(){
               
-                // 🔹 BUY NOW
+                //  BUY NOW
                 Button {
                     showSafari = true
                     outboundClickApi(strURl: post.outbondUrl ?? "")
@@ -255,30 +675,46 @@ struct ReelPostView: View {
                 .background(Color(hexString: "#FF9900"))
                 .cornerRadius(10)
                 .padding()
-            }
+             }else{
+                 HStack{
+                     Spacer()
+                 }.frame(height:8)
+             }
             
-        }.background(Color(.systemBackground))
-        
-            .sheet(isPresented: $showSeeMore) {
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 6)
+        )
+           
+        .sheet(isPresented: $showSeeMore) {
                 DynamicHeightSheet(
-                    content: SeeMorePopupView(
-                        title: post.name ?? "",
-                        description: post.description ?? ""
-                    ) {
+                    content:SeeMorePopupView(title: post.name ?? "", description: post.description ?? "", onBuy: {
                         showSeeMore = false
                         showSafari = true
                         outboundClickApi(strURl: post.outbondUrl ?? "")
-                    }
+                    }, ctaLabel: post.ctaLabel ?? "Buy Now")
                 )
-            }
+           
+        }
 
-            .fullScreenCover(isPresented: $showSafari) {
+        .fullScreenCover(isPresented: $showSafari) {
               
                 if let url = URL(string:getUrlValid(strURl: post.outbondUrl ?? ""))  {
                     
                     SafariView(url:url)
                 }
-            }
+        }
+           
+        .sheet(isPresented: $showComments) {
+                CommentsView(itemObj: post) {
+                    showComments = false
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+           
+        }
 
     }
 
@@ -318,6 +754,20 @@ struct ReelPostView: View {
                         }
                     }
                 }
+                
+                
+                Button {
+                    
+                    showComments = true
+                } label: {
+                    HStack(spacing:3){
+                        Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
+                        if (post.commentsCount ?? 0) > 0{
+                            Text("\((post.commentsCount ?? 0))").font(.inter(.medium, size: 14)).foregroundColor(Color(.label))
+                        }
+                    }
+                }
+                
                 Button {
                     showShareSheet = true
                 } label: {
@@ -387,6 +837,7 @@ struct ReelPostView: View {
                             .foregroundColor(Color(hex: "#008838"))
                         
                     }.padding(.top,5)
+                        
 
                 }else{
                    
@@ -586,37 +1037,56 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
 
 
 struct PostImagesCarousel: View {
-    let images: [String]
-
+    
+    let images: [GalleryImage]
+    @State private var selectedIndex = 0
+    
     var body: some View {
-        TabView {
-            ForEach(images, id: \.self) { img in
+        
+        TabView(selection: $selectedIndex) {
+            
+            ForEach(Array(images.enumerated()), id: \.element.id) { index, img in
                 
-                if let url = URL(string: img){
+                if let url = URL(string: img.image ?? "") {
                     
                     
-                    AsyncImage(url: url) { img in
-                        img.resizable()
-                            .resizable()
-                            .scaledToFit()
-                         .frame(maxWidth: UIScreen.ft_width())
-                            .clipped()
-                    } placeholder: {
-                        Image("getkartplaceholder")
-                            .resizable()
-                            .scaledToFit()
-                            .clipped()
-                    }
+                    KFImage(url)
+                      .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        )
+                        .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                    
+//                    AsyncImage(url: url) { image in
+//                        image.scaleFactor(UIScreen.main.scale)
+//                            .resizable()
+//                            .scaledToFit()
+//                           .frame(height: 350)
+//                            .clipped()
+//                    } placeholder: {
+//                        Image("getkartplaceholder")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(height: 350)
+//                            .clipped()
+//                    }
+                    .tag(index)
                 }
-
             }
         }
-        .tabViewStyle(PageTabViewStyle())
-        .frame(maxHeight: 400) // match your UI
-        .clipped()
+        .frame(height: 350)
+        .tabViewStyle(.page(indexDisplayMode: .automatic))
+        .clipShape(RoundedRectangle(cornerRadius: 10)) //  important
+        //.padding(.horizontal, 5)
+        .onAppear {
+            UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.orange
+            UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray4
+        }
     }
 }
-
 
 
 struct NavigationConfigurator: UIViewControllerRepresentable {
@@ -639,6 +1109,7 @@ struct NavigationConfigurator: UIViewControllerRepresentable {
 
 import UIKit
 import CoreImage
+import SafariServices
 
 extension UIImage {
 
@@ -933,7 +1404,8 @@ struct SeeMorePopupView: View {
     let title: String
     let description: String
     let onBuy: () -> Void
-
+    let ctaLabel:String?
+    
     var body: some View {
         VStack(spacing: 14) {
 
@@ -947,7 +1419,7 @@ struct SeeMorePopupView: View {
                .foregroundColor(Color(hex: "#666666"))
 
             Button(action: onBuy) {
-                Text("Buy Now")
+                Text( ctaLabel ?? "Buy Now")
                     .font(.inter(.medium, size: 18))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, minHeight: 50)

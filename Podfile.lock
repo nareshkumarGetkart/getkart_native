@@ -55,11 +55,6 @@ PODS:
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleMaps (7.1.0):
-    - GoogleMaps/Maps (= 7.1.0)
-  - GoogleMaps/Base (7.1.0)
-  - GoogleMaps/Maps (7.1.0):
-    - GoogleMaps/Base
   - GooglePlaces (9.2.0)
   - GoogleSignIn (8.0.0):
     - AppAuth (< 2.0, >= 1.7.3)
@@ -167,7 +162,6 @@ DEPENDENCIES:
   - FirebaseAuth
   - FirebaseCore
   - FittedSheets
-  - GoogleMaps (= 7.1.0)
   - GooglePlaces
   - GoogleSignIn
   - GoogleSignInSwiftSupport
@@ -200,7 +194,6 @@ SPEC REPOS:
     - FirebaseMessaging
     - FittedSheets
     - GoogleDataTransport
-    - GoogleMaps
     - GooglePlaces
     - GoogleSignIn
     - GoogleSignInSwiftSupport
@@ -247,7 +240,6 @@ SPEC CHECKSUMS:
   FirebaseMessaging: e1aca1fcc23e8b9eddb0e33f375ff90944623021
   FittedSheets: 38ec85129bf5c970f99d4dba4fbf48185c5fa98a
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleMaps: bc56ffb0324e345a2d91bac1a64a920f9c8f1b20
   GooglePlaces: f997a80fb7b88233ad53aa8c9d5f092c86ceae54
   GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
   GoogleSignInSwiftSupport: de6a0f0c2f0f7420d77a58275fbef7c7f4fcf3c2
@@ -278,6 +270,6 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: e5850b261f5bfee49fa5eddc1552e0039ff136d7
+PODFILE CHECKSUM: d60d2c8dc18ef1e68dfef30dc17f1e9a0248e2c2
 
 COCOAPODS: 1.16.2
