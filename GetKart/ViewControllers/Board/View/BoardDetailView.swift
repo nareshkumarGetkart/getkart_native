@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Kingfisher
+import FittedSheets
 
 struct BoardDetailView: View{
     
@@ -15,7 +16,7 @@ struct BoardDetailView: View{
     @State private var listArray:Array<ItemModel> = [ItemModel]()
     @State private var page = 1
     @State private var isDataLoading = true
-    let itemObj:ItemModel
+    @State var itemObj:ItemModel
     @State  private var isLastPage = false
     
     @State private var userDidScroll = false  //  User intent + safety locks
@@ -32,7 +33,9 @@ struct BoardDetailView: View{
     @State private var visibilityWorkItem: DispatchWorkItem?
     @State private var openSafari: Bool = false
     @State private var outboundUrlClicked: String = ""
+    @State private var showComments: Bool = false
 
+    
     var body: some View {
         
         // HEADER
@@ -53,18 +56,17 @@ struct BoardDetailView: View{
                         }
                     )
                         
-                        ReelPostView(post: itemObj,
+                        ReelPostView(post: $itemObj,
                                      sendLikeDislikeObject: { isLiked, boardId,likeCount  in
-                            if let index = listArray.firstIndex(where: { $0.id == boardId }) {
-                             // index is Int
-                             print("Found at index:", index)
-                             var obj = listArray[index]
-                             obj.isLiked = isLiked
-                             obj.totalLikes = likeCount
-                             listArray[index] = obj
-                             }
+                         
+                            itemObj.isLiked = isLiked
+                            itemObj.totalLikes = likeCount
+                           
                         },onClickedUserProfile: { user in
                             self.pushToProfileScreen(user: user)
+                        },onClickedUserComents:{
+                           // presentCommentScreen()
+                            showComments = true
                         }).padding([.horizontal],5)
                         
                         let columns = splitColumns()
@@ -73,8 +75,7 @@ struct BoardDetailView: View{
                             
                             // LEFT COLUMN
                             LazyVStack(spacing: 6) {
-//                                ForEach(columns.left.indices, id: \.self) { index in
-//                                    let item = columns.left[index]
+
                                     ForEach(columns.left, id: \.id) { item in
 
                                         if item.boardType == 2 {
@@ -193,14 +194,38 @@ struct BoardDetailView: View{
                     boardClickApi(post: itemObj)
                 }
             }
+            
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
+                )
+            ) { notification in
+                
+                guard let dict = notification.object as? [String: Any] else { return }
+                
+                let isLike  = dict["isLike"] as? Bool ?? false
+                let count  = dict["count"] as? Int ?? 0
+                let boardId = dict["boardId"] as? Int ?? 0
+              
+                
+                if let index = listArray.firstIndex(where: { $0.id == boardId }) {
+                    listArray[index].isLiked = isLike
+                    listArray[index].totalLikes = count
+                }
+                
+                if itemObj.id == boardId{
+                    itemObj.isLiked = isLike
+                    itemObj.totalLikes = count
+                }
+            }
             //  Detect REAL user scroll
-                .simultaneousGesture(
-                        DragGesture()
-                            .onEnded { _ in
-                          
-                                scheduleVisibilityUpdate()
-                            }
-                    )
+            .simultaneousGesture(
+                DragGesture()
+                    .onEnded { _ in
+                        
+                        scheduleVisibilityUpdate()
+                    }
+            )
         
             .background(
                 
@@ -216,6 +241,23 @@ struct BoardDetailView: View{
                     
                     SafariView(url:url)
                 }
+            }
+            
+            .sheet(isPresented: $showComments) {
+               
+                CommentsView(onClose:{ isToProfileOpen,user  in
+                    showComments = false
+
+                    if isToProfileOpen{
+                        if let obj = user{
+                            pushToProfileScreen(user: obj)
+                        }
+                    }
+
+                }, itemObj: itemObj, navController: navigationController)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                
             }
         }
     }
@@ -411,6 +453,42 @@ struct BoardDetailView: View{
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    private func presentCommentScreen() {
+        let controller = UIHostingController(
+            rootView: CommentsView(itemObj: itemObj, navController: navigationController)
+        )
+//        vc.hidesBottomBarWhenPushed = true
+//        navigationController?.pushViewController(vc, animated: true)
+        
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic,.fixed(0.75)],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: true))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+            self.navigationController?.present(sheet, animated: true, completion: nil)
+        }
+        
+    }
     
     private func pushToProfileScreen(user: User) {
         let vc = UIHostingController(
@@ -554,7 +632,7 @@ struct BoardDetailView: View{
 }
 
 struct ReelPostView: View {
-    @State var post: ItemModel
+    @Binding var post: ItemModel
     var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int, _ likeCount:Int) -> Void
     @State private var showSeeMore = false
     @State private var isTextTruncated = false
@@ -564,6 +642,7 @@ struct ReelPostView: View {
     @State private var isCommentTextTruncated = false
     @State private var showShareSheet = false
     var onClickedUserProfile:(_ user:User) -> Void
+    var onClickedUserComents:() -> Void
 
     var body: some View {
 
@@ -622,7 +701,8 @@ struct ReelPostView: View {
                                 Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 11)).lineLimit(1)
                                 Text("...").font(.inter(.medium, size: 13)).foregroundColor(Color(.gray))
                                 Button {
-                                    showComments = true
+                                   // showComments = true
+                                    onClickedUserComents()
                                 } label: {
                                     
                                     Text("See all comments")
@@ -707,14 +787,14 @@ struct ReelPostView: View {
                 }
         }
            
-        .sheet(isPresented: $showComments) {
-                CommentsView(itemObj: post) {
+       /* .sheet(isPresented: $showComments) {
+            CommentsView(itemObj: post,navController:self.navigationController) {
                     showComments = false
                 }
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
            
-        }
+        }*/
 
     }
 
@@ -757,8 +837,8 @@ struct ReelPostView: View {
                 
                 
                 Button {
-                    
-                    showComments = true
+                    onClickedUserComents()
+                   // showComments = true
                 } label: {
                     HStack(spacing:3){
                         Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))

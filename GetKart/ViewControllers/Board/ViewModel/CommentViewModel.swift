@@ -151,8 +151,9 @@ class CommentViewModel:ObservableObject{
     func editReply(commentId:Int,comment:String,parentId:Int){
         
         let params = ["comment_id":commentId,"comment":comment] as [String : Any]
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.edit_reply, param: params) { response, error in
-           
+        //URLhandler.sharedinstance.makeCall(url: Constant.shared.edit_reply, param: params) { response, error in
+            URLhandler.sharedinstance.makeCall(url: Constant.shared.edit_comment, param: params) { response, error in
+
             if error == nil{
                  if  let result = response{
                      let index  = self.commentsArray.firstIndex { $0.id == parentId }
@@ -174,8 +175,10 @@ class CommentViewModel:ObservableObject{
     func deleteReply(comment_id:Int,parentId:Int){
         
         let params = ["comment_id":comment_id] as [String : Any]
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.delete_reply, param: params) { response, error in
-            
+     //   URLhandler.sharedinstance.makeCall(url: Constant.shared.delete_reply, param: params) { response, error in
+        
+    URLhandler.sharedinstance.makeCall(url: Constant.shared.delete_comment, param: params) { response, error in
+
             if error == nil{
                  if  let result = response{
                      let index  = self.commentsArray.firstIndex { $0.id == parentId }

@@ -27,7 +27,7 @@ struct MyBoardsView: View {
                     .foregroundColor(Color(UIColor.label))
             }
             
-            Text("My Boards") .font(.inter(.medium, size: 18))
+            Text("My Boards & Ideas") .font(.inter(.medium, size: 18))
             Spacer()
             
         }.padding().frame(height:44)

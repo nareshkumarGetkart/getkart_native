@@ -10,18 +10,25 @@ import FittedSheets
 import PhonePePayment
 import StoreKit
 import SwiftUI
-
+import PayUCheckoutProKit
+import PayUCheckoutProBaseKit
+import PayUParamsKit
+import CryptoKit
+import PayUCommonUI
 
 enum PaymentMethod: Int {
     case phonePe = 3
     case applePay = 1
-    
+    case payUPay = 4
+
     var title: String {
         switch self {
         case .phonePe:
             return "PhonePe"
         case .applePay:
             return "apple"
+        case .payUPay:
+            return "Payu"
         }
     }
 }
@@ -49,9 +56,7 @@ class PayPlanVC: UIViewController {
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var btnPay:UIButton!
     @IBOutlet weak var lblDesc:UILabel!
-
     var InAppReceipt = ""
-    
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     
     var campaign_banner_id:Int?
@@ -97,7 +102,7 @@ class PayPlanVC: UIViewController {
         self.getPaymentSettings()
     }
     
-    //MARK: UIbutton Action Methods
+    //MARK: UIButton Action Methods
     @IBAction func closeBtnAction(_ sender:UIButton){
         
         if self.sheetViewController?.options.useInlineMode == true {
@@ -113,11 +118,10 @@ class PayPlanVC: UIViewController {
             //In App
             if paymentFor == .bannerPromotion{
                 inAppCampaignPaymentIntent()
-           
+                
             }else if paymentFor == .bannerPromotionDraft{
                 revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
-
-
+                
             }else{
                 self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
             }
@@ -127,7 +131,7 @@ class PayPlanVC: UIViewController {
             if paymentFor == .bannerPromotion{
                 
                 getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
-           
+                
             } else if paymentFor == .bannerPromotionDraft{
                 
                 revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
@@ -135,9 +139,15 @@ class PayPlanVC: UIViewController {
             }else{
                 self.createPhonePayOrder(package_id: planObj?.id ?? 0)
             }
-
+            
+        }else if payment_method_type == 4 {
+            
+            //Payu pay
+            createPayUIntent(package_id: planObj?.id ?? 0)
         }
     }
+    
+    //MARK: Api Methods
     
     func getPaymentSettings(){
         
@@ -179,7 +189,6 @@ class PayPlanVC: UIViewController {
                                 if let method = PaymentMethod(rawValue: self.payment_method_type) {
                                     self.payment_method = method.title
                                 }
-                               // self.payment_method = "PhonePe"
                                 
                                 if devEnvironment == .live {
                                     self.ppPayment = PPPayment(environment: .production,
@@ -192,6 +201,26 @@ class PayPlanVC: UIViewController {
                                                                merchantId: self.merchantId, enableLogging: true)
                                 }
 
+                            }
+                        }else if self.payment_method_type == 4 {
+                            //PayuMoney Pay
+                            
+                            if let PayuDict = dataDict["Payu"] as? Dictionary<String, Any>  {
+                                
+                                self.api_key = PayuDict["api_key"] as? String ?? ""
+
+                                if let method = PaymentMethod(rawValue: self.payment_method_type) {
+                                    self.payment_method = method.title
+                                }
+                                
+                                /*
+                                 Payu =         {
+                                     "api_key" = dBtGYO;
+                                     "currency_code" = "<null>";
+                                     "payment_method" = Payu;
+                                     status = 1;
+                                 }
+                                 */
                             }
                         }
                     }
@@ -248,10 +277,11 @@ class PayPlanVC: UIViewController {
         }
         
     }
-    
-    
+}
 
-  
+extension PayPlanVC{
+    
+    //MARK: Banner promotion
     
     func revokeCampaignPaymentApi(package_id:Int){
         
@@ -369,7 +399,10 @@ class PayPlanVC: UIViewController {
     --form 'payment_method="PhonePe"'
      
     */
-    
+}
+
+extension PayPlanVC{
+    //MARK: Phone Pe
     
     func createPhonePayOrder(package_id:Int){
                 
@@ -418,6 +451,8 @@ class PayPlanVC: UIViewController {
     }
     
     
+    
+    
     func startCheckoutPhonePay(orderId: String, token:String){
         let appSchema =  "getkart.com"//"Getkart IOS App"
         ppPayment.startCheckoutFlow(merchantId: merchantId,
@@ -442,9 +477,249 @@ class PayPlanVC: UIViewController {
     }
 }
 
+extension PayPlanVC{
+    //MARK: Payu
+    
+    func createPayUIntent(package_id:Int){
+                
+        var params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city,"state":state]
+        
+        if let postItemId = itemId{
+            params["item_id"] = postItemId
+        }
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.payu_payment_intent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            let hash = payment_intentDict["hash"] as? String ?? ""
+                            let payment_transaction_id = payment_intentDict["payment_transaction_id"] as? Int ?? 0
+                        }
+
+                      
+                        if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                            
+                            let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                            let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                            self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                            self?.openPayuMoney(order_id: self?.paymentIntentId ?? "", amount: amount)
+
+                        }
+                        
+                    }
+                    
+                    
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
+    
+    func openPayuMoney(order_id:String, amount:Int) {
+
+        let userInfo = RealmManager.shared.fetchLoggedInUserInfo()
+
+        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "test@test.com"
+
+        let paymentParam = PayUPaymentParam(
+            key: api_key,
+            transactionId: order_id,
+            amount: String(format: "%.2f", Double(amount)),
+            productInfo: "Test Product",
+            firstName: userInfo.name ?? "Test",
+            email: email,
+            phone: userInfo.mobile ?? "9999999999",
+            surl: "https://payu.herokuapp.com/success",
+            furl: "https://payu.herokuapp.com/failure",
+            environment: (devEnvironment == .live) ? .production : .test
+        )
+
+        paymentParam.userCredential = "\(api_key):\(email)"
+
+        paymentParam.additionalParam = [
+            "udf1": "",
+            "udf2": "",
+            "udf3": "",
+            "udf4": "",
+            "udf5": ""
+        ]
+
+        paymentParam.userCredential = "\(api_key):\(email)"
+        // PayU Configuration
+        let config = PayUCheckoutProConfig()
+        config.merchantName = "Test Merchant"
+        config.showExitConfirmationOnCheckoutScreen = true
+        
+      
+
+        // Open PayU Checkout
+       /* PayUCheckoutPro.open(
+            on: (AppDelegate.sharedInstance.navigationController?.topViewController!)!,
+            paymentParam: paymentParam,
+            config: config,
+            delegate: self
+        )
+        */
+        
+      /*  PayUCheckoutPro.open(on: <#T##UIViewController#>, paymentParam: <#T##PayUPaymentParam#>, config: <#T##PayUCheckoutProConfig?#>, delegate: <#T##any PayUCheckoutProDelegate#>)
+        PayUCheckoutPro.open(
+            on: self,
+            paymentParam: paymentParam,
+            config: config,
+            delegate: self
+        ) { (hashName, hashString, completion) in
+
+            print("HashName:", hashName)
+            print("HashString:", hashString)
+
+            self.fetchHashFromServer(hashName: hashName,
+                                     hashString: hashString) { hash in
+
+                completion(hash ?? "")
+            }
+        }*/
+        
+    }
+    
+    
+    
+    func fetchHashFromServer(hashName: String,
+                             hashString: String,
+                             completion: @escaping (String?) -> Void) {
+
+        let url = URL(string: "https://yourserver.com/generate-hash")!
+
+        let body: [String: Any] = [
+            "hashName": hashName,
+            "hashString": hashString
+        ]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+
+            guard let data = data else {
+                completion(nil)
+                return
+            }
+
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let hash = json?["hash"] as? String
+
+            completion(hash)
+
+        }.resume()
+    }
+    
+    //MARK: Generate HAsh
+    
+    func generatePayUHash(
+        key: String,
+        txnId: String,
+        amount: String,
+        productInfo: String,
+        firstName: String,
+        email: String,
+        salt: String
+    ) -> String {
+
+        let hashString = "\(key)|\(txnId)|\(amount)|\(productInfo)|\(firstName)|\(email)|||||||||||\(salt)"
+        
+        print("Hash String:", hashString)
+
+        let hash = hashString.sha512()
+        
+        print("Generated Hash:", hash)
+
+        return hash
+    }
+  
+}
 
 
 
+extension PayPlanVC: PayUCheckoutProDelegate {
+   
+    
+    func generateHash(for param: DictOfString, onCompletion: @escaping PayUHashGenerationCompletion) {
+        // Send this string to your backend and append the salt at the end and send the sha512 back to us, do not calculate the hash at your client side, for security is reasons, hash has to be calculated at the server side
+        let hashStringWithoutSalt = param[HashConstant.hashString] ?? ""
+        // Or you can send below string hashName to your backend and send the sha512 back to us, do not calculate the hash at your client side, for security is reasons, hash has to be calculated at the server side
+        let hashName = param[HashConstant.hashName] ?? ""
+        let postSalt = param[HashConstant.postSalt] ?? "" //// compulsory for Additional Charges and Split Payment
+        // Set the hash in below string which is fetched from your server
+            //  "<create SHA -512 hash of 'hashString+salt+postSalt'>"
+        
+       //
+        //fetchHashFromServer(hashName: hashName, hashString: <#T##String#>, completion: <#T##(String?) -> Void#>)
+        
+        
+       // onCompletion([hashName : hashFetchedFromServer])
+    }
+    
+  /*  func generateHash(
+        for param: DictOfString,
+        onCompletion: @escaping PayUHashGenerationCompletion
+    ) {
+
+        let salt = "Df4YHc5eBB32VLMFFvE42Bz0AcdMKqV0"
+
+        guard let hashName = param["hashName"],
+              let hashString = param["hashString"] else { return }
+
+        print("HashName:", hashName)
+        print("HashString:", hashString)
+
+        let finalHash = generateSHA512(hashString + salt)
+
+        onCompletion([hashName: finalHash])
+    }
+    */
+    func generateSHA512(_ value: String) -> String {
+
+        let data = Data(value.utf8)
+        let hash = SHA512.hash(data: data)
+
+        return hash.map { String(format: "%02x", $0) }.joined()
+    }
+    
+    func onPaymentSuccess(response: Any?) {
+        print("Payment Success:", response ?? "")
+    }
+
+    func onPaymentFailure(response: Any?) {
+        print("Payment Failed:", response ?? "")
+    }
+
+    func onPaymentCancel(isTxnInitiated: Bool) {
+        print("Payment Cancelled")
+    }
+
+    func onError(_ error: Error?) {
+        print("Payment Error:", error ?? "")
+    }
+}
 extension PayPlanVC {
     //MARK: For campaign banner intent
 
@@ -610,5 +885,17 @@ extension PayPlanVC {
             }
             catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
         }
+    }
+}
+
+
+
+
+
+extension String {
+    func sha512() -> String {
+        let data = Data(self.utf8)
+        let digest = SHA512.hash(data: data)
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 }

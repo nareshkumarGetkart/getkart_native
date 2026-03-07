@@ -822,6 +822,13 @@ final class Constant: NSObject {
     }
     
     
+    var payu_payment_intent:String{
+        get {
+            return "\(Constant.shared.baseURL)/v2/payu-payment-intent"
+        }
+    }
+    
+    
     var board_payment_intent:String{
         get {
             return "\(Constant.shared.baseURL)/v1/board-payment-intent"

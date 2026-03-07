@@ -459,7 +459,6 @@ final class BoardViewModelNew: ObservableObject {
             items[index].isLiked = isLike
             items[index].totalLikes = likeCount
         }
-       
     }
     
     

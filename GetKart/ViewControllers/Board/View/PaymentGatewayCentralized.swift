@@ -11,6 +11,11 @@ import FittedSheets
 import PhonePePayment
 import StoreKit
 import SwiftUI
+import PayUCheckoutProKit
+import PayUCheckoutProBaseKit
+import PayUParamsKit
+import CryptoKit
+import PayUCommonUI
 
 class PaymentGatewayCentralized{
     
@@ -133,6 +138,27 @@ class PaymentGatewayCentralized{
                                 self?.openPaymentPay()
 
                            // }
+                        }else if self?.payment_method_type == 4 {
+                            //PayuMoney Pay
+                            
+                            if let PayuDict = dataDict["Payu"] as? Dictionary<String, Any>  {
+                                
+                                self?.api_key = PayuDict["api_key"] as? String ?? ""
+
+                                if let method = PaymentMethod(rawValue: self?.payment_method_type ?? 4) {
+                                    self?.payment_method = method.title
+                                }
+                                
+                                self?.openPaymentPay()
+                                /*
+                                 Payu =         {
+                                     "api_key" = dBtGYO;
+                                     "currency_code" = "<null>";
+                                     "payment_method" = Payu;
+                                     status = 1;
+                                 }
+                                 */
+                            }
                         }
                       
                     }
@@ -146,7 +172,8 @@ class PaymentGatewayCentralized{
     
     
   private  func openPaymentPay(){
-      if payment_method_type == 1 {//In App
+      if payment_method_type == 1 {
+          //In App
           
           if paymentFor == .bannerPromotion{
               
@@ -176,7 +203,11 @@ class PaymentGatewayCentralized{
                 
                 self.createPhonePayOrder(package_id: selectedPlanId)
             }
-        }
+      }else if payment_method_type == 4 {
+          
+          //Payu Pay
+          self.createPayUIntent(package_id: selectedPlanId)
+      }
     }
     
     private  func updateOrderApi(){
@@ -584,5 +615,176 @@ class PaymentGatewayCentralized{
             }
             catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
         }
+    }
+}
+
+
+
+extension PaymentGatewayCentralized{
+    //MARK: Payu
+    
+    func createPayUIntent(package_id:Int){
+                
+        var params:Dictionary<String, Any> = ["package_id":package_id, "payment_method":payment_method, "platform_type":"app","category_id":categoryId,"city":city,"state":state]
+        
+        if let postItemId = itemId{
+            params["item_id"] = postItemId
+        }
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.payu_payment_intent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            let hash = payment_intentDict["hash"] as? String ?? ""
+                            let payment_transaction_id = payment_intentDict["payment_transaction_id"] as? Int ?? 0
+                        }
+
+                      
+                        if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                            
+                            let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                            let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                            self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                            self?.openPayuMoney(order_id: self?.paymentIntentId ?? "", amount: amount)
+
+                        }
+                        
+                    }
+                    
+                    
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
+    
+    func openPayuMoney(order_id:String, amount:Int) {
+
+        let userInfo = RealmManager.shared.fetchLoggedInUserInfo()
+
+        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "test@test.com"
+
+        let paymentParam = PayUPaymentParam(
+            key: api_key,
+            transactionId: order_id,
+            amount: String(format: "%.2f", Double(amount)),
+            productInfo: "Test Product",
+            firstName: userInfo.name ?? "Test",
+            email: email,
+            phone: userInfo.mobile ?? "9999999999",
+            surl: "https://payu.herokuapp.com/success",
+            furl: "https://payu.herokuapp.com/failure",
+            environment: .test
+        )
+
+        paymentParam.userCredential = "\(api_key):\(email)"
+
+        paymentParam.additionalParam = [
+            "udf1": "",
+            "udf2": "",
+            "udf3": "",
+            "udf4": "",
+            "udf5": ""
+        ]
+
+        paymentParam.userCredential = "\(api_key):\(email)"
+        // PayU Configuration
+        let config = PayUCheckoutProConfig()
+        config.merchantName = "Test Merchant"
+        config.showExitConfirmationOnCheckoutScreen = true
+
+        // Open PayU Checkout
+        PayUCheckoutPro.open(
+            on: (AppDelegate.sharedInstance.navigationController?.topViewController!)!,
+            paymentParam: paymentParam,
+            config: config,
+            delegate: self
+        )
+    }
+    //MARK: Generate HAsh
+    
+    func generatePayUHash(
+        key: String,
+        txnId: String,
+        amount: String,
+        productInfo: String,
+        firstName: String,
+        email: String,
+        salt: String
+    ) -> String {
+
+        let hashString = "\(key)|\(txnId)|\(amount)|\(productInfo)|\(firstName)|\(email)|||||||||||\(salt)"
+        
+        print("Hash String:", hashString)
+
+        let hash = hashString.sha512()
+        
+        print("Generated Hash:", hash)
+
+        return hash
+    }
+}
+
+
+extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
+   
+    func generateHash(
+        for param: DictOfString,
+        onCompletion: @escaping PayUHashGenerationCompletion
+    ) {
+
+        let salt = "Df4YHc5eBB32VLMFFvE42Bz0AcdMKqV0"
+
+        guard let hashName = param["hashName"],
+              let hashString = param["hashString"] else { return }
+
+        print("HashName:", hashName)
+        print("HashString:", hashString)
+
+        let finalHash = generateSHA512(hashString + salt)
+
+        onCompletion([hashName: finalHash])
+    }
+    
+    func generateSHA512(_ value: String) -> String {
+
+        let data = Data(value.utf8)
+        let hash = SHA512.hash(data: data)
+
+        return hash.map { String(format: "%02x", $0) }.joined()
+    }
+    
+    func onPaymentSuccess(response: Any?) {
+        print("Payment Success:", response ?? "")
+    }
+
+    func onPaymentFailure(response: Any?) {
+        print("Payment Failed:", response ?? "")
+    }
+
+    func onPaymentCancel(isTxnInitiated: Bool) {
+        print("Payment Cancelled")
+    }
+
+    func onError(_ error: Error?) {
+        print("Payment Error:", error ?? "")
     }
 }

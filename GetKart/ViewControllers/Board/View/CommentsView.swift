@@ -8,20 +8,22 @@
 import SwiftUI
 
 struct CommentsView: View {
-    
+    var onClose:((_ isToProfilePpen:Bool,_ user:User?) -> Void)?
     let itemObj:ItemModel?
+    var navController:UINavigationController?
+
     @State private var commentText: String = ""
     @State private var replyingTo: String? = nil
     @State private var isFocused: Bool = false
     @StateObject private var keyboard = KeyboardObserver()
     @StateObject private var objVM = CommentViewModel()
     @State private var replyCommentId = 0
-    var onClose: (() -> Void)?
     @State private var textHeight: CGFloat = 35
     @State private var selectedCommentObj:CommentModel?
-    @State private var showDeleteConfirmationSheet: Bool = false
-    @State private var showBlockConfirmationSheet: Bool = false
-    
+    @State private var showActionSheet = false
+    @State private var confirmationType: ConfirmationType?
+    @State private var selectedUser: User?
+
     var body: some View {
 
         VStack(spacing: 0) {
@@ -52,10 +54,15 @@ struct CommentsView: View {
                                 
                                 loadReplies(commentId: commentId)
                             },selectedOption:{ objComment in
-                                selectedCommentObj = objComment
                                 DispatchQueue.main.async {
-                                    actionSheetOpen()
+                                    selectedCommentObj = objComment
+                                    showActionSheet = true
                                 }
+                            },selectedUser:{user in
+                            
+                                
+                               // onClose?(true,user)
+
                             })
                         }
                         Spacer()
@@ -95,34 +102,71 @@ struct CommentsView: View {
                 objVM.getComment(itemId: itemObj?.id ?? 0)
             }
         }
-        .sheet(isPresented: $showBlockConfirmationSheet) {
-            ConfirmationView(user: selectedCommentObj?.user,confirmType: .blockUser,
-            onCancel: {
-                showBlockConfirmationSheet = false
-            },
-            onDone: {
-                showBlockConfirmationSheet = false
-            }) .presentationDetents([.height(220)])
+        .confirmationDialog(
+            "",
+            isPresented: $showActionSheet,
+            titleVisibility: .hidden
+        ) {
+
+            if selectedCommentObj?.user?.id == Local.shared.getUserId() {
+
+                Button("Edit") {
+                    commentText = selectedCommentObj?.comment ?? ""
+                    isFocused = true
+                }
+
+                Button("Delete") {
+                    confirmationType = .deleteComment
+                }
+
+            } else {
+
+                Button("Report") {
+                }
+
+                Button("Block User") {
+                    confirmationType = .blockUser
+                }
+            }
+
+            Button("Cancel", role: .cancel) { }
+
+        }
+        .sheet(item: $confirmationType) { type in
+            if let obj = selectedCommentObj?.user{
+                ConfirmationView(
+                    user: obj,
+                    confirmType:type,
+                    onCancel: {
+                        confirmationType = nil
+
+                    },
+                    onDone: {
+                        
+                        if type == .deleteComment{
+                            if (selectedCommentObj?.parentID ?? 0) > 0{
+                                objVM.deleteReply(comment_id: selectedCommentObj?.id ?? 0, parentId: selectedCommentObj?.parentID ?? 0)
+                            }else{
+                                objVM.deleteComment(comment_id: selectedCommentObj?.id ?? 0)
+                            }
+                        }else if type == .blockUser{
+                                                    
+                        }
+                        
+                        confirmationType = nil
+
+                    }
+                ).presentationDetents([.height(220)])
                 .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(30)
+            }
+            
+        }
+        .sheet(item: $selectedUser) { user in
+            
+            SellerProfileView(navController: self.navController, userId: user.id ?? 0)
         }
         
-        .sheet(isPresented: $showDeleteConfirmationSheet) {
-            ConfirmationView(user: selectedCommentObj?.user,confirmType: .deleteComment,
-            onCancel: {
-                showDeleteConfirmationSheet = false
-            },
-            onDone: {
-                showDeleteConfirmationSheet = false
-                if (selectedCommentObj?.parentID ?? 0) > 0{
-                    objVM.deleteReply(comment_id: selectedCommentObj?.id ?? 0, parentId: selectedCommentObj?.parentID ?? 0)
-                }else{
-                    objVM.deleteComment(comment_id: selectedCommentObj?.id ?? 0)
-                }
-            }) .presentationDetents([.height(220)])
-                .presentationDragIndicator(.hidden)
-                .presentationCornerRadius(30)
-        }
     }
     
     func loadReplies(commentId:Int){
@@ -131,6 +175,9 @@ struct CommentsView: View {
     }
     
     func actionSheetOpen(){
+        
+        guard let comment = selectedCommentObj else { return }
+
         let sheet = UIAlertController(
             title: "",
             message: nil,
@@ -141,7 +188,7 @@ struct CommentsView: View {
             
             sheet.addAction(UIAlertAction(title: "Edit", style: .default, handler: { action in
                 
-                commentText = selectedCommentObj?.comment ?? ""
+                commentText = comment.comment ?? ""
                 isFocused = true
              
             }))
@@ -149,8 +196,10 @@ struct CommentsView: View {
             sheet.addAction(UIAlertAction(title: "Delete", style: .default, handler: { action in
                 
                 
-                
-                showDeleteConfirmationSheet = true
+               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    selectedCommentObj = comment
+                    confirmationType = .deleteComment
+              //  }
 //                if (selectedCommentObj?.parentID ?? 0) > 0{
 //                    objVM.deleteReply(comment_id: selectedCommentObj?.id ?? 0, parentId: selectedCommentObj?.parentID ?? 0)
 //                }else{
@@ -166,8 +215,11 @@ struct CommentsView: View {
             }))
             
             sheet.addAction(UIAlertAction(title: "Block User", style: .default, handler: { action in
-                showBlockConfirmationSheet = true
-             
+                
+               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    selectedCommentObj = comment
+                    confirmationType = .blockUser
+                //}
             }))
         }
         
@@ -186,6 +238,12 @@ struct CommentsView: View {
             top = presented
         }
         return top
+    }
+    
+    func pushToProfileScreen(user:User?){
+        
+        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: user?.id ?? 0))
+        self.navController?.pushViewController(hostingController, animated: true)
     }
 }
 
@@ -337,7 +395,7 @@ private extension CommentsView {
                 Spacer()
                 
                 Button {
-                    onClose?()
+                    onClose?(false, nil)
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 16, weight: .medium))
@@ -353,7 +411,9 @@ private extension CommentsView {
 
 
 #Preview {
-    CommentsView(itemObj: nil)
+    CommentsView(onClose: {isToProfileOpen,user  in
+        
+    }, itemObj: nil, navController: nil)
 }
 
 
@@ -363,9 +423,9 @@ struct CommentRow: View {
     var onReply: () -> Void
     var onLikeDislike: (_ commentId:Int,_ isliked:Bool) -> Void
     var loadMoreReplies: (_ commentId:Int) -> Void
-    
     var selectedOption:(_ commentObj:CommentModel) -> Void
-    
+    var selectedUser:(_ user:User?) -> Void
+
     
     var body: some View {
         VStack{
@@ -383,6 +443,8 @@ struct CommentRow: View {
                             .scaledToFit()
                             .frame(width: 30,height:30)
                             .clipShape(Circle())
+                    }.onTapGesture {
+                        selectedUser(comment.user)
                     }
                 }
                 
@@ -390,27 +452,31 @@ struct CommentRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     
                     HStack {
-                        Text(comment.user?.name ?? "")
-                            .font(.system(size: 14, weight: .semibold))
+                        Text(comment.user?.name ?? "").autocapitalization(.words)
+                            .font(.inter(.medium, size: 16))
                         Text((comment.createdAt ?? "").timeAgoDisplay())
-                            .font(.system(size: 12))
+                            .font(.inter(.regular, size: 12))
                             .foregroundColor(.gray)
                         
-                        Button {
-                            selectedOption(comment)
-                        } label: {
-                            Image("threeDotHori")
+                        if comment.user?.id == Local.shared.getUserId(){
+                            Button {
+                                selectedOption(comment)
+                            } label: {
+                                Image("threeDotHori")
+                            }
                         }
+                       
                         
                     }
                     
                     Text(comment.comment ?? "")
-                        .font(.system(size: 14))
+                        .font(.inter(.regular, size: 14))
+                        .foregroundColor(Color(hex: "#6E6E6E"))
                     
                     Button("Reply") {
                         onReply()
                     }
-                    .font(.inter(.bold, size: 15))
+                    .font(.inter(.regular, size: 14))
                     .foregroundColor(Color(.label))
                 }
                 
@@ -428,7 +494,7 @@ struct CommentRow: View {
                     
                     if (comment.likesCount ?? 0) > 0{
                         Text("\(comment.likesCount ?? 0)")
-                            .font(.system(size: 12))
+                            .font(.inter(.medium, size: 12))
                     }
                 }
             }
@@ -442,6 +508,9 @@ struct CommentRow: View {
                         updatelikeInArrayOfReplies(commentId: commentId, islike: isliked)
                     } selectedOption: { commentObj in
                         selectedOption(commentObj)
+                    } selectedUser: {user in
+                        selectedUser(user)
+
                     }.padding(.leading,50)
 
                    /* ReplyCommentRow(comment: reply) { commentId, islike in
@@ -488,7 +557,8 @@ struct ReplyCommentRow: View {
     var comment: CommentModel
     var onLikeDislike: (_ commentId:Int,_ isliked:Bool) -> Void
     var selectedOption:(_ commentObj:CommentModel) -> Void
-    
+    var selectedUser:(_ user:User?) -> Void
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             if let url = URL(string: comment.user?.profile ?? "")
@@ -501,6 +571,8 @@ struct ReplyCommentRow: View {
                         .clipShape(Circle())
                 } placeholder: {
                     
+                }.onTapGesture {
+                    selectedUser(comment.user)
                 }
             }
             
@@ -514,10 +586,13 @@ struct ReplyCommentRow: View {
                     Text((comment.createdAt ?? "").timeAgoDisplay())
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
-                    Button {
-                        selectedOption(comment)
-                    } label: {
-                        Image("threeDotHori")
+                    if comment.user?.id == Local.shared.getUserId(){
+                        
+                        Button {
+                            selectedOption(comment)
+                        } label: {
+                            Image("threeDotHori")
+                        }
                     }
                 }
                 
@@ -748,19 +823,19 @@ extension String {
         
         switch secondsAgo {
         case 0..<minute:
-            return "\(secondsAgo)s ago"
+            return "\(secondsAgo)s"
         case minute..<hour:
-            return "\(secondsAgo / minute)m ago"
+            return "\(secondsAgo / minute)m"
         case hour..<day:
-            return "\(secondsAgo / hour)h ago"
+            return "\(secondsAgo / hour)h"
         case day..<week:
-            return "\(secondsAgo / day)d ago"
+            return "\(secondsAgo / day)d"
         case week..<month:
-            return "\(secondsAgo / week)w ago"
+            return "\(secondsAgo / week)w"
         case month..<year:
-            return "\(secondsAgo / month)mo ago"
+            return "\(secondsAgo / month)mo"
         default:
-            return "\(secondsAgo / year)y ago"
+            return "\(secondsAgo / year)y"
         }
     }
 }

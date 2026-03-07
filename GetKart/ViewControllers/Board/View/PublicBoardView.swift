@@ -10,6 +10,8 @@ import Kingfisher
 import UIKit
 
 
+
+
 struct PublicBoardView: View {
 
     @State private var selectedCategoryId: Int = 0
@@ -20,7 +22,6 @@ struct PublicBoardView: View {
     @State private var loadedCategoryIds: Set<Int> = []
     @State private var openSafari: Bool = false
     @State private var outboundUrlClicked: String = ""
-
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,21 +36,7 @@ struct PublicBoardView: View {
             ).background(Color(.systemBackground))
             
             if selectedCategoryId > 0{
-                /*   TabView(selection: $selectedCategoryId) {
-                 
-                 ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
-                 BoardListView(
-                 vm: boardStore.vm(for: cat.id ?? 0),
-                 navigationController: navigationController
-                 )
-                 .tag(cat.id ?? 0)
-                 }
-                 }
-                 .tabViewStyle(.page(indexDisplayMode: .never))
-                 .transaction { tx in
-                 tx.animation = nil   //  CRITICAL
-                 }*/
-                
+              
                 ZStack {
                     
                     let boardNav = tabBarController?.viewControllers?[1] as? UINavigationController
@@ -86,23 +73,13 @@ struct PublicBoardView: View {
             
             Spacer()
         }
-//        .onChange(of: selectedCategoryId) { newId in
-//            markTabLoaded(newId)
-//        }
-        
+
         .onChange(of: selectedCategoryId) { newId in
            
-              FeedVideoManager.shared.pauseAll()
+                FeedVideoManager.shared.pauseAll()
                 FeedVideoManager.shared.muteAll()
                 markTabLoaded(newId)
-            // 2️⃣ Clear all video frames (important)
-//            NotificationCenter.default.post(
-//                name: Notification.Name("PauseAllVideos"),
-//                object: nil
-//            )
-//            
-//            // 3️⃣ Load tab
-//            markTabLoaded(newId)
+
         }
         .onAppear {
             markTabLoaded(selectedCategoryId)
@@ -134,15 +111,6 @@ struct PublicBoardView: View {
             selectedCategoryId = 55555
             selectedName = "All"
 
-            // 2️⃣ Get ALL category VM
-           // let allVM = boardStore.vm(for: 55555)
-
-            // 3️⃣ Refresh ONLY that VM
-//            Task {
-//                await allVM.refresh()
-//                
-//            }
-            
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
         }
     
@@ -373,18 +341,14 @@ struct BoardListView: View {
 
                 } else {
 
-                  
-
                     let columns = splitColumns()
 
                     HStack(alignment: .top, spacing: 6) {
 
                         // LEFT COLUMN
                         LazyVStack(spacing: 6) {
-//                            ForEach(columns.left.indices, id: \.self) { index in
-//                                let item = columns.left[index]
-                                
-                                ForEach(columns.left, id: \.id) { item in
+
+                            ForEach(columns.left, id: \.id) { item in
 
                                 if item.boardType == 2 {
                                     SmartVideoPlayerView(
@@ -396,19 +360,17 @@ struct BoardListView: View {
                                                 openSafari = true
                                             }
                                         }
-                                    )
-                                        .background(
-                                            GeometryReader { geo in
-                                                Color.clear
-                                                    .onAppear {
-                                                        videoFrames[item.id ?? 0] = geo.frame(in: .global)
-                                                    }
-                                                    .onChange(of: geo.frame(in: .global)) { frame in
-                                                        videoFrames[item.id ?? 0] = frame
-                                                    }
-                                            }
-                                        )
-                                        .measureHeight(id: item.id ?? 0)
+                                    ).background(
+                                        GeometryReader { geo in
+                                            Color.clear
+                                                .onAppear {
+                                                    videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                }
+                                                .onChange(of: geo.frame(in: .global)) { frame in
+                                                    videoFrames[item.id ?? 0] = frame
+                                                }
+                                        }
+                                    ) .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             handlePrefetch(itemIndex: globalIndex(of: item))
                                         }
@@ -443,10 +405,8 @@ struct BoardListView: View {
 
                         // RIGHT COLUMN
                         LazyVStack(spacing: 6) {
-                          //  ForEach(columns.right.indices, id: \.self) { index in
                                 
                                 ForEach(columns.right, id: \.id) { item in
-                              //  let item = columns.right[index]
                                 
                                 if item.boardType == 2 {
                                    
@@ -519,17 +479,16 @@ struct BoardListView: View {
               
             //  Detect REAL user scroll
                 .simultaneousGesture(
-                        DragGesture()
-                            .onEnded { _ in
-                                
-                                userDidScroll = true
-                                paginationConsumed = false
-                                
-                                scheduleVisibilityUpdate()
-                            }
-                    )
+                    DragGesture()
+                        .onEnded { _ in
+                            
+                            userDidScroll = true
+                            paginationConsumed = false
+                            
+                            scheduleVisibilityUpdate()
+                        }
+                )
                 
-
             .onChange(of: vm.items.count) { _ in
                 paginationConsumed = false
             }
@@ -541,9 +500,9 @@ struct BoardListView: View {
                 itemHeights.removeAll()
                 
                 // ADD
-                  lastItemCount = 0
-                  lastScrollTick = scrollTick
-               
+                lastItemCount = 0
+                lastScrollTick = scrollTick
+                
                 FeedVideoManager.shared.reset()
                 videoFrames.removeAll()
             }
@@ -839,13 +798,7 @@ struct CardItemView: View {
         if item.boardType == 1{
             //Image ads view
             PromotionalAdsCardStaggered(product: item, onTapBottomtButton: onTapBoostButton)
-        }
-//        else if item.boardType == 2{
-//            //Video ads
-//            SmartVideoPlayerView(item: item)
-//
-//        }
-        else if item.boardType == 3{
+        }else if item.boardType == 3{
             //Idea View
             IdeaCardStaggered(product: item).onTapGesture(perform: onTap)
         }else{
@@ -1126,9 +1079,9 @@ struct ProductCardStaggered: View {
     func getUrlValid(strURl:String) ->String{
         var urlString = strURl
         if !urlString.lowercased().hasPrefix("http://") &&
-              !urlString.lowercased().hasPrefix("https://") {
-               urlString = "https://" + urlString
-           }
+            !urlString.lowercased().hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
         return urlString
     }
     
@@ -1688,3 +1641,19 @@ struct BoardListView: View {
     }
 }
 */
+
+
+/*   TabView(selection: $selectedCategoryId) {
+ 
+ ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
+ BoardListView(
+ vm: boardStore.vm(for: cat.id ?? 0),
+ navigationController: navigationController
+ )
+ .tag(cat.id ?? 0)
+ }
+ }
+ .tabViewStyle(.page(indexDisplayMode: .never))
+ .transaction { tx in
+ tx.animation = nil   //  CRITICAL
+ }*/

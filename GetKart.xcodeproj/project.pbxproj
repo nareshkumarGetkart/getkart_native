@@ -68,11 +68,15 @@
 		};
 		F0EA7F002D65D9D40026815A /* GetKartTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = GetKartTests;
 			sourceTree = "<group>";
 		};
 		F0EA7F0A2D65D9D40026815A /* GetKartUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = GetKartUITests;
 			sourceTree = "<group>";
 		};
@@ -302,13 +306,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -323,13 +323,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -366,13 +362,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -431,13 +423,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

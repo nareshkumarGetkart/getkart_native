@@ -360,6 +360,8 @@ struct SmartVideoPlayerView: View {
                         
                         
                         Button {
+                            manager.muteAll()
+                            manager.pauseAll()
                             isExpand = true
                         } label: {
                             Image("material-symbols_pan-zoom-rounded")
@@ -406,7 +408,8 @@ struct SmartVideoPlayerView: View {
         .fullScreenCover(isPresented: $isExpand) {
           
             if let url = URL(string:(item.videoLink ?? "").getValidUrl())  {
-                
+               
+           
                 VideoPreviewView(item: item)
             }
         }

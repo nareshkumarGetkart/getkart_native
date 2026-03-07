@@ -8,11 +8,23 @@
 import SwiftUI
 
 
-enum ConfirmationType{
-    
+//enum ConfirmationType{
+//    
+//    case deleteComment
+//    case blockUser
+//    
+//}
+
+enum ConfirmationType: Identifiable {
     case deleteComment
     case blockUser
     
+    var id: Int {
+        switch self {
+        case .deleteComment: return 1
+        case .blockUser: return 2
+        }
+    }
 }
 
 struct ConfirmationView: View {

@@ -358,7 +358,7 @@ struct GalleryImage: Codable {
 //}
 
 // MARK: - User
-struct User: Codable {
+struct User: Codable,Identifiable {
     let id: Int?
     let name, email: String?
     let mobile: String?

@@ -35,7 +35,7 @@ class ProfileVC: UIViewController {
     var iconArray =  ["","myAdsIcon","gridOpaque","promoted","buyPackages","transaction","dark_theme","notification","article","like_fill","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","privacypolicy"]
     */
     
-    var titleArray =  ["Anonymous","My Ads","My Boards","Buy Packages","Favorites","Order History & Plans","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+    var titleArray =  ["Anonymous","My Ads","My Boards & Ideas","Buy Packages","Favorites","Order History & Plans","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       
     var iconArray =  ["","myAdsIcon","gridOpaque","buyPackages","like_fill","transaction","dark_theme","notification","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
       
@@ -407,7 +407,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     self.navigationController?.pushViewController(destVC, animated: true)
                 }
                 
-            } else if titleArray[indexPath.row] == "My Boards"{
+            } else if titleArray[indexPath.row] == "My Boards & Ideas"{
                 //My Boards
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     

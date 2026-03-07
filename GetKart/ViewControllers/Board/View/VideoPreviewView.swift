@@ -130,11 +130,13 @@ struct VideoPreviewView: View {
                             Button {
                                 print("Visit site tapped")
                                 openSafari = true
-                                
+                                vm.player.pause()
+
                             } label: {
                                 Text(vm.itemObj?.ctaLabel ?? "")
                                     .foregroundColor(.white)
-                                    .font(.inter(.medium, size: 16))                                    .frame(maxWidth: .infinity)
+                                    .font(.inter(.medium, size: 16))
+                                    .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.orange)
                                     .cornerRadius(14)
