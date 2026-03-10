@@ -18,6 +18,7 @@ struct BoardAnalyticsView: View {
     @State private var selectedPkgObj:PlanModel?
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var showSafari = false
+    @State private var isToPreviewVideo = false
 
     
     //'draft','approved','paused','expired','rejected','pending'
@@ -32,8 +33,18 @@ struct BoardAnalyticsView: View {
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
-            Text("Board analytics").font(.inter(.medium, size: 18.0))
-                .foregroundColor(Color(UIColor.label))
+            
+            if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                Text("Promotional Ad analytics").font(.inter(.medium, size: 18.0))
+                    .foregroundColor(Color(UIColor.label))
+            }else if (objAnalytics?.board?.boardType ?? 0) == 3 {
+                Text("Idea analytics").font(.inter(.medium, size: 18.0))
+                    .foregroundColor(Color(UIColor.label))
+            }else{
+                Text("Board analytics").font(.inter(.medium, size: 18.0))
+                    .foregroundColor(Color(UIColor.label))
+            }
+          
             Spacer()
             
           
@@ -69,21 +80,48 @@ struct BoardAnalyticsView: View {
                     
                     Spacer()
                     VStack{
-                        Text("Board image").font(.inter(.medium, size: 18.0))
-                        KFImage(URL(string: objAnalytics?.board?.image ?? ""))
-                            .placeholder {
-                                Image("getkartplaceholder")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 230, height:280)
-                                    .clipped() //  Important to crop overflowing area
-                                    .cornerRadius(8)
+                        if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                            Text("Promotional Ad image").font(.inter(.medium, size: 18.0))
+
+                        }else if (objAnalytics?.board?.boardType ?? 0) == 3{
+                            Text("Idea image").font(.inter(.medium, size: 18.0))
+
+                        }else{
+                            Text("Board image").font(.inter(.medium, size: 18.0))
+                        }
+                        ZStack(alignment:.topLeading){
+                            KFImage(URL(string: objAnalytics?.board?.image ?? ""))
+                                .placeholder {
+                                    Image("getkartplaceholder")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 230, height:280)
+                                        .clipped() //  Important to crop overflowing area
+                                        .cornerRadius(8)
+                                }
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 230, height:280)
+                                .clipped()
+                                .cornerRadius(8)
+                            
+                            if (objAnalytics?.board?.boardType ?? 0) == 2{
+                                
+                                Button {
+                                    isToPreviewVideo = true
+                                } label: {
+                                    Text("Preview")
+                                        .padding(5).font(.inter(.regular, size: 14.0))
+                                        .frame(width:75,height:26)
+                                        .foregroundColor(Color(.white))
+                                }
+                                .background(Color(.darkGray))
+                                .cornerRadius(13.0)
+                                .clipped()
+                                .padding([.leading,.top],8)
+                                
                             }
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 230, height:280)
-                            .clipped()
-                            .cornerRadius(8)
+                        }
                         
                         Text(getFormattedCreatedDate(date:objAnalytics?.board?.createdAt ?? "")).font(.inter(.regular, size: 14.0)).foregroundColor(Color(.gray))
 
@@ -99,8 +137,18 @@ struct BoardAnalyticsView: View {
                
                 if (objAnalytics?.board?.outbondURL ?? "").count > 0 {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Board URL")
-                            .font(.inter(.semiBold, size: 16.0))
+                        
+                        
+                        if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                            Text("Prmotional URL")
+                                .font(.inter(.semiBold, size: 16.0))
+                        }else if (objAnalytics?.board?.boardType ?? 0) == 3 {
+                            Text("Idea URL")
+                                .font(.inter(.semiBold, size: 16.0))
+                        }else{
+                            Text("Board URL")
+                                .font(.inter(.semiBold, size: 16.0))
+                        }
                         
                         HStack{
                             
@@ -149,12 +197,26 @@ struct BoardAnalyticsView: View {
 //                    BannerAnalyticCell(title: "Status", value: "\(objAnalytics?.status ?? "")", isActive: true)
                     
                     if (objAnalytics?.board?.isActive ?? 0) == 1 && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
-                        BoardAnalyticCell(title: "Board Status", value: "", isActive: true)
+                        
+                        if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                            BoardAnalyticCell(title: "Promotional Ad Status", value: "", isActive: true)
 
+                        }else if (objAnalytics?.board?.boardType ?? 0) == 3{
+                            BoardAnalyticCell(title: "Idea Status", value: "", isActive: true)
+                        }else{
+                            BoardAnalyticCell(title: "Board Status", value: "", isActive: true)
+                            
+                        }
                     }else{
                         let status = ((objAnalytics?.board?.status ?? "").lowercased() == "review") ? "Under review" : objAnalytics?.board?.status ?? ""
-                        
-                        BoardAnalyticWithStatusGrayCell(title: "Board Status", value: "\(status.capitalized )")
+                        if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                            BoardAnalyticWithStatusGrayCell(title: "Promotional Ad Status", value: "\(status.capitalized )")
+                        }else if (objAnalytics?.board?.boardType ?? 0) == 3{
+                            BoardAnalyticWithStatusGrayCell(title: "Idea Status", value: "\(status.capitalized )")
+
+                        }else{
+                            BoardAnalyticWithStatusGrayCell(title: "Board Status", value: "\(status.capitalized )")
+                        }
                     }
           
                     
@@ -168,8 +230,15 @@ struct BoardAnalyticsView: View {
                     .frame(height: 1.5)
                    
                     BoardAnalyticCell(title: "Impressions", value: "\(objAnalytics?.analytics?.impressions ?? 0)", isActive: false)
+                    if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                        BoardAnalyticCell(title: "Promotional Ad Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
+                        
+                    }else if (objAnalytics?.board?.boardType ?? 0) == 3{
+                        BoardAnalyticCell(title: "Idea Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
 
-                    BoardAnalyticCell(title: "Board Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
+                    }else{
+                        BoardAnalyticCell(title: "Board Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
+                    }
                     BoardAnalyticCell(title: "Favorites", value: "\(objAnalytics?.analytics?.favorites ?? 0)", isActive: false)
                     BoardAnalyticCell(title: "Outbound Click", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
                                       
@@ -232,6 +301,15 @@ struct BoardAnalyticsView: View {
                 SafariView(url:url)
             }
         }
+        
+        .fullScreenCover(isPresented: $isToPreviewVideo) {
+          
+            if let url = URL(string:(objAnalytics?.board?.videoLink ?? "").getValidUrl())  {
+           
+                VideoPreviewView(item: nil,strURl: objAnalytics?.board?.videoLink ?? "")
+            }
+        }
+
     }
     
     

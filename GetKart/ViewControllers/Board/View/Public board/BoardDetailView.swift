@@ -122,7 +122,8 @@ struct BoardDetailView: View{
                                                     paymentGatewayOpen(product: item)
                                                 }
                                                 
-                                            }
+                                            },
+                                            isToShowBoostButton:true
                                         )
                                         .measureHeight(id: item.id ?? 0)
                                         .onAppear {
@@ -172,7 +173,8 @@ struct BoardDetailView: View{
                                             onTap: { pushToDetail(item: item) },
                                             onTapBoostButton:{
                                                 paymentGatewayOpen(product: item)
-                                            }
+                                            },
+                                            isToShowBoostButton:true
                                         )
                                         .measureHeight(id: item.id ?? 0)
                                         .onAppear {
@@ -678,7 +680,7 @@ struct ReelPostView: View {
                                 .frame(width: 30,height:30)
                                 .clipped()
                         } placeholder: {
-                            Image("getkartplaceholder")
+                            Image("user-circle")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30,height:30)

@@ -132,9 +132,17 @@ struct SearchBoardResultView: View {
                                                 Color.clear
                                                     .onAppear {
                                                         videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                        scheduleVisibilityUpdate()
+
+                                                    }.onDisappear{
+                                                        print("dissapearing video \(item.id ?? 0)")
+                                                        videoFrames.removeValue(forKey: item.id ?? 0)
+                                                        FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                     }
                                                     .onChange(of: geo.frame(in: .global)) { frame in
                                                         videoFrames[item.id ?? 0] = frame
+                                                        scheduleVisibilityUpdate()
+
                                                     }
                                             }
                                         )
@@ -178,7 +186,8 @@ struct SearchBoardResultView: View {
                                                 paymentGatewayOpen(product: item)
                                             }
                                             
-                                        }
+                                        },
+                                        isToShowBoostButton:true
                                     )
                                     .measureHeight(id: item.id ?? 0)
                                     .onAppear {

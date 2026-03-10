@@ -14,8 +14,6 @@ struct PickerConfig: Identifiable {
     let limit: Int
 }
 
-
-
 enum ProductType:Int {
     case product
     case promoteBusiness

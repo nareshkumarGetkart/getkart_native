@@ -79,9 +79,15 @@ final class FeedVideoManager: ObservableObject {
         for (id, player) in players {
             
             if visibleIDs.contains(id) {
-                player.play()
+                if player.timeControlStatus != .playing {
+                    player.play()
+                }
+                //player.play()
             } else {
-                player.pause()
+                if player.timeControlStatus == .playing {
+                    player.pause()
+                }
+               // player.pause()
             }
         }
     }
@@ -284,8 +290,8 @@ struct SmartVideoPlayerView: View {
     
     let item: ItemModel
     
-    @ObservedObject private var manager = FeedVideoManager.shared
-    
+   // @ObservedObject private var manager = FeedVideoManager.shared
+    private let manager = FeedVideoManager.shared
     @State private var isReadyToPlay = false
     @State private var isMuted = true
     
@@ -293,13 +299,23 @@ struct SmartVideoPlayerView: View {
     
     private var videoId: Int? { item.id }
     
-    private var player: AVQueuePlayer? {
+   private var player: AVQueuePlayer? {
         guard let id = item.id,
               let link = item.videoLink,
               let url = URL(string: link) else { return nil }
         
         return manager.player(for: id, url: url)
     }
+    
+//    private var player: AVQueuePlayer? {
+//        guard let id = item.id,
+//              let link = item.videoLink,
+//              let url = URL(string: link) else { return nil }
+//
+//        let playURL = VideoCacheManager.shared.cachedURL(for: url) ?? url
+//        
+//        return manager.player(for: id, url: playURL)
+//    }
     
     @State  private var isExpand:Bool = false
     
@@ -318,16 +334,36 @@ struct SmartVideoPlayerView: View {
                         PlayerLayerView(player: player)
                             .frame(height: 280)
                             .clipped()
+                           /* .onAppear {
+                                observeReadyState(player: player)
+                                updateMuteState()
+                            }*/
+                        
                             .onAppear {
+/*
+                                if let link = item.videoLink,
+                                   let url = URL(string: link) {
+
+                                    VideoCacheManager.shared.precacheVideo(url: url)
+                                }
+*/
                                 observeReadyState(player: player)
                                 updateMuteState()
                             }
+                        
+                        
                             .onChange(of: manager.currentUnmutedId) { _ in
                                 updateMuteState()
                             }
+                            .onDisappear {
+                                if let id = videoId {
+                                    FeedVideoManager.shared.pause(id: id)
+                                }
+                                cancellables.removeAll()
+                            }
                     }
                     
-                    // 🖼 Thumbnail
+                    //  Thumbnail
                     if !isReadyToPlay {
                         AsyncImage(url: URL(string: item.image ?? "")) { image in
                             image
@@ -410,7 +446,7 @@ struct SmartVideoPlayerView: View {
             if let url = URL(string:(item.videoLink ?? "").getValidUrl())  {
                
            
-                VideoPreviewView(item: item)
+                VideoPreviewView(item: item,strURl: item.videoLink ?? "")
             }
         }
     }
@@ -420,7 +456,22 @@ struct SmartVideoPlayerView: View {
 
 private extension SmartVideoPlayerView {
     
+   /* func observeReadyState(player: AVQueuePlayer) {
+        
+        player.publisher(for: \.timeControlStatus)
+            .receive(on: DispatchQueue.main)
+            .sink { status in
+                if status == .playing {
+                    isReadyToPlay = true
+                }
+            }
+            .store(in: &cancellables)
+    }
+    */
     func observeReadyState(player: AVQueuePlayer) {
+        
+        // remove old observers
+        cancellables.removeAll()
         
         player.publisher(for: \.timeControlStatus)
             .receive(on: DispatchQueue.main)
@@ -445,6 +496,171 @@ private extension SmartVideoPlayerView {
         player.volume = shouldUnmute ? 1 : 0
     }
 }
+
+
+import Foundation
+import CryptoKit
+
+final class VideoCacheManager {
+
+    static let shared = VideoCacheManager()
+
+    private init() {}
+
+    // MARK: Config
+
+    private let precacheSize: Int = 5 * 1024 * 1024     // 5MB per video
+    private let maxCacheSize: UInt64 = 500 * 1024 * 1024 // 500MB total
+
+    private var runningTasks: [String: URLSessionDataTask] = [:]
+
+    // MARK: Cache Folder
+
+    private lazy var cacheFolder: URL = {
+
+        let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        let folder = path.appendingPathComponent("FeedVideoCache")
+
+        if !FileManager.default.fileExists(atPath: folder.path) {
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+
+        return folder
+    }()
+
+    // MARK: Cache Path
+
+    private func cacheURL(for url: URL) -> URL {
+        let name = url.absoluteString.md5
+        return cacheFolder.appendingPathComponent(name)
+    }
+
+    func cachedURL(for url: URL) -> URL? {
+
+        let file = cacheURL(for: url)
+
+        guard FileManager.default.fileExists(atPath: file.path) else {
+            return nil
+        }
+
+        // update last access date (for LRU)
+        try? FileManager.default.setAttributes(
+            [.modificationDate: Date()],
+            ofItemAtPath: file.path
+        )
+
+        return file
+    }
+
+    // MARK: Precache
+
+    func precacheVideo(url: URL) {
+
+        let key = url.absoluteString
+
+        if runningTasks[key] != nil { return }
+
+        let cacheFile = cacheURL(for: url)
+
+        var downloadedBytes = 0
+
+        if FileManager.default.fileExists(atPath: cacheFile.path) {
+
+            let attr = try? FileManager.default.attributesOfItem(atPath: cacheFile.path)
+            downloadedBytes = attr?[.size] as? Int ?? 0
+        }
+
+        if downloadedBytes >= precacheSize { return }
+
+        var request = URLRequest(url: url)
+
+        let range = "bytes=\(downloadedBytes)-\(precacheSize)"
+        request.setValue(range, forHTTPHeaderField: "Range")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+
+            defer { self.runningTasks[key] = nil }
+
+            guard let data = data else { return }
+
+            if FileManager.default.fileExists(atPath: cacheFile.path) {
+
+                if let handle = try? FileHandle(forWritingTo: cacheFile) {
+
+                    handle.seekToEndOfFile()
+                    handle.write(data)
+                    try? handle.close()
+                }
+
+            } else {
+
+                try? data.write(to: cacheFile)
+            }
+
+            // cleanup cache
+            self.cleanupIfNeeded()
+        }
+
+        runningTasks[key] = task
+        task.resume()
+    }
+
+    // MARK: Cache Cleanup (LRU)
+
+    private func cleanupIfNeeded() {
+
+        let files = try? FileManager.default.contentsOfDirectory(
+            at: cacheFolder,
+            includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey],
+            options: []
+        )
+
+        guard var urls = files else { return }
+
+        var totalSize: UInt64 = 0
+        var fileInfos: [(url: URL, size: UInt64, date: Date)] = []
+
+        for url in urls {
+
+            let values = try? url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
+
+            let size = UInt64(values?.fileSize ?? 0)
+            let date = values?.contentModificationDate ?? Date()
+
+            totalSize += size
+
+            fileInfos.append((url, size, date))
+        }
+
+        if totalSize <= maxCacheSize { return }
+
+        // sort oldest first
+        fileInfos.sort { $0.date < $1.date }
+
+        for file in fileInfos {
+
+            try? FileManager.default.removeItem(at: file.url)
+
+            totalSize -= file.size
+
+            if totalSize <= maxCacheSize {
+                break
+            }
+        }
+    }
+}
+
+
+import CryptoKit
+
+extension String {
+
+    var md5: String {
+        let digest = Insecure.MD5.hash(data: Data(self.utf8))
+        return digest.map { String(format: "%02hhx", $0) }.joined()
+    }
+}
+
 /*
 final class FeedVideoManager: ObservableObject {
     

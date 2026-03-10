@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-
-//enum ConfirmationType{
-//    
-//    case deleteComment
-//    case blockUser
-//    
-//}
-
 enum ConfirmationType: Identifiable {
     case deleteComment
     case blockUser

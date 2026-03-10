@@ -430,15 +430,15 @@ struct CommentRow: View {
     var body: some View {
         VStack{
             HStack(alignment: .top, spacing: 12) {
-                if let url = URL(string: comment.user?.profile ?? "")
-                {
-                    AsyncImage(url: url) { img in
+//                if let url = URL(string: comment.user?.profile ?? "")
+//                {
+                    AsyncImage(url:URL(string: comment.user?.profile ?? "")) { img in
                         img.resizable()
                             .scaledToFill()
                             .frame(width: 30, height: 30)
                             .clipShape(Circle())
                     } placeholder: {
-                        Image("getkartplaceholder")
+                        Image("user-circle")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 30,height:30)
@@ -446,7 +446,7 @@ struct CommentRow: View {
                     }.onTapGesture {
                         selectedUser(comment.user)
                     }
-                }
+                //}
                 
                 
                 VStack(alignment: .leading, spacing: 2) {
@@ -561,20 +561,24 @@ struct ReplyCommentRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            if let url = URL(string: comment.user?.profile ?? "")
-            {
+//            if let url = URL(string: comment.user?.profile ?? "")
+//            {
                 
-                AsyncImage(url: url) { img in
+                AsyncImage(url: URL(string: comment.user?.profile ?? "")) { img in
                     img.resizable()
                         .scaledToFill()
                         .frame(width: 30, height: 30)
                         .clipShape(Circle())
                 } placeholder: {
-                    
+                    Image("user-circle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30,height:30)
+                        .clipShape(Circle())
                 }.onTapGesture {
                     selectedUser(comment.user)
                 }
-            }
+           // }
             
             
             VStack(alignment: .leading, spacing: 2) {

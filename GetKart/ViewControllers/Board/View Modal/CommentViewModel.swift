@@ -25,9 +25,7 @@ class CommentViewModel:ObservableObject{
                 self.page = self.page + 1
             }
         }
-     
     }
-    
     
     func getReplies(itemId:Int,commentId:Int){
         let params = ["comment_id":commentId,"page":1] as [String : Any]

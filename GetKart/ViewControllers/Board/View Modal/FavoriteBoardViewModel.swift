@@ -1,34 +1,33 @@
 //
-//  BoardViewModel.swift
+//  FavoriteBoardViewModel.swift
 //  GetKart
 //
-//  Created by Radheshyam Yadav on 27/12/25.
+//  Created by Radheshyam Yadav on 28/12/25.
 //
+
 
 import Foundation
 import SwiftUI
 
-final class BoardViewModel: ObservableObject {
+
+final class FavoriteBoardViewModel: ObservableObject {
 
     // MARK: - Published (UI State)
     @Published var items: [ItemModel] = []
-    @Published var selectedCategoryId: Int = 0
     @Published var isLoading: Bool = false
     @Published var hasMoreData: Bool = true
 
     // MARK: - Pagination
     private var page: Int = 1
-    private let preloadOffset = 4   // 🔥 KEY
-    private var didUserScroll = false   // 🔥 KEY
+    private let preloadOffset = 4   //  KEY
+    private var didUserScroll = false   //  KEY
     private var lastTriggeredCount = 0
-    private let preloadDistance: CGFloat =  200
+    
+    private let preloadDistance: CGFloat = 200
     private var lastTriggerPage = 0
 
     func handleScrollBottom(bottomY: CGFloat) {
         let screenHeight = UIScreen.main.bounds.height
-
-        print("screenHeight=\(screenHeight)\n")
-        print("screenHeight + preloadDistance =\(screenHeight + preloadDistance)")
 
         guard bottomY < screenHeight + preloadDistance else { return }
         guard !isLoading, hasMoreData else { return }
@@ -66,63 +65,32 @@ final class BoardViewModel: ObservableObject {
     // MARK: - NEXT PAGE CALL (🔥 THIS IS THE FIX)
  
     func loadNextPageIfNeeded(currentIndex: Int) {
-        //guard didUserScroll else { return }
+        guard didUserScroll else { return }
         guard !isLoading, hasMoreData else { return }
 
         let threshold = max(items.count - preloadOffset, 0)
-      
-        guard threshold >= 0 else { return }
-
         guard currentIndex >= threshold else { return }
 
         guard lastTriggeredCount != items.count else { return }
         lastTriggeredCount = items.count
-        
-        let objItem =  items[currentIndex]
-        let lastItem = items.last
-        if (objItem.id == lastItem?.id){
-            fetchBoards()
-        }
 
+        fetchBoards()
     }
 
 
     // MARK: - Category Change
-  /*  func categoryChanged(_ id: Int) {
-        
-        if selectedCategoryId == id{
-            return
-        }
+    func categoryChanged(_ id: Int) {
         isLoading = false
         hasMoreData = true
         didUserScroll = false   // 🔥 reset
-        selectedCategoryId = id
         loadInitial()
-    }
-*/
-    func categoryChanged(_ id: Int) {
-
-        guard selectedCategoryId != id else { return }
-
-        // 🔥 FULL RESET
-        page = 1
-        lastTriggerPage = 0
-        lastTriggeredCount = 0
-        hasMoreData = true
-        isLoading = false
-        didUserScroll = false
-
-        items.removeAll()
-        selectedCategoryId = id
-
-        fetchBoards(showLoader: false)
     }
 
     // MARK: - Like Update
     func updateLike(boardId: Int, isLiked: Bool) {
         if let index = items.firstIndex(where: { $0.id == boardId }) {
             items[index].isLiked = isLiked
-            self.manageLikeDislikeApi(boardId: boardId, index: index)
+            manageLikeDislikeApi(boardId: boardId, index: index)
         }
     }
 
@@ -143,17 +111,14 @@ final class BoardViewModel: ObservableObject {
         }
        
     }
-    
     // MARK: - API
     private func fetchBoards(showLoader: Bool = false) {
         guard !isLoading else { return }
 
-        self.isLoading = true
+        isLoading = true
 
-        
         let url =
-        Constant.shared.get_public_board +
-        "?page=\(page)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
+        Constant.shared.get_favourite_board + "?page=\(page)"
 
         ApiHandler.sharedInstance.makeGetGenericData(
             isToShowLoader: showLoader,
@@ -166,20 +131,14 @@ final class BoardViewModel: ObservableObject {
                    let data = obj.data?.data,
                    !data.isEmpty {
 
-                    if self.page == 1{
-                        self.items = data
-                    }else{
-//                        withTransaction(Transaction(animation: nil)) {
-//                                self.items.append(contentsOf: data)
-//                            }
-                        self.items.append(contentsOf: data)
-                    }
+                    self.items.append(contentsOf: data)
                     self.page += 1
                     self.hasMoreData = true
                 } else {
                     self.hasMoreData = false
                 }
 
+                
                 self.isLoading = false
             }
         }
@@ -204,6 +163,10 @@ final class BoardViewModel: ObservableObject {
                         if let favouriteCount = data["favourite_count"] as? Int{
                             
                             self.items[index].totalLikes = favouriteCount
+                           
+                             
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshLikeDislikeBoard.rawValue), object:  ["isLike":self.items[index].isLiked ?? false,"count":favouriteCount,"boardId":boardId], userInfo: nil)
+
 
                         }
                     }
@@ -227,31 +190,21 @@ final class BoardViewModel: ObservableObject {
                 _ = result["message"] as? String ?? ""
                 
                 if status == 200{
-                    
+
                 }else{
                 }
             }
         }
         
         
-        var finalString = strURl.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if !finalString.lowercased().hasPrefix("http://") &&
-            !finalString.lowercased().hasPrefix("https://") {
-            finalString = "https://" + finalString
+        if let url = URL(string: strURl)  {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                print("Cannot open URL")
+            }
         }
-        
-        guard let url = URL(string: finalString) else {
-            print("Invalid URL")
-            return
-        }
-        
-        if UIApplication.shared.canOpenURL(url) {
-            //  if sliderObj?.
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else {
-            print("Cannot open URL")
-        }
+      
     }
 
 }

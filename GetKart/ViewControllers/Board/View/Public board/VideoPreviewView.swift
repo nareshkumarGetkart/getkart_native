@@ -16,8 +16,8 @@ struct VideoPreviewView: View {
     @StateObject private var vm: PremiumVideoVM
      @State private var openSafari:Bool = false
     
-    init(item:ItemModel) {
-        _vm = StateObject(wrappedValue: PremiumVideoVM(url:URL(string: item.videoLink?.getValidUrl() ?? "")! , item: item))
+    init(item:ItemModel?,strURl:String?) {
+        _vm = StateObject(wrappedValue: PremiumVideoVM(url:URL(string: strURl?.getValidUrl() ?? "")! , item: item))
     }
     
     var body: some View {
@@ -121,11 +121,13 @@ struct VideoPreviewView: View {
                  //   VStack {
                        // Spacer()
                         
+                    if vm.itemObj != nil {
                         VStack(spacing: 5) {
                             
                             Text(vm.itemObj?.name ?? "")
                                 .font(.inter(.semiBold, size: 18))
                                 .multilineTextAlignment(.center)
+                                .foregroundColor(Color.black)
                             
                             Button {
                                 print("Visit site tapped")
@@ -141,6 +143,7 @@ struct VideoPreviewView: View {
                                     .background(Color.orange)
                                     .cornerRadius(14)
                             }
+                                
                         }
                         .padding()
                         .background(
@@ -149,6 +152,25 @@ struct VideoPreviewView: View {
                         )
                         .padding(.horizontal,5)
                         .padding(.bottom, 10)
+                    }else{
+                       
+                        Button {
+                            print("Done")
+                            vm.player.pause()
+                            dismiss()
+                        } label: {
+                            Text("Done")
+                                .foregroundColor(.white)
+                                .font(.inter(.medium, size: 16))
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .cornerRadius(14)
+                        } .padding(.horizontal,5)
+                            .padding(.bottom, 10)
+                    }
+
+                       
                    // }
 
                     
@@ -316,7 +338,7 @@ final class PremiumVideoVM: ObservableObject {
     private var hideWorkItem: DispatchWorkItem?
     @Published var itemObj:ItemModel?
     
-    init(url: URL,item:ItemModel) {
+    init(url: URL,item:ItemModel?) {
         player = AVPlayer(url: url)
         itemObj = item
         setup()

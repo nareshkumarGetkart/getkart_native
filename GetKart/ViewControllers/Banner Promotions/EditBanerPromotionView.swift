@@ -193,9 +193,8 @@ struct EditBanerPromotionView: View {
     func uploadFileAndDataApi(){
     
         let params = ["url":strUrl,"banner_id":(objBanner?.id ?? 0)] as [String : Any]
-//        guard let img = selectedImage?.wxCompress() else{ return }
      
-         let img = selectedImage?.wxCompress() //else{ return }
+         let img = selectedImage?.wxCompress()
 
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.update_campaign_banner, params: params) { responseObject, error in
             

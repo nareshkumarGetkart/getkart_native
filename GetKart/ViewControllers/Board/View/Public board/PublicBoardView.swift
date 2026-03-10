@@ -9,9 +9,6 @@ import SwiftUI
 import Kingfisher
 import UIKit
 
-
-
-
 struct PublicBoardView: View {
 
     @State private var selectedCategoryId: Int = 0
@@ -301,20 +298,14 @@ struct BoardListView: View {
     @State private var userDidScroll = false  //  User intent + safety locks
     @State private var paginationConsumed = false
     @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
-    //  ADD THESE
     @State private var lastItemCount: Int = 0
     @State private var scrollTick: Int = 0
     @State private var lastScrollTick: Int = 0
-    
     private let prefetchOffset = 4   //  call API before 4 items
     @State private var paymentGateway: PaymentGatewayCentralized?
-
-
     @State private var videoFrames: [Int: CGRect] = [:]
-   // @ObservedObject private var manager = FeedVideoManager.shared
     @State private var visibilityWorkItem: DispatchWorkItem?
     let isActive: Bool   //  ADD THIS
-    
     @State private var openSafari: Bool = false
     @State private var outboundUrlClicked: String = ""
 
@@ -365,14 +356,23 @@ struct BoardListView: View {
                                             Color.clear
                                                 .onAppear {
                                                     videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    scheduleVisibilityUpdate()
                                                 }
                                                 .onChange(of: geo.frame(in: .global)) { frame in
                                                     videoFrames[item.id ?? 0] = frame
+                                                    scheduleVisibilityUpdate()
                                                 }
                                         }
                                     ) .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             handlePrefetch(itemIndex: globalIndex(of: item))
+                                            if let index = vm.items.firstIndex(where: { $0.id == item.id }) {
+                                                precacheNextVideos(from: index)
+                                            }
+                                        }.onDisappear{
+                                            print("dissapearing video \(item.id ?? 0)")
+                                            videoFrames.removeValue(forKey: item.id ?? 0)
+                                            FeedVideoManager.shared.pause(id: item.id ?? 0)
                                         }
                                 } else {
                                     CardItemView(
@@ -393,7 +393,8 @@ struct BoardListView: View {
                                                 paymentGatewayOpen(product: item)
                                             }
                                             
-                                        }
+                                        },
+                                        isToShowBoostButton:true
                                     )
                                     .measureHeight(id: item.id ?? 0)
                                     .onAppear {
@@ -426,15 +427,26 @@ struct BoardListView: View {
                                                 Color.clear
                                                     .onAppear {
                                                         videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                        scheduleVisibilityUpdate()
+                                                     
                                                     }
                                                     .onChange(of: geo.frame(in: .global)) { frame in
                                                         videoFrames[item.id ?? 0] = frame
+                                                        scheduleVisibilityUpdate()
                                                     }
                                             }
                                         )
                                         .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             handlePrefetch(itemIndex: globalIndex(of: item))
+                                            
+                                            if let index = vm.items.firstIndex(where: { $0.id == item.id }) {
+                                                precacheNextVideos(from: index)
+                                            }
+                                        }.onDisappear{
+                                            print("dissapearing video \(item.id ?? 0)")
+                                            videoFrames.removeValue(forKey: item.id ?? 0)
+                                            FeedVideoManager.shared.pause(id: item.id ?? 0)
                                         }
                                 } else {
                                 CardItemView(
@@ -454,7 +466,8 @@ struct BoardListView: View {
                                         }else{
                                             paymentGatewayOpen(product: item)
                                         }
-                                    }
+                                    },
+                                    isToShowBoostButton:true
                                 )
                                 .measureHeight(id: item.id ?? 0)
                                 .onAppear {
@@ -491,7 +504,20 @@ struct BoardListView: View {
                 
             .onChange(of: vm.items.count) { _ in
                 paginationConsumed = false
+            
+               /* let nextVideos = vm.items.suffix(6)
+
+                for item in nextVideos {
+
+                    if item.boardType == 2,
+                       let link = item.videoLink,
+                       let url = URL(string: link) {
+
+                        VideoCacheManager.shared.precacheVideo(url: url)
+                    }
+                }*/
             }
+            
 
             .refreshable {
                 await vm.refresh()
@@ -602,13 +628,24 @@ struct BoardListView: View {
     }
     
     
-    func getUrlValid(strURl:String) ->String{
-        var urlString = strURl
-        if !urlString.lowercased().hasPrefix("http://") &&
-            !urlString.lowercased().hasPrefix("https://") {
-            urlString = "https://" + urlString
+ 
+    func precacheNextVideos(from index: Int) {
+
+        guard index < vm.items.count - 1 else { return }
+
+        let endIndex = min(index + 3, vm.items.count - 1)
+
+        for i in (index + 1)...endIndex {
+
+            let item = vm.items[i]
+
+            if item.boardType == 2,
+               let link = item.videoLink,
+               let url = URL(string: link) {
+
+                VideoCacheManager.shared.precacheVideo(url: url)
+            }
         }
-        return urlString
     }
 
     private func scheduleVisibilityUpdate() {
@@ -646,7 +683,7 @@ struct BoardListView: View {
 
             let percent = visibleHeight / frame.height
 
-            if percent >= 0.3 {
+            if percent >= 0.6 {
                 visibleSet.insert(id)
             }
         }
@@ -791,7 +828,7 @@ struct CardItemView: View {
     let onLike: (Bool, Int) -> Void
     let onTap: () -> Void
     let onTapBoostButton: () -> Void
-
+    var isToShowBoostButton = true
 
     var body: some View {
         
@@ -802,7 +839,7 @@ struct CardItemView: View {
             //Idea View
             IdeaCardStaggered(product: item).onTapGesture(perform: onTap)
         }else{
-            ProductCardStaggered(product: item, sendLikeUnlikeObject: onLike, onTapBoostButton: onTapBoostButton)
+            ProductCardStaggered(product: item, sendLikeUnlikeObject: onLike, onTapBoostButton: onTapBoostButton,isToShowBoostButton:isToShowBoostButton)
                 .onTapGesture(perform: onTap)
         }
     }
@@ -936,7 +973,8 @@ struct ProductCardStaggered: View {
     let sendLikeUnlikeObject: (Bool, Int) -> Void
     @State private var imageRatio: CGFloat = 1
     let onTapBoostButton: () -> Void
-
+    var isToShowBoostButton = true
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             
@@ -1028,7 +1066,7 @@ struct ProductCardStaggered: View {
             ).padding([.bottom],8).padding(.horizontal,8).padding(.top,2)
             
             
-            if (product.user?.id ?? 0) == Local.shared.getUserId(){
+            if (product.user?.id ?? 0) == Local.shared.getUserId() && isToShowBoostButton{
                 
                 if product.isFeature == false {
                     Button {

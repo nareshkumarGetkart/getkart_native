@@ -20,12 +20,12 @@ import SwiftUI
     @Published var errorMessage: String?
       private var isRefreshing = false
 
-     var isScrollArmed = true   // 🔥 KEY
+     var isScrollArmed = true   //  KEY
 
     // MARK: - Pagination
     private(set) var currentPage: Int = 1
     private let pageSize: Int = 10
-    private var requestedPages: Set<Int> = []   // 🔒 PAGE LOCK
+    private var requestedPages: Set<Int> = []   //  PAGE LOCK
 
     // MARK: - Category
     let categoryId: Int

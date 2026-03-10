@@ -344,6 +344,10 @@ struct SellerProfileView: View {
                                                                         Color.clear
                                                                             .onAppear {
                                                                                 videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                                            }.onDisappear{
+                                                                                print("dissapearing video \(item.id ?? 0)")
+                                                                                videoFrames.removeValue(forKey: item.id ?? 0)
+                                                                                FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                                             }
                                                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                                                 videoFrames[item.id ?? 0] = frame
@@ -373,7 +377,9 @@ struct SellerProfileView: View {
                                                                         paymentGatewayOpen(product: item)
                                                                     }
                                                                     
-                                                                }
+                                                                },
+                                                                isToShowBoostButton:false
+                                                                
                                                             )
                                                             .measureHeight(id: item.id ?? 0)
                                                             .onAppear {
@@ -403,6 +409,10 @@ struct SellerProfileView: View {
                                                                         Color.clear
                                                                             .onAppear {
                                                                                 videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                                            }.onDisappear{
+                                                                                print("dissapearing video \(item.id ?? 0)")
+                                                                                videoFrames.removeValue(forKey: item.id ?? 0)
+                                                                                FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                                             }
                                                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                                                 videoFrames[item.id ?? 0] = frame
@@ -430,7 +440,8 @@ struct SellerProfileView: View {
                                                                     }else{
                                                                         paymentGatewayOpen(product: item)
                                                                     }
-                                                                }
+                                                                },
+                                                                isToShowBoostButton:false
                                                             )
                                                             .measureHeight(id: item.id ?? 0)
                                                             .onAppear {

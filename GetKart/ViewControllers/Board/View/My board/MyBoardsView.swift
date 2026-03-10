@@ -39,8 +39,8 @@ struct MyBoardsView: View {
                     VStack(spacing: 20){
                         Spacer(minLength: 100)
                         Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
-                        Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
-                        Text("There are currently no boards available. Start by creating your first board now").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+                        Text("No Data Found").foregroundColor(.orange).font(Font.inter(.medium, size: 20.0)).padding(.top).padding(.horizontal)
+                        Text("There are currently no boards available. Start by creating your first board now").font(Font.inter(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
                         
                         Spacer(minLength: 100)
                     }
@@ -65,15 +65,6 @@ struct MyBoardsView: View {
                     }
                 }
                 Spacer()
-                
-//                    if hasMoreData {
-//                        Color.clear
-//                            .frame(height: 1).hid
-//                            .onAppear {
-//                                loadNextPage()
-//                            }
-//                    }
-                
 
             }.padding(8)
             
@@ -81,7 +72,7 @@ struct MyBoardsView: View {
         }.simultaneousGesture(
             DragGesture()
                 .onChanged { _ in
-                    hasUserScrolled = true   // ✅ REAL scroll detected
+                    hasUserScrolled = true   //REAL scroll detected
                 }
         )
     .background(Color(.systemGray6))
@@ -115,7 +106,7 @@ struct MyBoardsView: View {
     }
     func loadNextPageIfAllowed() {
         guard
-            hasUserScrolled,        // ✅ user actually scrolled
+            hasUserScrolled,   //  user actually scrolled
             !isDataLoading,
             hasMoreData
         else { return }
@@ -164,50 +155,6 @@ struct MyBoardsView: View {
         }
     }
 
-  /*  func getAdsListApi(){
-        guard !isDataLoading else { return }
-      
-        self.isDataLoading = true
-        
-        if self.page == 1 {
-            hasMoreData = true
-            self.listArray.removeAll()
-        }
-        
-        let strUrl = Constant.shared.get_my_board + "?page=\(page)"
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
-            
-            if obj.code == 200 {
-                
-              //  DispatchQueue.main.async {
-                    let newItems = obj.data?.data ?? []
-                    
-                    if newItems.isEmpty {
-                        self.hasMoreData = false
-                    } else {
-                        self.listArray.append(contentsOf: newItems)
-                    }
-                    self.isDataLoading = false
-                    self.page += 1
-              //  }
-                
-               /* if obj.data != nil , (obj.data?.data ?? []).count > 0 {
-                    self.listArray.append(contentsOf:  obj.data?.data ?? [])
-                }
-               
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                    self.isDataLoading = false
-                    self.page += 1
-               })
-                */
-                
-            }else{
-                self.isDataLoading = false
-            }
-        }
-    }
-    */
-    
     func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
 
         paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
@@ -260,7 +207,6 @@ struct MyBoardCell:View {
                         .fill(Color.gray.opacity(0.5))
                         .frame(width: 105,height: 120)
                         .cornerRadius(10)
-                      //  .cornerRadius(10, corners: [.topRight, .bottomRight])
                     
                     KFImage(URL(string:  itemObj.image ?? ""))
                         .placeholder {
@@ -273,22 +219,17 @@ struct MyBoardCell:View {
                         )
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: 105, maxHeight: 120).cornerRadius(10).clipped()//.padding(1)
+                        .frame(maxWidth: 105, maxHeight: 120).cornerRadius(10).clipped()
                     
                     if (itemObj.isFeature ?? false) == true{
-                      //  VStack(alignment:.leading){
                            HStack{
                                Spacer()
                                 Text("Sponsored")
                                     .frame(height:22)
-                                   // .background(.orange)
-                                   // .cornerRadius(5)
                                     .foregroundColor(Color(.white))
                                     .font(.inter(.medium, size: 14))
                                Spacer()
-                            } .background(.orange)//.padding(.top,5)
-                            //Spacer()
-                       // }
+                            } .background(.orange)
                     }
                 }.frame(width: 105,height: 120).cornerRadius(10)
                 
@@ -298,16 +239,7 @@ struct MyBoardCell:View {
                     HStack{
                         
                         VStack(alignment:.leading){
-                           /* if itemObj.boardType  == 1{
-                                
-                            }else  if itemObj.boardType  == 2{
-                                
-                            }else  if itemObj.boardType  == 3{
-                                
-                            }else{
-                                
-                                
-                            }*/
+                         
                             if (itemObj.specialPrice ?? 0.0) > 0{
                                 HStack{
                                     
@@ -347,11 +279,12 @@ struct MyBoardCell:View {
                                     }else{
                                         
                                         if itemObj.boardType  == 1{
-                                            Text( "Your Promotional Ad Image").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                                            
+                                        Text( "Your Promotional Ad Image").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 14)).foregroundColor(Color(UIColor.label))
                                                 .padding(.trailing)
                                         }else{
-                                            Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
-                                                    .padding(.bottom,10)
+                                            
+                                        Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                                                     .padding(.trailing)
                                         }
                                     }
@@ -366,7 +299,6 @@ struct MyBoardCell:View {
                                         .padding(8)
                                         .frame(height:24)
                                         .background(bgColor)
-                                    
                                         .cornerRadius(12)
                                         .clipped()
                                         .padding(.trailing,5)
@@ -377,7 +309,6 @@ struct MyBoardCell:View {
                     
                     if itemObj.boardType  == 0{
                         Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
-                            .padding(.bottom,10)
                             .padding(.trailing)
                     }
                     
@@ -392,22 +323,24 @@ struct MyBoardCell:View {
                             Spacer()
                         }
                     }
+                    Spacer()
+                    
                     HStack(spacing:6){
                         
                         HStack(spacing:3){
                             Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 13, height: 13)
-                            Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)//.padding(.trailing)
+                            Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                         }
                         
                         HStack(spacing:3){
                             Image("heart").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 11, height: 11)
-                            Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)//.padding(.trailing)
+                            Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                         }
                         Spacer()
                         Text("More Details").font(Font.inter(.medium, size: 14)).foregroundColor(Color(.systemOrange)).padding(.trailing,5)
                     }
                     
-                }.padding(.horizontal,2)//.padding([.top,.bottom],10)
+                }.padding(.horizontal,2).padding([.top,.bottom],10)
                 
             }.frame(height: 120)
                 .background(Color(UIColor.systemBackground)).cornerRadius(10)
@@ -442,11 +375,11 @@ struct MyBoardCell:View {
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
                 onBoostTapped(itemObj,selPkgObj)
-            })//.cornerRadius(25)
+            })
             
             .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)
-            .presentationCornerRadius(20)   // ✅ THIS
+            .presentationCornerRadius(20)   //  THIS
             .presentationBackground(Color(.systemBackground)) // ✅ sheet background
 
         }

@@ -9,16 +9,14 @@ import SwiftUI
 import FittedSheets
 import Kingfisher
 import AVFoundation
+import UIKit
 
-struct CreatePromotionalAdsView: View {
+struct CreatePromotionalVideoAdsView: View {
     
     var navigationController:UINavigationController?
-    @State  var selectedImage: UIImage? = nil
     @State private var strUrl:String = ""
     @State private var strTitle:String = ""
-    @State private var strDescription:String = ""
-    @State private var showImagePicker = false
-    @State private var showCropper = false
+    @State private var showVideoPicker = false
     @State private var showSheetpackages = false
     @State private var showBuySheetpackages = false
     @State private var selectedPkgObj:PlanModel?
@@ -30,6 +28,8 @@ struct CreatePromotionalAdsView: View {
     @State private var selectedCallToACtion: String?
     @State private var selectedCallToACtionId: Int?
     @State private var boardObj:ItemModel?
+    @State  var videoSelected: AVURLAsset?
+    @State  private var selectedImage: UIImage? = nil
 
     var isFromEdit:Bool = false
     var boardId = 0
@@ -43,18 +43,24 @@ struct CreatePromotionalAdsView: View {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
          
-                Text(isFromEdit ? "Edit Promotional Ad" : "Create Promotional Ad").font(.inter(.medium, size: 18))
+                Text(isFromEdit ? "Edit Video Ad" : "Create Video Ad").font(.inter(.medium, size: 18))
                     .foregroundColor(Color(UIColor.label))
-            
             Spacer()
 
         }.frame(height:44).background(Color(UIColor.systemBackground))
             
-        .onAppear {
-            if isFromEdit && boardObj == nil{
-                getBoardDetailApi()
+            .onAppear {
+                
+                if isFromEdit && boardObj == nil{
+                    getBoardDetailApi()
+                }else{
+                    if selectedImage == nil{
+                        if let asset = videoSelected{
+                            selectedImage = generateThumbnail(from: asset)
+                        }
+                    }
+                }
             }
-        }
             
         ScrollView{
             VStack(alignment:.leading,spacing: 20){
@@ -62,14 +68,23 @@ struct CreatePromotionalAdsView: View {
                     if isFromEdit{
                         HStack{
                             Spacer()
-                                Text("Create Promotional Ad").font(.inter(.medium, size: 18.0))
-                            
+                          
+                                Text("Create Video Ad").font(.inter(.medium, size: 18.0))
                             Spacer()
                         }
                     }else{
-                            
-                            Text("Promotional Board Image").font(.inter(.medium, size: 16.0))
-                            Text("For the best results on all devices, use an image/video that's at least 4 MB or less.").font(.inter(.regular, size: 12.0))
+                       
+                            Text("Board Video Ad").font(.inter(.medium, size: 16.0))
+//                            Text("For best results, upload a video up to 50 MB with a maximum length of 30 seconds.").font(.inter(.regular, size: 12.0))
+                            (
+                                Text("For best results, upload a video up to ")
+                                + Text("50 MB").bold()
+                                + Text(" with a maximum length of ")
+                                + Text("30 seconds").bold()
+                                + Text(".")
+                            )
+                            .font(.inter(.regular, size: 12.0))
+
                     }
                 }
                 HStack{
@@ -78,7 +93,7 @@ struct CreatePromotionalAdsView: View {
                         
                         
                         Button {
-                            showImagePicker = true
+                            showVideoPicker = true
                             
                         } label: {
                             ZStack{
@@ -86,7 +101,7 @@ struct CreatePromotionalAdsView: View {
                                 if isFromEdit && selectedImage == nil{
                                     
                                     GeometryReader { geo in
-                                        KFImage(URL(string:  boardObj?.image ?? ""))
+                                        KFImage(URL(string: boardObj?.image ?? ""))
                                             .placeholder {
                                                 Image("getkartplaceholder")
                                                     .resizable()
@@ -121,11 +136,10 @@ struct CreatePromotionalAdsView: View {
                                 VStack{
                                     
                                     if isFromEdit {
-                                            
-                                            Image("uploadBanner").renderingMode(.template).foregroundColor(Color(.white))
-                                            Text("Upload Image").font(.inter(.regular, size: 13.0))
-                                                .foregroundColor(Color(.white))
                                         
+                                        Image("uploadBanner").renderingMode(.template).foregroundColor(Color(.white))
+                                        Text("Upload Video").font(.inter(.regular, size: 13.0))
+                                            .foregroundColor(Color(.white))
                                     }else{
                                         Image("gallery")
                                         Text("Select file").font(.inter(.regular, size: 13.0)).foregroundColor(Color(hexString: "#888888"))
@@ -144,10 +158,7 @@ struct CreatePromotionalAdsView: View {
                                     RoundedRectangle(cornerRadius: 8.0).stroke(Color(hexString: "#DADADA"), lineWidth: 1.0)
                                 }
                         }
-                        
-                        Text("Allowed file types: PNG, JPG, JPEG").multilineTextAlignment(.center).font(.inter(.medium, size: 11.0)).foregroundColor(Color.red)
-                        
-                        
+                                                
                     }
                     Spacer()
                     
@@ -169,6 +180,31 @@ struct CreatePromotionalAdsView: View {
 
                 }
                 
+                // MARK: - Title
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Title")
+                        .font(.inter(.regular, size: 16))
+                    
+                    TextField("Add your board title", text: $strTitle)
+                        .padding(.horizontal)
+                        .frame(height: 55)
+                        .tint(Color(.systemOrange))
+                        .background(RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(.systemBackground)))
+                        .onChange(of: strTitle) { newValue in
+                            if newValue.count > 50 {
+                                strTitle = String(newValue.prefix(50))
+                            }
+                        }
+                    
+                    HStack {
+                        Spacer()
+                        Text("\(strTitle.count)/50")
+                            .font(.inter(.regular, size: 10))
+                    }
+                }
+
                
                 VStack(alignment:.leading,spacing: 8){
                     Text("Call to action").font(.inter(.regular, size: 16.0))
@@ -187,7 +223,7 @@ struct CreatePromotionalAdsView: View {
                             showCallToActionPopup = true
 
                         }
-                    Text("Choose where you want to redirect users.").font(.inter(.regular, size: 10.0))
+                    Text("Choose where you want to redirect users.").font(.inter(.regular, size: 10.0)).foregroundColor(Color(.gray))
                 }
                 
                 VStack(alignment:.leading,spacing: 8){
@@ -201,7 +237,7 @@ struct CreatePromotionalAdsView: View {
                       .autocapitalization(.none)
                       .disableAutocorrection(true)
                       .textInputAutocapitalization(.never)
-                    Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 10.0))
+                    Text("Add your business page link and let users discover you in just one click.").font(.inter(.regular, size: 10.0)).foregroundColor(Color(.gray))
                 }
 
                 
@@ -236,31 +272,23 @@ struct CreatePromotionalAdsView: View {
         }
            
             
-            .sheet(isPresented: $showImagePicker) {
-                ImagePickerPromotion(image: $selectedImage) {
-                           showCropper = true
-                       }
-                   }
-          
-            .fullScreenCover(isPresented: $showCropper) {
-                if let img = selectedImage {
-                    
-                    ImageCropperBoardView(
-                        image: img,
-                        onCropped: { croppedImage in
-                            self.selectedImage = croppedImage
-                            showCropper = false
-                        },
-                        onCancel: {
-                            showCropper = false
-                        }
-                    )
-                }
+        .sheet(isPresented: $showVideoPicker) {
+            
+            
+            VideoPickerView(maxDuration: 30) { assets in
+                //videoSelected = assets
+                self.videoSelected = assets
+                self.selectedImage = generateThumbnail(from: assets)
+            } onCancel: {
+                
             }
+        }
+        
+          
             .fullScreenCover(isPresented: $showCallToActionPopup) {
                 CallToActionPopupView(
                     isPresented: $showCallToActionPopup,
-                    selectedCategory: $selectedCallToACtion,selectedCategoryId: $selectedCallToACtionId,type:1
+                    selectedCategory: $selectedCallToACtion,selectedCategoryId: $selectedCallToACtionId,type:2
                 )
                 .presentationBackground(.clear)
                
@@ -307,19 +335,24 @@ struct CreatePromotionalAdsView: View {
        
         if selectedImage == nil && !isFromEdit {
             
-            AlertView.sharedManager.showToast(message: "Please upload image")
+            AlertView.sharedManager.showToast(message: "Please upload video")
             
         }else if selectedCategoryId == nil {
             
             AlertView.sharedManager.showToast(message: "Please select category")
             
+        }else if strTitle.count < 3 || strTitle.count > 50 {
+            // 3 to 50 characters
+            AlertView.sharedManager.showToast(
+                message: "Ad title must be between 3 and 50 characters."
+            )
         }else if selectedCallToACtionId == nil {
             
             AlertView.sharedManager.showToast(message: "Please select call to action")
             
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your ad")
-        }else{
+        } else{
             isDataUploading = true
             uploadFIleToServer()
 
@@ -329,13 +362,13 @@ struct CreatePromotionalAdsView: View {
     func updateDetails(){
         if boardObj != nil && selectedCategoryId == nil{
             strTitle = boardObj?.name ?? ""
-            strDescription = boardObj?.description ?? ""
             strUrl = boardObj?.outbondUrl ?? ""
             selectedCategory = boardObj?.category?.name ?? ""
             selectedCategoryId = boardObj?.category?.id ?? 0
-           
+            
             selectedCallToACtion = boardObj?.ctaLabel ?? ""
             selectedCallToACtionId = boardObj?.ctaType ?? 0
+            
         }
     }
      func getBoardDetailApi(){
@@ -363,31 +396,28 @@ struct CreatePromotionalAdsView: View {
     func uploadFIleToServer(){
         
         var params:Dictionary<String,Any> = [:]
-        
+     
         var strApiUrl = Constant.shared.create_promotional_board
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
             strApiUrl = Constant.shared.update_promotional_board
         }
         
-        params["board_type"] = 1 // 0=product,1=business,2=board video,3=idea
+        params["board_type"] = 2 // 0=product,1=business
         params["cta_type"] =  selectedCallToACtionId
         params["category_id"] = selectedCategoryId ?? 0
         params["outbond_url"] = strUrl
-        params["name"] = ""
-        
-        var imgNames = [String]()
-        var galleryImagesData = [Data]()
-                    
-        if let img = selectedImage{
-            if let imgData = img.wxCompress().pngData(){
-                galleryImagesData.append(imgData)
-                imgNames.append("gallery_images[]")
-            }
+        params["name"] = strTitle
+
+        var selectedVideoArray = [AVURLAsset]()
+        if let asset = videoSelected{
+            selectedVideoArray.append(asset)
         }
-       
-        URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: nil, imageName: "", imagesData: galleryImagesData, imageNames: imgNames, url:strApiUrl , params: params, completionHandler: { responseObject, error in
+   
+    
         
+        URLhandler.sharedinstance.uploadVideoArrayWithParameters(videoAssets: selectedVideoArray, videoParamName: "gallery_images[]", url: strApiUrl, params: params) { responseObject, error in
+      
             self.isDataUploading = false
 
             if error == nil {
@@ -406,7 +436,7 @@ struct CreatePromotionalAdsView: View {
                     AlertView.sharedManager.showToast(message: message)
                 }
             }
-        })
+        }//)
     }
     
    
@@ -416,6 +446,7 @@ struct CreatePromotionalAdsView: View {
         as! PayPlanVC
         controller.strUrl = strUrl
         controller.paymentFor = .bannerPromotion
+
         
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
@@ -462,8 +493,25 @@ struct CreatePromotionalAdsView: View {
             self.navigationController?.present(sheet, animated: true, completion: nil)
         }
     }
+    
+ 
+
+    func generateThumbnail(from asset: AVURLAsset) -> UIImage? {
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        
+        let time = CMTime(seconds: 1, preferredTimescale: 600)
+        
+        do {
+            let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print("Thumbnail generation failed: \(error)")
+            return nil
+        }
+    }
 }
 
 #Preview {
-    CreatePromotionalAdsView()
+    CreatePromotionalVideoAdsView()
 }

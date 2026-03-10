@@ -50,7 +50,7 @@ struct BoardDetail: Codable {
     var isActive:Int?
     var isFeature: Bool?
     let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea
-
+    let videoLink:String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, image, description
@@ -64,6 +64,7 @@ struct BoardDetail: Codable {
         case isActive = "is_active"
         case isFeature = "is_feature"
         case boardType = "board_type"
+        case videoLink = "video_link"
     }
 }
 
