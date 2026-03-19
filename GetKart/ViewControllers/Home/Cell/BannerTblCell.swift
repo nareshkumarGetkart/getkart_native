@@ -193,6 +193,9 @@ extension BannerTblCell{
 
        // if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.campaign_id ?? 0) > 0{
             self.campaignClickEventApi(campaign_banner_id: sliderObj?.id ?? 0)
+        }else{
+            //For apps own banner
+            self.captureSliderClickApi(campaign_banner_id: sliderObj?.id ?? 0)
         }
     
     if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "AdsListing"{
@@ -352,6 +355,31 @@ func isUserLoggedInRequest() -> Bool {
         }
     }
 
+    
+    func captureSliderClickApi(campaign_banner_id:Int){
+        
+        let params = ["id":campaign_banner_id] as [String : Any]
+     
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.capture_slider_click, param: params,methodType:.post,showLoader: false) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+               // let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    
+               
+                }else{
+                    
+
+                }
+            }
+        }
+    }
+
+    
     
 }
 

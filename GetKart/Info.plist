@@ -60,7 +60,8 @@
 		<string>ppemerchantsdkv2</string>
 		<string>ppemerchantsdkv3</string>
 		<string>paytmmp</string>
-		<string>gpay</string>
+        <string>phonepe</string>
+        <string>gpay</string>
 		<string>credpay</string>
 		<string>amazonpay</string>
 		<string>bhim</string>

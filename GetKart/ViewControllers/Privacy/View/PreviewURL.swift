@@ -369,6 +369,8 @@ struct SafariView: UIViewControllerRepresentable {
         let vc = SFSafariViewController(url: url)
         vc.delegate = context.coordinator
         vc.modalPresentationStyle = .fullScreen
+        FeedVideoManager.shared.muteAll()
+        
         return vc
     }
 

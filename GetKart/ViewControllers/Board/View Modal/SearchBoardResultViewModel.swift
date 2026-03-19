@@ -109,6 +109,15 @@ final class SearchBoardResultViewModel: ObservableObject {
        
     }
     
+    
+    func updateCommentCount(commentCount:Int,commentObj:CommentModel?,boardId:Int){
+        
+        if let index = items.firstIndex(where: { $0.id == boardId }) {
+            items[index].commentsCount = commentCount
+            items[index].lastComment = commentObj
+        }
+    }
+    
     func updateBoost(isBoosted:Bool,boardId:Int){
         
         if let index = items.firstIndex(where: { $0.id == boardId }) {

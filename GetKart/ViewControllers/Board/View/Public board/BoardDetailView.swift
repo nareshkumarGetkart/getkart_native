@@ -27,14 +27,13 @@ struct BoardDetailView: View{
     @State private var scrollTick: Int = 0
     @State private var lastScrollTick: Int = 0
     
-    private let prefetchOffset = 4   //  call API before 4 items
+    private let prefetchOffset = 4   // call API before 4 items
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var videoFrames: [Int: CGRect] = [:]
     @State private var visibilityWorkItem: DispatchWorkItem?
-    @State private var openSafari: Bool = false
-    @State private var outboundUrlClicked: String = ""
-    @State private var showComments: Bool = false
+    @State private var safariURL: URL?
 
+    @State private var showComments: Bool = false
     
     var body: some View {
         
@@ -55,212 +54,287 @@ struct BoardDetailView: View{
                                 }
                         }
                     )
+                
+                ReelPostView(post: $itemObj,
+                             sendLikeDislikeObject: { isLiked, boardId,likeCount  in
+                    
+                    itemObj.isLiked = isLiked
+                    itemObj.totalLikes = likeCount
+                    
+                },onClickedUserProfile: { user in
+                    self.pushToProfileScreen(user: user)
+                },onClickedUserComents:{
+                    if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                         
-                        ReelPostView(post: $itemObj,
-                                     sendLikeDislikeObject: { isLiked, boardId,likeCount  in
-                         
-                            itemObj.isLiked = isLiked
-                            itemObj.totalLikes = likeCount
-                           
-                        },onClickedUserProfile: { user in
-                            self.pushToProfileScreen(user: user)
-                        },onClickedUserComents:{
-                           // presentCommentScreen()
-                            showComments = true
-                        }).padding([.horizontal],5)
+                        showComments = true
+                    }
+                }).padding([.horizontal],5)
+                
+                let columns = splitColumns()
+                
+                HStack(alignment: .top, spacing: 6) {
+                    
+                    // LEFT COLUMN
+                    LazyVStack(spacing: 6) {
                         
-                        let columns = splitColumns()
-                        
-                        HStack(alignment: .top, spacing: 6) {
+                        ForEach(columns.left, id: \.id) { item in
                             
-                            // LEFT COLUMN
-                            LazyVStack(spacing: 6) {
-
-                                    ForEach(columns.left, id: \.id) { item in
-
-                                        if item.boardType == 2 {
-                                            SmartVideoPlayerView(item: item,
-                                                                 onTapBottomButton: {
-                                                //Tapped vide
-                                                if (item.outbondUrl ?? "").count > 0{
-                                                    outboundUrlClicked =  item.outbondUrl ?? ""
-                                                    openSafari = true
-                                                }
-                                            })
-                                            .background(
-                                                GeometryReader { geo in
-                                                    Color.clear
-                                                        .onAppear {
-                                                            videoFrames[item.id ?? 0] = geo.frame(in: .global)
-                                                        }
-                                                        .onChange(of: geo.frame(in: .global)) { frame in
-                                                            videoFrames[item.id ?? 0] = frame
-                                                        }
-                                                }
-                                            )
-                                            .measureHeight(id: item.id ?? 0)
-                                            .onAppear {
-                                                handlePrefetch(itemIndex: globalIndex(of: item))
-                                            }
-                                        } else {
-                                        CardItemView(
-                                            item: item,
-                                            onLike: { isLiked, boardId in
-                                           
-                                                updateLike(boardId: boardId, isLiked: isLiked)
-                                            },
-                                            onTap: { pushToDetail(item: item) },
-                                            onTapBoostButton:{
-                                                if item.boardType == 1{
-                                                    //Ckicking on bottom
-                                                    if (item.outbondUrl ?? "").count > 0{
-                                                        outboundUrlClicked =  item.outbondUrl ?? ""
-                                                        openSafari = true
-                                                    }
-                                                    
-                                                }else{
-                                                    paymentGatewayOpen(product: item)
-                                                }
-                                                
-                                            },
-                                            isToShowBoostButton:true
-                                        )
-                                        .measureHeight(id: item.id ?? 0)
-                                        .onAppear {
-                                            handlePrefetch(itemIndex: globalIndex(of: item))
-                                        }
+                            if item.boardType == 2 {
+                                SmartVideoPlayerView(item: item,
+                                                     onTapBottomButton: {
+                                    //Tapped vide
+                                    if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                        safariURL = url
+                                        FeedVideoManager.shared.muteAll()
                                     }
+                                })
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear {
+                                                videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                // scheduleVisibilityUpdate()
+                                            }
+                                            .onChange(of: geo.frame(in: .global)) { frame in
+                                                videoFrames[item.id ?? 0] = frame
+                                                // scheduleVisibilityUpdate()
+                                            }
+                                    }
+                                )
+                                .measureHeight(id: item.id ?? 0)
+                                .onAppear {
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
+                                    prefetchNextVideos(from: item)
                                 }
-                            }
-                            
-                            // RIGHT COLUMN
-                            LazyVStack(spacing: 6) {
-//                                ForEach(columns.right.indices, id: \.self) { index in
-//                                    let item = columns.right[index]
-                                    ForEach(columns.right, id: \.id) { item in
-
-                                        if item.boardType == 2 {
-                                            SmartVideoPlayerView(
-                                                item: item,
-                                                onTapBottomButton: {
-                                                    //Tapped vide
-                                                    if (item.outbondUrl ?? "").count > 0{
-                                                        outboundUrlClicked =  item.outbondUrl ?? ""
-                                                        openSafari = true
-                                                    }
-                                                })
-                                            .background(
-                                                GeometryReader { geo in
-                                                    Color.clear
-                                                        .onAppear {
-                                                            videoFrames[item.id ?? 0] = geo.frame(in: .global)
-                                                        }
-                                                        .onChange(of: geo.frame(in: .global)) { frame in
-                                                            videoFrames[item.id ?? 0] = frame
-                                                        }
-                                                }
-                                            )
-                                            .measureHeight(id: item.id ?? 0)
-                                            .onAppear {
-                                                handlePrefetch(itemIndex: globalIndex(of: item))
+                                .onDisappear{
+                                    videoFrames.removeValue(forKey: item.id ?? 0)
+                                    FeedVideoManager.shared.pause(id: item.id ?? 0)
+                                }
+                                
+                            } else {
+                                
+                                CardItemView(
+                                    item: item,
+                                    onLike: { isLiked, boardId in
+                                        
+                                        updateLike(boardId: boardId, isLiked: isLiked)
+                                    },
+                                    onTap: { pushToDetail(item: item) },
+                                    onTapBoostButton:{
+                                        if item.boardType == 1{
+                                            //Ckicking on bottom
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
                                             }
-                                        } else {
-                                        CardItemView(
-                                            item: item,
-                                            onLike: { isLiked, boardId in
-                                             updateLike(boardId: boardId, isLiked: isLiked)
-                                            },
-                                            onTap: { pushToDetail(item: item) },
-                                            onTapBoostButton:{
-                                                paymentGatewayOpen(product: item)
-                                            },
-                                            isToShowBoostButton:true
-                                        )
-                                        .measureHeight(id: item.id ?? 0)
-                                        .onAppear {
-                                            handlePrefetch(itemIndex: globalIndex(of: item))
+                                            
+                                        }else{
+                                            paymentGatewayOpen(product: item)
                                         }
-                                    }
+                                        
+                                    },
+                                    isToShowBoostButton:true
+                                )
+                                .measureHeight(id: item.id ?? 0)
+                                .onAppear {
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
                                 }
                             }
                         }
-                        .padding([.horizontal], 5)
-           
+                    }
+                    
+                    // RIGHT COLUMN
+                    LazyVStack(spacing: 6) {
+                        
+                        ForEach(columns.right, id: \.id) { item in
+                            
+                            if item.boardType == 2 {
+                                SmartVideoPlayerView(
+                                    item: item,
+                                    onTapBottomButton: {
+                                        //Tapped vide
+                                        if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                            safariURL = url
+                                            FeedVideoManager.shared.muteAll()
+                                        }
+                                    })
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear {
+                                                videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                // scheduleVisibilityUpdate()
+                                            }
+                                            .onChange(of: geo.frame(in: .global)) { frame in
+                                                videoFrames[item.id ?? 0] = frame
+                                                // scheduleVisibilityUpdate()
+                                                
+                                            }
+                                    }
+                                )
+                                .measureHeight(id: item.id ?? 0)
+                                .onAppear {
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
+                                    prefetchNextVideos(from: item)
+                                    
+                                }
+                                
+                                .onDisappear{
+                                    videoFrames.removeValue(forKey: item.id ?? 0)
+                                    FeedVideoManager.shared.pause(id: item.id ?? 0)
+                                }
+                                
+                            } else {
+                                CardItemView(
+                                    item: item,
+                                    onLike: { isLiked, boardId in
+                                        updateLike(boardId: boardId, isLiked: isLiked)
+                                    },
+                                    onTap: { pushToDetail(item: item) },
+                                    onTapBoostButton:{
+                                        
+                                        if item.boardType == 1{
+                                            //Ckicking on bottom
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                            }
+                                            
+                                        }else{
+                                            
+                                            paymentGatewayOpen(product: item)
+                                        }
+                                    },
+                                    isToShowBoostButton:true
+                                )
+                                .measureHeight(id: item.id ?? 0)
+                                .onAppear {
+                                    handlePrefetch(itemIndex: globalIndex(of: item))
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding([.horizontal], 5)
+                
                 Spacer()
             }.background(Color(.systemGray6))
-            .scrollIndicators(.hidden, axes: .vertical)
-            .onAppear {
-                
-                if listArray.count == 0{
-                    getBoardListApi()
-                    boardClickApi(post: itemObj)
-                }
-            }
-            
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
-                )
-            ) { notification in
-                
-                guard let dict = notification.object as? [String: Any] else { return }
-                
-                let isLike  = dict["isLike"] as? Bool ?? false
-                let count  = dict["count"] as? Int ?? 0
-                let boardId = dict["boardId"] as? Int ?? 0
-              
-                
-                if let index = listArray.firstIndex(where: { $0.id == boardId }) {
-                    listArray[index].isLiked = isLike
-                    listArray[index].totalLikes = count
-                }
-                
-                if itemObj.id == boardId{
-                    itemObj.isLiked = isLike
-                    itemObj.totalLikes = count
-                }
-            }
-            //  Detect REAL user scroll
-            .simultaneousGesture(
-                DragGesture()
-                    .onEnded { _ in
-                        
-                        scheduleVisibilityUpdate()
-                    }
-            )
-        
-            .background(
-                
-                NavigationConfigurator { nav in
-                    nav.interactivePopGestureRecognizer?.isEnabled = true
-                    nav.interactivePopGestureRecognizer?.delegate = nil
-                }
-            ) //Added for swipe pop navigation
-            
-            .fullScreenCover(isPresented: $openSafari) {
-                
-                if let url = URL(string:outboundUrlClicked.getValidUrl())  {
+                .scrollIndicators(.hidden, axes: .vertical)
+                .onAppear {
                     
-                    SafariView(url:url)
+                    if listArray.count == 0{
+                        getBoardListApi()
+                        boardClickApi(post: itemObj)
+                    }
                 }
-            }
             
-            .sheet(isPresented: $showComments) {
-               
-                CommentsView(onClose:{ isToProfileOpen,user  in
-                    showComments = false
-
-                    if isToProfileOpen{
-                        if let obj = user{
-                            pushToProfileScreen(user: obj)
+                .onReceive(
+                    NotificationCenter.default.publisher(
+                        for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
+                    )
+                ) { notification in
+                    
+                    guard let dict = notification.object as? [String: Any] else { return }
+                    
+                    let isLike  = dict["isLike"] as? Bool ?? false
+                    let count  = dict["count"] as? Int ?? 0
+                    let boardId = dict["boardId"] as? Int ?? 0
+                    
+                    if let index = listArray.firstIndex(where: { $0.id == boardId }) {
+                        listArray[index].isLiked = isLike
+                        listArray[index].totalLikes = count
+                    }
+                    
+                    if itemObj.id == boardId{
+                        itemObj.isLiked = isLike
+                        itemObj.totalLikes = count
+                    }
+                }
+            
+            //Refresh Comment Count board
+            
+                .onReceive(
+                    NotificationCenter.default.publisher(
+                        for: Notification.Name(NotificationKeys.refreshCommentCountBoard.rawValue)
+                    )
+                ) { notification in
+                    
+                    guard let dict = notification.object as? [String: Any] else { return }
+                    
+                    let count  = dict["count"] as? Int ?? 0
+                    let boardId = dict["boardId"] as? Int ?? 0
+                    if boardId == itemObj.id{
+                        itemObj.commentsCount = count
+                        if let commentObj = dict["lastComment"] as? CommentModel {
+                            
+                            itemObj.lastComment = commentObj
+                        }
+                    }else{
+                        
+                        if let commentObj = dict["lastComment"] as? CommentModel {
+                            updateCommentCount(commentCount: count, commentObj: commentObj, boardId: boardId)
+                        }else{
+                            updateCommentCount(commentCount: count, commentObj: nil, boardId: boardId)
                         }
                     }
-
-                }, itemObj: itemObj, navController: navigationController)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-                
-            }
+                }
+            
+            //  Detect REAL user scroll
+                .simultaneousGesture(
+                    DragGesture()
+                        .onEnded { _ in
+                            
+                            scheduleVisibilityUpdate()
+                        }
+                )
+            
+                .background(
+                    
+                    NavigationConfigurator { nav in
+                        nav.interactivePopGestureRecognizer?.isEnabled = true
+                        nav.interactivePopGestureRecognizer?.delegate = nil
+                    }
+                ) //Added for swipe pop navigation
+            
+                .fullScreenCover(item: $safariURL) { url in
+                    SafariView(url: url)
+                }
+            
+//                .sheet(isPresented: $showComments) {
+//                    CommentsView(
+//                        onClose:{ isToProfileOpen,user in
+//                            showComments = false
+//                            
+//                            if isToProfileOpen {
+//                                if let obj = user {
+//                                    pushToProfileScreen(user: obj)
+//                                }
+//                            }
+//                        },
+//                        itemObj: itemObj,
+//                        navController: navigationController
+//                    )
+//                    .presentationDetents([.large])
+//                    .presentationDragIndicator(.hidden)
+//                    .presentationBackgroundInteraction(.enabled)   // 👈 add here
+//                }
+            
+            
+                .sheet(isPresented: $showComments) {
+                    CommentsView(
+                        onClose:{ isToProfileOpen,user in
+                            showComments = false
+                            
+                            if isToProfileOpen {
+                                if let obj = user {
+                                    pushToProfileScreen(user: obj)
+                                }
+                            }
+                        },
+                        itemObj: itemObj,
+                        navController: navigationController
+                    )
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+                }
         }
     }
 
@@ -279,12 +353,58 @@ struct BoardDetailView: View{
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
     }
     
-    private func calculateVisibleVideos() {
-        
-//        guard isActive else {
-//            FeedVideoManager.shared.pauseAll()
-//            return
+//    func precacheNextVideos(from index: Int) {
+//
+//        guard index < listArray.count - 1 else { return }
+//
+//        let endIndex = min(index + 3, listArray.count - 1)
+//
+//        for i in (index + 1)...endIndex {
+//
+//            let item = listArray[i]
+//
+//            if item.boardType == 2,
+//               let link = item.videoLink,
+//               let url = URL(string: link) {
+//
+//                VideoCacheManager.shared.precacheVideo(url: url)
+//                FeedVideoManager.shared.warmupPlayer(
+//                    id: item.id!,
+//                    url: url
+//                )
+//            }
 //        }
+//    }
+    
+    
+    // MARK: - Prefetch Next Videos
+  private func prefetchNextVideos(from currentItem: ItemModel) {
+
+      guard let index = listArray.firstIndex(where: { $0.id == currentItem.id }) else { return }
+
+      let start = index + 1
+      let end = min(index + 2, listArray.count - 1)
+
+      guard start <= end else { return }
+
+      var urls: [URL] = []
+
+      for i in start...end {
+
+          let item = listArray[i]
+
+          if item.boardType == 2,
+             let link = item.videoLink,
+             let url = URL(string: link) {
+
+              urls.append(url)
+          }
+      }
+
+      VideoPreloadManagerDefault.shared.set(waiting: urls)
+  }
+    
+    private func calculateVisibleVideos() {
 
         let screenHeight = UIScreen.main.bounds.height
         var visibleSet: Set<Int> = []
@@ -309,6 +429,13 @@ struct BoardDetailView: View{
         FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
     }
     
+    func updateCommentCount(commentCount:Int,commentObj:CommentModel?,boardId:Int){
+        
+        if let index = listArray.firstIndex(where: { $0.id == boardId }) {
+            listArray[index].commentsCount = commentCount
+            listArray[index].lastComment = commentObj
+        }
+    }
     func paymentGatewayOpen(product:ItemModel) {
 
         paymentGateway = PaymentGatewayCentralized()
@@ -670,7 +797,9 @@ struct ReelPostView: View {
                 HStack{
                  
                     Button {
-                        
+                        if let obj = post.lastComment?.user{
+                            onClickedUserProfile(obj)
+                        }
                     } label: {
                       
                         AsyncImage(url: URL(string: post.lastComment?.user?.profile ?? "")) { image in
@@ -685,11 +814,7 @@ struct ReelPostView: View {
                                 .scaledToFit()
                                 .frame(width: 30,height:30)
                                 .clipped()
-                        }.onTapGesture {
-                            if let obj = post.lastComment?.user{
-                                onClickedUserProfile(obj)
-                            }
-                        }
+                       }
                         
                     }.frame(width: 30,height:30)
                     .cornerRadius(15.0)
@@ -700,7 +825,7 @@ struct ReelPostView: View {
                            
                             // Spacer()
                             if (post.commentsCount ?? 0) > 1{
-                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 11)).lineLimit(1)
+                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12)).lineLimit(1)
                                 Text("...").font(.inter(.medium, size: 13)).foregroundColor(Color(.gray))
                                 Button {
                                    // showComments = true
@@ -708,11 +833,11 @@ struct ReelPostView: View {
                                 } label: {
                                     
                                     Text("See all comments")
-                                        .font(.inter(.bold, size: 14))
+                                        .font(.inter(.medium, size: 12))
                                         .foregroundColor(Color(.label))
                                 }
                             }else{
-                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 11))
+                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12))
                             }
                         }
                        
@@ -742,14 +867,15 @@ struct ReelPostView: View {
                 }.padding()
             }
            
-             if (post.user?.id ?? 0) != Local.shared.getUserId(){
+            
+             if ((post.user?.id ?? 0) != Local.shared.getUserId()) && (post.boardType ?? 0) == 0{
               
                 //  BUY NOW
                 Button {
                     showSafari = true
                     outboundClickApi(strURl: post.outbondUrl ?? "")
                 } label: {
-                    Text("Buy Now")
+                    Text(post.ctaLabel ?? "Buy Now")
                         .font(.inter(.semiBold, size: 16))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, minHeight: 55)
@@ -771,12 +897,13 @@ struct ReelPostView: View {
         )
            
         .sheet(isPresented: $showSeeMore) {
+            let isBuyBtn = (post.boardType == 3) ? false : true
                 DynamicHeightSheet(
                     content:SeeMorePopupView(title: post.name ?? "", description: post.description ?? "", onBuy: {
                         showSeeMore = false
                         showSafari = true
                         outboundClickApi(strURl: post.outbondUrl ?? "")
-                    }, ctaLabel: post.ctaLabel ?? "Buy Now")
+                    }, ctaLabel: post.ctaLabel ?? "Buy Now",isBuyButton: isBuyBtn)
                 )
            
         }
@@ -906,26 +1033,28 @@ struct ReelPostView: View {
                     }
                 }
                 
-                if (post.specialPrice ?? 0.0) > 0{
-                    HStack{
-                        Text("\(Local.shared.currencySymbol)\((post.specialPrice ?? 0.0).formatNumber())")
+                if (post.boardType ?? 0) == 0{
+                    if (post.specialPrice ?? 0.0) > 0{
+                        HStack{
+                            Text("\(Local.shared.currencySymbol)\((post.specialPrice ?? 0.0).formatNumber())")
+                                .font(.inter(.medium, size: 18))
+                                .foregroundColor(Color(hex: "#008838"))
+                            Text("\(Local.shared.currencySymbol)\((post.price ?? 0.0).formatNumber())")
+                                .font(.inter(.medium, size: 15))
+                                .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
+                            let per = (((post.price ?? 0.0) - (post.specialPrice ?? 0.0)) / (post.price ?? 0.0)) * 100.0
+                            Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
+                                .foregroundColor(Color(hex: "#008838"))
+                            
+                        }.padding(.top,5)
+                        
+                        
+                    }else{
+                        
+                        Text("\(Local.shared.currencySymbol) \((post.price ?? 0.0).formatNumber())")
                             .font(.inter(.medium, size: 18))
-                            .foregroundColor(Color(hex: "#008838"))
-                        Text("\(Local.shared.currencySymbol)\((post.price ?? 0.0).formatNumber())")
-                            .font(.inter(.medium, size: 15))
-                            .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
-                        let per = (((post.price ?? 0.0) - (post.specialPrice ?? 0.0)) / (post.price ?? 0.0)) * 100.0
-                        Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
-                            .foregroundColor(Color(hex: "#008838"))
-                        
-                    }.padding(.top,5)
-                        
-
-                }else{
-                   
-                    Text("\(Local.shared.currencySymbol) \((post.price ?? 0.0).formatNumber())")
-                        .font(.inter(.medium, size: 18))
-                        .foregroundColor(Color(hex: "#008838")).padding(.top,5)
+                            .foregroundColor(Color(hex: "#008838")).padding(.top,5)
+                    }
                 }
             }
             
@@ -1487,26 +1616,29 @@ struct SeeMorePopupView: View {
     let description: String
     let onBuy: () -> Void
     let ctaLabel:String?
+    let isBuyButton:Bool
     
     var body: some View {
         VStack(spacing: 14) {
-
+            
             Text(title)
                 .font(.inter(.semiBold, size: 18))
                 .foregroundColor(Color(.label))
                 .multilineTextAlignment(.center)
-
+            
             Text(description)
                 .font(.inter(.medium, size: 16))
-               .foregroundColor(Color(hex: "#666666"))
-
-            Button(action: onBuy) {
-                Text( ctaLabel ?? "Buy Now")
-                    .font(.inter(.medium, size: 18))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color(hexString: "#FF9900"))
-                    .cornerRadius(12)
+                .foregroundColor(Color(hex: "#666666"))
+            
+            if isBuyButton{
+                Button(action: onBuy) {
+                    Text( ctaLabel ?? "Buy Now")
+                        .font(.inter(.medium, size: 18))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(Color(hexString: "#FF9900"))
+                        .cornerRadius(12)
+                }
             }
         }
         .padding()

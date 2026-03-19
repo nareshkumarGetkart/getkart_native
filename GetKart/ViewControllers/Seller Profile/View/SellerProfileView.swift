@@ -17,12 +17,10 @@ struct SellerProfileView: View {
     
     var navController:UINavigationController?
     var userId:Int = 33925
-    
     @StateObject private var objVM:ProfileViewModel
     @State var showShareSheet = false
     @State var showOptionSheet = false
     @State private var selectedTab: ProfileTab = .products
-    
     @State private var userDidScroll = false  //  User intent + safety locks
     @State private var paginationConsumed = false
     @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
@@ -30,11 +28,9 @@ struct SellerProfileView: View {
     @State private var lastItemCount: Int = 0
     @State private var scrollTick: Int = 0
     @State private var lastScrollTick: Int = 0
-    
     private let prefetchOffset = 4   //  call API before 4 items
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var videoFrames: [Int: CGRect] = [:]
-    
     @State private var openSafari: Bool = false
     @State private var outboundUrlClicked: String = ""
     
@@ -344,19 +340,24 @@ struct SellerProfileView: View {
                                                                         Color.clear
                                                                             .onAppear {
                                                                                 videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                                               // scheduleVisibilityUpdate()
+
                                                                             }.onDisappear{
-                                                                                print("dissapearing video \(item.id ?? 0)")
                                                                                 videoFrames.removeValue(forKey: item.id ?? 0)
                                                                                 FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                                             }
                                                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                                                 videoFrames[item.id ?? 0] = frame
+                                                                                //scheduleVisibilityUpdate()
+
                                                                             }
                                                                     }
                                                                 )
                                                                 .measureHeight(id: item.id ?? 0)
                                                                 .onAppear {
                                                                     handlePrefetch(itemIndex: globalIndex(of: item))
+                                                                    prefetchNextVideos(from: item)
+
                                                                 }
                                                         } else {
                                                             CardItemView(
@@ -409,19 +410,24 @@ struct SellerProfileView: View {
                                                                         Color.clear
                                                                             .onAppear {
                                                                                 videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                                               // scheduleVisibilityUpdate()
+
                                                                             }.onDisappear{
-                                                                                print("dissapearing video \(item.id ?? 0)")
                                                                                 videoFrames.removeValue(forKey: item.id ?? 0)
                                                                                 FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                                             }
                                                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                                                 videoFrames[item.id ?? 0] = frame
+                                                                               // scheduleVisibilityUpdate()
+
                                                                             }
                                                                     }
                                                                 )
                                                                 .measureHeight(id: item.id ?? 0)
                                                                 .onAppear {
                                                                     handlePrefetch(itemIndex: globalIndex(of: item))
+                                                                    prefetchNextVideos(from: item)
+
                                                                 }
                                                         } else {
                                                             CardItemView(
@@ -469,12 +475,7 @@ struct SellerProfileView: View {
                                 .onChange(of: scrollTick) { _ in
                                     calculateVisibleVideos()
                                 }
-//                                .onAppear {
-//                                    
-//                                    if objVM.boardArray.count == 0{
-//                                        objVM.getBoardListApi()
-//                                    }
-//                                }
+
                                 //  Capture measured heights
                                 .onPreferenceChange(ItemHeightKey.self) { value in
                                     itemHeights.merge(value) { $1 }
@@ -592,6 +593,33 @@ struct SellerProfileView: View {
           objVM.getBoardListApi()
       }
 
+    
+    private func prefetchNextVideos(from currentItem: ItemModel) {
+
+        guard let index = objVM.boardArray.firstIndex(where: { $0.id == currentItem.id }) else { return }
+
+        let start = index + 1
+        let end = min(index + 2, objVM.boardArray.count - 1)
+
+        guard start <= end else { return }
+
+        var urls: [URL] = []
+
+        for i in start...end {
+
+            let item = objVM.boardArray[i]
+
+            if item.boardType == 2,
+               let link = item.videoLink,
+               let url = URL(string: link) {
+
+                urls.append(url)
+            }
+        }
+
+        VideoPreloadManagerDefault.shared.set(waiting: urls)
+    }
+    
     private func calculateVisibleVideos() {
         
 //        guard isActive else {
@@ -614,7 +642,7 @@ struct SellerProfileView: View {
 
             let percent = visibleHeight / frame.height
 
-            if percent >= 0.3 {
+            if percent >= 0.6 {
                 visibleSet.insert(id)
             }
         }

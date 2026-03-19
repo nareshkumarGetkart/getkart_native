@@ -19,21 +19,18 @@ enum ProductType:Int {
     case promoteBusiness
 }
 
+
 struct UploadImageVideoView: View {
 
     var navigationController: UINavigationController?
-
     @State private var showVideoSheet = false
-
     @State private var showSheet = false
     @State private var finalImages: [UIImage] = []
     @State private var imagesForCrop: [UIImage]? = nil
     @State private var cropWrapper: CropImageWrapper? = nil
     @State private var selectionType: ProductType = .product
-  //  @State private var videoSelected: AVURLAsset? = nil
-
-    //  FIXED — use identifiable config instead of showPicker bool
     @State private var pickerConfig: PickerConfig?
+    @State private var selectedVideoURL: URL?
 
     private var currentSelectionLimit: Int {
         switch selectionType {
@@ -46,142 +43,187 @@ struct UploadImageVideoView: View {
 
     var body: some View {
 
-        VStack(spacing: 0) {
-
-            // Header
-            HStack {
-                Button {
-                    navigationController?.popViewController(animated: true)
-                } label: {
-                    Image("arrow_left")
-                        .renderingMode(.template)
-                        .foregroundColor(Color(UIColor.label))
-                }
-                .frame(width: 40, height: 40)
-
-                Text("Upload Image/Video")
-                    .font(.system(size: 18, weight: .medium))
-
-                Spacer()
-            }
-            .frame(height: 44)
-            .background(Color(UIColor.systemBackground))
-
-            ScrollView {
-                VStack(spacing: 15) {
-
-                    // Product
-                    UploadCardView(
-                        title: "Add Your Product",
-                        subtitle: "Sell your items quickly!",
-                        imageName: "products",
-                        buttonTitle: "Sell Now"
-                    ) {
-                        selectionType = .product
-                        pickerConfig = PickerConfig(limit: currentSelectionLimit)
+        if #available(iOS 17.0, *) {
+            VStack(spacing: 0) {
+                
+                // Header
+                HStack {
+                    Button {
+                        navigationController?.popViewController(animated: true)
+                    } label: {
+                        Image("arrow_left")
+                            .renderingMode(.template)
+                            .foregroundColor(Color(UIColor.label))
                     }
-
-                    // Promote
-                    UploadCardView(
-                        title: "Promote Your Business",
-                        subtitle: "Grow your brand & services!",
-                        imageName: "promoteYourBusiness",
-                        buttonTitle: "Get Started"
-                    ) {
-                        selectionType = .promoteBusiness
-                        showSheet = true
-                    }
-
+                    .frame(width: 40, height: 40)
+                    
+                    Text("Upload Image/Video")
+                        .font(.system(size: 18, weight: .medium))
+                    
                     Spacer()
                 }
-                .padding()
-            }
-        }
-        .background(Color(.systemGray5))
-
-        // Bottom Sheet
-        .sheet(isPresented: $showSheet) {
-
-            UploadBottomSheet { type in
-
-                showSheet = false
-
-                switch type {
-                case .video:
-                    print("Video tapped")
-                    self.showVideoSheet = true
-                case .image:
-                    print("Image tapped")
-                    print("Selection type:", selectionType)
-                    print("Limit:", currentSelectionLimit)
-
-                    pickerConfig = PickerConfig(limit: currentSelectionLimit)
-                }
-            }
-            .presentationDetents([.height(220)])
-            .presentationDragIndicator(.visible)
-            .presentationCornerRadius(25)
-        }
-
-        //  FIXED PICKER PRESENTATION
-        .fullScreenCover(item: $pickerConfig) { config in
-
-            ImagePickerViewNew(maxSelectLimit: config.limit) { images in
+                .frame(height: 44)
+                .background(Color(UIColor.systemBackground))
                 
-                pickerConfig = nil
-                cropWrapper = CropImageWrapper(images: images, type: selectionType)
-                print("selectionType==\(selectionType)")
-
-            }
-        }
-        .fullScreenCover(isPresented:  $showVideoSheet, content: {
-          
-            VideoPickerView(maxDuration: 30) { assets in
-                //videoSelected = assets
-                self.pushToPromotionalVideoView(asset: assets)
-                showVideoSheet = false
-
-            } onCancel: {
-                showVideoSheet = false
-
-            }
-
-        })
-    
-      
-        // Cropper
-        .fullScreenCover(item: $cropWrapper) { wrapper in
-
-//            if selectionType == .promoteBusiness {
-
-            if wrapper.type == .promoteBusiness {
-
-                MultiImageCropperView(images: wrapper.images) { images in
-                    finalImages = images
-                    cropWrapper = nil
-
-                    if let img = finalImages.first {
-                        pushToPromotionalImageView(image: img)
+                ScrollView {
+                    VStack(spacing: 15) {
+                        
+                        // Product
+                        UploadCardView(
+                            title: "Add Your Product",
+                            subtitle: "Sell your items quickly!",
+                            imageName: "products",
+                            buttonTitle: "Sell Now"
+                        ) {
+                            selectionType = .product
+                            pickerConfig = PickerConfig(limit: currentSelectionLimit)
+                        }
+                        
+                        // Promote
+                        UploadCardView(
+                            title: "Promote Your Business",
+                            subtitle: "Grow your brand & services!",
+                            imageName: "promoteYourBusiness",
+                            buttonTitle: "Get Started"
+                        ) {
+                            selectionType = .promoteBusiness
+                            showSheet = true
+                        }
+                        
+                        Spacer()
                     }
-
-                } onCancel: {
-                    cropWrapper = nil
-                    finalImages.removeAll()
-                }
-
-            } else {
-
-                MultiImageCropperView(images: wrapper.images) { images in
-                    finalImages = images
-                    cropWrapper = nil
-                    pushToCreateBoardScreen()
-
-                } onCancel: {
-                    cropWrapper = nil
-                    finalImages.removeAll()
-
+                    .padding()
                 }
             }
+            .background(Color(.systemGray5))
+            
+            // Bottom Sheet
+            .sheet(isPresented: $showSheet) {
+                
+                UploadBottomSheet { type in
+                    
+                    showSheet = false
+                    
+                    switch type {
+                    case .video:
+                        print("Video tapped")
+                        self.showVideoSheet = true
+                    case .image:
+                        print("Image tapped")
+                        print("Selection type:", selectionType)
+                        print("Limit:", currentSelectionLimit)
+                        
+                        pickerConfig = PickerConfig(limit: currentSelectionLimit)
+                    }
+                }
+                .presentationDetents([.height(220)])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(25)
+            }
+            
+            //  FIXED PICKER PRESENTATION
+            .fullScreenCover(item: $pickerConfig) { config in
+                
+                ImagePickerViewNew(maxSelectLimit: config.limit) { images in
+                    
+                    pickerConfig = nil
+                    cropWrapper = CropImageWrapper(images: images, type: selectionType)
+                    print("selectionType==\(selectionType)")
+                    
+                }
+            }
+            
+            .fullScreenCover(isPresented: $showVideoSheet) {
+                
+                VideoPickerPHPicker { url in
+                    showVideoSheet = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        selectedVideoURL = url
+                    }
+                } onCancel: {
+                    showVideoSheet = false
+                    
+                }
+                
+                /* VideoPickerView(maxDuration: 30) { assets in
+                 showVideoSheet = false
+                 
+                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                 selectedVideoURL = assets.url
+                 }
+                 //videoSelected = assets
+                 //                self.pushToPromotionalVideoView(asset: assets)
+                 //                showVideoSheet = false
+                 
+                 } onCancel: {
+                 showVideoSheet = false
+                 
+                 }*/
+                
+            }
+            .sheet(item: $selectedVideoURL, content: { url in
+                
+                ProVideoTrimmerView(url: url, maxDuration: 30) { trimmedURL in
+                    
+                    self.pushToPromotionalVideoView(asset: AVURLAsset(url: trimmedURL))                   // ✅ final output after trimming
+                    print("Final video:", trimmedURL)
+                    selectedVideoURL = nil
+                    // 👉 push next screen (upload / preview)
+                } onCancel: {
+                    selectedVideoURL = nil
+
+                }
+
+//                ProVideoTrimmerView(   //  your trimmer here
+//                    url: url,
+//                    maxDuration: 30
+//                ) { trimmedURL in
+//                    
+//                    self.pushToPromotionalVideoView(asset: AVURLAsset(url: trimmedURL))                   // ✅ final output after trimming
+//                    print("Final video:", trimmedURL)
+//                    selectedVideoURL = nil
+//                    // 👉 push next screen (upload / preview)
+//                }
+                
+                
+                
+            })
+            
+            
+            // Cropper
+            .fullScreenCover(item: $cropWrapper) { wrapper in
+                if wrapper.type == .promoteBusiness {
+                    
+                    MultiImageCropperView(images: wrapper.images) { images in
+                        finalImages = images
+                        cropWrapper = nil
+                        
+                        if let img = finalImages.first {
+                            pushToPromotionalImageView(image: img)
+                        }
+                        
+                    } onCancel: {
+                        cropWrapper = nil
+                        finalImages.removeAll()
+                    }
+                    
+                } else {
+                    
+                    MultiImageCropperView(images: wrapper.images) { images in
+                        finalImages = images
+                        cropWrapper = nil
+                        pushToCreateBoardScreen()
+                        
+                    } onCancel: {
+                        cropWrapper = nil
+                        finalImages.removeAll()
+                        
+                    }
+                }
+            }
+        } else {
+            // Fallback on earlier versions
         }
     }
 
@@ -774,168 +816,517 @@ struct VideoPickerView: UIViewControllerRepresentable {
 
 
 
-//==
+
+
+
+struct TrimmerTimelineView: View {
+    
+    var thumbnails: [UIImage]
+    var duration: Double
+    
+    @Binding var startTime: Double
+    @Binding var endTime: Double
+    
+    var onSeek: (Double) -> Void
+    
+    @State private var totalWidth: CGFloat = 0
+    
+    var body: some View {
+        GeometryReader { geo in
+            
+            ZStack(alignment: .leading) {
+                
+                // 🔹 Thumbnails
+                HStack(spacing: 2) {
+                    ForEach(thumbnails.indices, id: \.self) { i in
+                        Image(uiImage: thumbnails[i])
+                            .resizable()
+                            .scaledToFill()
+                    }
+                }
+                .frame(width: geo.size.width, height: 60)
+                .clipped()
+                
+                // 🔹 Selection overlay
+                Rectangle()
+                    .fill(Color.black.opacity(0.5))
+                    .frame(width: geo.size.width)
+                
+                // 🔹 Active area
+                Rectangle()
+                    .stroke(Color.yellow, lineWidth: 2)
+                    .frame(
+                        width: selectedWidth(geo),
+                        height: 60
+                    )
+                    .offset(x: startOffset(geo))
+                
+                // 🔹 LEFT HANDLE
+                handleView
+                    .offset(x: startOffset(geo))
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                let percent = value.location.x / geo.size.width
+                                let newTime = max(0, percent * duration)
+                                
+                                if newTime < endTime - 0.5 {
+                                    startTime = newTime
+                                    onSeek(startTime)
+                                }
+                            }
+                    )
+                
+                // 🔹 RIGHT HANDLE
+                handleView
+                    .offset(x: endOffset(geo) - 20)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                let percent = value.location.x / geo.size.width
+                                let newTime = min(duration, percent * duration)
+                                
+                                if newTime > startTime + 0.5 {
+                                    endTime = newTime
+                                    onSeek(endTime)
+                                }
+                            }
+                    )
+            }
+            .onAppear {
+                totalWidth = geo.size.width
+            }
+        }
+    }
+    
+    private var handleView: some View {
+        Rectangle()
+            .fill(Color.yellow)
+            .frame(width: 20, height: 70)
+            .cornerRadius(4)
+    }
+    
+    private func startOffset(_ geo: GeometryProxy) -> CGFloat {
+        CGFloat(startTime / duration) * geo.size.width
+    }
+    
+    private func endOffset(_ geo: GeometryProxy) -> CGFloat {
+        CGFloat(endTime / duration) * geo.size.width
+    }
+    
+    private func selectedWidth(_ geo: GeometryProxy) -> CGFloat {
+        endOffset(geo) - startOffset(geo)
+    }
+}
+
+import SwiftUI
+import AVFoundation
+import _AVKit_SwiftUI
+
+import SwiftUI
+import AVKit
+import AVFoundation
+
+struct ProVideoTrimmerView: View {
+    
+    let url: URL
+    var maxDuration: Double = 30
+    var onFinished: (URL) -> Void
+    var onCancel: () -> Void
+
+    @State private var thumbnails: [UIImage] = []
+    @State private var startTime: Double = 0
+    @State private var endTime: Double = 0
+    @State private var player = AVPlayer()
+    
+    // 🔥 NEW
+    @State private var isCompressing = false
+    @State private var progress: Double = 0
+    @State private var exportSession: AVAssetExportSession?
+    
+    private var asset: AVAsset {
+        AVURLAsset(url: url)
+    }
+    
+    private var duration: Double {
+        min(asset.duration.seconds, maxDuration)
+    }
+    
+    var body: some View {
+        ZStack {
+            
+            // 🎬 MAIN UI
+            VStack(spacing: 20) {
+                
+                VideoPlayer(player: player)
+                   // .frame(height: 300)
+                    .cornerRadius(12)
+                    .padding()
+                    .onAppear {
+                        player.replaceCurrentItem(with: AVPlayerItem(asset: asset))
+                        player.pause()
+                    }
+                
+                TrimmerTimelineView(
+                    thumbnails: thumbnails,
+                    duration: duration,
+                    startTime: $startTime,
+                    endTime: $endTime,
+                    onSeek: { seekVideo($0) }
+                )
+                .frame(height: 80)
+                .padding()
+                Text("\(startTime, specifier: "%.1f")s - \(endTime, specifier: "%.1f")s").font(.inter(.regular, size: 15))
+                    .padding()
+                
+                Spacer()
+//            }
+//            .padding()
+//            
+//            
+//            //  OVERLAY (BOTTOM UI)
+//            VStack {
+                Spacer()
+                
+                // 🔵 PROGRESS
+                if isCompressing {
+                    VStack(spacing: 6) {
+                        
+                        ProgressView(value: progress)
+                            .progressViewStyle(.linear)
+                            .tint(.blue.opacity(0.7)) // softer color
+                            .background(
+                                Capsule()
+                                    .fill(.ultraThinMaterial) // blur behind
+                            )
+                            .frame(height: 3)
+                            .animation(nil, value: progress)
+                        
+                        Text("Compressing Video...")
+                            .font(.caption)
+                            .foregroundColor(Color(.label))
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                }
+                
+                HStack {
+                    
+                    Button("Cancel") {
+                        if isCompressing {
+                            exportSession?.cancelExport()
+                        }
+                        onCancel()
+                    }
+                    .disabled(isCompressing)
+                    
+                    Spacer()
+                    
+                    Button("Choose") {
+                        startCompression()
+                    }
+                    .disabled(isCompressing)
+                }
+                .frame(height: 50)
+                .foregroundColor(.white)
+                .font(.system(size: 18))
+                .padding()
+                .background(Color.black.opacity(0.6))
+            }
+        }
+        .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            setup()
+        }
+    }
+}
+
+extension ProVideoTrimmerView {
+    //  MAIN ENTRY
+        private func startCompression() {
+            isCompressing = true
+            progress = 0
+            
+            compressVideo(
+                asset: asset,
+                startTime: startTime,
+                endTime: endTime
+            ) { url in
+                
+                isCompressing = false
+                
+                if let url {
+                    onFinished(url)
+                }
+            }
+        }
+    
+    func compressVideo(
+        asset: AVAsset,
+        startTime: Double,
+        endTime: Double,
+        completion: @escaping (URL?) -> Void
+    ) {
+        
+        guard endTime > startTime else {
+            completion(nil)
+            return
+        }
+        
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".mp4")
+        
+        try? FileManager.default.removeItem(at: outputURL)
+        
+        //  FAST preset (same behavior as UIImagePicker)
+        let preset = AVAssetExportPresetMediumQuality
+        
+        guard let exporter = AVAssetExportSession(
+            asset: asset,
+            presetName: preset
+        ) else {
+            completion(nil)
+            return
+        }
+        
+        exportSession = exporter
+        
+        exporter.outputURL = outputURL
+        exporter.outputFileType = .mp4
+        exporter.shouldOptimizeForNetworkUse = true
+        
+        let start = CMTime(seconds: startTime, preferredTimescale: 600)
+        let duration = CMTime(seconds: endTime - startTime, preferredTimescale: 600)
+        exporter.timeRange = CMTimeRange(start: start, duration: duration)
+        
+        //  IMPORTANT: DO NOT USE videoComposition
+        exporter.videoComposition = nil
+        
+        //  FAST progress
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+            
+            DispatchQueue.main.async {
+                progress = Double(exporter.progress)
+            }
+            
+            if exporter.progress >= 1.0 || exporter.status != .exporting {
+                timer.invalidate()
+            }
+        }
+        
+        exporter.exportAsynchronously {
+            DispatchQueue.main.async {
+                
+                switch exporter.status {
+                case .completed:
+                    completion(outputURL)
+                    
+                case .failed:
+                    print("❌ Export failed:", exporter.error?.localizedDescription ?? "")
+                    completion(nil)
+                    
+                case .cancelled:
+                    completion(nil)
+                    
+                default:
+                    completion(nil)
+                }
+            }
+        }
+    }
+}
+
+extension ProVideoTrimmerView {
+    
+    private func setup() {
+        startTime = 0
+        endTime = duration
+        
+        generateThumbs()
+    }
+    
+    private func seekVideo(_ time: Double) {
+        let cmTime = CMTime(seconds: time, preferredTimescale: 600)
+        player.seek(to: cmTime, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    private func generateThumbs() {
+        DispatchQueue.global().async {
+            let imgs = generateThumbnails(asset: asset, count: 12)
+            
+            DispatchQueue.main.async {
+                self.thumbnails = imgs
+            }
+        }
+    }
+    
+    private func trimVideo() {
+        trimVideo(asset: asset, startTime: startTime, endTime: endTime) { url in
+            if let url {
+                onFinished(url)
+            }
+        }
+    }
+    
+
+    func generateThumbnails(asset: AVAsset, count: Int) -> [UIImage] {
+        
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: 200, height: 200) // performance
+        
+        let duration = max(asset.duration.seconds, 1)
+        let interval = duration / Double(count)
+        
+        var images: [UIImage] = []
+        
+        for i in 0..<count {
+            let time = CMTime(seconds: Double(i) * interval, preferredTimescale: 600)
+            
+            do {
+                let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
+                images.append(UIImage(cgImage: cgImage))
+            } catch {
+                print("Thumbnail error:", error.localizedDescription)
+            }
+        }
+        
+        return images
+    }
+
+    func trimVideo(
+        asset: AVAsset,
+        startTime: Double,
+        endTime: Double,
+        completion: @escaping (URL?) -> Void
+    ) {
+        
+        // 🔒 Safety check (prevents crash)
+        guard endTime > startTime else {
+            completion(nil)
+            return
+        }
+        
+        // 📁 Output URL
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".mp4")
+        
+        // 🧹 Remove if already exists
+        try? FileManager.default.removeItem(at: outputURL)
+        
+        // 🎬 Export session
+        guard let exporter = AVAssetExportSession(
+            asset: asset,
+            presetName: AVAssetExportPresetHighestQuality
+        ) else {
+            completion(nil)
+            return
+        }
+        
+        exporter.outputURL = outputURL
+        exporter.outputFileType = .mp4
+        exporter.shouldOptimizeForNetworkUse = true
+        
+        // ⏱ Time range
+        let start = CMTime(seconds: startTime, preferredTimescale: 600)
+        let duration = CMTime(seconds: endTime - startTime, preferredTimescale: 600)
+        
+        exporter.timeRange = CMTimeRange(start: start, duration: duration)
+        
+        // 🚀 Export
+        exporter.exportAsynchronously {
+            DispatchQueue.main.async {
+                switch exporter.status {
+                case .completed:
+                    print("✅ Trim success:", outputURL)
+                    completion(outputURL)
+                    
+                case .failed:
+                    print("❌ Trim failed:", exporter.error?.localizedDescription ?? "")
+                    completion(nil)
+                    
+                case .cancelled:
+                    print("⚠️ Trim cancelled")
+                    completion(nil)
+                    
+                default:
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+}
+
 
 import SwiftUI
 import PhotosUI
 import AVFoundation
 
-struct VideoPicker: UIViewControllerRepresentable {
+struct VideoPickerPHPicker: UIViewControllerRepresentable {
     
-    var onPicked: (URL) -> Void
+    var onVideoPicked: (URL) -> Void
+    var onCancel: () -> Void
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
     
     func makeUIViewController(context: Context) -> PHPickerViewController {
+        
         var config = PHPickerConfiguration()
         config.filter = .videos
         config.selectionLimit = 1
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
+        
         return picker
     }
     
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         
-        let parent: VideoPicker
+        let parent: VideoPickerPHPicker
         
-        init(_ parent: VideoPicker) {
+        init(_ parent: VideoPickerPHPicker) {
             self.parent = parent
         }
         
+      
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            
             picker.dismiss(animated: true)
             
+            // User tapped cancel
+               if results.isEmpty {
+                   print("User cancelled picker")
+                   DispatchQueue.main.async {
+                       self.parent.onCancel()
+                   }
+                   return
+               }
+
             guard let item = results.first?.itemProvider,
-                  item.hasItemConformingToTypeIdentifier("public.movie") else { return }
+                  item.hasItemConformingToTypeIdentifier("public.movie") else {
+                return
+            }
             
-            item.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, _ in
+            item.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, error in
+                
                 guard let url else { return }
                 
+                // Copy to temp (IMPORTANT)
                 let tempURL = FileManager.default.temporaryDirectory
                     .appendingPathComponent(UUID().uuidString + ".mov")
                 
                 try? FileManager.default.copyItem(at: url, to: tempURL)
                 
                 DispatchQueue.main.async {
-                    self.parent.onPicked(tempURL)
+                    self.parent.onVideoPicked(tempURL)
                 }
             }
-        }
-    }
-}
-
-func generateThumbnails(asset: AVAsset, count: Int) -> [UIImage] {
-    
-    let generator = AVAssetImageGenerator(asset: asset)
-    generator.appliesPreferredTrackTransform = true
-    
-    let duration = CMTimeGetSeconds(asset.duration)
-    let interval = duration / Double(count)
-    
-    var images: [UIImage] = []
-    
-    for i in 0..<count {
-        let time = CMTime(seconds: Double(i) * interval, preferredTimescale: 600)
-        if let cgImage = try? generator.copyCGImage(at: time, actualTime: nil) {
-            images.append(UIImage(cgImage: cgImage))
-        }
-    }
-    
-    return images
-}
-
-func trimVideo(
-    asset: AVAsset,
-    startTime: Double,
-    endTime: Double,
-    completion: @escaping (URL?) -> Void
-) {
-    let outputURL = FileManager.default.temporaryDirectory
-        .appendingPathComponent(UUID().uuidString + ".mov")
-    
-    guard let exporter = AVAssetExportSession(
-        asset: asset,
-        presetName: AVAssetExportPresetHighestQuality
-    ) else {
-        completion(nil)
-        return
-    }
-    
-    exporter.outputURL = outputURL
-    exporter.outputFileType = .mov
-    
-    let start = CMTime(seconds: startTime, preferredTimescale: 600)
-    let duration = CMTime(seconds: endTime - startTime, preferredTimescale: 600)
-    exporter.timeRange = CMTimeRange(start: start, duration: duration)
-    
-    exporter.exportAsynchronously {
-        DispatchQueue.main.async {
-            completion(exporter.status == .completed ? outputURL : nil)
-        }
-    }
-}
-
-struct VideoTrimmerView: View {
-    
-    let url: URL
-    var maxDuration: Double = 30
-    var onFinished: (AVURLAsset) -> Void
-    
-    @State private var thumbnails: [UIImage] = []
-    @State private var startTime: Double = 0
-    @State private var endTime: Double = 0
-    
-    private var asset: AVAsset {
-        AVURLAsset(url: url)
-    }
-    
-    var body: some View {
-        VStack {
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(thumbnails.indices, id: \.self) { i in
-                        Image(uiImage: thumbnails[i])
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 60, height: 60)
-                            .clipped()
-                    }
-                }
-            }
-            
-            VStack {
-                Text("Start: \(startTime, specifier: "%.1f")s")
-                Slider(value: $startTime,
-                       in: 0...(endTime - 1))
-            }
-            
-            VStack {
-                Text("End: \(endTime, specifier: "%.1f")s")
-                Slider(value: $endTime,
-                       in: (startTime + 1)...min(asset.duration.seconds, maxDuration))
-            }
-            
-            Button("Trim Video") {
-                trimVideo(asset: asset,
-                          startTime: startTime,
-                          endTime: endTime) { url in
-                    if let url {
-                        onFinished(AVURLAsset(url: url))
-                    }
-                }
-            }
-            .padding()
-        }
-        .onAppear {
-            endTime = min(asset.duration.seconds, maxDuration)
-            thumbnails = generateThumbnails(asset: asset, count: 10)
         }
     }
 }

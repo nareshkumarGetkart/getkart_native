@@ -10,6 +10,7 @@ import SocketIO
 
 
 enum SocketEvents: String, CaseIterable {
+    
     case buyerChatList = "buyerChatList"
     case sellerChatList = "sellerChatList"
     case chatMessages = "chatMessages"
@@ -27,8 +28,6 @@ enum SocketEvents: String, CaseIterable {
     case socketConnected = "socketConnected"
     case createRoom = "createRoom"
     case chatUnreadCount = "chatUnreadCount"
-
-    
 }
 
 final class SocketIOManager: NSObject {

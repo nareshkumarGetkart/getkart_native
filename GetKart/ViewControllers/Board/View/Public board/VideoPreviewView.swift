@@ -10,33 +10,43 @@ import SwiftUI
 import AVKit
 
 
+import SwiftUI
+import AVKit
+
 struct VideoPreviewView: View {
-    
+
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vm: PremiumVideoVM
-     @State private var openSafari:Bool = false
-    
-    init(item:ItemModel?,strURl:String?) {
-        _vm = StateObject(wrappedValue: PremiumVideoVM(url:URL(string: strURl?.getValidUrl() ?? "")! , item: item))
+    @State private var openSafari = false
+
+    init(item: ItemModel?, strURl: String?) {
+        _vm = StateObject(
+            wrappedValue: PremiumVideoVM(
+                url: URL(string: strURl?.getValidUrl() ?? "")!,
+                item: item
+            )
+        )
     }
-    
+
     var body: some View {
+
         ZStack {
-            
+
             PlayerLayerView(player: vm.player)
                 .ignoresSafeArea()
                 .onTapGesture {
                     vm.toggleControls()
                 }
-            
-            // Double Tap Seek
+
+            // Double tap seek
             HStack {
+
                 Color.clear
                     .contentShape(Rectangle())
                     .onTapGesture(count: 2) {
                         vm.seek(by: -10)
                     }
-                
+
                 Color.clear
                     .contentShape(Rectangle())
                     .onTapGesture(count: 2) {
@@ -44,12 +54,14 @@ struct VideoPreviewView: View {
                     }
             }
             .ignoresSafeArea()
-            
+
             if vm.showControls {
+
                 VStack {
-                    
-                    // Top Bar
+
+                    // Top bar
                     HStack {
+
                         Button {
                             dismiss()
                         } label: {
@@ -60,9 +72,9 @@ struct VideoPreviewView: View {
                                 .background(Color.black.opacity(0.4))
                                 .clipShape(Circle())
                         }
-                        
+
                         Spacer()
-                        
+
                         Button {
                             vm.toggleMute()
                         } label: {
@@ -74,10 +86,10 @@ struct VideoPreviewView: View {
                         }
                     }
                     .padding()
-                    
+
                     Spacer()
-                    
-                    // Play / Pause Center
+
+                    // Play pause
                     Button {
                         vm.togglePlay()
                     } label: {
@@ -88,27 +100,27 @@ struct VideoPreviewView: View {
                             .background(Color.black.opacity(0.4))
                             .clipShape(Circle())
                     }
-                    
+
                     Spacer()
-                    
-                    // Bottom Slider
+
+                    // Slider
                     VStack {
+
                         HStack {
-                            Text(format(vm.currentTime))
+
+                            Text(format(vm.sliderValue))
                                 .foregroundColor(.white)
                                 .font(.caption)
-                            
+
                             Slider(
-                                value: $vm.currentTime,
+                                value: $vm.sliderValue,
                                 in: 0...vm.duration,
                                 onEditingChanged: { editing in
-                                    if !editing {
-                                        vm.seek(to: vm.currentTime)
-                                    }
+                                    vm.sliderEditingChanged(editing)
                                 }
                             )
                             .tint(.white)
-                            
+
                             Text(format(vm.duration))
                                 .foregroundColor(.white)
                                 .font(.caption)
@@ -116,64 +128,59 @@ struct VideoPreviewView: View {
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 10)
-                    
-                    // MARK: Bottom CTA Card
-                 //   VStack {
-                       // Spacer()
-                        
+
+                    // CTA Card
                     if vm.itemObj != nil {
+
                         VStack(spacing: 5) {
-                            
+
                             Text(vm.itemObj?.name ?? "")
-                                .font(.inter(.semiBold, size: 18))
+                                .font(.headline)
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(Color.black)
-                            
+
                             Button {
-                                print("Visit site tapped")
+
                                 openSafari = true
                                 vm.player.pause()
-
+                                outboundClickApi(boardId: vm.itemObj?.id ?? 0)
                             } label: {
+
                                 Text(vm.itemObj?.ctaLabel ?? "")
                                     .foregroundColor(.white)
-                                    .font(.inter(.medium, size: 16))
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.orange)
                                     .cornerRadius(14)
                             }
-                                
+
                         }
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 24)
                                 .fill(Color.white)
                         )
-                        .padding(.horizontal,5)
+                        .padding(.horizontal, 5)
                         .padding(.bottom, 10)
-                    }else{
-                       
+
+                    } else {
+
                         Button {
-                            print("Done")
+
                             vm.player.pause()
                             dismiss()
+
                         } label: {
+
                             Text("Done")
                                 .foregroundColor(.white)
-                                .font(.inter(.medium, size: 16))
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.orange)
                                 .cornerRadius(14)
-                        } .padding(.horizontal,5)
-                            .padding(.bottom, 10)
+                        }
+                        .padding(.horizontal, 5)
+                        .padding(.bottom, 10)
                     }
-
-                       
-                   // }
-
-                    
                 }
                 .transition(.opacity)
             }
@@ -182,250 +189,220 @@ struct VideoPreviewView: View {
             vm.player.pause()
         }
         .sheet(isPresented: $openSafari) {
+
             if let url = URL(string: vm.itemObj?.outbondUrl?.getValidUrl() ?? "") {
                 SafariView(url: url)
                     .ignoresSafeArea()
             }
         }
     }
-    
+
     private func format(_ seconds: Double) -> String {
+
         let total = Int(seconds)
         let mins = total / 60
         let secs = total % 60
+
         return String(format: "%02d:%02d", mins, secs)
     }
-}
-
-/*struct VideoPreviewView: View {
     
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var vm: VideoPlayerViewModel
-  
-    init(videoURL: URL) {
-        _vm = StateObject(wrappedValue: VideoPlayerViewModel(url: videoURL))
-    }
-    
-    var body: some View {
-        ZStack {
+    func outboundClickApi(boardId:Int){
+        
+        let params = ["board_id":boardId]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
             
-            // MARK: Video Background
-            VideoPlayer(player: vm.player)
-                .ignoresSafeArea()
-            
-            VStack {
+            if error == nil{
                 
-                // MARK: Top Bar
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "arrow.left")
-                            .foregroundColor(.white)
-                            .font(.system(size: 22, weight: .semibold))
-                            .padding(12)
-                            .contentShape(Rectangle())
-                    }
-                    Spacer()
-                }
-                .padding()
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                _ = result["message"] as? String ?? ""
                 
-                Spacer()
-                
-                // MARK: Play Pause Center Button
-                Button {
-                    vm.togglePlayPause()
-                } label: {
-                    Image(systemName: vm.isPlaying ? "pause.fill" : "play.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 40))
-                        .padding(26)
-                        .background(Color.black.opacity(0.4))
-                        .clipShape(Circle())
-                }
-                
-                Spacer()
-                
-                // MARK: Bottom Controls
-                VStack(spacing: 8) {
+                if status == 200{
                     
-                    HStack {
-                        Text(formatTime(vm.currentTime))
-                            .foregroundColor(.white)
-                            .font(.caption)
-                        
-                        Slider(
-                            value: $vm.currentTime,
-                            in: 0...vm.duration,
-                            onEditingChanged: { editing in
-                                if !editing {
-                                    vm.seek(to: vm.currentTime)
-                                }
-                            }
-                        )
-                        .tint(.white)
-                        
-                        Text(formatTime(vm.duration))
-                            .foregroundColor(.white)
-                            .font(.caption)
-                        
-                        Image(systemName: "speaker.wave.2.fill")
-                            .foregroundColor(.white)
-                    }
+                }else{
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 110)
-            }
-            
-            // MARK: Bottom CTA Card
-            VStack {
-                Spacer()
-                
-                VStack(spacing: 16) {
-                    
-                    Text("Prada SS24 Single-breasted wool coat Prada SS24 Single-breasted wool coat Prada SS24 Single-breasted wool coat")
-                        .font(.headline)
-                        .multilineTextAlignment(.center)
-                    
-                    Button {
-                        print("Visit site tapped")
-                    } label: {
-                        Text("Visit site")
-                            .foregroundColor(.white)
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .cornerRadius(14)
-                    }
-                }
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.white)
-                )
-                .padding(.horizontal)
-                .padding(.bottom, 10)
             }
         }
-        .onDisappear {
-            vm.player.pause()
-        }
-    }
-    
-    private func formatTime(_ seconds: Double) -> String {
-        let sec = Int(seconds)
-        return String(format: "00.%02d", sec)
     }
 }
-*/
-//#Preview {
-//    VideoPreviewView(videoURL: URL(string:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/item_images/2026/03/69a55a73ba7271.795803081772444275.mp4")!, item: ItemModel())
-//}
 
 
 
 final class PremiumVideoVM: ObservableObject {
-    
+
     @Published var isPlaying = true
     @Published var isMuted = false
-    @Published var currentTime: Double = 0
-    @Published var duration: Double = 1
     @Published var showControls = true
-    
+
+    @Published var sliderValue: Double = 0
+    @Published var duration: Double = 1
+
     let player: AVPlayer
+
     private var timeObserver: Any?
     private var hideWorkItem: DispatchWorkItem?
-    @Published var itemObj:ItemModel?
-    
-    init(url: URL,item:ItemModel?) {
+    private var isDragging = false
+
+    @Published var itemObj: ItemModel?
+
+    init(url: URL, item: ItemModel?) {
+
         player = AVPlayer(url: url)
         itemObj = item
+
         setup()
     }
-    
+
     private func setup() {
+
         player.play()
         player.actionAtItemEnd = .none
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(loopVideo),
             name: .AVPlayerItemDidPlayToEndTime,
             object: player.currentItem
         )
-        
+
         duration = player.currentItem?.asset.duration.seconds ?? 1
-        
-        let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
-        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
-            [weak self] time in
-            self?.currentTime = time.seconds
+
+        let interval = CMTime(seconds: 0.1, preferredTimescale: 600)
+
+        timeObserver = player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: .main
+        ) { [weak self] time in
+
+            guard let self else { return }
+
+            if !self.isDragging {
+                let seconds = time.seconds
+                self.sliderValue = seconds
+            }
         }
-        
+
         startAutoHideTimer()
     }
-    
+
     @objc private func loopVideo() {
+
         player.seek(to: .zero)
         player.play()
     }
-    
+
+    // MARK: Controls
+
     func togglePlay() {
+
         isPlaying.toggle()
+
         isPlaying ? player.play() : player.pause()
-        showTemporarily()
+
+        userDidInteract()
     }
-    
+
     func toggleMute() {
+
         isMuted.toggle()
         player.isMuted = isMuted
-        showTemporarily()
+
+        userDidInteract()
     }
-    
-    func seek(by seconds: Double) {
-        let newTime = max(0, min(currentTime + seconds, duration))
-        player.seek(to: CMTime(seconds: newTime, preferredTimescale: 600))
-        showTemporarily()
-    }
-    
-    func seek(to value: Double) {
-        player.seek(to: CMTime(seconds: value, preferredTimescale: 600))
-    }
-    
+
     func toggleControls() {
+
         withAnimation {
             showControls.toggle()
         }
+
         if showControls {
             startAutoHideTimer()
         }
     }
-    
-    private func showTemporarily() {
+
+    func seek(by seconds: Double) {
+
+        let newTime = max(0, min(sliderValue + seconds, duration))
+
+        player.seek(
+            to: CMTime(seconds: newTime, preferredTimescale: 600),
+            toleranceBefore: .zero,
+            toleranceAfter: .zero
+        )
+
+        sliderValue = newTime
+
+        userDidInteract()
+    }
+
+    // MARK: Slider
+
+    func sliderEditingChanged(_ editing: Bool) {
+
+        isDragging = editing
+
+        if editing {
+
+            cancelAutoHide()
+
+        } else {
+
+            let time = CMTime(seconds: sliderValue, preferredTimescale: 600)
+
+            player.seek(
+                to: time,
+                toleranceBefore: .zero,
+                toleranceAfter: .zero
+            )
+
+            startAutoHideTimer()
+        }
+    }
+
+    // MARK: Interaction
+
+    private func userDidInteract() {
+
         withAnimation {
             showControls = true
         }
+
         startAutoHideTimer()
     }
-    
+
+    // MARK: Auto Hide
+
     private func startAutoHideTimer() {
-        hideWorkItem?.cancel()
-        
+
+        cancelAutoHide()
+
         let task = DispatchWorkItem { [weak self] in
+
             withAnimation {
                 self?.showControls = false
             }
         }
-        
+
         hideWorkItem = task
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: task)
+
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + 3,
+            execute: task
+        )
     }
-    
+
+    private func cancelAutoHide() {
+        hideWorkItem?.cancel()
+    }
+
     deinit {
+
         if let observer = timeObserver {
             player.removeTimeObserver(observer)
         }
+
         NotificationCenter.default.removeObserver(self)
     }
 }

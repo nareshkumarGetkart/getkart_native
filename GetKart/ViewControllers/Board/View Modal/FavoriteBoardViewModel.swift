@@ -95,6 +95,15 @@ final class FavoriteBoardViewModel: ObservableObject {
     }
 
     
+    func updateCommentCount(commentCount:Int,commentObj:CommentModel?,boardId:Int){
+        
+        if let index = items.firstIndex(where: { $0.id == boardId }) {
+            items[index].commentsCount = commentCount
+            items[index].lastComment = commentObj
+        }
+    }
+    
+    
     func update(likeCount:Int,isLike:Bool,boardId:Int){
         
         if let index = items.firstIndex(where: { $0.id == boardId }) {
@@ -177,6 +186,7 @@ final class FavoriteBoardViewModel: ObservableObject {
             }
         }
     }
+   
     func outboundClickApi(strURl:String,boardId:Int){
         
         let params = ["board_id":boardId]

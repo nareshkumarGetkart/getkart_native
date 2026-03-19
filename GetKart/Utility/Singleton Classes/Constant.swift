@@ -16,8 +16,8 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var devEnvironment: DevEnvironment = .live
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -56,9 +56,14 @@ final class Constant: NSObject {
    let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
   
-    
-    
-    
+//    let payuSuccessURL = "https://gupsup.com/payments?status=success"
+//    let payuFailureURL = "https://gupsup.com/payments?status=fail"
+//
+//    
+    let payuSuccessURL = "https://payu.herokuapp.com/success"
+    let payuFailureURL = "https://payu.herokuapp.com/failure"
+       
+   
     var edit_comment:String{
         get{
             return "\(baseURL)/v2/edit-comment"
@@ -104,8 +109,12 @@ final class Constant: NSObject {
         }
     }
     
-    
-     
+
+    var capture_slider_click:String{
+        get{
+            return "\(baseURL)/v2/capture-slider-click"
+        }
+    }
     
     var like_comment:String{
         get{
@@ -1152,6 +1161,8 @@ enum NotificationKeys:String,CaseIterable{
     case refreshInterestChangeBoardScreen = "refreshInterestChangeBoardScreen"
     static let scrollBoardToTop = "scrollBoardToTop"
     case boardBoostedRefresh = "boardBoostedRefresh"
+    case refreshCommentCountBoard = "refreshCommentCountBoard"
+
 
 }
 

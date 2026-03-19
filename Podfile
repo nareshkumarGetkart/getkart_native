@@ -29,6 +29,7 @@ pod 'GooglePlaces'
 pod 'NSFWDetector'
 pod 'MarqueeLabel'
 pod 'PayUIndia-CheckoutPro'  # For Checkout Pro SDK
+#pod 'GSPlayer'
 
   target 'GetKartTests' do
     inherit! :search_paths

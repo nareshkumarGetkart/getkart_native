@@ -331,11 +331,15 @@ struct MyBoardCell:View {
                             Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 13, height: 13)
                             Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                         }
-                        
-                        HStack(spacing:3){
-                            Image("heart").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 11, height: 11)
-                            Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
+                        if itemObj.boardType == 1 || itemObj.boardType == 2{
+                            
+                        }else{
+                            HStack(spacing:3){
+                                Image("heart").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 11, height: 11)
+                                Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
+                            }
                         }
+                       
                         Spacer()
                         Text("More Details").font(Font.inter(.medium, size: 14)).foregroundColor(Color(.systemOrange)).padding(.trailing,5)
                     }
@@ -356,7 +360,20 @@ struct MyBoardCell:View {
                     Rectangle() .fill(Color.orange)
                         .frame(width: 4)
                         .cornerRadius(2)
-                    Text("Boost your board to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                    
+                    if itemObj.boardType == 1{
+                        Text("Boost your promotional ad to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                        
+                    }else  if itemObj.boardType == 2{
+                        
+                        Text("Boost your promotional ad to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                        
+                    }else  if itemObj.boardType == 3{
+                        Text("Boost your Idea to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                    }else{
+                        Text("Boost your board to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                    }
+                 
                     Spacer()
                     Button {
                         showBoostSheet = true

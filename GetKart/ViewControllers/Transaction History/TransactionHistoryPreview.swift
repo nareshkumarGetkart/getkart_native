@@ -373,19 +373,25 @@ private func detailsCard() -> some View {
 
 
     func pushToBannerAnalytics(){
+       
         if let bannerId = transaction?.banners?.first?.id{
             let swiftView = BannerAlalyticsView(navigationController: self.navController, bannerId: bannerId)
             let destVC = UIHostingController(rootView: swiftView)
             self.navController?.pushViewController(destVC, animated: true)
+        }else{
+            //AlertView.sharedManager.showToast(message: "Item has been deleted")
         }
     }
     
     
     func pushToBoardAnalytics(){
+      
         if let boarId = transaction?.items?.first?.itemId{
             let swiftView = BoardAnalyticsView(navigationController: self.navController, boardId: boarId)
             let destVC = UIHostingController(rootView: swiftView)
             self.navController?.pushViewController(destVC, animated: true)
+        }else{
+           // AlertView.sharedManager.showToast(message: "Item has been deleted")
         }
     }
     
@@ -411,9 +417,7 @@ private func detailsCard() -> some View {
             URLhandler.sharedinstance.makeCall(url: "\(Constant.shared.invoice_download)/\(invoiceId)", param: nil,methodType: .get,showLoader: true) { responseObject, error in
                 
                 if error == nil {
-                    
-                    
-                 
+                                     
                
                       if  let result = responseObject{
                         if let data = result["data"] as? String{

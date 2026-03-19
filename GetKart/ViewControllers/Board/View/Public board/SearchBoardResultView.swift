@@ -8,22 +8,18 @@
 import SwiftUI
 
 struct SearchBoardResultView: View {
+    
     let navigationController:UINavigationController?
     @State  var isByDefaultOpenSearch:Bool
     @State private var searchText = ""
     @State private var selected = "All"
     @StateObject private var vm = SearchBoardResultViewModel()
     @State private var paymentGateway: PaymentGatewayCentralized?
-   
     @State private var videoFrames: [Int: CGRect] = [:]
-    @State private var openSafari: Bool = false
-    @State private var outboundUrlClicked: String = ""
-    
-   // @ObservedObject private var manager = FeedVideoManager.shared
+    @State private var safariURL: URL?
     @State private var visibilityWorkItem: DispatchWorkItem?
     
     var body: some View {
-        
         
         VStack(spacing: 0) {
             
@@ -74,7 +70,6 @@ struct SearchBoardResultView: View {
                         
                     } label: {
                         Text("Cancel")
-                            .font(.title3)
                             .foregroundColor(Color(.label))
                     }
                 }
@@ -122,9 +117,9 @@ struct SearchBoardResultView: View {
                                         item: item,
                                         onTapBottomButton: {
                                         //Tapped video
-                                            if (item.outbondUrl ?? "").count > 0{
-                                                outboundUrlClicked =  item.outbondUrl ?? ""
-                                                openSafari = true
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                                FeedVideoManager.shared.muteAll()
                                             }
                                         }
                                     ).background(
@@ -135,7 +130,6 @@ struct SearchBoardResultView: View {
                                                         scheduleVisibilityUpdate()
 
                                                     }.onDisappear{
-                                                        print("dissapearing video \(item.id ?? 0)")
                                                         videoFrames.removeValue(forKey: item.id ?? 0)
                                                         FeedVideoManager.shared.pause(id: item.id ?? 0)
                                                     }
@@ -149,25 +143,11 @@ struct SearchBoardResultView: View {
                                         .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             vm.loadNextPageIfNeeded(currentIndex: index)
+                                            prefetchNextVideos(from: item)
+
                                         }
                                 }else{
-                                   
-                                  /*  ProductCardStaggered1(
-                                        product: item,
-                                        sendLikeUnlikeObject: { isLiked, boardId in
-                                            vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                        }, onTapBoostButton: {
-                                            paymentGatewayOpen(product: item)
-                                        }
-                                    )
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        pushToDetailScreen(item: item)
-                                    }
-                                    .onAppear {
-                                        vm.loadNextPageIfNeeded(currentIndex: index)
-                                    }*/
-                                    
+                                
                                     CardItemView(
                                         item: item,
                                         onLike: { isLiked, boardId in
@@ -177,10 +157,8 @@ struct SearchBoardResultView: View {
                                         onTapBoostButton:{
                                             if item.boardType == 1{
                                                 //Clicking on bottom prmotional
-                                                if (item.outbondUrl ?? "").count > 0{
-
-                                                    outboundUrlClicked =  item.outbondUrl ?? ""
-                                                    openSafari = true
+                                                if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                    safariURL = url
                                                 }
                                             }else{
                                                 paymentGatewayOpen(product: item)
@@ -220,10 +198,6 @@ struct SearchBoardResultView: View {
                     .simultaneousGesture(
                             DragGesture()
                                 .onEnded { _ in
-                                    
-//                                    userDidScroll = true
-//                                    paginationConsumed = false
-                                    
                                     scheduleVisibilityUpdate()
                                 }
                         )
@@ -276,8 +250,55 @@ struct SearchBoardResultView: View {
             
             vm.updateBoost(isBoosted: true, boardId: boardId)
         }
+        .onReceive(
+             NotificationCenter.default.publisher(
+                 for: Notification.Name(NotificationKeys.refreshCommentCountBoard.rawValue)
+             )
+        ) { notification in
+            
+            guard let dict = notification.object as? [String: Any] else { return }
+            
+            let count  = dict["count"] as? Int ?? 0
+            let boardId = dict["boardId"] as? Int ?? 0
+            if let commentObj = dict["lastComment"] as? CommentModel {
+                vm.updateCommentCount(commentCount: count, commentObj: commentObj, boardId: boardId)
+            }else{
+                vm.updateCommentCount(commentCount: count, commentObj: nil, boardId: boardId)
+            }
+        }
+        
+        .fullScreenCover(item: $safariURL) { url in
+            SafariView(url: url)
+        }
 
     }
+    
+    private func prefetchNextVideos(from currentItem: ItemModel) {
+
+        guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }
+
+        let start = index + 1
+        let end = min(index + 2, vm.items.count - 1)
+
+        guard start <= end else { return }
+
+        var urls: [URL] = []
+
+        for i in start...end {
+
+            let item = vm.items[i]
+
+            if item.boardType == 2,
+               let link = item.videoLink,
+               let url = URL(string: link) {
+
+                urls.append(url)
+            }
+        }
+
+        VideoPreloadManagerDefault.shared.set(waiting: urls)
+    }
+    
     
     private func scheduleVisibilityUpdate() {
         
@@ -314,12 +335,13 @@ struct SearchBoardResultView: View {
 
             let percent = visibleHeight / frame.height
 
-            if percent >= 0.3 {
+            if percent >= 0.6 {
                 visibleSet.insert(id)
             }
         }
 
         FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
+        
     }
     
     func paymentGatewayOpen(product:ItemModel) {

@@ -10,12 +10,14 @@ import SwiftUI
 
 
 struct BannerNavigation{
-        
     
     static func navigateToScreen(index:Int, sliderObj:SliderModel?,navigationController:UINavigationController?,viewType:String){
         
         if ((sliderObj?.is_active ?? 0) != 0) && (sliderObj?.id ?? 0) > 0 && (sliderObj?.is_campaign ?? false){
             campaignClickEventApi(campaign_banner_id: sliderObj?.id ?? 0, viewType: viewType)
+        }else{
+            //For apps own banner
+           captureSliderClickApi(campaign_banner_id: sliderObj?.id ?? 0)
         }
         if sliderObj?.appRedirection == true && sliderObj?.redirectionType == "AdsListing"{
             
@@ -173,4 +175,30 @@ struct BannerNavigation{
             }
         }
     }
+    
+    
+    static func captureSliderClickApi(campaign_banner_id:Int){
+        
+        let params = ["id":campaign_banner_id] as [String : Any]
+     
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.capture_slider_click, param: params,methodType:.post,showLoader: false) { responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+               // let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    
+               
+                }else{
+                    
+
+                }
+            }
+        }
+    }
+
+
 }

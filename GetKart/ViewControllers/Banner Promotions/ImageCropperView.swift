@@ -21,7 +21,7 @@ struct ImageCropperView: UIViewControllerRepresentable {
         var config = Mantis.Config()
         config.presetFixedRatioType = .alwaysUsingOnePresetFixedRatio(ratio: cropAspectRatio.width / cropAspectRatio.height)
 
-        let cropViewController = Mantis.cropViewController(image: image, config: config)
+        let cropViewController = Mantis.cropViewController(image: image.normalizedImage(), config: config)
         cropViewController.delegate = context.coordinator
         return cropViewController
     }
@@ -130,7 +130,7 @@ struct ImageCropperBoardView: UIViewControllerRepresentable {
         // ✅ Free hand crop
         // (DO NOT set presetFixedRatioType)
 
-        let cropVC = Mantis.cropViewController(image: image, config: config)
+        let cropVC = Mantis.cropViewController(image: image.normalizedImage(), config: config)
         cropVC.delegate = context.coordinator
 
         let container = UIViewController()

@@ -10,24 +10,6 @@ import SwiftUI
 import FittedSheets
 
 
-class CustomTabBar: UITabBar {
-
-    weak var middleButton: UIButton?
-
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        guard let middleButton = middleButton else {
-            return super.hitTest(point, with: event)
-        }
-
-        let convertedPoint = middleButton.convert(point, from: self)
-
-        if middleButton.bounds.contains(convertedPoint) {
-            return middleButton
-        }
-
-        return super.hitTest(point, with: event)
-    }
-}
 
 class HomeBaseVC: UITabBarController {
     
@@ -263,19 +245,6 @@ class HomeBaseVC: UITabBarController {
         sheet.dismissOnPull = false
         sheet.gripColor = .clear
       
-        /* if (objPopup.mandatoryClick ?? false){
-         
-         sheet.dismissOnOverlayTap = false
-         sheet.dismissOnPull = false
-         sheet.allowPullingPastMaxHeight = false
-         sheet.allowPullingPastMinHeight = false
-         sheet.shouldRecognizePanGestureWithUIControls = false
-         sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
-         sheet.sheetViewController?.allowGestureThroughOverlay = false
-         sheet.sheetViewController?.dismissOnPull = false
-         sheet.allowPullingPastMinHeight = false
-         }*/
-        
         
         let settingView = PostOptionsSheet(
             
@@ -291,13 +260,10 @@ class HomeBaseVC: UITabBarController {
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     if let selectedVC =  self.selectedViewController as? UINavigationController {
                         let destvc = UIHostingController(rootView: UploadImageVideoView(navigationController: selectedVC))
-                       // let destvc = UIHostingController(rootView: CreateBoardView(navigationController: selectedVC))
                         destvc.hidesBottomBarWhenPushed = true
                         selectedVC.pushViewController(destvc, animated: true)
                     }
-                    }
-                
-                
+                }
             },
             onAdsTap: {
                 print("Ads tapped")
@@ -346,9 +312,7 @@ class HomeBaseVC: UITabBarController {
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     if let selectedVC =  self.selectedViewController as? UINavigationController {
                         
-//                       let destvc = UIHostingController(rootView: UploadImageVideoView(navigationController: selectedVC))
                         let destvc = UIHostingController(rootView: CreateIdeaView(navigationController: selectedVC))
-
                         destvc.hidesBottomBarWhenPushed = true
                         selectedVC.pushViewController(destvc, animated: true)
                     }
@@ -375,41 +339,7 @@ class HomeBaseVC: UITabBarController {
         }
         
     }
-    
-    
-   /* func addNewBadgeOnBoardTab() {
-        // Board tab index = 1
-        let boardIndex = 1
-        let badgeTag = 7777
 
-        // Remove if already added
-        tabBar.viewWithTag(badgeTag)?.removeFromSuperview()
-
-        let tabBarButtons = tabBar.subviews
-            .filter { $0 is UIControl }
-            .sorted { $0.frame.minX < $1.frame.minX }
-
-        guard boardIndex < tabBarButtons.count else { return }
-
-        let boardButton = tabBarButtons[boardIndex]
-
-        let badgeImageView = UIImageView(image: UIImage(named: "NEW"))
-        badgeImageView.tag = badgeTag
-        badgeImageView.contentMode = .scaleAspectFit
-
-        // Adjust size for "thin" look
-        let badgeWidth: CGFloat = 22
-        let badgeHeight: CGFloat = 10
-
-        badgeImageView.frame = CGRect(
-            x: boardButton.frame.width / 2 + 2,
-            y: 6,
-            width: badgeWidth,
-            height: badgeHeight
-        )
-
-        boardButton.addSubview(badgeImageView)
-    }*/
 
     func addNewBadgeOnBoardTab() {
         let boardIndex = 1
@@ -449,18 +379,6 @@ class HomeBaseVC: UITabBarController {
         tabBar.viewWithTag(7777)?.removeFromSuperview()
     }
 
-    
-    /*
-     func tabBarController(_ tabBarController: UITabBarController,
-                           didSelect viewController: UIViewController) {
-
-         if let index = viewControllers?.firstIndex(of: viewController),
-            index == 1 {
-             removeNewBadgeFromBoardTab()
-         }
-     }
-
-     */
 }
 
 
@@ -468,14 +386,11 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     //MARK: Delegate
     
     func showNChatUnreadCountRedDot(count:Int){
-        
-       // let str = count > 10 ? "10+" : "\(count)"
-       // tabBar.items?[1].badgeValue = str
+   
         self.showSmallRedDot(at: 4, tabBar: self.tabBar)
     }
     
     func removeChatUnreadCountRedDot(){
-       // tabBar.items?[1].badgeValue = nil
         self.removeSmallRedDot(at: 4, tabBar: self.tabBar)
     }
     private func showSmallRedDot(at index: Int, tabBar: UITabBar) {
@@ -511,33 +426,6 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         itemView.addSubview(dot)
     }
 
-   /*
-    private func showSmallRedDot(at index: Int, tabBar: UITabBar) {
-        let dotTag = 9999 + index
-
-        // Remove existing dot if any
-        tabBar.viewWithTag(dotTag)?.removeFromSuperview()
-
-        // Get the tab bar button views (UIControl)
-        let tabBarButtons = tabBar.subviews
-            .filter { $0 is UIControl }
-            .sorted { $0.frame.minX < $1.frame.minX }
-
-        guard index < tabBarButtons.count else { return }
-
-        let itemView = tabBarButtons[index]
-
-        // Create the dot
-        let dotSize: CGFloat = 9
-        let dot = UIView(frame: CGRect(x: itemView.frame.width / 2 + 6, y: 6, width: dotSize, height: dotSize))
-        dot.backgroundColor = .red
-        dot.layer.cornerRadius = dotSize / 2
-        dot.clipsToBounds = true
-        dot.tag = dotTag
-
-        itemView.addSubview(dot)
-    }
-*/
     private func removeSmallRedDot(at index: Int, tabBar: UITabBar) {
         let dotTag = 9999 + index
         tabBar.viewWithTag(dotTag)?.removeFromSuperview()
@@ -591,7 +479,6 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         if index == 0{
             return true
        
-//        }else if index == 1 || index == 3 {
         }else if  index == 3 {
 
             if AppDelegate.sharedInstance.isUserLoggedInRequest() == false {
@@ -636,4 +523,26 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         lastSelectedIndex = currentIndex
     }
 
+}
+
+
+
+
+class CustomTabBar: UITabBar {
+
+    weak var middleButton: UIButton?
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard let middleButton = middleButton else {
+            return super.hitTest(point, with: event)
+        }
+
+        let convertedPoint = middleButton.convert(point, from: self)
+
+        if middleButton.bounds.contains(convertedPoint) {
+            return middleButton
+        }
+
+        return super.hitTest(point, with: event)
+    }
 }

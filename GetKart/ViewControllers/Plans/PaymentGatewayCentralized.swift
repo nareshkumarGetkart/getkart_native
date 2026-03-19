@@ -18,8 +18,10 @@ import CryptoKit
 import PayUCommonUI
 
 class PaymentGatewayCentralized{
-    
-    private var ppPayment = PPPayment()
+   
+    var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
+
+    private var ppPayment: PPPayment?
     private var merchantId = ""
     private var api_key = ""
     private var phonePeAppId = ""
@@ -27,6 +29,8 @@ class PaymentGatewayCentralized{
     private  var payment_method = ""
     private  var payment_method_type = 0
     private   var InAppReceipt = ""
+    private  var saltKeyPayu = ""
+    
     var planObj:PlanModel?
     var campaign_banner_id:Int?
     var paymentFor:PaymentForEnum? = .adsPlan
@@ -44,9 +48,7 @@ class PaymentGatewayCentralized{
     var pincode = ""
     var selectedImage:UIImage?
     var strUrl = ""
-    var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     var itemId:Int?
-   
     var selectedPlanId = 0
     var selIOSProductID = ""
     
@@ -59,11 +61,7 @@ class PaymentGatewayCentralized{
         }
         getPaymentSettings()
     }
-    
-    
   
-    
-    
     //MARK: Methods
   private  func getPaymentSettings(){
         
@@ -82,85 +80,44 @@ class PaymentGatewayCentralized{
                 
                 if status == 200{
                     
-                   // guard let self = self else { return }
                     
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
                         self?.payment_method_type = dataDict["payment_method_type"] as? Int ?? 0
                         
                         if self?.payment_method_type == 1 {
                             //IN App Purchase
-                          //  DispatchQueue.main.async {
-                               // self?.openPaymentPay()
-
-                           // }
-                            
                             self?.openPaymentPay()
-//                            if paymentFor == .bannerPromotion{
-//                                inAppCampaignPaymentIntent()
-//                            }else{
-//                                
-//                                self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
-//                            }
-
-                            
-                        }else if self?.payment_method_type == 3 {//Phone Pay
+             
+                        }else if self?.payment_method_type == 3 {
+                            //Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
+                                
                                 self?.api_key = PhonePeDict["api_key"] as? String ?? ""
                                 self?.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
-                                
-                                var flowId = ""
-            
-                                if Local.shared.getUserId() > 0{
-                                    flowId = "\(Local.shared.getUserId())"
-                                }
-                                
+                                let flowId = "\(Local.shared.getUserId())"
                                 if let method = PaymentMethod(rawValue: self?.payment_method_type ?? 3) {
                                     self?.payment_method  = method.title
                                 }
-                              //  self?.payment_method = "PhonePe"
                                 
-                                if devEnvironment == .live {
-                                    self?.ppPayment = PPPayment(environment: .production,
-                                                               flowId: flowId,
-                                                               merchantId: self?.merchantId ?? "",
-                                                               enableLogging: false)
-                                }else {
-                                    self?.ppPayment = PPPayment(environment: .sandbox,
-                                                               flowId: flowId,
-                                                               merchantId: self?.merchantId ?? "", enableLogging: true)
-                                }
-                                
-                                            
-
-                            }
-                            
-                          //  DispatchQueue.main.async {
+                                self?.ppPayment = PPPayment(environment: (devEnvironment == .live) ? .production : .sandbox,
+                                                            flowId: flowId,
+                                                            merchantId: self?.merchantId ?? "",
+                                                            enableLogging: (devEnvironment == .live) ? false : true)
                                 self?.openPaymentPay()
+                            }
 
-                           // }
                         }else if self?.payment_method_type == 4 {
                             //PayuMoney Pay
-                            
                             if let PayuDict = dataDict["Payu"] as? Dictionary<String, Any>  {
                                 
                                 self?.api_key = PayuDict["api_key"] as? String ?? ""
-
+                                self?.saltKeyPayu = PayuDict["secret_key"] as? String ?? ""
                                 if let method = PaymentMethod(rawValue: self?.payment_method_type ?? 4) {
                                     self?.payment_method = method.title
                                 }
-                                
                                 self?.openPaymentPay()
-                                /*
-                                 Payu =         {
-                                     "api_key" = dBtGYO;
-                                     "currency_code" = "<null>";
-                                     "payment_method" = Payu;
-                                     status = 1;
-                                 }
-                                 */
                             }
                         }
-                      
                     }
                     
                 }else{
@@ -182,7 +139,6 @@ class PaymentGatewayCentralized{
           else if paymentFor == .bannerPromotionDraft{
               revokeCampaignPaymentApi(package_id: selectedPlanId)
               
-
           }else{
               
               self.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
@@ -206,19 +162,33 @@ class PaymentGatewayCentralized{
       }else if payment_method_type == 4 {
           
           //Payu Pay
-          self.createPayUIntent(package_id: selectedPlanId)
+          if paymentFor == .bannerPromotion{
+              
+              getIntentForBannerPromotions(package_id: selectedPlanId)
+         
+          } else if paymentFor == .bannerPromotionDraft{
+              
+              revokeCampaignPaymentApi(package_id: selectedPlanId)
+              
+          }else{
+              self.createPayUIntent(package_id: selectedPlanId)
+          }
       }
     }
     
-    private  func updateOrderApi(){
+        
+        private func updateOrderApi(order_status:Bool=true){
+
         
         let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
-        var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId]
+        var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId,"order_status":order_status]
         
         if let postItemId = itemId{
             params["item_id"] = postItemId
         }
-        
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
             if(error != nil)
@@ -281,7 +251,9 @@ class PaymentGatewayCentralized{
                         
                         if self?.payment_method_type == 1{
                             self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
-
+                       
+                        }else if self?.payment_method_type == 2{
+                            
                         }else{
                             
                             if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
@@ -294,9 +266,16 @@ class PaymentGatewayCentralized{
                                     self?.startCheckoutPhonePay(orderId: orderId, token: token)
                                 }
                             }
+                            
+                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                //payu
+                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                self?.openPayuMoney(order_id: order_id, amount: amount)
+                            }
                         }
                     }
-                    
                 }else{
                     
                     AlertView.sharedManager.showToast(message: message)
@@ -340,6 +319,14 @@ class PaymentGatewayCentralized{
                                 let token  = payment_gateway_response["token"] as? String ?? ""
                                 self?.startCheckoutPhonePay(orderId: orderId, token: token)
                             }
+                        }
+                        
+                        if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                            //payu
+                            let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                            let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                            self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                            self?.openPayuMoney(order_id: order_id, amount: amount)
                         }
                     }
                     
@@ -431,7 +418,7 @@ class PaymentGatewayCentralized{
     
     func startCheckoutPhonePay(orderId: String, token:String){
         let appSchema =  "getkart.com"//"Getkart IOS App"
-        ppPayment.startCheckoutFlow(merchantId: merchantId,
+        ppPayment?.startCheckoutFlow(merchantId: merchantId,
                                     orderId: orderId,
                                     token: token,
                                     appSchema: appSchema,
@@ -496,9 +483,7 @@ class PaymentGatewayCentralized{
     }
     
     private  func updateInAppPurchaseOrderApi(transactionId:String,order_id:String,user_id:Int,id:Int){
-        //
-//        let params:Dictionary<String, Any> = ["purchase_token":transactionId, "payment_method":"apple", "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city]
-//      
+    
       let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
 
       var params:Dictionary<String, Any> = ["purchase_token":transactionId, "package_id":selectedPlanId, "receipt": self.InAppReceipt,"category_id":categoryId,"city":city,"campaign_banner_id":campaignBannerId]
@@ -589,7 +574,6 @@ class PaymentGatewayCentralized{
                             print("payment_id \(transaction?.transactionIdentifier ?? "")")
                             let transactionId = transaction?.transactionIdentifier ?? ""
                             self?.getInAppReceipt()
-                         //   self?.updateInAppPurchaseOrderApi(transactionId: transactionId,)
                             self?.updateInAppPurchaseOrderApi(transactionId: transactionId, order_id: order_id, user_id: user_id, id: id)
                         }
                         //Show payment successfull messsage
@@ -660,7 +644,7 @@ extension PaymentGatewayCentralized{
                             let  order_id = payment_transactionDict["order_id"] as? String ?? ""
                             let  amount = payment_transactionDict["amount"] as? Int ?? 0
                             self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
-                            self?.openPayuMoney(order_id: self?.paymentIntentId ?? "", amount: amount)
+                            self?.openPayuMoney(order_id: order_id, amount: amount)
 
                         }
                         
@@ -686,19 +670,29 @@ extension PaymentGatewayCentralized{
             key: api_key,
             transactionId: order_id,
             amount: String(format: "%.2f", Double(amount)),
-            productInfo: "Test Product",
+            productInfo: "Getkart Product",
             firstName: userInfo.name ?? "Test",
             email: email,
             phone: userInfo.mobile ?? "9999999999",
-            surl: "https://payu.herokuapp.com/success",
-            furl: "https://payu.herokuapp.com/failure",
+            surl: Constant.shared.payuSuccessURL,
+            furl:  Constant.shared.payuFailureURL,
             environment: .test
         )
-
+      
         paymentParam.userCredential = "\(api_key):\(email)"
+/*
+ $metaData = 't' .'-'. $customMetaData['payment_transaction_id'] .'-'. 'p' .'-'. $customMetaData['package_id']. '-'.'item' .'-'. $customMetaData['item_id'];
+// t-123-p-123-item-123
+ */
+        var strUdf1Val = "t-\(paymentIntentId)-p-\(selectedPlanId)-item-"
+        
+        if let postItemId = itemId{
+             strUdf1Val = "t-\(paymentIntentId)-p-\(selectedPlanId)-item-\(postItemId)"
 
+        }
+        
         paymentParam.additionalParam = [
-            "udf1": "",
+            "udf1": strUdf1Val,
             "udf2": "",
             "udf3": "",
             "udf4": "",
@@ -708,7 +702,7 @@ extension PaymentGatewayCentralized{
         paymentParam.userCredential = "\(api_key):\(email)"
         // PayU Configuration
         let config = PayUCheckoutProConfig()
-        config.merchantName = "Test Merchant"
+        config.merchantName = "Getkart"
         config.showExitConfirmationOnCheckoutScreen = true
 
         // Open PayU Checkout
@@ -751,7 +745,6 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
         onCompletion: @escaping PayUHashGenerationCompletion
     ) {
 
-        let salt = "Df4YHc5eBB32VLMFFvE42Bz0AcdMKqV0"
 
         guard let hashName = param["hashName"],
               let hashString = param["hashString"] else { return }
@@ -759,7 +752,7 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
         print("HashName:", hashName)
         print("HashString:", hashString)
 
-        let finalHash = generateSHA512(hashString + salt)
+        let finalHash = generateSHA512(hashString + saltKeyPayu)
 
         onCompletion([hashName: finalHash])
     }
@@ -768,20 +761,25 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
 
         let data = Data(value.utf8)
         let hash = SHA512.hash(data: data)
-
         return hash.map { String(format: "%02x", $0) }.joined()
     }
     
     func onPaymentSuccess(response: Any?) {
         print("Payment Success:", response ?? "")
+      self.updateOrderApi(order_status: true)
+
     }
 
     func onPaymentFailure(response: Any?) {
         print("Payment Failed:", response ?? "")
+        self.updateOrderApi(order_status: false)
+
     }
 
     func onPaymentCancel(isTxnInitiated: Bool) {
         print("Payment Cancelled")
+        self.updateOrderApi(order_status: false)
+
     }
 
     func onError(_ error: Error?) {

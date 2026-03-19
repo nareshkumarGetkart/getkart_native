@@ -64,6 +64,7 @@ struct CommentModel: Codable,Identifiable {
     var isLiked: Bool?
     let user: User?
     var replyArray:[CommentModel]?
+    let commentCount:Int?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -79,6 +80,7 @@ struct CommentModel: Codable,Identifiable {
         case isOwner = "is_owner"
         case isLiked = "is_liked"
         case user
+        case commentCount = "comment_count"
     }
 }
 

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CommentsView: View {
+
     var onClose:((_ isToProfilePpen:Bool,_ user:User?) -> Void)?
     let itemObj:ItemModel?
     var navController:UINavigationController?
@@ -15,8 +16,10 @@ struct CommentsView: View {
     @State private var commentText: String = ""
     @State private var replyingTo: String? = nil
     @State private var isFocused: Bool = false
+
     @StateObject private var keyboard = KeyboardObserver()
     @StateObject private var objVM = CommentViewModel()
+
     @State private var replyCommentId = 0
     @State private var textHeight: CGFloat = 35
     @State private var selectedCommentObj:CommentModel?
@@ -26,51 +29,57 @@ struct CommentsView: View {
 
     var body: some View {
 
-        VStack(spacing: 0) {
-            // Fixed Header
-            headerView.zIndex(1)
+        VStack(spacing:0) {
 
-            //Scrollable Comments Only
+            /// HEADER
+            headerView
+
+            /// COMMENTS LIST
             ScrollViewReader { proxy in
+
                 ScrollView {
-                    LazyVStack(spacing: 20) {
-                        
+
+                    LazyVStack(spacing:20) {
+
                         ForEach($objVM.commentsArray) { $comment in
-                            
-                            CommentRow(comment: $comment,
-                            onReply: {
-                                replyingTo = comment.user?.name ?? ""
-                                //commentText = "@\(comment.user?.name ?? "") "
-                                isFocused = true
-                                replyCommentId = comment.id ?? 0
-                            }, onLikeDislike: { commentId, isliked in
-                                
-                                if isliked{
-                                    objVM.likeComment(comment_id: commentId)
-                                }else{
-                                    objVM.unlikeComment(comment_id: commentId)
-                                }
-                            },loadMoreReplies: {commentId in
-                                
-                                loadReplies(commentId: commentId)
-                            },selectedOption:{ objComment in
-                                DispatchQueue.main.async {
+
+                            CommentRow(
+                                comment: $comment,
+
+                                onReply: {
+                                    replyingTo = comment.user?.name ?? ""
+                                    isFocused = true
+                                    replyCommentId = comment.id ?? 0
+                                },
+
+                                onLikeDislike: { commentId,isLiked in
+
+                                    if isLiked {
+                                        objVM.likeComment(comment_id: commentId)
+                                    } else {
+                                        objVM.unlikeComment(comment_id: commentId)
+                                    }
+                                },
+
+                                loadMoreReplies: { commentId in
+                                    loadReplies(commentId: commentId)
+                                },
+
+                                selectedOption:{ objComment in
                                     selectedCommentObj = objComment
                                     showActionSheet = true
-                                }
-                            },selectedUser:{user in
-                            
-                                
-                               // onClose?(true,user)
+                                },
 
-                            })
+                                selectedUser:{ user in
+                                    selectedUser = user
+                                }
+                            )
+                            .id(comment.id)
                         }
-                        Spacer()
+
+                        Spacer().frame(height:20)
                     }
                     .padding()
-                }
-                .onChange(of: keyboard.height) { _ in
-                    scrollToBottom(proxy: proxy)
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .simultaneousGesture(
@@ -78,30 +87,36 @@ struct CommentsView: View {
                         isFocused = false
                     }
                 )
-
+                .onChange(of: keyboard.height) { _ in
+                  //  scrollToBottom(proxy: proxy)
+                }
             }
-            
-            inputBar
-                .frame(maxWidth: .infinity)
         }
-//        .safeAreaInset(edge: .bottom) {
-//            inputBar
-//                .background(Color(.systemBackground))
-//        }
-        
-//        .safeAreaInset(edge: .bottom) {
-//            inputBar
-//                .frame(maxWidth: .infinity)
-//        }
+
+        /// INPUT BAR STICKY ABOVE KEYBOARD
+        .safeAreaInset(edge: .bottom) {
+            inputBar
+                .background(.ultraThinMaterial)
+        }
+
         .background(Color(.systemBackground))
-       // .ignoresSafeArea(.keyboard, edges: .bottom)
-        
-        .onAppear{
-            if objVM.commentsArray.count == 0{
-                
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+
+        .onAppear {
+
+            if objVM.commentsArray.isEmpty {
                 objVM.getComment(itemId: itemObj?.id ?? 0)
             }
         }
+
+        .onDisappear {
+
+            if objVM.totalCommentCount >= 0 {
+                postNotificationToUpdateCommentInBoard()
+            }
+        }
+
+        /// ACTION SHEET
         .confirmationDialog(
             "",
             isPresented: $showActionSheet,
@@ -121,290 +136,257 @@ struct CommentsView: View {
 
             } else {
 
-                Button("Report") {
-                }
+                Button("Report") {}
 
                 Button("Block User") {
                     confirmationType = .blockUser
                 }
             }
 
-            Button("Cancel", role: .cancel) { }
-
+            Button("Cancel", role: .cancel) {}
         }
+
+        /// CONFIRMATION SHEET
         .sheet(item: $confirmationType) { type in
-            if let obj = selectedCommentObj?.user{
+
+            if let obj = selectedCommentObj?.user {
+
                 ConfirmationView(
                     user: obj,
-                    confirmType:type,
+                    confirmType: type,
+
                     onCancel: {
                         confirmationType = nil
-
                     },
+
                     onDone: {
-                        
-                        if type == .deleteComment{
-                            if (selectedCommentObj?.parentID ?? 0) > 0{
-                                objVM.deleteReply(comment_id: selectedCommentObj?.id ?? 0, parentId: selectedCommentObj?.parentID ?? 0)
-                            }else{
-                                objVM.deleteComment(comment_id: selectedCommentObj?.id ?? 0)
+
+                        if type == .deleteComment {
+
+                            if (selectedCommentObj?.parentID ?? 0) > 0 {
+
+                                objVM.deleteReply(
+                                    comment_id: selectedCommentObj?.id ?? 0,
+                                    parentId: selectedCommentObj?.parentID ?? 0
+                                )
+
+                            } else {
+
+                                objVM.deleteComment(
+                                    comment_id: selectedCommentObj?.id ?? 0
+                                )
                             }
-                        }else if type == .blockUser{
-                                                    
+
+                        } else if type == .blockUser {
+
                         }
-                        
+
                         confirmationType = nil
-
                     }
-                ).presentationDetents([.height(220)])
-                .presentationDragIndicator(.hidden)
+                )
+                .presentationDetents([.height(220)])
                 .presentationCornerRadius(30)
+                .presentationDragIndicator(.hidden)
             }
-            
         }
+
+        /// PROFILE VIEW
         .sheet(item: $selectedUser) { user in
-            
-            SellerProfileView(navController: self.navController, userId: user.id ?? 0)
-        }
-        
-    }
-    
-    func loadReplies(commentId:Int){
-        objVM.getReplies(itemId: itemObj?.id ?? 0, commentId: commentId)
-
-    }
-    
-    func actionSheetOpen(){
-        
-        guard let comment = selectedCommentObj else { return }
-
-        let sheet = UIAlertController(
-            title: "",
-            message: nil,
-            preferredStyle: .actionSheet
-        )
-        if selectedCommentObj?.user?.id == Local.shared.getUserId(){
-          // Actionsheetop
-            
-            sheet.addAction(UIAlertAction(title: "Edit", style: .default, handler: { action in
-                
-                commentText = comment.comment ?? ""
-                isFocused = true
-             
-            }))
-            
-            sheet.addAction(UIAlertAction(title: "Delete", style: .default, handler: { action in
-                
-                
-               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    selectedCommentObj = comment
-                    confirmationType = .deleteComment
-              //  }
-//                if (selectedCommentObj?.parentID ?? 0) > 0{
-//                    objVM.deleteReply(comment_id: selectedCommentObj?.id ?? 0, parentId: selectedCommentObj?.parentID ?? 0)
-//                }else{
-//                    objVM.deleteComment(comment_id: selectedCommentObj?.id ?? 0)
-//                }
-            }))
-          
-            
-        }else{
-            sheet.addAction(UIAlertAction(title: "Report", style: .default, handler: { action in
-                
-             
-            }))
-            
-            sheet.addAction(UIAlertAction(title: "Block User", style: .default, handler: { action in
-                
-               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    selectedCommentObj = comment
-                    confirmationType = .blockUser
-                //}
-            }))
-        }
-        
-        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-          
-        topMostController()?.present(sheet, animated: true)
-        
-    }
-    
-    func topMostController() -> UIViewController? {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let root = scene.windows.first?.rootViewController else { return nil }
-        
-        var top = root
-        while let presented = top.presentedViewController {
-            top = presented
-        }
-        return top
-    }
-    
-    func pushToProfileScreen(user:User?){
-        
-        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navController, userId: user?.id ?? 0))
-        self.navController?.pushViewController(hostingController, animated: true)
-    }
-}
-
-private extension CommentsView {
-    
-    /* var inputBar: some View {
-     HStack(spacing: 12) {
-     
-     TextField("Add a Comment", text: $commentText)
-     .focused($isFocused)
-     .padding(12)
-     .background(Color(.systemGray6))
-     .clipShape(RoundedRectangle(cornerRadius: 20))
-     
-     if !commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-     Button {
-     sendComment()
-     } label: {
-     Text("Send")
-     .font(.system(size: 15, weight: .semibold))
-     .foregroundColor(.blue)
-     }
-     .transition(.opacity)
-     }
-     }
-     .padding()
-     .animation(.easeInOut(duration: 0.2), value: commentText)
-     }*/
-    
-    private var inputBar: some View {
-        
-        VStack(spacing: 0){
-            if replyCommentId > 0{
-                HStack{
-                    Text("Replying to @\(replyingTo ?? "")")
-                        .font(.inter(.regular, size: 13))
-                    Spacer()
-                    Button("Cancel") {
-                        commentText = ""
-                        replyCommentId = 0
-                        replyingTo = ""
-                    }.foregroundColor(Color(.systemOrange))
-                    .font(.inter(.semiBold, size: 15))
-                }.padding()
-                .background(.ultraThinMaterial)
-                
-            }
-            
-            HStack(alignment: .bottom, spacing: 8) {
-                
-                GrowingTextViewNew(
-                    text: $commentText,
-                    dynamicHeight: $textHeight,
-                    isFocused: $isFocused
-                )
-                .frame(height: textHeight)
-                .overlay(
-                    Group {
-                        if commentText.isEmpty {
-                            Text("Add a Comment")
-                                .foregroundColor(.gray)
-                                .padding(.leading, 12)
-                                .allowsHitTesting(false)
-                        }
-                    },
-                    alignment: .leading
-                )
-                .padding(.horizontal, 5)
-                .padding(.vertical, 5)
-                .background(
-                    RoundedRectangle(cornerRadius: 17.5)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
-                .frame(maxWidth: .infinity)
-                
-                if !commentText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Button {
-                        sendComment()
-                        textHeight = 35
-                    } label: {
-                        Image("msg_send_icon").renderingMode(.template)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(.label))
-                    }.frame(width:40,height:40).cornerRadius(20)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 5)
-            .background(.ultraThinMaterial)
+            SellerProfileView(
+                navController: navController,
+                userId: user.id ?? 0
+            )
         }
     }
 }
 
-
-  
 private extension CommentsView {
-    
-    func scrollToBottom(proxy: ScrollViewProxy) {
-        if let last = objVM.commentsArray.last {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                proxy.scrollTo(last.id, anchor: .bottom)
-            }
-        }
-    }
-    
-    func sendComment() {
-        
-        if selectedCommentObj != nil {
-            if (selectedCommentObj?.parentID ?? 0) > 0{
-                objVM.editReply(commentId: selectedCommentObj?.id ?? 0, comment: commentText, parentId: selectedCommentObj?.parentID ?? 0)
-                
-            }else{
-                objVM.editComment(commentId: selectedCommentObj?.id ?? 0, comment: commentText)
-            }
-        }else if (replyingTo?.count ?? 0) > 0{
-//            var finaltxt = commentText
-//            if commentText.hasPrefix("@\(replyingTo ?? "")"){
-//                finaltxt = commentText.replacingPrefix("@\(replyingTo ?? "")", with: "")
-//            }
-            
-            objVM.replyComment(msg: commentText, comment_id: replyCommentId)
-                
-        }else{
-            objVM.addComment(msg: commentText, itemId: itemObj?.id ?? 0)
 
-        }
-    
-        commentText = ""
-        replyCommentId = 0
-        replyingTo = ""
-        selectedCommentObj = nil
-        
-    }
-    
-    
-}
-
-private extension CommentsView {
-    
     var headerView: some View {
-        VStack{
+
+        VStack {
+
             HStack {
-                
+
                 Spacer()
-                
+
                 Text("Comments")
-                    .font(.system(size: 18, weight: .semibold))
-                
+                    .font(.system(size:18,weight:.semibold))
+
                 Spacer()
-                
+
                 Button {
-                    onClose?(false, nil)
+                    onClose?(false,nil)
                 } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .medium))
+
+                    Image(systemName:"xmark")
+                        .font(.system(size:16,weight:.medium))
                         .foregroundColor(.black)
                 }
             }
             .padding()
+
             Divider()
         }
+    }
+}
+
+private extension CommentsView {
+
+    var inputBar: some View {
+
+        VStack(spacing:0) {
+
+            /// Reply banner
+            if replyCommentId > 0 {
+
+                HStack {
+
+                    Text("Replying to @\(replyingTo ?? "")")
+                        .font(.system(size:13))
+
+                    Spacer()
+
+                    Button("Cancel") {
+
+                        commentText = ""
+                        replyCommentId = 0
+                        replyingTo = ""
+
+                    }
+                    .foregroundColor(.orange)
+                    .font(.system(size:15,weight:.semibold))
+                }
+                .padding()
+                .background(.ultraThinMaterial)
+            }
+
+            HStack(alignment:.bottom,spacing:8) {
+
+                GrowingTextViewNew(
+                    text:$commentText,
+                    dynamicHeight:$textHeight,
+                    isFocused:$isFocused
+                )
+                .frame(height:textHeight)
+                .overlay(
+
+                    Group {
+
+                        if commentText.isEmpty {
+
+                            Text("Add a Comment")
+                                .foregroundColor(.gray)
+                                .padding(.leading,12)
+                                .allowsHitTesting(false)
+                        }
+                    },
+                    alignment:.leading
+                )
+                .padding(.horizontal,5)
+                .padding(.vertical,5)
+                .background(
+                    RoundedRectangle(cornerRadius:17.5)
+                        .stroke(Color.gray,lineWidth:1)
+                )
+                .frame(maxWidth:.infinity)
+
+                if !commentText.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty {
+
+                    Button {
+
+                        sendComment()
+                        textHeight = 35
+
+                    } label: {
+
+                        Image("msg_send_icon")
+                            .renderingMode(.template)
+                            .foregroundColor(.primary)
+                    }
+                    .frame(width:40,height:40)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical,5)
+        }
+    }
+}
+
+
+private extension CommentsView {
+
+    func loadReplies(commentId: Int) {
+        objVM.getReplies(itemId: itemObj?.id ?? 0, commentId: commentId)
+    }
+
+    func postNotificationToUpdateCommentInBoard() {
+        NotificationCenter.default.post(
+            name: NSNotification.Name(
+                rawValue: NotificationKeys.refreshCommentCountBoard.rawValue
+            ),
+            object: [
+                "count": objVM.totalCommentCount,
+                "boardId": itemObj?.id ?? 0,
+                "lastComment": (objVM.commentsArray.count > 0 ? objVM.commentsArray.first : nil)
+            ],
+            userInfo: nil
+        )
+    }
+
+   
+    func scrollToBottom(proxy: ScrollViewProxy) {
+
+        if let last = objVM.commentsArray.first {
+
+            DispatchQueue.main.asyncAfter(deadline:.now()+0.1) {
+
+                proxy.scrollTo(last.id,anchor:.bottom)
+            }
+        }
+    }
+
+    func sendComment() {
+        isFocused = false
+
+        if selectedCommentObj != nil {
+
+            if (selectedCommentObj?.parentID ?? 0) > 0 {
+
+                objVM.editReply(
+                    commentId: selectedCommentObj?.id ?? 0,
+                    comment: commentText,
+                    parentId: selectedCommentObj?.parentID ?? 0
+                )
+
+            } else {
+
+                objVM.editComment(
+                    commentId: selectedCommentObj?.id ?? 0,
+                    comment: commentText
+                )
+            }
+
+        } else if replyCommentId > 0 {
+
+            objVM.replyComment(
+                itemId: itemObj?.id ?? 0,
+                msg: commentText,
+                comment_id: replyCommentId
+            )
+
+        } else {
+
+            objVM.addComment(
+                msg: commentText,
+                itemId: itemObj?.id ?? 0
+            )
+        }
+
+        commentText = ""
+        replyCommentId = 0
+        replyingTo = ""
+        selectedCommentObj = nil
     }
 }
 

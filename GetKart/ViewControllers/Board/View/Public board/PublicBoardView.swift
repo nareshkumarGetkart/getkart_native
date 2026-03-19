@@ -66,7 +66,26 @@ struct PublicBoardView: View {
                                 swipeCategory(left: false)  // previous tab
                             }
                         }
-                )        }
+                )
+                
+                
+               /* let boardNav = tabBarController?.viewControllers?[1] as? UINavigationController
+                TabView(selection: $selectedCategoryId) {
+                 
+                 ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
+                 BoardListView(
+                 vm: boardStore.vm(for: cat.id ?? 0),
+                 navigationController: boardNav, isActive: selectedCategoryId == cat.id
+                 )
+                 .tag(cat.id ?? 0)
+                 }
+                 }
+                 .tabViewStyle(.page(indexDisplayMode: .never))
+                 .transaction { tx in
+                 tx.animation = nil   //  CRITICAL
+                 }
+                */
+            }
             
             Spacer()
         }
@@ -82,6 +101,10 @@ struct PublicBoardView: View {
             markTabLoaded(selectedCategoryId)
         }
         .background(Color(.systemGray6))
+        
+        .onDisappear{
+            FeedVideoManager.shared.muteAll()
+        }
         
         //  NOTIFICATION OBSERVER HERE
         .onReceive(
@@ -127,7 +150,6 @@ struct PublicBoardView: View {
             selectedName = newCat.name ?? ""
         }
     }
-
 }
 
 
@@ -269,28 +291,6 @@ struct CategoryTabsNew: View {
 }
 
 
-//struct BoardPageView: View {
-//
-//    let categoryId: Int
-//    let navigationController: UINavigationController?
-//
-//    @StateObject private var vm: BoardViewModelNew
-//
-//    init(categoryId: Int, navigationController: UINavigationController?) {
-//        self.categoryId = categoryId
-//        self.navigationController = navigationController
-//        _vm = StateObject(wrappedValue: BoardViewModelNew(categoryId: categoryId))
-//    }
-//
-//    var body: some View {
-//        BoardListView(
-//            vm: vm,
-//            navigationController: navigationController
-//        )
-//    }
-//}
-
-
 struct BoardListView: View {
 
     @ObservedObject var vm: BoardViewModelNew
@@ -306,8 +306,7 @@ struct BoardListView: View {
     @State private var videoFrames: [Int: CGRect] = [:]
     @State private var visibilityWorkItem: DispatchWorkItem?
     let isActive: Bool   //  ADD THIS
-    @State private var openSafari: Bool = false
-    @State private var outboundUrlClicked: String = ""
+    @State private var safariURL: URL?
 
     var body: some View {
 
@@ -342,13 +341,14 @@ struct BoardListView: View {
                             ForEach(columns.left, id: \.id) { item in
 
                                 if item.boardType == 2 {
+                                    
                                     SmartVideoPlayerView(
                                         item: item,
                                         onTapBottomButton: {
                                         //Tapped video
-                                            if (item.outbondUrl ?? "").count > 0{
-                                                outboundUrlClicked =  item.outbondUrl ?? ""
-                                                openSafari = true
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                                FeedVideoManager.shared.muteAll()
                                             }
                                         }
                                     ).background(
@@ -366,14 +366,12 @@ struct BoardListView: View {
                                     ) .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             handlePrefetch(itemIndex: globalIndex(of: item))
-                                            if let index = vm.items.firstIndex(where: { $0.id == item.id }) {
-                                                precacheNextVideos(from: index)
-                                            }
+                                            prefetchNextVideos(from: item)
                                         }.onDisappear{
-                                            print("dissapearing video \(item.id ?? 0)")
                                             videoFrames.removeValue(forKey: item.id ?? 0)
                                             FeedVideoManager.shared.pause(id: item.id ?? 0)
                                         }
+                                    
                                 } else {
                                     CardItemView(
                                         item: item,
@@ -384,10 +382,9 @@ struct BoardListView: View {
                                         onTapBoostButton:{
                                             if item.boardType == 1{
                                                 //Clicking on bottom prmotional
-                                                if (item.outbondUrl ?? "").count > 0{
+                                        if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                            safariURL = url
 
-                                                    outboundUrlClicked =  item.outbondUrl ?? ""
-                                                    openSafari = true
                                                 }
                                             }else{
                                                 paymentGatewayOpen(product: item)
@@ -415,10 +412,9 @@ struct BoardListView: View {
                                         item: item,
                                         onTapBottomButton: {
                                         //Tapped vide
-                                            if (item.outbondUrl ?? "").count > 0{
-
-                                                outboundUrlClicked =  item.outbondUrl ?? ""
-                                                openSafari = true
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                                FeedVideoManager.shared.muteAll()
                                             }
                                         }
                                     )
@@ -439,12 +435,9 @@ struct BoardListView: View {
                                         .measureHeight(id: item.id ?? 0)
                                         .onAppear {
                                             handlePrefetch(itemIndex: globalIndex(of: item))
-                                            
-                                            if let index = vm.items.firstIndex(where: { $0.id == item.id }) {
-                                                precacheNextVideos(from: index)
-                                            }
+                                            prefetchNextVideos(from: item)
+
                                         }.onDisappear{
-                                            print("dissapearing video \(item.id ?? 0)")
                                             videoFrames.removeValue(forKey: item.id ?? 0)
                                             FeedVideoManager.shared.pause(id: item.id ?? 0)
                                         }
@@ -459,9 +452,9 @@ struct BoardListView: View {
                                         
                                         if item.boardType == 1{
                                             //Tapped on prmotional button
-                                            if (item.outbondUrl ?? "").count > 0{
-                                                outboundUrlClicked =  item.outbondUrl ?? ""
-                                                openSafari = true
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+
+                                                safariURL = url
                                             }
                                         }else{
                                             paymentGatewayOpen(product: item)
@@ -504,18 +497,7 @@ struct BoardListView: View {
                 
             .onChange(of: vm.items.count) { _ in
                 paginationConsumed = false
-            
-               /* let nextVideos = vm.items.suffix(6)
-
-                for item in nextVideos {
-
-                    if item.boardType == 2,
-                       let link = item.videoLink,
-                       let url = URL(string: link) {
-
-                        VideoCacheManager.shared.precacheVideo(url: url)
-                    }
-                }*/
+        
             }
             
 
@@ -552,6 +534,23 @@ struct BoardListView: View {
                 
                 vm.update(likeCount: count, isLike: isLike, boardId: boardId)
             }
+            .onReceive(
+                 NotificationCenter.default.publisher(
+                     for: Notification.Name(NotificationKeys.refreshCommentCountBoard.rawValue)
+                 )
+            ) { notification in
+                
+                guard let dict = notification.object as? [String: Any] else { return }
+                
+                let count  = dict["count"] as? Int ?? 0
+                let boardId = dict["boardId"] as? Int ?? 0
+                if let commentObj = dict["lastComment"] as? CommentModel {
+                    vm.updateCommentCount(commentCount: count, commentObj: commentObj, boardId: boardId)
+                }else{
+                    vm.updateCommentCount(commentCount: count, commentObj: nil, boardId: boardId)
+                }
+            }
+            
             .onReceive(
                 NotificationCenter.default.publisher(
                     for: Notification.Name(NotificationKeys.scrollBoardToTop)
@@ -605,23 +604,8 @@ struct BoardListView: View {
                 }
             }
             
-           /* .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name("PauseAllVideos")
-                )
-            ) { _ in
-                
-                FeedVideoManager.shared.visibleVideoIDs = []
-                FeedVideoManager.shared.soundVideoID = nil
-                videoFrames.removeAll()
-            }*/
-            
-            .fullScreenCover(isPresented: $openSafari) {
-              
-                if let url = URL(string:outboundUrlClicked.getValidUrl())  {
-                    
-                    SafariView(url:url)
-                }
+            .fullScreenCover(item: $safariURL) { url in
+                SafariView(url: url)
             }
 
         }
@@ -629,24 +613,35 @@ struct BoardListView: View {
     
     
  
-    func precacheNextVideos(from index: Int) {
+    // MARK: - Prefetch Next Videos
+  private func prefetchNextVideos(from currentItem: ItemModel) {
 
-        guard index < vm.items.count - 1 else { return }
+      guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }
 
-        let endIndex = min(index + 3, vm.items.count - 1)
+      let start = index + 1
+      let end = min(index + 2, vm.items.count - 1)
 
-        for i in (index + 1)...endIndex {
+      guard start <= end else { return }
 
-            let item = vm.items[i]
+      var urls: [URL] = []
 
-            if item.boardType == 2,
-               let link = item.videoLink,
-               let url = URL(string: link) {
+      for i in start...end {
 
-                VideoCacheManager.shared.precacheVideo(url: url)
-            }
-        }
-    }
+          let item = vm.items[i]
+
+          if item.boardType == 2,
+             let link = item.videoLink,
+             let url = URL(string: link) {
+
+              urls.append(url)
+          }
+      }
+
+      VideoPreloadManagerDefault.shared.set(waiting: urls)
+      
+
+  }
+  
 
     private func scheduleVisibilityUpdate() {
         
@@ -689,6 +684,7 @@ struct BoardListView: View {
         }
 
         FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
+      
     }
     
     func paymentGatewayOpen(product:ItemModel) {
@@ -725,24 +721,6 @@ struct BoardListView: View {
     }
 
     // MARK: -  Prefetch Logic (FINAL & SAFE)
-   /* private func handlePrefetch(itemIndex: Int?) {
-
-        guard let index = itemIndex else { return }
-
-        let triggerIndex = max(vm.items.count - prefetchOffset, 0)
-
-        guard index >= triggerIndex else { return }
-        guard userDidScroll else { return }
-        guard !paginationConsumed else { return }
-        guard !vm.isLoading else { return }
-        guard !vm.isLastPage else { return }
-
-        paginationConsumed = true
-        userDidScroll = false
-
-        vm.tryLoadNextPage()
-    }*/
-    
     private func handlePrefetch(itemIndex: Int?) {
 
         guard let index = itemIndex else { return }
@@ -867,32 +845,11 @@ struct ItemHeightKey: PreferenceKey {
 
 
 
-struct PrefetchTriggerView: View {
-    var body: some View {
-        Color.clear
-            .frame(height: 1)
-    }
-}
-
-// MARK: - PreferenceKey for Video Frames
-struct VideoFramePreferenceKey: PreferenceKey {
-    static var defaultValue: [Int: CGRect] = [:]
-
-    static func reduce(value: inout [Int: CGRect],
-                       nextValue: () -> [Int: CGRect]) {
-        value.merge(nextValue()) { $1 }
-    }
-}
-
-
 extension PublicBoardView{
     
     var headerView: some View {
         HStack {
-           /* Text("For you")
-                .underline()
-                .font(.manrope(.medium, size: 15))*/
-            
+    
             searchBar
             
             interestButton
@@ -979,23 +936,23 @@ struct ProductCardStaggered: View {
         VStack(alignment: .leading, spacing: 1) {
             
             ZStack(alignment:.bottomTrailing) {
-
-                    KFImage(URL(string: product.image ?? ""))
-                      .setProcessor(
-                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
-                        )
-                        .scaleFactor(UIScreen.main.scale)
-                        .cacheOriginalImage(false)
-                        .resizable()
-                        .scaledToFit()
-                        .clipped()
-                        .cornerRadius(10)
-                            .shadow(
-                                color: Color.black.opacity(0.10),
-                                radius: 7,
-                                x: 0,
-                                y: 2
-                            )
+                
+                KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                    )
+                    .scaleFactor(UIScreen.main.scale)
+                    .cacheOriginalImage(false)
+                    .resizable()
+                    .scaledToFit()
+                    .clipped()
+                    .cornerRadius(10)
+                    .shadow(
+                        color: Color.black.opacity(0.10),
+                        radius: 7,
+                        x: 0,
+                        y: 2
+                    )
                 
                 if (product.user?.id ?? 0) != Local.shared.getUserId(){
                     
@@ -1004,7 +961,7 @@ struct ProductCardStaggered: View {
                         outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
                     } label: {
                         HStack(spacing:2){
-                           
+                            
                             Text(product.ctaLabel ?? "Buy Now")
                                 .font(.inter(.medium, size: 11))
                                 .foregroundColor(.white)
@@ -1021,7 +978,7 @@ struct ProductCardStaggered: View {
             HStack(spacing:2) {
                 if (product.user?.id ?? 0) == Local.shared.getUserId(){
                     Spacer()
-
+                    
                 }else{
                     Button {
                         manageLike(boardId: product.id ?? 0)
@@ -1044,7 +1001,7 @@ struct ProductCardStaggered: View {
                 }
             } .padding(.horizontal,4)
             
-           
+            
             VStack(alignment: .leading,spacing: 0){
                 
                 Text(product.name ?? "").foregroundColor(Color(.label))
@@ -1055,7 +1012,7 @@ struct ProductCardStaggered: View {
                     .font(.inter(.regular, size: 12)).lineLimit(2)
                     .foregroundColor(.gray)
                     .fixedSize(horizontal: false, vertical: true)
-              
+                
             }.padding(.horizontal,8)
             
             
@@ -1072,7 +1029,7 @@ struct ProductCardStaggered: View {
                     Button {
                         // Boost action
                         onTapBoostButton()
-                     
+                        
                     } label: {
                         Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
                             .font(.inter(.semiBold, size: 14))
@@ -1093,8 +1050,8 @@ struct ProductCardStaggered: View {
                     .padding(.horizontal, 10)
                     .padding(.bottom, 10)
                 }
-
-
+                
+                
             }
         }
         .background(Color(.systemBackground))
@@ -1103,25 +1060,16 @@ struct ProductCardStaggered: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
         
-           
-        .fullScreenCover(isPresented: $showSafari) {
-              
-                if let url = URL(string:getUrlValid(strURl: product.outbondUrl ?? ""))  {
-                    
-                    SafariView(url:url)
-                }
-            }
         
-    }
-    
-    func getUrlValid(strURl:String) ->String{
-        var urlString = strURl
-        if !urlString.lowercased().hasPrefix("http://") &&
-            !urlString.lowercased().hasPrefix("https://") {
-            urlString = "https://" + urlString
+        .fullScreenCover(isPresented: $showSafari) {
+                
+            if let url = URL(string:(product.outbondUrl ?? "").getValidUrl())  {
+                    
+                SafariView(url:url)
+            }
         }
-        return urlString
     }
+
     
     private func manageLike(boardId: Int) {
         if AppDelegate.sharedInstance.isUserLoggedInRequest(){
@@ -1178,6 +1126,13 @@ struct IdeaCardStaggered: View {
                                 x: 0,
                                 y: 2
                             )
+                
+                if (product.isFeature ?? false){
+                    Text("Sponsored")
+                        .foregroundColor(.white)
+                        .font(.inter(.bold, size: 14)).padding([.bottom,.trailing],8)
+                        .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
+                }
             }
          
         .background(Color(.systemBackground))
@@ -1187,69 +1142,36 @@ struct IdeaCardStaggered: View {
         ).contentShape(Rectangle())
         
       }
-        
-    
-    
-    func getUrlValid(strURl:String) ->String{
-        var urlString = strURl
-        if !urlString.lowercased().hasPrefix("http://") &&
-              !urlString.lowercased().hasPrefix("https://") {
-               urlString = "https://" + urlString
-           }
-        return urlString
-    }
-    
-   
-    func outboundClickApi(strURl:String,boardId:Int){
-        
-        let params = ["board_id":boardId]
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
-            
-            if error == nil{
-                
-                let result = responseObject! as NSDictionary
-                let status = result["code"] as? Int ?? 0
-                _ = result["message"] as? String ?? ""
-                
-                if status == 200{
-                    
-                }else{
-                }
-            }
-        }
-    }
-
 }
 
 
 struct PromotionalAdsCardStaggered: View {
-
+    
     let product: ItemModel
     @State private var imageRatio: CGFloat = 1
     let onTapBottomtButton: () -> Void
-
+    
     var body: some View {
         VStack(spacing: 0) {
             
             ZStack(alignment:.topTrailing) {
-
-                    KFImage(URL(string: product.image ?? ""))
-                      .setProcessor(
-                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
-                        )
-                        .scaleFactor(UIScreen.main.scale)
-                        .cacheOriginalImage(false)
-                        .resizable()
-                        .scaledToFit()
-                        .clipped()
-                        //.cornerRadius(10)
-                            .shadow(
-                                color: Color.black.opacity(0.10),
-                                radius: 7,
-                                x: 0,
-                                y: 2
-                            )
+                
+                KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                    )
+                    .scaleFactor(UIScreen.main.scale)
+                    .cacheOriginalImage(false)
+                    .resizable()
+                    .scaledToFit()
+                    .clipped()
+                //.cornerRadius(10)
+                    .shadow(
+                        color: Color.black.opacity(0.10),
+                        radius: 7,
+                        x: 0,
+                        y: 2
+                    )
             }
             
             // CTA (Attached like screenshot)
@@ -1271,427 +1193,37 @@ struct PromotionalAdsCardStaggered: View {
             .background(Color.orange)
             .onTapGesture {
                 onTapBottomtButton()
+                outboundClickApi()
             }
-         
+            
         }
         .background(Color(.systemBackground))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
         .clipShape(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
-       
         
-    }
-}
-
-
-/*
-struct BoardListView: View {
-
-    @ObservedObject var vm: BoardViewModelNew
-    let navigationController: UINavigationController?
-
-    var body: some View {
-        
-        ScrollViewReader { proxy in     //  added
-            
-            ScrollView {
-                // 🔝 TOP ANCHOR (harmless)
-                if vm.items.isEmpty && !vm.isLoading {
-                    
-                    
-                    emptyView.padding(.top,100)
-                    
-                } else {
-                    
-                    Color.clear
-                        .frame(height: 0)
-                        .id("TOP")
-                    LazyVStack {
-                        
-                        StaggeredGrid(columns: 2, spacing: 6) {
-                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
-                                
-                                ProductCardStaggered(product: item) { isLiked, boardId in
-                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
-                                .onTapGesture {
-                                    pushToDetail(item: item)
-                                }
-                                
-                            }
-                        }
-                        .padding(.horizontal, 5).padding(.top,0)
-                        
-                        //  SINGLE PAGINATION TRIGGER (FOOTER)
-                        if !vm.isLastPage {
-                            PaginationFooter()
-                                .onAppear {
-                                    guard !vm.isLoading else { return }
-                                    vm.loadNextPage()
-                                }
-                        }
-                        
-                        
-                        //  Bottom loading indicator
-                        if vm.isLoading && !vm.items.isEmpty {
-                            ProgressView()
-                                .padding(.vertical, 24)
-                        }
-                    }.transaction { tx in
-                        tx.animation = nil   // CRITICAL
-                    }
-                    
-                }
-            }
-           
-            .refreshable {
-                await vm.refresh()
-            }
-            .task {
-                if vm.items.count == 0{
-                    vm.loadIfNeeded()
-                }
-            }
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
-                )
-            ) { notification in
-                
-                guard let dict = notification.object as? [String: Any] else { return }
-                
-                let isLike  = dict["isLike"] as? Bool ?? false
-                let count  = dict["count"] as? Int ?? 0
-                let boardId = dict["boardId"] as? Int ?? 0
-                
-                vm.update(likeCount: count, isLike: isLike, boardId: boardId)
-            }
-            
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name(NotificationKeys.scrollBoardToTop)
-                )
-            ) { _ in
-                print("SCROLL TO TOP TRIGGERED")
-                DispatchQueue.main.async {
-                    
-                    withAnimation(.easeInOut) {
-                        
-                        proxy.scrollTo("TOP", anchor: .top)
-                    }
-                }
-            }
-        }
-    }
-
-    var emptyView: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            Image("no_data_found_illustrator")
-            Text("No Data Found")
-                .foregroundColor(.orange)
-            Spacer()
-        }
-    }
-    
-    private func pushToDetail(item: ItemModel) {
-       
-        let vc = UIHostingController(
-            rootView: BoardDetailView(
-                navigationController: navigationController,
-                itemObj: item
-            )
-        )
-        vc.hidesBottomBarWhenPushed = true
-
-        navigationController?.pushViewController(vc, animated: true)
-    }
-}
-*/
-
-/*import SwiftUI
-
-struct BoardListView: View {
-
-    @ObservedObject var vm: BoardViewModelNew
-    let navigationController: UINavigationController?
-
-    // Track scroll intent
-    @State private var isUserScrolling = false
-
-    var body: some View {
-
-        ScrollViewReader { proxy in
-            ScrollView {
-
-                // MARK: - CONTENT
-                LazyVStack(spacing: 0) {
-
-                    // Empty state
-                    if vm.items.isEmpty && !vm.isLoading {
-                        emptyView
-                            .padding(.top, 120)
-                    } else {
-
-                        Color.clear
-                            .frame(height: 0)
-                            .id("TOP")
-
-                        StaggeredGrid(columns: 2, spacing: 6) {
-                            ForEach(vm.items, id: \.id) { item in
-                                ProductCardStaggered(product: item) { isLiked, boardId in
-                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
-                                .onTapGesture {
-                                    pushToDetail(item: item)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 5)
-
-                        //  BOTTOM SENTINEL (pagination trigger)
-                                                Color.clear
-                                                    .frame(height: 1)
-                                                    .background(
-                                                        GeometryReader { geo in
-                                                            Color.clear
-                                                                .onChange(of: geo.frame(in: .global).minY) { minY in
-                                                                    let screenHeight = UIScreen.main.bounds.height
-
-                                                                    // Trigger BEFORE reaching bottom (~100px)
-                                                                    if minY < screenHeight + 100 {
-                                                                        vm.tryLoadNextPage()
-                                                                    }
-                                                                }
-                                                        }
-                                                    )
-
-                        // Loader
-                        if vm.isLoading {
-                            ProgressView()
-                                .padding(.vertical, 24)
-                        }
-                    }
-                }
-                .transaction { tx in
-                    tx.animation = nil
-                }
-            }
-            // 🔑 Detect USER SCROLL (arms pagination)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 5)
-                    .onChanged { _ in
-                        vm.isScrollArmed = true
-                    }
-            )
-            .refreshable {
-                await vm.refresh()
-            }
-            .task {
-                vm.loadIfNeeded()
-            }
-            // Scroll to top notification
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name(NotificationKeys.scrollBoardToTop)
-                )
-            ) { _ in
-                withAnimation(.easeInOut) {
-                    proxy.scrollTo("TOP", anchor: .top)
-                }
-            }
-        }
-    }
-
-    // MARK: - Empty View
-    private var emptyView: some View {
-        VStack(spacing: 20) {
-            Image("no_data_found_illustrator")
-            Text("No Data Found")
-                .foregroundColor(.orange)
-        }
-    }
-
-    // MARK: - Navigation
-    private func pushToDetail(item: ItemModel) {
-        let vc = UIHostingController(
-            rootView: BoardDetailView(
-                navigationController: navigationController,
-                itemObj: item
-            )
-        )
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
-    }
-}
-*/
-
-
-/*
-
-struct BoardListView: View {
-
-    @ObservedObject var vm: BoardViewModelNew
-    let navigationController: UINavigationController?
-
-    // 🔒 Prevent duplicate page calls
-    @State private var nextPageLock: Int? = nil
-
-    // 🔑 User scroll intent (MOST IMPORTANT)
-    @State private var userDidScroll = false
-    @State private var paginationConsumed = false
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: 0) {
-
-                    if vm.items.isEmpty && !vm.isLoading {
-                        emptyView
-                            .padding(.top, 120)
-                    } else {
-
-                        Color.clear
-                            .frame(height: 0)
-                            .id("TOP")
-
-                        StaggeredGrid(columns: 2, spacing: 6) {
-                            ForEach(vm.items.indices, id: \.self) { index in
-                                let item = vm.items[index]
-
-                                ProductCardStaggered(product: item) { isLiked, boardId in
-                                    vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                }
-                                .onTapGesture {
-                                    pushToDetail(item: item)
-                                }
-                            
-                                // Pagination trigger (position based)
-                                .background(
-                                    GeometryReader { geo in
-                                        Color.clear.frame(height:0)
-                                            .onChange(
-                                                of: geo.frame(in: .global).maxY
-                                            ) { y in
-                                                checkIfShouldLoadNextPage(
-                                                    itemPosition: y
-                                                )
-                                            }
-                                    }
-                                )
-                            }
-                        }
-                        .padding(.horizontal, 5)
-
-                        if vm.isLoading {
-                            ProgressView()
-                                .padding(.vertical, 24)
-                        }
-                    }
-                }.transaction { tx in
-                    tx.animation = nil
-                }
-            }
-            //  Detect REAL user scroll (NOT inertia)
-            .simultaneousGesture(
-                DragGesture()
-                    .onChanged { _ in
-                        userDidScroll = true
-                    }
-            )
-            .refreshable {
-                await vm.refresh()
-                nextPageLock = nil
-                userDidScroll = false
-            }
-            .task {
-                vm.loadIfNeeded()
-            }
-            .onReceive(
-                NotificationCenter.default.publisher(
-                    for: Notification.Name(
-                        NotificationKeys.scrollBoardToTop
-                    )
-                )
-            ) { _ in
-                withAnimation(.easeInOut) {
-                    proxy.scrollTo("TOP", anchor: .top)
-                }
-            }
-            
-            .simultaneousGesture(
-                DragGesture()
-                    .onEnded { _ in
-                        paginationConsumed = false
-                        nextPageLock = nil   //  ONLY arm pagination AFTER scroll ends
-                    }
-            )
-
-        }
-    }
-
-    // MARK: - Pagination logic (SAFE)
-    private func checkIfShouldLoadNextPage(itemPosition: CGFloat) {
-        let screenHeight = UIScreen.main.bounds.height
-        let nextPage = vm.page + 1
-
-        guard userDidScroll else { return }
-        guard vm.hasMorePages else { return }
-        guard !vm.isLoading else { return }
-        guard nextPageLock != nextPage else { return }
-        guard !paginationConsumed else { return }   //  FINAL SAFETY
-
-        if itemPosition < screenHeight + 100 {
-
-            paginationConsumed = true    // consume immediately
-            userDidScroll = false
-            nextPageLock = nextPage
-
-           // DispatchQueue.main.async {
-                vm.tryLoadNextPage()
-           // }
-        }
     }
     
    
-
-
-    // MARK: - Empty view
-    private var emptyView: some View {
-        VStack(spacing: 20) {
-            Image("no_data_found_illustrator")
-            Text("No Data Found")
-                .foregroundColor(.orange)
+    func outboundClickApi(){
+        
+        let params = ["board_id":product.id ?? 0]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
+            
+            if error == nil{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                }else{
+                }
+            }
         }
     }
-
-    // MARK: - Navigation
-    private func pushToDetail(item: ItemModel) {
-        let vc = UIHostingController(
-            rootView: BoardDetailView(
-                navigationController: navigationController,
-                itemObj: item
-            )
-        )
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
-    }
 }
-*/
 
-
-/*   TabView(selection: $selectedCategoryId) {
- 
- ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
- BoardListView(
- vm: boardStore.vm(for: cat.id ?? 0),
- navigationController: navigationController
- )
- .tag(cat.id ?? 0)
- }
- }
- .tabViewStyle(.page(indexDisplayMode: .never))
- .transaction { tx in
- tx.animation = nil   //  CRITICAL
- }*/

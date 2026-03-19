@@ -16,55 +16,29 @@ import PayUParamsKit
 import CryptoKit
 import PayUCommonUI
 
-enum PaymentMethod: Int {
-    case phonePe = 3
-    case applePay = 1
-    case payUPay = 4
-
-    var title: String {
-        switch self {
-        case .phonePe:
-            return "PhonePe"
-        case .applePay:
-            return "apple"
-        case .payUPay:
-            return "Payu"
-        }
-    }
-}
-
-enum PaymentForEnum{
-    
-    case adsPlan
-    case bannerPromotion
-    case bannerPromotionDraft
-    case boostBoard
-    
-}
 
 class PayPlanVC: UIViewController {
-    
+   
+    var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
     private var merchantId = ""
     private var api_key = ""
     private var phonePeAppId = ""
-    private var ppPayment = PPPayment()
+    private var ppPayment: PPPayment?
     var planObj:PlanModel?
-    
     var paymentIntentId = ""
     var payment_method = ""
-    var payment_method_type = 0
+    var payment_method_type = 0  //1 => inapp , 2 => strip , 3 => phonepe , 4 =>  payu
+    private  var saltKeyPayu = ""
+
     @IBOutlet weak var lblPrice:UILabel!
     @IBOutlet weak var btnPay:UIButton!
     @IBOutlet weak var lblDesc:UILabel!
+   
     var InAppReceipt = ""
-    var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
-    
     var campaign_banner_id:Int?
-
     var paymentFor:PaymentForEnum? = .adsPlan
     var banner_id:Int = 0
     var payment_transaction_id:Int = 0
-    
     var categoryId = 0
     var categoryName = ""
     var city = ""
@@ -72,7 +46,6 @@ class PayPlanVC: UIViewController {
     var state = ""
     var latitude = ""
     var longitude = ""
-   // var isBannerPromotionPay = false
     var radius = 10
     var area = ""
     var pincode = ""
@@ -93,7 +66,6 @@ class PayPlanVC: UIViewController {
             btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
             lblDesc.textAlignment = .center
             lblPrice.textAlignment = .center
-
         }else{
             lblDesc.text = ""
             lblPrice.text = "Total \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")"
@@ -143,7 +115,17 @@ class PayPlanVC: UIViewController {
         }else if payment_method_type == 4 {
             
             //Payu pay
-            createPayUIntent(package_id: planObj?.id ?? 0)
+            if paymentFor == .bannerPromotion{
+                
+                getIntentForBannerPromotions(package_id: planObj?.id ?? 0)
+                
+            } else if paymentFor == .bannerPromotionDraft{
+                
+                revokeCampaignPaymentApi(package_id:  planObj?.id ?? 0)
+                
+            }else{
+                self.createPayUIntent(package_id: planObj?.id ?? 0)
+            }
         }
     }
     
@@ -174,53 +156,31 @@ class PayPlanVC: UIViewController {
                         if self.payment_method_type == 1 {
                             //IN App Purchase
                             
-                        }else if self.payment_method_type == 3 {//Phone Pay
+                        }else if self.payment_method_type == 3 {
+                            //Phone Pay
                             if let PhonePeDict = dataDict["PhonePe"] as? Dictionary<String, Any>  {
-                               
+                                
                                 self.api_key = PhonePeDict["api_key"] as? String ?? ""
                                 self.merchantId = PhonePeDict["merchent_id"] as? String ?? ""
-                                
-                                var flowId = ""
-            
-                                if Local.shared.getUserId() > 0{
-                                    flowId = "\(Local.shared.getUserId())"
-                                }
-                                
+                                let flowId = "\(Local.shared.getUserId())"
                                 if let method = PaymentMethod(rawValue: self.payment_method_type) {
                                     self.payment_method = method.title
                                 }
                                 
-                                if devEnvironment == .live {
-                                    self.ppPayment = PPPayment(environment: .production,
-                                                               flowId: flowId,
-                                                               merchantId: self.merchantId,
-                                                               enableLogging: false)
-                                }else {
-                                    self.ppPayment = PPPayment(environment: .sandbox,
-                                                               flowId: flowId,
-                                                               merchantId: self.merchantId, enableLogging: true)
-                                }
-
+                                self.ppPayment = PPPayment(environment: (devEnvironment == .live) ? .production : .sandbox,
+                                                           flowId: flowId,
+                                                           merchantId: self.merchantId,
+                                                           enableLogging: (devEnvironment == .live) ? false : true)
+                                
                             }
                         }else if self.payment_method_type == 4 {
                             //PayuMoney Pay
-                            
                             if let PayuDict = dataDict["Payu"] as? Dictionary<String, Any>  {
-                                
                                 self.api_key = PayuDict["api_key"] as? String ?? ""
-
+                                self.saltKeyPayu = PayuDict["secret_key"] as? String ?? ""
                                 if let method = PaymentMethod(rawValue: self.payment_method_type) {
                                     self.payment_method = method.title
                                 }
-                                
-                                /*
-                                 Payu =         {
-                                     "api_key" = dBtGYO;
-                                     "currency_code" = "<null>";
-                                     "payment_method" = Payu;
-                                     status = 1;
-                                 }
-                                 */
                             }
                         }
                     }
@@ -233,15 +193,18 @@ class PayPlanVC: UIViewController {
     }
     
     
-    func updateOrderApi(){
+   private func updateOrderApi(order_status:Bool=true){
         
         let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
-        var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId]
+        var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId,"order_status":order_status]
         
         if let postItemId = itemId{
             params["item_id"] = postItemId
         }
         
+        if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.order_update, param: params,methodType: .post,showLoader: true) { responseObject, error in
             
@@ -309,16 +272,27 @@ extension PayPlanVC{
                             
                             self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
                        
+                        }else if self?.payment_method_type == 2{
+                            
                         }else{
+                           
                             if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
-                                
                                 self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
-                                
+                               
                                 if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    //phone pe
                                     let orderId = payment_gateway_response["orderId"] as? String ?? ""
                                     let token  = payment_gateway_response["token"] as? String ?? ""
                                     self?.startCheckoutPhonePay(orderId: orderId, token: token)
                                 }
+                            }
+                            
+                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                //payu
+                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                self?.openPayuMoney(order_id: order_id, amount: amount)
                             }
                         }
                     }
@@ -358,14 +332,24 @@ extension PayPlanVC{
                         }
                         
                         if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
-                            
+                            //phone pe
                             self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
                             
                             if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                
                                 let orderId = payment_gateway_response["orderId"] as? String ?? ""
                                 let token  = payment_gateway_response["token"] as? String ?? ""
                                 self?.startCheckoutPhonePay(orderId: orderId, token: token)
                             }
+                        }
+                        
+                        
+                        if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                            //payu
+                            let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                            let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                            self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                            self?.openPayuMoney(order_id: order_id, amount: amount)
                         }
                     }
                     
@@ -377,28 +361,7 @@ extension PayPlanVC{
             }
         }
     }
-    
-    
-  /*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
-    --header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
-    --header 'Accept: application/json' \
-    --form 'image=@"/home/khusyal/Desktop/error_17382998.png"' \
-    --form 'country="India"' \
-    --form 'state="Maharashtra"' \
-    --form 'city="Mumbai"' \
-    --form 'area="Andheri East"' \
-    --form 'pincode="400059"' \
-    --form 'latitude="19.1136"' \
-    --form 'longitude="72.8697"' \
-    --form 'radius="15"' \
-    --form 'type="redirect"' \
-    --form 'url="https://example.com/job-promotions"' \
-    --form 'status="active"' \
-    --form 'city="Delhi"' \
-    --form 'package_id="516"' \
-    --form 'payment_method="PhonePe"'
-     
-    */
+  
 }
 
 extension PayPlanVC{
@@ -455,7 +418,7 @@ extension PayPlanVC{
     
     func startCheckoutPhonePay(orderId: String, token:String){
         let appSchema =  "getkart.com"//"Getkart IOS App"
-        ppPayment.startCheckoutFlow(merchantId: merchantId,
+        ppPayment?.startCheckoutFlow(merchantId: merchantId,
                                     orderId: orderId,
                                     token: token,
                                     appSchema: appSchema,
@@ -505,11 +468,10 @@ extension PayPlanVC{
                 if status == 200{
                     if let dataDict = result["data"] as? Dictionary<String, Any> {
                         
-                        if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
-                            
+                        /*if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
                             let hash = payment_intentDict["hash"] as? String ?? ""
                             let payment_transaction_id = payment_intentDict["payment_transaction_id"] as? Int ?? 0
-                        }
+                        }*/
 
                       
                         if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
@@ -517,13 +479,9 @@ extension PayPlanVC{
                             let  order_id = payment_transactionDict["order_id"] as? String ?? ""
                             let  amount = payment_transactionDict["amount"] as? Int ?? 0
                             self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
-                            self?.openPayuMoney(order_id: self?.paymentIntentId ?? "", amount: amount)
-
+                            self?.openPayuMoney(order_id: order_id, amount: amount)
                         }
-                        
                     }
-                    
-                    
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
                     //self?.delegate?.showError(message: message)
@@ -543,19 +501,34 @@ extension PayPlanVC{
             key: api_key,
             transactionId: order_id,
             amount: String(format: "%.2f", Double(amount)),
-            productInfo: "Test Product",
+            productInfo: "Getkart Product",
             firstName: userInfo.name ?? "Test",
             email: email,
             phone: userInfo.mobile ?? "9999999999",
-            surl: "https://payu.herokuapp.com/success",
-            furl: "https://payu.herokuapp.com/failure",
+            surl: Constant.shared.payuSuccessURL,
+            furl: Constant.shared.payuFailureURL,
             environment: (devEnvironment == .live) ? .production : .test
         )
+        
+        
 
         paymentParam.userCredential = "\(api_key):\(email)"
 
+        
+        
+       /* $metaData = 't' .'-'. $customMetaData['payment_transaction_id'] .'-'. 'p' .'-'. $customMetaData['package_id']. 'item' .'-'. $customMetaData['item_id'];
+        t-123-p-123-item-123
+        */
+        
+        var strUdf1Val = "t-\(paymentIntentId)-p-\(planObj?.id ?? 0)-item-"
+        
+        if let postItemId = itemId{
+             strUdf1Val = "t-\(paymentIntentId)-p-\(planObj?.id ?? 0)-item-\(postItemId)"
+
+        }
+
         paymentParam.additionalParam = [
-            "udf1": "",
+            "udf1": strUdf1Val,
             "udf2": "",
             "udf3": "",
             "udf4": "",
@@ -565,19 +538,19 @@ extension PayPlanVC{
         paymentParam.userCredential = "\(api_key):\(email)"
         // PayU Configuration
         let config = PayUCheckoutProConfig()
-        config.merchantName = "Test Merchant"
+        config.merchantName = "Getkart"
         config.showExitConfirmationOnCheckoutScreen = true
         
       
 
         // Open PayU Checkout
-       /* PayUCheckoutPro.open(
+        PayUCheckoutPro.open(
             on: (AppDelegate.sharedInstance.navigationController?.topViewController!)!,
             paymentParam: paymentParam,
             config: config,
             delegate: self
         )
-        */
+        
         
       /*  PayUCheckoutPro.open(on: <#T##UIViewController#>, paymentParam: <#T##PayUPaymentParam#>, config: <#T##PayUCheckoutProConfig?#>, delegate: <#T##any PayUCheckoutProDelegate#>)
         PayUCheckoutPro.open(
@@ -596,9 +569,7 @@ extension PayPlanVC{
                 completion(hash ?? "")
             }
         }*/
-        
     }
-    
     
     
     func fetchHashFromServer(hashName: String,
@@ -662,7 +633,7 @@ extension PayPlanVC{
 extension PayPlanVC: PayUCheckoutProDelegate {
    
     
-    func generateHash(for param: DictOfString, onCompletion: @escaping PayUHashGenerationCompletion) {
+    /*func generateHash(for param: DictOfString, onCompletion: @escaping PayUHashGenerationCompletion) {
         // Send this string to your backend and append the salt at the end and send the sha512 back to us, do not calculate the hash at your client side, for security is reasons, hash has to be calculated at the server side
         let hashStringWithoutSalt = param[HashConstant.hashString] ?? ""
         // Or you can send below string hashName to your backend and send the sha512 back to us, do not calculate the hash at your client side, for security is reasons, hash has to be calculated at the server side
@@ -676,14 +647,13 @@ extension PayPlanVC: PayUCheckoutProDelegate {
         
         
        // onCompletion([hashName : hashFetchedFromServer])
-    }
+    }*/
     
-  /*  func generateHash(
+   func generateHash(
         for param: DictOfString,
         onCompletion: @escaping PayUHashGenerationCompletion
     ) {
 
-        let salt = "Df4YHc5eBB32VLMFFvE42Bz0AcdMKqV0"
 
         guard let hashName = param["hashName"],
               let hashString = param["hashString"] else { return }
@@ -691,11 +661,11 @@ extension PayPlanVC: PayUCheckoutProDelegate {
         print("HashName:", hashName)
         print("HashString:", hashString)
 
-        let finalHash = generateSHA512(hashString + salt)
+        let finalHash = generateSHA512(hashString + saltKeyPayu)
 
         onCompletion([hashName: finalHash])
     }
-    */
+    
     func generateSHA512(_ value: String) -> String {
 
         let data = Data(value.utf8)
@@ -706,14 +676,20 @@ extension PayPlanVC: PayUCheckoutProDelegate {
     
     func onPaymentSuccess(response: Any?) {
         print("Payment Success:", response ?? "")
+        self.updateOrderApi(order_status: true)
+
     }
 
     func onPaymentFailure(response: Any?) {
         print("Payment Failed:", response ?? "")
+        self.updateOrderApi(order_status: false)
+
     }
 
     func onPaymentCancel(isTxnInitiated: Bool) {
         print("Payment Cancelled")
+        self.updateOrderApi(order_status: false)
+
     }
 
     func onError(_ error: Error?) {
@@ -899,3 +875,28 @@ extension String {
         return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
+
+
+
+
+
+/*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
+--header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
+--header 'Accept: application/json' \
+--form 'image=@"/home/khusyal/Desktop/error_17382998.png"' \
+--form 'country="India"' \
+--form 'state="Maharashtra"' \
+--form 'city="Mumbai"' \
+--form 'area="Andheri East"' \
+--form 'pincode="400059"' \
+--form 'latitude="19.1136"' \
+--form 'longitude="72.8697"' \
+--form 'radius="15"' \
+--form 'type="redirect"' \
+--form 'url="https://example.com/job-promotions"' \
+--form 'status="active"' \
+--form 'city="Delhi"' \
+--form 'package_id="516"' \
+--form 'payment_method="PhonePe"'
+ 
+*/

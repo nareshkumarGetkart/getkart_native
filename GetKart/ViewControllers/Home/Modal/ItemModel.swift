@@ -98,8 +98,8 @@ struct ItemModel: Codable,Identifiable {
     let ctaLabel:String?
     let ctaType:Int?
     let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea 
-    let commentsCount:Int?
-    let lastComment:CommentModel?
+    var commentsCount:Int?
+    var lastComment:CommentModel?
 
     enum CodingKeys: String, CodingKey {
         

@@ -123,13 +123,15 @@ struct FavoriteBoardView: View {
 
 
 struct FavoriteBoardView: View {
-
+    
     let navigationController: UINavigationController?
     @StateObject private var vm = FavoriteBoardViewModel()
-
+    @State private var safariURL: URL?
+    @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    
     var body: some View {
         VStack(spacing: 0) {
-
+            
             if vm.items.isEmpty && !vm.isLoading {
                 HStack{
                     Spacer()
@@ -144,53 +146,160 @@ struct FavoriteBoardView: View {
                 }
             } else {
                 ScrollView {
-                    LazyVStack {
-                        StaggeredGrid(columns: 2, spacing: 5) {
-
-                            ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
-
-                                    /*ProductCardStaggered1(
-                                        product: item,
-                                       // imgHeight: CGFloat(150 + (index % 2) * 50)
-                                        onTapBoostButton:{
-                                           // paymentGatewayOpen(product: item)
-                                            
-                                        }
-                                    ) { isLiked, boardId in
-                                        vm.updateLike(boardId: boardId, isLiked: isLiked)
-                                    }*/
+                    /* LazyVStack {
+                     StaggeredGrid(columns: 2, spacing: 5) {
+                     
+                     ForEach(Array(vm.items.enumerated()), id: \.element.id) { index, item in
+                     
+                     /*ProductCardStaggered1(
+                      product: item,
+                      // imgHeight: CGFloat(150 + (index % 2) * 50)
+                      onTapBoostButton:{
+                      // paymentGatewayOpen(product: item)
+                      
+                      }
+                      ) { isLiked, boardId in
+                      vm.updateLike(boardId: boardId, isLiked: isLiked)
+                      }*/
+                     
+                     ProductCardStaggered1(
+                     product: item,
+                     sendLikeUnlikeObject: { isLiked, boardId in
+                     vm.updateLike(boardId: boardId, isLiked: isLiked)
+                     },
+                     onTapBoostButton: { }
+                     )
+                     .contentShape(Rectangle())
+                     .onTapGesture {
+                     pushToDetailScreen(item: item)
+                     }
+                     .onAppear {
+                     vm.loadNextPageIfNeeded(currentIndex: index)
+                     }
+                     }
+                     }
+                     .padding(5)
+                     
+                     //  bottom detector (NO layout impact)
+                     GeometryReader { geo in
+                     Color.clear
+                     .preference(
+                     key: ScrollBottomKey.self,
+                     value: geo.frame(in: .global).maxY
+                     )
+                     }
+                     .frame(height: 0)
+                     
+                     if vm.isLoading {
+                     ProgressView().padding()
+                     }
+                     }*/
+                    
+                    //
+                    
+                    
+                    let columns = splitColumns()
+                    
+                    HStack(alignment: .top, spacing: 6) {
+                        
+                        // LEFT COLUMN
+                        LazyVStack(spacing: 6) {
+                            
+                            ForEach(columns.left, id: \.id) { item in
+                                
+                                if item.boardType == 2 {
                                     
-                                    ProductCardStaggered1(
-                                        product: item,
-                                        sendLikeUnlikeObject: { isLiked, boardId in
+                                    
+                                } else {
+                                    CardItemView(
+                                        item: item,
+                                        onLike: { isLiked, boardId in
                                             vm.updateLike(boardId: boardId, isLiked: isLiked)
                                         },
-                                        onTapBoostButton: { }
+                                        onTap: { pushToDetailScreen(item: item) },
+                                        onTapBoostButton:{
+                                            if item.boardType == 1{
+                                                //Clicking on bottom prmotional
+                                                if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                    safariURL = url
+                                                    
+                                                }
+                                            }else{
+                                                //paymentGatewayOpen(product: item)
+                                            }
+                                            
+                                        },
+                                        isToShowBoostButton:false
                                     )
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    pushToDetailScreen(item: item)
-                                }
-                                .onAppear {
-                                    vm.loadNextPageIfNeeded(currentIndex: index)
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                        // handlePrefetch(itemIndex: globalIndex(of: item))
+                                        
+                                        if let index = globalIndex(of: item){
+                                            vm.loadNextPageIfNeeded(currentIndex: index)
+                                        }
+                                    }
                                 }
                             }
                         }
-                        .padding(5)
-
-                        //  bottom detector (NO layout impact)
-                           GeometryReader { geo in
-                               Color.clear
-                                   .preference(
-                                       key: ScrollBottomKey.self,
-                                       value: geo.frame(in: .global).maxY
-                                   )
-                           }
-                           .frame(height: 0)
                         
-                        if vm.isLoading {
-                            ProgressView().padding()
+                        // RIGHT COLUMN
+                        LazyVStack(spacing: 6) {
+                            
+                            ForEach(columns.right, id: \.id) { item in
+                                
+                                
+                                if item.boardType == 2 {
+                                    
+                                } else {
+                                    CardItemView(
+                                        item: item,
+                                        onLike: { isLiked, boardId in
+                                            vm.updateLike(boardId: boardId, isLiked: isLiked)
+                                        },
+                                        onTap: { pushToDetailScreen(item: item) },
+                                        onTapBoostButton:{
+                                            
+                                            if item.boardType == 1{
+                                                //Tapped on prmotional button
+                                                if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                    
+                                                    safariURL = url
+                                                }
+                                            }else{
+                                                // paymentGatewayOpen(product: item)
+                                            }
+                                        },
+                                        isToShowBoostButton:false
+                                    )
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                        
+                                        if let index = globalIndex(of: item){
+                                            vm.loadNextPageIfNeeded(currentIndex: index)
+                                        }
+                                        //handlePrefetch(itemIndex: globalIndex(of: item))
+                                    }
+                                }
+                            }
                         }
+                    }
+                    .padding(.horizontal, 5)
+                    
+                                    
+                    //
+                    
+                    GeometryReader { geo in
+                    Color.clear
+                    .preference(
+                    key: ScrollBottomKey.self,
+                    value: geo.frame(in: .global).maxY
+                    )
+                    }
+                    .frame(height: 0)
+                    
+                    if vm.isLoading {
+                    ProgressView().padding()
                     }
                 }
                 .onPreferenceChange(ScrollBottomKey.self) { bottomY in
@@ -214,32 +323,76 @@ struct FavoriteBoardView: View {
                 for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
             )
         ) { notification in
-
+            
             guard let dict = notification.object as? [String: Any] else { return }
-
+            
             let isLike  = dict["isLike"] as? Bool ?? false
             let count  = dict["count"] as? Int ?? 0
             let boardId = dict["boardId"] as? Int ?? 0
-
+            
             vm.update(likeCount: count, isLike: isLike, boardId: boardId)
         }
-
+        
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.refreshCommentCountBoard.rawValue)
+            )
+        ) { notification in
+            
+            guard let dict = notification.object as? [String: Any] else { return }
+            
+            let count  = dict["count"] as? Int ?? 0
+            let boardId = dict["boardId"] as? Int ?? 0
+            if let commentObj = dict["lastComment"] as? CommentModel {
+                vm.updateCommentCount(commentCount: count, commentObj: commentObj, boardId: boardId)
+            }else{
+                vm.updateCommentCount(commentCount: count, commentObj: nil, boardId: boardId)
+            }
+        }
+        
         .onReceive(
             NotificationCenter.default.publisher(
                 for: Notification.Name(NotificationKeys.boardBoostedRefresh.rawValue)
             )
         ) { notification in
-           guard let dict = notification.object as? [String: Any] else { return }
+            guard let dict = notification.object as? [String: Any] else { return }
             let boardId = dict["boardId"] as? Int ?? 0
             
             vm.updateBoost(isBoosted: true, boardId: boardId)
         }
-
     }
     
     func pushToDetailScreen(item:ItemModel){
         let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
         self.navigationController?.pushViewController(hostingVC, animated: true)
+    }
+    
+    // MARK: - Split into 2 staggered columns
+    private func splitColumns() -> (left: [ItemModel], right: [ItemModel]) {
+        
+        var left: [ItemModel] = []
+        var right: [ItemModel] = []
+        
+        var leftHeight: CGFloat = 0
+        var rightHeight: CGFloat = 0
+        
+        for item in vm.items {
+            let h = itemHeights[item.id ?? 0] ?? 200
+            
+            if leftHeight <= rightHeight {
+                left.append(item)
+                leftHeight += h
+            } else {
+                right.append(item)
+                rightHeight += h
+            }
+        }
+        return (left, right)
+    }
+    
+    
+    private func globalIndex(of item: ItemModel) -> Int? {
+        vm.items.firstIndex { $0.id == item.id }
     }
 }
 

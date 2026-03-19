@@ -54,7 +54,8 @@ struct CreateBoardView: View {
             // MARK: - Header
             HStack {
                 Button {
-                    navigationController?.popViewController(animated: true)
+                    navigationController?.popToRootViewController(animated: true)
+                    //navigationController?.popViewController(animated: true)
                 } label: {
                     Image("arrow_left")
                         .renderingMode(.template)
@@ -397,7 +398,7 @@ struct CreateBoardView: View {
     func validateField(){
         UIApplication.shared.endEditing()
        
-        if selectedImages.count == 0 && !isFromEdit {
+        if selectedImages.count == 0 { //}&& !isFromEdit {
             
             AlertView.sharedManager.showToast(message: "Please upload board image")
             
@@ -542,7 +543,9 @@ struct CreateBoardView: View {
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
                     }
                     AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                        self.navigationController?.popViewController(animated: true)
+                       // self.navigationController?.popViewController(animated: true)
+                        self.navigationController?.popToRootViewController(animated: true)
+
                     }
                 }else{
                     AlertView.sharedManager.showToast(message: message)
@@ -618,6 +621,15 @@ struct MultiImagePickerView: UIViewControllerRepresentable {
 
 import Mantis
 
+extension UIImage {
+    func normalizedImage() -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let normalized = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return normalized ?? self
+    }
+}
 struct MultiImageCropperView: UIViewControllerRepresentable {
 
     var images: [UIImage]
@@ -682,8 +694,13 @@ struct MultiImageCropperView: UIViewControllerRepresentable {
            // config.presetFixedRatioType = .canUseMultiplePresetFixedRatio(defaultRatio: 1)
                 
             config.showAttachedCropToolbar = false
+          
+            let fixedImage = image.normalizedImage()
 
-            let cropVC = Mantis.cropViewController(image: image, config: config)
+//            let cropVC = Mantis.cropViewController(image: image, config: config)
+            
+            let cropVC = Mantis.cropViewController(image: fixedImage, config: config)
+
             cropVC.delegate = self
 
             container.addChild(cropVC)

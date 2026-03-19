@@ -37,8 +37,8 @@ struct CreatePromotionalVideoAdsView: View {
     var body: some View {
         HStack(spacing:0){
             Button {
-                navigationController?.popViewController(animated: true)
-                
+                self.navigationController?.popToRootViewController(animated: true)
+
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
@@ -430,7 +430,8 @@ struct CreatePromotionalVideoAdsView: View {
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
                     }
                     AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                        self.navigationController?.popViewController(animated: true)
+                     
+                        self.navigationController?.popToRootViewController(animated: true)
                     }
                 }else{
                     AlertView.sharedManager.showToast(message: message)

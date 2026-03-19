@@ -123,8 +123,8 @@ struct ActivePlansCell:  View {
                     Text("Remaining").font(.inter(.medium, size: 10.0)).foregroundColor(Color(.systemGray))
                     let itemLimit = Int(transactionObj.package?.itemLimit ?? "0") ?? 0
                     let usedlimit = Int(transactionObj.usedLimit ?? 0)
-                    let remain = itemLimit - usedlimit
-                    
+                    let remain = (itemLimit - usedlimit) < 0 ? (-1 * (itemLimit - usedlimit)) : (itemLimit - usedlimit)
+                  
                     if  transactionObj.package?.type == "board"{
                         //Board
                         Text("\(remain) clicks").font(.inter(.medium, size: 12.0))

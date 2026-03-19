@@ -19,10 +19,7 @@ struct BoardAnalyticsView: View {
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var showSafari = false
     @State private var isToPreviewVideo = false
-
-    
     //'draft','approved','paused','expired','rejected','pending'
-    
     @State var isFromBoostPopup:Bool = false
     
     var body: some View {
@@ -80,8 +77,11 @@ struct BoardAnalyticsView: View {
                     
                     Spacer()
                     VStack{
-                        if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+                        if (objAnalytics?.board?.boardType ?? 0) == 1 {
                             Text("Promotional Ad image").font(.inter(.medium, size: 18.0))
+
+                        }else if (objAnalytics?.board?.boardType ?? 0) == 2{
+                            Text("Promotional Video").font(.inter(.medium, size: 18.0))
 
                         }else if (objAnalytics?.board?.boardType ?? 0) == 3{
                             Text("Idea image").font(.inter(.medium, size: 18.0))
@@ -140,7 +140,7 @@ struct BoardAnalyticsView: View {
                         
                         
                         if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
-                            Text("Prmotional URL")
+                            Text("Promotional Ad URL")
                                 .font(.inter(.semiBold, size: 16.0))
                         }else if (objAnalytics?.board?.boardType ?? 0) == 3 {
                             Text("Idea URL")
@@ -230,17 +230,28 @@ struct BoardAnalyticsView: View {
                     .frame(height: 1.5)
                    
                     BoardAnalyticCell(title: "Impressions", value: "\(objAnalytics?.analytics?.impressions ?? 0)", isActive: false)
-                    if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
-                        BoardAnalyticCell(title: "Promotional Ad Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
-                        
-                    }else if (objAnalytics?.board?.boardType ?? 0) == 3{
+//                    if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
+//                        BoardAnalyticCell(title: "Promotional Ad Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
+//                        
+//                    }
+                    
+                    if (objAnalytics?.board?.boardType ?? 0) == 3{
                         BoardAnalyticCell(title: "Idea Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
 
-                    }else{
+                    }else if (objAnalytics?.board?.boardType ?? 0) == 0{
                         BoardAnalyticCell(title: "Board Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
                     }
-                    BoardAnalyticCell(title: "Favorites", value: "\(objAnalytics?.analytics?.favorites ?? 0)", isActive: false)
-                    BoardAnalyticCell(title: "Outbound Click", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
+                   
+                    if (objAnalytics?.board?.boardType ?? 0) == 0  || (objAnalytics?.board?.boardType ?? 0) == 3{
+                        
+                        BoardAnalyticCell(title: "Favorites", value: "\(objAnalytics?.analytics?.favorites ?? 0)", isActive: false)
+                    }
+                    if (objAnalytics?.board?.boardType ?? 0) == 3{
+                        
+                    }else{
+                        BoardAnalyticCell(title: "Outbound Click", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
+                    }
+                   
                                       
                 }.padding()
                 
@@ -288,7 +299,7 @@ struct BoardAnalyticsView: View {
             
             .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)
-            .presentationCornerRadius(20)   // ✅ THIS
+            .presentationCornerRadius(20)   //  THIS
 
          
         }.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue))) { notification in
