@@ -25,7 +25,6 @@ struct PublicBoardView: View {
             
             headerView.background(Color(.systemBackground))
             
-            
             CategoryTabsNew(
                 selected: $selectedName,
                 selectedCategoryId: $selectedCategoryId,
@@ -959,6 +958,7 @@ struct ProductCardStaggered: View {
                     Button {
                         showSafari = true
                         outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
+
                     } label: {
                         HStack(spacing:2){
                             

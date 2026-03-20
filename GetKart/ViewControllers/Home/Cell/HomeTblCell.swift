@@ -64,6 +64,14 @@ class HomeTblCell: UITableViewCell {
         super.layoutSubviews()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        listArray = nil
+        cllctnView.setContentOffset(.zero, animated: false)
+        cllctnView.reloadData()
+    }
+    
 }
 
 

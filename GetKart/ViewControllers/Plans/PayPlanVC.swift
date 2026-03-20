@@ -495,7 +495,7 @@ extension PayPlanVC{
 
         let userInfo = RealmManager.shared.fetchLoggedInUserInfo()
 
-        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "test@test.com"
+        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "noreply@getkart.com"
 
         let paymentParam = PayUPaymentParam(
             key: api_key,

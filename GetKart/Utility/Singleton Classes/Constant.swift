@@ -70,7 +70,6 @@ final class Constant: NSObject {
         }
     }
     
-    
     var edit_reply:String{
         get{
             return "\(baseURL)/v2/edit-reply"
@@ -82,7 +81,6 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/delete-reply"
         }
     }
-
     
     var get_comments:String{
         get{
@@ -108,7 +106,6 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/get-replies"
         }
     }
-    
 
     var capture_slider_click:String{
         get{
@@ -127,9 +124,6 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/unlike-comment"
         }
     }
-    
-  
-    
     
     var delete_comment:String{
         get{
@@ -150,7 +144,6 @@ final class Constant: NSObject {
         }
     }
     
-    
     var create_ideas:String{
         get{
             return "\(baseURL)/v2/create-ideas"
@@ -163,18 +156,12 @@ final class Constant: NSObject {
         }
     }
     
-    
-     
-    
     var get_cta_options:String{
         get {
             //?type = : // 0=product,1=business,2=ideas
             return "\(baseURL)/v1/get-cta-options"
         }
     }
-    
-    
-    
     
     var  dismiss_boost_ad:String {
         get {

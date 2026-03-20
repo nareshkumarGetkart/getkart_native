@@ -664,7 +664,7 @@ extension PaymentGatewayCentralized{
 
         let userInfo = RealmManager.shared.fetchLoggedInUserInfo()
 
-        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "test@test.com"
+        let email = (userInfo.email?.isEmpty == false) ? userInfo.email! : "noreply@getkart.com"
 
         let paymentParam = PayUPaymentParam(
             key: api_key,
@@ -676,9 +676,10 @@ extension PaymentGatewayCentralized{
             phone: userInfo.mobile ?? "9999999999",
             surl: Constant.shared.payuSuccessURL,
             furl:  Constant.shared.payuFailureURL,
-            environment: .test
+            environment: (devEnvironment == .live) ? .production : .test
         )
-      
+        
+        
         paymentParam.userCredential = "\(api_key):\(email)"
 /*
  $metaData = 't' .'-'. $customMetaData['payment_transaction_id'] .'-'. 'p' .'-'. $customMetaData['package_id']. '-'.'item' .'-'. $customMetaData['item_id'];
