@@ -68,6 +68,8 @@ struct BoardDetailView: View{
                         
                         showComments = true
                     }
+                },onClickedImages: { selIndex in
+                    self.navigateToPager(selectedIndex: selIndex)
                 }).padding([.horizontal],5)
                 
                 let columns = splitColumns()
@@ -353,28 +355,13 @@ struct BoardDetailView: View{
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
     }
     
-//    func precacheNextVideos(from index: Int) {
-//
-//        guard index < listArray.count - 1 else { return }
-//
-//        let endIndex = min(index + 3, listArray.count - 1)
-//
-//        for i in (index + 1)...endIndex {
-//
-//            let item = listArray[i]
-//
-//            if item.boardType == 2,
-//               let link = item.videoLink,
-//               let url = URL(string: link) {
-//
-//                VideoCacheManager.shared.precacheVideo(url: url)
-//                FeedVideoManager.shared.warmupPlayer(
-//                    id: item.id!,
-//                    url: url
-//                )
-//            }
-//        }
-//    }
+   
+    func navigateToPager(selectedIndex:Int){
+        let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ZoomImageViewController") as! ZoomImageViewController
+        vc.currentTag = selectedIndex
+        vc.imageArrayUrl = itemObj.galleryImages ?? []
+        self.navigationController?.pushViewController(vc, animated: true )
+    }
     
     
     // MARK: - Prefetch Next Videos
@@ -621,7 +608,7 @@ struct BoardDetailView: View{
     
     private func pushToProfileScreen(user: User) {
         let vc = UIHostingController(
-            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
+            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0,isProductSelected: false)
         )
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
@@ -760,6 +747,7 @@ struct BoardDetailView: View{
     }
 }
 
+
 struct ReelPostView: View {
     @Binding var post: ItemModel
     var sendLikeDislikeObject: (_ isLiked:Bool, _ boardId:Int, _ likeCount:Int) -> Void
@@ -772,11 +760,15 @@ struct ReelPostView: View {
     @State private var showShareSheet = false
     var onClickedUserProfile:(_ user:User) -> Void
     var onClickedUserComents:() -> Void
+    var onClickedImages:(_ selIndex:Int) -> Void
 
     var body: some View {
 
         VStack(spacing: 0) {
-            PostImagesCarousel(images: post.galleryImages ?? [])
+            PostImagesCarousel(images: post.galleryImages ?? [],onClickedIndex: { selIndex in
+               onClickedImages(selIndex)
+                    
+            })
                 .background(
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(.systemBackground))
@@ -786,23 +778,24 @@ struct ReelPostView: View {
                             x: 0,
                             y: 5
                         )  )
+               
               
             //  FLAT CONTENT (NO CARD)
             bottomCard
                 .padding(.horizontal,8)
                 .padding(.top, 10)
+                          
             
-            if (post.lastComment?.comment?.count ?? 0) > 0 {
-              
+            VStack(spacing: 8){
                 HStack{
                  
                     Button {
-                        if let obj = post.lastComment?.user{
+                        if let obj = post.user{
                             onClickedUserProfile(obj)
                         }
                     } label: {
                       
-                        AsyncImage(url: URL(string: post.lastComment?.user?.profile ?? "")) { image in
+                        AsyncImage(url: URL(string: post.user?.profile ?? "")) { image in
                             image
                                 .resizable()
                                 .scaledToFill()
@@ -819,55 +812,38 @@ struct ReelPostView: View {
                     }.frame(width: 30,height:30)
                     .cornerRadius(15.0)
                     
-                    VStack(alignment:.leading ,spacing: 0){
-                        Text(post.lastComment?.user?.name ?? "").font(.inter(.medium, size: 13)).lineLimit(1)
-                        HStack{
-                           
-                            // Spacer()
-                            if (post.commentsCount ?? 0) > 1{
-                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12)).lineLimit(1)
-                                Text("...").font(.inter(.medium, size: 13)).foregroundColor(Color(.gray))
-                                Button {
-                                   // showComments = true
-                                    onClickedUserComents()
-                                } label: {
-                                    
-                                    Text("See all comments")
-                                        .font(.inter(.medium, size: 12))
-                                        .foregroundColor(Color(.label))
-                                }
-                            }else{
-                                Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12))
+                    Text(post.user?.name ?? "").font(.inter(.medium, size: 13)).lineLimit(1)
+                        .onTapGesture {
+                            if let obj = post.user{
+                                onClickedUserProfile(obj)
                             }
                         }
-                       
-//                        ZStack(alignment: .bottomTrailing) {
-//                            
-//                            TruncatableText(
-//                                text: post.lastComment?.comment ?? "",
-//                                lineLimit: 1,
-//                                font: .inter(.regular, size: 12)
-//                            ) { truncated in
-//                                isCommentTextTruncated = truncated
-//                            }.padding(.trailing, isCommentTextTruncated ? 125 : 0) //  space for "See more"
-//                            
-//                            if isCommentTextTruncated{
-//                                Button {
-//                                    showComments = true
-//                                } label: {
-//                                    Text("See all comments")
-//                                        .font(.inter(.bold, size: 14))
-//                                        .foregroundColor(Color(.label))
-//                                }
-//                            }
-//                        }
-                       // Text(post.lastComment?.comment ?? "").lineLimit(1)
-                    }
+                  
                     Spacer()
-                }.padding()
-            }
-           
-            
+                }//.padding()
+              
+                if (post.commentsCount ?? 0) > 0{
+                    HStack{
+                        
+                        if (post.commentsCount ?? 0) > 1{
+                            Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12)).lineLimit(1)
+                            Text("...").font(.inter(.medium, size: 13)).foregroundColor(Color(.gray))
+                            Button {
+                                onClickedUserComents()
+                            } label: {
+                                
+                                Text("See all comments")
+                                    .font(.inter(.medium, size: 12))
+                                    .foregroundColor(Color(.label))
+                            }
+                        }else{
+                            Text(post.lastComment?.comment ?? "").font(.inter(.regular, size: 12))
+                        }
+                        Spacer()
+                    }
+                }
+            }.padding(8)
+   
              if ((post.user?.id ?? 0) != Local.shared.getUserId()) && (post.boardType ?? 0) == 0{
               
                 //  BUY NOW
@@ -1251,7 +1227,8 @@ struct PostImagesCarousel: View {
     
     let images: [GalleryImage]
     @State private var selectedIndex = 0
-    
+    var onClickedIndex:(_ selIndex:Int) -> Void
+
     var body: some View {
         
         TabView(selection: $selectedIndex) {
@@ -1295,6 +1272,9 @@ struct PostImagesCarousel: View {
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.orange
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray4
+        }
+        .onTapGesture {
+            onClickedIndex(selectedIndex)
         }
     }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 final class SearchBoardResultViewModel: ObservableObject {
 
     // MARK: - Published (UI State)

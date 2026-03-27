@@ -10,6 +10,7 @@ import Kingfisher
 
 
 struct BoardView: View {
+    
     weak var tabBarController: UITabBarController?
     let navigationController: UINavigationController?
     @State private var selected = "All"
@@ -206,7 +207,6 @@ struct ScrollBottomKey: PreferenceKey {
        value = nextValue()
    }
 }
-
 
 
 struct CategoryTabs: View {

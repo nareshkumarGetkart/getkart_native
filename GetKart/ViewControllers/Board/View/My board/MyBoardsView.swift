@@ -17,6 +17,7 @@ struct MyBoardsView: View {
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var hasMoreData = true
     @State private var hasUserScrolled = false
+    @State private var showFilterScreen = false
 
     var body: some View {
         HStack{
@@ -30,7 +31,20 @@ struct MyBoardsView: View {
             Text("My Boards & Ideas") .font(.inter(.medium, size: 18))
             Spacer()
             
+           /* Button {
+                showFilterScreen = true
+                
+            } label: {
+                Image("FilterLine")
+            }
+            */
+            
         }.padding().frame(height:44)
+            .sheet(isPresented: $showFilterScreen) {
+                BoardFilterView()
+                    .presentationDetents([.fraction(0.75)])
+                    .presentationDragIndicator(.visible)
+            }
         
         ScrollView{
             if listArray.count == 0 && !isDataLoading {
@@ -49,60 +63,60 @@ struct MyBoardsView: View {
             }else{
                 
                 LazyVStack(spacing:10){
-                
-                ForEach(listArray ,id: \.id) { myBroad in
-                    MyBoardCell(itemObj: myBroad,onBoostTapped: { item, plan in
-                        paymentGatewayOpen(selPlan: plan, item: item)
-                    })
                     
-                    .onTapGesture {
-                        pushToBoardAnalytics(myBroad: myBroad)
-                    }
-                    .onAppear {
-                        if myBroad.id == listArray.last?.id {
-                            loadNextPageIfAllowed()
+                    ForEach(listArray ,id: \.id) { myBroad in
+                        MyBoardCell(itemObj: myBroad,onBoostTapped: { item, plan in
+                            paymentGatewayOpen(selPlan: plan, item: item)
+                        })
+                        
+                        .onTapGesture {
+                            pushToBoardAnalytics(myBroad: myBroad)
+                        }
+                        .onAppear {
+                            if myBroad.id == listArray.last?.id {
+                                loadNextPageIfAllowed()
+                            }
                         }
                     }
-                }
-                Spacer()
-
-            }.padding(8)
-            
-        }
+                    Spacer()
+                    
+                }.padding(8)
+                
+            }
         }.simultaneousGesture(
             DragGesture()
                 .onChanged { _ in
                     hasUserScrolled = true   //REAL scroll detected
                 }
         )
-    .background(Color(.systemGray6))
-            .refreshable {
-                print("call api here")
-                
-                if !isDataLoading{
-                    self.page = 1
-                    getAdsListApi()
-                }
-            }
-            .onAppear{
-                if listArray.count == 0 {
-                    self.page = 1
-                    getAdsListApi()
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue))) { notification in
+        .background(Color(.systemGray6))
+        .refreshable {
+            print("call api here")
+            
+            if !isDataLoading{
                 self.page = 1
                 getAdsListApi()
             }
+        }
+        .onAppear{
+            if listArray.count == 0 {
+                self.page = 1
+                getAdsListApi()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue))) { notification in
+            self.page = 1
+            getAdsListApi()
+        }
     }
     
     
     func pushToBoardAnalytics(myBroad:ItemModel){
         
-   
+        
         let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: myBroad.id ?? 0))
         self.navigationController?.pushViewController(destVC, animated: true)
-         
+        
     }
     func loadNextPageIfAllowed() {
         guard
@@ -110,10 +124,10 @@ struct MyBoardsView: View {
             !isDataLoading,
             hasMoreData
         else { return }
-
+        
         getAdsListApi()
     }
-
+    
     
     func loadMoreIfNeeded(currentItem: ItemModel) {
         guard
@@ -121,50 +135,50 @@ struct MyBoardsView: View {
             !isDataLoading,
             hasMoreData
         else { return }
-
+        
         isDataLoading = true
         getAdsListApi()
     }
-
+    
     //MARK: Api methods
     func getAdsListApi() {
         guard !isDataLoading else { return }
         isDataLoading = true
-
+        
         let strUrl = Constant.shared.get_my_board + "?page=\(page)"
-
+        
         ApiHandler.sharedInstance.makeGetGenericData(
             isToShowLoader: page == 1,
             url: strUrl,
             loaderPos: .mid
         ) { (obj: ItemParse) in
-
+            
             DispatchQueue.main.async {
                 let newItems = obj.data?.data ?? []
-
+                
                 if self.page == 1 {
                     self.listArray = newItems
                 } else {
                     self.listArray.append(contentsOf: newItems)
                 }
-
+                
                 self.hasMoreData = !newItems.isEmpty
                 self.isDataLoading = false
                 self.page += 1
             }
         }
     }
-
+    
     func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
-
+        
         paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
         paymentGateway?.planObj = selPlan
         paymentGateway?.categoryId = item.categoryID ?? 0
         paymentGateway?.itemId = item.id ?? 0
         paymentGateway?.paymentFor = .boostBoard
-
+        
         paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
-
+            
             if isSuccess {
                 let vc = UIHostingController(
                     rootView: PlanBoughtSuccessView(
@@ -178,9 +192,9 @@ struct MyBoardsView: View {
             }
             
             //  RELEASE
-               self.paymentGateway = nil
+            self.paymentGateway = nil
         }
-
+        
         paymentGateway?.initializeDefaults()
     }
 }
@@ -189,10 +203,8 @@ struct MyBoardsView: View {
     MyBoardsView(navigationController:nil)
 }
 
-
-
-
 struct MyBoardCell:View {
+    
     let itemObj:ItemModel
     @State private var showBoostSheet = false
     var onBoostTapped: (_ item: ItemModel, _ plan: PlanModel) -> Void
@@ -222,24 +234,24 @@ struct MyBoardCell:View {
                         .frame(maxWidth: 105, maxHeight: 120).cornerRadius(10).clipped()
                     
                     if (itemObj.isFeature ?? false) == true{
-                           HStack{
-                               Spacer()
-                                Text("Sponsored")
-                                    .frame(height:22)
-                                    .foregroundColor(Color(.white))
-                                    .font(.inter(.medium, size: 14))
-                               Spacer()
-                            } .background(.orange)
+                        HStack{
+                            Spacer()
+                            Text("Sponsored")
+                                .frame(height:22)
+                                .foregroundColor(Color(.white))
+                                .font(.inter(.medium, size: 14))
+                            Spacer()
+                        } .background(.orange)
                     }
                 }.frame(width: 105,height: 120).cornerRadius(10)
                 
                 
                 VStack(alignment: .leading, spacing: 5){
-                  
+                    
                     HStack{
                         
                         VStack(alignment:.leading){
-                         
+                            
                             if (itemObj.specialPrice ?? 0.0) > 0{
                                 HStack{
                                     
@@ -261,7 +273,7 @@ struct MyBoardCell:View {
                                         .padding(.trailing,5)
                                     
                                 }
-                              
+                                
                                 HStack{
                                     Text("\(Local.shared.currencySymbol)\((itemObj.price ?? 0.0).formatNumber())")
                                         .font(.inter(.regular, size: 14))
@@ -278,14 +290,15 @@ struct MyBoardCell:View {
                                         Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
                                     }else{
                                         
+                                        
                                         if itemObj.boardType  == 1{
                                             
-                                        Text( "Your Promotional Ad Image").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 14)).foregroundColor(Color(UIColor.label))
+                                            Text( "Your Promotional Ad Image").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 14)).foregroundColor(Color(UIColor.label))
                                                 .padding(.trailing)
                                         }else{
                                             
-                                        Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
-                                                    .padding(.trailing)
+                                            Text(itemObj.name ?? "").lineLimit(1).multilineTextAlignment(.leading).font(Font.inter(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                                                .padding(.trailing)
                                         }
                                     }
                                     
@@ -323,6 +336,11 @@ struct MyBoardCell:View {
                             Spacer()
                         }
                     }
+                    
+                    if itemObj.boardType  == 3{
+                        Text(itemObj.description ?? "").lineLimit(2).font(Font.inter(.regular, size: 14)).foregroundColor(Color(UIColor.label))
+                            .padding(.trailing)
+                    }
                     Spacer()
                     
                     HStack(spacing:6){
@@ -339,7 +357,7 @@ struct MyBoardCell:View {
                                 Text("Like: \(itemObj.totalLikes ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                             }
                         }
-                       
+                        
                         Spacer()
                         Text("More Details").font(Font.inter(.medium, size: 14)).foregroundColor(Color(.systemOrange)).padding(.trailing,5)
                     }
@@ -373,7 +391,7 @@ struct MyBoardCell:View {
                     }else{
                         Text("Boost your board to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
                     }
-                 
+                    
                     Spacer()
                     Button {
                         showBoostSheet = true
@@ -384,9 +402,9 @@ struct MyBoardCell:View {
                         .cornerRadius(5, antialiased: true)
                     
                 } .padding(.horizontal,5).padding(.vertical,8)
-                  .frame(maxWidth: .infinity, alignment: .leading)
-                  .background(Color.orange.opacity(0.1))
-                  .cornerRadius(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(8)
             }
             
         } .sheet(isPresented: $showBoostSheet) {
@@ -398,9 +416,9 @@ struct MyBoardCell:View {
             .presentationDragIndicator(.hidden)
             .presentationCornerRadius(20)   //  THIS
             .presentationBackground(Color(.systemBackground)) // ✅ sheet background
-
+            
         }
-        }
+    }
     
     
     func statusColors(for status: String) -> (Color, Color, String) {

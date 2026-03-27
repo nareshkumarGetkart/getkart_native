@@ -477,7 +477,7 @@ struct SmartVideoPlayerView: View {
                     if let player {
 
                         PlayerLayerView(player: player)
-                            .frame(height: 280)
+                            .frame(height: 285)
                             .frame(width:geo.size.width)
                             .clipped()
 
@@ -512,7 +512,7 @@ struct SmartVideoPlayerView: View {
                         } placeholder: {
                             Color.gray.opacity(0.2)
                         }.frame(width:geo.size.width)
-                        .frame(height: 280)
+                        .frame(height: 285)
                         .clipped()
                         .opacity(isReadyToPlay ? 0 : 1)
                         .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
@@ -520,7 +520,7 @@ struct SmartVideoPlayerView: View {
                     overlayUI
                 }
             }
-            .frame(height: 280)
+            .frame(height: 285)
 
             bottomCTA
         }

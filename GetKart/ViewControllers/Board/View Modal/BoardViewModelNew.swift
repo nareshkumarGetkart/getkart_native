@@ -399,9 +399,9 @@ final class BoardViewModelNew: ObservableObject {
                 defer {
                     
                     self.isLoading = false
-                    self.hasLoadedOnce = true   // 👈 important
+                    self.hasLoadedOnce = true   //  important
 
-                } // 🔒 Unlock only after processing
+                } //  Unlock only after processing
 
                 guard
                     let dict = responseObject as? NSDictionary,

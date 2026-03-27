@@ -579,14 +579,12 @@ class PaymentGatewayCentralized{
                         //Show payment successfull messsage
                     }
                 }
-                
             }
         }
-        
     }
     
     
-    func getInAppReceipt() {
+     func getInAppReceipt() {
         // Get the receipt if it's available.
         if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
@@ -745,8 +743,6 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
         for param: DictOfString,
         onCompletion: @escaping PayUHashGenerationCompletion
     ) {
-
-
         guard let hashName = param["hashName"],
               let hashString = param["hashString"] else { return }
 
@@ -754,12 +750,10 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
         print("HashString:", hashString)
 
         let finalHash = generateSHA512(hashString + saltKeyPayu)
-
         onCompletion([hashName: finalHash])
     }
     
     func generateSHA512(_ value: String) -> String {
-
         let data = Data(value.utf8)
         let hash = SHA512.hash(data: data)
         return hash.map { String(format: "%02x", $0) }.joined()
@@ -774,13 +768,11 @@ extension PaymentGatewayCentralized: PayUCheckoutProDelegate {
     func onPaymentFailure(response: Any?) {
         print("Payment Failed:", response ?? "")
         self.updateOrderApi(order_status: false)
-
     }
 
     func onPaymentCancel(isTxnInitiated: Bool) {
         print("Payment Cancelled")
         self.updateOrderApi(order_status: false)
-
     }
 
     func onError(_ error: Error?) {

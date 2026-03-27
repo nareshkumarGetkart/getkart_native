@@ -39,47 +39,55 @@ struct CommentsView: View {
 
                 ScrollView {
 
-                    LazyVStack(spacing:20) {
+                    if $objVM.commentsArray.count == 0{
+                        //Show empty view
+                        emptyView.padding(.top,100)
+                   
+                    }else{
+                        //Coments
+                        LazyVStack(spacing:20) {
 
-                        ForEach($objVM.commentsArray) { $comment in
+                            ForEach($objVM.commentsArray) { $comment in
 
-                            CommentRow(
-                                comment: $comment,
+                                CommentRow(
+                                    comment: $comment,
 
-                                onReply: {
-                                    replyingTo = comment.user?.name ?? ""
-                                    isFocused = true
-                                    replyCommentId = comment.id ?? 0
-                                },
+                                    onReply: {
+                                        replyingTo = comment.user?.name ?? ""
+                                        isFocused = true
+                                        replyCommentId = comment.id ?? 0
+                                    },
 
-                                onLikeDislike: { commentId,isLiked in
+                                    onLikeDislike: { commentId,isLiked in
 
-                                    if isLiked {
-                                        objVM.likeComment(comment_id: commentId)
-                                    } else {
-                                        objVM.unlikeComment(comment_id: commentId)
+                                        if isLiked {
+                                            objVM.likeComment(comment_id: commentId)
+                                        } else {
+                                            objVM.unlikeComment(comment_id: commentId)
+                                        }
+                                    },
+
+                                    loadMoreReplies: { commentId in
+                                        loadReplies(commentId: commentId)
+                                    },
+
+                                    selectedOption:{ objComment in
+                                        selectedCommentObj = objComment
+                                        showActionSheet = true
+                                    },
+
+                                    selectedUser:{ user in
+                                        selectedUser = user
                                     }
-                                },
+                                )
+                                .id(comment.id)
+                            }
 
-                                loadMoreReplies: { commentId in
-                                    loadReplies(commentId: commentId)
-                                },
-
-                                selectedOption:{ objComment in
-                                    selectedCommentObj = objComment
-                                    showActionSheet = true
-                                },
-
-                                selectedUser:{ user in
-                                    selectedUser = user
-                                }
-                            )
-                            .id(comment.id)
+                            Spacer().frame(height:20)
                         }
-
-                        Spacer().frame(height:20)
+                        .padding()
                     }
-                    .padding()
+                   
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .simultaneousGesture(
@@ -200,6 +208,15 @@ struct CommentsView: View {
     }
 }
 
+private var emptyView: some View {
+    VStack(spacing: 20) {
+        Spacer()
+        Image("no_chat_found")
+        Text("No any Comments")
+            .foregroundColor(.orange)
+        Spacer()
+    }
+}
 private extension CommentsView {
 
     var headerView: some View {

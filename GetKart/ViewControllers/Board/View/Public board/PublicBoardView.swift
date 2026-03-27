@@ -35,7 +35,7 @@ struct PublicBoardView: View {
               
                 ZStack {
                     
-                    let boardNav = tabBarController?.viewControllers?[1] as? UINavigationController
+                    let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
                     ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
                         if loadedCategoryIds.contains(cat.id ?? 0) {
                             
@@ -498,7 +498,6 @@ struct BoardListView: View {
                 paginationConsumed = false
         
             }
-            
 
             .refreshable {
                 await vm.refresh()
@@ -877,7 +876,7 @@ extension PublicBoardView{
     
     func pushSearchBoard() {
        guard let tabBar = tabBarController,
-             let boardNav = tabBar.viewControllers?[1] as? UINavigationController else { return }
+             let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
        
        let vc = UIHostingController(
            rootView: SearchBoardResultView(
@@ -892,7 +891,7 @@ extension PublicBoardView{
     var interestButton: some View {
         Button {
             guard let tabBar = tabBarController,
-                  let boardNav = tabBar.viewControllers?[1] as? UINavigationController else { return }
+                  let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
             let vc = UIHostingController(
                 rootView: BoardInterestView(navigationController: boardNav)
             )
@@ -922,6 +921,7 @@ extension PublicBoardView{
 }
 
 
+
 struct ProductCardStaggered: View {
 
     @State private var showSafari = false
@@ -930,6 +930,7 @@ struct ProductCardStaggered: View {
     @State private var imageRatio: CGFloat = 1
     let onTapBoostButton: () -> Void
     var isToShowBoostButton = true
+   // @State private var randomHeight: CGFloat = CGFloat(Int.random(in: 400...480))
     
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
@@ -938,7 +939,7 @@ struct ProductCardStaggered: View {
                 
                 KFImage(URL(string: product.image ?? ""))
                     .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
                     )
                     .scaleFactor(UIScreen.main.scale)
                     .cacheOriginalImage(false)
@@ -1020,7 +1021,7 @@ struct ProductCardStaggered: View {
                 price: product.price ?? 0.0,
                 specialPrice: product.specialPrice ?? 0.0,
                 currencySymbol: Local.shared.currencySymbol
-            ).padding([.bottom],8).padding(.horizontal,8).padding(.top,2)
+            ).padding([.bottom],10).padding(.horizontal,8).padding(.top,2)
             
             
             if (product.user?.id ?? 0) == Local.shared.getUserId() && isToShowBoostButton{
@@ -1165,7 +1166,6 @@ struct PromotionalAdsCardStaggered: View {
                     .resizable()
                     .scaledToFit()
                     .clipped()
-                //.cornerRadius(10)
                     .shadow(
                         color: Color.black.opacity(0.10),
                         radius: 7,

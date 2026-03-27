@@ -33,7 +33,8 @@ struct CreatePromotionalVideoAdsView: View {
 
     var isFromEdit:Bool = false
     var boardId = 0
-    
+    @State  private var isFirstTime = true
+
     var body: some View {
         HStack(spacing:0){
             Button {
@@ -58,6 +59,11 @@ struct CreatePromotionalVideoAdsView: View {
                         if let asset = videoSelected{
                             selectedImage = generateThumbnail(from: asset)
                         }
+                    }
+                    
+                    if isFirstTime{
+                        showVideoPicker = true
+                        isFirstTime = false
                     }
                 }
             }

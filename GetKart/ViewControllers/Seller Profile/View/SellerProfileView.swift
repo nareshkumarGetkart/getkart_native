@@ -35,10 +35,11 @@ struct SellerProfileView: View {
     @State private var outboundUrlClicked: String = ""
     
     //MARK: Initialization
-    init(navController: UINavigationController? = nil, userId: Int) {
-           self.navController = navController
-           self.userId = userId
-           _objVM = StateObject(wrappedValue: ProfileViewModel(userId: userId))
+    init(navController: UINavigationController? = nil, userId: Int,isProductSelected:Bool=true) {
+        self.navController = navController
+        self.userId = userId
+        _objVM = StateObject(wrappedValue: ProfileViewModel(userId: userId))
+        _selectedTab = State(initialValue: isProductSelected ? .products : .boards)
     }
     
     var body: some View {
@@ -505,6 +506,11 @@ struct SellerProfileView: View {
                     if objVM.itemArray.count == 0{
                         objVM.getSellerProfile(sellerId: userId,nav: navController)
                         objVM.getItemListApi(sellerId: userId)
+                    }
+                }else  if selectedTab == .boards{
+                    if objVM.boardArray.count == 0{
+                        objVM.getSellerProfile(sellerId: userId,nav: navController)
+                        objVM.getBoardListApi()
                     }
                 }
             }

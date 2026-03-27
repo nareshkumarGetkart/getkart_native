@@ -7,6 +7,12 @@
 
 import SwiftUI
 import AVFoundation
+import _AVKit_SwiftUI
+import AVKit
+import AVFoundation
+import SwiftUI
+import PhotosUI
+import AVFoundation
 
 
 struct PickerConfig: Identifiable {
@@ -31,7 +37,9 @@ struct UploadImageVideoView: View {
     @State private var selectionType: ProductType = .product
     @State private var pickerConfig: PickerConfig?
     @State private var selectedVideoURL: URL?
-
+   // @State private var isPreparingVideo = false
+    @State private var isLoading = false
+    
     private var currentSelectionLimit: Int {
         switch selectionType {
         case .product:
@@ -96,6 +104,27 @@ struct UploadImageVideoView: View {
                 }
             }
             .background(Color(.systemGray5))
+            .overlay {
+                if isLoading {
+                    ZStack {
+                        Color.black.opacity(0.4).ignoresSafeArea()
+                        
+                        VStack(spacing: 10) {
+                            ProgressView()
+                                .scaleEffect(1.4)
+                            
+                            Text("Preparing video...")
+                                .foregroundColor(.white)
+                                .font(.inter(.medium, size: 15))
+                        }
+                        .padding(20)
+                        .background(Color(.systemOrange).opacity(0.9))
+                        .cornerRadius(10)
+                    }
+                    .transition(.opacity)
+                    .zIndex(999) //  important
+                }
+            }
             
             // Bottom Sheet
             .sheet(isPresented: $showSheet) {
@@ -107,7 +136,11 @@ struct UploadImageVideoView: View {
                     switch type {
                     case .video:
                         print("Video tapped")
-                        self.showVideoSheet = true
+                       // self.showVideoSheet = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
+                            self.pushQuick()
+
+                        })
                     case .image:
                         print("Image tapped")
                         print("Selection type:", selectionType)
@@ -134,60 +167,43 @@ struct UploadImageVideoView: View {
             }
             
             .fullScreenCover(isPresented: $showVideoSheet) {
-                
-                VideoPickerPHPicker { url in
-                    showVideoSheet = false
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        selectedVideoURL = url
-                    }
-                } onCancel: {
-                    showVideoSheet = false
-                    
-                }
-                
-                /* VideoPickerView(maxDuration: 30) { assets in
-                 showVideoSheet = false
-                 
-                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                 selectedVideoURL = assets.url
-                 }
-                 //videoSelected = assets
-                 //                self.pushToPromotionalVideoView(asset: assets)
-                 //                showVideoSheet = false
-                 
-                 } onCancel: {
-                 showVideoSheet = false
-                 
-                 }*/
-                
+                VideoPickerPHPicker(
+                            onVideoPicked: { url in
+                                print("Video:", url)
+                                showVideoSheet = false
+                                selectedVideoURL = url
+                            },
+                            onCancel: {
+                                showVideoSheet = false
+                            },
+                            isLoading: $isLoading   // 👈 PASS BINDING
+                        )
+               
+
+//                VideoPickerPHPicker { url in
+//                    showVideoSheet = false
+//                    selectedVideoURL = url
+//               
+//                    
+//                } onCancel: {
+//                    showVideoSheet = false
+//                }
             }
+            
+           
             .sheet(item: $selectedVideoURL, content: { url in
                 
                 ProVideoTrimmerView(url: url, maxDuration: 30) { trimmedURL in
                     
-                    self.pushToPromotionalVideoView(asset: AVURLAsset(url: trimmedURL))                   // ✅ final output after trimming
+                    self.pushToPromotionalVideoView(asset: AVURLAsset(url: trimmedURL))                   //  final output after trimming
                     print("Final video:", trimmedURL)
                     selectedVideoURL = nil
-                    // 👉 push next screen (upload / preview)
+                    //  push next screen (upload / preview)
                 } onCancel: {
                     selectedVideoURL = nil
-
                 }
 
-//                ProVideoTrimmerView(   //  your trimmer here
-//                    url: url,
-//                    maxDuration: 30
-//                ) { trimmedURL in
-//                    
-//                    self.pushToPromotionalVideoView(asset: AVURLAsset(url: trimmedURL))                   // ✅ final output after trimming
-//                    print("Final video:", trimmedURL)
-//                    selectedVideoURL = nil
-//                    // 👉 push next screen (upload / preview)
-//                }
-                
-                
-                
+                                
             })
             
             
@@ -260,7 +276,23 @@ struct UploadImageVideoView: View {
         )
         navigationController?.pushViewController(destVC, animated: true)
     }
+    
+    
+    func pushQuick(){
+        
+        let destVC = UIHostingController(
+            rootView: CreatePromotionalVideoAdsView(
+                navigationController: navigationController,
+                videoSelected: nil,
+                isFromEdit: false
+            )
+        )
+        navigationController?.pushViewController(destVC, animated: true)
+    }
 }
+
+
+
 
 #Preview {
     UploadImageVideoView()
@@ -430,71 +462,6 @@ struct CropImageWrapper: Identifiable {
 }
 
 
-struct ImageCropper: View {
-
-    var originalImage: UIImage
-    var onCrop: (UIImage) -> Void
-
-    @State private var scale: CGFloat = 1
-    @State private var lastScale: CGFloat = 1
-    @State private var offset: CGSize = .zero
-    @State private var lastOffset: CGSize = .zero
-
-    var body: some View {
-
-        GeometryReader { geo in
-
-            ZStack {
-
-                Color.black
-
-                Image(uiImage: originalImage)
-                    .resizable()
-                    .scaledToFit()
-                    .scaleEffect(scale)
-                    .offset(offset)
-                    .gesture(
-                        SimultaneousGesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    scale = lastScale * value
-                                }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                },
-                            DragGesture()
-                                .onChanged { value in
-                                    offset = CGSize(
-                                        width: lastOffset.width + value.translation.width,
-                                        height: lastOffset.height + value.translation.height
-                                    )
-                                }
-                                .onEnded { _ in
-                                    lastOffset = offset
-                                }
-                        )
-                    )
-
-                Rectangle()
-                    .stroke(Color.white, lineWidth: 2)
-                    .frame(width: geo.size.width * 0.8,
-                           height: geo.size.width * 0.8)
-            }
-            .onDisappear {
-                let cropped = cropImage(size: geo.size)
-                onCrop(cropped)
-            }
-        }
-    }
-
-    private func cropImage(size: CGSize) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: originalImage.size)
-        return renderer.image { _ in
-            originalImage.draw(in: CGRect(origin: .zero,
-                                           size: originalImage.size))
-        }
-    }
-}
 //=======
 
 
@@ -919,13 +886,7 @@ struct TrimmerTimelineView: View {
     }
 }
 
-import SwiftUI
-import AVFoundation
-import _AVKit_SwiftUI
 
-import SwiftUI
-import AVKit
-import AVFoundation
 
 struct ProVideoTrimmerView: View {
     
@@ -939,10 +900,12 @@ struct ProVideoTrimmerView: View {
     @State private var endTime: Double = 0
     @State private var player = AVPlayer()
     
-    // 🔥 NEW
+    //  NEW
     @State private var isCompressing = false
     @State private var progress: Double = 0
     @State private var exportSession: AVAssetExportSession?
+  
+    @State private var isLoading = true
     
     private var asset: AVAsset {
         AVURLAsset(url: url)
@@ -955,11 +918,10 @@ struct ProVideoTrimmerView: View {
     var body: some View {
         ZStack {
             
-            // 🎬 MAIN UI
+            //  MAIN UI
             VStack(spacing: 20) {
                 
                 VideoPlayer(player: player)
-                   // .frame(height: 300)
                     .cornerRadius(12)
                     .padding()
                     .onAppear {
@@ -980,15 +942,10 @@ struct ProVideoTrimmerView: View {
                     .padding()
                 
                 Spacer()
-//            }
-//            .padding()
-//            
-//            
-//            //  OVERLAY (BOTTOM UI)
-//            VStack {
+
                 Spacer()
                 
-                // 🔵 PROGRESS
+                //  PROGRESS
                 if isCompressing {
                     VStack(spacing: 6) {
                         
@@ -1017,14 +974,14 @@ struct ProVideoTrimmerView: View {
                             exportSession?.cancelExport()
                         }
                         onCancel()
-                    }
+                    }.font(.inter(.semiBold, size: 16))
                     .disabled(isCompressing)
                     
                     Spacer()
                     
                     Button("Choose") {
                         startCompression()
-                    }
+                    }.font(.inter(.semiBold, size: 16))
                     .disabled(isCompressing)
                 }
                 .frame(height: 50)
@@ -1032,6 +989,17 @@ struct ProVideoTrimmerView: View {
                 .font(.system(size: 18))
                 .padding()
                 .background(Color.black.opacity(0.6))
+            }
+            
+            if isLoading {
+                Color.black.opacity(0.9).ignoresSafeArea()
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                    Text("Preparing video...")
+                        .foregroundColor(.white)
+                        .font(.system(size: 14, weight: .medium))
+                }
             }
         }
         .ignoresSafeArea(edges: .bottom)
@@ -1079,7 +1047,8 @@ extension ProVideoTrimmerView {
         try? FileManager.default.removeItem(at: outputURL)
         
         //  FAST preset (same behavior as UIImagePicker)
-        let preset = AVAssetExportPresetMediumQuality
+         let preset = AVAssetExportPresetMediumQuality
+        
         
         guard let exporter = AVAssetExportSession(
             asset: asset,
@@ -1156,6 +1125,7 @@ extension ProVideoTrimmerView {
             
             DispatchQueue.main.async {
                 self.thumbnails = imgs
+                self.isLoading = false
             }
         }
     }
@@ -1258,16 +1228,12 @@ extension ProVideoTrimmerView {
     
 }
 
-
-import SwiftUI
-import PhotosUI
-import AVFoundation
-
 struct VideoPickerPHPicker: UIViewControllerRepresentable {
     
     var onVideoPicked: (URL) -> Void
     var onCancel: () -> Void
-    
+    @Binding var isLoading: Bool   //  ADD THIS
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -1294,28 +1260,40 @@ struct VideoPickerPHPicker: UIViewControllerRepresentable {
             self.parent = parent
         }
         
-      
+ 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            
             picker.dismiss(animated: true)
             
             // User tapped cancel
-               if results.isEmpty {
-                   print("User cancelled picker")
-                   DispatchQueue.main.async {
-                       self.parent.onCancel()
-                   }
-                   return
-               }
-
-            guard let item = results.first?.itemProvider,
-                  item.hasItemConformingToTypeIdentifier("public.movie") else {
+            if results.isEmpty {
+                print("User cancelled picker")
+                DispatchQueue.main.async {
+                    self.parent.onCancel()
+                    // picker.dismiss(animated: true)
+                }
                 return
             }
             
+            guard let item = results.first?.itemProvider,
+                  item.hasItemConformingToTypeIdentifier("public.movie") else {
+                // picker.dismiss(animated: true)
+                return
+            }
+            
+            // START LOADING
+            DispatchQueue.main.async {
+                self.parent.isLoading = true
+            }
+            
             item.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, error in
-                
-                guard let url else { return }
+                defer {
+                    DispatchQueue.main.async {
+                        self.parent.isLoading = false   //  STOP LOADING
+                    }
+                }
+                guard let url else {
+                    // picker.dismiss(animated: true)
+                    return }
                 
                 // Copy to temp (IMPORTANT)
                 let tempURL = FileManager.default.temporaryDirectory
@@ -1325,8 +1303,78 @@ struct VideoPickerPHPicker: UIViewControllerRepresentable {
                 
                 DispatchQueue.main.async {
                     self.parent.onVideoPicked(tempURL)
+                    // picker.dismiss(animated: true)
                 }
             }
+        }
+    }
+}
+
+
+//===
+
+struct ImageCropper: View {
+
+    var originalImage: UIImage
+    var onCrop: (UIImage) -> Void
+
+    @State private var scale: CGFloat = 1
+    @State private var lastScale: CGFloat = 1
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+
+    var body: some View {
+
+        GeometryReader { geo in
+
+            ZStack {
+
+                Color.black
+
+                Image(uiImage: originalImage)
+                    .resizable()
+                    .scaledToFit()
+                    .scaleEffect(scale)
+                    .offset(offset)
+                    .gesture(
+                        SimultaneousGesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    scale = lastScale * value
+                                }
+                                .onEnded { _ in
+                                    lastScale = scale
+                                },
+                            DragGesture()
+                                .onChanged { value in
+                                    offset = CGSize(
+                                        width: lastOffset.width + value.translation.width,
+                                        height: lastOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    lastOffset = offset
+                                }
+                        )
+                    )
+
+                Rectangle()
+                    .stroke(Color.white, lineWidth: 2)
+                    .frame(width: geo.size.width * 0.8,
+                           height: geo.size.width * 0.8)
+            }
+            .onDisappear {
+                let cropped = cropImage(size: geo.size)
+                onCrop(cropped)
+            }
+        }
+    }
+
+    private func cropImage(size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: originalImage.size)
+        return renderer.image { _ in
+            originalImage.draw(in: CGRect(origin: .zero,
+                                           size: originalImage.size))
         }
     }
 }

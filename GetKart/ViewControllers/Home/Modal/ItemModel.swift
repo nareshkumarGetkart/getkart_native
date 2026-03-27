@@ -9,6 +9,7 @@ import Foundation
  
 // MARK: - Empty
 struct ItemParse: Codable {
+   
     let error: Bool?
     let message: String?
     let data: ItemModelClass?
@@ -57,6 +58,7 @@ struct ItemModelClass: Codable {
 
 // MARK: - ItemModel
 struct ItemModel: Codable,Identifiable {
+  
     let id: Int?
     let name, slug, description: String?
     let price: Double?

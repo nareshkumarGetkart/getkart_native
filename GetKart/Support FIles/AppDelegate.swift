@@ -13,6 +13,7 @@ import SwiftUI
 import Kingfisher
 import GooglePlaces
 import FittedSheets
+import AVFoundation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -56,11 +57,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         reachabilityListener()
         registerForRemoteNotification(application: application)
-        
-        
+            
         //by me kingfisher
         setupImageCache()
-            
+       
+        configureAudioSession()
+
         // Define the desired large font
       if let largeFont = UIFont(name: "Inter-Regular", size: 12) {
 
@@ -364,6 +366,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    
+
+    func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("✅ Audio session configured")
+        } catch {
+            print("❌ Audio session error: \(error)")
+        }
+    }
 }
 
 

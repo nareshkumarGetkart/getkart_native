@@ -18,14 +18,17 @@ struct CategoryPopupView: View {
         ZStack {
             if isPresented {
                 // Dim background
-                Color.black.opacity(0.35)
-                    .ignoresSafeArea()
-                    .onTapGesture { isPresented = false }
+                Color(.systemGray5).opacity(0.7)
+                               .ignoresSafeArea()
+                               .onTapGesture {
+                                   isPresented = false
+                               }
+
 
                 // Popup container
                 VStack {
                     ScrollView {
-                        VStack(spacing: 0) {
+                        VStack(spacing: 5) {
                             ForEach(objViewModel.listArray ?? [], id: \.id) { category in
                                 Button {
                                     selectedCategory = category.name ?? ""
@@ -56,14 +59,21 @@ struct CategoryPopupView: View {
                                     .padding(.vertical, 9)
                                 }
                             }
-                        }.padding([.bottom,.top])
+                        }.padding([.bottom,.top],15)
                     }
                 }
-                .frame(minHeight: 300, maxHeight: 600)
+                .frame(maxHeight: 600)
                 .background(Color(.systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) // ✅ KEY FIX
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)) //  KEY FIX
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.gray, lineWidth: 0.2)   // Border color here
+                )
                 .shadow(color: Color.black.opacity(0.15), radius: 20)
-                .padding(.horizontal, 24)
+                .scaleEffect(isPresented ? 1 : 0.9)   // 👈 popup animation
+                .opacity(isPresented ? 1 : 0)
+                .padding(.horizontal, 25)
+                
             }
         }
         .animation(.easeInOut(duration: 0.25), value: isPresented)
