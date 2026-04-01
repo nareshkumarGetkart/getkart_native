@@ -59,15 +59,18 @@
 		<string>ppemerchantsdkv1</string>
 		<string>ppemerchantsdkv2</string>
 		<string>ppemerchantsdkv3</string>
+		<string>paytm</string>
 		<string>paytmmp</string>
-        <string>phonepe</string>
-        <string>gpay</string>
-		<string>credpay</string>
-		<string>amazonpay</string>
+		<string>phonepe</string>
+		<string>gpay</string>
+		<string>cred</string>
+		<string>amazon</string>
 		<string>bhim</string>
-        <string>instagram</string>
-        <string>whatsapp</string>
-        <string>fb</string>
+		<string>credpay</string>
+		<string>tez</string>
+		<string>instagram</string>
+		<string>whatsapp</string>
+		<string>fb</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -83,14 +86,14 @@
 		<string>Manrope-Medium.ttf</string>
 		<string>Manrope-Regular.ttf</string>
 		<string>Manrope-SemiBold.ttf</string>
-        <string>Inter-Regular.otf</string>
-        <string>Inter-Bold.otf</string>
-        <string>Inter-Medium.otf</string>
-        <string>Inter-SemiBold.otf</string>
-        <string>Inter-Black.otf</string>
-        <string>Inter_18pt-Italic.ttf</string>
-        <string>Inter_18pt-BoldItalic.ttf</string>
-        <string>Inter_18pt-ExtraBoldItalic.ttf</string>
+		<string>Inter-Regular.otf</string>
+		<string>Inter-Bold.otf</string>
+		<string>Inter-Medium.otf</string>
+		<string>Inter-SemiBold.otf</string>
+		<string>Inter-Black.otf</string>
+		<string>Inter_18pt-Italic.ttf</string>
+		<string>Inter_18pt-BoldItalic.ttf</string>
+		<string>Inter_18pt-ExtraBoldItalic.ttf</string>
 	</array>
 </dict>
 </plist>

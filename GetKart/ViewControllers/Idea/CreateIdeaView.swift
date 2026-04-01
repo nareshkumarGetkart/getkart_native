@@ -8,6 +8,10 @@
 import SwiftUI
 import FittedSheets
 import Kingfisher
+import NSFWDetector
+import UIKit
+import CoreML
+import Vision
 
 struct CreateIdeaView: View {
     
@@ -28,6 +32,10 @@ struct CreateIdeaView: View {
     var isFromEdit:Bool = false
     @State private var boardObj:ItemModel?
     var boardId = 0
+    
+    @State var isPostValidate:Int = 0
+
+    
     
     var body: some View {
         HStack{
@@ -269,7 +277,8 @@ struct CreateIdeaView: View {
                     ImageCropperBoardView(
                         image: img,
                         onCropped: { croppedImage in
-                            self.selectedImage = croppedImage
+                            self.checkNudityOfiMages(pickedImage: croppedImage)
+                           // self.selectedImage = croppedImage
                             showCropper = false
                         },
                         onCancel: {
@@ -382,25 +391,19 @@ struct CreateIdeaView: View {
         params["name"] = strTitle
         params["category_id"] = selectedCategoryId ?? 0
         params["description"] = strDescription
+        params["isPostValidate"] = isPostValidate
+
         
         var strUrl = Constant.shared.create_ideas
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
             strUrl = Constant.shared.update_ideas
+            params["isPostValidate"] = 0
         }
+        
         params["board_type"] = 3 // 0=product,1=business
 
-//        let imgData =   (selectedImage != nil) ? selectedImage?.wxCompress().pngData() : nil
-//        
-//        
-//        
-//        
-//        URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: imgData, imageName: "image", imagesData: [], imageNames: [], url:strUrl , params: params, completionHandler: { responseObject, error in
-//
-//            self.isDataUploading = false
-//            
-            
-            
+
             var imgNames = [String]()
             var galleryImagesData = [Data]()
                         
@@ -440,7 +443,6 @@ struct CreateIdeaView: View {
         controller.strUrl = strUrl
         controller.paymentFor = .bannerPromotion
 
-        
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
             if controller.sheetViewController?.options.useInlineMode == true {
@@ -485,6 +487,133 @@ struct CreateIdeaView: View {
         } else {
             self.navigationController?.present(sheet, animated: true, completion: nil)
         }
+    }
+    
+    
+    
+    func detectNudity(in image: UIImage, completion: @escaping (Bool, VNConfidence?) -> Void) {
+        guard let ciImage = CIImage(image: image) else {
+            completion(false, nil)
+            return
+        }
+
+        do {
+            let configuration = MLModelConfiguration()
+            let coreMLModel = try OpenNSFW(configuration: configuration).model
+            let vnModel = try VNCoreMLModel(for: coreMLModel)
+
+            let request = VNCoreMLRequest(model: vnModel) { request, error in
+                guard let results = request.results as? [VNClassificationObservation] else {
+                    completion(false, nil)
+                    return
+                }
+
+                let explicitKeywords = ["nsfw", "nudity", "porn", "sexual", "explicit"]
+                var maxConfidence: VNConfidence = 0.0
+                var isExplicit = false
+
+                for result in results {
+                    let label = result.identifier.lowercased()
+                    if explicitKeywords.contains(where: { label.contains($0) }) {
+                        isExplicit = true
+                        maxConfidence = max(maxConfidence, result.confidence)
+                    }
+                }
+
+                completion(isExplicit, maxConfidence)
+            }
+
+            let handler = VNImageRequestHandler(ciImage: ciImage)
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try handler.perform([request])
+                } catch {
+                    print("Failed to perform VN request: \(error)")
+                    completion(false, nil)
+                }
+            }
+
+        } catch {
+            print("Failed to load Core ML model: \(error)")
+            completion(false, nil)
+        }
+    }
+
+    
+    func checkNudityOfiMages(pickedImage: UIImage) {
+        
+        if Float(Local.shared.iosNudityThreshold) > 0 {
+            
+            detectNudity(in: pickedImage) { isExplicit, confidence in
+                if isExplicit {
+                    print("Nudity detected with confidence: \(confidence!)")
+                    DispatchQueue.main.async {
+                        
+                        if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+                            isPostValidate = 0
+                             AlertView.sharedManager.displayMessageWithAlert(
+                             title: "!Alert",
+                             msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+                             )
+                        }else{
+                            isPostValidate = 1
+                            self.selectedImage = pickedImage
+                        }
+                    }
+                } else {
+                    isPostValidate = 1
+                    print("Image is safe")
+                }
+            }
+        }
+
+        
+        return
+//        pickedImage.checkNSFW() { result, confidence in
+//
+//            print(" confidence == \(confidence)")
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .sfw:
+//                       // isPostValidate = 1
+//
+//                case .nsfw:
+//                    if confidence > 0.5 {
+//                        isPostValidate = 0
+//                        AlertView.sharedManager.displayMessageWithAlert(
+//                            title: "!Alert",
+//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                        )
+//                    } else {
+//                       // isPostValidate = 1
+//                    }
+//                case .unknown:
+//                    isPostValidate = 0
+//                }
+//            }
+//        }
+
+//        NSFWDetector.shared.check(image: pickedImage) { result in
+//            switch result {
+//            case let .success(nsfwConfidence: confidence):
+//
+//                print(" confidence == \(confidence)")
+//                DispatchQueue.main.async {   // <-- FIX IS HERE
+//                    if confidence > 0.05 {
+//                        isPostValidate = 0
+//                        AlertView.sharedManager.displayMessageWithAlert(
+//                            title: "!Alert",
+//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                        )
+//                    } else {
+//                        isPostValidate = 1
+//                    }
+//                }
+//
+//            default:
+//                break
+//            }
+//        }
     }
 }
 

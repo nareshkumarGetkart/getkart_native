@@ -28,22 +28,35 @@ struct MyBoardsView: View {
                     .foregroundColor(Color(UIColor.label))
             }
             
-            Text("My Boards & Ideas") .font(.inter(.medium, size: 18))
+            Text("My Boards & Ideas").font(.inter(.medium, size: 18))
             Spacer()
             
-           /* Button {
+            
+            Button {
                 showFilterScreen = true
                 
             } label: {
-                Image("FilterLine")
+                
+                if getFilterAppliedCount() > 0{
+                    HStack{
+                        Text("\(getFilterAppliedCount())").font(.inter(.regular, size: 16)).foregroundColor(Color.gray)
+                        Image("FilterLine")
+                    }
+                }else{
+                    Image("FilterLine")
+                }
             }
-            */
+            
             
         }.padding().frame(height:44)
             .sheet(isPresented: $showFilterScreen) {
-                BoardFilterView()
-                    .presentationDetents([.fraction(0.75)])
-                    .presentationDragIndicator(.visible)
+                BoardFilterView(onFilterApplied: {
+                    self.page = 1
+                    getAdsListApi()
+                })
+                .presentationDetents([.height(450)])   // fixed height
+                .presentationDragIndicator(.visible)
+                .cornerRadius(20.0)
             }
         
         ScrollView{
@@ -129,6 +142,15 @@ struct MyBoardsView: View {
     }
     
     
+    func getFilterAppliedCount() -> Int{
+        var filterCount = (FilterBoard.shared.selectedRange.count > 0 ? 1 : 0) + (FilterBoard.shared.selectedStatus.count > 0 ? 1 : 0)
+        
+        if let board =  FilterBoard.shared.selectedCategory{
+            filterCount += 1
+        }
+        return filterCount
+    }
+    
     func loadMoreIfNeeded(currentItem: ItemModel) {
         guard
             currentItem.id == listArray.last?.id,
@@ -145,7 +167,22 @@ struct MyBoardsView: View {
         guard !isDataLoading else { return }
         isDataLoading = true
         
-        let strUrl = Constant.shared.get_my_board + "?page=\(page)"
+        var strUrl = Constant.shared.get_my_board + "?page=\(page)"
+        
+        if FilterBoard.shared.selectedStatus.count > 0{
+            strUrl.append("&status=\(FilterBoard.shared.selectedStatus)")
+        }
+        
+        if let boardType = FilterBoard.shared.selectedCategory{
+            strUrl.append("&board_type=\(boardType)")
+        }
+        
+        if  FilterBoard.shared.selectedRange.count > 0{
+            
+            strUrl.append("&posted_since=\(FilterBoard.shared.selectedRange)")
+
+            
+        }
         
         ApiHandler.sharedInstance.makeGetGenericData(
             isToShowLoader: page == 1,

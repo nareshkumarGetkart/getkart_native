@@ -234,6 +234,27 @@ struct ItemDetailView: View {
                     
                     if Local.shared.getUserId() == itemUserId {
                         
+                        if objVM.itemObj?.status?.lowercased() == "approved"{
+                            VStack(spacing:0){
+                                HStack(spacing:25){
+                                    Spacer()
+                                    Text("Posted on").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                                    Text("Expire on").font(Font.manrope(.regular, size: 13)).foregroundColor(.gray)
+                                    Spacer()
+                                }
+                                
+                                HStack(spacing:10){
+                                    Spacer()
+                                    Text(getFormattedCreatedDate(isoDateString:objVM.itemObj?.createdAt ?? ""))
+                                        .font(Font.manrope(.medium, size: 14))
+                                    Text("-") .font(Font.manrope(.medium, size: 14))
+                                    Text(getFormattedDate(date:objVM.itemObj?.expiryDate ?? ""))
+                                        .font(Font.manrope(.medium, size: 14))
+                                    Spacer()
+                                }
+                            }
+                        }
+                        
                         HStack {
                             HStack {
                                 Image(systemName: "eye")
@@ -308,7 +329,7 @@ struct ItemDetailView: View {
                             Spacer()
                         }
                         
-                        Text(getFormattedCreatedDate())
+                        Text(getFormattedCreatedDate(isoDateString:objVM.itemObj?.createdAt ?? ""))
                             .font(Font.manrope(.medium, size: 15))
                     }.padding(5)
                     //.padding(.bottom,5)
@@ -1073,10 +1094,10 @@ struct ItemDetailView: View {
         }
     }
     
-    func getFormattedCreatedDate() -> String{
+    func getFormattedCreatedDate(isoDateString:String) -> String{
        
         
-        let isoDateString = objVM.itemObj?.createdAt ?? ""
+       // let isoDateString = objVM.itemObj?.createdAt ?? ""
 
         let isoFormatter = DateFormatter()
         isoFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -1093,6 +1114,25 @@ struct ItemDetailView: View {
         }
     }
     
+    
+    func getFormattedDate(date:String) -> String{
+       
+        
+       // let isoDateString = objVM.itemObj?.createdAt ?? ""
+
+        let isoFormatter = DateFormatter()
+        isoFormatter.dateFormat = "yyyy-MM-dd"
+
+        if let date = isoFormatter.date(from: date) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "dd MMM yyyy"
+            let formattedDate = outputFormatter.string(from: date)
+            return formattedDate
+        } else {
+            print("Invalid date string")
+            return ""
+        }
+    }
     
     @ViewBuilder
     private var reportingAdsView: some View {

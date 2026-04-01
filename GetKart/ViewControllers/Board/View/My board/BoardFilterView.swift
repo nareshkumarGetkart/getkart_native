@@ -7,14 +7,30 @@
 
 import SwiftUI
 
+
+final class FilterBoard{
+    
+    static let shared = FilterBoard()
+    private init(){ }
+    
+    var fromDate = ""
+    var toDate = ""
+    var selectedRange = ""
+    var selectedCategory:Int?
+    var selectedStatus = ""
+}
+
+
 struct BoardFilterView: View {
 
+    @Environment(\.presentationMode) var presentationMode
     @State private var fromDate: Date = Date()
     @State private var toDate: Date = Date()
-    @State private var selectedRange: String = "This Week"
-    @State private var selectedCategory: String = "Board"
-    @State private var selectedStatus: String = "Active"
+    @State private var selectedRange: String = ""
+    @State private var selectedCategory: String = ""
+    @State private var selectedStatus: String = ""
     
+    var onFilterApplied:()->Void
     var formattedFromDate: String {
         dateFormatter.string(from: fromDate)
     }
@@ -52,7 +68,7 @@ struct BoardFilterView: View {
                         Text("Date Range")
                             .font(.inter(.medium, size: 14))
 
-                        HStack(spacing: 12) {
+                       /* HStack(spacing: 12) {
                             DateFieldView(title: "From", date: $fromDate)
                             DateFieldView(title: "To", date: $toDate)
                         }
@@ -60,19 +76,30 @@ struct BoardFilterView: View {
                             if newValue >= toDate {
                                 toDate = newValue
                             }
-                        }
-
-                        HStack(spacing: 12) {
-                            BoardFilterChip(title: "Today", isSelected: selectedRange == "Today") {
-                                selectedRange = "Today"
+                        }*/
+                       
+                            ScrollView(.horizontal, showsIndicators: false) {
+                               
+                                HStack(spacing: 7) {
+                                BoardFilterChip(title: "Today", isSelected: selectedRange == "Today") {
+                                    selectedRange = "Today"
+                                }
+                                BoardFilterChip(title: "This Week", isSelected: selectedRange == "This Week") {
+                                    selectedRange = "This Week"
+                                }
+                                
+                                BoardFilterChip(title: "Two Week", isSelected: selectedRange == "Two Week") {
+                                    selectedRange = "Two Week"
+                                }
+                                BoardFilterChip(title: "This Month", isSelected: selectedRange == "This Month") {
+                                    selectedRange = "This Month"
+                                }
+                                
+                                BoardFilterChip(title: "Three Month", isSelected: selectedRange == "Three Month") {
+                                    selectedRange = "Three Month"
+                                }
                             }
-                            BoardFilterChip(title: "This Week", isSelected: selectedRange == "This Week") {
-                                selectedRange = "This Week"
-                            }
-                            BoardFilterChip(title: "This Month", isSelected: selectedRange == "This Month") {
-                                selectedRange = "This Month"
-                            }
-                        }
+                            }.padding(.horizontal,2)
                     }
 
                     // MARK: Category
@@ -96,37 +123,46 @@ struct BoardFilterView: View {
 
                     // MARK: Buttons
                     HStack(spacing: 16) {
-
+                        
                         Button(action: {
                             resetAll()
+                           // updateApplyFilterStatus()
+                            
+                            
                         }) {
                             Text("Reset All")
                                 .frame(maxWidth: .infinity)
                                 .frame(height:50)
-                                //.padding()
+                            //.padding()
                                 .background(Color.gray.opacity(0.2))
                                 .foregroundColor(.orange)
                                 .cornerRadius(12)
                                 .font(.inter(.semiBold, size: 14))
-
+                            
                         }
-
+                        
                         Button(action: {
                             // Apply action
+                            updateApplyFilterStatus()
+                            onFilterApplied()
+                            presentationMode.wrappedValue.dismiss()
+                            
                         }) {
-                            Text("Apply Filters(4)")
+                            let filterCount = (selectedRange.count > 0 ? 1 : 0) + (selectedStatus.count > 0 ? 1 : 0) + ((selectedCategory.count > 0) ? 1 : 0)
+                            let titleBtn = (filterCount > 0) ? "Apply Filters(\(filterCount))" : "Apply Filters"
+                            Text(titleBtn)
                                 .frame(maxWidth: .infinity)
                                 .frame(height:50)
-                                //.padding()
                                 .background(Color.orange)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                                 .font(.inter(.semiBold, size: 14))
-
                         }
                     }
                 }
-                .padding(9)
+                .padding(8)
+            }.onAppear{
+                getAppliedFilterStatus()
             }
         }
         .background(Color(.systemBackground))
@@ -138,10 +174,127 @@ struct BoardFilterView: View {
         selectedCategory = ""
         selectedStatus = ""
     }
+    
+    
+    func updateApplyFilterStatus(){
+        //Catgeory
+        if selectedCategory == "Board"{
+            FilterBoard.shared.selectedCategory = 0
+        }else if selectedCategory == "Ideas"{
+            FilterBoard.shared.selectedCategory = 3
+
+        }else if selectedCategory == "Image Ad"{
+            FilterBoard.shared.selectedCategory = 1
+        }else if selectedCategory == "Video Ad"{
+            FilterBoard.shared.selectedCategory = 2
+        }else{
+            FilterBoard.shared.selectedCategory = nil
+        }
+        
+        //Status
+       // value : 'draft', 'review', 'approved', 'rejected', 'sold out','featured'
+         
+        if selectedStatus == "Active"{
+            FilterBoard.shared.selectedStatus = "approved"
+
+        }else if selectedStatus == "Rejected"{
+            FilterBoard.shared.selectedStatus = "rejected"
+
+        }else if selectedStatus == "Inreview"{
+            FilterBoard.shared.selectedStatus = "review"
+
+        }else if selectedStatus == "Draft"{
+            FilterBoard.shared.selectedStatus = "draft"
+        }else{
+            FilterBoard.shared.selectedStatus = ""
+        }
+        
+        //Date Range
+        //posted_since :  today , within-1-week,within-2-week,within-1-month,within-3-month
+        
+        if selectedRange == "Today"{
+            FilterBoard.shared.selectedRange = "today"
+
+        }else if selectedRange == "This Week"{
+            FilterBoard.shared.selectedRange = "within-1-week"
+        }else if selectedRange == "Two Week"{
+            FilterBoard.shared.selectedRange = "within-2-week"
+        }else if selectedRange == "This Month"{
+            FilterBoard.shared.selectedRange = "within-1-month"
+        }else if selectedRange == "Three Month"{
+            FilterBoard.shared.selectedRange = "within-3-month"
+        }else{
+            FilterBoard.shared.selectedRange = ""
+        }
+    }
+    
+    
+    func getAppliedFilterStatus(){
+        //Catgeory
+        if FilterBoard.shared.selectedCategory == 0{
+            selectedCategory = "Board"
+            
+        }else if FilterBoard.shared.selectedCategory == 3{
+            
+            selectedCategory = "Ideas"
+
+        }else if FilterBoard.shared.selectedCategory == 1{
+            selectedCategory = "Image Ad"
+            
+        }else if  FilterBoard.shared.selectedCategory == 2{
+            
+            selectedCategory = "Video Ad"
+        }
+        
+        //Status
+       // value : 'draft', 'review', 'approved', 'rejected', 'sold out','featured'
+         
+        if  FilterBoard.shared.selectedStatus == "approved"{
+            selectedStatus = "Active"
+           
+
+        }else if FilterBoard.shared.selectedStatus == "rejected" {
+            
+            selectedStatus = "Rejected"
+            
+
+        }else if FilterBoard.shared.selectedStatus == "review"{
+            
+            selectedStatus = "Inreview"
+            
+
+        }else if FilterBoard.shared.selectedStatus == "draft"{
+            
+            selectedStatus = "Draft"
+            
+        }
+        
+        //Date Range
+        //posted_since :  today , within-1-week,within-2-week,within-1-month,within-3-month
+        
+        if FilterBoard.shared.selectedRange == "today"{
+            
+            selectedRange = "Today"
+
+        }else if FilterBoard.shared.selectedRange == "within-1-week" {
+            
+            selectedRange = "This Week"
+            
+        }else if FilterBoard.shared.selectedRange == "within-2-week" {
+            
+            selectedRange = "Two Week"
+            
+        }else if FilterBoard.shared.selectedRange == "within-1-month"{
+            selectedRange = "This Month"
+        }else if FilterBoard.shared.selectedRange == "within-3-month"{
+            selectedRange = "Three Month"
+        }
+       
+    }
 }
 
 #Preview {
-    BoardFilterView()
+    BoardFilterView(onFilterApplied: {})
 }
 
 
@@ -154,7 +307,7 @@ struct CategoryScrollView: View {
         
         ScrollView(.horizontal, showsIndicators: false) {
             
-            HStack(spacing: 10) {
+            HStack(spacing: 7) {
                 
                 ForEach(items, id: \.self) { item in
                     
@@ -164,17 +317,30 @@ struct CategoryScrollView: View {
                         Text(item)
                             .font(.inter(.semiBold, size: 13))
                             .frame(minWidth: 89) //  fixed minimum width
-                            .frame(height:50)
+                            .frame(height:48)
                            // .padding(.vertical, 10)
-                            .background(
-                                selected == item
-                                ? Color.orange
-                                : Color.gray.opacity(0.15)
-                            )
+//                            .background(
+//                                selected == item
+//                                ? Color.orange
+//                                : Color.gray.opacity(0.15)
+//                            )
                             .foregroundColor(
                                 selected == item ? .white : .gray
                             )
-                            .cornerRadius(12)
+//                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+//                            .overlay(
+//                                        RoundedRectangle(cornerRadius: 12)
+//                                            .stroke( selected == item  ? Color.orange : Color.gray.opacity(0.4), lineWidth: 1)
+//                                    )
+//                        
+                            .background(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(selected == item ? Color.orange : Color.gray.opacity(0.08))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(selected == item ? Color.orange : Color.gray.opacity(0.25), lineWidth: 0.8)
+                            )
                     }
                 }
             }
@@ -252,11 +418,20 @@ struct BoardFilterChip: View {
                // .padding(.vertical, 10)
                 .frame(maxWidth: .infinity)
                 .font(.inter(.semiBold, size: 13))
-                .frame(height:50)
-                .background(isSelected ? Color.orange : Color.gray.opacity(0.1))
+                .frame(minWidth: 89) //  fixed minimum width
+                .frame(height:48)
+                //.background(isSelected ? Color.orange : Color.gray.opacity(0.1))
                 .foregroundColor(isSelected ? .white : .gray)
-                .cornerRadius(12)
-        }
+                
+        }.background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(isSelected ? Color.orange : Color.gray.opacity(0.08))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(isSelected ? Color.orange : Color.gray.opacity(0.25), lineWidth: 0.8)
+        )
+        .clipped()
     }
 }
 

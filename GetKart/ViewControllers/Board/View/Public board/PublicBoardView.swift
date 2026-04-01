@@ -90,11 +90,10 @@ struct PublicBoardView: View {
         }
 
         .onChange(of: selectedCategoryId) { newId in
-           
-                FeedVideoManager.shared.pauseAll()
-                FeedVideoManager.shared.muteAll()
-                markTabLoaded(newId)
-
+            
+            FeedVideoManager.shared.pauseAll()
+            FeedVideoManager.shared.muteAll()
+            markTabLoaded(newId)
         }
         .onAppear {
             markTabLoaded(selectedCategoryId)
