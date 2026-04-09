@@ -33,7 +33,7 @@ struct CreateIdeaView: View {
     @State private var boardObj:ItemModel?
     var boardId = 0
     
-    @State var isPostValidate:Int = 0
+    @State private var isPostValidate:Int = 0
 
     
     
@@ -360,6 +360,12 @@ struct CreateIdeaView: View {
             strUrl = boardObj?.outbondUrl ?? ""
             selectedCategory = boardObj?.category?.name ?? ""
             selectedCategoryId = boardObj?.category?.id ?? 0
+            
+            if boardObj?.status?.lowercased() != "approved"{
+                isPostValidate = 0
+            }else{
+                isPostValidate = 1
+            }
         }
     }
      func getBoardDetailApi(){
@@ -398,7 +404,7 @@ struct CreateIdeaView: View {
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
             strUrl = Constant.shared.update_ideas
-            params["isPostValidate"] = 0
+          //  params["isPostValidate"] = 0
         }
         
         params["board_type"] = 3 // 0=product,1=business
@@ -542,78 +548,55 @@ struct CreateIdeaView: View {
     
     func checkNudityOfiMages(pickedImage: UIImage) {
         
-        if Float(Local.shared.iosNudityThreshold) > 0 {
-            
-            detectNudity(in: pickedImage) { isExplicit, confidence in
-                if isExplicit {
-                    print("Nudity detected with confidence: \(confidence!)")
-                    DispatchQueue.main.async {
-                        
-                        if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
-                            isPostValidate = 0
-                             AlertView.sharedManager.displayMessageWithAlert(
-                             title: "!Alert",
-                             msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
-                             )
-                        }else{
-                            isPostValidate = 1
-                            self.selectedImage = pickedImage
-                        }
+        NudityChecker.detectNudity(in: pickedImage) { isExplicit, confidence in
+            if isExplicit {
+                print("Nudity detected with confidence: \(confidence!)")
+                DispatchQueue.main.async {
+                    
+                    if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+                        isPostValidate = 0
+                         AlertView.sharedManager.displayMessageWithAlert(
+                         title: "!Alert",
+                         msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+                         )
+                    }else{
+                        isPostValidate = 1
+                        self.selectedImage = pickedImage
                     }
-                } else {
-                    isPostValidate = 1
-                    print("Image is safe")
                 }
+            } else {
+                isPostValidate = 1
+                print("Image is safe")
             }
         }
+//        
+//        if Float(Local.shared.iosNudityThreshold) > 0 {
+//            
+//            detectNudity(in: pickedImage) { isExplicit, confidence in
+//                if isExplicit {
+//                    print("Nudity detected with confidence: \(confidence!)")
+//                    DispatchQueue.main.async {
+//                        
+//                        if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+//                            isPostValidate = 0
+//                             AlertView.sharedManager.displayMessageWithAlert(
+//                             title: "!Alert",
+//                             msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                             )
+//                        }else{
+//                            isPostValidate = 1
+//                            self.selectedImage = pickedImage
+//                        }
+//                    }
+//                } else {
+//                    isPostValidate = 1
+//                    print("Image is safe")
+//                }
+//            }
+//        }
 
         
-        return
-//        pickedImage.checkNSFW() { result, confidence in
-//
-//            print(" confidence == \(confidence)")
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .sfw:
-//                       // isPostValidate = 1
-//
-//                case .nsfw:
-//                    if confidence > 0.5 {
-//                        isPostValidate = 0
-//                        AlertView.sharedManager.displayMessageWithAlert(
-//                            title: "!Alert",
-//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
-//                        )
-//                    } else {
-//                       // isPostValidate = 1
-//                    }
-//                case .unknown:
-//                    isPostValidate = 0
-//                }
-//            }
-//        }
 
-//        NSFWDetector.shared.check(image: pickedImage) { result in
-//            switch result {
-//            case let .success(nsfwConfidence: confidence):
-//
-//                print(" confidence == \(confidence)")
-//                DispatchQueue.main.async {   // <-- FIX IS HERE
-//                    if confidence > 0.05 {
-//                        isPostValidate = 0
-//                        AlertView.sharedManager.displayMessageWithAlert(
-//                            title: "!Alert",
-//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
-//                        )
-//                    } else {
-//                        isPostValidate = 1
-//                    }
-//                }
-//
-//            default:
-//                break
-//            }
-//        }
     }
 }
 

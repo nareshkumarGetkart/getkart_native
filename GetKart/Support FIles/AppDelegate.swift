@@ -673,6 +673,23 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
             }
+            
+        case "board-notification":
+            do{
+                
+                if itemId == 0{
+                    let hostingController = UIHostingController(rootView: NotificationView(navigation:self.navigationController))
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+               
+                }else{
+                    
+                    //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        
+                        self.getBoardDetailApi(boardId: itemId)
+                   // }
+                }
+            }
         case "seller-profile":
             do{
                 let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: userIdRecieved))

@@ -53,11 +53,8 @@ class HomeViewModel:ObservableObject{
         country = Local.shared.getUserCountry()
         state = Local.shared.getUserState()
         area = Local.shared.getUserLocality()
-        
-        // if state.count > 0 || city.count > 0{
         latitude = Local.shared.getUserLatitude()
         longitude = Local.shared.getUserLongitude()
-        //        }
         getSliderListApi()
         getCategoriesListApi()
         if Local.shared.getUserId() > 0{
@@ -66,7 +63,7 @@ class HomeViewModel:ObservableObject{
         getFeaturedListApi()
     }
     
-    
+   
     func getProductListApi(){
 
         if isDataLoading == true{
@@ -102,10 +99,16 @@ class HomeViewModel:ObservableObject{
                 
                 if self?.page == 1{
                     self?.itemObj = obj.data
-                    self?.delegate?.refreshScreen()
+                   // DispatchQueue.main.async {
+                        
+                        self?.delegate?.refreshScreen()
+                   // }
                     
                 }else{
-                    self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
+                  //  DispatchQueue.main.async {
+                        
+                        self?.delegate?.newItemRecieve(newItemArray: obj.data?.data)
+                    //}
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                     self?.isDataLoading = false
@@ -175,7 +178,10 @@ class HomeViewModel:ObservableObject{
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:FeaturedParse) in
             if obj.code == 200 {
                 self?.featuredObj = obj.data
-                self?.delegate?.refreshFeaturedsList()
+                //DispatchQueue.main.async {
+                    
+                    self?.delegate?.refreshFeaturedsList()
+               // }
             }else{
 
             }
@@ -197,7 +203,10 @@ class HomeViewModel:ObservableObject{
             */
             if obj.code == 200 {
                 self?.sliderArray = obj.data
-                self?.delegate?.refreshBannerList()
+               // DispatchQueue.main.async {
+                    
+                    self?.delegate?.refreshBannerList()
+               // }
             }
         })
     }
@@ -209,7 +218,10 @@ class HomeViewModel:ObservableObject{
             
             if obj.code == 200 {
                 self?.categoryObj = obj.data
-                self?.delegate?.refreshCategoriesList()
+               // DispatchQueue.main.async {
+                    
+                    self?.delegate?.refreshCategoriesList()
+               // }
             }
         }
     }
@@ -238,7 +250,9 @@ class HomeViewModel:ObservableObject{
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_my_ad) {[weak self] (obj:ItemParse) in
             if obj.code == 200 {
                 self?.myAdsArray = obj.data?.data ?? []
-                self?.delegate?.refreshMyAdsList()                
+                //DispatchQueue.main.async {
+                    self?.delegate?.refreshMyAdsList()
+                //}
             }else{
 
             }

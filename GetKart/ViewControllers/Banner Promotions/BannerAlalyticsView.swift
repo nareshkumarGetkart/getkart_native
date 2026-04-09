@@ -100,7 +100,10 @@ struct BannerAlalyticsView: View {
 
                 }
 
-                if (objBanner?.rejectionReason?.count ?? 0) > 0{
+              //  if (objBanner?.rejectionReason?.count ?? 0) > 0{
+                    
+                if ((objBanner?.rejectionReason?.count ?? 0) > 0)  && ((objBanner?.status?.lowercased() ?? "") == "rejected"){
+                        
                     Text(objBanner?.rejectionReason ?? "").foregroundColor(Color(.systemRed)).font(.manrope(.regular, size: 16.0))
                 }
                

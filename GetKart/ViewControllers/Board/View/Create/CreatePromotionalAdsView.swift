@@ -33,7 +33,8 @@ struct CreatePromotionalAdsView: View {
 
     var isFromEdit:Bool = false
     var boardId = 0
-    
+    @State   var isPostValidate:Int = 0
+
     var body: some View {
         HStack(spacing:0){
             Button {
@@ -249,7 +250,8 @@ struct CreatePromotionalAdsView: View {
                     ImageCropperBoardView(
                         image: img,
                         onCropped: { croppedImage in
-                            self.selectedImage = croppedImage
+                           // self.selectedImage = croppedImage
+                            self.checkNudityOfiMages(pickedImage: croppedImage)
                             showCropper = false
                         },
                         onCancel: {
@@ -326,7 +328,34 @@ struct CreatePromotionalAdsView: View {
 
         }
     }
+    
+    func checkNudityOfiMages(pickedImage: UIImage) {
         
+        NudityChecker.detectNudity(in: pickedImage) { isExplicit, confidence in
+           
+            if isExplicit {
+                print("Nudity detected with confidence: \(confidence!)")
+                DispatchQueue.main.async {
+                    
+                    if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+                        isPostValidate = 0
+                         AlertView.sharedManager.displayMessageWithAlert(
+                         title: "!Alert",
+                         msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+                         )
+                    }else{
+                        isPostValidate = 1
+                        self.selectedImage = pickedImage
+                    }
+                }
+            } else {
+                isPostValidate = 1
+                print("Image is safe")
+            }
+        }
+        
+    }
+
     func updateDetails(){
         if boardObj != nil && selectedCategoryId == nil{
             strTitle = boardObj?.name ?? ""
@@ -337,6 +366,13 @@ struct CreatePromotionalAdsView: View {
            
             selectedCallToACtion = boardObj?.ctaLabel ?? ""
             selectedCallToACtionId = boardObj?.ctaType ?? 0
+            
+           
+            if boardObj?.status?.lowercased() != "approved"{
+                isPostValidate = 0
+            }else{
+                isPostValidate = 1
+            }
         }
     }
      func getBoardDetailApi(){
@@ -366,9 +402,13 @@ struct CreatePromotionalAdsView: View {
         var params:Dictionary<String,Any> = [:]
         
         var strApiUrl = Constant.shared.create_promotional_board
+        params["isPostValidate"] = isPostValidate
+
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
             strApiUrl = Constant.shared.update_promotional_board
+           // params["isPostValidate"] = 0
+
         }
         
         params["board_type"] = 1 // 0=product,1=business,2=board video,3=idea

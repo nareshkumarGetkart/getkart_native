@@ -25,8 +25,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var lblAddress:UILabel!
     @IBOutlet weak var btnLocation:UIButton!
-    @IBOutlet weak var loaderBgView:UIView!
-    @IBOutlet weak var cnstrntLoaderHt:NSLayoutConstraint!
     
     private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -42,7 +40,7 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        cnstrntHtNavBar.constant = self.getNavBarHt
+        cnstrntHtNavBar.constant = self.getNavBarHt + 50
         btnLocation.layer.cornerRadius = 8.0
         btnLocation.backgroundColor = .systemBackground
         btnLocation.setImageColor(color: .label)
@@ -76,10 +74,6 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if !AppDelegate.sharedInstance.isInternetConnected{
@@ -94,6 +88,11 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
         // Clear caches, release unnecessary memory
         ImageCache.default.clearMemoryCache()
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     
     func registerCells(){
         tblView.register(UINib(nibName: "HomeTblCell", bundle: nil), forCellReuseIdentifier: "HomeTblCell")
@@ -563,7 +562,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         return 5
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    /*func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 1{
             return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 135 : 0
         }
@@ -585,10 +584,38 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
         }
         return  UITableView.automaticDimension
     }
+    */
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+        case 1:
+            return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 135 : 0
+            
+        case 2:
+            return (homeVModel?.myAdsArray?.count ?? 0) > 0 ? 180 : 0
+            
+        case 3:
+            guard
+                let featured = homeVModel?.featuredObj,
+                indexPath.row < featured.count   // bounds check — no subscript needed
+            else { return 0 }
+            
+            let obj = featured[indexPath.row]    // safe because we checked above
+            
+            guard let sectionData = obj.sectionData, !sectionData.isEmpty
+            else { return 0 }
+            
+            if obj.style == "style_1" || obj.style == "style_2" || obj.style == "style_4" {
+                return 315
+            }
+            return UITableView.automaticDimension
+            
+        default:
+            return UITableView.automaticDimension
+        }
+    }
     
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+   /* func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
             
@@ -614,22 +641,27 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
             return 0
         }
     }
-    
-    
+    */
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch section {
+        case 0: return (homeVModel?.sliderArray?.count ?? 0) > 0 ? 1 : 0
+        case 1: return (homeVModel?.categoryObj?.data?.count ?? 0) > 0 ? 1 : 0
+        case 2: return (homeVModel?.myAdsArray?.count ?? 0) > 0 ? 1 : 0
+        case 3: return homeVModel?.featuredObj?.count ?? 0  // must match what heightForRowAt accesses
+        case 4: return (homeVModel?.itemObj?.data?.count ?? 0) > 0 ? 1 : 0
+        default: return 0
+        }
+    }
+ 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "BannerTblCell") as! BannerTblCell
-            if let banners = homeVModel?.sliderArray {
+            if let banners = homeVModel?.sliderArray , !banners.isEmpty {
                 cell.configure(with: banners)
             }
              cell.navigationController = self.navigationController
-
-//            cell.listArray = homeVModel?.sliderArray
-//            cell.collctnView.updateConstraints()
-//            cell.collctnView.reloadData()
-//            cell.updateConstraints()
             return cell
             
         }  else if indexPath.section == 1 {
@@ -850,7 +882,15 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource {
 
 
 extension HomeVC: RefreshScreen{
-    
+    // HomeVC — safe section reload helper
+    private func safeReload(section: Int) {
+        DispatchQueue.main.async {
+            guard self.tblView.numberOfSections > section else { return }
+            UIView.performWithoutAnimation {
+                self.tblView.reloadSections(IndexSet(integer: section), with: .none)
+            }
+        }
+    }
     
     func refreshFeaturedsList(){
         
@@ -858,18 +898,21 @@ extension HomeVC: RefreshScreen{
             self.tblView.reloadData()
             
         }else{
+            //safeReload(section: 3)
+
             tblView.reloadSections(IndexSet(integer: 3), with: .none)
         }
     }
     
     func refreshBannerList(){
-        
+       // safeReload(section: 0)
         tblView.reloadSections(IndexSet(integer: 0), with: .none)
 
     }
     func refreshCategoriesList(){
-        
-        tblView.reloadSections(IndexSet(integer: 1), with: .none)
+       // safeReload(section: 1)
+
+       tblView.reloadSections(IndexSet(integer: 1), with: .none)
     }
     
     func refreshScreen(){
@@ -884,7 +927,6 @@ extension HomeVC: RefreshScreen{
         tblView.setNeedsLayout()
         tblView.layoutIfNeeded()
        // tblView.reloadSections(IndexSet(integer: 2), with: .none)
-        
     }
     
     func newItemRecieve(newItemArray:[Any]?){
@@ -965,10 +1007,9 @@ extension HomeVC {
 
     func configureTableView() {
         tblView.rowHeight = UITableView.automaticDimension
-        tblView.estimatedRowHeight = 200
+       // tblView.estimatedRowHeight = 200
         tblView.refreshControl = topRefreshControl
         self.topRefreshControl.backgroundColor = .clear
-        
         registerCells()
     }
 

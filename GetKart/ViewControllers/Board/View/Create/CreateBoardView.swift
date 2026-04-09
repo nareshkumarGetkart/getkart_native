@@ -36,8 +36,8 @@ struct CreateBoardView: View {
     @State private var selectedCallToAction: String?
     @State private var selectedCallToActionId: Int?
     @State private var boardObj: ItemModel?
-    
     @State private var deletedImgIdArray = [String]()
+    @State  var isPostValidate:Int = 0
 
    
     // MARK: - Grid Layout
@@ -372,6 +372,7 @@ struct CreateBoardView: View {
         .fullScreenCover(item: $cropWrapper) { wrapper in
             MultiImageCropperView(images:  wrapper.images) { images in
                 selectedImages.append(contentsOf: images)
+                self.checkNudityOfiMages(selectedImages: selectedImages)
                 cropWrapper = nil
             } onCancel: {
                 cropWrapper = nil
@@ -432,6 +433,43 @@ struct CreateBoardView: View {
     }
     
     
+    func checkNudityOfiMages(selectedImages: [Any]) {
+        
+        
+        for img in selectedImages{
+          
+            if let pickedImage = img as? UIImage{
+                
+                NudityChecker.detectNudity(in: pickedImage) { isExplicit, confidence in
+                   
+                    if isExplicit {
+                        print("Nudity detected with confidence: \(confidence!)")
+                        DispatchQueue.main.async {
+                            
+                            if (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+                                isPostValidate = 0
+                                 AlertView.sharedManager.displayMessageWithAlert(
+                                 title: "!Alert",
+                                 msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+                                 )
+                                return
+                            }else{
+                                isPostValidate = 1
+                              //  self.selectedImages = pickedImage
+                            }
+                        }
+                    } else {
+                        isPostValidate = 1
+                        print("Image is safe")
+                    }
+                }
+
+            }
+
+        }
+        
+    }
+    
     func checkAndAppendData(strURL:String){
         
         for anyData in (self.boardObj?.galleryImages ?? []){
@@ -442,6 +480,8 @@ struct CreateBoardView: View {
         }
         
     }
+    
+    
     
     
     func updateDetails(){
@@ -464,6 +504,12 @@ struct CreateBoardView: View {
 
             for item in self.boardObj?.galleryImages ?? []{
                 self.selectedImages.append(item.image ?? "")
+            }
+            
+            if boardObj?.status?.lowercased() != "approved"{
+                isPostValidate = 0
+            }else{
+                isPostValidate = 1
             }
         }
     }
@@ -499,11 +545,14 @@ struct CreateBoardView: View {
         params["description"] = strDescription
         params["outbond_url"] = strUrl
         params["special_price"] = strOfferPrice
-        
+        params["isPostValidate"] = isPostValidate
+
         var strApiUrl = Constant.shared.create_board
         if isFromEdit{
             params["id"] = boardObj?.id ?? 0
             strApiUrl = Constant.shared.update_board
+          //  params["isPostValidate"] = 0
+
         }
         
         params["board_type"] = 0 // 0=product,1=business
@@ -527,7 +576,6 @@ struct CreateBoardView: View {
                 }
             }
         }
-        
        
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: nil, imageName: "", imagesData: galleryImagesData, imageNames: imgNames, url:strApiUrl , params: params, completionHandler: { responseObject, error in
 

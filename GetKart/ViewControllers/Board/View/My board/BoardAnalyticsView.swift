@@ -130,10 +130,12 @@ struct BoardAnalyticsView: View {
                     
                     Spacer()
                 }.padding(.top)
- 
-                if (objAnalytics?.board?.rejectionReason?.count ?? 0) > 0{
+               
+                if ((objAnalytics?.board?.rejectionReason?.count ?? 0) > 0)  && ((objAnalytics?.board?.status?.lowercased() ?? "") == "rejected"){
                     Text(objAnalytics?.board?.rejectionReason ?? "").foregroundColor(Color(.systemRed)).font(.inter(.regular, size: 16.0))
                 }
+                
+                
                
                 if (objAnalytics?.board?.outbondURL ?? "").count > 0 {
                     VStack(alignment: .leading, spacing: 8) {
@@ -295,7 +297,7 @@ struct BoardAnalyticsView: View {
                 self.showSheetpackages = false
                 selectedPkgObj = selPkgObj
                 paymentGatewayOpen()
-            })
+            },boardType: objAnalytics?.board?.boardType ?? 0)
             
             .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)

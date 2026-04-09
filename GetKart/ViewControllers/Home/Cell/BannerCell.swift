@@ -17,5 +17,15 @@ class BannerCell: UICollectionViewCell {
         imgVwBanner.layer.cornerRadius = 10.0
         imgVwBanner.clipsToBounds = true
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+    }
+    
+    func setBannerItem(obj:SliderModel){
+        self.imgVwBanner.kf.setImage(with: URL(string: obj.image ?? "")) //, placeholder:UIImage(named: "getkartplaceholder")
+        self.imgVwBanner.contentMode = .scaleToFill
+        self.imgVwBanner.clipsToBounds = true
+    }
 
 }

@@ -27,7 +27,7 @@ enum ProductType:Int {
 
 
 struct UploadImageVideoView: View {
-
+    
     var navigationController: UINavigationController?
     @State private var showVideoSheet = false
     @State private var showSheet = false
@@ -37,7 +37,7 @@ struct UploadImageVideoView: View {
     @State private var selectionType: ProductType = .product
     @State private var pickerConfig: PickerConfig?
     @State private var selectedVideoURL: URL?
-   // @State private var isPreparingVideo = false
+    // @State private var isPreparingVideo = false
     @State private var isLoading = false
     
     private var currentSelectionLimit: Int {
@@ -48,9 +48,9 @@ struct UploadImageVideoView: View {
             return 1
         }
     }
-
+    
     var body: some View {
-
+        
         if #available(iOS 17.0, *) {
             VStack(spacing: 0) {
                 
@@ -136,10 +136,10 @@ struct UploadImageVideoView: View {
                     switch type {
                     case .video:
                         print("Video tapped")
-                       // self.showVideoSheet = true
+                        // self.showVideoSheet = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
                             self.pushQuick()
-
+                            
                         })
                     case .image:
                         print("Image tapped")
@@ -168,29 +168,29 @@ struct UploadImageVideoView: View {
             
             .fullScreenCover(isPresented: $showVideoSheet) {
                 VideoPickerPHPicker(
-                            onVideoPicked: { url in
-                                print("Video:", url)
-                                showVideoSheet = false
-                                selectedVideoURL = url
-                            },
-                            onCancel: {
-                                showVideoSheet = false
-                            },
-                            isLoading: $isLoading   // 👈 PASS BINDING
-                        )
-               
-
-//                VideoPickerPHPicker { url in
-//                    showVideoSheet = false
-//                    selectedVideoURL = url
-//               
-//                    
-//                } onCancel: {
-//                    showVideoSheet = false
-//                }
+                    onVideoPicked: { url in
+                        print("Video:", url)
+                        showVideoSheet = false
+                        selectedVideoURL = url
+                    },
+                    onCancel: {
+                        showVideoSheet = false
+                    },
+                    isLoading: $isLoading   // 👈 PASS BINDING
+                )
+                
+                
+                //                VideoPickerPHPicker { url in
+                //                    showVideoSheet = false
+                //                    selectedVideoURL = url
+                //
+                //
+                //                } onCancel: {
+                //                    showVideoSheet = false
+                //                }
             }
             
-           
+            
             .sheet(item: $selectedVideoURL, content: { url in
                 
                 ProVideoTrimmerView(url: url, maxDuration: 30) { trimmedURL in
@@ -202,8 +202,8 @@ struct UploadImageVideoView: View {
                 } onCancel: {
                     selectedVideoURL = nil
                 }
-
-                                
+                
+                
             })
             
             
@@ -242,31 +242,61 @@ struct UploadImageVideoView: View {
             // Fallback on earlier versions
         }
     }
-
+    
     // MARK: - Navigation
-
+    
     func pushToCreateBoardScreen() {
-        let destVC = UIHostingController(
-            rootView: CreateBoardView(
-                navigationController: navigationController,
-                selectedImages: finalImages
+        
+        checkNudityOfImages(selectedImages: finalImages) { result in
+            if result == 1 {
+                print("All images safe, continue upload")
+            } else {
+                print("Nudity found, stop upload")
+                AlertView.sharedManager.showToast(message: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited.")
+            }
+            let destVC = UIHostingController(
+                rootView: CreateBoardView(
+                    navigationController: navigationController,
+                    selectedImages: finalImages,
+                    isPostValidate: result
+                )
             )
-        )
-        navigationController?.pushViewController(destVC, animated: true)
+            navigationController?.pushViewController(destVC, animated: true)
+        }
     }
-
+    
     func pushToPromotionalImageView(image: UIImage) {
-        let destVC = UIHostingController(
-            rootView: CreatePromotionalAdsView(
-                navigationController: navigationController,
-                selectedImage: image,
-                isFromEdit: false
+        
+        
+        checkNudityOfImages(selectedImages: [image]) { result in
+            if result == 1 {
+                print("All images safe, continue upload")
+            } else {
+                print("Nudity found, stop upload")
+                AlertView.sharedManager.showToast(message: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited.")
+                
+               // displayMessageWithAlert(
+               //                            title: "!Alert",
+               //                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+               //                        )
+            }
+            
+            let destVC = UIHostingController(
+                rootView: CreatePromotionalAdsView(
+                    navigationController: navigationController,
+                    selectedImage: image,
+                    isFromEdit: false,
+                    isPostValidate:result
+                )
             )
-        )
-        navigationController?.pushViewController(destVC, animated: true)
+            navigationController?.pushViewController(destVC, animated: true)
+        }
+        
+      
     }
     
     func pushToPromotionalVideoView(asset: AVURLAsset) {
+     
         let destVC = UIHostingController(
             rootView: CreatePromotionalVideoAdsView(
                 navigationController: navigationController,
@@ -288,6 +318,42 @@ struct UploadImageVideoView: View {
             )
         )
         navigationController?.pushViewController(destVC, animated: true)
+    }
+    
+    
+    func checkNudityOfImages(selectedImages: [Any], completion: @escaping (Int) -> Void) {
+        
+        var safeCount = 0
+        let total = selectedImages.count
+        
+        for img in selectedImages {
+            
+            guard let pickedImage = img as? UIImage else { continue }
+            
+            NudityChecker.detectNudity(in: pickedImage) { isExplicit, confidence in
+                
+                DispatchQueue.main.async {
+                    
+                    if isExplicit == true,
+                       (confidence ?? 0) > Float(Local.shared.iosNudityThreshold) {
+//                        
+//                        AlertView.sharedManager.displayMessageWithAlert(
+//                            title: "!Alert",
+//                            msg: "Uploading or sharing any form of vulgar or offensive content on this platform is strictly prohibited."
+//                        )
+                        
+                        completion(0) // nudity found
+                        return
+                    }
+                    
+                    safeCount += 1
+                    
+                    if safeCount == total {
+                        completion(1) // all images safe
+                    }
+                }
+            }
+        }
     }
 }
 

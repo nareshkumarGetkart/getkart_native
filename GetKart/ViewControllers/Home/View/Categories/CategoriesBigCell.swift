@@ -17,8 +17,25 @@ class CategoriesBigCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-       
-     
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
     }
 
+    
+    func updateCellItems(obj:CategoryModel){
+        
+        self.lblTitle.text = obj.name
+        self.imgView.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        DispatchQueue.main.async {
+            self.imageBgView.backgroundColor = UIColor(hexString: "#fff7e9")
+            self.imageBgView.roundCorners(corners: [.bottomLeft,.bottomRight], radius: 15.0)
+            self.imageBgView.clipsToBounds = true
+            self.bgView.layer.borderColor = UIColor.lightGray.cgColor
+            self.bgView.layer.borderWidth = 1.5
+            self.bgView.layer.cornerRadius = 10.0
+            self.bgView.clipsToBounds = true
+        }
+    }
 }

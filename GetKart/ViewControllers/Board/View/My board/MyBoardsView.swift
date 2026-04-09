@@ -20,7 +20,7 @@ struct MyBoardsView: View {
     @State private var showFilterScreen = false
 
     var body: some View {
-        HStack{
+       /* HStack{
             Button {
                 navigationController?.popViewController(animated: true)
             } label: {
@@ -54,11 +54,58 @@ struct MyBoardsView: View {
                     self.page = 1
                     getAdsListApi()
                 })
-                .presentationDetents([.height(450)])   // fixed height
+                .presentationDetents([.height(550)])   // fixed height
                 .presentationDragIndicator(.visible)
                 .cornerRadius(20.0)
             }
-        
+        */
+        HStack {
+            Button {
+                navigationController?.popViewController(animated: true)
+            } label: {
+                Image("arrow_left")
+                    .renderingMode(.template)
+                    .foregroundColor(Color(UIColor.label))
+            }
+
+            Text("My Boards & Ideas")
+                .font(.inter(.medium, size: 18))
+
+            Spacer()
+
+            Button {
+                showFilterScreen = true
+            } label: {
+
+                ZStack(alignment: .topTrailing) {
+
+                    Image("FilterLine")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+
+                    if getFilterAppliedCount() > 0 {
+                        Text("\(getFilterAppliedCount())")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 18, height: 18)
+                            .background(Color.red)
+                            .clipShape(Circle())
+                            .offset(x: 8, y: -8)
+                    }
+                }
+            }
+        }
+        .padding()
+        .frame(height: 44)
+        .sheet(isPresented: $showFilterScreen) {
+            BoardFilterView(onFilterApplied: {
+                self.page = 1
+                getAdsListApi()
+            })
+            .presentationDetents([.height(510)])
+            .presentationDragIndicator(.visible)
+            .cornerRadius(25.0)
+        }
         ScrollView{
             if listArray.count == 0 && !isDataLoading {
                 HStack{
@@ -144,6 +191,7 @@ struct MyBoardsView: View {
     
     func getFilterAppliedCount() -> Int{
         var filterCount = (FilterBoard.shared.selectedRange.count > 0 ? 1 : 0) + (FilterBoard.shared.selectedStatus.count > 0 ? 1 : 0)
+        + ((FilterBoard.shared.fromDate.count > 0 && FilterBoard.shared.toDate.count > 0) ? 1 : 0)
         
         if let board =  FilterBoard.shared.selectedCategory{
             filterCount += 1
@@ -180,8 +228,12 @@ struct MyBoardsView: View {
         if  FilterBoard.shared.selectedRange.count > 0{
             
             strUrl.append("&posted_since=\(FilterBoard.shared.selectedRange)")
-
-            
+        }
+        
+        
+        if FilterBoard.shared.fromDate.count > 0 && FilterBoard.shared.toDate.count > 0{
+            strUrl.append("&from_date=\(FilterBoard.shared.fromDate)")
+            strUrl.append("&to_date=\(FilterBoard.shared.toDate)")
         }
         
         ApiHandler.sharedInstance.makeGetGenericData(
@@ -447,7 +499,7 @@ struct MyBoardCell:View {
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
                 onBoostTapped(itemObj,selPkgObj)
-            })
+            },boardType: itemObj.boardType ?? 0)
             
             .presentationDetents([.height(410)])
             .presentationDragIndicator(.hidden)

@@ -34,11 +34,23 @@ class BannerTblCell: UITableViewCell {
             collctnView.addGestureRecognizer(longPress)
     }
     
+  
     
-    deinit{
-        timer = nil
+    // prepareForReuse — stop timer and reset state so reused cell is clean
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        stopTimer()
+        listArray = nil
+        x = 0
+        pageControl.currentPage = 0
+        pageControl.numberOfPages = 0
+        // Scroll back to 0 without animation so reuse doesn't flash old position
+        collctnView.setContentOffset(.zero, animated: false)
     }
-    
+    // deinit — always stop timer on dealloc
+    deinit {
+        stopTimer()
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -46,7 +58,7 @@ class BannerTblCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func configure(with banners: [SliderModel]) {
+   /* func configure(with banners: [SliderModel]) {
       //  guard self.listArray?.count != banners.count else { return }
         self.listArray = banners
         self.pageControl.numberOfPages = banners.count
@@ -55,15 +67,75 @@ class BannerTblCell: UITableViewCell {
         self.collctnView.reloadData()
         startTimer()
     }
+    */
     
-    func startTimer() {
+  
+     
+     func configure(with banners: [SliderModel]) {
+         // Guard — don't reload if same banners already showing
+         let newIds = banners.compactMap { $0.id }
+         let currentIds = self.listArray?.compactMap { $0.id } ?? []
+         guard newIds != currentIds else {
+             // Data is same, just ensure timer is running
+             startTimer()
+             return
+         }
+         
+         self.listArray = banners
+         self.pageControl.numberOfPages = banners.count
+         self.pageControl.currentPage = 0
+         self.x = 0
+         
+         // Stop old timer before reload
+         stopTimer()
+         
+         self.collctnView.reloadData()
+         
+         // Layout must complete before scrolling to top
+         self.collctnView.layoutIfNeeded()
+         
+         // Reset scroll position to start — prevents flash of old position
+         if banners.count > 0 {
+             self.collctnView.scrollToItem(
+                 at: IndexPath(item: 0, section: 0),
+                 at: .centeredHorizontally,
+                 animated: false  // false = no flicker on load
+             )
+         }
+         
+         startTimer()
+     }
+     
+ 
+    
+   /* func startTimer() {
         if timer == nil {
             timer =  Timer.scheduledTimer(timeInterval:  TimeInterval(Local.shared.bannerScrollInterval), target: self, selector: #selector(self.scrollAutomatically), userInfo: nil, repeats: true)
         }
+    }*/
+    
+    // Split timer management into clear start/stop
+    func startTimer() {
+        guard timer == nil else { return }  // never stack timers
+        guard (listArray?.count ?? 0) > 1 else { return }  // no timer for single banner
+        timer = Timer.scheduledTimer(
+            timeInterval: TimeInterval(Local.shared.bannerScrollInterval),
+            target: self,
+            selector: #selector(scrollAutomatically(_:)),
+            userInfo: nil,
+            repeats: true
+        )
+    }
+
+    
+    
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
     }
     
     
-    @objc func scrollAutomatically(_ timer1: Timer) {
+   /* @objc func scrollAutomatically(_ timer1: Timer) {
         
         if let banner = listArray, banner.count > 0{
             if self.x < banner.count {
@@ -75,11 +147,26 @@ class BannerTblCell: UITableViewCell {
                 self.collctnView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredHorizontally, animated: true)
             }
         }
-    }
+    }*/
     
  
+    @objc func scrollAutomatically(_ timer1: Timer) {
+        guard let banner = listArray, banner.count > 1 else { return }
+        
+        // x is always the NEXT item to scroll to
+        let nextIndex = x % banner.count
+        
+        collctnView.scrollToItem(
+            at: IndexPath(item: nextIndex, section: 0),
+            at: .centeredHorizontally,
+            animated: true
+        )
+        x = (nextIndex + 1) % banner.count
+    }
     
-    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+    
+    
+  /*  @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             // User pressed & holding — stop auto-scroll
@@ -93,8 +180,21 @@ class BannerTblCell: UITableViewCell {
         default:
             break
         }
-    }
+    }*/
 
+ 
+
+    // handleLongPress — use stopTimer/startTimer
+    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            stopTimer()
+        case .ended, .cancelled, .failed:
+            startTimer()
+        default:
+            break
+        }
+    }
 
 }
 
@@ -140,11 +240,12 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
     
     
     // MARK: - Scroll Handling
+  
+    // scrollViewWillBeginDragging — use stopTimer not inline invalidate
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-        timer = nil
+        stopTimer()
     }
-
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageWidth = scrollView.frame.width
         let currentPage = Int((scrollView.contentOffset.x + pageWidth/2) / pageWidth)
@@ -166,9 +267,10 @@ extension BannerTblCell:UICollectionViewDelegate,UICollectionViewDataSource,UICo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BannerCell", for: indexPath) as! BannerCell
         if let obj = listArray?[indexPath.item]{
-            cell.imgVwBanner.kf.setImage(with:  URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+            cell.setBannerItem(obj: obj)
+           /* cell.imgVwBanner.kf.setImage(with: URL(string: obj.image ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
             cell.imgVwBanner.contentMode = .scaleToFill
-            cell.imgVwBanner.clipsToBounds = true
+            cell.imgVwBanner.clipsToBounds = true*/
         }
         
         return cell

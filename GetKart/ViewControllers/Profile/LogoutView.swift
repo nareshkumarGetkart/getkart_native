@@ -94,6 +94,7 @@ struct LogoutView: View {
                 RealmManager.shared.clearDB()
                 */
                 Local.shared.removeUserData()
+                FilterBoard.shared.removeSavedFilter()
                 showAlert = false
                 presentationMode.wrappedValue.dismiss()
                 AppDelegate.sharedInstance.showLoginScreen()

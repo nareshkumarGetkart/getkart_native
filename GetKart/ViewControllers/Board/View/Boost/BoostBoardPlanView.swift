@@ -12,6 +12,7 @@ struct BoostBoardPlanView: View {
     @State private var planListArray:Array<PlanModel>?
     let categoryId:Int
     var packageSelectedPressed: ((_ selPkgObj:PlanModel)->Void)?
+    var boardType:Int = 0
 
     var body: some View {
         VStack(spacing: 16) {
@@ -64,7 +65,7 @@ struct BoostBoardPlanView: View {
     private var header: some View {
         HStack {
             Spacer()
-            Text("Boost your board")
+            Text(getTitle())
                 .font(.inter(.semiBold, size: 18))
             Spacer()
             Button {
@@ -75,6 +76,22 @@ struct BoostBoardPlanView: View {
                     .padding(8)
             }
         }
+    }
+    
+    func getTitle() ->String{
+        if boardType == 0{
+            return "Boost your board"
+        }else  if boardType == 0{
+            return "Boost your board"
+
+        }else  if boardType == 0{
+            return "Boost your board"
+
+        }else  if boardType == 3{
+            return "Boost your idea"
+
+        }
+        return "Boost your board"
     }
     
     func getPackagesApi(){

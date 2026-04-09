@@ -647,7 +647,7 @@ private extension SmartVideoPlayerView {
                 switch status {
                     
                 case .readyToPlay:
-                    print("✅ Ready to play")
+                  //  print("✅ Ready to play")
                     isReadyToPlay = true
                     
                 case .failed:
@@ -804,7 +804,7 @@ final class FeedVideoManager: ObservableObject {
             return existing
         }
 
-        print("🎬 Creating player:", id)
+       // print("🎬 Creating player:", id)
 
         let item = AVPlayerItem(url: url)
         item.preferredForwardBufferDuration = 2
