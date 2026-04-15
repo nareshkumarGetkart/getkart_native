@@ -69,7 +69,6 @@ class ItemDetailViewModel:ObservableObject{
                             nav?.popViewController(animated: true)
                             
                         }
-
                     }
                 }else{
                     AlertView.sharedManager.presentAlertWith(title: "", msg: (obj.message ?? "") as NSString, buttonTitles: ["OK"], onController: (nav?.topViewController)!) { title, index in

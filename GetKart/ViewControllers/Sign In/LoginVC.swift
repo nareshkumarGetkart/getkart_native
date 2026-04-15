@@ -11,6 +11,8 @@ import GoogleSignIn
 import SwiftUI
 import FirebaseAuth
 import FirebaseCore
+import FacebookAEM
+import FacebookCore
 
 enum SocialMediaLoginType{
     case gmail, apple
@@ -142,6 +144,9 @@ class LoginVC: UIViewController {
     }
     
     @IBAction func skipButtonAction() {
+       // AppEvents.shared.logEvent(AppEvents.Name("skip"))
+        FaceBookAppEvents.facebookEvents(type: .skip, categoryName: "")
+
         self.txtEmailPhone.text = ""
         if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
             self.navigationController?.pushViewController(vc, animated: true)
@@ -170,7 +175,6 @@ class LoginVC: UIViewController {
     }
     
     
-    
     func saltGeneratorApi(){
         
         
@@ -185,12 +189,11 @@ class LoginVC: UIViewController {
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.salt_handler , param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
             
-            
             if(error != nil)
             {
                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
                 print(error ?? "defaultValue")
-                
+           
             }else{
                 
                 let result = responseObject! as NSDictionary
@@ -205,9 +208,7 @@ class LoginVC: UIViewController {
                             self?.sendOTPApi(saltKey: salt_token)
                         }
                     }
-               
                 }
-                
             }
         }
     }
@@ -217,14 +218,9 @@ class LoginVC: UIViewController {
         let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
 
         let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","salt_token":saltKey,"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
-        
-        
-        
+                
         URLhandler.sharedinstance.makeCall(url: Constant.shared.send_mobile_otp_handler, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
-            
-//        URLhandler.sharedinstance.makeCall(url: Constant.shared.sendMobileOtpUrl, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
-//            
-            
+
             if(error != nil)
             {
                 //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
@@ -441,7 +437,11 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                         Local.shared.saveUserId(userId: objUserInfo.id ?? 0)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
                         SocketIOManager.sharedInstance.checkSocketStatus()
-                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController)) 
+                        
+                        FaceBookAppEvents.saveLoginEvent(userObj: objUserInfo, screenName: "login_screen")
+                       // AppEvents.shared.logEvent(AppEvents.Name("login"))
+                        
+                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
                         self.navigationController?.pushViewController(hostingController, animated: true)
                     }
                     
@@ -560,3 +560,191 @@ extension LoginVC:SignInWithEmailSkipDelegate{
     }
 }
 
+
+enum FaceBookEventType{
+    case login
+    case loginEmail
+    case skip
+    case board
+    case boardDetail
+    case classified
+    case classifiedDetail
+    case payment
+    case createOffer
+    case postBoard
+    case postClassified
+    case boardSearch
+    case classifiedSearch
+}
+
+class FaceBookAppEvents{
+    
+    
+    static func facebookEvents(type:FaceBookEventType,categoryName:String,amount:String = ""){
+        
+        switch type {
+            
+        case .boardSearch:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("board_search"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "board_search_screen",
+                        AppEvents.ParameterName("search_query"): categoryName,
+                    ]
+                )
+            }
+            break
+        case .classifiedSearch:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("classified_search"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "classified_search_screen",
+                        AppEvents.ParameterName("search_query"): categoryName,
+                    ]
+                )
+            }
+            break
+            
+        case .login:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("login"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "login_screen"
+                    ]
+                )
+            }
+            break
+            
+        case .loginEmail:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("login"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "login_email"
+                    ]
+                )
+            }
+            break
+            
+        case .skip:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("login_skip"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "login_screen"
+                    ]
+                )
+            }
+            break
+            
+      
+        case .classified:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("classified_detail"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "classified_item_detail",
+                        AppEvents.ParameterName("category_name"): categoryName
+                    ]
+                )
+            }
+            break
+        case .classifiedDetail:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("classified_list"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "classified_home"
+                    ]
+                )
+            }
+            break
+        case .board:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("board_list"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "board_home"
+                    ]
+                )
+            }
+            break
+            
+        case .boardDetail:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("board_detail"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "board_item_detail",
+                        AppEvents.ParameterName("category_name"): categoryName
+
+                    ]
+                )
+            }
+            break
+            
+        case .payment:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("payment"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "payment_screen",
+                        AppEvents.ParameterName("userId"): "\(Local.shared.getUserId())",
+                        AppEvents.ParameterName("amount"): amount
+
+                        
+                    ]
+                )
+            }
+            break
+            
+        case .createOffer:
+            do{
+                AppEvents.shared.logEvent(
+                    AppEvents.Name("create_offer"),
+                    parameters: [
+                        AppEvents.ParameterName("screen_name"): "classified_item_detail",
+                        AppEvents.ParameterName("category_name"): categoryName
+
+                    ]
+                )
+            }
+            break
+            
+        default:
+            break
+        }
+        
+    }
+    
+    
+    
+    static func saveLoginEvent(userObj:UserInfo,screenName:String){
+        
+        var params: [AppEvents.ParameterName: Any] = [:]
+
+        if let email = userObj.email, !email.isEmpty {
+            params[AppEvents.ParameterName("userEmail")] = email
+        }
+
+        if let mobile = userObj.mobile, !mobile.isEmpty {
+            params[AppEvents.ParameterName("userMobile")] = mobile
+        }
+
+        if let name = userObj.name, !name.isEmpty {
+            params[AppEvents.ParameterName("userName")] = name
+        }
+
+        params[AppEvents.ParameterName("screen_name")] = screenName
+        params[AppEvents.ParameterName("userId")] = "\(userObj.id ?? 0)"
+
+        AppEvents.shared.logEvent(
+            AppEvents.Name("login"),
+            parameters: params
+        )
+    }
+    
+}

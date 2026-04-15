@@ -25,6 +25,9 @@ struct PublicBoardView: View {
         VStack(spacing: 0) {
             
             headerView.background(Color(.systemBackground))
+                .onAppear{
+                updateEvents()
+            }
             
             CategoryTabsNew(
                 selected: $selectedName,
@@ -151,6 +154,12 @@ struct PublicBoardView: View {
             selectedCategoryId = newCat.id ?? 0
             selectedName = newCat.name ?? ""
         }
+    }
+    
+    
+    func updateEvents(){
+        FaceBookAppEvents.facebookEvents(type: .board, categoryName: selectedName)
+
     }
 }
 

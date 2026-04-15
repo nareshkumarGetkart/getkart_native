@@ -9,8 +9,6 @@ import UIKit
 import Kingfisher
 
 
-
-
 class BuyingChatVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     
@@ -36,7 +34,7 @@ class BuyingChatVC: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.chatList), name: NSNotification.Name(rawValue: SocketEvents.buyerChatList.rawValue), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.updateChatList), name: NSNotification.Name(rawValue: SocketEvents.updateChatList.rawValue), object: nil)
-
+        
         tblView.refreshControl = topRefreshControl
         
         DispatchQueue.main.async{
@@ -47,9 +45,14 @@ class BuyingChatVC: UIViewController {
             self.emptyView?.imageView?.image = UIImage(named: "no_chat_found")
         }
         Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
-       
+        
         NotificationCenter.default.addObserver(self,selector: #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        
+//        self.edgesForExtendedLayout = [.bottom]
+//           self.extendedLayoutIncludesOpaqueBars = true
+//
+//           tblView.contentInsetAdjustmentBehavior = .never
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -70,6 +73,28 @@ class BuyingChatVC: UIViewController {
     }
     
     
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        guard let tabBar = tabBarController?.tabBar else { return }
+//
+//        let inset = tabBar.frame.height
+//        tblView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: inset, right: 0)
+//        tblView.scrollIndicatorInsets = tblView.contentInset
+//    }
+    
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//
+//        let tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
+//        let safeBottom = view.safeAreaInsets.bottom
+//
+//        let bottomInset = tabBarHeight + safeBottom
+//
+//        tblView.contentInset.bottom = bottomInset
+//        tblView.scrollIndicatorInsets.bottom = bottomInset
+//    }
+//    
     
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
@@ -211,7 +236,7 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     
-        return 85
+        return  UITableView.automaticDimension //85
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -265,7 +290,32 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
            cell.lblLastMessage.isHidden = false
        }
         
+      /*  if obj.item?.status?.lowercased() != "approved"{
+            cell.deletedBgView.isHidden = false
 
+        }else{
+            if (obj.item?.deletedAt?.count ?? 0) > 0{
+                cell.deletedBgView.isHidden = false
+                
+            }else if (obj.seller?.deletedAt?.count ?? 0) > 0{
+                cell.deletedBgView.isHidden = false
+                
+            }else{
+                cell.deletedBgView.isHidden = true
+            }
+        }*/
+
+        cell.deletedBgView.isHidden = true
+        cell.bgView.backgroundColor = .systemBackground
+
+        if let invalidatedAt = obj.invalidatedAt{
+            if let msg = self.chatDeleteInfo(invalidatedAt: invalidatedAt){
+                cell.deletedBgView.isHidden = false
+                cell.lblDeletedMsg.text = "This item is no longer available and \(msg)"
+                cell.bgView.backgroundColor = UIColor.black.withAlphaComponent(0.15)
+            }
+        }
+        
      /*   if (obj.lastMessage?.message?.count ?? 0) > 0 {
             cell.lblLastMessage.isHidden = false
             
@@ -290,6 +340,36 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
         return cell
         
         
+    }
+    
+
+    func chatDeleteInfo(invalidatedAt: String) -> String? {
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.timeZone = TimeZone.current
+        
+        guard let invalidatedDate = formatter.date(from: invalidatedAt) else {
+            return nil
+        }
+        
+        // Add 7 days
+        let deleteDate = Calendar.current.date(byAdding: .day, value: 7, to: invalidatedDate) ?? invalidatedDate
+        
+        let now = Date()
+        
+        if now >= deleteDate {
+            return nil//Chat is deleted"
+        }
+        
+        // Calculate remaining days
+        let diff = Calendar.current.dateComponents([.day, .hour, .minute], from: now, to: deleteDate)
+        
+        let days = diff.day ?? 0
+        let hours = diff.hour ?? 0
+        let minutes = diff.minute ?? 0
+        
+        return "chat will be deleted in \(days) days"// \(hours) hours \(minutes) minutes"
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

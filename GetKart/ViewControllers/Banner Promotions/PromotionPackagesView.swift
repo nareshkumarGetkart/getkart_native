@@ -24,7 +24,7 @@ struct PromotionPackagesView: View {
                     Image("Cross").renderingMode(.template).foregroundColor(Color(UIColor.label))
                 }
                 
-            }.frame(height:35).padding(8)
+            }.frame(height:35).padding()
             
             VStack(alignment:.leading, spacing:5){
                 

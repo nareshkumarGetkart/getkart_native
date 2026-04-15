@@ -1,43 +1,42 @@
-# Uncomment the next line to define a global platform for your project
-platform :ios, '15.0'
+platform :ios, '16.6'
 
 target 'GetKart' do
-  # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for GetKart
-
-pod 'GoogleSignIn'
-pod 'GoogleSignInSwiftSupport'
-pod 'Alamofire'
-pod 'Kingfisher', '~> 7.0'
-#pod 'GoogleMaps', '7.1.0'
-pod "MMMaterialDesignSpinner"
-pod 'Firebase/Messaging'
-pod 'FirebaseCore'
-pod 'FirebaseAuth'
-pod 'FittedSheets'
-pod 'Socket.IO-Client-Swift', '~> 16.0'
-pod 'GooglePlaces'
-pod 'SwiftyGif'
-pod 'IQKeyboardManagerSwift'
-pod 'RealmSwift', '~>10'
-pod 'SVGKit'
-pod 'PhonePePayment'
-pod 'Mantis'
-pod 'GooglePlaces'
-pod 'NSFWDetector'
-pod 'MarqueeLabel'
-pod 'PayUIndia-CheckoutPro'  # For Checkout Pro SDK
-#pod 'GSPlayer'
+  pod 'GoogleSignIn'
+  pod 'GoogleSignInSwiftSupport'
+  pod 'Alamofire'
+  pod 'Kingfisher', '~> 7.0'
+  pod "MMMaterialDesignSpinner"
+  pod 'Firebase/Messaging'
+  pod 'FirebaseCore'
+  pod 'FirebaseAuth'
+  pod 'FittedSheets'
+  pod 'Socket.IO-Client-Swift', '~> 16.0'
+  pod 'GooglePlaces'
+  pod 'SwiftyGif'
+  pod 'IQKeyboardManagerSwift'
+  pod 'RealmSwift', '10.54.2'
+  pod 'SVGKit'
+  pod 'PhonePePayment'
+  pod 'Mantis'
+  pod 'NSFWDetector'
+  pod 'MarqueeLabel'
+  pod 'PayUIndia-CheckoutPro'
 
   target 'GetKartTests' do
     inherit! :search_paths
-    # Pods for testing
   end
 
   target 'GetKartUITests' do
-    # Pods for testing
   end
 
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.6'
+    end
+  end
 end

@@ -19,9 +19,9 @@ struct BoardDetailView: View{
     @State var itemObj:ItemModel
     @State  private var isLastPage = false
     
-    @State private var userDidScroll = false  //  User intent + safety locks
+    @State private var userDidScroll = false  //User intent + safety locks
     @State private var paginationConsumed = false
-    @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    @State private var itemHeights: [Int: CGFloat] = [:] // Measured heights for staggered layout
     //  ADD THESE
     @State private var lastItemCount: Int = 0
     @State private var scrollTick: Int = 0
@@ -38,7 +38,10 @@ struct BoardDetailView: View{
     var body: some View {
         
         // HEADER
-        headerView.zIndex(1)
+        headerView.zIndex(1).onAppear{
+            FaceBookAppEvents.facebookEvents(type: .boardDetail, categoryName: itemObj.category?.name ?? "")
+
+        }
         
         ScrollViewReader { proxy in
             ScrollView {
@@ -953,6 +956,14 @@ struct ReelPostView: View {
                     }
                 }
                 
+                
+                if (post.impressions ?? 0) > 0{
+                    HStack(spacing:3){
+                        Image("eye").renderingMode(.template).foregroundColor(Color(.label))
+                        Text("\((post.impressions ?? 0).formatViews())").font(.inter(.medium, size: 13)).foregroundColor(Color(.label))
+                    }
+                }
+                
                 Button {
                     showShareSheet = true
                 } label: {
@@ -1061,29 +1072,28 @@ struct ReelPostView: View {
                 let message = result["message"] as? String ?? ""
                 
                 if status == 200{
-
+                    
                 }else{
                 }
             }
         }
         
-      /*   var urlString = strURl
+        /* var urlString = strURl
          if !urlString.lowercased().hasPrefix("http://") &&
-               !urlString.lowercased().hasPrefix("https://") {
-                urlString = "https://" + urlString
-            }
-        if let url = URL(string: urlString)  {
-            print(urlString)
-            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:urlString,isCopyUrl:true))
-            AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-            
-//            if UIApplication.shared.canOpenURL(url) {
-//                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-//            } else {
-//                print("Cannot open URL")
-//            }
-        }*/
-      
+         !urlString.lowercased().hasPrefix("https://") {
+         urlString = "https://" + urlString
+         }
+         if let url = URL(string: urlString)  {
+         print(urlString)
+         let vc = UIHostingController(rootView:  PreviewURL(fileURLString:urlString,isCopyUrl:true))
+         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
+         
+         //            if UIApplication.shared.canOpenURL(url) {
+         //                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+         //            } else {
+         //                print("Cannot open URL")
+         //            }
+         }*/
     }
     
 
@@ -1112,8 +1122,6 @@ struct ReelPostView: View {
                             self.sendLikeDislikeObject(post.isLiked ?? false, post.id ?? 0, favouriteCount)
                             
                             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshLikeDislikeBoard.rawValue), object:  ["isLike":post.isLiked ?? false,"count":favouriteCount,"boardId":self.post.id ?? 0], userInfo: nil)
-
-
                         }
                     }
                     
@@ -1128,7 +1136,7 @@ struct ReelPostView: View {
 struct VerticalPager<Content: View>: UIViewControllerRepresentable {
 
     var pages: [Content]
-    var onPageChange: ((Int) -> Void)?   // 👈 callback
+    var onPageChange: ((Int) -> Void)?   //  callback
 
     func makeUIViewController(context: Context) -> PagerVC {
         let vc = PagerVC()
@@ -1161,7 +1169,7 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
         scrollView.bounces = false
         scrollView.backgroundColor = .clear
         view.layer.cornerRadius = 14
-        view.layer.masksToBounds = true   // 🔥 IMPORTANT
+        view.layer.masksToBounds = true   //  IMPORTANT
         view.backgroundColor = .systemBackground
         view.addSubview(scrollView)
     }
@@ -1171,7 +1179,7 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
         layoutPages()
     }
 
-    // 🔥 APPEND-SAFE PAGE UPDATE
+    //  APPEND-SAFE PAGE UPDATE
     func setPages(_ newPages: [some View]) {
         guard newPages.count >= pages.count else { return }
 

@@ -15,7 +15,8 @@ import PayUCheckoutProBaseKit
 import PayUParamsKit
 import CryptoKit
 import PayUCommonUI
-
+import FacebookAEM
+import FacebookCore
 
 class PayPlanVC: UIViewController {
    
@@ -72,6 +73,9 @@ class PayPlanVC: UIViewController {
             btnPay.setTitle("Pay \(Local.shared.currencySymbol) \(planObj?.finalPrice ?? "0")", for: .normal)
         }
         self.getPaymentSettings()
+       
+        FaceBookAppEvents.facebookEvents(type: .payment, categoryName: "",amount: planObj?.finalPrice ?? "0")
+
     }
     
     //MARK: UIButton Action Methods
@@ -526,12 +530,21 @@ extension PayPlanVC{
              strUdf1Val = "t-\(paymentIntentId)-p-\(planObj?.id ?? 0)-item-\(postItemId)"
 
         }
+        
+        var strUdf4Val = strUdf1Val
+        
+        if let id = campaign_banner_id{
+            strUdf4Val.append("bannerId-\(id)")
+            
+        }
+        strUdf4Val.append("-platform-mobile")
+
 
         paymentParam.additionalParam = [
             "udf1": strUdf1Val,
             "udf2": "",
             "udf3": "",
-            "udf4": "",
+            "udf4": strUdf4Val,
             "udf5": ""
         ]
 

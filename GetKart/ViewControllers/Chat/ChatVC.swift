@@ -29,6 +29,10 @@ class ChatVC: UIViewController {
     @IBOutlet weak var lblMarquee: MarqueeLabel!
     @IBOutlet weak var bgViewMarquee: UIView!
 
+    
+    @IBOutlet weak var bgviewInavalidatedMsg:UIView!
+    @IBOutlet weak var lblInavalidatedMsg:UILabel!
+
 
     var isbeginVoiceRecord = false
     var playTime:Int = 0
@@ -96,7 +100,8 @@ class ChatVC: UIViewController {
     var popovershow = false
     var isItemDeleted = false
     var mobileNumber = ""
-    
+    var invalidatedAt:String?
+
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -976,7 +981,8 @@ class ChatVC: UIViewController {
         
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
-            
+            invalidatedAt = dataDict["invalidated_at"] as? String ?? ""
+
             if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
                      
                 if let id = dataDict["id"] as? Int, id != item_offer_id{
@@ -994,6 +1000,7 @@ class ChatVC: UIViewController {
                 print("Local user Id = \(Local.shared.getUserId())")
                 print("seller_id user Id = \(seller_id)")
                 print("buyer_id user Id = \(buyer_id)")
+              
 
                 
                 if self.suggestionArray.count == 0{
@@ -1008,6 +1015,20 @@ class ChatVC: UIViewController {
                 self.lblProduct.text = itemName
                 self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
                 self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
+                
+                self.bgviewInavalidatedMsg.isHidden = true
+                if let invalidatedAt = dataDict["invalidated_at"] as? String{
+                    if let msg = self.chatDeleteInfo(invalidatedAt: invalidatedAt){
+                        self.btnCall.isHidden = true
+                        isItemDeleted = true
+                        self.lblInavalidatedMsg.text = "This item is no longer available and \(msg)"
+                        self.lblInavalidatedMsg.layer.cornerRadius = 2.0
+                        self.lblInavalidatedMsg.clipsToBounds = true
+                        self.bgviewInavalidatedMsg.isHidden = false
+                        self.bgviewSuggestions.isHidden = true
+                    }
+                }
+                
             }else{
                 self.btnCall.isHidden = true
                 isItemDeleted = true
@@ -1017,6 +1038,34 @@ class ChatVC: UIViewController {
         }
     }
     
+    func chatDeleteInfo(invalidatedAt: String) -> String? {
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.timeZone = TimeZone.current
+        
+        guard let invalidatedDate = formatter.date(from: invalidatedAt) else {
+            return nil
+        }
+        
+        // Add 7 days
+        let deleteDate = Calendar.current.date(byAdding: .day, value: 7, to: invalidatedDate) ?? invalidatedDate
+        
+        let now = Date()
+        
+        if now >= deleteDate {
+            return nil//Chat is deleted"
+        }
+        
+        // Calculate remaining days
+        let diff = Calendar.current.dateComponents([.day, .hour, .minute], from: now, to: deleteDate)
+        
+        let days = diff.day ?? 0
+        let hours = diff.hour ?? 0
+        let minutes = diff.minute ?? 0
+        
+        return "chat will be deleted in \(days) days"// \(hours) hours \(minutes) minutes"
+    }
     
     @objc func userInfo(notification: Notification) {
         
@@ -2534,6 +2583,10 @@ extension ChatVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollectio
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
+        if isItemDeleted{
+            return
+        }
+        
         if let cell = collectionView.cellForItem(at: indexPath) as? SuggestionCollectionCell {
             let label = cell.lblTitle
               let centerPoint = CGPoint(x: label?.bounds.midX ?? 0, y: label?.bounds.midY ?? 0)

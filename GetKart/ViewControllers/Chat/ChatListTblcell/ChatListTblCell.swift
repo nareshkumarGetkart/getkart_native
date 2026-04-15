@@ -18,6 +18,12 @@ class ChatListTblCell: UITableViewCell {
     @IBOutlet weak var lblDot:UILabel!
     @IBOutlet weak var btnOption:UIButton!
     @IBOutlet weak var lblLastMessageTime:UILabel!
+    
+    
+    @IBOutlet weak var mainBgView:UIView!
+    @IBOutlet weak var deletedBgView:UIView!
+    @IBOutlet weak var lblDeletedMsg:UILabel!
+
 
 
     override func awakeFromNib() {

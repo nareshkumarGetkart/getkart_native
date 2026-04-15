@@ -75,7 +75,10 @@ struct ItemDetailView: View {
     var body: some View {
    
         VStack(spacing:0){
-            headerBar
+            headerBar.onAppear{
+                FaceBookAppEvents.facebookEvents(type: .classifiedDetail, categoryName:  objVM.itemObj?.category?.name ?? "")
+
+            }
             Divider()
             
             ScrollView(.vertical, showsIndicators: false) {
@@ -1071,6 +1074,7 @@ struct ItemDetailView: View {
     
     func createRoom(){
         
+        FaceBookAppEvents.facebookEvents(type: .createOffer, categoryName: objVM.itemObj?.category?.name ?? "")
         let params = ["item_id":(objVM.itemObj?.id ?? 0)] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.createRoom.rawValue, params)
     }

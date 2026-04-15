@@ -726,120 +726,158 @@ struct MultiImageCropperView: UIViewControllerRepresentable {
 
             return container
         }
+        // MARK: Hide Mantis Default Buttons
+        func hideMantisButtons(in view: UIView) {
+            for sub in view.subviews {
 
-        // MARK: Show Cropper
-        func showCropper(for image: UIImage, in container: UIViewController) {
+                if let button = sub as? UIButton {
 
-            cropVC?.view.removeFromSuperview()
-            cropVC?.removeFromParent()
+                    let title = button.title(for: .normal)?.lowercased() ?? ""
+                    let accessibility = button.accessibilityLabel?.lowercased() ?? ""
 
-            var config = Mantis.Config()
-//            config.presetFixedRatioType =
-//                .alwaysUsingOnePresetFixedRatio(
-//                    ratio: parent.cropAspectRatio.width / parent.cropAspectRatio.height
-//                )
-            
-           // config.presetFixedRatioType = .canUseMultiplePresetFixedRatio(defaultRatio: 1)
-                
-            config.showAttachedCropToolbar = false
-          
-            let fixedImage = image.normalizedImage()
+                    if title.contains("cancel") || title.contains("done") ||
+                       accessibility.contains("cancel") || accessibility.contains("done") {
 
-//            let cropVC = Mantis.cropViewController(image: image, config: config)
-            
-            let cropVC = Mantis.cropViewController(image: fixedImage, config: config)
-
-            cropVC.delegate = self
-
-            container.addChild(cropVC)
-            container.view.addSubview(cropVC.view)
-            cropVC.didMove(toParent: container)
-
-            cropVC.view.translatesAutoresizingMaskIntoConstraints = false
-
-            NSLayoutConstraint.activate([
-                cropVC.view.topAnchor.constraint(equalTo: container.view.topAnchor),
-                cropVC.view.leadingAnchor.constraint(equalTo: container.view.leadingAnchor),
-                cropVC.view.trailingAnchor.constraint(equalTo: container.view.trailingAnchor),
-                cropVC.view.bottomAnchor.constraint(equalTo: container.view.bottomAnchor, constant: -100)
-            ])
-
-            self.cropVC = cropVC
-
-            addBottomBar(to: container)
-        }
-
-        // MARK: Bottom Bar
-        func addBottomBar(to container: UIViewController) {
-
-            let bottomBar = MultiCropBottomBar(
-                currentIndex: currentIndex,
-                total: parent.images.count,
-                onCancel: { self.parent.onCancel() },
-                onPrevious: { self.previous() },
-                onNext: { self.next() }
-            )
-
-            let hosting = UIHostingController(rootView: bottomBar)
-
-            container.addChild(hosting)
-            container.view.addSubview(hosting.view)
-            hosting.didMove(toParent: container)
-
-            hosting.view.translatesAutoresizingMaskIntoConstraints = false
-
-            NSLayoutConstraint.activate([
-                hosting.view.leadingAnchor.constraint(equalTo: container.view.leadingAnchor),
-                hosting.view.trailingAnchor.constraint(equalTo: container.view.trailingAnchor),
-                hosting.view.bottomAnchor.constraint(equalTo: container.view.bottomAnchor),
-                hosting.view.heightAnchor.constraint(equalToConstant: 100)
-            ])
-        }
-
-        // MARK: Crop Delegate
-        func cropViewControllerDidCrop(
-            _ cropViewController: CropViewController,
-            cropped: UIImage,
-            transformation: Transformation,
-            cropInfo: CropInfo
-        ) {
-            croppedImages.append(cropped)
-        }
-
-        // MARK: Actions
-        func next() {
-
-            guard currentIndex < parent.images.count else { return }
-
-            cropVC?.crop()
-
-            if currentIndex < parent.images.count - 1 {
-                currentIndex += 1
-
-                if parent.images.indices.contains(currentIndex) {
-                    showCropper(for: parent.images[currentIndex], in: containerVC!)
+                        button.isHidden = true
+                        button.isUserInteractionEnabled = false
+                    }
                 }
-            } else {
-                parent.onFinished(croppedImages)
+
+                hideMantisButtons(in: sub)
+            }
+        }
+                // MARK: Show Cropper
+                func showCropper(for image: UIImage, in container: UIViewController) {
+
+                    cropVC?.willMove(toParent: nil)
+                    cropVC?.view.removeFromSuperview()
+                    cropVC?.removeFromParent()
+
+                    var config = Mantis.Config()
+
+                    // ✅ IMPORTANT: must be true in iOS 18 / iOS 26+
+                    config.showAttachedCropToolbar = true
+
+                    let fixedImage = image.normalizedImage()
+                    let cropVC = Mantis.cropViewController(image: fixedImage, config: config)
+                    cropVC.delegate = self
+
+                    container.addChild(cropVC)
+                    container.view.addSubview(cropVC.view)
+                    cropVC.didMove(toParent: container)
+
+                    cropVC.view.translatesAutoresizingMaskIntoConstraints = false
+
+                    NSLayoutConstraint.activate([
+                        cropVC.view.topAnchor.constraint(equalTo: container.view.topAnchor),
+                        cropVC.view.leadingAnchor.constraint(equalTo: container.view.leadingAnchor),
+                        cropVC.view.trailingAnchor.constraint(equalTo: container.view.trailingAnchor),
+                        cropVC.view.bottomAnchor.constraint(equalTo: container.view.bottomAnchor, constant: -100)
+                    ])
+
+                    self.cropVC = cropVC
+
+                    addBottomBar(to: container)
+
+                    // ✅ Hide default Mantis Done/Cancel buttons
+                    cropVC.view.alpha = 0
+
+                    DispatchQueue.main.async {
+                        self.hideMantisButtons(in: cropVC.view)
+                        cropVC.view.alpha = 1
+                    }
+                }
+
+                // MARK: Bottom Bar
+                func addBottomBar(to container: UIViewController) {
+
+                    // remove old hosting controller (important)
+                    container.children
+                        .filter { $0 is UIHostingController<MultiCropBottomBar> }
+                        .forEach {
+                            $0.willMove(toParent: nil)
+                            $0.view.removeFromSuperview()
+                            $0.removeFromParent()
+                        }
+
+                    let bottomBar = MultiCropBottomBar(
+                        currentIndex: currentIndex,
+                        total: parent.images.count,
+                        onCancel: { self.parent.onCancel() },
+                        onPrevious: { self.previous() },
+                        onNext: { self.next() }
+                    )
+
+                    let hosting = UIHostingController(rootView: bottomBar)
+                    hosting.view.backgroundColor = UIColor.black
+
+                    container.addChild(hosting)
+                    container.view.addSubview(hosting.view)
+                    hosting.didMove(toParent: container)
+
+                    hosting.view.translatesAutoresizingMaskIntoConstraints = false
+
+                    NSLayoutConstraint.activate([
+                        hosting.view.leadingAnchor.constraint(equalTo: container.view.leadingAnchor),
+                        hosting.view.trailingAnchor.constraint(equalTo: container.view.trailingAnchor),
+                        hosting.view.bottomAnchor.constraint(equalTo: container.view.bottomAnchor),
+                        hosting.view.heightAnchor.constraint(equalToConstant: 100)
+                    ])
+
+                    // keep bar always on top
+                    container.view.bringSubviewToFront(hosting.view)
+                }
+
+                // MARK: Crop Delegate
+                func cropViewControllerDidCrop(
+                    _ cropViewController: CropViewController,
+                    cropped: UIImage,
+                    transformation: Transformation,
+                    cropInfo: CropInfo
+                ) {
+                    croppedImages.append(cropped)
+                }
+
+                func cropViewControllerDidCancel(
+                    _ cropViewController: CropViewController,
+                    original: UIImage
+                ) {
+                    parent.onCancel()
+                }
+
+                // MARK: Actions
+                func next() {
+
+                    guard currentIndex < parent.images.count else { return }
+
+                    cropVC?.crop()
+
+                    if currentIndex < parent.images.count - 1 {
+                        currentIndex += 1
+
+                        if parent.images.indices.contains(currentIndex),
+                           let container = containerVC {
+                            showCropper(for: parent.images[currentIndex], in: container)
+                        }
+
+                    } else {
+                        parent.onFinished(croppedImages)
+                    }
+                }
+
+                func previous() {
+                    if currentIndex > 0 {
+                        currentIndex -= 1
+
+                        if parent.images.indices.contains(currentIndex),
+                           let container = containerVC {
+                            showCropper(for: parent.images[currentIndex], in: container)
+                        }
+                    }
+                }
             }
         }
 
-
-        func previous() {
-            if currentIndex > 0 {
-                currentIndex -= 1
-                showCropper(for: parent.images[currentIndex], in: containerVC!)
-            }
-        }
-
-        func cropViewControllerDidCancel(
-            _ cropViewController: CropViewController,
-            original: UIImage
-        ) {
-            parent.onCancel()
-        }
-    }
-}
 
 
 struct MultiCropBottomBar: View {

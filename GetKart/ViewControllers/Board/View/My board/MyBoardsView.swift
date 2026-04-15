@@ -436,7 +436,7 @@ struct MyBoardCell:View {
                         
                         HStack(spacing:3){
                             Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 13, height: 13)
-                            Text("Views: \(itemObj.clicks ?? 0)").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
+                            Text("Views: \((itemObj.impressions ?? 0).formatViews())").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                         }
                         if itemObj.boardType == 1 || itemObj.boardType == 2{
                             
@@ -469,14 +469,14 @@ struct MyBoardCell:View {
                         .cornerRadius(2)
                     
                     if itemObj.boardType == 1{
-                        Text("Boost your promotional ad to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                        Text("Boost your promotional ad to reach more views faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
                         
                     }else  if itemObj.boardType == 2{
                         
-                        Text("Boost your promotional ad to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                        Text("Boost your promotional ad to reach more views faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
                         
                     }else  if itemObj.boardType == 3{
-                        Text("Boost your Idea to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
+                        Text("Boost your Idea to reach more views faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
                     }else{
                         Text("Boost your board to reach more buyers faster.").font(Font.inter(.regular, size: 12)).foregroundColor(Color(.label))
                     }

@@ -88,6 +88,7 @@ struct ItemModel: Codable,Identifiable {
     let area: Int?
     var isFeature: Bool?
     var totalLikes: Int?
+    var impressions:Int?
     var isLiked: Bool?
     let customFields: [CustomField]?
     var isAlreadyOffered, isAlreadyReported: Bool?
@@ -145,6 +146,7 @@ struct ItemModel: Codable,Identifiable {
         case ctaType = "cta_type"
         case commentsCount = "comments_count"
         case lastComment = "last_comment"
+        case impressions
         
 
     }

@@ -274,17 +274,29 @@ struct CreateIdeaView: View {
             .fullScreenCover(isPresented: $showCropper) {
                 if let img = selectedImage {
                     
-                    ImageCropperBoardView(
-                        image: img,
-                        onCropped: { croppedImage in
-                            self.checkNudityOfiMages(pickedImage: croppedImage)
-                           // self.selectedImage = croppedImage
-                            showCropper = false
-                        },
-                        onCancel: {
-                            showCropper = false
+                    
+                    MultiImageCropperView(images: [img]) { images in
+                        if let croppedImage = images.first{
+                            // self.selectedImage = croppedImage
+                             self.checkNudityOfiMages(pickedImage: croppedImage)
                         }
-                    )
+              
+                        showCropper = false
+                    } onCancel: {
+                        showCropper = false
+                    }
+                    
+//                    ImageCropperBoardView(
+//                        image: img,
+//                        onCropped: { croppedImage in
+//                            self.checkNudityOfiMages(pickedImage: croppedImage)
+//                           // self.selectedImage = croppedImage
+//                            showCropper = false
+//                        },
+//                        onCancel: {
+//                            showCropper = false
+//                        }
+//                    )
                 }
             }
 

@@ -7,7 +7,8 @@
 
 import UIKit
 import SwiftUI
-
+import FacebookAEM
+import FacebookCore
 
 var SALT_TOKEN_TO_SEND = ""
 
@@ -85,7 +86,6 @@ class OTPViewController: UIViewController {
         self.view.endEditing(true)
         if (txtOtp.text?.count ?? 0) >= 4 {
             if isMobileLogin == true {
-                
                 self.verifyMobileOTPApi()
             }else{
                 self.verifyEmailOTPApi()
@@ -325,12 +325,19 @@ class OTPViewController: UIViewController {
                 if status == 200{
                     
                     if let payload =  result["data"] as? Dictionary<String,Any>{
+                       
+                        //AppEvents.shared.logEvent(AppEvents.Name("login"))
                         
+
+
                         let token = result["token"] as? String ?? ""
                         let objUserInfo = UserInfo(dict: payload, token: token)
                         Local.shared.saveUserId(userId: objUserInfo.id ?? 0)
                         RealmManager.shared.saveUserInfo(userInfo: objUserInfo)
                         SocketIOManager.sharedInstance.checkSocketStatus()
+                        
+                        FaceBookAppEvents.saveLoginEvent(userObj: objUserInfo, screenName: "otp_screen")
+
                         let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
                         self.navigationController?.pushViewController(hostingController, animated: true) // Push to
                         

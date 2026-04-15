@@ -77,13 +77,35 @@ class ChatListVC: UIViewController {
         
         // Initialize page menu with controller array, frame, and optional parameters
         pageMenu = CAPSPageMenu(viewControllers: controllerArray, frame: CGRectMake(0.0, cnstrntHtNavBar.constant, self.view.frame.width, self.view.frame.height-cnstrntHtNavBar.constant-(self.tabBarController?.tabBar.frame.height ?? 0)), pageMenuOptions: parameters)
+      
         pageMenu?.delegate = self
         pageMenu?.menuScrollView.isScrollEnabled = false
         pageMenu?.controllerScrollView.isScrollEnabled = false
         self.view.addSubview(pageMenu!.view)
+        
+//        pageMenu = CAPSPageMenu(
+//            viewControllers: controllerArray,
+//            frame: CGRect(x: 0,
+//                          y: cnstrntHtNavBar.constant,
+//                          width: self.view.frame.width,
+//                          height: self.view.frame.height - cnstrntHtNavBar.constant),
+//            pageMenuOptions: parameters
+//        )
+//
+//        pageMenu?.delegate = self
+//        pageMenu?.menuScrollView.isScrollEnabled = false
+//        pageMenu?.controllerScrollView.isScrollEnabled = false
+//
+//        // IMPORTANT (must do)
+//        self.addChild(pageMenu!)
+//        self.view.addSubview(pageMenu!.view)
+//        pageMenu!.didMove(toParent: self)
                 
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        
+//        self.edgesForExtendedLayout = [.bottom]
+//        self.extendedLayoutIncludesOpaqueBars = true
     }
     
     

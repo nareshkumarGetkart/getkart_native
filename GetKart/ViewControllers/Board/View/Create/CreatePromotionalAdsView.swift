@@ -247,7 +247,21 @@ struct CreatePromotionalAdsView: View {
             .fullScreenCover(isPresented: $showCropper) {
                 if let img = selectedImage {
                     
-                    ImageCropperBoardView(
+                    
+                    MultiImageCropperView(images: [img]) { images in
+                        if let croppedImage = images.first{
+                            // self.selectedImage = croppedImage
+                             self.checkNudityOfiMages(pickedImage: croppedImage)
+                             showCropper = false
+                        }
+              
+                        showCropper = false
+                    } onCancel: {
+                        showCropper = false
+                    }
+                    
+                    
+                   /* ImageCropperBoardView(
                         image: img,
                         onCropped: { croppedImage in
                            // self.selectedImage = croppedImage
@@ -257,7 +271,7 @@ struct CreatePromotionalAdsView: View {
                         onCancel: {
                             showCropper = false
                         }
-                    )
+                    )*/
                 }
             }
             .fullScreenCover(isPresented: $showCallToActionPopup) {

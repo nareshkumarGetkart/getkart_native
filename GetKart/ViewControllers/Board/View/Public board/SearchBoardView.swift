@@ -49,6 +49,9 @@ struct SearchBoardView: View {
                     .onSubmit {
                         
                         if  viewModel.searchText.count > 0{
+                            
+                            FaceBookAppEvents.facebookEvents(type: .boardSearch, categoryName:  viewModel.searchText)
+                            
                             AF.cancelAllRequests()
                             viewModel.istoSearch = false
                             isFocused = false

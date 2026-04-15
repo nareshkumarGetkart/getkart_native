@@ -140,7 +140,6 @@ struct BoardAnalyticsView: View {
                 if (objAnalytics?.board?.outbondURL ?? "").count > 0 {
                     VStack(alignment: .leading, spacing: 8) {
                         
-                        
                         if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
                             Text("Promotional Ad URL")
                                 .font(.inter(.semiBold, size: 16.0))
@@ -251,7 +250,7 @@ struct BoardAnalyticsView: View {
                     if (objAnalytics?.board?.boardType ?? 0) == 3{
                         
                     }else{
-                        BoardAnalyticCell(title: "Outbound Click", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
+                        BoardAnalyticCell(title: "Outbound Clicks", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
                     }
                    
                                       

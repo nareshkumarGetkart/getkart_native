@@ -72,6 +72,9 @@ class HomeVC: UIViewController, LocationSelectedDelegate {
             getpopupApi()
         }
         
+        
+        FaceBookAppEvents.facebookEvents(type: .classified, categoryName: "")
+
     }
     
     override func viewWillAppear(_ animated: Bool) {

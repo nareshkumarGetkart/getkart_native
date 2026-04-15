@@ -217,7 +217,7 @@ DEPENDENCIES:
   - NSFWDetector
   - PayUIndia-CheckoutPro
   - PhonePePayment
-  - RealmSwift (~> 10)
+  - RealmSwift (= 10.54.2)
   - Socket.IO-Client-Swift (~> 16.0)
   - SVGKit
   - SwiftyGif
@@ -345,6 +345,6 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
 
-PODFILE CHECKSUM: 64460a812fa81c9e42f22892838a0aaaee3d7448
+PODFILE CHECKSUM: ce3d0cfc1887c7dfb739ba7584b34679c95c8327
 
 COCOAPODS: 1.16.2

@@ -100,6 +100,7 @@ struct ChatList: Codable {
     var lastMessage:LastMessage?
     let chatCount:Int?
     var readAt:String?
+    let invalidatedAt:String?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -116,6 +117,7 @@ struct ChatList: Codable {
         case lastMessage = "last_message"
         case chatCount = "chat_count"
         case readAt = "read_at"
+        case invalidatedAt = "invalidated_at"
 
     }
 }
@@ -125,6 +127,14 @@ struct BuyerClass: Codable {
     let id: Int?
     let name: String?
     let profile: String?
+    let deletedAt:String?
+    
+    enum CodingKeys:String,CodingKey{
+        case id
+        case name
+        case profile
+        case deletedAt = "deleted_at"
+    }
 }
 
 // MARK: - Chat
@@ -160,7 +170,7 @@ struct ItemChat: Codable {
         case status
         case soldTo
         case review, id, price
-        case deletedAt
+        case deletedAt = "deleted_at"
         case image, description, name
         case isPurchased
     }

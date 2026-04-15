@@ -70,6 +70,8 @@ struct SearchProductView: View {
                                         viewModel.istoSearch = false
                                         isFocused = false
                                         saveSearchTerm(viewModel.searchText)
+                                     
+                                        FaceBookAppEvents.facebookEvents(type: .classifiedSearch, categoryName:  viewModel.searchText)
 
                                         onSelectSuggestion(Search(categoryID: 0, categoryName: "", categoryImage: "", keyword:  viewModel.searchText))
                                         self.navigation?.popViewController(animated: false)
@@ -222,6 +224,8 @@ struct SearchProductView: View {
                             SearchSuggestionCell(title: item.keyword ?? "",categoryTitle:item.categoryName ?? "")
                                 .onTapGesture {
                                     if  viewModel.searchText.count > 0{
+                                        FaceBookAppEvents.facebookEvents(type: .classifiedSearch, categoryName:  viewModel.searchText)
+
                                         saveSearchTerm(viewModel.searchText)
                                     }
                                     onSelectSuggestion(item)

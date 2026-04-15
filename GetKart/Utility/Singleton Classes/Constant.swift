@@ -16,7 +16,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -56,13 +56,41 @@ final class Constant: NSObject {
    let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
   
-//    let payuSuccessURL = "https://gupsup.com/payments?status=success"
-//    let payuFailureURL = "https://gupsup.com/payments?status=fail"
+    
+    
+ 
+    
+    var payuSuccessURL:String {
+        get {
+            if devEnvironment == .live {
+                return "https://getkart.com/api/payment/success"
+            }else {
+                return "https://gupsup.com/api/payment/success"
+            }
+        }
+    }
+    
+    
+    var payuFailureURL:String {
+        get {
+            if devEnvironment == .live {
+                return "https://getkart.com/api/payment/failure"
+            }else {
+                return "https://gupsup.com/api/payment/failure"
+            }
+        }
+    }
+    
+    
+
+//    
+//    let payuSuccessURL = "\(payuBaseURL)/payments?status=success"
+//    let payuFailureURL = "\(payuBaseURL)/payments?status=fail"
 //
 //    
-    let payuSuccessURL = "https://payu.herokuapp.com/success"
-    let payuFailureURL = "https://payu.herokuapp.com/failure"
-       
+//    let payuSuccessURL = "https://payu.herokuapp.com/success"
+//    let payuFailureURL = "https://payu.herokuapp.com/failure"
+//       
    
     var edit_comment:String{
         get{
@@ -929,7 +957,6 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/post-draft-item"
         }
     }
-    
 }
 
 
@@ -938,7 +965,6 @@ enum StoryBoard {
     static let preLogin = UIStoryboard(name: "PreLogin", bundle: nil)
     static let postAdd = UIStoryboard(name: "PostAdd", bundle: nil)
     static let chat = UIStoryboard(name: "Chats", bundle: nil)
-
 }
 
 
@@ -954,15 +980,6 @@ enum Images{
 //    static  let govtId = UIImage(named: "govtId")
 //    static  let verify = UIImage(named: "verify")
 }
-
-
-
-
-
-
-
-
-
 
 extension UIFont{
     

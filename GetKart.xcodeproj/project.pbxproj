@@ -7,10 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F7DF6D7B8E6F2EDC4D81E62 /* Pods_GetKart_GetKartUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20260B0F7A6C60D58701FE43 /* Pods_GetKart_GetKartUITests.framework */; };
-		A10008527A08478A79251759 /* Pods_GetKartTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 017C9D2F6B5F061A569079D6 /* Pods_GetKartTests.framework */; };
-		E6375CED7032C7F7413EBEDC /* Pods_GetKart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D65AE02B80D2E5AC0790F7FD /* Pods_GetKart.framework */; };
+		29535EAA2F8CB47700C3BD4B /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EA92F8CB47700C3BD4B /* FacebookAEM */; };
+		29535EAC2F8CB47700C3BD4B /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EAB2F8CB47700C3BD4B /* FacebookBasics */; };
+		29535EAE2F8CB47700C3BD4B /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EAD2F8CB47700C3BD4B /* FacebookCore */; };
+		5F55AC37A90D543B59CF93DC /* Pods_GetKart_GetKartUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3D5D11CD8818A5AA93F0531 /* Pods_GetKart_GetKartUITests.framework */; };
+		883902E17AA9B2B96A2455C1 /* Pods_GetKartTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC35FFF0AF324380FA8C6C7E /* Pods_GetKartTests.framework */; };
 		F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0B996062DBF51DD003335EB /* StoreKit.framework */; };
+		FF6ECB96487AFB094A6D6193 /* Pods_GetKart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4086CC1C5173A8337446521 /* Pods_GetKart.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,15 +34,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		017C9D2F6B5F061A569079D6 /* Pods_GetKartTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKartTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1BA735528BE680C9F0FB2722 /* Pods-GetKart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart.release.xcconfig"; path = "Target Support Files/Pods-GetKart/Pods-GetKart.release.xcconfig"; sourceTree = "<group>"; };
-		20260B0F7A6C60D58701FE43 /* Pods_GetKart_GetKartUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKart_GetKartUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3956A1966A0DF382A34D7A47 /* Pods-GetKartTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKartTests.debug.xcconfig"; path = "Target Support Files/Pods-GetKartTests/Pods-GetKartTests.debug.xcconfig"; sourceTree = "<group>"; };
-		83B8F2B2D6AFD657751B3729 /* Pods-GetKartTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKartTests.release.xcconfig"; path = "Target Support Files/Pods-GetKartTests/Pods-GetKartTests.release.xcconfig"; sourceTree = "<group>"; };
-		957D851C88FC283C7CBA0B54 /* Pods-GetKart-GetKartUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart-GetKartUITests.debug.xcconfig"; path = "Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		CD0F5E1539262CBD3C46E270 /* Pods-GetKart-GetKartUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart-GetKartUITests.release.xcconfig"; path = "Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests.release.xcconfig"; sourceTree = "<group>"; };
-		D65AE02B80D2E5AC0790F7FD /* Pods_GetKart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9338CD53A1EE7ADA8242362 /* Pods-GetKart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart.debug.xcconfig"; path = "Target Support Files/Pods-GetKart/Pods-GetKart.debug.xcconfig"; sourceTree = "<group>"; };
+		1F351554EE548D562A4503B7 /* Pods-GetKart-GetKartUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart-GetKartUITests.debug.xcconfig"; path = "Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		3002E6C4F578F9BF7F28C96F /* Pods-GetKart-GetKartUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart-GetKartUITests.release.xcconfig"; path = "Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests.release.xcconfig"; sourceTree = "<group>"; };
+		4E47B039111C77E98346D407 /* Pods-GetKart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart.debug.xcconfig"; path = "Target Support Files/Pods-GetKart/Pods-GetKart.debug.xcconfig"; sourceTree = "<group>"; };
+		5FBA08E5353872BB3AA9DC86 /* Pods-GetKartTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKartTests.release.xcconfig"; path = "Target Support Files/Pods-GetKartTests/Pods-GetKartTests.release.xcconfig"; sourceTree = "<group>"; };
+		85A431188E00A9B179C5237A /* Pods-GetKart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKart.release.xcconfig"; path = "Target Support Files/Pods-GetKart/Pods-GetKart.release.xcconfig"; sourceTree = "<group>"; };
+		A3D5D11CD8818A5AA93F0531 /* Pods_GetKart_GetKartUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKart_GetKartUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4086CC1C5173A8337446521 /* Pods_GetKart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC35FFF0AF324380FA8C6C7E /* Pods_GetKartTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GetKartTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2F82D6C5E2663B1629C9DB9 /* Pods-GetKartTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GetKartTests.debug.xcconfig"; path = "Target Support Files/Pods-GetKartTests/Pods-GetKartTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F0B996062DBF51DD003335EB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F0EA7EE72D65D9CF0026815A /* GetKart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GetKart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0EA7EFD2D65D9D40026815A /* GetKartTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GetKartTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,8 +86,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29535EAA2F8CB47700C3BD4B /* FacebookAEM in Frameworks */,
+				29535EAE2F8CB47700C3BD4B /* FacebookCore in Frameworks */,
 				F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */,
-				E6375CED7032C7F7413EBEDC /* Pods_GetKart.framework in Frameworks */,
+				29535EAC2F8CB47700C3BD4B /* FacebookBasics in Frameworks */,
+				FF6ECB96487AFB094A6D6193 /* Pods_GetKart.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10008527A08478A79251759 /* Pods_GetKartTests.framework in Frameworks */,
+				883902E17AA9B2B96A2455C1 /* Pods_GetKartTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +106,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F7DF6D7B8E6F2EDC4D81E62 /* Pods_GetKart_GetKartUITests.framework in Frameworks */,
+				5F55AC37A90D543B59CF93DC /* Pods_GetKart_GetKartUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,9 +117,9 @@
 			isa = PBXGroup;
 			children = (
 				F0B996062DBF51DD003335EB /* StoreKit.framework */,
-				D65AE02B80D2E5AC0790F7FD /* Pods_GetKart.framework */,
-				20260B0F7A6C60D58701FE43 /* Pods_GetKart_GetKartUITests.framework */,
-				017C9D2F6B5F061A569079D6 /* Pods_GetKartTests.framework */,
+				A4086CC1C5173A8337446521 /* Pods_GetKart.framework */,
+				A3D5D11CD8818A5AA93F0531 /* Pods_GetKart_GetKartUITests.framework */,
+				BC35FFF0AF324380FA8C6C7E /* Pods_GetKartTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -121,12 +127,12 @@
 		3C41A5EB717ABDDA9173B4FF /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				D9338CD53A1EE7ADA8242362 /* Pods-GetKart.debug.xcconfig */,
-				1BA735528BE680C9F0FB2722 /* Pods-GetKart.release.xcconfig */,
-				957D851C88FC283C7CBA0B54 /* Pods-GetKart-GetKartUITests.debug.xcconfig */,
-				CD0F5E1539262CBD3C46E270 /* Pods-GetKart-GetKartUITests.release.xcconfig */,
-				3956A1966A0DF382A34D7A47 /* Pods-GetKartTests.debug.xcconfig */,
-				83B8F2B2D6AFD657751B3729 /* Pods-GetKartTests.release.xcconfig */,
+				4E47B039111C77E98346D407 /* Pods-GetKart.debug.xcconfig */,
+				85A431188E00A9B179C5237A /* Pods-GetKart.release.xcconfig */,
+				1F351554EE548D562A4503B7 /* Pods-GetKart-GetKartUITests.debug.xcconfig */,
+				3002E6C4F578F9BF7F28C96F /* Pods-GetKart-GetKartUITests.release.xcconfig */,
+				C2F82D6C5E2663B1629C9DB9 /* Pods-GetKartTests.debug.xcconfig */,
+				5FBA08E5353872BB3AA9DC86 /* Pods-GetKartTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,12 +166,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F0EA7F102D65D9D40026815A /* Build configuration list for PBXNativeTarget "GetKart" */;
 			buildPhases = (
-				ABE1F15657C591148C58FF15 /* [CP] Check Pods Manifest.lock */,
+				D35E0FACCF229E161F249C73 /* [CP] Check Pods Manifest.lock */,
 				F0EA7EE32D65D9CF0026815A /* Sources */,
 				F0EA7EE42D65D9CF0026815A /* Frameworks */,
 				F0EA7EE52D65D9CF0026815A /* Resources */,
-				7B6679B8008C7A2F08C8080E /* [CP] Embed Pods Frameworks */,
-				EC3CA556E9780BF69B1A5951 /* [CP] Copy Pods Resources */,
+				E5E36694BC20238852F75A1C /* [CP] Embed Pods Frameworks */,
+				292CEA2344750DF87189099C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -183,7 +189,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F0EA7F152D65D9D40026815A /* Build configuration list for PBXNativeTarget "GetKartTests" */;
 			buildPhases = (
-				D6E3151EDF28E83705AD4C83 /* [CP] Check Pods Manifest.lock */,
+				1E719EC63CA0F84724EECA43 /* [CP] Check Pods Manifest.lock */,
 				F0EA7EF92D65D9D40026815A /* Sources */,
 				F0EA7EFA2D65D9D40026815A /* Frameworks */,
 				F0EA7EFB2D65D9D40026815A /* Resources */,
@@ -205,12 +211,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F0EA7F182D65D9D40026815A /* Build configuration list for PBXNativeTarget "GetKartUITests" */;
 			buildPhases = (
-				7079E3DEBDC45D011868865A /* [CP] Check Pods Manifest.lock */,
+				064FAE5BFD0068511925BFD1 /* [CP] Check Pods Manifest.lock */,
 				F0EA7F032D65D9D40026815A /* Sources */,
 				F0EA7F042D65D9D40026815A /* Frameworks */,
 				F0EA7F052D65D9D40026815A /* Resources */,
-				62E6DA7323332FF3F8D68998 /* [CP] Embed Pods Frameworks */,
-				08210192C3B455BE0728AA61 /* [CP] Copy Pods Resources */,
+				D67302A65C2564E94FDA52F8 /* [CP] Embed Pods Frameworks */,
+				53517A450E23FAE3AF428497 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -257,6 +263,9 @@
 			);
 			mainGroup = F0EA7EDE2D65D9CF0026815A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F0EA7EE82D65D9CF0026815A /* Products */;
 			projectDirPath = "";
@@ -294,49 +303,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		08210192C3B455BE0728AA61 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		62E6DA7323332FF3F8D68998 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7079E3DEBDC45D011868865A /* [CP] Check Pods Manifest.lock */ = {
+		064FAE5BFD0068511925BFD1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -358,50 +325,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7B6679B8008C7A2F08C8080E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		ABE1F15657C591148C58FF15 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-GetKart-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D6E3151EDF28E83705AD4C83 /* [CP] Check Pods Manifest.lock */ = {
+		1E719EC63CA0F84724EECA43 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -423,7 +347,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EC3CA556E9780BF69B1A5951 /* [CP] Copy Pods Resources */ = {
+		292CEA2344750DF87189099C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -442,6 +366,91 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		53517A450E23FAE3AF428497 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D35E0FACCF229E161F249C73 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-GetKart-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D67302A65C2564E94FDA52F8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart-GetKartUITests/Pods-GetKart-GetKartUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E5E36694BC20238852F75A1C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GetKart/Pods-GetKart-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -486,7 +495,7 @@
 /* Begin XCBuildConfiguration section */
 		F0EA7F112D65D9D40026815A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D9338CD53A1EE7ADA8242362 /* Pods-GetKart.debug.xcconfig */;
+			baseConfigurationReference = 4E47B039111C77E98346D407 /* Pods-GetKart.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -537,7 +546,7 @@
 		};
 		F0EA7F122D65D9D40026815A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1BA735528BE680C9F0FB2722 /* Pods-GetKart.release.xcconfig */;
+			baseConfigurationReference = 85A431188E00A9B179C5237A /* Pods-GetKart.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -707,7 +716,7 @@
 		};
 		F0EA7F162D65D9D40026815A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3956A1966A0DF382A34D7A47 /* Pods-GetKartTests.debug.xcconfig */;
+			baseConfigurationReference = C2F82D6C5E2663B1629C9DB9 /* Pods-GetKartTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -727,7 +736,7 @@
 		};
 		F0EA7F172D65D9D40026815A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 83B8F2B2D6AFD657751B3729 /* Pods-GetKartTests.release.xcconfig */;
+			baseConfigurationReference = 5FBA08E5353872BB3AA9DC86 /* Pods-GetKartTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -747,7 +756,7 @@
 		};
 		F0EA7F192D65D9D40026815A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 957D851C88FC283C7CBA0B54 /* Pods-GetKart-GetKartUITests.debug.xcconfig */;
+			baseConfigurationReference = 1F351554EE548D562A4503B7 /* Pods-GetKart-GetKartUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -765,7 +774,7 @@
 		};
 		F0EA7F1A2D65D9D40026815A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CD0F5E1539262CBD3C46E270 /* Pods-GetKart-GetKartUITests.release.xcconfig */;
+			baseConfigurationReference = 3002E6C4F578F9BF7F28C96F /* Pods-GetKart-GetKartUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -821,6 +830,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		29535EA92F8CB47700C3BD4B /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		29535EAB2F8CB47700C3BD4B /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		29535EAD2F8CB47700C3BD4B /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F0EA7EDF2D65D9CF0026815A /* Project object */;
 }

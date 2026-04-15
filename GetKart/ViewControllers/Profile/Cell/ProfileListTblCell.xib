@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -49,7 +49,7 @@
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="bWm-AC-4sy">
-                                <rect key="frame" x="55" y="10" width="181" height="38"/>
+                                <rect key="frame" x="55" y="10" width="176" height="38"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ag5-yT-USY">
                                         <rect key="frame" x="0.0" y="0.0" width="41.333333333333336" height="22.333333333333332"/>
@@ -88,8 +88,8 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jP0-7V-0XR">
-                                <rect key="frame" x="241" y="13.333333333333336" width="51" height="31"/>
+                            <switch opaque="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jP0-7V-0XR">
+                                <rect key="frame" x="236" y="15" width="51" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="49" id="VDY-1H-eHY"/>
                                 </constraints>
@@ -105,7 +105,7 @@
                             <constraint firstAttribute="bottom" secondItem="bWm-AC-4sy" secondAttribute="bottom" constant="10" id="Eve-dL-age"/>
                             <constraint firstItem="acx-uD-rlv" firstAttribute="leading" secondItem="HbY-lZ-ptQ" secondAttribute="leading" constant="10" id="NFU-Mf-Ogl"/>
                             <constraint firstAttribute="trailing" secondItem="G5X-QH-lI5" secondAttribute="trailing" constant="10" id="QUd-su-Ufm"/>
-                            <constraint firstAttribute="trailing" secondItem="jP0-7V-0XR" secondAttribute="trailing" constant="10" id="XvO-Bs-2NW"/>
+                            <constraint firstAttribute="trailing" secondItem="jP0-7V-0XR" secondAttribute="trailing" constant="15" id="XvO-Bs-2NW"/>
                             <constraint firstItem="jP0-7V-0XR" firstAttribute="centerY" secondItem="HbY-lZ-ptQ" secondAttribute="centerY" id="Z9u-Nw-JoL"/>
                             <constraint firstItem="jP0-7V-0XR" firstAttribute="leading" secondItem="bWm-AC-4sy" secondAttribute="trailing" constant="5" id="ty1-Kn-B8J"/>
                         </constraints>
@@ -143,7 +143,7 @@
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.55294117647058827" blue="0.15686274509803921" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

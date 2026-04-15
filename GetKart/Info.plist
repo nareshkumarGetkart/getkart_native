@@ -51,6 +51,14 @@
 				<string>iOSIntentIntegration</string>
 			</array>
 		</dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>fb414987369815126</string>
+            </array>
+        </dict>
 	</array>
 	<key>GIDClientID</key>
 	<string>968056389209-a30r9sqnm5hq5abb56v7null15bnkvh3.apps.googleusercontent.com</string>
@@ -95,5 +103,11 @@
 		<string>Inter_18pt-BoldItalic.ttf</string>
 		<string>Inter_18pt-ExtraBoldItalic.ttf</string>
 	</array>
+    <key>FacebookAppID</key>
+    <string> 414987369815126</string>
+    <key>FacebookClientToken</key>
+    <string> 93950d812f33d4a73f47209f82b8d04f</string>
+    <key>FacebookDisplayName</key>
+    <string>GetKart</string>
 </dict>
 </plist>

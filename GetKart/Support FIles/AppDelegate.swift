@@ -14,6 +14,9 @@ import Kingfisher
 import GooglePlaces
 import FittedSheets
 import AVFoundation
+import FacebookCore
+import FacebookAEM
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -58,6 +61,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         reachabilityListener()
         registerForRemoteNotification(application: application)
             
+        
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions
+        )
+        
+        
+        
         //by me kingfisher
         setupImageCache()
        
@@ -66,9 +77,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Define the desired large font
       if let largeFont = UIFont(name: "Inter-Regular", size: 12) {
 
-
              let appearance = UITabBarAppearance()
-             
+           
+          
              // Apply the font to the normal state
              appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
                  NSAttributedString.Key.font: largeFont
@@ -86,7 +97,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
              if #available(iOS 15.0, *) {
                  UITabBar.appearance().scrollEdgeAppearance = appearance
              }
-             
          }
 
 
@@ -126,11 +136,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 
         self.deviceRegisterApi()
+        
+ 
 
         return true
     }
     
-    
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+    ) -> Bool {
+
+        return ApplicationDelegate.shared.application(
+            app,
+            open: url,
+            options: options
+        )
+    }
 
     func setupImageCache() {
 
@@ -237,6 +260,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("applicationDidBecomeActive")
+       
+        AppEvents.shared.activateApp()
+        
         SocketIOManager.sharedInstance.checkSocketStatus()
         
         if isForceAppUpdate{

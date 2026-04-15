@@ -16,6 +16,8 @@ import PayUCheckoutProBaseKit
 import PayUParamsKit
 import CryptoKit
 import PayUCommonUI
+import FacebookAEM
+import FacebookCore
 
 class PaymentGatewayCentralized{
    
@@ -65,6 +67,10 @@ class PaymentGatewayCentralized{
     //MARK: Methods
   private  func getPaymentSettings(){
         
+    
+       FaceBookAppEvents.facebookEvents(type: .payment, categoryName: "",amount: planObj?.finalPrice ?? "")
+
+      
         URLhandler.sharedinstance.makeCall(url: Constant.shared.getPaymentSettings, param: nil, methodType: .get,showLoader:true) { [weak self] responseObject, error in
             
             if(error != nil)
@@ -690,11 +696,27 @@ extension PaymentGatewayCentralized{
 
         }
         
-        paymentParam.additionalParam = [
+        var strUdf4Val = strUdf1Val
+        
+        if let id = campaign_banner_id{
+            strUdf4Val.append("bannerId-\(id)")
+        }
+        strUdf4Val.append("-platform-mobile")
+
+        
+       /* paymentParam.additionalParam = [
             "udf1": strUdf1Val,
             "udf2": "",
             "udf3": "",
             "udf4": "",
+            "udf5": ""
+        ]*/
+        
+        paymentParam.additionalParam = [
+            "udf1": strUdf1Val,
+            "udf2": "",
+            "udf3": "",
+            "udf4": strUdf4Val,
             "udf5": ""
         ]
 
