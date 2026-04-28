@@ -10,6 +10,10 @@
 		29535EAA2F8CB47700C3BD4B /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EA92F8CB47700C3BD4B /* FacebookAEM */; };
 		29535EAC2F8CB47700C3BD4B /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EAB2F8CB47700C3BD4B /* FacebookBasics */; };
 		29535EAE2F8CB47700C3BD4B /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 29535EAD2F8CB47700C3BD4B /* FacebookCore */; };
+		29F0E0282F9FA98E00C5AE33 /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 29F0E0272F9FA98E00C5AE33 /* FacebookAEM */; };
+		29F0E02A2F9FA98E00C5AE33 /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 29F0E0292F9FA98E00C5AE33 /* FacebookBasics */; };
+		29F0E02C2F9FA98E00C5AE33 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 29F0E02B2F9FA98E00C5AE33 /* FacebookCore */; };
+		29F0E02E2F9FA98E00C5AE33 /* FacebookLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 29F0E02D2F9FA98E00C5AE33 /* FacebookLogin */; };
 		5F55AC37A90D543B59CF93DC /* Pods_GetKart_GetKartUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3D5D11CD8818A5AA93F0531 /* Pods_GetKart_GetKartUITests.framework */; };
 		883902E17AA9B2B96A2455C1 /* Pods_GetKartTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC35FFF0AF324380FA8C6C7E /* Pods_GetKartTests.framework */; };
 		F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0B996062DBF51DD003335EB /* StoreKit.framework */; };
@@ -86,10 +90,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29F0E02E2F9FA98E00C5AE33 /* FacebookLogin in Frameworks */,
 				29535EAA2F8CB47700C3BD4B /* FacebookAEM in Frameworks */,
+				29F0E0282F9FA98E00C5AE33 /* FacebookAEM in Frameworks */,
 				29535EAE2F8CB47700C3BD4B /* FacebookCore in Frameworks */,
 				F0B996072DBF51DD003335EB /* StoreKit.framework in Frameworks */,
+				29F0E02A2F9FA98E00C5AE33 /* FacebookBasics in Frameworks */,
 				29535EAC2F8CB47700C3BD4B /* FacebookBasics in Frameworks */,
+				29F0E02C2F9FA98E00C5AE33 /* FacebookCore in Frameworks */,
 				FF6ECB96487AFB094A6D6193 /* Pods_GetKart.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -501,7 +509,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = GetKart/GetKart.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.55;
+				CURRENT_PROJECT_VERSION = 2.57;
 				DEVELOPMENT_TEAM = 4J798VP7SK;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -530,7 +538,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/GetKart/External/VoiceLib",
 				);
-				MARKETING_VERSION = 2.55;
+				MARKETING_VERSION = 2.57;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ios.Getkart;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -552,7 +560,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = GetKart/GetKart.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.55;
+				CURRENT_PROJECT_VERSION = 2.57;
 				DEVELOPMENT_TEAM = 4J798VP7SK;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -581,7 +589,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/GetKart/External/VoiceLib",
 				);
-				MARKETING_VERSION = 2.55;
+				MARKETING_VERSION = 2.57;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ios.Getkart;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -857,6 +865,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
 			productName = FacebookCore;
+		};
+		29F0E0272F9FA98E00C5AE33 /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		29F0E0292F9FA98E00C5AE33 /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		29F0E02B2F9FA98E00C5AE33 /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		29F0E02D2F9FA98E00C5AE33 /* FacebookLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29535EA82F8CB47700C3BD4B /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookLogin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

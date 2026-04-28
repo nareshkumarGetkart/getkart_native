@@ -12,11 +12,11 @@ struct TakeBackDocumentView: View {
     @State private var showCapturedImage = false
     @State private var capturedBackImage: UIImage?
     var navigation:UINavigationController?
-  // @State private var coordinator: CameraView.CameraCoordinator?
+    //@State private var coordinator: CameraView.CameraCoordinator?
     var frontImage: UIImage?
     var selfieImage: UIImage?
     var businessName:String?
-     @State private var showProgresOnButton = false
+    @State private var showProgresOnButton = false
     
     var body: some View {
         
@@ -34,7 +34,6 @@ struct TakeBackDocumentView: View {
         
         VStack {
             
-            
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text("Submit the back of your ID Proof")
@@ -51,28 +50,28 @@ struct TakeBackDocumentView: View {
                 Text("Secure verification, no data sharing")
                     .font(.manrope(.medium, size: 18))
                     .padding(.top)
-           
+                
             }.padding(.top,15)
-            .padding(.horizontal, 20)
+             .padding(.horizontal, 20)
             
-
+            
             Text("Take a clear photo of the front side of your ID. Only Aadhaar Card, Driving License, Voter ID, or Passport will be accepted")
                 .font(.manrope(.regular, size: 14))
                 .multilineTextAlignment(.leading)
                 .padding()
-
+            
             Spacer()
             
             if let image = capturedBackImage {
-               /* Image(uiImage: image)
-                    .resizable()
-                
-                    .scaledToFit()
-                    .frame(height: 350)
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    .frame(width: widthScreen-40)
-                */
+                /* Image(uiImage: image)
+                 .resizable()
+                 
+                 .scaledToFit()
+                 .frame(height: 350)
+                 .cornerRadius(12)
+                 .padding(.horizontal)
+                 .frame(width: widthScreen-40)
+                 */
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -82,22 +81,22 @@ struct TakeBackDocumentView: View {
                     .padding(.horizontal)
                 Spacer()
                 HStack {
-                  /*  Button("Re-take") {
-                        capturedBackImage = nil
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.clear)
-                    .foregroundColor(.orange)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.orange, lineWidth: 1)
-                    }
-                    */
+                    /*  Button("Re-take") {
+                     capturedBackImage = nil
+                     }
+                     .padding()
+                     .frame(maxWidth: .infinity)
+                     .background(Color.clear)
+                     .foregroundColor(.orange)
+                     .overlay {
+                     RoundedRectangle(cornerRadius: 8)
+                     .stroke(Color.orange, lineWidth: 1)
+                     }
+                     */
                     
                     Button(action: {
                         capturedBackImage = nil
-
+                        
                     }) {
                         Text("Re-take")
                             .padding()
@@ -110,43 +109,43 @@ struct TakeBackDocumentView: View {
                             }
                             .contentShape(Rectangle())
                     }
-                      
+                    
                     /*
-                    Button("Next") {
-                            showProgresOnButton = true
-                        if let img1 = frontImage{
-                            
-                            if let img2 = capturedBackImage{
-                                if  let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view  {
-                                    Themes.sharedInstance.activityView(uiView:  topView)
-                                }
-                                if let mergeimg = mergeImages(img1, img2){
-                                    
-                                    if let selfie = selfieImage{
-                                        self.uploadData(selfieImg: selfie, mergedImg: mergeimg)
-                                        showProgresOnButton = false
-                                        
-                                    }
-                                }
-                            }
-                        }
-
-                            
-                            
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                    */
+                     Button("Next") {
+                     showProgresOnButton = true
+                     if let img1 = frontImage{
+                     
+                     if let img2 = capturedBackImage{
+                     if  let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view  {
+                     Themes.sharedInstance.activityView(uiView:  topView)
+                     }
+                     if let mergeimg = mergeImages(img1, img2){
+                     
+                     if let selfie = selfieImage{
+                     self.uploadData(selfieImg: selfie, mergedImg: mergeimg)
+                     showProgresOnButton = false
+                     
+                     }
+                     }
+                     }
+                     }
+                     
+                     
+                     
+                     }
+                     .padding()
+                     .frame(maxWidth: .infinity)
+                     .background(Color.orange)
+                     .foregroundColor(.white)
+                     .cornerRadius(12)
+                     */
                     
                     Button(action: {
                         showProgresOnButton = true
                         DispatchQueue.main.async {
                             self.mergeAnduploadFile()
                         }
-                      
+                        
                     }) {
                         if showProgresOnButton {
                             ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -154,7 +153,7 @@ struct TakeBackDocumentView: View {
                             Text("Next")
                                 .font(.headline)
                                 .contentShape(Rectangle())
-
+                            
                         }
                     }
                     .padding()
@@ -163,7 +162,7 @@ struct TakeBackDocumentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .disabled(showProgresOnButton)
-                
+                    
                 }
                 .padding()
                 
@@ -188,27 +187,27 @@ struct TakeBackDocumentView: View {
                     }
                     
                 }.frame(height: 350)
-                .padding(.horizontal)
-
+                    .padding(.horizontal)
+                
                 Spacer()
                 
-              /*  Button("Capture") {
-                    // Trigger photo capture and set capturedImage
-                    
-                    //coordinator?.capturePhoto()
-                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
-
-
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.orange)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .contentShape(Rectangle())
-                .padding(.bottom)
-                */
+                /*  Button("Capture") {
+                 // Trigger photo capture and set capturedImage
+                 
+                 //coordinator?.capturePhoto()
+                 NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
+                 
+                 
+                 }
+                 .padding()
+                 .frame(maxWidth: .infinity)
+                 .background(Color.orange)
+                 .foregroundColor(.white)
+                 .cornerRadius(12)
+                 .padding(.horizontal)
+                 .contentShape(Rectangle())
+                 .padding(.bottom)
+                 */
                 
                 Button(action: {
                     NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
@@ -224,7 +223,7 @@ struct TakeBackDocumentView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
-
+            
         }
         .navigationBarHidden(true)
         .background(Color(UIColor.systemGray6))
@@ -265,14 +264,14 @@ struct TakeBackDocumentView: View {
     
     
     func mergeImages(_ firstImage: UIImage, _ secondImage: UIImage) -> UIImage? {
-
+        
         let size = CGSize(
             width: max(firstImage.size.width, secondImage.size.width),
             height: firstImage.size.height + secondImage.size.height
         )
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-
+        
         firstImage.draw(in: CGRect(origin: .zero, size: firstImage.size))
         secondImage.draw(in: CGRect(
             x: 0,
@@ -280,23 +279,23 @@ struct TakeBackDocumentView: View {
             width: secondImage.size.width,
             height: secondImage.size.height
         ))
-
+        
         let mergedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return mergedImage
     }
-
+    
     
     func uploadData(selfieImg:UIImage,mergedImg:UIImage){
         
-//        let valDict = ["2":businessName ?? ""]
+        //        let valDict = ["2":businessName ?? ""]
         let valDict = ["1":businessName ?? ""]
-
+        
         let paramDict = ["verification_field":valDict,]
-//        let arrKey = ["1","4"]
+        //        let arrKey = ["1","4"]
         
         let arrKey = ["3","2"]
-
+        
         /*
          3 Selfie Image
          2 Valid Government-Issued ID
@@ -304,128 +303,128 @@ struct TakeBackDocumentView: View {
          */
         
         URLhandler.sharedinstance.uploadArrayOfImagesWithParameters(mediaArray: [selfieImg,mergedImg], mediaKeyArray: arrKey, mediaName: "verification_field_files", url: Constant.shared.send_verification_request, params: paramDict) { responseObject, error in
-      
-
+            
+            
             if error != nil {
                 self.showProgresOnButton = false
-
+                
             }else{
                 
-                    let result = responseObject! as NSDictionary
-                    let status = result["code"] as? Int ?? 0
-                    let message = result["message"] as? String ?? ""
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    // Navigate to next screen
+                    let hostVC = UIHostingController(rootView: SuccessVerifyStepView(navigation:navigation))
+                    self.navigation?.pushViewController(hostVC, animated: true)
                     
-                    if status == 200{
-                        // Navigate to next screen
-                        let hostVC = UIHostingController(rootView: SuccessVerifyStepView(navigation:navigation))
-                        self.navigation?.pushViewController(hostVC, animated: true)
-
-                    }
+                }
                 
                 self.showProgresOnButton = false
-
+                
             }
-
+            
         }
     }
     /*
-
-    func uploadVerificationData(
-        image1: UIImage,
-        image2: UIImage,
-        text: String,
-        url: URL
-    ) {
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-
-        let boundary = "Boundary-\(UUID().uuidString)"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-        let body = createMultipartBody(image1: image1, image2: image2, text: text, boundary: boundary)
-        request.httpBody = body
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Upload failed: \(error)")
-                return
-            }
-
-            if let data = data, let response = response as? HTTPURLResponse {
-                print("Status: \(response.statusCode)")
-                print("Response: \(String(data: data, encoding: .utf8) ?? "")")
-            }
-        }.resume()
-    }
-    
-    func createMultipartBody(image1: UIImage, image2: UIImage, text: String, boundary: String) -> Data {
-        var body = Data()
-
-        // Add text field: verification_field[2]
-        body.append(convertFormField(named: "verification_field[2]", value: text, using: boundary))
-
-        // Add file1: verification_field_files[1]
-        if let imageData1 = image1.jpegData(compressionQuality: 0.8) {
-            body.append(convertFileData(
-                fieldName: "verification_field_files[1]",
-                fileName: "image1.jpg",
-                mimeType: "image/jpeg",
-                fileData: imageData1,
-                using: boundary
-            ))
-        }
-
-        // Add file2: verification_field_files[4]
-        if let imageData2 = image2.jpegData(compressionQuality: 0.8) {
-            body.append(convertFileData(
-                fieldName: "verification_field_files[4]",
-                fileName: "image2.jpg",
-                mimeType: "image/jpeg",
-                fileData: imageData2,
-                using: boundary
-            ))
-        }
-
-        // Close boundary
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
-        return body
-    }
-
-    func convertFormField(named name: String, value: String, using boundary: String) -> Data {
-        var fieldData = Data()
-        fieldData.append("--\(boundary)\r\n")
-        fieldData.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
-        fieldData.append("\(value)\r\n")
-        return fieldData
-    }
-
-    func convertFileData(fieldName: String,
-                         fileName: String,
-                         mimeType: String,
-                         fileData: Data,
-                         using boundary: String) -> Data {
-        var data = Data()
-        data.append("--\(boundary)\r\n")
-        data.append("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n")
-        data.append("Content-Type: \(mimeType)\r\n\r\n")
-        data.append(fileData)
-        data.append("\r\n")
-        return data
-    }
-
-
+     
+     func uploadVerificationData(
+     image1: UIImage,
+     image2: UIImage,
+     text: String,
+     url: URL
+     ) {
+     var request = URLRequest(url: url)
+     request.httpMethod = "POST"
+     
+     let boundary = "Boundary-\(UUID().uuidString)"
+     request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+     
+     let body = createMultipartBody(image1: image1, image2: image2, text: text, boundary: boundary)
+     request.httpBody = body
+     
+     URLSession.shared.dataTask(with: request) { data, response, error in
+     if let error = error {
+     print("Upload failed: \(error)")
+     return
+     }
+     
+     if let data = data, let response = response as? HTTPURLResponse {
+     print("Status: \(response.statusCode)")
+     print("Response: \(String(data: data, encoding: .utf8) ?? "")")
+     }
+     }.resume()
+     }
+     
+     func createMultipartBody(image1: UIImage, image2: UIImage, text: String, boundary: String) -> Data {
+     var body = Data()
+     
+     // Add text field: verification_field[2]
+     body.append(convertFormField(named: "verification_field[2]", value: text, using: boundary))
+     
+     // Add file1: verification_field_files[1]
+     if let imageData1 = image1.jpegData(compressionQuality: 0.8) {
+     body.append(convertFileData(
+     fieldName: "verification_field_files[1]",
+     fileName: "image1.jpg",
+     mimeType: "image/jpeg",
+     fileData: imageData1,
+     using: boundary
+     ))
+     }
+     
+     // Add file2: verification_field_files[4]
+     if let imageData2 = image2.jpegData(compressionQuality: 0.8) {
+     body.append(convertFileData(
+     fieldName: "verification_field_files[4]",
+     fileName: "image2.jpg",
+     mimeType: "image/jpeg",
+     fileData: imageData2,
+     using: boundary
+     ))
+     }
+     
+     // Close boundary
+     body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+     
+     return body
+     }
+     
+     func convertFormField(named name: String, value: String, using boundary: String) -> Data {
+     var fieldData = Data()
+     fieldData.append("--\(boundary)\r\n")
+     fieldData.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
+     fieldData.append("\(value)\r\n")
+     return fieldData
+     }
+     
+     func convertFileData(fieldName: String,
+     fileName: String,
+     mimeType: String,
+     fileData: Data,
+     using boundary: String) -> Data {
+     var data = Data()
+     data.append("--\(boundary)\r\n")
+     data.append("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n")
+     data.append("Content-Type: \(mimeType)\r\n\r\n")
+     data.append(fileData)
+     data.append("\r\n")
+     return data
+     }
+     
+     
      VStack(spacing: 20) {
-                 if let mergedImage = mergedImage {
-                     Image(uiImage: mergedImage)
-                         .resizable()
-                         .scaledToFit()
-                         .frame(height: 400)
-                 }
-
-                 Button("Merge Images") {
-                     mergedImage = mergeImages(image1, image2)
-                 }
+     if let mergedImage = mergedImage {
+     Image(uiImage: mergedImage)
+     .resizable()
+     .scaledToFit()
+     .frame(height: 400)
+     }
+     
+     Button("Merge Images") {
+     mergedImage = mergeImages(image1, image2)
+     }
      */
 }
 

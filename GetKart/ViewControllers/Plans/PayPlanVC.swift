@@ -542,7 +542,7 @@ extension PayPlanVC{
 
         paymentParam.additionalParam = [
             "udf1": strUdf1Val,
-            "udf2": "",
+            "udf2": "Bearer \(userInfo.token ?? "")",
             "udf3": "",
             "udf4": strUdf4Val,
             "udf5": ""

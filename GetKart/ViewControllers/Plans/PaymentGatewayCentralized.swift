@@ -693,7 +693,6 @@ extension PaymentGatewayCentralized{
         
         if let postItemId = itemId{
              strUdf1Val = "t-\(paymentIntentId)-p-\(selectedPlanId)-item-\(postItemId)"
-
         }
         
         var strUdf4Val = strUdf1Val
@@ -702,7 +701,7 @@ extension PaymentGatewayCentralized{
             strUdf4Val.append("bannerId-\(id)")
         }
         strUdf4Val.append("-platform-mobile")
-
+      
         
        /* paymentParam.additionalParam = [
             "udf1": strUdf1Val,
@@ -714,7 +713,7 @@ extension PaymentGatewayCentralized{
         
         paymentParam.additionalParam = [
             "udf1": strUdf1Val,
-            "udf2": "",
+            "udf2": "Bearer \(userInfo.token ?? "")",
             "udf3": "",
             "udf4": strUdf4Val,
             "udf5": ""

@@ -139,7 +139,7 @@ struct FavoriteBoardView: View {
                         Spacer()
                         Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
                         Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding(.top).padding(.horizontal)
-                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
+//                        Text("We're sorry what you were looking for. Please try another way").font(Font.manrope(.regular, size: 16.0)).multilineTextAlignment(.center).padding(.horizontal)
                         Spacer()
                     }
                     Spacer()

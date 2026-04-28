@@ -102,7 +102,7 @@ struct BoardDetailView: View{
                                             }
                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                 videoFrames[item.id ?? 0] = frame
-                                                // scheduleVisibilityUpdate()
+                                                 scheduleVisibilityUpdate()
                                             }
                                     }
                                 )
@@ -171,7 +171,7 @@ struct BoardDetailView: View{
                                             }
                                             .onChange(of: geo.frame(in: .global)) { frame in
                                                 videoFrames[item.id ?? 0] = frame
-                                                // scheduleVisibilityUpdate()
+                                                 scheduleVisibilityUpdate()
                                                 
                                             }
                                     }
@@ -282,15 +282,6 @@ struct BoardDetailView: View{
                     }
                 }
             
-            //  Detect REAL user scroll
-                .simultaneousGesture(
-                    DragGesture()
-                        .onEnded { _ in
-                            
-                            scheduleVisibilityUpdate()
-                        }
-                )
-            
                 .background(
                     
                     NavigationConfigurator { nav in
@@ -299,30 +290,21 @@ struct BoardDetailView: View{
                     }
                 ) //Added for swipe pop navigation
             
+            
+            //  Detect REAL user scroll
+//                .simultaneousGesture(
+//                    DragGesture()
+//                        .onEnded { _ in
+//                            
+//                            scheduleVisibilityUpdate()
+//                        }
+//                )
+//            
                 .fullScreenCover(item: $safariURL) { url in
                     SafariView(url: url)
                 }
             
-//                .sheet(isPresented: $showComments) {
-//                    CommentsView(
-//                        onClose:{ isToProfileOpen,user in
-//                            showComments = false
-//                            
-//                            if isToProfileOpen {
-//                                if let obj = user {
-//                                    pushToProfileScreen(user: obj)
-//                                }
-//                            }
-//                        },
-//                        itemObj: itemObj,
-//                        navController: navigationController
-//                    )
-//                    .presentationDetents([.large])
-//                    .presentationDragIndicator(.hidden)
-//                    .presentationBackgroundInteraction(.enabled)   // 👈 add here
-//                }
-            
-            
+
                 .sheet(isPresented: $showComments) {
                     CommentsView(
                         onClose:{ isToProfileOpen,user in
@@ -644,6 +626,8 @@ struct BoardDetailView: View{
             }
         }
     }
+    
+    
     func getBoardListApi(){
         
         if self.page == 1{
@@ -922,7 +906,7 @@ struct ReelPostView: View {
 
     private var bottomCard: some View {
         VStack(alignment: .leading, spacing: 5) {
-            HStack{
+            HStack(spacing:12){
                 
                 if (post.user?.id ?? 0) != Local.shared.getUserId(){
               
@@ -933,8 +917,21 @@ struct ReelPostView: View {
                                 manageLikeDislikeApi()
                             }
                         } label: {
-                            let imgStr = (post.isLiked == true) ? "like_fill" : "like"
-                            Image(imgStr).foregroundColor(Color(.label))
+//                            let imgStr = (post.isLiked == true) ? "like_fill" : "likeBlack"
+//                            Image(imgStr).foregroundColor(Color(.label))
+//                            
+                            if post.isLiked == true{
+                                Image("like_fill").resizable().aspectRatio(contentMode: .fit)
+                                    .frame(width: 24, height: 24)
+                               
+                            }else{
+                                Image("like")
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .foregroundColor(.primary)
+                                    .frame(width: 24, height: 24)
+                            }
                         }
                         if (post.totalLikes ?? 0) > 0{
                             
@@ -1044,15 +1041,6 @@ struct ReelPostView: View {
                     }
                 }
             }
-            
-//            Button {
-//                outboundClickApi(strURl: post.outbondUrl ?? "")
-//            } label: {
-//                
-//                Text("Buy Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-//                  
-//            }.background(Color(hexString: "#FF9900"))
-//             .cornerRadius(8).padding([.bottom,.top])
         }
 
     }
@@ -1077,23 +1065,6 @@ struct ReelPostView: View {
                 }
             }
         }
-        
-        /* var urlString = strURl
-         if !urlString.lowercased().hasPrefix("http://") &&
-         !urlString.lowercased().hasPrefix("https://") {
-         urlString = "https://" + urlString
-         }
-         if let url = URL(string: urlString)  {
-         print(urlString)
-         let vc = UIHostingController(rootView:  PreviewURL(fileURLString:urlString,isCopyUrl:true))
-         AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
-         
-         //            if UIApplication.shared.canOpenURL(url) {
-         //                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-         //            } else {
-         //                print("Cannot open URL")
-         //            }
-         }*/
     }
     
 
@@ -1255,20 +1226,7 @@ struct PostImagesCarousel: View {
                         .resizable()
                         .scaledToFit()
                         .clipped()
-                    
-//                    AsyncImage(url: url) { image in
-//                        image.scaleFactor(UIScreen.main.scale)
-//                            .resizable()
-//                            .scaledToFit()
-//                           .frame(height: 350)
-//                            .clipped()
-//                    } placeholder: {
-//                        Image("getkartplaceholder")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(height: 350)
-//                            .clipped()
-//                    }
+
                     .tag(index)
                 }
             }
@@ -1351,217 +1309,6 @@ extension UIImage {
         )
     }
 }
-
-
-
-/*  var body: some View {
-
-      VStack(spacing: 0) {
-
-          // IMAGE
-          GeometryReader { geo in
-            //  ZStack(alignment:.top){
-              ZStack(alignment: .top) {
-                  // avgColor   // 🔥 background from image
-
-               /*   AsyncImage(url: URL(string: post.image ?? "")) { img in
-                      img
-                          .resizable()
-                      
-                      
-                          .scaledToFit()
-                          //.frame(width: geo.size.width, height: geo.size.height)
-                          .frame(maxWidth: .infinity)
-                      // .clipped()
-//                            .cornerRadius(10)
-//                            .shadow(
-//                                color: Color.black.opacity(0.10),
-//                                radius: 7,
-//                                x: 0,
-//                                y: 2
-//                            )
-                          . padding(0)
-                          .onAppear {
-                             // extractAverageColor(from: img)
-                          }
-                  } placeholder: {
-                      Color.black
-                  }*/
-                  
-                  if let url = URL(string: post.image ?? "") {
-                      
-                      
-                     // GeometryReader { geo in
-                          KFImage(url)
-                              .resizable()
-                             // .scaledToFill()
-                              //.frame(width: geo.size.width,height:imgHeight)
-                              //.aspectRatio(3/4, contentMode: .fill)
-                              .onSuccess { result in
-                                              let size = result.image.size
-                                              if size.height > 0 {
-                                                  imageRatio = size.width / size.height
-                                              }
-                                          }
-                                          .scaledToFill()
-                                          .aspectRatio(imageRatio, contentMode: .fit)
-                              .clipped()
-//                                .cornerRadius(8)
-//                                .shadow(
-//                                    color: Color.black.opacity(0.10),
-//                                    radius: 7,
-//                                    x: 0,
-//                                    y: 2
-//                                )
-  //                    }
-  //                    .frame(height: imgHeight)
-                  }
-
-              }.background(Color(.systemBackground))
-//                   .frame(width: geo.size.width, height: geo.size.height)
-                  .frame(maxWidth: .infinity)
-                  .frame(height: min(geo.size.height, UIScreen.main.bounds.height * 0.6))
-
-              .cornerRadius(15)
-                  .shadow(
-                      color: Color.black.opacity(0.6),
-                      radius: 15,
-                      x: 0,
-                      y: 6
-                  )
-          }
-          //.cornerRadius(10)
-
-          // BOTTOM CARD (ALWAYS VISIBLE)
-          bottomCard.padding()
-        //  Spacer()
-          Button {
-              outboundClickApi(strURl: post.outbondUrl ?? "")
-          } label: {
-              
-              Text("Buy Now").font(.inter(.semiBold, size: 16.0)).foregroundColor(.white).frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                
-          }.background(Color(hexString: "#FF9900"))
-              .cornerRadius(8).padding([.bottom,.top]).padding(.horizontal)
-          
-      }
-          .background(Color(.systemBackground))
-          //.cornerRadius(10)
-          .clipped()
-          //.padding(0)
-  }
-*/
-  
-//    private func extractAverageColor(from image: Image) {
-//            let renderer = ImageRenderer(content: image)
-//            renderer.scale = UIScreen.main.scale
-//
-//            if let uiImage = renderer.uiImage,
-//               let color = uiImage.averageColor {
-//                avgColor = Color(color)
-//            }
-//        }
-
-
-
-/*
-class PagerVC: UIViewController, UIScrollViewDelegate {
-
-    var pages: [UIViewController] = []
-    let scrollView = UIScrollView()
-
-    private let pageSpacing: CGFloat = 0
-    
-    
-      var onPageChange: ((Int) -> Void)?
-      private var lastIndex = 0
-    
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        scrollView.isPagingEnabled = true
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.backgroundColor = .clear
-        scrollView.isOpaque = false
-        scrollView.delegate = self
-        scrollView.bounces = false
-
-        view.addSubview(scrollView)
-    }
-    
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        let pageHeight = view.frame.height
-        let pageWidth = view.frame.width
-
-        scrollView.frame = view.bounds
-
-        // ⭐ UPDATED contentSize with spacing
-        scrollView.contentSize = CGSize(
-            width: pageWidth,
-            height: (pageHeight * CGFloat(pages.count)) +
-                    (pageSpacing * CGFloat(pages.count - 1))
-        )
-
-        for (i, vc) in pages.enumerated() {
-            if vc.view.superview == nil {
-                addChild(vc)
-                vc.view.backgroundColor = .systemGray5
-                scrollView.addSubview(vc.view)
-                vc.didMove(toParent: self)
-            }
-
-            // ⭐ UPDATED Y position with spacing
-            vc.view.frame = CGRect(
-                x: 0,
-                y: (pageHeight + pageSpacing) * CGFloat(i),
-                width: pageWidth,
-                height: pageHeight
-            )
-        }
-    }
-    
-    // ✅ THIS IS WHERE currentIndex COMES FROM
-       func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-           let index = Int(round(scrollView.contentOffset.y / view.bounds.height))
-
-           if index != lastIndex {
-               lastIndex = index
-               onPageChange?(index)
-           }
-       }
-}
-*/
-
-
-/*  func boardClickApi(){
-      
-      let params = ["board_id":post.id ?? 0]
-      
-      URLhandler.sharedinstance.makeCall(url: Constant.shared.board_click, param: params,methodType: .post) { responseObject, error in
-          
-          if error == nil{
-              
-              let result = responseObject! as NSDictionary
-              let status = result["code"] as? Int ?? 0
-              let message = result["message"] as? String ?? ""
-              
-              if status == 200{
-              }else{
-              }
-          }
-      }
-  }*/
-
-
-
-
-
-
 
 struct TruncatableText: View {
     let text: String

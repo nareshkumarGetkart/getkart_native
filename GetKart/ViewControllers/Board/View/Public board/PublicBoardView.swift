@@ -956,6 +956,10 @@ struct ProductCardStaggered: View {
     @State private var imageRatio: CGFloat = 1
     let onTapBoostButton: () -> Void
     var isToShowBoostButton = true
+    
+    var defaultImgWidth:CGFloat = 0.0
+    var defaultImgHeight:CGFloat = 0.0
+
    // @State private var randomHeight: CGFloat = CGFloat(Int.random(in: 400...480))
     
     var body: some View {
@@ -963,69 +967,173 @@ struct ProductCardStaggered: View {
             
             ZStack(alignment:.bottomTrailing) {
                 
-                KFImage(URL(string: product.image ?? ""))
-                    .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
-                    )
-                    .scaleFactor(UIScreen.main.scale)
-                    .cacheOriginalImage(false)
-                    .resizable()
-                    .scaledToFit()
-                    .clipped()
-                    .cornerRadius(10)
-                    .shadow(
-                        color: Color.black.opacity(0.10),
-                        radius: 7,
-                        x: 0,
-                        y: 2
-                    )
-                
-                if (product.user?.id ?? 0) != Local.shared.getUserId(){
+                if defaultImgHeight > 0 && defaultImgWidth > 0{
                     
-                    Button {
-                        showSafari = true
-                        outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
+                    KFImage(URL(string: product.image ?? ""))
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
+                        )
+                       // .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                        .cornerRadius(10)
+                        .frame(width:defaultImgWidth,height:defaultImgHeight)
 
-                    } label: {
-                        HStack(spacing:2){
-                            
-                            Text(product.ctaLabel ?? "Buy Now")
-                                .font(.inter(.medium, size: 11))
-                                .foregroundColor(.white)
-                            Image("upRight")
-                        }
-                    }.padding(.vertical, 3)
-                        .padding(.horizontal, 8)
-                        .background(Color.orange)
-                        .cornerRadius(5)
-                        .padding(5)
-                }
-            }
-            
-            HStack(spacing:2) {
-                if (product.user?.id ?? 0) == Local.shared.getUserId(){
-                    Spacer()
+                        .shadow(
+                            color: Color.black.opacity(0.10),
+                            radius: 7,
+                            x: 0,
+                            y: 2
+                        )
+                       
+                    
                     
                 }else{
-                    Button {
-                        manageLike(boardId: product.id ?? 0)
-                    } label: {
-                        Image(product.isLiked == true ? "like_fill" : "like")
-                            .frame(width: 24, height: 24)
-                        
-                    }
-                    if (product.totalLikes ?? 0) > 0{
-                        Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.gray))
-                            .font(Font.inter(.regular, size: 12))
+                    
+                    KFImage(URL(string: product.image ?? ""))
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
+                        )
+                        .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                        .cornerRadius(10)
+                        .shadow(
+                            color: Color.black.opacity(0.10),
+                            radius: 7,
+                            x: 0,
+                            y: 2
+                        )
+                    
+                }
+               
+                VStack{
+                    if (product.isFeature ?? false) {
+                        HStack{
+                            
+                            Text("Sponsored")
+                                .font(.inter(.medium, size: 11))
+                                .lineLimit(1)
+                                .foregroundColor(Color(.gray))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color(UIColor.systemBackground))
+                                .clipShape(Capsule())  //  Auto circular based on content size
+                                .overlay {
+                                    Capsule()
+                                        .stroke(Color(.systemGreen).opacity(0.4), lineWidth: 0.1)
+                                }
+                                .padding(8)
+                            
+                            Spacer()
+                            
+                        }
                     }
                     Spacer()
-                }
+                    
+                    if (product.user?.id ?? 0) != Local.shared.getUserId(){
+                        HStack{
+                            
+                            Spacer()
+                            Button {
+                                showSafari = true
+                                outboundClickApi(strURl: product.outbondUrl ?? "", boardId: product.id ?? 0)
+                                
+                            } label: {
+                                HStack(spacing:2){
+                                    
+                                    Text(product.ctaLabel ?? "Buy Now")
+                                        .font(.inter(.medium, size: 11))
+                                        .foregroundColor(.white)
+                                    Image("upRight")
+                                }
+                            }.padding(.vertical, 3)
+                                .padding(.horizontal, 8)
+                                .background(Color.orange)
+                                .cornerRadius(5)
+                                .padding(5)
+                        }
+                    }
                 
+            }
+            }
+            
+            HStack(spacing:12) {
+                if (product.user?.id ?? 0) == Local.shared.getUserId(){
+                   // Spacer()
+                    
+                }else{
+                        
+                        Button {
+                            manageLike(boardId: product.id ?? 0)
+                        } label: {
+                            HStack(spacing:1){
+                                if product.isLiked == true{
+                                    Image("like_fill").resizable().aspectRatio(contentMode: .fit)
+                                        .frame(width: 24, height: 24)
+                                   
+                                }else{
+                                    Image("like")
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .foregroundColor(.primary)
+                                        .frame(width: 24, height: 24)
+                                }
+                                                                   
+                                if (product.totalLikes ?? 0) > 0{
+                                    Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.label))
+                                        .font(Font.inter(.regular, size: 12))
+                                }
+                            }
+                            
+                        }
+                       
+                    }
+//                    Spacer()
+                
+                
+                //
+                
+              //  if (product.commentsCount ?? 0) > 0{
+                    //                    Button {
+                    //
+                    //                    } label: {
+                    HStack(spacing:3){
+                        Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
+                        if (product.commentsCount ?? 0) > 0{
+                            Text("\((product.commentsCount ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
+                        }
+                    }
+                    //}
+                    
+              //  }
+            
+                
+               
+                    HStack(spacing:3){
+                        Image("eye").renderingMode(.template).foregroundColor(Color(.label))
+                        if (product.impressions ?? 0) > 0{
+                            Text("\((product.impressions ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
+                        }
+                    }
+              //  }
+                
+                
+                //
+                
+                Spacer()
+
+              /*
                 if (product.isFeature ?? false) {
                     Text("Sponsored")
-                        .font(.inter(.medium, size: 11))
+                        .font(.inter(.medium, size: 11)).lineLimit(1)
                         .foregroundColor(Color(.gray))
-                }
+                }*/
             } .padding(.horizontal,4)
             
             
@@ -1132,13 +1240,41 @@ struct IdeaCardStaggered: View {
 
     let product: ItemModel
     @State private var imageRatio: CGFloat = 1
-
+    var defaultImgWidth:CGFloat = 0.0
+    var defaultImgHeight:CGFloat = 0.0
+    
+    
     var body: some View {
             
             ZStack(alignment:.bottomTrailing) {
 
+                
+                if defaultImgHeight > 0 && defaultImgWidth > 0{
+                    
                     KFImage(URL(string: product.image ?? ""))
-                      .setProcessor(
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
+                        )
+                       // .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFill()
+                        .clipped()
+                        .cornerRadius(10)
+                        .frame(width:defaultImgWidth,height:defaultImgHeight)
+
+                        .shadow(
+                            color: Color.black.opacity(0.10),
+                            radius: 7,
+                            x: 0,
+                            y: 2
+                        )
+                       
+                    
+                    
+                }else{
+                    KFImage(URL(string: product.image ?? ""))
+                        .setProcessor(
                             DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
                         )
                         .scaleFactor(UIScreen.main.scale)
@@ -1147,12 +1283,14 @@ struct IdeaCardStaggered: View {
                         .scaledToFit()
                         .clipped()
                         .cornerRadius(10)
-                            .shadow(
-                                color: Color.black.opacity(0.10),
-                                radius: 7,
-                                x: 0,
-                                y: 2
-                            )
+                        .shadow(
+                            color: Color.black.opacity(0.10),
+                            radius: 7,
+                            x: 0,
+                            y: 2
+                        )
+                    
+                }
                 
                 if (product.isFeature ?? false){
                     Text("Sponsored")
@@ -1254,6 +1392,34 @@ struct PromotionalAdsCardStaggered: View {
 }
 
 
+import SwiftUI
+import WebKit
+
+struct GIFView: UIViewRepresentable {
+    let gifName: String
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+        webView.scrollView.isScrollEnabled = false
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        if let path = Bundle.main.path(forResource: gifName, ofType: "gif") {
+            let url = URL(fileURLWithPath: path)
+            let data = try? Data(contentsOf: url)
+
+            uiView.load(
+                data ?? Data(),
+                mimeType: "image/gif",
+                characterEncodingName: "UTF-8",
+                baseURL: url.deletingLastPathComponent()
+            )
+        }
+    }
+}
 
 
 //Existing code

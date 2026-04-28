@@ -425,7 +425,6 @@ extension PostAdFinalVC: MKMapViewDelegate,LocationSelectedDelegate {
              self.params[AddKeys.address.rawValue] = city + ", " + state //+ ", " + country
              self.lblLocation.text =  city + ", " + state
 
-
          }
              self.params[AddKeys.latitude.rawValue] = latitude
              self.params[AddKeys.longitude.rawValue] = longitude

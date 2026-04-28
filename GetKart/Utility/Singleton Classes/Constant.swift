@@ -1,9 +1,7 @@
 //
 //  Constant.swift
 //  PickzonDating
-//
 //  Created by Radheshyam Yadav on 08/08/24.
-//
 
 import UIKit
 import Foundation
@@ -16,7 +14,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -58,12 +56,10 @@ final class Constant: NSObject {
   
     
     
- 
-    
     var payuSuccessURL:String {
         get {
             if devEnvironment == .live {
-                return "https://getkart.com/api/payment/success"
+                return "https://www.getkart.com/api/payment/success"
             }else {
                 return "https://gupsup.com/api/payment/success"
             }
@@ -74,7 +70,7 @@ final class Constant: NSObject {
     var payuFailureURL:String {
         get {
             if devEnvironment == .live {
-                return "https://getkart.com/api/payment/failure"
+                return "https://www.getkart.com/api/payment/failure"
             }else {
                 return "https://gupsup.com/api/payment/failure"
             }
@@ -221,6 +217,20 @@ final class Constant: NSObject {
             return "\(baseURL)/v1/clear-board-search"
         }
     }
+    
+    
+    var  get_popular_searches:String {
+        get {
+            return "\(baseURL)/v1/get-popular-searches"
+        }
+    }
+
+    var get_limited_views_items:String{
+        
+        get{
+            return "\(baseURL)/v1/get-limited-views-items"
+        }
+    }
 
     var  board_suggestion_search:String {
         get {
@@ -289,6 +299,15 @@ final class Constant: NSObject {
             return "\(baseURL)/v1/get-favourite-board"
         }
     }
+    
+    
+    var  get_views_items:String {
+        get {
+            return "\(baseURL)/v1/get-views-items"
+        }
+    }
+    
+
     
     var  get_public_board:String {
         get {
