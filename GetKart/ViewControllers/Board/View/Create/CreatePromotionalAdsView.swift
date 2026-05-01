@@ -259,19 +259,7 @@ struct CreatePromotionalAdsView: View {
                     } onCancel: {
                         showCropper = false
                     }
-                    
-                    
-                   /* ImageCropperBoardView(
-                        image: img,
-                        onCropped: { croppedImage in
-                           // self.selectedImage = croppedImage
-                            self.checkNudityOfiMages(pickedImage: croppedImage)
-                            showCropper = false
-                        },
-                        onCancel: {
-                            showCropper = false
-                        }
-                    )*/
+                  
                 }
             }
             .fullScreenCover(isPresented: $showCallToActionPopup) {

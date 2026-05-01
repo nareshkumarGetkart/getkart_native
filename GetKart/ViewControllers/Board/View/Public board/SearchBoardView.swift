@@ -203,15 +203,15 @@ struct SearchBoardView: View {
                         .padding([.top,.horizontal], 16)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
+                            HStack(spacing: 10) {
                                 
                                 ForEach(viewModel.myViewItems, id: \.id) { item in
 
                                     if item.boardType == 3{
                                         //Idea View
-                                        IdeaCardStaggered(product: item,
+                                        IdeaCardSearch(product: item,
                                                           defaultImgWidth: 170,
-                                                          defaultImgHeight: 240).frame(width:170,height: 240)
+                                                          defaultImgHeight: 190).frame(width:170,height: 260)
                                             .onTapGesture{
                                                 pushToDetailScreen(item: item)
 
@@ -220,13 +220,13 @@ struct SearchBoardView: View {
                                         //Normal board
                                         BoardCardView(product: item,
                                                       defaultImgWidth: 170,
-                                                      defaultImgHeight: 190).frame(width:170,height: 240)
+                                                      defaultImgHeight: 190).frame(width:170,height: 260)
                                         .onTapGesture {
                                             pushToDetailScreen(item: item)
                                         }
                                     }
                                 }
-                            }
+                            }.padding(.vertical)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 4)
                         }
@@ -406,7 +406,55 @@ struct BoardCardView: View {
             }
             .padding(.horizontal, 8)
             .padding(.top, 6)
+        }.frame(width: defaultImgWidth, height: 260, alignment: .top) // ✅ fixed card height
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+        .contentShape(Rectangle())
+    }
+}
+
+
+struct IdeaCardSearch: View {
+
+    let product: ItemModel
+    var defaultImgWidth: CGFloat = 170
+    var defaultImgHeight: CGFloat = 190
+
+    var body: some View {
+
+        VStack(alignment: .leading, spacing: 6) {
+
+            ZStack(alignment: .bottomTrailing) {
+
+                KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 400, height: 500)))
+                    .cacheOriginalImage(false)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: defaultImgWidth, height: defaultImgHeight)   // ✅ fixed image height
+                    .clipped()
+                    .cornerRadius(12)
+
+            if (product.isFeature ?? false) {
+                    Text("Sponsored")
+                        .foregroundColor(.white)
+                        .font(.inter(.bold, size: 14))
+                        .padding([.bottom, .trailing], 8)
+                        .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
+            }
+            }
+
+            Text(product.name ?? "")
+                .foregroundColor(Color(.label))
+                .font(.inter(.semiBold, size: 14))
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 6)
+
+            Spacer(minLength: 8)   // ✅ this gives bottom space always
         }
+        .frame(width: defaultImgWidth, height: 260, alignment: .top) // ✅ fixed card height
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)

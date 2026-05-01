@@ -1301,11 +1301,11 @@ struct IdeaCardStaggered: View {
             }
          
         .background(Color(.systemBackground))
-        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
         .clipShape(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
-        
+
       }
 }
 

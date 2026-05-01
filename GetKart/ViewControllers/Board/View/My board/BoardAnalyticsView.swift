@@ -190,12 +190,22 @@ struct BoardAnalyticsView: View {
                 }
                 
                 Divider()
-                            
-                Text("Overview").font(.inter(.semiBold, size: 16.0))
+                  
+                HStack{
+                    Text("Overview").font(.inter(.semiBold, size: 16.0))
+
+                    Spacer()
+                    
+                    if (objAnalytics?.board?.boardType ?? 0) == 0 , let expiryDate = objAnalytics?.board?.expiryDate,expiryDate.count > 0{
+                        HStack{
+                            Text("Expired On.").font(.inter(.medium, size: 16.0))
+                            Text(expiryDate).font(.inter(.regular, size: 15.0))
+                        }
+                    }
+                }
              
                 VStack(spacing:15){
                     
-//                    BannerAnalyticCell(title: "Status", value: "\(objAnalytics?.status ?? "")", isActive: true)
                     
                     if (objAnalytics?.board?.isActive ?? 0) == 1 && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
                         

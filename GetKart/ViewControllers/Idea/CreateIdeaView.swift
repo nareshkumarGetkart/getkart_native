@@ -285,18 +285,6 @@ struct CreateIdeaView: View {
                     } onCancel: {
                         showCropper = false
                     }
-                    
-//                    ImageCropperBoardView(
-//                        image: img,
-//                        onCropped: { croppedImage in
-//                            self.checkNudityOfiMages(pickedImage: croppedImage)
-//                           // self.selectedImage = croppedImage
-//                            showCropper = false
-//                        },
-//                        onCancel: {
-//                            showCropper = false
-//                        }
-//                    )
                 }
             }
 

@@ -57,58 +57,6 @@ struct ImageCropperView: UIViewControllerRepresentable {
 
 
 
-/*
-struct ImageCropperBoardView: UIViewControllerRepresentable {
-
-    var image: UIImage
-    var onCropped: (UIImage) -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    func makeUIViewController(context: Context) -> CropViewController {
-
-        var config = Mantis.Config()
-        config.presetFixedRatioType = .canUseMultiplePresetFixedRatio()
-        config.showAttachedCropToolbar = false
-
-        let cropVC = Mantis.cropViewController(image: image, config: config)
-        cropVC.delegate = context.coordinator
-        return cropVC
-    }
-
-    func updateUIViewController(_ uiViewController: CropViewController, context: Context) {}
-
-    class Coordinator: NSObject, CropViewControllerDelegate {
-
-        let parent: ImageCropperBoardView
-
-        init(_ parent: ImageCropperBoardView) {
-            self.parent = parent
-        }
-
-        func cropViewControllerDidCrop(
-            _ cropViewController: CropViewController,
-            cropped: UIImage,
-            transformation: Transformation,
-            cropInfo: CropInfo
-        ) {
-            cropViewController.dismiss(animated: true) {
-                self.parent.onCropped(cropped)
-            }
-        }
-
-        func cropViewControllerDidCancel(
-            _ cropViewController: CropViewController,
-            original: UIImage
-        ) {
-            cropViewController.dismiss(animated: true)
-        }
-    }
-}
-
-*/
 
 struct ImageCropperBoardView: UIViewControllerRepresentable {
 
