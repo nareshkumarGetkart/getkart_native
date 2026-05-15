@@ -28,6 +28,9 @@ enum SocketEvents: String, CaseIterable {
     case socketConnected = "socketConnected"
     case createRoom = "createRoom"
     case chatUnreadCount = "chatUnreadCount"
+    case chatList = "chatList"
+    case clearAllMessage = "clearAllMessage"
+
 }
 
 final class SocketIOManager: NSObject {
@@ -83,6 +86,12 @@ final class SocketIOManager: NSObject {
             NotificationCenter.default.post(name: Notification.Name(SocketEvents.socketConnected.rawValue), object: nil)
             
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+            
+            
+            if Local.shared.getUserId() > 0{
+                
+                self.emitEvent(SocketEvents.onlineOfflineStatus.rawValue, ["user_id":Local.shared.getUserId()])
+            }
 
         }
 
@@ -128,7 +137,7 @@ final class SocketIOManager: NSObject {
                     return
                 }
                 if ISDEBUG == true {
-                    print("responseDict =>\(dict)")
+                    print(" Event = \(eventName) \n: responseDict =>\(dict)")
                 }
                 NotificationCenter.default.post(name: Notification.Name(eventName), object: nil, userInfo: dict)
             }

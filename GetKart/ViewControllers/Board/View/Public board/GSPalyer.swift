@@ -555,19 +555,22 @@ private extension SmartVideoPlayerView {
         HStack {
 
             Text(item.ctaLabel ?? "")
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
                 .font(.system(size: 14, weight: .medium))
 
             Spacer()
 
             Image(systemName: "arrow.up.right")
-                .foregroundColor(.white)
+                .renderingMode(.template)
+                .foregroundColor(.primary)
                 .font(.system(size: 12))
         }
         .padding(.horizontal, 10)
         .frame(height: 35)
         .frame(maxWidth: .infinity)
-        .background(Color.orange)
+        .background(Color(.systemBackground))
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
+
         .onTapGesture {
             onTapBottomButton()
             outboundClickApi(boardId: item.id ?? 0)

@@ -16,7 +16,8 @@ struct BannerAlalyticsView: View {
     @State private var showSheetpackages = false
     @State private var selectedPkgObj:PlanModel?
     @State private var showSafari = false
-    
+    @State private var isToPreviewVideo = false
+
     //'draft','approved','paused','expired','rejected','pending'
     var body: some View {
         HStack{
@@ -78,15 +79,38 @@ struct BannerAlalyticsView: View {
         ScrollView{
             VStack(alignment: .leading,spacing: 10){
                // Text("Banner image").font(.manrope(.bold, size: 20.0))
-                AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
-                    img.resizable().frame(maxWidth:.infinity,minHeight:130, maxHeight: 130).cornerRadius(10)
-                } placeholder: {
-                    Image("getkartplaceholder")
-                        .frame(maxWidth:.infinity,maxHeight: 130)
+                if let img = objBanner?.thumbnail, img.count>0{
+                    ZStack(alignment:.topLeading){
+                        AsyncImage(url: URL(string: img)) { img in
+                            img.resizable().aspectRatio(contentMode: .fill).frame(maxWidth:.infinity,minHeight:170, maxHeight: 170).cornerRadius(10)
+                        } placeholder: {
+                            Image("getkartplaceholder")
+                                .frame(maxWidth:.infinity,maxHeight: 170)
+                        } .frame(maxWidth:.infinity,minHeight:170, maxHeight: 170)
+                        
+                        Button {
+                            isToPreviewVideo = true
+                        } label: {
+                            Text("Preview")
+                                .padding(5).font(.inter(.regular, size: 14.0))
+                                .frame(width:75,height:26)
+                                .foregroundColor(Color(.white))
+                        }
+                        .background(Color(.darkGray))
+                        .cornerRadius(13.0)
+                        .clipped()
+                        .padding([.leading,.top],8)
+                    }
+                }else{
+                    AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
+                        img.resizable().frame(maxWidth:.infinity,minHeight:170, maxHeight: 170).cornerRadius(10)
+                    } placeholder: {
+                        Image("getkartplaceholder")
+                            .frame(maxWidth:.infinity,maxHeight: 170)
+                    } .frame(maxWidth:.infinity,minHeight:170, maxHeight: 170)
                 }
 
-            //    Image("getkartplaceholder")
-                .frame(maxWidth:.infinity,minHeight:130, maxHeight: 130)
+               
                 HStack{
                     Spacer()
                     Text(getFormattedCreatedDate(date:objBanner?.startDate ?? ""))
@@ -196,9 +220,9 @@ struct BannerAlalyticsView: View {
                     BannerAnalyticCell(title: "Click-through rate (CTR)", value: "\(objBanner?.ctr ?? "")", isActive: false)
                    // BannerAnalyticCell(title: "Conversions", value: "\(objBanner?.conversions ?? "")", isActive: false)
                     BannerAnalyticCell(title: "Screen Appearance", value: "\(objBanner?.screenAppearance ?? "")", isActive: false)
-                    BannerAnalyticCell(title: "Radius", value: "\(objBanner?.radius ?? 0)km", isActive: false)
+                  //  BannerAnalyticCell(title: "Radius", value: "\(objBanner?.radius ?? 0)km", isActive: false)
                    //BannerAnalyticCell(title: "Time to Click", value: "5sec.", isActive: false)
-                    BannerAnalyticCell(title: "Location", value: "\(objBanner?.location ?? "")", isActive: false)
+                   // BannerAnalyticCell(title: "Location", value: "\(objBanner?.location ?? "")", isActive: false)
                     
                 }.padding()
                 
@@ -224,7 +248,7 @@ struct BannerAlalyticsView: View {
                         Text("Complete Now").font(.manrope(.medium, size: 16.0)).foregroundColor(.white)
                           
                     }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                         .background(Color(hexString: "#FF9900")) .cornerRadius(27.5)
+                        .background(Color(hexString: "#FF9900")) .cornerRadius(12)
                 }
 
             }
@@ -252,6 +276,13 @@ struct BannerAlalyticsView: View {
             if let url = URL(string:getUrlValid(strURl: objBanner?.url ?? ""))  {
                 
                 SafariView(url:url)
+            }
+        }
+        .fullScreenCover(isPresented: $isToPreviewVideo) {
+          
+            if let url = URL(string:(objBanner?.image ?? "").getValidUrl())  {
+           
+                VideoPreviewView(item: nil,strURl: objBanner?.image ?? "")
             }
         }
     }

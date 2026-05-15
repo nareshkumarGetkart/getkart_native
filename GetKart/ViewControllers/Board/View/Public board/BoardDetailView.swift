@@ -8,6 +8,7 @@
 import SwiftUI
 import Kingfisher
 import FittedSheets
+import Photos
 
 struct BoardDetailView: View{
     
@@ -289,17 +290,7 @@ struct BoardDetailView: View{
                         nav.interactivePopGestureRecognizer?.delegate = nil
                     }
                 ) //Added for swipe pop navigation
-            
-            
-            //  Detect REAL user scroll
-//                .simultaneousGesture(
-//                    DragGesture()
-//                        .onEnded { _ in
-//                            
-//                            scheduleVisibilityUpdate()
-//                        }
-//                )
-//            
+
                 .fullScreenCover(item: $safariURL) { url in
                     SafariView(url: url)
                 }
@@ -558,9 +549,7 @@ struct BoardDetailView: View{
         let controller = UIHostingController(
             rootView: CommentsView(itemObj: itemObj, navController: navigationController)
         )
-//        vc.hidesBottomBarWhenPushed = true
-//        navigationController?.pushViewController(vc, animated: true)
-        
+
         controller.title = ""
         controller.navigationController?.navigationBar.isHidden = true
         let nav = UINavigationController(rootViewController: controller)
@@ -593,7 +582,7 @@ struct BoardDetailView: View{
     
     private func pushToProfileScreen(user: User) {
         let vc = UIHostingController(
-            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0,isProductSelected: false)
+            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
         )
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
@@ -748,24 +737,47 @@ struct ReelPostView: View {
     var onClickedUserProfile:(_ user:User) -> Void
     var onClickedUserComents:() -> Void
     var onClickedImages:(_ selIndex:Int) -> Void
+    @State private var selectedImageIndex: Int = 0
 
     var body: some View {
 
         VStack(spacing: 0) {
-            PostImagesCarousel(images: post.galleryImages ?? [],onClickedIndex: { selIndex in
-               onClickedImages(selIndex)
-                    
-            })
+            ZStack(alignment: .topLeading){
+                PostImagesCarousel(images: post.galleryImages ?? [], selectedIndex: $selectedImageIndex,onClickedIndex: { selIndex in
+                   onClickedImages(selIndex)
+                        
+                })
                 .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.systemBackground))
-                        .shadow(
-                            color: Color(.label).opacity(0.18),
-                            radius: 7,
-                            x: 0,
-                            y: 5
-                        )  )
-               
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(.systemBackground))
+                            .shadow(
+                                color: Color(.label).opacity(0.18),
+                                radius: 7,
+                                x: 0,
+                                y: 5
+                            )  )
+                   
+                if (post.isFeature ?? false){
+                HStack {
+                    Text("Sponsored")
+                        .font(.inter(.medium, size: 13))
+                        .lineLimit(1)
+                        .foregroundColor(Color(.gray))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(UIColor.systemBackground))
+                        .clipShape(Capsule())
+                        .overlay {
+                            Capsule()
+                                .stroke(Color(.systemGreen).opacity(0.4), lineWidth: 0.1)
+                        }
+                        .padding(8)
+                    Spacer()
+                }
+                }
+                
+            }
+          
               
             //  FLAT CONTENT (NO CARD)
             bottomCard
@@ -917,9 +929,7 @@ struct ReelPostView: View {
                                 manageLikeDislikeApi()
                             }
                         } label: {
-//                            let imgStr = (post.isLiked == true) ? "like_fill" : "likeBlack"
-//                            Image(imgStr).foregroundColor(Color(.label))
-//                            
+                       
                             if post.isLiked == true{
                                 Image("like_fill").resizable().aspectRatio(contentMode: .fit)
                                     .frame(width: 24, height: 24)
@@ -943,7 +953,6 @@ struct ReelPostView: View {
                 
                 Button {
                     onClickedUserComents()
-                   // showComments = true
                 } label: {
                     HStack(spacing:3){
                         Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
@@ -964,7 +973,7 @@ struct ReelPostView: View {
                 Button {
                     showShareSheet = true
                 } label: {
-                    Image("Share-outline")//.renderingMode(.template).foregroundColor(Color(hex: "#818181"))
+                    Image("Share-outline")
                 }
                 .actionSheet(isPresented: $showShareSheet) {
                     ActionSheet(
@@ -985,9 +994,19 @@ struct ReelPostView: View {
                 }
                 
                 Spacer()
-                if (post.isFeature ?? false){
-                    Text("Sponsored").font(.inter(.medium, size: 16)).foregroundColor(Color(.gray))
-                }
+//                if (post.isFeature ?? false){
+//                    Text("Sponsored").font(.inter(.medium, size: 16)).foregroundColor(Color(.gray))
+//                }
+//                
+                Button {
+                    let urlString = post.galleryImages?[selectedImageIndex].image ?? ""
+                    downloadAndSaveImage(imageUrl: urlString)
+                } label: {
+                    Text("Save").foregroundColor(.black).font(.inter(.medium, size: 13))
+                }.frame(width:60, height:30)
+                .background(Color(hexString: "#B6EEF5"))
+                .cornerRadius(8)
+
             }
             
             VStack(alignment: .leading, spacing: 3) {
@@ -1047,7 +1066,54 @@ struct ReelPostView: View {
     
     
     
-    func outboundClickApi(strURl:String){
+    private func downloadAndSaveImage(imageUrl:String) {
+        
+        guard let url = URL(string: imageUrl) else {
+            AlertView.sharedManager.showToast(message: "Invalid URL")
+            return
+        }
+        
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            
+            if status != .authorized && status != .limited {
+                DispatchQueue.main.async {
+                    AlertView.sharedManager.showToast(message: "Photos permission denied. Please allow permission from settings.")
+                }
+                return
+            }
+            
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                
+                if let error = error {
+                    DispatchQueue.main.async {
+                        AlertView.sharedManager.showToast(message: "\(error.localizedDescription)")
+                        
+                    }
+                    return
+                }
+                
+                guard let data = data,
+                      let image = UIImage(data: data) else {
+                    DispatchQueue.main.async {
+                        AlertView.sharedManager.showToast(message: "Unable to download image")
+                        
+                    }
+                    return
+                }
+                
+                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                
+                DispatchQueue.main.async {
+                    AlertView.sharedManager.showToast(message:  "Image saved successfully!")
+                    
+                }
+                
+            }.resume()
+        }
+        
+    }
+        
+        func outboundClickApi(strURl:String){
         
         let params = ["board_id":post.id ?? 0]
         
@@ -1200,25 +1266,35 @@ class PagerVC: UIViewController, UIScrollViewDelegate {
     }
 }
 
-
-
 struct PostImagesCarousel: View {
-    
+
     let images: [GalleryImage]
-    @State private var selectedIndex = 0
-    var onClickedIndex:(_ selIndex:Int) -> Void
+    @Binding var selectedIndex: Int
+    var onClickedIndex: (_ selIndex: Int) -> Void
+
+    init(images: [GalleryImage],
+         selectedIndex: Binding<Int>,
+         onClickedIndex: @escaping (_ selIndex: Int) -> Void) {
+
+        self.images = images
+        self._selectedIndex = selectedIndex
+        self.onClickedIndex = onClickedIndex
+
+        // ✅ PageControl color
+        UIPageControl.appearance().currentPageIndicatorTintColor = .orange
+        UIPageControl.appearance().pageIndicatorTintColor = UIColor.lightGray.withAlphaComponent(0.5)
+    }
 
     var body: some View {
-        
+
         TabView(selection: $selectedIndex) {
-            
+
             ForEach(Array(images.enumerated()), id: \.element.id) { index, img in
-                
+
                 if let url = URL(string: img.image ?? "") {
-                    
-                    
+
                     KFImage(url)
-                      .setProcessor(
+                        .setProcessor(
                             DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
                         )
                         .scaleFactor(UIScreen.main.scale)
@@ -1226,25 +1302,55 @@ struct PostImagesCarousel: View {
                         .resizable()
                         .scaledToFit()
                         .clipped()
-
-                    .tag(index)
+                        .tag(index)
                 }
             }
         }
         .frame(height: 350)
-        .tabViewStyle(.page(indexDisplayMode: .automatic))
-        .clipShape(RoundedRectangle(cornerRadius: 10)) //  important
-        //.padding(.horizontal, 5)
-        .onAppear {
-            UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.orange
-            UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray4
-        }
+        .tabViewStyle(.page(indexDisplayMode: images.count > 1 ? .always : .never)) // hide for single
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .onTapGesture {
             onClickedIndex(selectedIndex)
         }
     }
 }
 
+/*struct PostImagesCarousel: View {
+
+    let images: [GalleryImage]
+    @Binding var selectedIndex: Int
+    var onClickedIndex: (_ selIndex: Int) -> Void
+
+    var body: some View {
+
+        TabView(selection: $selectedIndex) {
+
+            ForEach(Array(images.enumerated()), id: \.element.id) { index, img in
+
+                if let url = URL(string: img.image ?? "") {
+
+                    KFImage(url)
+                        .setProcessor(
+                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        )
+                        .scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        .resizable()
+                        .scaledToFit()
+                        .clipped()
+                        .tag(index)
+                }
+            }
+        }
+        .frame(height: 350)
+        .tabViewStyle(.page(indexDisplayMode: .automatic))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .onTapGesture {
+            onClickedIndex(selectedIndex)
+        }
+    }
+}
+*/
 
 struct NavigationConfigurator: UIViewControllerRepresentable {
     var configure: (UINavigationController) -> Void

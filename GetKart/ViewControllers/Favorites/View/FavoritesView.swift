@@ -21,18 +21,18 @@ struct FavoritesView: View {
             HeaderView(navigation: navigation)
 
             // Tabs
-            tabBar.padding(.bottom,5)
+          //  tabBar.padding(.bottom,5)
 
             // Swipe Content
-            TabView(selection: $selectedTab) {
-
-                FavoriteAdsView(navigation:navigation)
-                    .tag(FavoritesTab.posts)
+//            TabView(selection: $selectedTab) {
+//
+//                FavoriteAdsView(navigation:navigation)
+//                    .tag(FavoritesTab.posts)
 
                 FavoriteBoardView(navigationController: navigation)
                     .tag(FavoritesTab.boards)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+//            }
+//            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .background(Color(.systemGroupedBackground))
     }
@@ -89,6 +89,7 @@ enum FavoritesTab: Int, CaseIterable {
 
 struct HeaderView: View {
    var navigation:UINavigationController?
+    var title = "Likes"
     var body: some View {
         HStack{
             
@@ -100,7 +101,7 @@ struct HeaderView: View {
                     .foregroundColor(Color(UIColor.label))
                     .padding(.leading)
             }
-            Text("Favorites").font(Font.inter(.semiBold, size: 18))
+            Text(title).font(Font.inter(.semiBold, size: 18))
                 .foregroundColor(Color(UIColor.label))
             
             Spacer()

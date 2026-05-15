@@ -16,18 +16,18 @@ class BuyingChatVC: UIViewController {
     var page = 1
     var isDataLoading = false
     private var emptyView:EmptyList?
-    private  lazy var topRefreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-                                    #selector(handlePullDownRefresh(_:)),
-                                 for: .valueChanged)
-        refreshControl.tintColor = UIColor.systemYellow
-        return refreshControl
-    }()
+//    private  lazy var topRefreshControl: UIRefreshControl = {
+//        let refreshControl = UIRefreshControl()
+//        refreshControl.addTarget(self, action:
+//                                    #selector(handlePullDownRefresh(_:)),
+//                                 for: .valueChanged)
+//        refreshControl.tintColor = UIColor.systemYellow
+//        return refreshControl
+//    }()
     
     var navController: UINavigationController? 
     //MARK: Controller life cycle methods
-    override func viewDidLoad() {
+  /*  override func viewDidLoad() {
         super.viewDidLoad()
         
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
@@ -208,29 +208,30 @@ class BuyingChatVC: UIViewController {
         }
         
     }
+    */
 }
 
-extension BuyingChatVC: PageVisible {
-    func pageDidBecomeVisible() {
-        // do something when this page becomes visible
-        
-        print("Page is visible == BuyingChatVC")
-        
-        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER == true{
-            self.page = 1
-            getChatList()
-        }
-        
-        
-        if !AppDelegate.sharedInstance.isInternetConnected{
-            isDataLoading = false
-            AlertView.sharedManager.showToast(message: "No internet connection")
-            return
-        }
-
-    }
-}
-
+//extension BuyingChatVC: PageVisible {
+//    func pageDidBecomeVisible() {
+//        // do something when this page becomes visible
+//        
+//        print("Page is visible == BuyingChatVC")
+//        
+//        if Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER == true{
+//            self.page = 1
+//            getChatList()
+//        }
+//        
+//        
+//        if !AppDelegate.sharedInstance.isInternetConnected{
+//            isDataLoading = false
+//            AlertView.sharedManager.showToast(message: "No internet connection")
+//            return
+//        }
+//
+//    }
+//}
+/*
 extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
    
     
@@ -429,3 +430,4 @@ extension BuyingChatVC:UITableViewDelegate,UITableViewDataSource{
 }
 
 
+*/

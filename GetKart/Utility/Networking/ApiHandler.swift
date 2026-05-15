@@ -23,10 +23,52 @@ class ApiHandler:NSObject{
     
    
     func isConnectedToNetwork() -> Bool {
+      
         return (UIApplication.shared.delegate as! AppDelegate).isInternetConnected
     }
     
+    // MARK: - ApiHandler
+ 
+    @discardableResult
+    func makeGetGenericDataWithReturn<T: Decodable>(
+        isToShowLoader: Bool,
+        url: String,
+        completion: @escaping (T) -> Void
+    ) -> DataRequest {                                      // ← must be DataRequest, not Void
 
+        let encodedUrl = url.addingPercentEncoding(
+            withAllowedCharacters: .urlQueryAllowed
+        ) ?? url
+
+        let headers = URLhandler.sharedinstance.getHeaderFields(isFormData: false)
+
+        if ISDEBUG {
+            print("GET URL == \(encodedUrl)")
+        }
+
+        return AF.request(                                  // ← must use return here
+            encodedUrl,
+            method: .get,
+            headers: headers
+        )
+        .validate()
+        .responseDecodable(of: T.self) { response in
+            switch response.result {
+            case .success(let decoded):
+                if ISDEBUG { print("response: \(response)") }
+                completion(decoded)
+            case .failure(let error):
+                if let urlError = error.underlyingError as? URLError,
+                   urlError.code == .cancelled {
+                    if ISDEBUG { print("Cancelled: \(encodedUrl)") }
+                    return
+                }
+                if ISDEBUG { print("API Error: \(error.localizedDescription)") }
+            }
+        }
+    }
+    
+    
     func makePostGenericData<T:Decodable>(url:String,param:Dictionary<String, Any>?, httpMethod: HTTPMethod = .post, isToShowLoader:Bool=true,loaderPos:LoaderPosition = .mid,completion:@escaping(T)-> ()){
         
         if isConnectedToNetwork() == true {

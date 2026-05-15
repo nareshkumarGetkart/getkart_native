@@ -104,11 +104,12 @@ struct ItemModel: Codable,Identifiable {
     var commentsCount:Int?
     var lastComment:CommentModel?
     var postDuration:Int?
+    let banner: BannerHome?
 
     enum CodingKeys: String, CodingKey {
         
         case id, name, slug, description, image
-        case price
+        case price,banner
         case specialPrice = "special_price"
         case outbondUrl = "outbond_url"
         case watermarkImage = "watermark_image"
@@ -175,6 +176,28 @@ struct ItemOffers: Codable {
     }
     
 }
+
+// MARK: - Banner
+struct BannerHome: Codable {
+    let isCampaign: Bool
+    let image, imagePath: String
+    let url, thirdPartyLink: String
+    let title, description: String
+    let campaignID: Int
+    let packageInfo: JSONNull?
+
+    enum CodingKeys: String, CodingKey {
+        case isCampaign = "is_campaign"
+        case image
+        case imagePath = "image_path"
+        case url
+        case thirdPartyLink = "third_party_link"
+        case title, description
+        case campaignID = "campaign_id"
+        case packageInfo = "package_info"
+    }
+}
+
 
 // MARK: - Category
 struct Category: Codable {

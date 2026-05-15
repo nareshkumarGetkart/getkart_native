@@ -43,7 +43,6 @@ class LoginVC: UIViewController {
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-     
         
         if self.navigationController?.viewControllers.count ?? 0 > 1 {
             self.navigationController?.viewControllers.remove(at: 0)
@@ -441,8 +440,16 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
                         FaceBookAppEvents.saveLoginEvent(userObj: objUserInfo, screenName: "login_screen")
                        // AppEvents.shared.logEvent(AppEvents.Name("login"))
                         
-                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
-                        self.navigationController?.pushViewController(hostingController, animated: true)
+//                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
+//                        self.navigationController?.pushViewController(hostingController, animated: true)
+//                        
+                        
+                        if Local.shared.getUserCity().count > 0 {
+                            if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
+                                self.navigationController?.pushViewController(vc, animated: true)
+                            }
+                        }
+                        
                     }
                     
                 }else{

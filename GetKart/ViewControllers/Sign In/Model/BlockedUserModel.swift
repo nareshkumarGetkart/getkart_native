@@ -31,7 +31,7 @@ struct UserModel: Codable,Identifiable {
     let createdAt, updatedAt:String?
     let countryCode: String?
     let showPersonalDetails, isVerified:Int?
-    let isFollowing:Bool?
+    var isFollowing:Bool?
     
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, mobileVisibility

@@ -276,8 +276,8 @@ class ZoomImageViewController: UIViewController {
         super.loadView()
         self.navigationController?.isNavigationBarHidden = true
         self.view.backgroundColor = imageColor
-     
-
+        btnDownload.layer.cornerRadius = 8.0
+        btnDownload.clipsToBounds = true
     }
 
     override func viewDidLoad() {

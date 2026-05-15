@@ -289,7 +289,7 @@ struct BoardAnalyticsView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity, minHeight: 55)
                             .background(Color(hexString: "#FF9900"))
-                            .cornerRadius(27.5)
+                            .cornerRadius(12)
                     }
                     .buttonStyle(.plain)
 

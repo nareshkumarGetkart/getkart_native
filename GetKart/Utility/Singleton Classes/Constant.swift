@@ -14,7 +14,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -88,6 +88,25 @@ final class Constant: NSObject {
 //    let payuFailureURL = "https://payu.herokuapp.com/failure"
 //       
    
+
+    
+    
+    var search_room_users:String{
+        get{
+            return "\(baseURL)/v2/search-room-users"
+        }
+    }
+    
+    
+    var search_global_users:String{
+        get{
+            return "\(baseURL)/v2/search-global-users"
+        }
+    }
+    
+     
+    
+    
     var edit_comment:String{
         get{
             return "\(baseURL)/v2/edit-comment"
@@ -313,6 +332,8 @@ final class Constant: NSObject {
         get {
             return "\(baseURL)/v1/get-public-board"
             
+          //  return "\(baseURL)/v2/get-public-board"
+
             
         }
     }
@@ -401,7 +422,7 @@ final class Constant: NSObject {
     
     var  update_campaign_banner:String {
         get {
-            return "\(baseURL)/v1/update-campaign-banner"
+            return "\(baseURL)/v2/update-campaign-banner"
         }
     }
     
@@ -423,7 +444,9 @@ final class Constant: NSObject {
     
     var  campaign_payment_intent:String {
         get {
-            return "\(baseURL)/v1/campaign-payment-intent"
+//            return "\(baseURL)/v1/campaign-payment-intent"
+            return "\(baseURL)/v2/campaign-payment-intent"
+
         }
     }
     
@@ -612,6 +635,14 @@ final class Constant: NSObject {
         }
     }
     
+    
+    var get_user_board:String{
+        get{
+            return "\(Constant.shared.baseURL)/v1/get-user-board"
+            
+        }
+    }
+        
     
     var tips:String{
         get{

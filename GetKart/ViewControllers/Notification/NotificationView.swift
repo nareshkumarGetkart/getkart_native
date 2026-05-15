@@ -91,8 +91,8 @@ struct NotificationView: View {
     func pushToDesiredView(obj:NotificationModel){
         
         if let itemId = obj.itemID{
-           let hostingVC = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId:itemId, itemObj: nil, slug: ""))
-            self.navigation?.pushViewController(hostingVC, animated: true)
+         /*  let hostingVC = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId:itemId, itemObj: nil, slug: ""))
+            self.navigation?.pushViewController(hostingVC, animated: true)*/
 
         }else{
             let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: obj))

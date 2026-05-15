@@ -109,5 +109,11 @@
     <string> 93950d812f33d4a73f47209f82b8d04f</string>
     <key>FacebookDisplayName</key>
     <string>GetKart</string>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>This helps us deliver relevant ads and improve your experience.</string>
+    <key>FacebookAutoLogAppEventsEnabled</key>
+    <true/>
+    <key>FacebookAdvertiserIDCollectionEnabled</key>
+    <true/>
 </dict>
 </plist>

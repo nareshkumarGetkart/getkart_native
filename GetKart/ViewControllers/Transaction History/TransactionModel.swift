@@ -179,7 +179,7 @@ struct Banner: Codable {
     let id, userID, userPurchasedPackageID: Int?
     let campaignID: Int?
     let imagePath: String?
-    let fileType: Int?
+    let fileType: String?
     let country, state: String?
     let city: String?
     let area, pincode: String?

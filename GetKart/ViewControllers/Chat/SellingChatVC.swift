@@ -16,18 +16,18 @@ class SellingChatVC: UIViewController {
     var isDataLoading = false
     private var emptyView:EmptyList?
     
-    private  lazy var topRefreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-                                    #selector(handlePullDownRefresh(_:)),
-                                 for: .valueChanged)
-        refreshControl.tintColor = UIColor.systemYellow
-        return refreshControl
-    }()
+//    private  lazy var topRefreshControl: UIRefreshControl = {
+//        let refreshControl = UIRefreshControl()
+//        refreshControl.addTarget(self, action:
+//                                    #selector(handlePullDownRefresh(_:)),
+//                                 for: .valueChanged)
+//        refreshControl.tintColor = UIColor.systemYellow
+//        return refreshControl
+//    }()
     var navController: UINavigationController? 
     
     //MARK: Controller life cycle methods
-    override func viewDidLoad() {
+ /*   override func viewDidLoad() {
         super.viewDidLoad()
         
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
@@ -228,14 +228,13 @@ extension SellingChatVC: PageVisible {
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
-    }
+    }*/
 }
 
-
+/*
 extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
     
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+      func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     
         return UITableView.automaticDimension //85
     }
@@ -427,7 +426,7 @@ extension SellingChatVC:UITableViewDelegate,UITableViewDataSource{
           self.present(actionSheetAlertController, animated: true, completion: nil)
       }
     
-    
 }
 
-
+ */
+ 

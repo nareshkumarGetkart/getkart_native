@@ -22,10 +22,10 @@ class AnonymousUserCell: UITableViewCell {
         
     @IBOutlet weak var btnResubmit:UIButton!
     @IBOutlet weak var lblStatus:UILabel!
-    @IBOutlet weak var bgViewVerified:UIView!
 
     @IBOutlet weak var btnEditProfile:UIButton!
 
+    @IBOutlet weak var imgVwVerify:UIImageView!
 
 
     override func awakeFromNib() {
@@ -55,11 +55,12 @@ class AnonymousUserCell: UITableViewCell {
         btnLogin.clipsToBounds = true
         
         
-        bgViewVerified.layer.cornerRadius = 5
-        bgViewVerified.backgroundColor = Themes.sharedInstance.themeColor
+//        bgViewVerified.layer.cornerRadius = 5
+//        bgViewVerified.backgroundColor = Themes.sharedInstance.themeColor
         btnLogin.clipsToBounds = true
         
-        
+        bgViewLoggedInUser.layer.cornerRadius = 8.0
+        bgViewLoggedInUser.clipsToBounds = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

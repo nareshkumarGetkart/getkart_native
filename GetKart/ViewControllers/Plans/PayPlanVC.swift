@@ -51,6 +51,8 @@ class PayPlanVC: UIViewController {
     var area = ""
     var pincode = ""
     var selectedImage:UIImage?
+    var selectedMedia:PromotionMediaType?
+
     var strUrl = ""
     var itemId:Int?
 
@@ -61,6 +63,11 @@ class PayPlanVC: UIViewController {
         super.viewDidLoad()
         btnPay.layer.cornerRadius = 8.0
         btnPay.clipsToBounds = true
+        
+      
+        if case .image(let image) = selectedMedia {
+            selectedImage = image
+        }
         if paymentFor == .bannerPromotion || paymentFor == .bannerPromotionDraft{
             lblDesc.text = "You've selected the \(planObj?.name ?? "") Plan"
             lblPrice.text = "Let's Get You More Views & Sales"
@@ -313,14 +320,27 @@ extension PayPlanVC{
     
     func getIntentForBannerPromotions(package_id:Int){
     
-        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+//        var params = ["radius":radius,"country":country,"city":city,"state":state,"area":area,"pincode":pincode,"latitude":latitude,"longitude":longitude,"package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+//
+        var params = ["package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
         
+
         if let method = PaymentMethod(rawValue: self.payment_method_type) {
             params["payment_method"] = method.title
         }
+        var selImg:UIImage?
+        var videoUrl:URL?
+
+        if case .image(let image) = selectedMedia {
+            selImg = image.wxCompress()
+        }
         
-        guard let img = selectedImage?.wxCompress() else{ return }
-        URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
+        if case .video(let video) = selectedMedia {
+            videoUrl = video
+        }
+        
+        
+        URLhandler.sharedinstance.uploadMediaWithParameters(profileImg: selImg, imageKey: "image", videoURL: videoUrl, videoKey: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
             
             if error == nil {
                 let result = responseObject! as NSDictionary
@@ -364,7 +384,58 @@ extension PayPlanVC{
                 }
             }
         }
-    }
+       /* if case .image(let image) = selectedMedia {
+            
+             let img = image.wxCompress()
+            URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
+                
+                if error == nil {
+                    let result = responseObject! as NSDictionary
+                    let code = result["code"] as? Int ?? 0
+                    let message = result["message"] as? String ?? ""
+                
+                    
+                    if code == 200{
+                        if let dataDict = result["data"] as? Dictionary<String, Any> {
+                            
+                            if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                                self?.campaign_banner_id = campaign_banner_id
+                            }
+                            
+                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                //phone pe
+                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                                
+                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    
+                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                    let token  = payment_gateway_response["token"] as? String ?? ""
+                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                }
+                            }
+                            
+                            
+                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                //payu
+                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                self?.openPayuMoney(order_id: order_id, amount: amount)
+                            }
+                        }
+                        
+                    }else{
+                        
+                        AlertView.sharedManager.showToast(message: message)
+
+                    }
+                }
+            }
+
+        }*/
+            
+        }
+    
   
 }
 

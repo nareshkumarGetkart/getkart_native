@@ -209,7 +209,7 @@ struct CategoryTabsNew: View {
                         }
                     }
                     .padding(.horizontal, 12)
-                    .padding(.top)
+                    .padding(.top,8)
                 }
                 .onAppear {
                     categoryScrollProxy = proxy   //  SAVE HORIZONTAL PROXY
@@ -960,6 +960,7 @@ struct ProductCardStaggered: View {
     var defaultImgWidth:CGFloat = 0.0
     var defaultImgHeight:CGFloat = 0.0
 
+   
    // @State private var randomHeight: CGFloat = CGFloat(Int.random(in: 400...480))
     
     var body: some View {
@@ -987,9 +988,7 @@ struct ProductCardStaggered: View {
                             x: 0,
                             y: 2
                         )
-                       
-                    
-                    
+            
                 }else{
                     
                     KFImage(URL(string: product.image ?? ""))
@@ -1048,12 +1047,13 @@ struct ProductCardStaggered: View {
                                     
                                     Text(product.ctaLabel ?? "Buy Now")
                                         .font(.inter(.medium, size: 11))
-                                        .foregroundColor(.white)
-                                    Image("upRight")
+                                        .foregroundColor(.black)
+                                    Image("upRight").renderingMode(.template)
+                                        .foregroundColor(Color(UIColor.label))
                                 }
                             }.padding(.vertical, 3)
                                 .padding(.horizontal, 8)
-                                .background(Color.orange)
+                                .background(randomColor(for: product.id ?? 0))
                                 .cornerRadius(5)
                                 .padding(5)
                         }
@@ -1190,7 +1190,9 @@ struct ProductCardStaggered: View {
             }
         }
         .background(Color(.systemBackground))
-        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        //.shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
+
         .clipShape(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
         ).contentShape(Rectangle())
@@ -1212,6 +1214,17 @@ struct ProductCardStaggered: View {
             let newState = !(product.isLiked ?? false)
             sendLikeUnlikeObject(newState, boardId)
         }
+    }
+    
+    func randomColor(for id: Int) -> Color {
+
+        let colors: [Color] = [
+            .white,
+            Color(hex: "#B6EEF5"),
+            Color(hex: "#FFBC55")
+        ]
+
+        return colors[id % colors.count]
     }
     
     func outboundClickApi(strURl:String,boardId:Int){
@@ -1342,19 +1355,20 @@ struct PromotionalAdsCardStaggered: View {
             
             HStack {
                 Text(product.ctaLabel ?? "Learn more")
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .font(.system(size: 14, weight: .medium))
                 
                 Spacer()
                 
-                Image(systemName: "arrow.up.right")
-                    .foregroundColor(.white)
+                Image(systemName: "arrow.up.right").renderingMode(.template)
+                    .foregroundColor(.primary)
                     .font(.system(size: 12))
             }
             .padding(.horizontal, 10)
             .frame(height: 35)
             .frame(maxWidth: .infinity)
-            .background(Color.orange)
+            .background(Color(.systemBackground))
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
             .onTapGesture {
                 onTapBottomtButton()
                 outboundClickApi()

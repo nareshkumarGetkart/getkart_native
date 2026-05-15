@@ -14,25 +14,12 @@ import MarqueeLabel
 
 class ChatVC: UIViewController {
     
-    var suggestionArray = [String]()
-    @IBOutlet weak var bgviewSuggestions:UIView!
-    @IBOutlet weak var collectionVwSuggestion:UICollectionView!
-    @IBOutlet weak var btnShowHideSuggestion:UIButton!
-    @IBOutlet weak var cnstrntHeightConstantSuggestion:NSLayoutConstraint!
-    var showSuggestion = false
+ 
     @IBOutlet weak var imgViewBackground:UIImageView!
     @IBOutlet weak var bgViewAudioRecord: UIView!
     @IBOutlet weak var btnAudioRecordStarted: UIButton!
     @IBOutlet weak var btnImgMicBlink: UIButton!
-    @IBOutlet weak var btnCall: UIButton!
-    
-    @IBOutlet weak var lblMarquee: MarqueeLabel!
-    @IBOutlet weak var bgViewMarquee: UIView!
-
-    
-    @IBOutlet weak var bgviewInavalidatedMsg:UIView!
-    @IBOutlet weak var lblInavalidatedMsg:UILabel!
-
+   // @IBOutlet weak var btnCall: UIButton!
 
     var isbeginVoiceRecord = false
     var playTime:Int = 0
@@ -43,9 +30,7 @@ class ChatVC: UIViewController {
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var lblName:UILabel!
     @IBOutlet weak var imgViewProfile:ContactImageView!
-    @IBOutlet weak var lblPrice:UILabel!
-    @IBOutlet weak var imgViewProduct:UIImageView!
-    @IBOutlet weak var lblProduct:UILabel!
+
     @IBOutlet weak var lblTypingStatus:UILabel!
     @IBOutlet weak var onlineOfflineView:UIView!
 
@@ -83,14 +68,9 @@ class ChatVC: UIViewController {
     
     var name = ""
     var profileImg = ""
-    var itemName = ""
-    var itemImg = ""
     var isDataLoading = true
     var userId = 0
-    var itemId = 0
-    var slug = ""
-    var price:Double = 0.0
-    
+
     
     var typingTimer: Timer?
     var isTyping = false
@@ -98,9 +78,7 @@ class ChatVC: UIViewController {
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
-    var isItemDeleted = false
     var mobileNumber = ""
-    var invalidatedAt:String?
 
     
     //MARK: Controller life cycle methods
@@ -108,16 +86,15 @@ class ChatVC: UIViewController {
         super.viewDidLoad()
         cnstrntHtNavBar.constant = self.getNavBarHt
         btnThreeDots.setImageColor(color: .label)
-        btnCall.setImageColor(color: .label)
+       // btnCall.setImageColor(color: .label)
         btnBack.setImageColor(color: .label)
-        self.btnCall.isHidden = true
+        //self.btnCall.isHidden = true
         updateUserData()
         btnSend.layer.cornerRadius = btnSend.frame.size.height/2.0
         btnSend.clipsToBounds = true
         btnSend.translatesAutoresizingMaskIntoConstraints = false
         
         blockedView.isHidden = true
-        bgviewSuggestions.isHidden = true
         
         // Configure the button
         var config = UIButton.Configuration.filled()
@@ -128,10 +105,7 @@ class ChatVC: UIViewController {
         config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         config.baseBackgroundColor =  UIColor(hexString:"#FF9900")
         btnSend.configuration = config
-                
-        imgViewProduct.layer.cornerRadius = imgViewProduct.frame.size.height/2.0
-        imgViewProduct.clipsToBounds = true
-        
+
         registerTblCell()
         
         imgViewProfile.layer.cornerRadius = imgViewProfile.frame.size.height/2.0
@@ -152,28 +126,22 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(endRecordVoice), for: .touchUpInside)
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
         
-        // checkOnlineOfflineStatus()
+         checkOnlineOfflineStatus()
         
-//        self.topRefreshControl.backgroundColor = .clear
-//        self.tblView.refreshControl = topRefreshControl
-        
-        getItemOfferId()
         getMessageList()
         
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: {
             
-            if self.name.count == 0 && self.itemName.count == 0 && self.isItemDeleted == false{
+            if self.name.count == 0 {
                 self.isDataLoading = false
                 self.isMoreChatAvailable = true
                 self.page = 1
                 self.getUserInfo()
-                self.getItemOfferId()
                 self.getMessageList()
             }
         })
         
-      //  setUpMarqueeLabel()
     }
     
     
@@ -200,7 +168,6 @@ class ChatVC: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        setUpMarqueeLabel()
     }
 
     
@@ -212,42 +179,16 @@ class ChatVC: UIViewController {
     
     
     
-    func setUpMarqueeLabel(){
-        // Source - https://stackoverflow.com/a
-        bgViewMarquee.backgroundColor = UIColor(hexString: "#ea0001", alpha: 1).withAlphaComponent(0.1)
-        lblMarquee.text = "Never scan QR code or share your OTP with anyone"
-        lblMarquee.type = .continuous
-        lblMarquee.scrollDuration = 5.0
-        lblMarquee.animationCurve = .easeInOut
-        lblMarquee.fadeLength = 10.0
-        lblMarquee.leadingBuffer = 25.0
-        lblMarquee.trailingBuffer = 1.0
-    }
     
     func updateUserData(){
         
         if name.count > 0{
             self.lblName.text = name
         }
-        
-       /* if profileImg.count > 0{
-            self.imgViewProfile.kf.setImage(with: URL(string: profileImg),placeholder:ImageName.userPlaceHolder)
-        }
-        */
+  
         self.imgViewProfile.configure(name: name, imageUrl: profileImg)
         
         
-        if itemName.count > 0{
-            self.lblProduct.text = itemName
-        }
-        
-        if itemImg.count > 0{
-            self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
-        }
-        
-        if price > 0{
-            self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
-        }
     }
     //MARK: Pull Down refresh
     @objc func handlePullDownRefresh(_ refreshControl: UIRefreshControl){
@@ -267,7 +208,6 @@ class ChatVC: UIViewController {
 //            self.page = 1
 //            self.getMessageList()
 //            self.getUserInfo()
-//            self.getItemOfferId()
 //        }
         refreshControl.endRefreshing()
     }
@@ -288,32 +228,7 @@ class ChatVC: UIViewController {
         }
     }
     
-    
-    @IBAction func suggestionShowHideButtonAction(sender : UIButton){
-        self.view.endEditing(true)
-        showSuggestion.toggle()
-        hideUnhideSuggestion()
-    }
-    
-    func hideUnhideSuggestion(isToScrollBottom:Bool = true){
-        if showSuggestion{
-            cnstrntHeightConstantSuggestion.constant  = 170
-            self.btnShowHideSuggestion.setImage(UIImage(named: "arrow_dd"), for: .normal)
-        }else{
-            cnstrntHeightConstantSuggestion.constant  = 35
-            self.btnShowHideSuggestion.setImage(UIImage(named: "arrow_up"), for: .normal)
 
-        }
-        
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-            if isToScrollBottom{
-                self.scrollToBottom(animated: true)
-            }
-        }
-      
-    }
-    
     @IBAction func backButtonAction(sender : UIButton){
         self.navigationController?.popViewController(animated: true)
     }
@@ -325,7 +240,7 @@ class ChatVC: UIViewController {
         
     }
     @IBAction func callBtnAction(sender : UIButton){
-        if isItemDeleted || youBlockedByUser.count > 0 {
+        if youBlockedByUser.count > 0 {
             
         }else{
             
@@ -338,41 +253,21 @@ class ChatVC: UIViewController {
                     }
                 }
             }else{
-                self.btnCall.isHidden = true
+                //self.btnCall.isHidden = true
             }
         }
     }
     
-    @IBAction func productBtnAction(sender : UIButton){
-        self.view.endEditing(true)
-        if isItemDeleted{
-            AlertView.sharedManager.showToast(message: "This item is no longer available")
-            return
-            
-        }else if !AppDelegate.sharedInstance.isInternetConnected{
-            AlertView.sharedManager.showToast(message: "No internet connection")
-            return
-      
-        }else{
-            
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemId, itemObj: nil, slug: slug))
-            self.navigationController?.pushViewController(hostingController, animated: true)
-        }
-        
-    }
+   
     
     
     
     @IBAction func sendMessageButtonAction(sender : UIButton){
         
-        if isItemDeleted{
+        self.view.endEditing(true)
+        if !AppDelegate.sharedInstance.isInternetConnected{
             self.view.endEditing(true)
-
-            AlertView.sharedManager.showToast(message: "This item is no longer available")
-            return
-        }else if !AppDelegate.sharedInstance.isInternetConnected{
-            self.view.endEditing(true)
-
+            
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }else{
@@ -411,12 +306,7 @@ class ChatVC: UIViewController {
     
     @IBAction func attachmentButtonAction(sender : UIButton){
         
-        if isItemDeleted{
-            self.view.endEditing(true)
-
-            AlertView.sharedManager.showToast(message: "This item is no longer available")
-            return
-        }else if !AppDelegate.sharedInstance.isInternetConnected{
+         if !AppDelegate.sharedInstance.isInternetConnected{
             self.view.endEditing(true)
 
             AlertView.sharedManager.showToast(message: "No internet connection")
@@ -457,11 +347,8 @@ class ChatVC: UIViewController {
     
     @IBAction func threeDotsButtonAction(sender : UIButton){
         self.view.endEditing(true)
-        
-        if isItemDeleted{
-            AlertView.sharedManager.showToast(message: "This item is no longer available")
-            return
-        }else if !AppDelegate.sharedInstance.isInternetConnected{
+      
+        if !AppDelegate.sharedInstance.isInternetConnected{
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
        
@@ -500,6 +387,19 @@ class ChatVC: UIViewController {
                 actionSheetAlertController.addAction(block)
             }
             
+            
+            
+            let clearChatOption =  UIAlertAction(title: "Clear Chat", style: .default) { (action) in
+                
+                AlertView.sharedManager.presentAlertWith(title: "", msg: "Are you sure want to clear Chat?" as NSString, buttonTitles: ["Cancel","Clear"], onController: self, tintColor: .blue) { title, index in
+                    if index == 1{
+                        self.clearChat()
+                    }
+                }
+            }
+            actionSheetAlertController.addAction(clearChatOption)
+
+            
             self.present(actionSheetAlertController, animated: true, completion: nil)
             
         }
@@ -520,27 +420,25 @@ class ChatVC: UIViewController {
             self.textView.text = ""
             blockedView.isHidden = false
             lblBlockedMsg.text = "You have blocked this user."
-            self.btnCall.isHidden = true
-            self.showSuggestion = false
-            self.hideUnhideSuggestion()
+           // self.btnCall.isHidden = true
+       
 
         }else  if youBlockedByUser.count > 0{
             self.view.endEditing(true)
             self.textView.text = ""
             blockedView.isHidden = false
             lblBlockedMsg.text = "User has blocked you."
-            self.btnCall.isHidden = true
-            self.showSuggestion = false
-            self.hideUnhideSuggestion()
+           // self.btnCall.isHidden = true
+     
 
         }else{
              blockedView.isHidden = true
             
-            if (mobileVisibility == 1 && mobileNumber.count > 0) && !isItemDeleted{
-                self.btnCall.isHidden = false
+            if (mobileVisibility == 1 && mobileNumber.count > 0){
+                //self.btnCall.isHidden = false
 
             }else{
-                self.btnCall.isHidden = true
+               // self.btnCall.isHidden = true
             }
 
             self.btnMic.isUserInteractionEnabled = true
@@ -558,7 +456,7 @@ class ChatVC: UIViewController {
     
     func blockUnblockUser(isBlock:Bool){
         let strBlockStatus = isBlock ? "block" : "unblock"
-        let params = ["blocked_user_id":userId,"action":strBlockStatus,"item_offer_id":item_offer_id] as [String : Any]
+        let params = ["blocked_user_id":userId,"action":strBlockStatus,"room_id":item_offer_id] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.blockUnblock.rawValue, params)
         
       /*  let strUrl = isBlock ? Constant.shared.block_user : Constant.shared.unblock_user
@@ -601,9 +499,7 @@ class ChatVC: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.userInfo),
                                                name: NSNotification.Name(rawValue: SocketEvents.userInfo.rawValue), object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(self.getItemOffer),
-                                               name: NSNotification.Name(rawValue: SocketEvents.getItemOffer.rawValue), object: nil)
+       
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.typingStatus),
                                                name: NSNotification.Name(rawValue: SocketEvents.typing.rawValue), object: nil)
@@ -624,21 +520,18 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self,selector: #selector(refreshChatTblViewScreen(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.refreshChatTblViewScreen.rawValue), object: nil)
         
-       /* NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
-                                               name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)*/
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onlineOfflineStatus),
+                                               name: NSNotification.Name(rawValue: SocketEvents.onlineOfflineStatus.rawValue), object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.clearAllMessage),
+                                               name: NSNotification.Name(rawValue: SocketEvents.clearAllMessage.rawValue), object: nil)
+        
     }
     
     //MARK: Other helpful methods
     func registerTblCell(){
         
-        let alignedFlowLayout = collectionVwSuggestion?.collectionViewLayout as? AlignedCollectionViewFlowLayout
-        alignedFlowLayout?.horizontalAlignment = .left
-        alignedFlowLayout?.verticalAlignment = .top
-        alignedFlowLayout?.minimumLineSpacing = 1
-        alignedFlowLayout?.minimumInteritemSpacing = 1
-        alignedFlowLayout?.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        
-        collectionVwSuggestion.register(UINib(nibName: "SuggestionCollectionCell", bundle: nil), forCellWithReuseIdentifier: "SuggestionCollectionCell")
         tblView.register(UINib(nibName: "SendChatCell", bundle: nil), forCellReuseIdentifier: "SendChatCell")
         tblView.register(UINib(nibName: "RecieveChatCell", bundle: nil), forCellReuseIdentifier: "RecieveChatCell")
         tblView.register(UINib(nibName: "SeperatorDateCell", bundle: nil), forCellReuseIdentifier: "SeperatorDateCell")
@@ -659,11 +552,12 @@ class ChatVC: UIViewController {
         tblView.register(UINib(nibName: "RecieveOfferChatCell", bundle: nil), forCellReuseIdentifier: "RecieveOfferChatCell")
   
     }
+  
     
-    func getItemOfferId(){
+    func clearChat(){
         
-        let params = ["item_offer_id":item_offer_id] as [String : Any]
-        SocketIOManager.sharedInstance.emitEvent(SocketEvents.getItemOffer.rawValue, params)
+        let params = ["room_id":item_offer_id] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.clearAllMessage.rawValue, params)
     }
     
     
@@ -675,19 +569,23 @@ class ChatVC: UIViewController {
     
     
     func sendmessageAcknowledge(){
-        let params = ["item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
+        let params = ["room_id":item_offer_id,"receiver_id":userId] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.messageAcknowledge.rawValue, params)
     }
     
     func getMessageList(){
         
-        let params = ["page":page,"item_offer_id":item_offer_id,"receiver_id":userId] as [String : Any]
+//        let params = ["page":page,"room_id":item_offer_id,"receiver_id":userId] as [String : Any]
+        
+        let params = ["page":page,"room_id":item_offer_id] as [String : Any]
+
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatMessages.rawValue, params)
         
     }
     
+    
     func sendtypinStatus(status:Bool){
-        let params = ["receiver_id":userId,"typing":status,"item_offer_id":item_offer_id] as [String : Any]
+        let params = ["receiver_id":userId,"typing":status,"room_id":item_offer_id] as [String : Any]
         SocketIOManager.sharedInstance.emitEvent(SocketEvents.typing.rawValue, params)
     }
     
@@ -695,45 +593,20 @@ class ChatVC: UIViewController {
         
         if msgType == "file"{
             
-            let params = ["message":"","audio":"","file":msg,"item_offer_id":item_offer_id] as [String : Any]
+            let params = ["message":"","audio":"","file":msg,"room_id":item_offer_id,"receiver_id":userId] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
        
         }else if msgType == "audio"{
             
-            let params = ["message":"","audio":msg,"file":"","item_offer_id":item_offer_id] as [String : Any]
+            let params = ["message":"","audio":msg,"file":"","room_id":item_offer_id,"receiver_id":userId] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
             
         }else if msgType == "text"{
             
-            let params = ["message":msg,"audio":"","file":"","item_offer_id":item_offer_id] as [String : Any]
+            let params = ["message":msg,"audio":"","file":"","room_id":item_offer_id,"receiver_id":userId] as [String : Any]
             SocketIOManager.sharedInstance.emitEvent(SocketEvents.sendMessage.rawValue, params)
         }
     }
-    
-    
-    func getSuggestionListApi(categoryId:Int,isBuyer:Bool){
-        
-        let params = ["category_id":categoryId,"type":(isBuyer ? "buyer" : "seller")] as [String : Any]
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.chat_suggestions, param: params,methodType: .post) { responseObject, error in
-            
-            if error == nil {
-                let result = responseObject! as NSDictionary
-                let code = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
-                
-                if code == 200{
-                    
-                    if let data = result["data"] as? Array<String>{
-                        self.showSuggestion = true
-                        self.suggestionArray  = data
-                        self.collectionVwSuggestion.reloadData()
-                        self.bgviewSuggestions.isHidden = false
-                    }
-                }
-            }
-        }
-    }
-    
     
     func uploadFIleToServer(img:UIImage,name:String){
         
@@ -795,12 +668,7 @@ class ChatVC: UIViewController {
     
     @objc func refreshChatTblViewScreen(notification:Notification){
         
-        DispatchQueue.main.async {
-            if self.suggestionArray.count > 0 {
-                self.hideUnhideSuggestion()
-              
-            }
-        }
+      
     }
     
     @objc func socketConnected(notification: Notification) {
@@ -808,7 +676,6 @@ class ChatVC: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
             if self.chatArray.count == 0{
                 self.page = 1
-                self.getItemOfferId()
                 self.getMessageList()
                 self.getUserInfo()
             }else{
@@ -824,8 +691,7 @@ class ChatVC: UIViewController {
         DispatchQueue.main.async {
             self.btnMic.isHidden = true
             self.btnSend.isHidden = false
-            self.showSuggestion = false
-            self.hideUnhideSuggestion()
+           
         }
     
       
@@ -852,8 +718,7 @@ class ChatVC: UIViewController {
         DispatchQueue.main.async {
             self.btnMic.isHidden = false
             self.btnSend.isHidden = false
-            self.showSuggestion = true
-            self.hideUnhideSuggestion()
+        
         }
         inputBarBottomSpace.constant = 0
         view.setNeedsLayout()
@@ -873,6 +738,23 @@ class ChatVC: UIViewController {
         tblView.scrollToRow(at: IndexPath(row: chatArray.count - 1, section: 0), at: .bottom, animated: animated)
     }
     
+    
+    
+    @objc func clearAllMessage(notification: Notification) {
+        
+        guard let data = notification.userInfo else{
+            return
+        }
+
+        if (data["code"] as? Int ?? 0) == 200{
+            let  message = data["message"] as? String ?? ""
+           
+            self.chatArray.removeAll()
+            self.tblView.reloadData()
+
+            AlertView.sharedManager.showToast(message: message)
+        }
+    }
    
     @objc func blockUnblock(notification: Notification) {
         
@@ -886,7 +768,7 @@ class ChatVC: UIViewController {
             if  let  dataDict = data["data"] as? Dictionary<String,Any>{
                 let blocked_user_id = dataDict["blocked_user_id"] as? Int ?? 0
                 let action = dataDict["action"] as? String ?? ""
-                let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
+                let item_offer_id =  dataDict["room_id"] as? Int ?? 0
                 
                 if self.item_offer_id == item_offer_id {
                     
@@ -957,7 +839,7 @@ class ChatVC: UIViewController {
         if let dataDict = data["data"] as? Dictionary<String,Any>{
             
             let typing = dataDict["typing"] as? Int ?? 0
-            let item_offer_id =  dataDict["item_offer_id"] as? Int ?? 0
+            let item_offer_id =  dataDict["room_id"] as? Int ?? 0
            // let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
             
             if self.item_offer_id == item_offer_id {
@@ -973,70 +855,6 @@ class ChatVC: UIViewController {
     }
 
     
-    @objc func getItemOffer(notification: Notification) {
-        
-        guard let data = notification.userInfo else{
-            return
-        }
-        
-        if let dataDict = data["data"] as? Dictionary<String,Any>{
-            
-            invalidatedAt = dataDict["invalidated_at"] as? String ?? ""
-
-            if let itemDict = dataDict["item"] as? Dictionary<String,Any>{
-                     
-                if let id = dataDict["id"] as? Int, id != item_offer_id{
-                    return
-                }
-                
-                itemName = itemDict["name"] as? String ?? ""
-                itemImg = itemDict["image"] as? String ?? ""
-                price = itemDict["price"] as? Double ?? 0.0
-                
-                let category_id = itemDict["category_id"] as? Int ?? 0
-                let seller_id   = dataDict["seller_id"] as? Int ?? 0
-                let buyer_id   = dataDict["buyer_id"] as? Int ?? 0
-
-                print("Local user Id = \(Local.shared.getUserId())")
-                print("seller_id user Id = \(seller_id)")
-                print("buyer_id user Id = \(buyer_id)")
-              
-
-                
-                if self.suggestionArray.count == 0{
-                    if Local.shared.getUserId() == seller_id{
-                        getSuggestionListApi(categoryId: category_id, isBuyer: false)
-                    }else{
-                        getSuggestionListApi(categoryId: category_id, isBuyer: true)
-                    }
-
-                }
-                self.itemId = itemDict["id"] as? Int ?? 0
-                self.lblProduct.text = itemName
-                self.lblPrice.text = "\(Local.shared.currencySymbol) \(price.formatNumber())"
-                self.imgViewProduct.kf.setImage(with: URL(string: itemImg),placeholder:ImageName.getKartplaceHolder)
-                
-                self.bgviewInavalidatedMsg.isHidden = true
-                if let invalidatedAt = dataDict["invalidated_at"] as? String{
-                    if let msg = self.chatDeleteInfo(invalidatedAt: invalidatedAt){
-                        self.btnCall.isHidden = true
-                        isItemDeleted = true
-                        self.lblInavalidatedMsg.text = "This item is no longer available and \(msg)"
-                        self.lblInavalidatedMsg.layer.cornerRadius = 2.0
-                        self.lblInavalidatedMsg.clipsToBounds = true
-                        self.bgviewInavalidatedMsg.isHidden = false
-                        self.bgviewSuggestions.isHidden = true
-                    }
-                }
-                
-            }else{
-                self.btnCall.isHidden = true
-                isItemDeleted = true
-                AlertView.sharedManager.showToast(message: "This item is no longer available.")
-            }
-            
-        }
-    }
     
     func chatDeleteInfo(invalidatedAt: String) -> String? {
         
@@ -1094,12 +912,12 @@ class ChatVC: UIViewController {
             if  self.mobileVisibility == 1{
                 self.mobileNumber = dataDict["mobile"] as? String ?? ""
                 if mobileNumber.count > 0 {
-                    self.btnCall.isHidden = false
+                   // self.btnCall.isHidden = false
                 }
                 
             }else{
                 self.mobileNumber = ""
-                self.btnCall.isHidden = true
+               // self.btnCall.isHidden = true
             }
             
             updateUserBlockStatus()
@@ -1133,8 +951,8 @@ class ChatVC: UIViewController {
                 
                 if item_offer_id > 0 && (response.data?.data?.count ?? 0) > 0{
                     //Checking if other room messages
-                    if let msg = response.data?.data?.first, (msg.itemOfferID ?? 0) > 0 {
-                        if (msg.itemOfferID ?? 0) != item_offer_id{
+                    if let msg = response.data?.data?.first, (msg.roomId ?? 0) > 0 {
+                        if (msg.roomId ?? 0) != item_offer_id{
                             self.isDataLoading = false
                             return
                         }
@@ -1194,7 +1012,7 @@ class ChatVC: UIViewController {
             if chatArray.count == 0{
                 
                 
-                chatArray.append(MessageModel(readAt: nil, id: nil, createdAt: Date().getISODateFormat(), file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil))
+                chatArray.append(MessageModel(readAt: nil, id: nil, createdAt: Date().getISODateFormat(), file: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil, roomId: nil))
             }
             
             
@@ -1225,12 +1043,16 @@ class ChatVC: UIViewController {
         }
         if let response : SendMessageParse = try? SocketParser.convert(data: data) {
             
-            if var obj = response.data ,obj.itemOfferID == item_offer_id {
+            if item_offer_id == 0{
+                item_offer_id = response.data?.roomId ?? 0
+            }
+            if var obj = response.data ,obj.roomId == item_offer_id {
                 
                 if Local.shared.getUserId() != (obj.senderID ?? 0) {
                     obj.isCautionExpanded = 1
                 }
 
+               
                 self.chatArray.append(obj)
                 self.tblView.reloadData()
                 self.scrollToBottom(animated: true)
@@ -1298,7 +1120,7 @@ class ChatVC: UIViewController {
                         }
                     }
                     if components != 0 {
-                        let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: $0.receiverID)
+                        let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: $0.receiverID, roomId: nil)
                         orderingArr.append(obj)
                     }
                     
@@ -1311,7 +1133,7 @@ class ChatVC: UIViewController {
             else
             {
                 
-                let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, itemOfferID: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil)
+                let obj = MessageModel(readAt: "", id: nil, createdAt: $0.createdAt, file: nil, message: nil, messageType:"100", updatedAt: nil, senderID: nil, audio: nil, receiverID: nil, roomId: nil)
                 
                 //   let obj = ChatDetail(createdAt: $0.createdAt, type: 100)
                 orderingArr.append(obj)
@@ -1535,11 +1357,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         
         if scrollView == tblView{
             _ = textView.resignFirstResponder()
-            
-            if showSuggestion{
-                showSuggestion = false
-                hideUnhideSuggestion()
-            }
+          
         }
     }
     
@@ -1965,10 +1783,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         }else{
             chatArray[sender.tag].isCautionExpanded = 1
         }
-        if showSuggestion == true {
-            showSuggestion = false
-            self.hideUnhideSuggestion(isToScrollBottom:false)
-        }
+      
         self.tblView.reloadRows(at: [IndexPath(row: sender.tag, section: 0)], with: .automatic)
     }
     
@@ -2091,7 +1906,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                      let index = IndexPath(row: (recognizer.view?.tag)!, section: 0)
                      
                      let cell = self.tblView.cellForRow(at: index)
-                     var messageFrame = MessageModel(readAt: nil, id: nil, createdAt: nil, file: nil, itemOfferID: nil, message: nil, messageType: nil, updatedAt: nil, senderID: nil, audio: nil, receiverID: nil) // =  ChatDetail()
+                     var messageFrame = MessageModel(readAt: nil, id: nil, createdAt: nil, file: nil, message: nil, messageType: nil, updatedAt: nil, senderID: nil, audio: nil, receiverID: nil, roomId: nil) // =  ChatDetail()
                      if(self.chatArray.count > (recognizer.view?.tag)!)
                      {
                          messageFrame = self.chatArray[(recognizer.view?.tag)!]
@@ -2561,40 +2376,3 @@ extension ChatVC{
 }
 
 
-extension ChatVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
-   
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-   
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return suggestionArray.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SuggestionCollectionCell", for: indexPath) as! SuggestionCollectionCell
-        cell.lblTitle.text = "  \(suggestionArray[indexPath.item])  "
-        return cell
-    }
-    
- 
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
-        if isItemDeleted{
-            return
-        }
-        
-        if let cell = collectionView.cellForItem(at: indexPath) as? SuggestionCollectionCell {
-            let label = cell.lblTitle
-              let centerPoint = CGPoint(x: label?.bounds.midX ?? 0, y: label?.bounds.midY ?? 0)
-                cell.showRipple(on: label!, at: centerPoint)
-            
-        }
-        self.sendMessageList(msg: suggestionArray[indexPath.item], msgType: "text")
-
-    }
-
-}

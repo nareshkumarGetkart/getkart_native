@@ -20,14 +20,14 @@ class MyAdsVC: UIViewController {
     
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
-    @IBOutlet weak var btnScrollView:UIScrollView!
+   // @IBOutlet weak var btnScrollView:UIScrollView!
     @IBOutlet weak var btnBack:UIButton!
 
-    private  var selectedIndex = 500
-    private var apiStatus = ""
+   // private  var selectedIndex = 500
+   // private var apiStatus = ""
     private var page = 1
-    private let filters = ["All ads", "Live", "Deactivate","Banner Details", "Under Review","Sold out","Rejected"]
-    private var listArray = [ItemModel]()
+   // private let filters = ["All ads", "Live", "Deactivate","Banner Details", "Under Review","Sold out","Rejected"]
+   // private var listArray = [ItemModel]()
     private var emptyView:EmptyList?
     private var isDataLoading = true
     private var userBannerArray = [UserBannerModel]()
@@ -52,6 +52,7 @@ class MyAdsVC: UIViewController {
         tblView.refreshControl = topRefreshControl
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        self.getUserBannersApi()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,7 +78,7 @@ class MyAdsVC: UIViewController {
        private func setupUI() {
            btnBack.setImageColor(color: .label)
            cnstrntHtNavBar.constant = getNavBarHt
-           tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
+           //tblView.register(UINib(nibName: "AdsTblCell", bundle: nil), forCellReuseIdentifier: "AdsTblCell")
            tblView.register(UINib(nibName: "BannerDetailTblCell", bundle: nil), forCellReuseIdentifier: "BannerDetailTblCell")
            tblView.refreshControl = topRefreshControl
            tblView.delegate = self
@@ -90,29 +91,29 @@ class MyAdsVC: UIViewController {
                self.tblView.addSubview(self.emptyView!)
                self.emptyView?.delegate = self
            }
-           setupFilterButtons()
+          // setupFilterButtons()
        }
     
-     private func setupFilterButtons() {
-            btnScrollView.subviews.forEach { $0.removeFromSuperview() }
-            for (index, filter) in filters.enumerated() {
-                let btn = UIButton(frame: CGRect(x: (135 * index), y: 10, width: 120, height: 40))
-                btn.setTitle(filter, for: .normal)
-                btn.tag = index + 500
-                btn.layer.cornerRadius = 10
-                btn.layer.borderWidth = 1
-                btn.layer.borderColor = UIColor.label.cgColor
-                btn.setTitleColor(.label, for: .normal)
-                btn.titleLabel?.font = UIFont.Manrope.medium(size: 16.0).font
-                btn.addTarget(self, action: #selector(filterBtnAction(_:)), for: .touchUpInside)
-                btnScrollView.addSubview(btn)
-            }
-            btnScrollView.contentSize = CGSize(width: CGFloat(135 * filters.count), height: 60)
-            updateCoorOfSelectedTab()
-            getAdsListApi()
-        }
+//     private func setupFilterButtons() {
+//            btnScrollView.subviews.forEach { $0.removeFromSuperview() }
+//            for (index, filter) in filters.enumerated() {
+//                let btn = UIButton(frame: CGRect(x: (135 * index), y: 10, width: 120, height: 40))
+//                btn.setTitle(filter, for: .normal)
+//                btn.tag = index + 500
+//                btn.layer.cornerRadius = 10
+//                btn.layer.borderWidth = 1
+//                btn.layer.borderColor = UIColor.label.cgColor
+//                btn.setTitleColor(.label, for: .normal)
+//                btn.titleLabel?.font = UIFont.Manrope.medium(size: 16.0).font
+//                btn.addTarget(self, action: #selector(filterBtnAction(_:)), for: .touchUpInside)
+//                btnScrollView.addSubview(btn)
+//            }
+//            btnScrollView.contentSize = CGSize(width: CGFloat(135 * filters.count), height: 60)
+//            updateCoorOfSelectedTab()
+//            getAdsListApi()
+//        }
     private func addObservers() {
-          NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: .init(NotificationKeys.refreshAdsScreen.rawValue), object: nil)
+//          NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: .init(NotificationKeys.refreshAdsScreen.rawValue), object: nil)
           NotificationCenter.default.addObserver(self, selector: #selector(noInternet(notification:)), name: .init(NotificationKeys.noInternet.rawValue), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(reBannerList), name: .init(NotificationKeys.refreshBannerAdsScreen.rawValue), object: nil)
@@ -140,23 +141,24 @@ class MyAdsVC: UIViewController {
             self.isDataLoading = true
            
             page = 1
+            self.getUserBannersApi()
 
-            if apiStatus == "banner details"{
-                self.getUserBannersApi()
-            }else{
-                self.getAdsListApi()
-            }
+//            if apiStatus == "banner details"{
+//                self.getUserBannersApi()
+//            }else{
+//                self.getAdsListApi()
+//            }
         }
         refreshControl.endRefreshing()
     }
      
 
-    @objc func refreshList(){
-        if  self.isDataLoading == false{
-            
-            refreshMyAds()
-        }
-    }
+//    @objc func refreshList(){
+//        if  self.isDataLoading == false{
+//            
+//            refreshMyAds()
+//        }
+//    }
     
     
     @objc func reBannerList(){
@@ -166,92 +168,94 @@ class MyAdsVC: UIViewController {
         }
     }
     
-    func updateCoorOfSelectedTab(){
-        
-        (self.view.viewWithTag(selectedIndex) as? UIButton)?.backgroundColor = .systemOrange
-        (self.view.viewWithTag(selectedIndex) as? UIButton)?.layer.borderColor = UIColor.clear.cgColor
-        (self.view.viewWithTag(selectedIndex) as? UIButton)?.clipsToBounds = true
-        (self.view.viewWithTag(selectedIndex) as? UIButton)?.setTitleColor(.white, for: .normal)
-    }
-    
+//    func updateCoorOfSelectedTab(){
+//        
+//        (self.view.viewWithTag(selectedIndex) as? UIButton)?.backgroundColor = .systemOrange
+//        (self.view.viewWithTag(selectedIndex) as? UIButton)?.layer.borderColor = UIColor.clear.cgColor
+//        (self.view.viewWithTag(selectedIndex) as? UIButton)?.clipsToBounds = true
+//        (self.view.viewWithTag(selectedIndex) as? UIButton)?.setTitleColor(.white, for: .normal)
+//    }
+//    
     @IBAction func backButtonAction(_ sender : UIButton){
         self.navigationController?.popViewController(animated: true)
     }
     
-    @objc func filterBtnAction(_ btn : UIButton){
-        
-      
-        selectedIndex = btn.tag
-        self.isDataLoading = true
-
-        for index in 0..<filters.count{
-            
-            (self.view.viewWithTag(500 + index) as? UIButton)?.backgroundColor = .clear
-            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderColor = UIColor.label.cgColor
-            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderWidth = 1.0
-            (self.view.viewWithTag(500 + index) as? UIButton)?.setTitleColor( UIColor.label, for: .normal)
-            (self.view.viewWithTag(500 + index) as? UIButton)?.clipsToBounds = true
-        }
-
-        page = 1
-        
-        
-        switch btn.tag{
-            
-        case 500:
-            apiStatus = ""
-            break
-        case 501:
-            apiStatus = "approved"
-
-            break
-        case 502:
-            apiStatus = "inactive"
-
-            break
-            
-        case 503:
-            //Banner Details
-           apiStatus = "banner details"
-            
-            break
-        case 504:
-            apiStatus = "review"
-
-            break
-        case 505:
-            apiStatus = "sold out"
-            break
-        case 506:
-            apiStatus = "rejected"
-            break
-       
-        default:
-            break
-        }
-        
-        updateCoorOfSelectedTab()
-        
-        if apiStatus == "banner details"{
-            self.getUserBannersApi()
-
-        }else{
-            getAdsListApi()
-        }
-        
-    }
+//    @objc func filterBtnAction(_ btn : UIButton){
+//        
+//      
+//        selectedIndex = btn.tag
+//        self.isDataLoading = true
+//
+//        for index in 0..<filters.count{
+//            
+//            (self.view.viewWithTag(500 + index) as? UIButton)?.backgroundColor = .clear
+//            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderColor = UIColor.label.cgColor
+//            (self.view.viewWithTag(500 + index) as? UIButton)?.layer.borderWidth = 1.0
+//            (self.view.viewWithTag(500 + index) as? UIButton)?.setTitleColor( UIColor.label, for: .normal)
+//            (self.view.viewWithTag(500 + index) as? UIButton)?.clipsToBounds = true
+//        }
+//
+//        page = 1
+//        
+//        
+//        switch btn.tag{
+//            
+//        case 500:
+//            apiStatus = ""
+//            break
+//        case 501:
+//            apiStatus = "approved"
+//
+//            break
+//        case 502:
+//            apiStatus = "inactive"
+//
+//            break
+//            
+//        case 503:
+//            //Banner Details
+//           apiStatus = "banner details"
+//            
+//            break
+//        case 504:
+//            apiStatus = "review"
+//
+//            break
+//        case 505:
+//            apiStatus = "sold out"
+//            break
+//        case 506:
+//            apiStatus = "rejected"
+//            break
+//       
+//        default:
+//            break
+//        }
+//        
+//        updateCoorOfSelectedTab()
+//        
+//        if apiStatus == "banner details"{
+//            self.getUserBannersApi()
+//
+//        }else{
+//            getAdsListApi()
+//        }
+//        
+//    }
 
     
     
     
     func refreshMyAds(){
         if  self.isDataLoading == false{
-            selectedIndex = 500
-            page = 1
-            apiStatus = ""
-            if let btn = (self.view.viewWithTag(500) as? UIButton){
-                filterBtnAction(btn)
-            }
+//            selectedIndex = 500
+//            page = 1
+//            apiStatus = ""
+//            if let btn = (self.view.viewWithTag(500) as? UIButton){
+//                filterBtnAction(btn)
+//            }
+            
+            self.getUserBannersApi()
         }
     }
     
@@ -260,18 +264,19 @@ class MyAdsVC: UIViewController {
     func refreshBannerAds(){
         
       //  if  self.isDataLoading == false{
-            selectedIndex = 503
+           // selectedIndex = 503
             page = 1
-            apiStatus = "banner details"
-            if let btn = (self.view.viewWithTag(503) as? UIButton){
-               
-                if let btnNext = (self.view.viewWithTag(504) as? UIButton){
-                    
-                    self.btnScrollView.scrollRectToVisible(btnNext.frame, animated: true)
-                }
-
-                filterBtnAction(btn)
-            }
+        self.getUserBannersApi()
+           // apiStatus = "banner details"
+//            if let btn = (self.view.viewWithTag(503) as? UIButton){
+//               
+//                if let btnNext = (self.view.viewWithTag(504) as? UIButton){
+//                    
+//                    self.btnScrollView.scrollRectToVisible(btnNext.frame, animated: true)
+//                }
+//
+//                filterBtnAction(btn)
+//            }
         //}
     }
     
@@ -279,67 +284,67 @@ class MyAdsVC: UIViewController {
     
     
     //MARK: Api methods
-    func getAdsListApi(){
-        
-        
-        if self.page == 1{
-            self.listArray.removeAll()
-            self.tblView.reloadData()
-        }
-
-        let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
-        self.isDataLoading = true
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
-            
-            
-            if obj.code == 200 {
-                
-
-                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
-                    self.listArray.append(contentsOf: obj.data?.data ?? [])
-                    self.tblView.reloadData()
-                }
-                                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                    
-                    self.isDataLoading = false
-                    self.page += 1
-
-                })
-
-            }else{
-                self.isDataLoading = false
-
-            }
-            
-//            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
-//            self.emptyView?.lblMsg?.text = "No Ads Found"
-//            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
-            
-            if (self.listArray.count) > 0 {
-                self.emptyView?.isHidden = true
-
-            }else{
-                if self.apiStatus.count == 0{
-                    self.emptyView?.btnNavigation?.isHidden = false
-                    self.emptyView?.setTitleToBUtton(strTitle: "Start Selling")
-                }else{
-                    self.emptyView?.btnNavigation?.isHidden = true
-                }
-                self.emptyView?.isHidden = false
-                self.emptyView?.lblMsg?.text = "No Ads Found"
-                self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
-
-            }
-
-        }
-    }
+//    func getAdsListApi(){
+//        
+//        
+//        if self.page == 1{
+//            self.listArray.removeAll()
+//            self.tblView.reloadData()
+//        }
+//
+//        let strUrl = Constant.shared.my_items + "?status=\(apiStatus)&page=\(page)"
+//        self.isDataLoading = true
+//        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl,loaderPos: .mid) { (obj:ItemParse) in
+//            
+//            
+//            if obj.code == 200 {
+//                
+//
+//                if obj.data != nil , (obj.data?.data ?? []).count > 0 {
+//                    self.listArray.append(contentsOf: obj.data?.data ?? [])
+//                    self.tblView.reloadData()
+//                }
+//                                
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+//                    
+//                    self.isDataLoading = false
+//                    self.page += 1
+//
+//                })
+//
+//            }else{
+//                self.isDataLoading = false
+//
+//            }
+//            
+////            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+////            self.emptyView?.lblMsg?.text = "No Ads Found"
+////            self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+//            
+//            if (self.listArray.count) > 0 {
+//                self.emptyView?.isHidden = true
+//
+//            }else{
+//                if self.apiStatus.count == 0{
+//                    self.emptyView?.btnNavigation?.isHidden = false
+//                    self.emptyView?.setTitleToBUtton(strTitle: "Start Selling")
+//                }else{
+//                    self.emptyView?.btnNavigation?.isHidden = true
+//                }
+//                self.emptyView?.isHidden = false
+//                self.emptyView?.lblMsg?.text = "No Ads Found"
+//                self.emptyView?.subHeadline?.text = "There are currently no ads available. Start by creating your first ad now"
+//
+//            }
+//
+//        }
+//    }
     
     func getUserBannersApi(){
         
         if self.page == 1{
             self.userBannerArray.removeAll()
-            self.listArray.removeAll()
+           // self.listArray.removeAll()
             self.tblView.reloadData()
         }
         
@@ -392,18 +397,18 @@ extension MyAdsVC:EmptyListDelegate{
     
     func navigationButtonClicked() {
         
-        if apiStatus == "banner details"{
+        //if apiStatus == "banner details"{
             let destvc = UIHostingController(rootView: BannerPromotionsView(navigationController:  self.navigationController))
             destvc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destvc, animated: true)
             
-        }else{
-            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
-                destVC.hidesBottomBarWhenPushed = true
-                destVC.popType = .createPost
-                self.navigationController?.pushViewController(destVC, animated: true)
-            }
-        }
+//        }else{
+//            if let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "CategoriesVC") as? CategoriesVC {
+//                destVC.hidesBottomBarWhenPushed = true
+//                destVC.popType = .createPost
+//                self.navigationController?.pushViewController(destVC, animated: true)
+//            }
+//        }
         
     }
 }
@@ -412,30 +417,31 @@ extension MyAdsVC:EmptyListDelegate{
 extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
    
     
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        if apiStatus == "banner details"{
-//            return 155
-//
-//        }
-//        return  140
-//    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        return  200
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if apiStatus == "banner details"{
+      //  if apiStatus == "banner details"{
             return userBannerArray.count
-        }
-
-        return listArray.count
+//        }
+//
+//        return listArray.count
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if apiStatus == "banner details"{
+      //  if apiStatus == "banner details"{
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "BannerDetailTblCell") as? BannerDetailTblCell else { return UITableViewCell() }
             
             let obj = userBannerArray[indexPath.row]
+        if let img = obj.thumbnail,img.count>0{
+            cell.imgVwBanner.kf.setImage(with:  URL(string: img) , placeholder:UIImage(named: "getkartplaceholder"))
+        }else{
             cell.imgVwBanner.kf.setImage(with:  URL(string: obj.imagePath ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
+        }
             
            /* if (obj.isActive ?? 0) == 1{
                 cell.lblStatus.text = "Active"
@@ -508,28 +514,28 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
             }
             return cell
             
-        }
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as? AdsTblCell else { return UITableViewCell() }
-        cell.configureTblCellData(itemObj: listArray[indexPath.item])
-        
-        return cell
+//        }
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as? AdsTblCell else { return UITableViewCell() }
+//        cell.configureTblCellData(itemObj: listArray[indexPath.item])
+//        
+//        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if apiStatus == "banner details"{
+        //if apiStatus == "banner details"{
             
             let swiftView = BannerAlalyticsView(navigationController: self.navigationController,bannerId: userBannerArray[indexPath.row].id ?? 0)
             let destVC = UIHostingController(rootView: swiftView)
             destVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destVC, animated: true)
       
-        }else{
-            
-            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true, slug: listArray[indexPath.item].slug))
-            hostingController.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(hostingController, animated: true)
-        }
+//        }else{
+//            
+//            let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId: listArray[indexPath.item].id ?? 0, itemObj: listArray[indexPath.item], isMyProduct:true, slug: listArray[indexPath.item].slug))
+//            hostingController.hidesBottomBarWhenPushed = true
+//            self.navigationController?.pushViewController(hostingController, animated: true)
+//        }
     }
     
     
@@ -545,13 +551,13 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         if ((scrollView.contentOffset.y + scrollView.frame.size.height) >= scrollView.contentSize.height - 70)
         {
             if scrollView == tblView{
-                if isDataLoading == false && (listArray.count > 0 || (apiStatus == "banner details" && userBannerArray.count > 0)){
+                if (isDataLoading == false && userBannerArray.count > 0){
                     self.isDataLoading = true
-                    if apiStatus == "banner details"{
+                   // if apiStatus == "banner details"{
                         getUserBannersApi()
-                    }else{
-                        getAdsListApi()
-                    }
+//                    }else{
+//                        getAdsListApi()
+//                    }
                 }
             }
         }

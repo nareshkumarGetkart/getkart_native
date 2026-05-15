@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Manrope-Regular.ttf">
+            <string>Manrope-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="ChatListTblCell" rowHeight="80" id="KGk-i7-Jjw" customClass="ChatListTblCell" customModule="GetKart" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Svt-8B-KGg">
+                        <rect key="frame" x="10" y="2.6666666666666643" width="300" height="70"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete_illustrator" translatesAutoresizingMaskIntoConstraints="NO" id="uuS-Mc-LQk" customClass="ContactImageView" customModule="GetKart" customModuleProvider="target">
+                                <rect key="frame" x="7" y="10" width="45" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="Lu4-xl-XXf"/>
+                                    <constraint firstAttribute="width" constant="45" id="RuF-qT-Th4"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7fd-9i-iXu">
+                                <rect key="frame" x="220" y="10.000000000000002" width="70" height="16.666666666666671"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="70" id="I9A-VX-g46"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="acw-p5-U79">
+                                <rect key="frame" x="57" y="14" width="213" height="37"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jpp-iv-N9r">
+                                        <rect key="frame" x="0.0" y="0.0" width="213" height="18"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="18" id="qSn-h0-zIR"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="14"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rue-hB-vsY">
+                                        <rect key="frame" x="0.0" y="18.999999999999996" width="213" height="18.000000000000004"/>
+                                        <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="13"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="diG-a2-ssS">
+                                <rect key="frame" x="282" y="28.666666666666664" width="8" height="8"/>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="8" id="7iU-zK-hef"/>
+                                    <constraint firstAttribute="width" constant="8" id="a1m-Ze-mTl"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="acw-p5-U79" firstAttribute="centerY" secondItem="uuS-Mc-LQk" secondAttribute="centerY" id="82W-pD-XBy"/>
+                            <constraint firstItem="acw-p5-U79" firstAttribute="leading" secondItem="uuS-Mc-LQk" secondAttribute="trailing" constant="5" id="CyS-EC-smV"/>
+                            <constraint firstAttribute="height" constant="70" id="FzP-Ih-6bA"/>
+                            <constraint firstAttribute="trailing" secondItem="acw-p5-U79" secondAttribute="trailing" constant="30" id="OjZ-pK-FR1"/>
+                            <constraint firstAttribute="trailing" secondItem="7fd-9i-iXu" secondAttribute="trailing" constant="10" id="Q96-P5-wHz"/>
+                            <constraint firstAttribute="trailing" secondItem="diG-a2-ssS" secondAttribute="trailing" constant="10" id="gjt-oe-wxU"/>
+                            <constraint firstItem="uuS-Mc-LQk" firstAttribute="leading" secondItem="Svt-8B-KGg" secondAttribute="leading" constant="7" id="mgV-gr-0PK"/>
+                            <constraint firstItem="diG-a2-ssS" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" constant="-2.3333333333333357" id="rFJ-N6-YiR"/>
+                            <constraint firstItem="7fd-9i-iXu" firstAttribute="top" secondItem="Svt-8B-KGg" secondAttribute="top" constant="10" id="rw1-RM-DgQ"/>
+                            <constraint firstItem="uuS-Mc-LQk" firstAttribute="centerY" secondItem="Svt-8B-KGg" secondAttribute="centerY" constant="-2.5" id="skt-U3-fKF"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="Svt-8B-KGg" secondAttribute="bottom" constant="2.3333333333333286" id="Ane-xu-cMo"/>
+                    <constraint firstAttribute="trailing" secondItem="Svt-8B-KGg" secondAttribute="trailing" constant="10" id="bmx-yU-1Vj"/>
+                    <constraint firstItem="Svt-8B-KGg" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="iDW-Kh-Vft"/>
+                    <constraint firstItem="Svt-8B-KGg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2.6666666666666665" id="zO0-mD-UOU"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="bgView" destination="Svt-8B-KGg" id="om1-LE-QOu"/>
+                <outlet property="imgViewProfile" destination="uuS-Mc-LQk" id="dsg-hW-kkd"/>
+                <outlet property="lblDot" destination="diG-a2-ssS" id="1nZ-gh-YyS"/>
+                <outlet property="lblLastMessage" destination="rue-hB-vsY" id="6aM-su-Q3N"/>
+                <outlet property="lblLastMessageTime" destination="7fd-9i-iXu" id="ecQ-av-fMZ"/>
+                <outlet property="lblName" destination="Jpp-iv-N9r" id="P5v-ok-19b"/>
+            </connections>
+            <point key="canvasLocation" x="80.916030534351137" y="21.83098591549296"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="delete_illustrator" width="255" height="255"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

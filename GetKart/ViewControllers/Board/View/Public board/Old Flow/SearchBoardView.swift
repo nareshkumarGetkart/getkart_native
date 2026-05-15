@@ -17,7 +17,7 @@ struct SearchBoardView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = BoardSearchViewModel()
     @FocusState private var isFocused: Bool
-    
+
    
     var body: some View {
         

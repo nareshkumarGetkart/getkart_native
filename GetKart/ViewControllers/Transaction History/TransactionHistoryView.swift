@@ -257,7 +257,7 @@ struct TransactionRow: View {
                 img.resizable().aspectRatio(contentMode: .fit).frame(width:50,height: 50)
                     .background(Color(hex: "#FEF6E9")).cornerRadius(12)
             } placeholder: {
-                Image("getkartplaceholder").resizable().aspectRatio(contentMode: .fit).frame(width:50,height: 50).background(Color(hex: "#FEF6E9")).cornerRadius(12)
+                Image("iconlogo").resizable().aspectRatio(contentMode: .fit).frame(width:50,height: 50).background(Color(hex: "#FEF6E9")).cornerRadius(12)
             }
 
             VStack(alignment: .leading, spacing: 5) {

@@ -19,6 +19,16 @@ struct EditBanerPromotionView: View {
     @State private var settingObj:PromotionSettingModel = PromotionSettingModel(crop_height: 100, crop_width: 100, default_radius: 50, min_radius: 25, max_radius: 100)
 
     var objBanner:AnalyticsModel?
+    @State private var selectedMedia: PromotionMediaType?
+    
+    
+    
+    @State private var showMediaPicker = false
+
+    @State private var isCompressing = false
+    
+    
+
 
     var body: some View {
         HStack{
@@ -45,17 +55,165 @@ struct EditBanerPromotionView: View {
             }
          VStack(alignment:.leading,spacing: 25){
             VStack(alignment:.leading,spacing: 5){
-                Text("Banner image").font(.manrope(.semiBold, size: 16.0))
-                Text("For the best results on all devices, use an image that's at least 1080 x 354 pixels and 4 MB or less.").font(.manrope(.regular, size: 12.0))
+                Text("Banner image & video")
+                    .font(.manrope(.semiBold, size: 16.0))
+                
+                Text("For the best results on all devices, use an image & video that's at least 800 x 350 pixels and 12 MB or less.")
+                    .font(.manrope(.regular, size: 12.0))
             }
             
             VStack(alignment:.leading){
                 
                 
                 Button {
-                    showImagePicker = true
-
+                    showMediaPicker = true
                 } label: {
+                   
+                            ZStack {
+                                
+                                
+                                if (((objBanner?.thumbnail?.count ?? 0) > 0) || ((objBanner?.image?.count ?? 0) > 0)) && selectedMedia == nil{
+                                    
+                                    GeometryReader { geo in
+                                        
+                                        if let img = objBanner?.thumbnail, img.count > 0{
+                                            AsyncImage(url: URL(string: img)) { img in
+                                                img.image?.resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: geo.size.width, height: geo.size.height)
+                                                    .clipped() //  Important to crop overflowing area
+                                                    .cornerRadius(8)
+                                            }
+
+                                        }else{
+                                            AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
+                                                img.image?.resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: geo.size.width, height: geo.size.height)
+                                                    .clipped() //  Important to crop overflowing area
+                                                    .cornerRadius(8)
+                                            }
+
+                                        }
+                                        
+                                    }
+                                    VStack{
+                                        
+                                        Image("gallery")
+                                        Text("Upload Banner/Video").font(.manrope(.regular, size: 15.0)).foregroundColor(Color(hexString: "#888888"))
+                                    }
+                                }else{
+                                    
+                                    
+                                    // MARK: Selected Media
+                                    
+                                    switch selectedMedia {
+                                        
+                                        // MARK: Image
+                                        
+                                    case .image(let img):
+                                        
+                                        GeometryReader { geo in
+                                            
+                                            Image(uiImage: img)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(
+                                                    width: geo.size.width,
+                                                    height: geo.size.height
+                                                )
+                                                .clipped()
+                                                .cornerRadius(8)
+                                        }
+                                        
+                                        // MARK: Video
+                                        
+                                    case .video(let url):
+                                        
+                                        VideoBannerThumbnailView(
+                                            videoURL: url
+                                        )
+                                        
+                                        // MARK: Empty
+                                        
+                                    case .none:
+                                        
+                                        VStack(spacing: 12) {
+                                            
+                                            Image("gallery")
+                                            
+                                            Text("Select file")
+                                                .font(.manrope(.regular, size: 15.0))
+                                                .foregroundColor(
+                                                    Color(hexString: "#888888")
+                                                )
+                                            
+                                            Text("Upload file")
+                                                .font(.manrope(.medium, size: 14))
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 10)
+                                                .background(Color.orange)
+                                                .cornerRadius(6)
+                                        }
+                                    }
+                                }
+                                // MARK: Compression Loader
+                                
+                                if isCompressing {
+                                    
+                                    ZStack {
+                                        
+                                        Color.black.opacity(0.45)
+                                        
+                                        VStack(spacing: 14) {
+                                            
+                                            ProgressView()
+                                                .progressViewStyle(
+                                                    CircularProgressViewStyle(
+                                                        tint: .white
+                                                    )
+                                                )
+                                                .scaleEffect(1.2)
+                                            
+                                            Text("Compressing video...")
+                                                .font(
+                                                    .manrope(
+                                                        .medium,
+                                                        size: 14
+                                                    )
+                                                )
+                                                .foregroundColor(.white)
+                                        }
+                                    }
+                                    .cornerRadius(8)
+                                }
+                            }
+                            .frame(
+                                maxWidth: .infinity,
+                                minHeight: 170,
+                                maxHeight: 170
+                            )
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemBackground))
+                            )
+                            .overlay {
+                                
+                                RoundedRectangle(cornerRadius: 8.0)
+                                    .stroke(
+                                        Color(hexString: "#DADADA"),
+                                        lineWidth: 1.0
+                                    )
+                            }
+                            .cornerRadius(8)
+                        }
+                        
+                        Text("Allowed file types: PNG, JPG, JPEG, MP4, MOV")
+                            .font(.manrope(.regular, size: 12.0))
+                            .foregroundColor(.red)
+                    
+                    /*
                     ZStack{
                         if let img = selectedImage{
                             
@@ -72,12 +230,24 @@ struct EditBanerPromotionView: View {
                             
                             GeometryReader { geo in
                                 
-                                AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
-                                    img.image?.resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: geo.size.width, height: geo.size.height)
-                                        .clipped() //  Important to crop overflowing area
-                                        .cornerRadius(8)
+                                if let img = objBanner?.thumbnail, img.count > 0{
+                                    AsyncImage(url: URL(string: img)) { img in
+                                        img.image?.resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: geo.size.width, height: geo.size.height)
+                                            .clipped() //  Important to crop overflowing area
+                                            .cornerRadius(8)
+                                    }
+
+                                }else{
+                                    AsyncImage(url: URL(string: objBanner?.image ?? "")) { img in
+                                        img.image?.resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: geo.size.width, height: geo.size.height)
+                                            .clipped() //  Important to crop overflowing area
+                                            .cornerRadius(8)
+                                    }
+
                                 }
                                 
                             }
@@ -100,7 +270,7 @@ struct EditBanerPromotionView: View {
                     }
                 }
               
-                Text("Allowed file types: PNG, JPG, JPEG").font(.manrope(.regular, size: 14.0)).foregroundColor(Color.red)
+                Text("Allowed file types: PNG, JPG, JPEG").font(.manrope(.regular, size: 14.0)).foregroundColor(Color.red)*/
             }
           
             
@@ -142,7 +312,7 @@ struct EditBanerPromotionView: View {
                        }
                    }
                 
-            .fullScreenCover(isPresented: $showCropper) {
+          /*  .fullScreenCover(isPresented: $showCropper) {
                        if let img = selectedImage {
                            ImageCropperView(
                                image: img,
@@ -155,23 +325,51 @@ struct EditBanerPromotionView: View {
                                self.showCropper = false
                            }
                        }
-                   }
+                   }*/
                
         
-            
-//            .onChange(of: selectedPkgObj) { newValue in
-//                if newValue != nil {
-//                    showBuySheetpackages = true
-//                }
-//            }
         
+        
+        // MARK: Media Picker
+        
+        .sheet(isPresented: $showMediaPicker) {
+            
+            MediaPickerPromotion(selectedMedia:
+                                    $selectedMedia,
+                                 onImagePicked: {
+                
+                if case .image = selectedMedia {
+                    showCropper = true
+                }
+            }, isCompressing:$isCompressing)
+        }
+           
+        // MARK: Cropper
+        
+        .fullScreenCover(isPresented: $showCropper) {
+            
+            if case .image(let img) = selectedMedia {
+                
+                ImageCropperView(
+                    image: img,
+                    cropAspectRatio: CGSize(
+                        width: settingObj.crop_width,
+                        height: settingObj.crop_height
+                    )
+                ) { croppedImage in
+                    
+                    self.selectedMedia = .image(croppedImage)
+                    self.showCropper = false
+                }
+            }
+        }
         
     }
     
     
     func validateField(){
         
-        if ( selectedImage == nil) && objBanner?.url?.trim() == strUrl.trim(){
+        if ( selectedMedia == nil) && objBanner?.url?.trim() == strUrl.trim(){
            // AlertView.sharedManager.showToast(message: "Please ")
 
         }else if strUrl.count > 0 && !strUrl.isValidWebsiteURL() {
@@ -189,7 +387,7 @@ struct EditBanerPromotionView: View {
         }
     }
     
-
+/*
     func uploadFileAndDataApi(){
     
         let params = ["url":strUrl,"banner_id":(objBanner?.id ?? 0)] as [String : Any]
@@ -218,6 +416,46 @@ struct EditBanerPromotionView: View {
             }
         }
     }
+    */
+    
+    func uploadFileAndDataApi(){
+        
+            let params = ["url":strUrl,"banner_id":(objBanner?.id ?? 0)] as [String : Any]
+
+                var selImg:UIImage?
+                var videoUrl:URL?
+
+                if case .image(let image) = selectedMedia {
+                    selImg = image.wxCompress()
+                }
+                
+                if case .video(let video) = selectedMedia {
+                    videoUrl = video
+                }
+                
+                
+                URLhandler.sharedinstance.uploadMediaWithParameters(profileImg: selImg, imageKey: "image", videoURL: videoUrl, videoKey: "image", url: Constant.shared.update_campaign_banner, params: params) { responseObject, error in
+                    
+                    if error == nil {
+                        let result = responseObject! as NSDictionary
+                        let code = result["code"] as? Int ?? 0
+                        let message = result["message"] as? String ?? ""
+                    
+                        
+                        if code == 200{
+                            AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (AppDelegate.sharedInstance.navigationController?.topViewController)!) { str, index in
+                                
+                                self.navigationController?.popViewController(animated: true)
+                            }
+                       
+                        }else{
+                            
+                            AlertView.sharedManager.showToast(message: message)
+
+                        }
+                    }
+                }
+        }
     
     
     func getCmpaignSettingsApi(){

@@ -67,6 +67,7 @@ struct UserBannerModel: Codable {
     let deletedAt: String?
     let user: User?
     let analyticsSummary: AnalyticsSummary?
+    let thumbnail:String?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -83,7 +84,7 @@ struct UserBannerModel: Codable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case deletedAt = "deleted_at"
-        case user
+        case user,thumbnail
         case analyticsSummary = "analytics_summary"
 
     }

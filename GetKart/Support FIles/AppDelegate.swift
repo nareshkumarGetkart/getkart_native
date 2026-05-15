@@ -16,7 +16,8 @@ import FittedSheets
 import AVFoundation
 import FacebookCore
 import FacebookAEM
-
+import AppTrackingTransparency
+import FBSDKCoreKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -66,7 +67,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
+       
+//        if #available(iOS 14, *) {
+//            print("ATT Status: \(ATTrackingManager.trackingAuthorizationStatus.rawValue)")
+//        }
         
+
         
         
         //by me kingfisher
@@ -141,6 +147,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
+    
+
+
+    private func requestTrackingPermission() {
+        if #available(iOS 14, *) {
+            
+            print("ATT Before Request: \(ATTrackingManager.trackingAuthorizationStatus.rawValue)")
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                ATTrackingManager.requestTrackingAuthorization { status in
+                    print("ATT After Request: \(status.rawValue)")
+                }
+            }
+        }
+    }
+    
     
     func application(
         _ app: UIApplication,
@@ -263,6 +285,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
        
         AppEvents.shared.activateApp()
         
+        requestTrackingPermission()
+
         SocketIOManager.sharedInstance.checkSocketStatus()
         
         if isForceAppUpdate{
@@ -289,7 +313,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        
+       // SocketEvents.onlineOfflineStatus.rawValue, ["user_id":Local.shared.getUserId()
         print("applicationWillTerminate")
     }
     
@@ -314,7 +338,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }else  if myUrl?.range(of: "/product-details/") != nil {
                     
-                    let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
+                  /*  let slugName = (urlArray?.last ?? "").replacingOccurrences(of: "?share=true", with: "")
                     
                    // https://getkart.com/product-details/yamaha-fzs-2017-model?share=true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -324,6 +348,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         hostingController.hidesBottomBarWhenPushed = true
                         self.navigationController?.pushViewController(hostingController, animated: true)
                     }
+                    */
                 }else  if myUrl?.range(of: "/board/") != nil {
                     
                     let boardId = (urlArray?.last ?? "")
@@ -694,9 +719,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
                
                 }else{
                    
-                    let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemIdRecieved, itemObj: nil, slug: nil))
+                    /*let hostingController = UIHostingController(rootView: ItemDetailView(navController:  self.navigationController, itemId:itemIdRecieved, itemObj: nil, slug: nil))
                     hostingController.hidesBottomBarWhenPushed = true
-                    self.navigationController?.pushViewController(hostingController, animated: true)
+                    self.navigationController?.pushViewController(hostingController, animated: true)*/
                 }
             }
             
@@ -905,9 +930,12 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
             
             notificationType =  response.notification.request.content.userInfo["type"] as? String ?? ""
             userId =  Int(response.notification.request.content.userInfo["sender_id"] as? String ?? "0") ?? 0
-            roomId = Int(response.notification.request.content.userInfo["item_offer_id"] as? String ?? "0") ?? 0
+            roomId = Int(response.notification.request.content.userInfo["roomId"] as? String ?? "0") ?? 0
             itemId = Int(response.notification.request.content.userInfo["item_id"] as? String ?? "0") ?? 0
             
+            if userId == 0{
+                userId =  Int(response.notification.request.content.userInfo["userId"] as? String ?? "0") ?? 0
+            }
             
             if userId == 0{
                 userId =  Int(response.notification.request.content.userInfo["user_id"] as? String ?? "0") ?? 0

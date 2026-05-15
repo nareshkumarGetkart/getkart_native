@@ -390,7 +390,112 @@ class URLhandler: NSObject{
         }
     }
     
-    
+    func uploadMediaWithParameters(
+        profileImg: UIImage?,
+        imageKey: String,
+        videoURL: URL?,
+        videoKey: String,
+        url: String,
+        params: [String: Any],
+        completionHandler: @escaping (_ responseObject: NSDictionary?, _ error: NSError?) -> ()?
+    ) {
+
+        if isConnectedToNetwork() == true {
+
+            if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
+                Themes.sharedInstance.showActivityViewTop(uiView: topView, position: .mid)
+            }
+
+            if ISDEBUG {
+                print("URL: \(url)")
+                print("Params: \(params)")
+            }
+
+            AF.upload(multipartFormData: { multipartFormData in
+
+                // ✅ IMAGE Upload
+                if let image = profileImg,
+                   let data = image.jpegData(compressionQuality: 0.9) {
+
+                    multipartFormData.append(
+                        data,
+                        withName: imageKey,
+                        fileName: "\(imageKey).jpeg",
+                        mimeType: "image/jpeg"
+                    )
+                }
+
+                // ✅ VIDEO Upload
+                if let videoURL = videoURL {
+
+                    do {
+                        let videoData = try Data(contentsOf: videoURL)
+
+                        multipartFormData.append(
+                            videoData,
+                            withName: videoKey,
+                            fileName: "\(videoKey).mp4",
+                            mimeType: "video/mp4"
+                        )
+
+                    } catch {
+                        print("❌ Video read failed: \(error.localizedDescription)")
+                    }
+                }
+
+                // ✅ Parameters
+                for (key, value) in params {
+                    multipartFormData.append(
+                        "\(value)".data(using: .utf8)!,
+                        withName: key
+                    )
+                }
+
+            }, to: url,
+            method: .post,
+            headers: self.getHeaderFields())
+
+            .uploadProgress(queue: .main) { progress in
+                print("Upload Progress: \(progress.fractionCompleted)")
+            }
+
+            .response { response in
+
+                DispatchQueue.main.async {
+                    Themes.sharedInstance.removeActivityView(
+                        uiView: AppDelegate.sharedInstance.navigationController?.topViewController?.view ?? UIView()
+                    )
+                }
+
+                if response.response?.statusCode == 409 {
+                    AppDelegate.sharedInstance.deviceRefreshApi()
+                    return
+                }
+
+                if response.error == nil {
+
+                    do {
+                        self.respDictionary = try JSONSerialization.jsonObject(
+                            with: (response.value ?? Data())!,
+                            options: .mutableContainers
+                        ) as? NSDictionary
+
+                        if ISDEBUG {
+                            print("Response: \(self.respDictionary ?? [:])")
+                        }
+
+                        completionHandler(self.respDictionary, nil)
+
+                    } catch {
+                        completionHandler(nil, response.error as NSError?)
+                    }
+
+                } else {
+                    completionHandler(nil, response.error as NSError?)
+                }
+            }
+        }
+    }
     
     func uploadImageWithParameters(profileImg : UIImage?,imageName:String, url:String, params:[String:Any], completionHandler: @escaping (_ responseObject: NSDictionary?,_ error:NSError?  ) -> ()?){
     

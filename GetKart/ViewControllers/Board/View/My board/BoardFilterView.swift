@@ -169,6 +169,10 @@ struct BoardFilterView: View {
                         
                         Button(action: {
                             resetAll()
+                            updateApplyFilterStatus()
+                            onFilterApplied()
+                            presentationMode.wrappedValue.dismiss()
+
                         }) {
                             Text("Reset All")
                                 .frame(maxWidth: .infinity)
@@ -234,11 +238,13 @@ extension BoardFilterView {
             title: title,
             isSelected: selectedRange == title
         ) {
-            selectedRange = title
-            
-            //  Clear dates when chip selected
-            fromDate = nil
-            toDate = nil
+            if selectedRange == title {
+                selectedRange = ""    // ✅ deselect
+            } else {
+                selectedRange = title // ✅ select
+                fromDate = nil
+                toDate = nil
+            }
         }
     }
 }
@@ -251,6 +257,7 @@ extension BoardFilterView {
         selectedStatus = ""
         fromDate = nil
         toDate = nil
+
     }
     
     func updateApplyFilterStatus(){
@@ -390,7 +397,13 @@ struct CategoryScrollView: View {
                 ForEach(items, id: \.self) { item in
                     
                     Button {
-                        selected = item
+                       // selected = item
+                        
+                        if selected == item {
+                                selected = ""   // deselect if already selected
+                            } else {
+                                selected = item // select new
+                            }
                     } label: {
                         Text(item)
                             .font(.inter(.semiBold, size: 13))

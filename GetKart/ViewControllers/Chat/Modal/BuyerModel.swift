@@ -57,68 +57,52 @@ struct BuyerChatClass: Codable {
 
 struct LastMessage:Codable{
     var readAt: String?
-   // let id: Int?
+    let id: Int?
     let createdAt, file: String?
-    let itemOfferID: Int?
     let message: String?
     let messageType: String?
     let updatedAt: String?
-    //let senderID: Int?
     let audio: String?
-   // let receiverID: Int?
+    let roomId: Int?
 
     enum CodingKeys: String, CodingKey {
         case readAt = "read_at"
-       // case id
+        case id
         case createdAt = "created_at"
         case file
-        case itemOfferID = "item_offer_id"
         case message
         case messageType = "message_type"
         case updatedAt = "updated_at"
-       // case senderID = "sender_id"
+        case roomId = "room_id"
         case audio
-       // case receiverID = "receiver_id"
     }
 }
 
 
 // MARK: - Datum
 struct ChatList: Codable {
-    let id, buyerID: Int?
+    
     let lastMessageTime: String?
-    let buyer: BuyerClass?
-    let amount: Int?
     let createdAt: String?
-    let itemID: Int?
-    let item: ItemChat?
     let updatedAt: String?
     let userBlocked: Bool?
-    let sellerID: Int?
-    let seller: BuyerClass?
-    let chat: [Chat]?
     var lastMessage:LastMessage?
-    let chatCount:Int?
+    let unreadCount:Int?
     var readAt:String?
-    let invalidatedAt:String?
+    let user:ChatUser?
+    let roomId:Int?
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case buyerID = "buyer_id"
+       
         case lastMessageTime = "last_message_time"
-        case buyer, amount
         case createdAt = "created_at"
-        case itemID = "item_id"
-        case item
         case updatedAt = "updated_at"
-        case userBlocked = "user_blocked"
-        case sellerID = "seller_id"
-        case seller, chat
         case lastMessage = "last_message"
-        case chatCount = "chat_count"
         case readAt = "read_at"
-        case invalidatedAt = "invalidated_at"
-
+        case userBlocked = "user_blocked"
+        case user
+        case roomId = "room_id"
+        case unreadCount = "unread_count"
     }
 }
 
@@ -150,6 +134,16 @@ struct Chat: Codable {
     }
 }
 
+struct ChatUser: Codable,Identifiable {
+    let id: Int?
+    let name: String?
+    let profile: String?
+   
+    enum CodingKeys: String, CodingKey {
+        case id, name, profile
+    }
+}
+
 enum MessageType: String, Codable {
     case text = "text"
 }
@@ -177,3 +171,42 @@ struct ItemChat: Codable {
 }
 
 
+
+
+
+// MARK: - Buyer
+struct UserChatParse: Codable {
+    
+    let code: Int?
+    let message: String?
+    let data: UserChatClass?
+    let error: Bool?
+}
+
+// MARK: - DataClass
+struct UserChatClass: Codable {
+    let lastPageURL: String?
+    let prevPageURL: String?
+    let from, total: Int?
+    let path, firstPageURL: String?
+    let lastPage: Int?
+    let nextPageURL: String?
+    let data: [ChatUser]?
+    let currentPage: Int?
+    let links: [Link]?
+    let perPage, to: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case lastPageURL = "last_page_url"
+        case prevPageURL = "prev_page_url"
+        case from, total, path
+        case firstPageURL = "first_page_url"
+        case lastPage = "last_page"
+        case nextPageURL = "next_page_url"
+        case data
+        case currentPage = "current_page"
+        case links
+        case perPage = "per_page"
+        case to
+    }
+}

@@ -49,7 +49,6 @@ struct MessageModel: Codable {
     var readAt: String?
     let id: Int?
     let createdAt, file: String?
-    let itemOfferID: Int?
     let message: String?
     let messageType: String?
     let updatedAt: String?
@@ -57,7 +56,7 @@ struct MessageModel: Codable {
     let audio: String?
     let receiverID: Int?
     var isCautionExpanded = 0
-   // let userType: String?
+    let roomId:Int?
     let warning:String?
     
     enum CodingKeys: String, CodingKey {
@@ -65,21 +64,19 @@ struct MessageModel: Codable {
         case id,warning
         case createdAt = "created_at"
         case file
-        case itemOfferID = "item_offer_id"
         case message
         case messageType = "message_type"
         case updatedAt = "updated_at"
         case senderID = "sender_id"
         case audio
         case receiverID = "receiver_id"
-       // case userType
+        case roomId = "room_id"
     }
-    init(readAt: String? = nil, id: Int?, createdAt: String?, file: String?, itemOfferID: Int?, message: String?, messageType: String?, updatedAt: String?, senderID: Int?, audio: String?, receiverID: Int?,warning:String?="") {
+    init(readAt: String? = nil, id: Int?, createdAt: String?, file: String?, message: String?, messageType: String?, updatedAt: String?, senderID: Int?, audio: String?, receiverID: Int?,warning:String?="",roomId:Int?) {
         self.readAt = readAt
         self.id = id
         self.createdAt = createdAt
         self.file = file
-        self.itemOfferID = itemOfferID
         self.message = message
         self.messageType = messageType
         self.updatedAt = updatedAt
@@ -87,6 +84,8 @@ struct MessageModel: Codable {
         self.audio = audio
         self.receiverID = receiverID
         self.warning = warning
+        self.roomId = roomId
+
     }
 }
 

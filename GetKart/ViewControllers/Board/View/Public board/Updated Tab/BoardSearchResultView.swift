@@ -1,16 +1,15 @@
 //
-//  SearchBoardResultView.swift
+//  BoardSearchResultView.swift
 //  GetKart
 //
-//  Created by Radheshyam Yadav on 12/12/25.
+//  Created by Radheshyam Yadav on 01/05/26.
 //
 
 import SwiftUI
 
-struct SearchBoardResultView: View {
+struct BoardSearchResultView: View {
     
     let navigationController:UINavigationController?
-    @State  var isByDefaultOpenSearch:Bool
     @State private var searchText = ""
     @State private var selected = "All"
     @StateObject private var vm = SearchBoardResultViewModel()
@@ -18,6 +17,7 @@ struct SearchBoardResultView: View {
     @State private var videoFrames: [Int: CGRect] = [:]
     @State private var safariURL: URL?
     @State private var visibilityWorkItem: DispatchWorkItem?
+   
     
     var body: some View {
         
@@ -74,6 +74,7 @@ struct SearchBoardResultView: View {
                     }
                 }
                 .padding(.horizontal)
+                
                 
                 
                 CategoryTabs(
@@ -211,7 +212,7 @@ struct SearchBoardResultView: View {
              videoFrames.removeAll()
             
         }
-        .onAppear{
+       /* .onAppear{
             if isByDefaultOpenSearch{
                 let hostingVC = UIHostingController(rootView: SearchBoardView(navigationController: self.navigationController, isToCloseToSearchResultScreen:isByDefaultOpenSearch,searchedItem: { srchTxt in
                     if searchText != srchTxt{
@@ -225,7 +226,7 @@ struct SearchBoardResultView: View {
                 self.navigationController?.pushViewController(hostingVC, animated: true)
                 isByDefaultOpenSearch = false
             }
-        }
+        }*/
         .onReceive(
             NotificationCenter.default.publisher(
                 for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
@@ -382,5 +383,5 @@ struct SearchBoardResultView: View {
 }
 
 #Preview {
-    SearchBoardResultView(navigationController: nil, isByDefaultOpenSearch: false)
+    BoardSearchResultView(navigationController: nil)
 }

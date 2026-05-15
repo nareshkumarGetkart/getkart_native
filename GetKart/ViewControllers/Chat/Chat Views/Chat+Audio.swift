@@ -83,10 +83,7 @@ extension ChatVC:Mp3RecorderDelegate{
             
             return
         }
-        
-//        if checkBlockUnblock() == true{
-//            return
-//        }
+
         btnAudioRecordStarted.isHidden = false
         btnMic.isHidden = false
         MP3?.startRecord()
@@ -110,35 +107,27 @@ extension ChatVC:Mp3RecorderDelegate{
     
     @IBAction func voiceRecord(_ sender : UIButton){
         
-        if isItemDeleted{
-            AlertView.sharedManager.showToast(message: "Item is not available")
-            return
-        }
-        
         if !AppDelegate.sharedInstance.isInternetConnected{
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
         
         if  checkMicPermission() == false{
-          
+            
             AlertView.sharedManager.presentAlertWith(title: "Alert!", msg: "Please enable microphone to send audio message from settings.", buttonTitles: ["Cancel","Ok"], onController: self) { title, index in
                 if index == 1{
                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-
+                    
                 }
             }
             
-
+            
             return
         }
-        
-//        if checkBlockUnblock() == true{
-//            return
-//        }
+    
         MP3  = Mp3Recorder(delegate: self)
         self.bgViewAudioRecord.isHidden = false
-
+        
         AudioServicesPlaySystemSound(0)
         AudioServicesPlayAlertSound(kSystemSoundID_Vibrate)
         

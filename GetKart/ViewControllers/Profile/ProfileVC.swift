@@ -24,12 +24,15 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnSetting:UIButton!
     @IBOutlet weak var lblAppVersion:UILabel!
+    @IBOutlet weak var btnPreviewProfile:UIButton!
 
+
+    //,"Buy Packages"
+  
     
-    
-    var titleArray =  ["Anonymous","My Ads","My Boards & Ideas","Buy Packages","Favorites","Order History & Plans","Dark Theme","Notifications","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
-      
-    var iconArray =  ["","myAdsIcon","gridOpaque","buyPackages","like_fill","transaction","dark_theme","notification","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
+    var titleArray =  ["Anonymous","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+      //,"buyPackages"
+    var iconArray =  ["","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
       
     var verifiRejectedReason:String = ""
     var verifyStatus:String = ""
@@ -64,31 +67,42 @@ class ProfileVC: UIViewController {
         btnSetting.clipsToBounds = true
         btnSetting.backgroundColor = Themes.sharedInstance.themeColor.withAlphaComponent(0.2)
         lblAppVersion.text = "App version : \(UIDevice.appVersion)"
+        
+        btnPreviewProfile.titleLabel?.font = UIFont.Inter.medium(size: 15.0).font
+        btnPreviewProfile.setTitleColor(.systemBlue, for: .normal)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         self.tblView.reloadData()
-//        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
-//       
-//        if objLoggedInUser.id != nil {
+
             if Local.shared.getUserId() > 0{
             if Local.shared.isToRefreshVerifiedStatusApi == true{
                 
                 getVerificationStatusApi()
             }
                 self.btnSetting.isHidden = false
-                
+                self.btnPreviewProfile.isHidden = false
+
                 showPopupUpdateProfileRemainder()
 
             }else{
                 self.btnSetting.isHidden = true
+                self.btnPreviewProfile.isHidden = true
             }
     }
     
     //MARK: UIButton Action Methods
     @IBAction func settingsBtnAction(_ sender : UIButton){
         presentSettingView()
+    }
+    
+    
+    @IBAction func previewProfileBtnAction(_ sender : UIButton){
+        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Local.shared.getUserId()))
+        self.navigationController?.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     //MARK: Pull Down refresh
@@ -122,6 +136,7 @@ class ProfileVC: UIViewController {
             }
         }
     }
+    
     
     func getUserProfileApi(){
 
@@ -185,6 +200,7 @@ class ProfileVC: UIViewController {
     
     func showPopupUpdateProfileRemainder(){
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+       
         if (objLoggedInUser.name ?? "").lowercased() == "guest user"{
            
             if ProfilePopupManager.shouldShowPopup() {
@@ -250,47 +266,58 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         
         
         if indexPath.row == 0{
+            
             let cell = tableView.dequeueReusableCell(withIdentifier: "AnonymousUserCell") as! AnonymousUserCell
             let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
             
             if objLoggedInUser.id != nil {
+                
+                cell.lblStatus.backgroundColor = UIColor.clear
+                cell.lblStatus.layer.borderColor = UIColor.clear.cgColor
+                cell.lblStatus.layer.borderWidth = 0
+                cell.lblStatus.textColor = UIColor.white
+                
                 cell.bgViewAnonymousUser.isHidden = true
                 cell.bgViewLoggedInUser.isHidden = false
                 cell.btnGetVerifiedBadge.isHidden = true
-                cell.bgViewVerified.isHidden = true
+                cell.imgVwVerify.isHidden = true
                 cell.lblStatus.isHidden = true
                 cell.btnResubmit.isHidden = true
                 cell.lblName.text =  objLoggedInUser.name ?? ""
                 cell.lblEmail.text =  objLoggedInUser.email ?? ""
                 cell.lblEmail.isHidden = (objLoggedInUser.email ?? "").count == 0
-                                
+                
                 if verifyStatus.lowercased() == "pending"{
-                    cell.lblStatus.text =  "Under review" //verifyStatus.capitalized
+                    cell.lblStatus.text =  "Under Review" //verifyStatus.capitalized
                     cell.lblStatus.backgroundColor = Themes.sharedInstance.themeColor
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = true
                     cell.btnGetVerifiedBadge.isHidden = true
-                    cell.bgViewVerified.isHidden = true
-
+                    cell.imgVwVerify.isHidden = true
+                    
                 }else if verifyStatus.lowercased() == "rejected"{
                     cell.lblStatus.text =  verifyStatus.capitalized
-                    cell.lblStatus.backgroundColor = UIColor.red
+                    cell.lblStatus.backgroundColor = UIColor.systemBackground
+                    cell.lblStatus.layer.borderColor = UIColor.red.cgColor
+                    cell.lblStatus.layer.borderWidth = 1.0
+                    cell.lblStatus.textColor = UIColor.red
+                    cell.lblStatus.clipsToBounds = true
                     cell.lblStatus.isHidden = false
                     cell.btnResubmit.isHidden = false
                     cell.btnGetVerifiedBadge.isHidden = true
-                    cell.bgViewVerified.isHidden = true
+                    cell.imgVwVerify.isHidden = true
                 }else if verifyStatus.lowercased() == "approved"{
                     
                     cell.btnGetVerifiedBadge.isHidden = true
-                    cell.bgViewVerified.isHidden = false
+                    cell.imgVwVerify.isHidden = false
                 }else{
                     
                     if (objLoggedInUser.is_verified ?? 0) == 1{
                         cell.btnGetVerifiedBadge.isHidden = true
-                        cell.bgViewVerified.isHidden = false
+                        cell.imgVwVerify.isHidden = false
                     }else{
                         cell.btnGetVerifiedBadge.isHidden = false
-                        cell.bgViewVerified.isHidden = true
+                        cell.imgVwVerify.isHidden = true
                     }
                 }
                 
@@ -300,39 +327,19 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                  3 if user upload image  then will show user's profile image
                  */
                 
-                 cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
-                
-                // cell.imgVwProfile.kf.setImage(with: URL(string: objLoggedInUser.profile ?? ""), placeholder: UIImage(named: "user-circle"), options: nil, progressBlock: nil, completionHandler: nil)
-                
-                
+                cell.btnGetVerifiedBadge.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
-
-//                if (objLoggedInUser.profile ?? "").count == 0{
-//                    cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
-//
-//                }else if (objLoggedInUser.name ?? "") == "Guest User"{
-//                    
-//                }else{
-//                    cell.imgVwProfile.configure(name: objLoggedInUser.name ?? "", imageUrl: objLoggedInUser.profile ?? "")
-//
-//                }
                 
-               // if (objLoggedInUser.profile ?? "").count == 0{
-                    cell.imgVwProfile.layer.borderColor = Themes.sharedInstance.themeColor.cgColor
-                    cell.imgVwProfile.layer.borderWidth = 1.5
-                    cell.imgVwProfile.clipsToBounds = true
-//                }else{
-//                    cell.imgVwProfile.layer.borderColor = UIColor.clear.cgColor
-//                    cell.imgVwProfile.layer.borderWidth = 0.0
-//                    cell.imgVwProfile.clipsToBounds = true
-//                }
-
+                cell.imgVwProfile.layer.borderColor = Themes.sharedInstance.themeColor.cgColor
+                cell.imgVwProfile.layer.borderWidth = 1.5
+                cell.imgVwProfile.clipsToBounds = true
+                
                 cell.btnResubmit.addTarget(self, action: #selector(getVerified), for: .touchUpInside)
                 cell.lblStatus.isUserInteractionEnabled = true
                 cell.lblStatus.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(statusTapped)))
                 cell.btnPencil.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
                 cell.btnEditProfile.addTarget(self, action: #selector(editProfileBtnACtion), for: .touchUpInside)
-
+                
             }else{
                 cell.bgViewLoggedInUser.isHidden = true
                 cell.bgViewAnonymousUser.isHidden = false
@@ -383,15 +390,27 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
         }else{
-                        
             
-            if titleArray[indexPath.row] == "Contact us"{
+            
+            
+            if titleArray[indexPath.row] == "My Connections"{
+                
+                let hostingController = UIHostingController(rootView: MyConnectionsView(navigation: navigationController))
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
+            else if titleArray[indexPath.row] == "Blocked Users"{
+                let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                hostingController.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(hostingController, animated: true)
+            }
+            else if titleArray[indexPath.row] == "Contact us"{
                 
                 let destVC = UIHostingController(rootView: ContactUsView(navigationController:self.navigationController))
                 destVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destVC, animated: true)
                 
-            } else if titleArray[indexPath.row] == "My Ads"{
+            } else if titleArray[indexPath.row] == "Promotional Banners"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     let destVC = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
@@ -409,15 +428,15 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                 }
                 
             }
-          /*  else if titleArray[indexPath.row] == "My Boost Ads"{
-                
-                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
-                    let destVC = UIHostingController(rootView: MyBoostAdsView(navigation: self.navigationController))
-                    destVC.hidesBottomBarWhenPushed = true
-                    self.navigationController?.pushViewController(destVC, animated: true)
-                }
-                
-            }*/
+            /*  else if titleArray[indexPath.row] == "My Boost Ads"{
+             
+             if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+             let destVC = UIHostingController(rootView: MyBoostAdsView(navigation: self.navigationController))
+             destVC.hidesBottomBarWhenPushed = true
+             self.navigationController?.pushViewController(destVC, animated: true)
+             }
+             
+             }*/
             else if titleArray[indexPath.row] == "Buy Packages"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
@@ -488,7 +507,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
                 
-            }else if titleArray[indexPath.row] == "Favorites"{
+            }else if titleArray[indexPath.row] == "Likes"{
                 
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     let hostingController = UIHostingController(rootView: FavoritesView(navigation:self.navigationController)) // Wrap in UIHostingController
@@ -540,12 +559,12 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         controller.title = ""
         controller.navigationController?.navigationBar.isHidden = true
         let nav = UINavigationController(rootViewController: controller)
-        var fixedSize = 0.47
+        var fixedSize = 0.42
         if UIDevice().hasNotch{
-            fixedSize = 0.47
+            fixedSize = 0.42
         }else{
             if UIScreen.main.bounds.size.height <= 700 {
-                fixedSize = 0.58
+                fixedSize = 0.52
             }
         }
         nav.navigationBar.isHidden = true

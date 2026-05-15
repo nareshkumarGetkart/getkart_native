@@ -32,6 +32,7 @@ struct AnalyticsModel: Codable {
     let rejectionReason: String?
     let isActive:Int?
     let paymentTransactions: PaymentTransactions?
+    let thumbnail:String?
 
     enum CodingKeys: String, CodingKey {
         case id, title, radius, image, status, impressions, clicks,url
@@ -39,7 +40,7 @@ struct AnalyticsModel: Codable {
         case ctr, conversions
         case timeOnScreen = "time_on_screen"
         case timeToClick = "time_to_click"
-        case location
+        case location,thumbnail
         case createdAt = "created_at"
         case startDate = "start_date"
         case screenAppearance = "screen_appearance"

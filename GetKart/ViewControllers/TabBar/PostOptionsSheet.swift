@@ -10,7 +10,7 @@ import SwiftUI
 struct PostOptionsSheet: View {
 
     var onBoardTap: () -> Void = {}
-    var onAdsTap: () -> Void = {}
+   // var onAdsTap: () -> Void = {}
     var onBannerTap: () -> Void = {}
     var onIdeaTap: () -> Void = {}
     var onClose: () -> Void = {}
@@ -57,13 +57,13 @@ struct PostOptionsSheet: View {
 
             VStack(spacing: 8) {
 
-                PostingOptionRow(
+            /*    PostingOptionRow(
                     icon: "add-circle",
                     title: "Ads",
                     subtitle: "Classified Used Items"
                 )
                 .onTapGesture { onAdsTap() }
-
+*/
                 PostingOptionRow(
                     icon: "gridOpaque",
                     title: "Board",
