@@ -178,18 +178,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func setupImageCache() {
-
         let cache = ImageCache.default
 
-        // 🔒 HARD MEMORY LIMIT (MOST IMPORTANT)
-        cache.memoryStorage.config.totalCostLimit = 1204 * 1024 * 1024 // 120 MB
-        cache.memoryStorage.config.countLimit = 150
+        // Hard memory cap — 80 MB is plenty for a visible feed
+        cache.memoryStorage.config.totalCostLimit = 80 * 1024 * 1024  // 80 MB (was 120, and then 1 byte!)
+        cache.memoryStorage.config.countLimit = 60                      // was 150 — too high
+        cache.memoryStorage.config.cleanInterval = 30
 
-        // 🧊 Disk cache (safe)
+        // Disk cache
         cache.diskStorage.config.sizeLimit = 300 * 1024 * 1024
-     
+        cache.diskStorage.config.expiration = .days(3)
     }
 
+    // DELETE the entire setupKingfisherSettings() method — it undoes everything above.
+    // Also DELETE the call to self.setupKingfisherSettings() in didFinishLaunching.
+    
+    
     private func navigateToHomeOrLogin(){
         
         if Local.shared.getUserId() > 0{
@@ -262,6 +266,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        // 1. Nuke image memory cache
+        ImageCache.default.clearMemoryCache()
+        
+        // 2. Pause all video players (was missing — each player holds 30–80 MB)
+        FeedVideoManager.shared.pauseAll()
+        
+        // 3. Keep only the currently playing player, evict the rest
+        FeedVideoManager.shared.reset()
+
+        // 4. Clear URL cache
+        URLCache.shared.removeAllCachedResponses()
+    }
     
     func applicationWillResignActive(_ application: UIApplication) {
    
@@ -975,9 +992,9 @@ extension AppDelegate:UNUserNotificationCenterDelegate,MessagingDelegate{
         }
         
         
-//        if userId == 0{
-//            userId =  Int(notification.request.content.userInfo["seller_id"] as? String ?? "0") ?? 0
-//        }
+        if userId == 0{
+            userId =   Int(notification.request.content.userInfo["userId"] as? String ?? "0") ?? 0
+        }
         
          
         if notificationType == "offer" {

@@ -10,17 +10,17 @@ import SocketIO
 
 
 enum SocketEvents: String, CaseIterable {
-    
+    case getItemOffer = "getItemOffer"
+    case itemOffer = "itemOffer"
     case buyerChatList = "buyerChatList"
     case sellerChatList = "sellerChatList"
+    case onlineOfflineStatus = "onlineOfflineStatus"
+
     case chatMessages = "chatMessages"
     case sendMessage = "sendMessage"
     case userInfo = "userInfo"
-    case getItemOffer = "getItemOffer"
-    case itemOffer = "itemOffer"
     case typing = "typing"
     case messageAcknowledge = "messageAcknowledge"
-    case onlineOfflineStatus = "onlineOfflineStatus"
     case updateChatList = "updateChatList"
     case blockUnblock = "blockUnblock"
     case joinRoom = "joinRoom"
@@ -30,6 +30,7 @@ enum SocketEvents: String, CaseIterable {
     case chatUnreadCount = "chatUnreadCount"
     case chatList = "chatList"
     case clearAllMessage = "clearAllMessage"
+    case deleteChatList = "deleteChatList"
 
 }
 
@@ -51,11 +52,11 @@ final class SocketIOManager: NSObject {
             print("Invalid socket URL")
             return
         }
-        let headers = ["Authorization": getHeaderToken()]
+        let headers = ["Authorization": getHeaderToken(),"appversion":UIDevice.appVersion]
         
        
         manager = SocketManager(socketURL: url, config: [.log(false), .reconnects(true), .forcePolling(true), .reconnectAttempts(-1), .forceNew(true), .secure(true), .compress, .forceWebsockets(false), .extraHeaders(headers)])
-        socket = manager?.socket(forNamespace: "/chat")
+        socket = manager?.socket(forNamespace: "/chatNew")
     }
 
     private func getHeaderToken() -> String {
@@ -85,14 +86,10 @@ final class SocketIOManager: NSObject {
             self.addListeners()
             NotificationCenter.default.post(name: Notification.Name(SocketEvents.socketConnected.rawValue), object: nil)
             
-            SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
-            
-            
             if Local.shared.getUserId() > 0{
-                
-                self.emitEvent(SocketEvents.onlineOfflineStatus.rawValue, ["user_id":Local.shared.getUserId()])
+            self.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+            // self.emitEvent(SocketEvents.onlineOfflineStatus.rawValue, ["user_id":Local.shared.getUserId()])
             }
-
         }
 
         socket.on(clientEvent: .error) { data, ack in
@@ -162,12 +159,14 @@ final class SocketIOManager: NSObject {
            return
        }
 
+        
        guard let socket = socket else {
            print("Socket is nil. Reinitializing connection.")
            establishConnection()
            return
        }
 
+        
        switch socket.status {
        case .connected:
            print("Socket is already connected. No action needed.")

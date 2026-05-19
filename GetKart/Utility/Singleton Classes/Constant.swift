@@ -330,9 +330,9 @@ final class Constant: NSObject {
     
     var  get_public_board:String {
         get {
-            return "\(baseURL)/v1/get-public-board"
+           return "\(baseURL)/v1/get-public-board"
             
-          //  return "\(baseURL)/v2/get-public-board"
+           //return "\(baseURL)/v2/get-public-board"
 
             
         }
@@ -664,6 +664,9 @@ final class Constant: NSObject {
             
         }
     }
+    
+    
+    
     
     
     var getCustomfields:String{

@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 import Combine
 import SwiftUI
-
+import Kingfisher
 
 final class VideoCacheTracker {
     
@@ -57,6 +57,18 @@ final class VideoPreloadManagerDefault {
         
         queue.async {
             self.startPrefetch(urls: urls)
+        }
+    }
+   
+    func cancelAll() {
+
+        queue.async {
+
+            self.activeTasks.values.forEach {
+                $0.cancel()
+            }
+
+            self.activeTasks.removeAll()
         }
     }
 }
@@ -505,7 +517,9 @@ struct SmartVideoPlayerView: View {
                     }
 
                     // THUMBNAIL (always on top)
-                        AsyncImage(url: URL(string: item.image ?? "")) { image in
+                    
+                    
+                       /* AsyncImage(url: URL(string: item.image ?? "")) { image in
                             image
                                 .resizable()
                                 .scaledToFill()
@@ -515,7 +529,26 @@ struct SmartVideoPlayerView: View {
                         .frame(height: 285)
                         .clipped()
                         .opacity(isReadyToPlay ? 0 : 1)
-                        .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
+                        .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)*/
+                    
+                    KFImage(URL(string: item.image ?? ""))
+                        .setProcessor(
+                            // Match actual column width: screen/2 minus padding, at screen scale
+                            DownsamplingImageProcessor(size: CGSize(
+                                width: (UIScreen.main.bounds.width / 2 - 10),// * UIScreen.main.scale,
+                                height: 300 //* UIScreen.main.scale
+                            ))
+                        ).scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        //.memoryCacheExpiration(.seconds(120))   // ← drop from memory after 2 min off-screen
+                        .loadDiskFileSynchronously()
+                       .diskCacheExpiration(.days(3))
+                       .fade(duration: 0.15)
+                       .frame(width:geo.size.width)
+                       .frame(height: 285)
+                       .clipped()
+                       .opacity(isReadyToPlay ? 0 : 1)
+                       .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
 
                     overlayUI
                 }
@@ -752,7 +785,7 @@ final class FeedVideoManager: ObservableObject {
     // Currently unmuted video
     @Published private(set) var currentUnmutedId: Int?
     
-    
+  
     // MARK: - Get or Create Player
 //    func player(for id: Int, url: URL) -> AVQueuePlayer {
 //
@@ -790,6 +823,15 @@ final class FeedVideoManager: ObservableObject {
 //
 //        return queue
 //    }
+    
+    
+    /// Pauses all players without destroying them (e.g. tab switch).
+        /// Use this instead of clearAll() during memory warnings to avoid
+        /// destroying players that SmartVideoPlayerView still holds a reference to.
+        func pauseAndSuspendAll() {
+            pauseAll()
+            players.values.forEach { $0.rate = 0 }
+        }
     
     func player(for id: Int, url: URL) -> AVQueuePlayer {
 
@@ -834,6 +876,17 @@ final class FeedVideoManager: ObservableObject {
         _ = player(for: id, url: url)
     }
     
+    func remove(id: Int) {
+
+        guard let player = players[id] else { return }
+
+        player.pause()
+
+        // CRITICAL: releases decoder buffers + IOSurface memory
+        player.replaceCurrentItem(with: nil)
+
+        players.removeValue(forKey: id)
+    }
     
     // MARK: - Update Playback
     
@@ -858,10 +911,7 @@ final class FeedVideoManager: ObservableObject {
     
     // MARK: - Play
     
-//    func play(id: Int) {
-//        players[id]?.play()
-//    }
-//    
+
     func play(id: Int) {
         
         guard let player = players[id] else { return }
@@ -939,7 +989,17 @@ final class FeedVideoManager: ObservableObject {
             self.currentUnmutedId = id
         }
     }
-    
+    func clearAll() {
+
+        for (_, player) in players {
+
+            player.pause()
+
+            player.replaceCurrentItem(with: nil)
+        }
+
+        players.removeAll()
+    }
     
     // MARK: - Reset
     
@@ -958,383 +1018,3 @@ final class FeedVideoManager: ObservableObject {
     }
 }
 
-
-//===============
-
-/*
-import SwiftUI
-import GSPlayer
-
-struct GSVideoPlayerView: UIViewRepresentable {
-
-    let url: URL
-    let isPlaying: Bool
-    let isMuted: Bool
-    var onReady: (() -> Void)?
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    func makeUIView(context: Context) -> VideoPlayerView {
-
-        let player = VideoPlayerView()
-        player.playerLayer.videoGravity = .resizeAspectFill
-        player.clipsToBounds = true
-
-        player.play(for: url)
-
-        // Listen when video ready
-      
-        player.stateDidChanged = { state in
-
-            if case .playing = state {
-
-                DispatchQueue.main.async {
-                    player.setNeedsLayout()
-                    player.layoutIfNeeded()
-                    context.coordinator.parent.onReady?()
-                }
-            }
-        }
-
-        return player
-    }
-
-    func updateUIView(_ uiView: VideoPlayerView, context: Context) {
-
-        if isPlaying {
-            uiView.resume()
-        } else {
-            uiView.pause()
-        }
-
-        uiView.player?.isMuted = isMuted
-    }
-
-    class Coordinator {
-
-        var parent: GSVideoPlayerView
-
-        init(_ parent: GSVideoPlayerView) {
-            self.parent = parent
-        }
-    }
-}
-
-extension Notification.Name {
-    static let pauseAllVideos = Notification.Name("pauseAllVideos")
-}
-
-import Foundation
-import Combine
-
-final class FeedVideoManager: ObservableObject {
-
-    static let shared = FeedVideoManager()
-
-    // Visible videos
-    @Published var visibleVideoIDs: Set<Int> = []
-
-    // Only one playing video
-    @Published var playingVideoID: Int?
-
-    // Only one video with sound
-    @Published var currentUnmutedId: Int?
-
-    private init() {}
-
-    // MARK: - SOUND CONTROL
-
-    func toggleSound(for id: Int) {
-
-        if currentUnmutedId == id {
-            currentUnmutedId = nil
-        } else {
-            currentUnmutedId = id
-        }
-
-        // Force UI refresh everywhere
-        objectWillChange.send()
-    }
-
-    func muteAll() {
-        currentUnmutedId = nil
-        objectWillChange.send()
-    }
-
-    // MARK: - PLAYBACK CONTROL
-
-    func updatePlayback(visibleIDs: Set<Int>) {
-
-        visibleVideoIDs = visibleIDs
-
-        if let firstVisible = visibleIDs.first {
-            playingVideoID = firstVisible
-        } else {
-            playingVideoID = nil
-        }
-
-        // If sound owner leaves screen -> mute
-        if let soundID = currentUnmutedId, !visibleIDs.contains(soundID) {
-            currentUnmutedId = nil
-        }
-    }
-
-    func pause(id: Int) {
-
-        visibleVideoIDs.remove(id)
-
-        if playingVideoID == id {
-            playingVideoID = nil
-        }
-
-        if currentUnmutedId == id {
-            currentUnmutedId = nil
-        }
-    }
-
-    func pauseAll() {
-
-        visibleVideoIDs.removeAll()
-        playingVideoID = nil
-        currentUnmutedId = nil
-    }
-
-    func reset() {
-
-        visibleVideoIDs.removeAll()
-        playingVideoID = nil
-        currentUnmutedId = nil
-    }
-}
-
-import SwiftUI
-import GSPlayer
-
-struct SmartVideoPlayerView: View {
-
-    let item: ItemModel
-    var onTapBottomButton: () -> Void
-
-    @ObservedObject private var manager = FeedVideoManager.shared
-
-    @State private var isPlaying = false
-    @State private var isReadyToPlay = false
-    @State private var isExpand = false
-
-    private var videoId: Int { item.id ?? -1 }
-
-    private var isMuted: Bool {
-        manager.currentUnmutedId != videoId
-    }
-
-    var body: some View {
-
-        VStack(spacing: 0) {
-
-            ZStack {
-
-                videoPlayer.background(Color(.black))
-//                    .aspectRatio(contentMode: .fill)   // 👈 ADD THIS
-//                                .frame(maxWidth: .infinity)
-                                .frame(height: 280)
-
-                thumbnailView
-
-                if isReadyToPlay{
-                    overlayUI
-                }
-            }
-            .frame(height: 280)
-
-            bottomCTA
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
-
-        // PLAY / PAUSE when visible IDs change
-        .onChange(of: manager.playingVideoID) { id in
-            isPlaying = id == videoId
-        }
-
-        // SAFETY pause
-        .onDisappear {
-            isPlaying = false
-            FeedVideoManager.shared.pause(id: videoId)
-        }
-        // GLOBAL AUDIO STATE CHANGE
-        .onChange(of: manager.currentUnmutedId) { _ in
-            // Force refresh of mute state
-            isPlaying = manager.visibleVideoIDs.contains(videoId)
-        }
-        .fullScreenCover(isPresented: $isExpand) {
-
-            VideoPreviewView(
-                item: item,
-                strURl: item.videoLink ?? ""
-            )
-        }
-    }
-}
-
-private extension SmartVideoPlayerView {
-
-    var videoPlayer: some View {
-
-        Group {
-
-            if let link = item.videoLink,
-               let url = URL(string: link) {
-
-                GSVideoPlayerView(
-                    url: url,
-                    isPlaying: isPlaying,
-                    isMuted: isMuted
-                ) {
-                    isReadyToPlay = true
-                }
-            }
-        }
-    }
-
-    // Thumbnail until video ready
-    var thumbnailView: some View {
-
-        Group {
-
-            if !isReadyToPlay {
-
-                AsyncImage(url: URL(string: item.image ?? "")) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                    
-                } placeholder: {
-
-                    Color.black.opacity(0.2)
-                }
-            }
-        }
-    }
-}
-
-import SwiftUI
-import Combine
-
-
-private extension SmartVideoPlayerView {
-
-    var overlayUI: some View {
-
-        VStack {
-
-            HStack(alignment: .top) {
-
-                if item.isFeature ?? false {
-
-                    Text("Sponsored")
-                        .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .medium))
-                }
-
-                Spacer()
-
-                VStack(spacing: 8) {
-
-                    Button {
-
-                        manager.toggleSound(for: videoId)
-
-                    } label: {
-
-                        Image(systemName:
-                                isMuted
-                                ? "speaker.slash.fill"
-                                : "speaker.wave.2.fill")
-
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(Color.black.opacity(0.5))
-                        .clipShape(Circle())
-                    }
-
-                    Button {
-
-                        manager.muteAll()
-                        isExpand = true
-
-                    } label: {
-
-                        Image("material-symbols_pan-zoom-rounded")
-                            .padding(8)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                }
-            }
-
-            Spacer()
-        }
-        .padding(8)
-    }
-}
-
-private extension SmartVideoPlayerView {
-
-    var bottomCTA: some View {
-
-        HStack {
-
-            Text(item.ctaLabel ?? "")
-                .foregroundColor(.white)
-                .font(.system(size: 14, weight: .medium))
-
-            Spacer()
-
-            Image(systemName: "arrow.up.right")
-                .foregroundColor(.white)
-                .font(.system(size: 12))
-        }
-        .padding(.horizontal, 10)
-        .frame(height: 35)
-        .frame(maxWidth: .infinity)
-        .background(Color.orange)
-        .onTapGesture {
-            onTapBottomButton()
-        }
-    }
-}
-*/
-
-
-/*struct GSVideoPlayerView: UIViewRepresentable {
-
-    let url: URL
-    var isPlaying: Bool
-    var isMuted: Bool
-
-    func makeUIView(context: Context) -> VideoPlayerView {
-
-        let view = VideoPlayerView()
-        view.playerLayer.videoGravity = .resizeAspectFill
-
-        view.play(for: url)
-
-        view.player?.isMuted = isMuted
-
-        return view
-    }
-
-    func updateUIView(_ uiView: VideoPlayerView, context: Context) {
-
-        uiView.player?.isMuted = isMuted
-
-        if isPlaying {
-            uiView.resume()
-        } else {
-            uiView.pause()
-        }
-    }
-}
-*/

@@ -60,8 +60,14 @@ class HomeBaseVC: UITabBarController {
             customTabBar.middleButton = middleButton
         }
 
-        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+//        SocketIOManager.sharedInstance.checkSocketStatus()
         // badge is added in viewDidLayoutSubviews so frames are ready
+//        
+//        NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
+//            SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+//
+//        }
+
     }
    
     
@@ -73,10 +79,15 @@ class HomeBaseVC: UITabBarController {
             
             NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
                 AppDelegate.sharedInstance.navigateToNotificationType()
+                
             }
             // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
+        
+
+      
+
     }
 
     // reposition middle button and badge after layout so frames are correct on all iOS versions including iOS 26
@@ -107,7 +118,6 @@ class HomeBaseVC: UITabBarController {
             hasLayedOutBadge = true
             addNewBadgeOnBoardTab()
         }*/
-     
     }
 
     //MARK: Other Helpful Methods
@@ -148,8 +158,6 @@ class HomeBaseVC: UITabBarController {
                 showNChatUnreadCountRedDot(count: unreadCount)
             }else{
             }
-            
-            
         }
     }
 
@@ -514,7 +522,7 @@ extension HomeBaseVC: UITabBarControllerDelegate {
     
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        
+
         guard let index = viewControllers?.firstIndex(of: viewController) else { return false }
 
         // always catch dummy center tab (index 2) first

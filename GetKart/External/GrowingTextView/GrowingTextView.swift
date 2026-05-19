@@ -12,6 +12,9 @@ open class GrowingTextView: UIView {
     // MARK: - Public properties
     open weak var delegate: GrowingTextViewDelegate?
 
+    open override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: calculateHeight())
+    }
     open var internalTextView: UITextView {
         return textView
     }
@@ -245,12 +248,17 @@ extension GrowingTextView {
         }
     }
 
-    open override func layoutSubviews() {
+    /*open override func layoutSubviews() {
         super.layoutSubviews()
         updateTextViewFrame()
         updateMaxHeight()
         updateMinHeight()
         updateHeight()
+    }*/
+    
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        updateTextViewFrame()
     }
 
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -347,12 +355,25 @@ extension GrowingTextView {
         textView.sizeThatFits(textView.frame.size)
     }
 
-    fileprivate func updateGrowingTextView(newHeight: CGFloat, difference: CGFloat) {
+   /* fileprivate func updateGrowingTextView(newHeight: CGFloat, difference: CGFloat) {
         if let delegate = delegate, delegate.responds(to: DelegateSelectors.willChangeHeight) {
             delegate.growingTextView!(self, willChangeHeight: newHeight, difference: difference)
         }
         frame.size.height = newHeight
         updateTextViewFrame()
+    }*/
+    
+    fileprivate func updateGrowingTextView(newHeight: CGFloat, difference: CGFloat) {
+        if let delegate = delegate, delegate.responds(to: DelegateSelectors.willChangeHeight) {
+            delegate.growingTextView!(self, willChangeHeight: newHeight, difference: difference)
+        }
+
+        // ❌ Do not change frame height directly when using AutoLayout
+        // frame.size.height = newHeight
+
+        invalidateIntrinsicContentSize()
+        setNeedsLayout()
+        layoutIfNeeded()
     }
 
     fileprivate func updatedHeight() -> (newHeight: CGFloat, difference: CGFloat) {

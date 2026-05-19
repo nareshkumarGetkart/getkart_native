@@ -498,7 +498,7 @@ struct VideoBannerThumbnailView: View {
 extension BannerPromotionsView {
     
     func validateField() {
-        
+        UIApplication.shared.endEditing()
         if selectedMedia == nil {
             
             AlertView.sharedManager.showToast(
@@ -532,7 +532,17 @@ extension BannerPromotionsView {
             
         case .image(let img):
             
-            let vc = UIHostingController(
+            
+            do{
+                
+        
+                let zoomCtrl = VKImageZoom()
+                zoomCtrl.image = img
+                zoomCtrl.modalPresentationStyle = .fullScreen
+                navigationController?.present(zoomCtrl, animated: true, completion: nil)
+            }
+            
+           /* let vc = UIHostingController(
                 rootView: PreviewAdView(
                     navigationController: navigationController,
                     image: img
@@ -543,7 +553,7 @@ extension BannerPromotionsView {
                 vc,
                 animated: true
             )
-            
+            */
         case .video(let url):
             
             let vc = UIHostingController(

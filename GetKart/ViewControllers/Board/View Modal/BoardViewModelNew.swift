@@ -169,4 +169,14 @@ final class BoardViewModelNew: ObservableObject {
             }
         }
     }
+    
+    func clearItems() {
+        items = []
+        hasLoadedOnce = false
+        isLastPage = false
+    }
+    
+    deinit {
+        print("DEINIT BOARD VM")
+    }
 }

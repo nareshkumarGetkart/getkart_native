@@ -27,7 +27,7 @@ struct BannerAlalyticsView: View {
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
-            Text("Banner analytics").font(.manrope(.bold, size: 20.0))
+            Text("Banner analytics").font(.manrope(.bold, size: 18.0))
                 .foregroundColor(Color(UIColor.label))
             Spacer()
             

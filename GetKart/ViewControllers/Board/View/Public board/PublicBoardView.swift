@@ -164,7 +164,8 @@ struct PublicBoardView: View {
 }
 
 
-final class BoardStore: ObservableObject {
+/*final class BoardStore: ObservableObject {
+    
     
     @Published private(set) var boardVMs: [Int: BoardViewModelNew] = [:]
     @MainActor
@@ -181,7 +182,42 @@ final class BoardStore: ObservableObject {
 
         return vm
     }
+    
+ 
 
+}*/
+
+final class BoardStore: ObservableObject {
+    
+    @Published private(set) var boardVMs: [Int: BoardViewModelNew] = [:]
+    
+    @MainActor
+    func vm(for categoryId: Int) -> BoardViewModelNew {
+        if let vm = boardVMs[categoryId] {
+            return vm
+        }
+        let vm = BoardViewModelNew(categoryId: categoryId)
+        DispatchQueue.main.async {
+            self.boardVMs[categoryId] = vm
+        }
+        return vm
+    }
+    
+    // ADD THIS inside the class body (not an extension) so it can mutate boardVMs
+    @MainActor
+    func evict(id: Int) {
+        FeedVideoManager.shared.pauseAll()
+       // boardVMs[id]?.clearItems()
+        // Optional: fully remove VM so it reloads fresh on re-open
+        // boardVMs.removeValue(forKey: id)
+        
+        // force cleanup
+        ImageCache.default.clearMemoryCache()
+        
+       // FeedVideoManager.shared.reset()
+        FeedVideoManager.shared.clearAll()
+        
+    }
 }
 
 struct CategoryTabsNew: View {
@@ -1266,9 +1302,12 @@ struct IdeaCardStaggered: View {
                     
                     KFImage(URL(string: product.image ?? ""))
                         .setProcessor(
-                            DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
+                            // Match actual column width: screen/2 minus padding, at screen scale
+                            DownsamplingImageProcessor(size: CGSize(
+                                width: (UIScreen.main.bounds.width / 2 - 10) * UIScreen.main.scale,
+                                height: 300 * UIScreen.main.scale
+                            ))
                         )
-                       // .scaleFactor(UIScreen.main.scale)
                         .cacheOriginalImage(false)
                         .resizable()
                         .scaledToFill()
@@ -1336,10 +1375,16 @@ struct PromotionalAdsCardStaggered: View {
                 
                 KFImage(URL(string: product.image ?? ""))
                     .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(width: 400, height: 400))
+                        // Match actual column width: screen/2 minus padding, at screen scale
+                        DownsamplingImageProcessor(size: CGSize(
+                            width: (UIScreen.main.bounds.width / 2 - 10),// * UIScreen.main.scale,
+                            height: 300// * UIScreen.main.scale
+                        ))
                     )
                     .scaleFactor(UIScreen.main.scale)
                     .cacheOriginalImage(false)
+                    .memoryCacheExpiration(.seconds(120))
+                    .fade(duration: 0.15)
                     .resizable()
                     .scaledToFit()
                     .clipped()

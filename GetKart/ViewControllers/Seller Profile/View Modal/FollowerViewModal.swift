@@ -49,7 +49,7 @@ class FollowerViewModal:ObservableObject{
     // MARK: - Follow  APIs (your existing)
     func followUnfollowUserApi(userObj:UserModel) {
         
-        let flag = ((userObj.isFollowing ?? false) == true) ? 1 : 0
+        let flag = ((userObj.isFollowing ?? false) == true) ? 0 : 1
         let params = ["follower_id":(userObj.id ?? 0),"flag":flag]
         
         URLhandler.sharedinstance.makeCall(url: Constant.shared.follow_unfollow, param: params, showLoader: true) { [self] responseObject, error in
@@ -61,12 +61,12 @@ class FollowerViewModal:ObservableObject{
                 
                 if code == 200{
                     
-                    if let data = result["data"] as? Dictionary<String,Any>{
+                    if result["data"] is Dictionary<String,Any>{
                         
                         if let index = self.usersArray.firstIndex(where: { $0.id == userObj.id }) {
                             
                             var obj = self.usersArray[index]
-                            obj.isFollowing = (flag == 1)
+                            obj.isFollowing = (flag == 1) ? true : false
                             
                             self.usersArray[index] = obj
                         }

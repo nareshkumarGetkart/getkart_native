@@ -443,12 +443,12 @@ extension LoginVC: ASAuthorizationControllerDelegate, ASAuthorizationControllerP
 //                        let hostingController = UIHostingController(rootView: MyLocationView(navigationController: self.navigationController))
 //                        self.navigationController?.pushViewController(hostingController, animated: true)
 //                        
-                        
-                        if Local.shared.getUserCity().count > 0 {
+                      
+                      //  if Local.shared.getUserCity().count > 0 {
                             if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
                                 self.navigationController?.pushViewController(vc, animated: true)
                             }
-                        }
+                       // }
                         
                     }
                     

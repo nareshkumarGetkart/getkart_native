@@ -218,7 +218,7 @@ struct ChatSearchBarView: View {
     var body: some View {
         VStack{
             
-            TextField("", text: $text)
+            TextField("Search User", text: $text)
                 .placeholder(when: text.isEmpty) {
                     Text("Search")
                         .foregroundColor(.gray.opacity(0.7))

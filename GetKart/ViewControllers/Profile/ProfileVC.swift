@@ -101,7 +101,7 @@ class ProfileVC: UIViewController {
     
     @IBAction func previewProfileBtnAction(_ sender : UIButton){
         let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Local.shared.getUserId()))
-        self.navigationController?.hidesBottomBarWhenPushed = true
+        hostingController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     

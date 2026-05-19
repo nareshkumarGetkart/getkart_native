@@ -143,14 +143,11 @@ class ChatVC: UIViewController {
         })
         
     }
-    
-    
-    
-    
+   
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         IQKeyboardManager.shared.isEnabled = false
-         self.getUserInfo()
+        self.getUserInfo()
         
         if !AppDelegate.sharedInstance.isInternetConnected{
             AlertView.sharedManager.showToast(message: "No internet connection")
@@ -472,9 +469,8 @@ class ChatVC: UIViewController {
     func addObservers(){
         
         
-            super.viewDidLoad()
             
-            NotificationCenter.default.addObserver(self,
+    NotificationCenter.default.addObserver(self,
                                                    selector: #selector(appDidEnterBackground),
                                                    name: UIApplication.didEnterBackgroundNotification,
                                                    object: nil)
@@ -685,16 +681,53 @@ class ChatVC: UIViewController {
         })
     }
     
-    
     @objc func keyboardWillShow(_ notification: Notification) {
+
+        guard let userInfo = notification.userInfo else { return }
+
+        let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero
+        let duration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+        let curve = (userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt) ?? 7
+
+        let options = UIView.AnimationOptions(rawValue: curve << 16)
+
+        let bottomSafeArea = view.safeAreaInsets.bottom
+        inputBarBottomSpace.constant = keyboardFrame.height - bottomSafeArea
+
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            self.scrollToBottom(animated: false)
+        }
+
+        btnMic.isHidden = true
+        btnSend.isHidden = false
+    }
+
+    @objc func keyboardWillHide(_ notification: Notification) {
+
+        guard let userInfo = notification.userInfo else { return }
+
+        let duration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+        let curve = (userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt) ?? 7
+        let options = UIView.AnimationOptions(rawValue: curve << 16)
+
+        inputBarBottomSpace.constant = 0
+
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.view.layoutIfNeeded()
+        }
+
+        btnMic.isHidden = false
+        btnSend.isHidden = false
+    }
+   /* @objc func keyboardWillShow(_ notification: Notification) {
        
         DispatchQueue.main.async {
             self.btnMic.isHidden = true
             self.btnSend.isHidden = false
            
         }
-    
-      
         
         
         if let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
@@ -711,6 +744,7 @@ class ChatVC: UIViewController {
             view.layoutIfNeeded()
             scrollToBottom(animated: false)
         }
+        
     }
     
     
@@ -723,8 +757,9 @@ class ChatVC: UIViewController {
         inputBarBottomSpace.constant = 0
         view.setNeedsLayout()
         view.layoutIfNeeded()
+        
     }
-    
+    */
     @objc func noInternet(notification:Notification?){
         
         AlertView.sharedManager.showToast(message: "No internet connection")
@@ -751,7 +786,7 @@ class ChatVC: UIViewController {
            
             self.chatArray.removeAll()
             self.tblView.reloadData()
-
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
             AlertView.sharedManager.showToast(message: message)
         }
     }
@@ -817,6 +852,11 @@ class ChatVC: UIViewController {
 
                 if let read_at = dataDict["read_at"] as? String{
                   
+                    if (chatArray.last?.readAt?.count ?? 0) > 0{
+                        //Already seen updated
+                        return
+                    }
+                    
                     if chatArray.count > 0 {
                         for i in 0..<chatArray.count{
                             chatArray[i].readAt = read_at
@@ -1206,16 +1246,44 @@ class ChatVC: UIViewController {
 
 extension ChatVC: GrowingTextViewDelegate {
     
-    func growingTextView(_ growingTextView: GrowingTextView, willChangeHeight height: CGFloat, difference: CGFloat) {
+    /* func growingTextView(_ growingTextView: GrowingTextView,
+                         willChangeHeight height: CGFloat,
+                         difference: CGFloat) {
+
+        if abs(difference) < 1 { return }
+
+        let newHeight = min(height + 38, 160)
+
+        if abs(inputBarHeight.constant - newHeight) < 1 { return }
+
+        inputBarHeight.constant = newHeight
+
+        UIView.performWithoutAnimation {
+            self.view.layoutIfNeeded()
+        }
+    }*/
+    
+   /* func growingTextView(_ growingTextView: GrowingTextView, willChangeHeight height: CGFloat, difference: CGFloat) {
         print("Height Will Change To: \(height)  Diff: \(difference)")
 
         inputBarHeight.constant =  height + 38
         view.setNeedsLayout()
         view.layoutIfNeeded()
-    }
+    }*/
 
-    func growingTextView(_ growingTextView: GrowingTextView, didChangeHeight height: CGFloat, difference: CGFloat) {
-        print("Height Did Change!")
+    func growingTextView(_ growingTextView: GrowingTextView,
+                         didChangeHeight height: CGFloat,
+                         difference: CGFloat) {
+
+        let newHeight = min(height + 38, 170)
+
+        if abs(inputBarHeight.constant - newHeight) < 1 { return }
+
+        inputBarHeight.constant = newHeight
+
+        UIView.performWithoutAnimation {
+            self.view.layoutIfNeeded()
+        }
     }
 
     func growingTextViewShouldReturn(_ growingTextView: GrowingTextView) -> Bool {
@@ -1249,7 +1317,7 @@ extension ChatVC: GrowingTextViewDelegate {
     
     
     func userIsTyping(text: String) {
-        if !isTyping {
+       /* if !isTyping {
             isTyping = true
             self.sendtypinStatus(status: true)
             
@@ -1261,6 +1329,20 @@ extension ChatVC: GrowingTextViewDelegate {
                 self.isTyping = false
                 self.sendtypinStatus(status: false)
             }
+        }*/
+ 
+
+        typingTimer?.invalidate()
+
+        if !isTyping {
+            isTyping = true
+            sendtypinStatus(status: true)
+        }
+
+        typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            self.isTyping = false
+            self.sendtypinStatus(status: false)
         }
     }
 

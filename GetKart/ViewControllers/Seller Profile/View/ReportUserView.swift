@@ -129,7 +129,7 @@ struct ReportUserView: View {
     //MARK: Api methods
     func getReportReasonsListApi(){
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_report_reasons) { (obj:Report) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_user_report_reasons) { (obj:Report) in
             
             if obj.data != nil {
                 self.listArray = obj.data?.data ?? []

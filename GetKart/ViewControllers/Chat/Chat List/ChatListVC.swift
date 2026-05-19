@@ -11,7 +11,6 @@ import SwiftUI
 
 class ChatListVC: UIViewController {
     
-    
     @IBOutlet weak var cnstrntHtNavBar:NSLayoutConstraint!
     @IBOutlet weak var tblView:UITableView!
     @IBOutlet weak var btnMenu:UIButton!
@@ -32,24 +31,7 @@ class ChatListVC: UIViewController {
         return refreshControl
     }()
     
-    
-    private var selectedIndexPaths: [IndexPath] = []
-    private var isDeleteMode = false
-    
-    lazy var cancelButton = UIBarButtonItem(
-        title: "Cancel",
-        style: .plain,
-        target: self,
-        action: #selector(cancelDeleteMode)
-    )
-
-    lazy var doneButton = UIBarButtonItem(
-        title: "Done",
-        style: .done,
-        target: self,
-        action: #selector(doneDeleteMode)
-    )
-    
+  
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,7 +46,6 @@ class ChatListVC: UIViewController {
         
         tblView.register(UINib(nibName: "ChatListTblCell", bundle: nil), forCellReuseIdentifier: "ChatListTblCell")
         addObservers()
-       
         
         tblView.refreshControl = topRefreshControl
         
@@ -97,7 +78,8 @@ class ChatListVC: UIViewController {
             AlertView.sharedManager.showToast(message: "No internet connection")
             return
         }
-        
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+
     }
     
     //MARK: Add Observers
@@ -111,6 +93,10 @@ class ChatListVC: UIViewController {
         NotificationCenter.default.addObserver(self,selector:
                                                 #selector(noInternet(notification:)),
                                                name:NSNotification.Name(rawValue:NotificationKeys.noInternet.rawValue), object: nil)
+        
+        NotificationCenter.default.addObserver(self,selector:
+                                                #selector(self.deleteChatList),
+                                               name:NSNotification.Name(rawValue:SocketEvents.deleteChatList.rawValue), object: nil)
     }
     
     //MARK: UIbutton Action Methods
@@ -130,120 +116,16 @@ class ChatListVC: UIViewController {
         let hosting = UIHostingController(rootView: view)
         hosting.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(hosting, animated: true)
-        
     }
     
     
     
     @IBAction func threeDotOptionBtnAction(_ sender : UIButton){
-       /* let actionSheetAlertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        actionSheetAlertController.addAction(cancelActionButton)
      
-        
-        let deleteChat = UIAlertAction(title: "Delete Chat", style: .default) { (action) in
-            
-            self.deleteChatAction(sender)
-        }
-        
-        actionSheetAlertController.addAction(deleteChat)
-        
-     
-       
-        self.present(actionSheetAlertController, animated: true, completion: nil)*/
-        
-        /*let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
-        hostingController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(hostingController, animated: true)*/
     }
     
     func updateandcheckStatus(){
         SocketIOManager.sharedInstance.checkSocketStatus()
-    }
-    
-    
-    
-    func deleteChatAction(_ sender: UIButton) {
-        
-        tblView.setEditing(true, animated: true)
-
-            tblView.allowsMultipleSelectionDuringEditing = true
-
-            navigationItem.leftBarButtonItem = cancelButton
-            navigationItem.rightBarButtonItem = doneButton
-
-            selectedIndexPaths.removeAll()
-
-            AlertView.sharedManager.showToast(message: "Select up to 5 chats")
-    }
-    
-    @objc func cancelDeleteMode() {
-
-        selectedIndexPaths.removeAll()
-
-        tblView.setEditing(false, animated: true)
-
-        navigationItem.leftBarButtonItem = nil
-        navigationItem.rightBarButtonItem = nil
-
-        tblView.reloadData()
-    }
-    
-    @objc func doneDeleteMode() {
-
-        if selectedIndexPaths.isEmpty {
-
-            AlertView.sharedManager.showToast(message: "Select chats")
-
-            return
-        }
-
-        let selectedRows = selectedIndexPaths.map { $0.row }
-
-        let roomIds = selectedRows.compactMap {
-            listArray[$0].roomId
-        }
-
-        print(roomIds)
-
-        // DELETE API HERE
-
-        listArray.removeAll { item in
-            roomIds.contains(item.roomId ?? 0)
-        }
-
-        selectedIndexPaths.removeAll()
-
-        tblView.setEditing(false, animated: true)
-
-        navigationItem.leftBarButtonItem = nil
-        navigationItem.rightBarButtonItem = nil
-
-        tblView.reloadData()
-    }
-    
-    @IBAction func confirmDeleteAction(_ sender: UIButton) {
-
-        let selectedRows = selectedIndexPaths.map { $0.row }
-
-        let roomIds = selectedRows.compactMap {
-            listArray[$0].roomId
-        }
-
-        print(roomIds)
-
-        // API CALL HERE
-
-        listArray.removeAll { item in
-            roomIds.contains(item.roomId ?? 0)
-        }
-
-        selectedIndexPaths.removeAll()
-
-        tblView.setEditing(false, animated: true)
-
-        tblView.reloadData()
     }
 }
 
@@ -283,6 +165,18 @@ extension ChatListVC  {
 
     }
     
+    
+    
+    @objc func deleteChatList(notification: Notification) {
+        
+        guard let data = notification.userInfo else{
+            return
+        }
+        self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+        self.emptyView?.lblMsg?.text = "No chat Found"
+        self.emptyView?.subHeadline?.text = ""
+    }
+    
     @objc func updateChatList(notification: Notification) {
         
         guard let data = notification.userInfo else{
@@ -290,30 +184,34 @@ extension ChatListVC  {
         }
         
         if let response : ParseUpdatedChat = try? SocketParser.convert(data: data) {
-            
                 
                 var isFound = false
                 for (index,chat) in listArray.enumerated(){
                     
-//                    if chat.roomId == response.data?.id{
                     if chat.roomId == response.data?.roomId{
 
                         isFound = true
-                        if let data = response.data{
+                        if var data = response.data{
+                            data.unreadCount = 1
                             listArray.remove(at: index)
                             listArray.insert(data, at: 0)
-                           // listArray[index] = data
                         }
                         break
                     }
                 }
                 
                 if !isFound{
-                    if let data = response.data{
+                    if var data = response.data{
+                        data.unreadCount = 1
                         listArray.insert(data, at: 0)
                     }
                 }
-                self.tblView.reloadData()
+            
+            self.emptyView?.isHidden = (self.listArray.count) > 0 ? true : false
+            self.emptyView?.lblMsg?.text = "No chat Found"
+            self.emptyView?.subHeadline?.text = ""
+           
+           self.tblView.reloadData()
         }
     }
     
@@ -395,11 +293,13 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
             cell.lblLastMessage.text = obj.lastMessage?.message ?? ""
             
         }else  if obj.lastMessage?.audio?.count ?? 0 > 0 {
-            cell.lblLastMessage.text = "📢"
+           //cell.lblLastMessage.text = "📢"
+            cell.lblLastMessage.text = "🎤"
             cell.lblLastMessage.isHidden = false
             
         }else if obj.lastMessage?.file?.count ?? 0 > 0{
-            cell.lblLastMessage.text = "📝"
+           // cell.lblLastMessage.text = "📝"
+            cell.lblLastMessage.text = "🖼"
             cell.lblLastMessage.isHidden = false
         }
         
@@ -414,7 +314,6 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
         }else{
             cell.lblDot.isHidden = true
             cell.lblLastMessage.font = UIFont.Inter.regular(size: 15.0).font
-
         }
         
         
@@ -424,56 +323,31 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
     
 
     
-  /*  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        listArray[indexPath.item].readAt = listArray[indexPath.item].updatedAt
-        self.tblView.reloadData()
-        let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
-        destVC.item_offer_id = listArray[indexPath.item].roomId ?? 0
-        destVC.userId = listArray[indexPath.item].user?.id ?? 0
-        destVC.name = listArray[indexPath.item].user?.name ?? ""
-        destVC.profileImg = listArray[indexPath.item].user?.profile ?? ""
-        destVC.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(destVC, animated: true)
-    }
-    */
-    
-    func tableView(_ tableView: UITableView,
-                   shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
-        return true
-    }
+
+
     func tableView(_ tableView: UITableView,
                    editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
 
         return tableView.isEditing ? .none : .delete
     }
     
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
 
-        if tableView.isEditing {
-            selectedIndexPaths.removeAll { $0 == indexPath }
-        }
-    }
+    /*  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+          listArray[indexPath.item].readAt = listArray[indexPath.item].updatedAt
+          self.tblView.reloadData()
+          let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+          destVC.item_offer_id = listArray[indexPath.item].roomId ?? 0
+          destVC.userId = listArray[indexPath.item].user?.id ?? 0
+          destVC.name = listArray[indexPath.item].user?.name ?? ""
+          destVC.profileImg = listArray[indexPath.item].user?.profile ?? ""
+          destVC.hidesBottomBarWhenPushed = true
+          self.navigationController?.pushViewController(destVC, animated: true)
+      }
+      */
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        // DELETE MODE
-        if tableView.isEditing {
-
-            if selectedIndexPaths.count >= 5 &&
-                !selectedIndexPaths.contains(indexPath) {
-
-                tableView.deselectRow(at: indexPath, animated: true)
-
-                AlertView.sharedManager.showToast(message: "Maximum 5 chats allowed")
-                return
-            }
-
-            selectedIndexPaths.append(indexPath)
-
-            return
-        }
-
         // NORMAL OPEN CHAT
-        listArray[indexPath.item].readAt = listArray[indexPath.item].updatedAt
+        listArray[indexPath.item].readAt = listArray[indexPath.item].lastMessage?.updatedAt
 
         self.tblView.reloadData()
 
@@ -487,6 +361,7 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
 
         self.navigationController?.pushViewController(destVC, animated: true)
     }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
 
         if(scrollView.panGestureRecognizer.translation(in: scrollView.superview).y > 0) {
@@ -527,9 +402,66 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
     
 }
 
+extension ChatListVC{
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completionHandler) in
+            
+            self.deleteSelectedChatList(selIndex:indexPath.row)
 
+            // 1. Delete the item from your data model
+           // self.listArray.remove(at: indexPath.row)
+            
+            // 2. Delete the row from the TableView
+            //tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            // 3. Indicate the action was completed successfully
+            completionHandler(true)
+        }
+        
+        // Customize the color, image, or title as needed
+        deleteAction.backgroundColor = .systemRed
+        deleteAction.image = UIImage(systemName: "trash.fill")
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true // Optional: Delete on full swipe
+        return configuration
+    }
+    
+    
+    func deleteSelectedChatList(selIndex: Int) {
 
+        AlertView.sharedManager.presentAlertWith(
+            title: "Delete",
+            msg: "Are you sure want to delete selected chat?",
+            buttonTitles: ["Cancel","Delete"],
+            onController: self,
+            tintColor: .orange
+        ) { title, alertIndex in
 
+            if alertIndex == 1 {
+                guard selIndex < self.listArray.count else { return }
+                let obj = self.listArray[selIndex]
+                self.emitDeleteSocket(selObj: obj, index: selIndex)
+            }
+        }
+    }
+
+    
+    func emitDeleteSocket(selObj: ChatList, index: Int) {
+
+        let params = ["room_ids": [selObj.roomId ?? 0]] as [String: Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.deleteChatList.rawValue, params)
+
+        guard index < listArray.count else { return }
+
+        listArray.remove(at: index)
+
+        tblView.performBatchUpdates({
+            tblView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+        })
+    }
+
+}
 
 //MARK:
 extension ChatListVC: UIGestureRecognizerDelegate {

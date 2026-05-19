@@ -87,7 +87,7 @@ struct ChatList: Codable {
     let updatedAt: String?
     let userBlocked: Bool?
     var lastMessage:LastMessage?
-    let unreadCount:Int?
+    var unreadCount:Int?
     var readAt:String?
     let user:ChatUser?
     let roomId:Int?

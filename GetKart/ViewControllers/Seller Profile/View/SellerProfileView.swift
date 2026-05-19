@@ -290,7 +290,7 @@ extension SellerProfileView {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Follow")
-                        .font(.inter(.medium, size: 14))
+                        .font(.inter(.semiBold, size: 14))
                         .foregroundColor(.primary.opacity(0.8))
                     
                     Text("\(objVM.sellerObj?.followingCount ?? 0)")
@@ -313,7 +313,7 @@ extension SellerProfileView {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Followers")
-                        .font(.inter(.medium, size: 14))
+                        .font(.inter(.semiBold, size: 14))
                         .foregroundColor(.primary.opacity(0.8))
                     
                     Text(formatCount(objVM.sellerObj?.followersCount ?? 0))

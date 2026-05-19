@@ -44,7 +44,7 @@ struct FollowerListView: View {
                     .frame(width: 40, height: 40)
                     
                     Text(isFollower ? "Followers" : "Follow")
-                        .font(.custom("Manrope-Bold", size: 18))
+                        .font(.inter(.medium, size: 18))
                         .foregroundColor(Color(UIColor.label))
                     
                     Spacer()
@@ -90,6 +90,23 @@ struct FollowerListView: View {
                         
                         Divider()
                             .padding(.leading, 76)
+                    }
+                    
+                    if followerVM.usersArray.count == 0 {
+                        
+                        HStack{
+                            Spacer()
+                            
+                            VStack(spacing: 30){
+                                Spacer(minLength: 100)
+                                Image("no_data_found_illustrator").frame(width: 150,height: 150).padding()
+                                Text("No Data Found").foregroundColor(.orange).font(Font.manrope(.medium, size: 20.0)).padding()
+                                Spacer()
+                            }
+                            Spacer()
+                        }
+                    }else{
+                        Spacer()
                     }
                 }
             }
