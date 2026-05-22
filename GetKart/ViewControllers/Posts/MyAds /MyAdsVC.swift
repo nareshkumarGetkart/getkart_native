@@ -433,92 +433,92 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-      //  if apiStatus == "banner details"{
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "BannerDetailTblCell") as? BannerDetailTblCell else { return UITableViewCell() }
-            
-            let obj = userBannerArray[indexPath.row]
+        //  if apiStatus == "banner details"{
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "BannerDetailTblCell") as? BannerDetailTblCell else { return UITableViewCell() }
+        
+        let obj = userBannerArray[indexPath.row]
         if let img = obj.thumbnail,img.count>0{
             cell.imgVwBanner.kf.setImage(with:  URL(string: img) , placeholder:UIImage(named: "getkartplaceholder"))
         }else{
             cell.imgVwBanner.kf.setImage(with:  URL(string: obj.imagePath ?? "") , placeholder:UIImage(named: "getkartplaceholder"))
         }
+        
+        /* if (obj.isActive ?? 0) == 1{
+         cell.lblStatus.text = "Active"
+         cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+         
+         }else{
+         cell.lblStatus.text = obj.status?.capitalized ?? ""
+         cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+         
+         }
+         */
+        if obj.isActive == 1{
+            cell.bgViewStatus.isHidden = true
+            cell.bgViewActiveStatus.isHidden = false
+            cell.bgViewActiveStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
             
-           /* if (obj.isActive ?? 0) == 1{
-                cell.lblStatus.text = "Active"
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
-
-            }else{
-                cell.lblStatus.text = obj.status?.capitalized ?? ""
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-
-            }
-            */
-            if obj.isActive == 1{
-                cell.bgViewStatus.isHidden = true
-                cell.bgViewActiveStatus.isHidden = false
-                cell.bgViewActiveStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
-
-            }else{
-                cell.bgViewStatus.isHidden = false
-                cell.bgViewActiveStatus.isHidden = true
-            }
-            cell.lblStatus.text = obj.status?.capitalized ?? ""
-
-            switch obj.status ?? ""{
-                
-            case "approved", "completed":
-                cell.lblStatus.textColor = UIColor(hexString: "#32b983")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
-                break
-
-            case "rejected":
-                cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
-                break
-                
-            case "inactive":
-                cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
-                break
-            case "review":
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-                cell.lblStatus.text = "Under review"
-                break
-                
-            case "sold out":
-                cell.lblStatus.textColor = UIColor(hexString: "#ffbb34")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#fff8eb")
-                break
-           
-            case "draft","pending":
-                cell.lblStatus.textColor = UIColor(hexString: "#3e4c63")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-            case "expired":
-               // cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
-                cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
-                break
-
-            default:
-                break
-            }
+        }else{
+            cell.bgViewStatus.isHidden = false
+            cell.bgViewActiveStatus.isHidden = true
+        }
+        cell.lblStatus.text = obj.status?.capitalized ?? ""
+        
+        switch obj.status ?? ""{
             
+        case "approved", "completed":
+            cell.lblStatus.textColor = UIColor(hexString: "#32b983")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e5f7e7")
+            break
             
-            cell.lblViewCount.text = "Views: \(obj.analyticsSummary?.totalUniqueViews ?? "")"
-            cell.lblLikeCount.text = "No. of Click: \(obj.analyticsSummary?.totalClicks ?? "")"
-
-            DispatchQueue.main.async {
-                cell.bgView.roundCorners(corners: [.topRight,.bottomRight,.topLeft,.bottomLeft], radius: 10)
-                cell.bgView.layer.borderColor = UIColor.separator.cgColor
-                cell.bgView.layer.borderWidth = 0.5
-                cell.bgView.clipsToBounds = true
-            }
-            return cell
+        case "rejected":
+            cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
             
-//        }
-//        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as? AdsTblCell else { return UITableViewCell() }
-//        cell.configureTblCellData(itemObj: listArray[indexPath.item])
-//        
-//        return cell
+        case "inactive":
+            cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#ffe5e6")
+            break
+        case "review":
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            cell.lblStatus.text = "Under review"
+            break
+            
+        case "sold out":
+            cell.lblStatus.textColor = UIColor(hexString: "#ffbb34")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#fff8eb")
+            break
+            
+        case "draft","pending":
+            cell.lblStatus.textColor = UIColor(hexString: "#3e4c63")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+        case "expired":
+            // cell.lblStatus.textColor = UIColor(hexString: "#fe0002")
+            cell.bgViewStatus.backgroundColor = UIColor(hexString: "#e6eef5")
+            break
+            
+        default:
+            break
+        }
+        
+        
+        cell.lblViewCount.text = "Views: \(obj.analyticsSummary?.totalUniqueViews ?? "")"
+        cell.lblLikeCount.text = "No. of Clicks: \(obj.analyticsSummary?.totalClicks ?? "")"
+        
+        DispatchQueue.main.async {
+            cell.bgView.roundCorners(corners: [.topRight,.bottomRight,.topLeft,.bottomLeft], radius: 10)
+            cell.bgView.layer.borderColor = UIColor.separator.cgColor
+            cell.bgView.layer.borderWidth = 0.5
+            cell.bgView.clipsToBounds = true
+        }
+        return cell
+        
+        //        }
+        //        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AdsTblCell") as? AdsTblCell else { return UITableViewCell() }
+        //        cell.configureTblCellData(itemObj: listArray[indexPath.item])
+        //
+        //        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

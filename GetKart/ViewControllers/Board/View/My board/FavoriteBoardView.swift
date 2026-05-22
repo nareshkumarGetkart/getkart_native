@@ -284,7 +284,7 @@ struct FavoriteBoardView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 5)
+                    .padding([.horizontal,.top], 5)
                     
                                     
                     //

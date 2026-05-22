@@ -64,7 +64,7 @@ final class SocketIOManager: NSObject {
         return "Bearer \(user.token ?? "")"
     }
 
-    func establishConnection() {
+   /* func establishConnection() {
         guard Local.shared.getUserId() > 0 else {
             print("User not logged in. Skipping socket connection.")
             return
@@ -87,7 +87,9 @@ final class SocketIOManager: NSObject {
             NotificationCenter.default.post(name: Notification.Name(SocketEvents.socketConnected.rawValue), object: nil)
             
             if Local.shared.getUserId() > 0{
-            self.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                    SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+                })
             // self.emitEvent(SocketEvents.onlineOfflineStatus.rawValue, ["user_id":Local.shared.getUserId()])
             }
         }
@@ -102,7 +104,49 @@ final class SocketIOManager: NSObject {
 
         socket.connect()
     }
+*/
+    
+    func establishConnection() {
 
+        guard Local.shared.getUserId() > 0 else { return }
+
+        if socket == nil {
+            initializeSocket()
+        }
+
+        guard let socket = socket else { return }
+
+        socket.removeAllHandlers()   // ✅ move here
+
+        socket.on(clientEvent: .connect) { [weak self] data, ack in
+            guard let self = self else { return }
+
+            print("Socket connected")
+
+            NotificationCenter.default.post(
+                name: Notification.Name(SocketEvents.socketConnected.rawValue),
+                object: nil
+            )
+
+          //  DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+          //  }
+        }
+
+        socket.on(clientEvent: .error) { data, ack in
+            print("Socket error: \(data)")
+        }
+
+        socket.on(clientEvent: .disconnect) { data, ack in
+            print("Socket disconnected: \(data)")
+        }
+
+        addListeners()
+
+        if socket.status != .connected && socket.status != .connecting {
+            socket.connect()
+        }
+    }
     func emitEvent(_ event: String, _ param: Dictionary<String, Any>) {
         guard AppDelegate.sharedInstance.isInternetConnected else {
             AlertView.sharedManager.showToast(message: "No internet connection")

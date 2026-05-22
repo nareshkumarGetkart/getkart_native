@@ -91,7 +91,10 @@ struct BannerPromotionsView: View {
                     Button {
                         pushToPreviewScreen()
                     } label: {
-                        Text("Preview Add")
+//                        Text("Preview Add")
+                        
+                        Text("How it works")
+
                             .font(.manrope(.semiBold, size: 18.0))
                             .foregroundColor(Color(hexString: "#FF9900"))
                             .padding(.trailing)
@@ -528,46 +531,52 @@ extension BannerPromotionsView {
     
     func pushToPreviewScreen() {
         
-        switch selectedMedia {
-            
-        case .image(let img):
-            
-            
-            do{
-                
         
-                let zoomCtrl = VKImageZoom()
-                zoomCtrl.image = img
-                zoomCtrl.modalPresentationStyle = .fullScreen
-                navigationController?.present(zoomCtrl, animated: true, completion: nil)
-            }
-            
-           /* let vc = UIHostingController(
-                rootView: PreviewAdView(
-                    navigationController: navigationController,
-                    image: img
-                )
-            )
-            
-            navigationController?.pushViewController(
-                vc,
-                animated: true
-            )
-            */
-        case .video(let url):
-            
-            let vc = UIHostingController(
-                rootView: VideoPreviewScreen(videoURL: url)
-            )
-            
-            navigationController?.pushViewController(
-                vc,
-                animated: true
-            )
-            
-        case .none:
-            break
+        if let url = URL(string: Constant.shared.BANNER_DEMO){
+            let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BANNER_DEMO))
+            self.navigationController?.pushViewController(vc, animated: true)
+
         }
+//        switch selectedMedia {
+//            
+//        case .image(let img):
+//            
+//            
+//            do{
+//                
+//        
+//                let zoomCtrl = VKImageZoom()
+//                zoomCtrl.image = img
+//                zoomCtrl.modalPresentationStyle = .fullScreen
+//                navigationController?.present(zoomCtrl, animated: true, completion: nil)
+//            }
+//            
+//           /* let vc = UIHostingController(
+//                rootView: PreviewAdView(
+//                    navigationController: navigationController,
+//                    image: img
+//                )
+//            )
+//            
+//            navigationController?.pushViewController(
+//                vc,
+//                animated: true
+//            )
+//            */
+//        case .video(let url):
+//            
+//            let vc = UIHostingController(
+//                rootView: VideoPreviewScreen(videoURL: url)
+//            )
+//            
+//            navigationController?.pushViewController(
+//                vc,
+//                animated: true
+//            )
+//            
+//        case .none:
+//            break
+//        }
     }
     
     func pushToLocationcreen() {

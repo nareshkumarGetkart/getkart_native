@@ -13,9 +13,11 @@ struct FollowerListView: View {
     var isFollower = true
     let userId: Int?
     var showHeader: Bool = true
+    @State private var isViewVisible = false
 
     @StateObject private var followerVM:FollowerViewModal
     @State private var isRommCreated: Bool = false
+    @State var selectedUser:UserModel?
     
     init(navController: UINavigationController?,
             isFollower: Bool = true,
@@ -64,6 +66,7 @@ struct FollowerListView: View {
                             onActionTap: {
                                 if isFollower {
                                     // Message action
+                                    selectedUser = user
                                     navigateToMessage(user: user)
                                 } else {
                                     // Follow / Unfollow action
@@ -118,15 +121,26 @@ struct FollowerListView: View {
 //                followerVM.getUserList()
 //            }
 //        }
+        .onAppear{
+            isViewVisible = true
+        }
+        .onDisappear{
+            isViewVisible = false
+            selectedUser = nil
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.createRoom.rawValue))) { notification in
             
             if isRommCreated == true{
                 return
             }
             
-            if navController?.topViewController is ChatVC {
+            if isViewVisible == false{
+                
                 return
             }
+//            if navController?.topViewController is ChatVC {
+//                return
+//            }
             
             guard let data = notification.userInfo else{
                 return
@@ -147,7 +161,8 @@ struct FollowerListView: View {
             else{
                 let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
                 destVC.item_offer_id = 0
-                destVC.userId = userId ?? 0
+                destVC.userId = selectedUser?.id ?? 0
+                destVC.profileImg =  selectedUser?.profile ?? ""
                 self.navController?.pushViewController(destVC, animated: true)
             }
             isRommCreated = true

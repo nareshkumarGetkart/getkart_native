@@ -15,7 +15,8 @@ struct SearchMessagedUserView: View{
     @StateObject private var searchService = ChatSearchVM(isGlobaSearch: false)
     @State private var debounceTimer: Timer? = nil
 
-  
+    @State private var isViewVisible = false
+
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -149,16 +150,24 @@ struct SearchMessagedUserView: View{
             }
         }
         .navigationBarHidden(true)
+        .onAppear{
+            isViewVisible = true
+        }
         .onDisappear {
+            isViewVisible = false
             searchService.cancel()
             debounceTimer?.invalidate()
             selectedUser = nil
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.createRoom.rawValue))) { notification in
             
-            if navigationController?.topViewController is ChatVC {
-                return
-            }
+            
+            //if navigationController?.topViewController is ChatVC {
+                
+                if isViewVisible == false{
+                    
+                    return
+                }
             
             guard let data = notification.userInfo else{
                 return

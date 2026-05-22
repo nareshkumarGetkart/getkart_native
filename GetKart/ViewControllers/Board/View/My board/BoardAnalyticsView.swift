@@ -198,7 +198,7 @@ struct BoardAnalyticsView: View {
                     
                     if (objAnalytics?.board?.boardType ?? 0) == 0 , let expiryDate = objAnalytics?.board?.expiryDate,expiryDate.count > 0{
                         HStack{
-                            Text("Expired On.").font(.inter(.medium, size: 16.0))
+                            Text("Expires On.").font(.inter(.medium, size: 16.0))
                             Text(expiryDate).font(.inter(.regular, size: 15.0))
                         }
                     }

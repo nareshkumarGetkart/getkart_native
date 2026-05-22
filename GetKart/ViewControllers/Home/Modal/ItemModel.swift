@@ -100,7 +100,7 @@ struct ItemModel: Codable,Identifiable {
     let package:Package?
     let ctaLabel:String?
     let ctaType:Int?
-    let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea 
+    let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea ,4 = image banner, 5 = video banner
     var commentsCount:Int?
     var lastComment:CommentModel?
     var postDuration:Int?

@@ -34,7 +34,7 @@ struct SellerProfileView: View {
 
     @State var showShareSheet = false
     @State var showOptionSheet = false
-
+    @State private var isViewVisible = false
     // Masonry heights
     @State private var itemHeights: [Int: CGFloat] = [:]
 
@@ -115,11 +115,14 @@ struct SellerProfileView: View {
         }
         .navigationBarHidden(true)
         .onAppear {
+            isViewVisible = true
             objVM.getSellerProfile(sellerId: userId, nav: navController)
 
             if objVM.getItems(for: selectedTab).isEmpty {
                 objVM.loadNextPage(tab: selectedTab)
             }
+        }.onDisappear{
+            isViewVisible = false
         }
         .onChange(of: selectedTab) { tab in
             if objVM.getItems(for: tab).isEmpty {
@@ -391,7 +394,11 @@ extension SellerProfileView {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(SocketEvents.createRoom.rawValue))) { notification in
             
             
-            if navController?.topViewController is ChatVC {
+//            if navController?.topViewController is ChatVC {
+//                return
+//            }
+            
+            if isViewVisible == false{
                 return
             }
             guard let data = notification.userInfo else{

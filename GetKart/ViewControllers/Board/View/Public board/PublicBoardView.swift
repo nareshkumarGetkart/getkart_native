@@ -1085,7 +1085,7 @@ struct ProductCardStaggered: View {
                                         .font(.inter(.medium, size: 11))
                                         .foregroundColor(.black)
                                     Image("upRight").renderingMode(.template)
-                                        .foregroundColor(Color(UIColor.label))
+                                        .foregroundColor(.black)
                                 }
                             }.padding(.vertical, 3)
                                 .padding(.horizontal, 8)
@@ -1100,7 +1100,6 @@ struct ProductCardStaggered: View {
             
             HStack(spacing:12) {
                 if (product.user?.id ?? 0) == Local.shared.getUserId(){
-                   // Spacer()
                     
                 }else{
                         
@@ -1130,46 +1129,23 @@ struct ProductCardStaggered: View {
                         }
                        
                     }
-//                    Spacer()
-                
-                
-                //
-                
-              //  if (product.commentsCount ?? 0) > 0{
-                    //                    Button {
-                    //
-                    //                    } label: {
+
                     HStack(spacing:3){
                         Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
                         if (product.commentsCount ?? 0) > 0{
                             Text("\((product.commentsCount ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
                         }
                     }
-                    //}
                     
-              //  }
-            
-                
-               
                     HStack(spacing:3){
                         Image("eye").renderingMode(.template).foregroundColor(Color(.label))
                         if (product.impressions ?? 0) > 0{
                             Text("\((product.impressions ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
                         }
                     }
-              //  }
-                
-                
-                //
-                
+            
                 Spacer()
 
-              /*
-                if (product.isFeature ?? false) {
-                    Text("Sponsored")
-                        .font(.inter(.medium, size: 11)).lineLimit(1)
-                        .foregroundColor(Color(.gray))
-                }*/
             } .padding(.horizontal,4)
             
             

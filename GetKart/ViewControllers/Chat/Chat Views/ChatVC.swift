@@ -72,14 +72,26 @@ class ChatVC: UIViewController {
     var userId = 0
 
     
-    var typingTimer: Timer?
-    var isTyping = false
-    var typingOtherTimer: Timer?
+//    var typingTimer: Timer?
+//    var isTyping = false
+//    var typingOtherTimer: Timer?
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
     var mobileNumber = ""
+    
+    
+    private var typingSendTimer: Timer?
+    private var typingReceiveTimer: Timer?
 
+    private var isTyping = false
+
+
+    private let typingTimeout: TimeInterval = 3.0
+    private var stopTypingWorkItem: DispatchWorkItem?
+    private var typingHeartbeatTimer: Timer?
+    private var lastTypingReceivedAt: Date?
+    private var typingMonitorTimer: Timer?
     
     //MARK: Controller life cycle methods
     override func viewDidLoad() {
@@ -155,13 +167,27 @@ class ChatVC: UIViewController {
         }
     }
     
+//    override func viewWillDisappear(_ animated: Bool) {
+//        self.view.endEditing(true)
+//        IQKeyboardManager.shared.isEnabled = true
+//        self.sendtypinStatus(status: false)
+//        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+//    }
+   
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
         self.view.endEditing(true)
+
         IQKeyboardManager.shared.isEnabled = true
-        self.sendtypinStatus(status: false)
-        SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
+
+        stopTyping()
+
+        SocketIOManager.sharedInstance.emitEvent(
+            SocketEvents.chatUnreadCount.rawValue,
+            [:]
+        )
     }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
@@ -170,10 +196,9 @@ class ChatVC: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        typingTimer?.invalidate()
-        typingOtherTimer?.invalidate()
+        typingSendTimer?.invalidate()
+        typingReceiveTimer?.invalidate()
     }
-    
     
     
     
@@ -270,6 +295,7 @@ class ChatVC: UIViewController {
         }else{
             
             if (textView.text?.count ?? 0) > 0{
+                stopTyping()
                 self.sendMessageList(msg: textView.text ?? "", msgType: "text")
                 self.textView.text = ""
             }
@@ -871,31 +897,28 @@ class ChatVC: UIViewController {
     }
     
     
-    @objc func typingStatus(notification: Notification) {
-        guard let data = notification.userInfo else{
-            return
-        }
-        
-        if let dataDict = data["data"] as? Dictionary<String,Any>{
-            
-            let typing = dataDict["typing"] as? Int ?? 0
-            let item_offer_id =  dataDict["room_id"] as? Int ?? 0
-           // let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
-            
-            if self.item_offer_id == item_offer_id {
-                self.lblTypingStatus.isHidden = (typing == 1) ? false : true
-                typingOtherTimer?.invalidate()
-                typingOtherTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
-                    self?.lblTypingStatus.isHidden = true
-                    self?.typingOtherTimer?.invalidate()
-                 }
-            }
-            
-        }
-    }
-
-    
-    
+//    @objc func typingStatus(notification: Notification) {
+//        guard let data = notification.userInfo else{
+//            return
+//        }
+//        
+//        if let dataDict = data["data"] as? Dictionary<String,Any>{
+//            
+//            let typing = dataDict["typing"] as? Int ?? 0
+//            let item_offer_id =  dataDict["room_id"] as? Int ?? 0
+//           // let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
+//            
+//            if self.item_offer_id == item_offer_id {
+//                self.lblTypingStatus.isHidden = (typing == 1) ? false : true
+//                typingOtherTimer?.invalidate()
+//                typingOtherTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
+//                    self?.lblTypingStatus.isHidden = true
+//                    self?.typingOtherTimer?.invalidate()
+//                 }
+//            }
+//            
+//        }
+//    }
     func chatDeleteInfo(invalidatedAt: String) -> String? {
         
         let formatter = DateFormatter()
@@ -1246,30 +1269,6 @@ class ChatVC: UIViewController {
 
 extension ChatVC: GrowingTextViewDelegate {
     
-    /* func growingTextView(_ growingTextView: GrowingTextView,
-                         willChangeHeight height: CGFloat,
-                         difference: CGFloat) {
-
-        if abs(difference) < 1 { return }
-
-        let newHeight = min(height + 38, 160)
-
-        if abs(inputBarHeight.constant - newHeight) < 1 { return }
-
-        inputBarHeight.constant = newHeight
-
-        UIView.performWithoutAnimation {
-            self.view.layoutIfNeeded()
-        }
-    }*/
-    
-   /* func growingTextView(_ growingTextView: GrowingTextView, willChangeHeight height: CGFloat, difference: CGFloat) {
-        print("Height Will Change To: \(height)  Diff: \(difference)")
-
-        inputBarHeight.constant =  height + 38
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-    }*/
 
     func growingTextView(_ growingTextView: GrowingTextView,
                          didChangeHeight height: CGFloat,
@@ -1284,95 +1283,177 @@ extension ChatVC: GrowingTextViewDelegate {
         UIView.performWithoutAnimation {
             self.view.layoutIfNeeded()
         }
-    }
-
-    func growingTextViewShouldReturn(_ growingTextView: GrowingTextView) -> Bool {
-       /* guard let text = growingTextView.text, !text.isEmpty else {
-            return false
-        }
-        messages.append(text)
-        textView.text = nil
-        tblView.beginUpdates()
-        tblView.insertRows(at: [IndexPath(row: messages.count, section: 0)], with: .none)
-        tblView.endUpdates()
-        scrollToBottom(animated: true)*/
-        return false
+        
+        
     }
     
     func growingTextView(_ growingTextView: GrowingTextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
-       
-        userIsTyping(text: text)
-
-        /*
-               if !isTyping {
-                    isTyping = true
-                  self.sendtypinStatus(status: true)
-                }
-                resetTypingTimer()
-        */
-      
+        
+        
+        userIsTyping()
+        
+        
         return true
     }
     
-    
-    
-    func userIsTyping(text: String) {
-       /* if !isTyping {
-            isTyping = true
-            self.sendtypinStatus(status: true)
-            
-            
-            // Reset the timer
-            typingTimer?.invalidate()
-            typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
-                guard let self = self else { return }
-                self.isTyping = false
-                self.sendtypinStatus(status: false)
-            }
-        }*/
- 
-
-        typingTimer?.invalidate()
-
-        if !isTyping {
-            isTyping = true
-            sendtypinStatus(status: true)
-        }
-
-        typingTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
-            guard let self = self else { return }
-            self.isTyping = false
-            self.sendtypinStatus(status: false)
-        }
-    }
-
-  
-//    
-//    func resetTypingTimer() {
-//         typingTimer?.invalidate()
-//         typingTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
-//             self?.userStoppedTyping()
-//         }
-//     }
-//
-//     func userStoppedTyping() {
-//         if isTyping {
-//             isTyping = false
-//             self.sendtypinStatus(status: false)
-//         }
-//     }
-
     func growingTextViewDidBeginEditing(_ growingTextView: GrowingTextView) {
-      //  self.sendtypinStatus(status: true)
         
     }
    
     func growingTextViewDidEndEditing(_ growingTextView: GrowingTextView) {
-      // self.sendtypinStatus(status: false)
+
+        stopTyping()
+    }
+    
+    func growingTextViewShouldReturn(_ growingTextView: GrowingTextView) -> Bool {
+     
+        return false
+    }
+    
+   
+    func userIsTyping() {
+
+        if !isTyping {
+
+            isTyping = true
+
+            sendtypinStatus(status: true)
+
+            startTypingHeartbeat()
+        }
+
+        stopTypingWorkItem?.cancel()
+
+        let workItem = DispatchWorkItem { [weak self] in
+
+            self?.stopTyping()
+        }
+
+        stopTypingWorkItem = workItem
+
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + 3,
+            execute: workItem
+        )
+    }
+  
+    func startTypingHeartbeat() {
+
+        typingHeartbeatTimer?.invalidate()
+
+        typingHeartbeatTimer = Timer.scheduledTimer(
+            withTimeInterval: 2,
+            repeats: true
+        ) { [weak self] _ in
+
+            guard let self = self else { return }
+
+            if self.isTyping {
+
+                self.sendtypinStatus(status: true)
+            }
+        }
+
+        RunLoop.main.add(
+            typingHeartbeatTimer!,
+            forMode: .common
+        )
+    }
+    
+    func stopTyping() {
+
+        guard isTyping else { return }
+
+        isTyping = false
+
+        stopTypingWorkItem?.cancel()
+
+        typingHeartbeatTimer?.invalidate()
+        typingHeartbeatTimer = nil
+
+        sendtypinStatus(status: false)
+    }
+    
+    @objc func typingStatus(notification: Notification) {
+
+        guard let data = notification.userInfo,
+              let dataDict = data["data"] as? [String: Any]
+        else {
+            return
+        }
+
+        let typing = dataDict["typing"] as? Int ?? 0
+        let roomId = dataDict["room_id"] as? Int ?? 0
+
+        guard roomId == self.item_offer_id else {
+            return
+        }
+
+        DispatchQueue.main.async {
+
+            if typing == 1 {
+
+                self.lblTypingStatus.isHidden = false
+
+                self.lastTypingReceivedAt = Date()
+
+                self.startTypingMonitor()
+
+            } else {
+
+                self.hideTypingIndicator()
+            }
+        }
     }
     
     
-   
+    func startTypingMonitor() {
+
+        if typingMonitorTimer != nil {
+            return
+        }
+
+        typingMonitorTimer = Timer.scheduledTimer(
+            withTimeInterval: 1,
+            repeats: true
+        ) { [weak self] timer in
+
+            guard let self = self else {
+
+                timer.invalidate()
+                return
+            }
+
+            guard let lastTyping = self.lastTypingReceivedAt else {
+
+                self.hideTypingIndicator()
+                return
+            }
+
+            let diff = Date().timeIntervalSince(lastTyping)
+
+            if diff > 4 {
+
+                self.hideTypingIndicator()
+            }
+        }
+
+        RunLoop.main.add(
+            typingMonitorTimer!,
+            forMode: .common
+        )
+    }
+    
+    func hideTypingIndicator() {
+
+        lblTypingStatus.isHidden = true
+
+        lastTypingReceivedAt = nil
+
+        typingMonitorTimer?.invalidate()
+        typingMonitorTimer = nil
+    }
+    
 }
 
 

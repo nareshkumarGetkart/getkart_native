@@ -53,7 +53,8 @@ final class Constant: NSObject {
     
    let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
-  
+   let BANNER_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/settings/getkart-Tutorial.gif"
+
     
     
     var payuSuccessURL:String {
@@ -330,9 +331,9 @@ final class Constant: NSObject {
     
     var  get_public_board:String {
         get {
-           return "\(baseURL)/v1/get-public-board"
+          // return "\(baseURL)/v1/get-public-board"
             
-           //return "\(baseURL)/v2/get-public-board"
+           return "\(baseURL)/v2/get-public-board"
 
             
         }
@@ -1124,13 +1125,9 @@ class ShareMedia{
     
     static var profileUrl = "https://getkart.com/seller/"
     static var itemUrl = "https://getkart.com/product-details/"
-
     static var boardUrl = "https://getkart.com/board/"
-
-    
   
-    
-    static func shareMediafrom(type:MediaShareType,mediaId:String,controller:UIViewController){
+        static func shareMediafrom(type:MediaShareType,mediaId:String,controller:UIViewController){
         
         var baseUrl =  "https://getkart.com"
       

@@ -530,33 +530,22 @@ struct BoardHomeView: View {
         FaceBookAppEvents.facebookEvents(type: .board, categoryName: selectedName)
         SocketIOManager.sharedInstance.checkSocketStatus()
         
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
+       /* NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                 SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
             })
-        }
+        }*/
     }
 }
 
-// MARK: - BoardListViewNew (Memory Optimized)
-// Key fixes:
-// 1. videoFrames is now a class-backed store (FrameStore) so it doesn't
-//    trigger full body re-renders on every geometry change.
-// 2. visibilityWorkItem cancellation uses a class wrapper to avoid State churn.
-// 3. .onDisappear removes frames eagerly to release geometry memory.
-
 struct BoardListViewNew: View {
+    
     let tabBarController: UITabBarController?
     @ObservedObject var vm: BoardViewModelNew
     let navigationController: UINavigationController?
     let isActive: Bool
-
     @State private var paymentGateway: PaymentGatewayCentralized?
-    // ─── MEMORY FIX ───────────────────────────────────────────────────────────
-    // FrameStore is a reference type — mutations don't trigger SwiftUI diffing
-    // on the parent view, preventing cascade re-renders during scroll.
     @StateObject private var frameStore = FrameStore()
-    // ──────────────────────────────────────────────────────────────────────────
     @State private var safariURL: URL?
 
     var body: some View {
@@ -572,17 +561,30 @@ struct BoardListViewNew: View {
                     emptyView.padding(.top, 100)
                     
                 } else {
+//                    PinterestMasonryFeed(
+//                        items: vm.items,
+//                        spacing: 6,
+//                        itemView: { item in (itemCellView(item: item) },
+//                        onLastItemAppear: {
+//                            guard !vm.isLoading, !vm.isLastPage else { return }
+//                            vm.tryLoadNextPage()
+//                        }, onOpenURL: {url in
+//                            safariURL = url
+//                        }
+//                    )
+                    
+                    
                     PinterestMasonryFeed(
                         items: vm.items,
                         spacing: 6,
-                        itemView: { item in AnyView(itemCellView(item: item)) },
+                        itemView: { item in itemCellView(item: item) },  // no AnyView wrapper
                         onLastItemAppear: {
                             guard !vm.isLoading, !vm.isLastPage else { return }
                             vm.tryLoadNextPage()
-                        }, onOpenURL: {url in
-                            safariURL = url
-                        }
+                        },
+                        onOpenURL: { url in safariURL = url }
                     )
+                    
                     .padding(.horizontal, 5)
                     .transaction { t in
                         t.animation = nil
@@ -648,14 +650,13 @@ struct BoardListViewNew: View {
                     frameStore.removeAll()
                 }
             }
+            
             .onReceive( NotificationCenter.default.publisher(
                                 for: UIApplication.didReceiveMemoryWarningNotification
                             )
                         ) { _ in
                             ImageCache.default.clearMemoryCache()
                             KingfisherManager.shared.downloader.cancelAll()
-                            // pauseAndSuspendAll() pauses without destroying players that
-                            // SmartVideoPlayerView still holds a strong reference to.
                             FeedVideoManager.shared.pauseAndSuspendAll()
                             frameStore.removeAll()
                             VideoPreloadManagerDefault.shared.cancelAll()
@@ -694,10 +695,8 @@ struct BoardListViewNew: View {
             )
             .onAppear { prefetchNextVideos(from: item) }
             .onDisappear {
-                // ─── MEMORY FIX: eagerly remove frame ───────────────────────
                 frameStore.remove(id: item.id ?? 0)
                 FeedVideoManager.shared.pause(id: item.id ?? 0)
-               // FeedVideoManager.shared.remove(id: item.id ?? 0)
             }
         } else {
             CardItemViewNew(
@@ -775,11 +774,6 @@ struct BoardListViewNew: View {
     }    
 }
 
-
-// MARK: - FrameStore (Reference-type geometry tracker)
-// Using a class prevents every geometry change from triggering a SwiftUI
-// re-render of the parent BoardListViewNew body. Mutations are silent.
-
 final class FrameStore: ObservableObject {
 
     private var frames: [Int: CGRect] = [:]
@@ -822,16 +816,8 @@ final class FrameStore: ObservableObject {
 
         FeedVideoManager.shared.updatePlayback(visibleIDs: visible)
     }
-    
-   
 }
 
-
-// MARK: - Segment model
-// A "segment" is either a full-width banner item, or a chunk of normal
-// (non-banner) items that get rendered as two staggered Pinterest columns.
-// This is what lets us keep the original two-LazyVStack stagger while
-// still supporting banners that break the columns at any position.
 
 enum FeedSegment: Identifiable {
     case banner(ItemModel)
@@ -848,21 +834,430 @@ enum FeedSegment: Identifiable {
     }
 }
 
+struct PinterestMasonryFeed<ItemContent: View>: View {
 
+    let items:            [ItemModel]
+    var spacing:          CGFloat = 6
+    let itemView:         (ItemModel) -> ItemContent
+    let onLastItemAppear: () -> Void
+    let onOpenURL:        (URL) -> Void
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - PinterestMasonryFeed
-//
-// Segments items at every banner (boardType==4) boundary.
-// Each non-banner segment is laid out by TwoColumnMasonryLayout — a custom
-// Layout that places items one-by-one into the shorter column, so:
-//
-//   • Each item keeps its own natural height  → true Pinterest stagger ✓
-//   • Container height == taller column only  → banner sits flush, zero gap ✓
-//
-// Pagination fires via onLastItemAppear on the last non-banner item.
-// ─────────────────────────────────────────────────────────────────────────────
+    @State private var lastTriggeredItemId: Int?
+    private let paginationThreshold = 8
+    private let chunkSize = 10
 
+    // MARK: - Segment Model
+
+    private enum Segment: Identifiable {
+        case chunk([ItemModel])           // ✅ raw chunk, TwoColumnMasonryLayout handles placement
+        case banner(ItemModel)
+        case paginationTrigger(itemId: Int)
+
+        var id: String {
+            switch self {
+            case .chunk(let items):
+                return "chunk-\(items.first?.id ?? 0)-\(items.last?.id ?? 0)"
+            case .banner(let i):
+                return "ban-\(i.id ?? 0)"
+            case .paginationTrigger(let id):
+                return "page-trigger-\(id)"
+            }
+        }
+    }
+
+    // MARK: - Segment Builder
+
+    private var segments: [Segment] {
+        var result: [Segment]   = []
+        var buffer: [ItemModel] = []
+
+        let triggerItemId: Int? = {
+            guard items.count >= paginationThreshold else { return nil }
+            return items[items.count - paginationThreshold].id
+        }()
+
+        func flush() {
+            guard !buffer.isEmpty else { return }
+            var i = 0
+            while i < buffer.count {
+                let chunk = Array(buffer[i..<min(i + chunkSize, buffer.count)])
+                result.append(.chunk(chunk))
+
+                // ✅ Insert pagination trigger after chunk that contains trigger item
+                let chunkIds = chunk.compactMap { $0.id }
+                if let tid = triggerItemId, chunkIds.contains(tid) {
+                    result.append(.paginationTrigger(itemId: tid))
+                }
+
+                i += chunkSize
+            }
+            buffer.removeAll()
+        }
+
+        for item in items {
+            if item.boardType == 4 || item.boardType == 5 {
+                flush()
+                result.append(.banner(item))
+            } else {
+                buffer.append(item)
+            }
+        }
+        flush()
+        return result
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        LazyVStack(spacing: spacing) {
+            ForEach(segments) { segment in
+                switch segment {
+
+                case .banner(let item):
+                    bannerView(item: item)
+                        .frame(maxWidth: .infinity)
+
+                case .chunk(let chunkItems):
+                    // ✅ TwoColumnMasonryLayout: true stagger, column heights tracked,
+                    //    only max 10 items per chunk so no memory pressure
+                    TwoColumnMasonryLayout(
+                        spacing: spacing,
+                        shouldEqualizeBottom: isBannerNext(after: chunkItems)
+                    ) {
+                        ForEach(chunkItems, id: \.id) { item in
+                            itemView(item)
+                        }
+                    }
+
+                case .paginationTrigger(let triggerItemId):
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            guard lastTriggeredItemId != triggerItemId else { return }
+                            lastTriggeredItemId = triggerItemId
+                            onLastItemAppear()
+                        }
+                }
+            }
+            
+            Color.clear.frame(height: 1)
+                            .id("bottom-\(items.count)")  // ✅ id changes with each page load
+                            .onAppear {
+                                guard !items.isEmpty else { return }
+                                guard lastTriggeredItemId != -items.count else { return }
+                                lastTriggeredItemId = -items.count  // negative so no clash with item ids
+                                onLastItemAppear()
+                            }
+        }
+        .onChange(of: items.count) { _ in
+            lastTriggeredItemId = nil
+        }
+    }
+
+    // MARK: - Helpers
+
+    // ✅ Equalize bottom only when next segment is a banner — removes gap
+    private func isBannerNext(after chunkItems: [ItemModel]) -> Bool {
+        guard let lastId = chunkItems.last?.id else { return false }
+        guard let lastIndex = items.firstIndex(where: { $0.id == lastId }) else { return false }
+        let nextIndex = lastIndex + 1
+        guard nextIndex < items.count else { return false }
+        return items[nextIndex].boardType == 4 || items[nextIndex].boardType == 5
+    }
+
+    // MARK: - Banner View
+
+    @ViewBuilder
+    private func bannerView(item: ItemModel) -> some View {
+        if item.boardType == 5 {
+            BoardVideoBannerCard(product: item) { url in onOpenURL(url) }
+        } else {
+            BoardBannerCard(product: item) { url in onOpenURL(url) }
+        }
+    }
+}
+/*
+struct PinterestMasonryFeed<ItemContent: View>: View {
+
+    let items:            [ItemModel]
+    var spacing:          CGFloat = 6
+    let itemView:         (ItemModel) -> ItemContent
+    let onLastItemAppear: () -> Void
+    let onOpenURL:        (URL) -> Void
+
+    @State private var lastTriggeredItemId: Int?
+    private let paginationThreshold = 8
+    private let chunkSize = 10
+
+    // MARK: - Segment Model
+
+    private enum Segment: Identifiable {
+        case columns(left: [ItemModel], right: [ItemModel])
+        case banner(ItemModel)
+        case paginationTrigger(itemId: Int)  // ✅ dedicated segment type
+
+        var id: String {
+            switch self {
+            case .columns(let l, let r):
+                return "col-\(l.first?.id ?? 0)-\(r.first?.id ?? 0)"
+            case .banner(let i):
+                return "ban-\(i.id ?? 0)"
+            case .paginationTrigger(let id):
+                return "page-trigger-\(id)"
+            }
+        }
+    }
+
+    // MARK: - Segment Builder
+    // ✅ Pagination trigger is injected as its own segment so LazyVStack
+    //    only renders it when it actually scrolls into view
+
+    private var segments: [Segment] {
+        var result:  [Segment]   = []
+        var buffer:  [ItemModel] = []
+        var allNonBannerItems:   [ItemModel] = items.filter {
+            $0.boardType != 4 && $0.boardType != 5
+        }
+
+        // Find the trigger item id (paginationThreshold from end of ALL items)
+        let triggerItemId: Int? = {
+            guard items.count >= paginationThreshold else { return nil }
+            return items[items.count - paginationThreshold].id
+        }()
+
+        func flush(isLast: Bool = false) {
+            guard !buffer.isEmpty else { return }
+            var i = 0
+            while i < buffer.count {
+                let chunk = Array(buffer[i..<min(i + chunkSize, buffer.count)])
+                var left:  [ItemModel] = []
+                var right: [ItemModel] = []
+                for (idx, item) in chunk.enumerated() {
+                    if idx % 2 == 0 { left.append(item) } else { right.append(item) }
+                }
+                result.append(.columns(left: left, right: right))
+
+                // ✅ After the chunk that contains the trigger item,
+                //    insert the pagination trigger as its own lazy row
+                let chunkIds = chunk.compactMap { $0.id }
+                if let tid = triggerItemId, chunkIds.contains(tid) {
+                    result.append(.paginationTrigger(itemId: tid))
+                }
+
+                i += chunkSize
+            }
+            buffer.removeAll()
+        }
+
+        for item in items {
+            if item.boardType == 4 || item.boardType == 5 {
+                flush()
+                result.append(.banner(item))
+            } else {
+                buffer.append(item)
+            }
+        }
+        flush(isLast: true)
+        return result
+    }
+
+    private var columnWidth: CGFloat {
+        (UIScreen.main.bounds.width - 10 - spacing) / 2
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        LazyVStack(spacing: spacing) {
+            ForEach(segments) { segment in
+                switch segment {
+
+                case .banner(let item):
+                    bannerView(item: item)
+                        .frame(maxWidth: .infinity)
+
+                case .columns(let left, let right):
+                    HStack(alignment: .top, spacing: spacing) {
+                        VStack(spacing: spacing) {
+                            ForEach(left, id: \.id) { item in
+                                itemView(item)
+                                    .frame(width: columnWidth)
+                            }
+                        }
+                        .frame(width: columnWidth, alignment: .top)
+
+                        VStack(spacing: spacing) {
+                            ForEach(right, id: \.id) { item in
+                                itemView(item)
+                                    .frame(width: columnWidth)
+                            }
+                        }
+                        .frame(width: columnWidth, alignment: .top)
+
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                // ✅ This row only enters the view tree when LazyVStack
+                //    scrolls to it — guaranteed to fire onAppear at the right time
+                case .paginationTrigger(let triggerItemId):
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            guard lastTriggeredItemId != triggerItemId else { return }
+                            lastTriggeredItemId = triggerItemId
+                            print("✅ Pagination triggered at item: \(triggerItemId)")
+                            onLastItemAppear()
+                        }
+                }
+            }
+        }
+        .onChange(of: items.count) { _ in
+            lastTriggeredItemId = nil
+        }
+    }
+
+    // MARK: - Banner View
+
+    @ViewBuilder
+    private func bannerView(item: ItemModel) -> some View {
+        if item.boardType == 5 {
+            BoardVideoBannerCard(product: item) { url in onOpenURL(url) }
+        } else {
+            BoardBannerCard(product: item) { url in onOpenURL(url) }
+        }
+    }
+}
+*/
+/*struct PinterestMasonryFeed<ItemContent: View>: View {
+    let items:            [ItemModel]
+    var spacing:          CGFloat = 6
+    let itemView:         (ItemModel) -> ItemContent
+    let onLastItemAppear: () -> Void
+    let onOpenURL:        (URL) -> Void
+
+    @State private var lastTriggeredItemId: Int?
+    private let paginationThreshold = 5
+
+    private enum Segment: Identifiable {
+        case columns(left: [ItemModel], right: [ItemModel])
+        case banner(ItemModel)
+
+        var id: String {
+            switch self {
+            case .columns(let l, _): return "col-\(l.first?.id ?? 0)"
+            case .banner(let i):     return "ban-\(i.id ?? 0)"
+            }
+        }
+    }
+
+    private var segments: [Segment] {
+        var result: [Segment] = []
+        var buffer: [ItemModel] = []
+
+        func flushBuffer() {
+            guard !buffer.isEmpty else { return }
+            var left: [ItemModel] = []
+            var right: [ItemModel] = []
+            for (i, item) in buffer.enumerated() {
+                if i % 2 == 0 { left.append(item) } else { right.append(item) }
+            }
+            result.append(.columns(left: left, right: right))
+            buffer.removeAll()
+        }
+
+        for item in items {
+            if item.boardType == 4 || item.boardType == 5 {
+                flushBuffer()
+                result.append(.banner(item))
+            } else {
+                buffer.append(item)
+            }
+        }
+        flushBuffer()
+        return result
+    }
+
+    var body: some View {
+        LazyVStack(spacing: spacing) {
+            ForEach(segments) { segment in
+                switch segment {
+                case .banner(let item):
+                    bannerView(item: item)
+                        .frame(maxWidth: .infinity)
+
+                case .columns(let left, let right):
+                    let nextSegmentIsBanner: Bool = {
+                        guard let currentIndex = segments.firstIndex(where: {
+                            if case .columns(let l, _) = $0 { return l.first?.id == left.first?.id }
+                            return false
+                        }) else { return false }
+                        let nextIndex = currentIndex + 1
+                        guard nextIndex < segments.count else { return false }
+                        if case .banner = segments[nextIndex] { return true }
+                        return false
+                    }()
+
+                    HStack(alignment: .top, spacing: spacing) {
+                        LazyVStack(spacing: spacing) {
+                            ForEach(left, id: \.id) { item in
+                                itemView(item)
+                            }
+                            // ✅ Push left column down if right is taller and next is banner
+                            if nextSegmentIsBanner && right.count > left.count {
+                                Color.clear.frame(height: 1)
+                            }
+                        }
+                        LazyVStack(spacing: spacing) {
+                            ForEach(right, id: \.id) { item in
+                                itemView(item)
+                            }
+                        }
+                    }
+                }
+            }
+            Color.clear
+                 .frame(height: 1)
+                 .onAppear {
+                     onLastItemAppear()
+                 }
+//            if items.count >= paginationThreshold {
+//                let triggerItem = items[items.count - paginationThreshold]
+//                Color.clear
+//                    .frame(height: 1)
+//                    .id("trigger-\(triggerItem.id ?? 0)")
+//                    .onAppear {
+//                        guard lastTriggeredItemId != triggerItem.id else { return }
+//                        lastTriggeredItemId = triggerItem.id
+//                        onLastItemAppear()
+//                    }
+//            }
+        }
+//        .onChange(of: items.count) { _ in
+//            lastTriggeredItemId = nil
+//        }
+    }
+
+    @ViewBuilder
+    private func bannerView(item: ItemModel) -> some View {
+        if item.boardType == 5 {
+            BoardVideoBannerCard(product: item) { url in onOpenURL(url) }
+        } else {
+            BoardBannerCard(product: item) { url in onOpenURL(url) }
+        }
+    }
+
+    private func triggerPaginationIfNeeded(item: ItemModel) {
+        guard items.count >= paginationThreshold else { return }
+        let triggerItem = items[items.count - paginationThreshold]
+        guard item.id == triggerItem.id,
+              lastTriggeredItemId != triggerItem.id else { return }
+        lastTriggeredItemId = triggerItem.id
+        onLastItemAppear()
+    }
+}
+*/
+/*
 struct PinterestMasonryFeed: View {
 
     let items:            [ItemModel]
@@ -1015,8 +1410,7 @@ struct PinterestMasonryFeed: View {
         }
     }
 }
-
-
+*/
 
 struct TwoColumnMasonryLayout: Layout {
  
@@ -1085,150 +1479,35 @@ struct TwoColumnMasonryLayout: Layout {
     }
 }
 
-/*struct TwoColumnMasonryLayout: Layout {
-
-    var spacing: CGFloat = 6
-    var shouldEqualizeBottom: Bool = true
-    private static let screenWidth = UIScreen.main.bounds.width
-
-    struct CacheData {
-        var frames: [CGRect] = []
-        var size: CGSize = .zero
-    }
-
-    func makeCache(subviews: Subviews) -> CacheData {
-        CacheData()
-    }
-
-    func sizeThatFits(
-        proposal: ProposedViewSize,
-        subviews: Subviews,
-        cache: inout CacheData
-    ) -> CGSize {
-
-        let totalW = proposal.width ?? Self.screenWidth
-        let colW = (totalW - spacing) / 2
-
-        var frames: [CGRect] = Array(repeating: .zero, count: subviews.count)
-
-        var colHeights: [CGFloat] = [0, 0]
-        var lastIndexInColumn: [Int?] = [nil, nil]
-
-        // First pass
-        for index in subviews.indices {
-
-            let sub = subviews[index]
-
-            let col = colHeights[0] <= colHeights[1] ? 0 : 1
-
-            let size = sub.sizeThatFits(
-                ProposedViewSize(width: colW, height: nil)
-            )
-
-            let x = col == 0 ? 0 : colW + spacing
-            let y = colHeights[col]
-
-            frames[index] = CGRect(
-                x: x,
-                y: y,
-                width: colW,
-                height: size.height
-            )
-
-            colHeights[col] += size.height + spacing
-
-            lastIndexInColumn[col] = index
-        }
-
-        // Final column heights
-        let leftHeight = max(colHeights[0] - spacing, 0)
-        let rightHeight = max(colHeights[1] - spacing, 0)
-
-        let maxHeight = max(leftHeight, rightHeight)
-
-        if shouldEqualizeBottom{
-            // Stretch last item of shorter column
-            if leftHeight < rightHeight {
-                
-                if let index = lastIndexInColumn[0] {
-                    
-                    let diff = rightHeight - leftHeight
-                    
-                    frames[index].size.height += diff
-                }
-                
-            } else if rightHeight < leftHeight {
-                
-                if let index = lastIndexInColumn[1] {
-                    
-                    let diff = leftHeight - rightHeight
-                    
-                    frames[index].size.height += diff
-                }
-            }
-        }
-
-        cache.frames = frames
-        cache.size = CGSize(width: totalW, height: maxHeight)
-
-        return cache.size
-    }
-
-    func placeSubviews(
-        in bounds: CGRect,
-        proposal: ProposedViewSize,
-        subviews: Subviews,
-        cache: inout CacheData
-    ) {
-
-        for index in subviews.indices {
-
-            let frame = cache.frames[index]
-
-            subviews[index].place(
-                at: CGPoint(
-                    x: bounds.minX + frame.minX,
-                    y: bounds.minY + frame.minY
-                ),
-                proposal: ProposedViewSize(
-                    width: frame.width,
-                    height: frame.height
-                )
-            )
-        }
-    }
-}*/
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - BoardBannerCard
-// Full-width banner (boardType == 4).
-// ─────────────────────────────────────────────────────────────────────────────
 
 struct BoardBannerCard: View {
-
+    
     let product: ItemModel
     let onClickedView:(_ url:URL)->Void
-
+    
     var body: some View {
-        KFImage(URL(string: product.banner?.image ?? ""))
-            .scaleFactor(UIScreen.main.scale)
-            .cacheOriginalImage(false)
-            .resizable()
-            .scaledToFill()
-            .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 220)
-            .clipped()
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                recordOutboundClick()
-            }
+        KFImage(URL(string: product.banner?.image ?? "")).onSuccess { result in
+            
+        }
+        .scaleFactor(UIScreen.main.scale)
+        .cacheOriginalImage(false)
+        .resizable()
+        .scaledToFill()
+        .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 220)
+        .clipped()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            recordOutboundClick()
+        }
     }
-
+    
     private func recordOutboundClick() {
         
         if  let url = product.banner?.thirdPartyLink{
-           
+            
             if let URL = URL(string: url.getValidUrl()){
                 onClickedView(URL)
             }
@@ -1237,7 +1516,7 @@ struct BoardBannerCard: View {
                 onClickedView(URL)
             }
         }
-                        
+        
         if (product.banner?.isCampaign ?? false){
             self.campaignClickEventApi(campaign_banner_id: product.banner?.campaignID ?? 0)
         }else{
@@ -1249,12 +1528,12 @@ struct BoardBannerCard: View {
     
     
     private func campaignClickEventApi(campaign_banner_id:Int){
-
+        
         let params = ["campaign_banner_id":campaign_banner_id,"event_type":"click","referrer_url":"HOME"] as [String : Any]
         URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_event, param: params,methodType:.post,showLoader: false) { responseObject, error in
         }
     }
-
+    
     
     private func captureSliderClickApi(campaign_banner_id:Int){
         let params = ["id":campaign_banner_id] as [String : Any]
@@ -1264,151 +1543,15 @@ struct BoardBannerCard: View {
 }
 
 
-import AVKit
-/*
-struct BoardVideoBannerCard: View {
-
-    let product: ItemModel
-    let onClickedView:(_ url:URL)->Void
-
-    @State private var player: AVPlayer? = nil
-
-    var body: some View {
-        VStack(spacing: 0) {
-            
-            ZStack(alignment: .bottomTrailing) {
-                
-                VideoPlayer(player: player)
-                    .frame(height: 200)
-                    .onAppear {
-                        
-                        guard player == nil else { return }
-                        
-                        if let url = URL(string: product.banner?.image ?? "") {
-                            
-                            let avPlayer = AVPlayer(url: url)
-                            
-                            avPlayer.isMuted = true
-                            avPlayer.play()
-                            
-                            // loop video
-                            NotificationCenter.default.addObserver(
-                                forName: .AVPlayerItemDidPlayToEndTime,
-                                object: avPlayer.currentItem,
-                                queue: .main
-                            ) { _ in
-                                avPlayer.seek(to: .zero)
-                                avPlayer.play()
-                            }
-                            
-                            
-                            
-                            
-                            
-                            self.player = avPlayer
-                        }
-                    }
-                    .onDisappear {
-                        
-                        player?.pause()
-                        player = nil
-                    }
-                
-            }
-            
-            HStack {
-
-                Text("Learn more")
-                    .foregroundColor(.primary)
-                    .font(.system(size: 14, weight: .medium))
-
-                Spacer()
-
-                Image(systemName: "arrow.up.right")
-                    .renderingMode(.template)
-                    .foregroundColor(.primary)
-                    .font(.system(size: 12))
-            }
-            .padding(.horizontal, 10)
-            .frame(height: 35)
-            .frame(maxWidth: .infinity)
-            .background(Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
-
-            .onTapGesture {
-                recordOutboundClick()
-            }
-        }
-        .background(Color.black)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
-    }
-
-    
-    private func recordOutboundClick() {
-        
-        if  let url = product.banner?.thirdPartyLink{
-           
-            if let URL = URL(string: url.getValidUrl()){
-                onClickedView(URL)
-            }
-        }else if  let url = product.banner?.url{
-            if let URL = URL(string: url.getValidUrl()){
-                onClickedView(URL)
-            }
-        }
-                        
-        if (product.banner?.isCampaign ?? false){
-            self.campaignClickEventApi(campaign_banner_id: product.banner?.campaignID ?? 0)
-        }else{
-            //For apps own banner
-            self.captureSliderClickApi(campaign_banner_id: product.banner?.campaignID ?? 0)
-        }
-    }
-    
-    
-    
-    private func campaignClickEventApi(campaign_banner_id:Int){
-        
-
-        let params = ["campaign_banner_id":campaign_banner_id,"event_type":"click","referrer_url":"HOME"] as [String : Any]
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.campaign_event, param: params,methodType:.post,showLoader: false) { responseObject, error in
- 
-        }
-    }
-
-    
-    private func captureSliderClickApi(campaign_banner_id:Int){
-        let params = ["id":campaign_banner_id] as [String : Any]
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.capture_slider_click, param: params,methodType:.post,showLoader: false) { responseObject, error in
-        }
-    }
-}*/
-
-import SwiftUI
-import AVKit
-
-// MARK: - BoardVideoBannerCard (Memory Optimized)
-//
-// Key fixes vs original:
-//  1. loopToken stored & removed on disappear  → no NotificationCenter leak
-//  2. player?.replaceCurrentItem(with: nil)    → releases AVAsset/buffers immediately
-//  3. [weak avPlayer] capture in loop closure  → no retain cycle
-//  4. AVPlayerLooper alternative skipped intentionally (AVQueuePlayer adds overhead
-//     for a single looping URL; the token approach is lighter)
 
 struct BoardVideoBannerCard: View {
-
+    
     let product: ItemModel
     let onClickedView: (_ url: URL) -> Void
-
-    // ── player state ──────────────────────────────────────────────────────────
+    
     @State private var player: AVPlayer?
-    /// Stored so we can remove the loop observer on disappear (prevents leak).
     @State private var loopToken: NSObjectProtocol?
-
-    // MARK: - Body
-
+    
     var body: some View {
         VStack(spacing: 0) {
             videoLayer
@@ -1418,16 +1561,16 @@ struct BoardVideoBannerCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
     }
-
+    
     // MARK: - Sub-views
-
+    
     private var videoLayer: some View {
         VideoPlayer(player: player)
             .frame(height: 200)
             .onAppear(perform: startPlayback)
             .onDisappear(perform: stopPlayback)
     }
-
+    
     private var learnMoreBar: some View {
         HStack {
             Text("Learn more")
@@ -1447,20 +1590,18 @@ struct BoardVideoBannerCard: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: recordOutboundClick)
     }
-
+    
     // MARK: - Playback Lifecycle
-
+    
     private func startPlayback() {
         // Guard: don't recreate if already running (e.g. SwiftUI double-appear)
         guard player == nil,
               let url = URL(string: product.banner?.image ?? "") else { return }
-
+        
         let avPlayer = AVPlayer(url: url)
         avPlayer.isMuted = true
         avPlayer.actionAtItemEnd = .none   // prevents auto-pause at end
-
-        // ── FIX 1: store token so we can remove it ────────────────────────────
-        // ── FIX 2: [weak avPlayer] breaks the retain cycle ───────────────────
+        
         loopToken = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: avPlayer.currentItem,
@@ -1470,41 +1611,41 @@ struct BoardVideoBannerCard: View {
                 avPlayer?.play()
             })
         }
-
+        
         avPlayer.play()
         self.player = avPlayer
     }
-
+    
     private func stopPlayback() {
         // ── FIX 3: remove observer before nil-ing player ─────────────────────
         if let token = loopToken {
             NotificationCenter.default.removeObserver(token)
             loopToken = nil
         }
-
+        
         player?.pause()
         // ── FIX 4: release AVAsset buffers immediately ────────────────────────
         player?.replaceCurrentItem(with: nil)
         player = nil
     }
-
+    
     // MARK: - Analytics / Navigation
-
+    
     private func recordOutboundClick() {
         let banner = product.banner
-
+        
         if let raw = banner?.thirdPartyLink ?? banner?.url,
            let url = URL(string: raw.getValidUrl()) {
             onClickedView(url)
         }
-
+        
         if banner?.isCampaign == true {
             campaignClickEventApi(campaignBannerId: banner?.campaignID ?? 0)
         } else {
             captureSliderClickApi(campaignBannerId: banner?.campaignID ?? 0)
         }
     }
-
+    
     private func campaignClickEventApi(campaignBannerId: Int) {
         let params: [String: Any] = [
             "campaign_banner_id": campaignBannerId,
@@ -1518,7 +1659,7 @@ struct BoardVideoBannerCard: View {
             showLoader: false
         ) { _, _ in }
     }
-
+    
     private func captureSliderClickApi(campaignBannerId: Int) {
         let params: [String: Any] = ["id": campaignBannerId]
         URLhandler.sharedinstance.makeCall(
@@ -1531,13 +1672,13 @@ struct BoardVideoBannerCard: View {
 }
 
 extension BoardHomeView {
-
+    
     var headerView: some View {
         HStack {
-    
+            
             Image("Logo").resizable().aspectRatio(contentMode: .fit).frame(width: 115,height: 50)
             Spacer()
-           // searchBar
+            // searchBar
             
             interestButton
         }
@@ -1545,7 +1686,7 @@ extension BoardHomeView {
         
         .background(Color(.systemBackground))
     }
-
+    
     var searchBar: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
@@ -1562,11 +1703,11 @@ extension BoardHomeView {
             pushSearchBoard()
         }
     }
-
+    
     func pushSearchBoard() {
         guard let tabBar = tabBarController,
               let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
-
+        
         let vc = UIHostingController(
             rootView: SearchBoardResultView(
                 navigationController: boardNav,
@@ -1576,7 +1717,7 @@ extension BoardHomeView {
         vc.hidesBottomBarWhenPushed = true
         boardNav.pushViewController(vc, animated: false)
     }
-
+    
     var interestButton: some View {
         Button {
             guard let tabBar = tabBarController,
@@ -1592,7 +1733,7 @@ extension BoardHomeView {
         .background(Color(.systemGray6))
         .cornerRadius(10)
     }
-
+    
     var emptyView: some View {
         VStack(spacing: 20) {
             Spacer()
@@ -1612,25 +1753,24 @@ extension BoardHomeView {
 private let columnWidth: CGFloat = UIScreen.main.bounds.width / 2 - 10
  
 struct ProductCardStaggeredNew: View {
- 
+
     @State private var showSafari = false
     let product:               ItemModel
     let sendLikeUnlikeObject:  (Bool, Int) -> Void
     let onTapBoostButton:      () -> Void
-    var isToShowBoostButton = true
-    var defaultImgWidth: CGFloat = 0
-    var defaultImgHeight: CGFloat = 0
- 
+    var isToShowBoostButton    = true
+
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
+
+            // ✅ image stretches to fill remaining space after bottom content
             ZStack(alignment: .bottomTrailing) {
                 KFImage(URL(string: product.image ?? ""))
-                    // ── FIX: pass POINT size; .scaleFactor handles pixel multiply ──
                     .setProcessor(DownsamplingImageProcessor(
-                        size: CGSize(width: columnWidth, height: 300)))
+                        size: CGSize(width: columnWidth, height: 350)))
                     .scaleFactor(UIScreen.main.scale)
                     .cacheOriginalImage(false)
-                    .memoryCacheExpiration(.seconds(80))
+                    .memoryCacheExpiration(.seconds(120))
                     .loadDiskFileSynchronously()
                     .diskCacheExpiration(.days(3))
                     .fade(duration: 0.15)
@@ -1638,8 +1778,7 @@ struct ProductCardStaggeredNew: View {
                     .scaledToFill()
                     .clipped()
                     .cornerRadius(10)
-                    .frame(maxWidth: columnWidth)
- 
+
                 VStack {
                     if product.isFeature == true {
                         HStack {
@@ -1666,7 +1805,7 @@ struct ProductCardStaggeredNew: View {
                                 HStack(spacing: 2) {
                                     Text(product.ctaLabel ?? "Buy Now")
                                         .font(.inter(.medium, size: 11)).foregroundColor(.black)
-                                    Image("upRight").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                                    Image("upRight").renderingMode(.template).foregroundColor(.black)
                                 }
                             }
                             .padding(.vertical, 3).padding(.horizontal, 8)
@@ -1676,7 +1815,11 @@ struct ProductCardStaggeredNew: View {
                     }
                 }
             }
- 
+            .frame(width: columnWidth)
+            .layoutPriority(1)   // ✅ image ZStack gets extra space first
+
+            // ── bottom content — fixed height, never stretches ──────────────
+
             HStack(spacing: 12) {
                 if (product.user?.id ?? 0) != Local.shared.getUserId() {
                     Button { manageLike(boardId: product.id ?? 0) } label: {
@@ -1708,17 +1851,30 @@ struct ProductCardStaggeredNew: View {
                 Spacer()
             }
             .padding(.horizontal, 4)
- 
+
             VStack(alignment: .leading, spacing: 0) {
-                Text(product.name ?? "").foregroundColor(Color(.label)).font(.inter(.semiBold, size: 14)).fixedSize(horizontal: false, vertical: true)
-                Text(product.description ?? "").font(.inter(.regular, size: 12)).lineLimit(2).foregroundColor(.gray).fixedSize(horizontal: false, vertical: true)
+                Text(product.name ?? "")
+                    .foregroundColor(Color(.label))
+                    .font(.inter(.semiBold, size: 14))
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(product.description ?? "")
+                    .font(.inter(.regular, size: 12))
+                    .lineLimit(2)
+                    .foregroundColor(.gray)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 8)
- 
-            PriceView(price: product.price ?? 0, specialPrice: product.specialPrice ?? 0, currencySymbol: Local.shared.currencySymbol)
-                .padding([.bottom], 10).padding(.horizontal, 8).padding(.top, 2)
- 
-            if (product.user?.id ?? 0) == Local.shared.getUserId(), isToShowBoostButton, product.isFeature == false {
+
+            PriceView(
+                price: product.price ?? 0,
+                specialPrice: product.specialPrice ?? 0,
+                currencySymbol: Local.shared.currencySymbol
+            )
+            .padding([.bottom], 10).padding(.horizontal, 8).padding(.top, 2)
+
+            if (product.user?.id ?? 0) == Local.shared.getUserId(),
+               isToShowBoostButton,
+               product.isFeature == false {
                 Button { onTapBoostButton() } label: {
                     Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
                         .font(.inter(.semiBold, size: 14)).foregroundColor(.white)
@@ -1732,25 +1888,31 @@ struct ProductCardStaggeredNew: View {
                 .padding(.horizontal, 10).padding(.bottom, 10)
             }
         }
+        .frame(width: columnWidth)          // ✅ fixed width
         .background(Color(.systemBackground))
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contentShape(Rectangle())
         .fullScreenCover(isPresented: $showSafari) {
-            if let url = URL(string: (product.outbondUrl ?? "").getValidUrl()) { SafariView(url: url) }
+            if let url = URL(string: (product.outbondUrl ?? "").getValidUrl()) {
+                SafariView(url: url)
+            }
         }
     }
- 
+
     private func manageLike(boardId: Int) {
         guard AppDelegate.sharedInstance.isUserLoggedInRequest() else { return }
         sendLikeUnlikeObject(!(product.isLiked ?? false), boardId)
     }
- 
+
     func outboundClickApi(strURl: String, boardId: Int) {
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click,
-                                           param: ["board_id": boardId], methodType: .post) { _, _ in }
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.board_outbond_click,
+            param: ["board_id": boardId],
+            methodType: .post
+        ) { _, _ in }
     }
- 
+
     func randomColor(for id: Int) -> Color {
         [Color.white, Color(hex: "#B6EEF5"), Color(hex: "#FFBC55")][id % 3]
     }
@@ -1758,24 +1920,22 @@ struct ProductCardStaggeredNew: View {
  
  
 struct IdeaCardStaggeredNew: View {
- 
+
     let product: ItemModel
-    var defaultImgWidth:  CGFloat = 0
-    var defaultImgHeight: CGFloat = 0
- 
+
     var body: some View {
         KFImage(URL(string: product.image ?? ""))
-            // ── FIX: point size only; scaleFactor handles pixel multiply ──────
             .setProcessor(DownsamplingImageProcessor(
-                size: CGSize(width: columnWidth, height: 300)))
+                size: CGSize(width: columnWidth, height: 410)))
             .scaleFactor(UIScreen.main.scale)
             .cacheOriginalImage(false)
             .memoryCacheExpiration(.seconds(120))
             .fade(duration: 0.15)
             .resizable()
             .scaledToFill()
+            .frame(width: columnWidth)
+            .frame(maxHeight:.infinity)
             .clipped()
-            .frame(maxWidth: columnWidth)
             .cornerRadius(10)
             .shadow(color: .black.opacity(0.10), radius: 7, x: 0, y: 2)
             .overlay(
@@ -1795,12 +1955,10 @@ struct IdeaCardStaggeredNew: View {
                 }
             )
             .background(Color(.systemBackground))
-            .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .contentShape(Rectangle())
     }
 }
- 
  
 struct CardItemViewNew: View {
     let item:             ItemModel
@@ -1812,7 +1970,7 @@ struct CardItemViewNew: View {
  
     var body: some View {
         if item.boardType == 1 {
-            PromotionalAdsCardStaggered(product: item, onTapBottomtButton: onTapBoostButton)
+            PromotionalAdsCardStaggeredNew(product: item, onTapBottomtButton: onTapBoostButton)
         } else if item.boardType == 3 {
             IdeaCardStaggeredNew(product: item).onTapGesture(perform: onTap)
         } else {
@@ -1828,12 +1986,85 @@ struct CardItemViewNew: View {
 }
  
  
+struct PromotionalAdsCardStaggeredNew: View {
+
+    let product: ItemModel
+    let onTapBottomtButton: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+
+            ZStack(alignment: .topTrailing) {
+                KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: CGSize(
+                            width: (UIScreen.main.bounds.width / 2 - 10),
+                            height: 380
+                        ))
+                    )
+                    .scaleFactor(UIScreen.main.scale)
+                    .cacheOriginalImage(false)
+                    .memoryCacheExpiration(.seconds(120))
+                    .fade(duration: 0.15)
+                    .resizable()
+                    .scaledToFill()              //  was .scaledToFit() — fills assigned height
+                    .clipped()                   //  crops overflow
+                    .shadow(color: Color.black.opacity(0.10), radius: 7, x: 0, y: 2)
+            }
+            .frame(maxWidth: columnWidth)  //  fixed width, min height
+            .frame(maxHeight:.infinity)
+            .layoutPriority(1)                           //  takes all extra height first
+
+            // CTA bar — fixed height, never stretches
+            HStack {
+                Text(product.ctaLabel ?? "Learn more")
+                    .foregroundColor(.primary)
+                    .font(.system(size: 14, weight: .medium))
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .renderingMode(.template)
+                    .foregroundColor(.primary)
+                    .font(.system(size: 12))
+            }
+            .padding(.horizontal, 10)
+            .frame(height: 35)
+            .frame(maxWidth: .infinity)
+            .background(Color(.systemBackground))
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
+            .onTapGesture {
+                onTapBottomtButton()
+                outboundClickApi()
+            }
+        }
+        .background(Color(.systemBackground))
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .contentShape(Rectangle())
+    }
+
+    func outboundClickApi() {
+        let params = ["board_id": product.id ?? 0]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.board_outbond_click,
+            param: params,
+            methodType: .post
+        ) { responseObject, error in
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                if status == 200 { }
+            }
+        }
+    }
+}
 struct HorizontalBannerCard: View {
     let product:     ItemModel
     let onTapButton: () -> Void
  
     var body: some View {
-        KFImage(URL(string: product.banner?.image ?? ""))
+        KFImage(URL(string: product.banner?.image ?? "")).onSuccess { result in
+           
+        }
             .scaleFactor(UIScreen.main.scale)
             .cacheOriginalImage(false)
             .resizable()
