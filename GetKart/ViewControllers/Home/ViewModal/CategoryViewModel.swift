@@ -10,12 +10,13 @@ import Foundation
 
 class CategoryViewModel:ObservableObject{
     
-   @Published var listArray:[CategoryModel]?
+    @Published var listArray:[CategoryModel]?
     weak var delegate:RefreshScreen?
     private var page = 1
     var isDataLoading = true
     private var ismoreDataAvailable = true
     private var catType:Int  //1 for previous 2 for board
+    
     init(type:Int = 1,isToShowLoader:Bool = true){
         catType = type
         getCategoriesListApi(showLoader: isToShowLoader)
@@ -36,11 +37,6 @@ class CategoryViewModel:ObservableObject{
                 self?.ismoreDataAvailable = (obj.data?.data ?? []).count > 4 ? true : false
                 if self?.page == 1{
                     self?.listArray = obj.data?.data
-                    
-//                    if self?.catType == 2{
-//                        self?.setCategories( self?.listArray ?? [])
-//                    }
-                    
                 }else{
                     self?.listArray?.append(contentsOf: obj.data?.data ?? [])
                 }
@@ -49,7 +45,6 @@ class CategoryViewModel:ObservableObject{
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
                     self?.isDataLoading = false
                     self?.page += 1
-                    
                 })
             }
         }
