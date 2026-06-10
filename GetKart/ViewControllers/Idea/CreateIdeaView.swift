@@ -34,6 +34,12 @@ struct CreateIdeaView: View {
     var boardId = 0
     
     @State private var isPostValidate:Int = 0
+    
+    
+    @State private var showSheet: Bool = false
+    @State private var isFreePost: Bool = true
+    @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var showBoostSheet: Bool = false
 
     
     
@@ -245,9 +251,11 @@ struct CreateIdeaView: View {
                } label: {
                    let strText = (isFromEdit) ? "Update" : "Submit"
                    Text(strText).font(.inter(.medium, size: 18.0)).foregroundColor(isFilled ? .white : .gray)
-                     
-               }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                    .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+                       .frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                       .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+                       .contentShape(Rectangle())
+                   
+               }
                 
                 Spacer()
             }.padding()
@@ -322,6 +330,41 @@ struct CreateIdeaView: View {
                     // Fallback on earlier versions
                 }
             }
+           
+            .sheet(isPresented: $showSheet) {
+                BoostBottomSheet(
+                    onBoostTap: {
+                        isFreePost = false
+                        showSheet = false
+                        showBoostSheet = true
+
+                    },
+                    onFreePostTap: {
+                        isFreePost = true
+                        showSheet = false
+                        isDataUploading = true
+                        uploadFIleToServer()
+                    }
+                )
+                .presentationDetents([.height(270)])
+                .presentationCornerRadius(25)
+            }
+            
+            .sheet(isPresented: $showBoostSheet) {
+
+                BoostBoardPlanView(
+                    categoryId: selectedCategoryId ?? 0,
+                    packageSelectedPressed: { selPkgObj in
+                        showBoostSheet = false
+                        isDataUploading = true
+                        uploadFIleToServer(selPkgObj:selPkgObj)
+                    }, boardType: 3)
+                .presentationDetents([.height(410)])
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(20)
+                .presentationBackground(Color(.systemBackground))
+            }
+            
         
     }
     
@@ -348,8 +391,13 @@ struct CreateIdeaView: View {
                 message: "Description must be between 20 and 400 characters."
             )
         } else{
-            isDataUploading = true
-            uploadFIleToServer()
+            if isFromEdit{
+                isDataUploading = true
+                uploadFIleToServer()
+            }else{
+                showSheet = true
+            }
+           
         }
     }
         
@@ -390,7 +438,7 @@ struct CreateIdeaView: View {
         }
     }
     
-    func uploadFIleToServer(){
+    func uploadFIleToServer(selPkgObj:PlanModel? = nil){
         
         var params:Dictionary<String,Any> = [:]
        
@@ -408,13 +456,19 @@ struct CreateIdeaView: View {
         }
         
         params["board_type"] = 3 // 0=product,1=business
-
+       
+        if isFreePost{
+            params["post_with_boost"] = 0
+        }else{
+            params["post_with_boost"] = 1
+        }
+    
 
             var imgNames = [String]()
             var galleryImagesData = [Data]()
                         
             if let img = selectedImage{
-                if let imgData = img.wxCompress().pngData(){
+                if let imgData = img.wxCompressedData(){
                     galleryImagesData.append(imgData)
                     imgNames.append("gallery_images[]")
                 }
@@ -422,17 +476,40 @@ struct CreateIdeaView: View {
            
             URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: nil, imageName: "", imagesData: galleryImagesData, imageNames: imgNames, url:strUrl , params: params, completionHandler: { responseObject, error in
 
+                self.isDataUploading = false
             if error == nil {
                 let result = responseObject! as NSDictionary
                 let code = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
                 if code == 200{
-                    if self.isFromEdit{
-//                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
-                    }
-                    AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                        self.navigationController?.popToRootViewController(animated: true)
+                    
+                    if self.isFromEdit || self.isFreePost{
+                    
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            self.navigationController?.popToRootViewController(animated: true)
+                            
+                        }
+                    }else{
+                        if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted){
+                            
+                            do{
+                                let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                                if let itemObj = item.data?.first{
+                                    DispatchQueue.main.async{
+                                        if let obj =  selPkgObj{
+                                            self.paymentGatewayOpen(selPlan:obj , item: itemObj)
+                                        }
+                                    }
+                                }
+                            }catch{
+                                
+                            }
+                        }else {
+                            print("Something is wrong while converting dictionary to JSON data.")
+                            AlertView.sharedManager.showToast(message: message)
+                            
+                        }
                     }
                 }else{
                     AlertView.sharedManager.showToast(message: message)
@@ -447,7 +524,7 @@ struct CreateIdeaView: View {
         let controller = StoryBoard.chat.instantiateViewController(identifier: "PayPlanVC")
         as! PayPlanVC
         controller.strUrl = strUrl
-        controller.paymentFor = .bannerPromotion
+        controller.paymentFor = .boostBoard
 
         controller.callbackPaymentSuccess = { (isSuccess) -> Void in
             
@@ -598,6 +675,35 @@ struct CreateIdeaView: View {
         
 
     }
+    
+    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
+        
+        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
+        paymentGateway?.planObj = selPlan
+        paymentGateway?.categoryId = item.categoryID ?? 0
+        paymentGateway?.itemId = item.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                self.navigationController?.present(vc, animated: true)
+            }
+            
+            //  RELEASE
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
+    }
+
 }
 
 #Preview {

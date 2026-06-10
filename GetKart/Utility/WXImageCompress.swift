@@ -32,6 +32,21 @@ public extension UIImage {
         return UIImage.init(data: data)!
     }
     
+    
+    func wxCompressedData(
+        type: WechatCompressType = .timeline,
+        compressionQuality: CGFloat = 0.5
+    ) -> Data? {
+
+        let size = wxImageSize(type: type)
+
+        let resized = resizedImage(size: size)
+
+        return resized.jpegData(
+            compressionQuality: compressionQuality
+        )
+    }
+    
     /**
      get wechat compress image size
      

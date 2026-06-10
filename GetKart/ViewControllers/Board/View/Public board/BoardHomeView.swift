@@ -8,53 +8,58 @@
 import SwiftUI
 import Kingfisher
 import AVKit
+import FittedSheets
+
+//MARK: - BoardHomeView
 
 struct BoardHomeView: View {
 
-    @State private var selectedCategoryId: Int = 0
-    @State private var selectedName: String = ""
+    @State private var selectedCategoryId: Int = 55555
+    @State private var selectedName: String = "All"
     let tabBarController: UITabBarController?
-    @StateObject private var categoryVM = CategoryViewModel(type: 2, isToShowLoader: false)
-    @StateObject private var boardStore = BoardStore()
-    // Only keep selected tab + 1 neighbour each side alive (max 3 total)
-    @State private var loadedCategoryIds: [Int] = []
+    @StateObject private var categoryVM = CategoryViewModelOptimized(type: 2, isToShowLoader: false)
+    @StateObject private var boardStore = BoardStoreNew()
+    @State private var loadedCategoryIds: [Int] = [55555]
     private let maxLoadedTabs = 3
-    @State private var isUpdatedEvents: Bool = false
+    @State private var isUpdatedEvents: Bool = true
 
     var body: some View {
         VStack(spacing: 0) {
             headerView
                 .background(Color(.systemBackground))
-        
 
-            CategoryTabsNew(
+            CategoryTabsOtimized(
                 selected: $selectedName,
                 selectedCategoryId: $selectedCategoryId,
                 categoryVM: categoryVM
             )
             .background(Color(.systemBackground))
 
+            //  FIX 4: selectedCategoryId is 55555 from the start, so
+            // tabContentView renders immediately without waiting for the API.
             if selectedCategoryId > 0 {
                 tabContentView
             } else {
-                HStack{Spacer()}.frame(height:30)
-                PinterestSkeletonGrid()   // visible immediately on launch
-                        .padding(.top, 5)
-               // Spacer()
+                HStack { Spacer() }.frame(height: 30).padding()
+                PinterestSkeletonGrid().padding(.top, 5)
             }
         }
-        .onChange(of: selectedCategoryId) { newId in
+        //  FIX 5: Kick off the "All" feed load as early as possible —
+        // before the category API even returns.
+//        .task {
+//            markTabLoaded(55555)
+//            prefetchNeighbours(of: 55555)
+//        }
+      .onChange(of: selectedCategoryId) { newId in
             FeedVideoManager.shared.pauseAll()
             FeedVideoManager.shared.muteAll()
             markTabLoaded(newId)
             prefetchNeighbours(of: newId)
         }
         .onAppear {
-            
-            markTabLoaded(selectedCategoryId)
-            if isUpdatedEvents{
+            if isUpdatedEvents {
                 updateEvents()
-                isUpdatedEvents = true
+                isUpdatedEvents = false
             }
         }
         .background(Color(.systemGray6))
@@ -66,11 +71,7 @@ struct BoardHomeView: View {
         ) { _ in handleInterestRefresh() }
     }
 
-    // MARK: - Tab Content
-    // This is the critical change: instead of ZStack with all tabs at opacity 0/1,
-    // we only insert the active tab (+ loaded neighbours) into the view tree.
-    // Views not in the tree = zero memory for their scroll state, image cache refs, etc.
-
+    // Rest of the view is unchanged...
     @ViewBuilder
     private var tabContentView: some View {
         let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
@@ -78,7 +79,6 @@ struct BoardHomeView: View {
         ZStack {
             ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
                 let catId = cat.id ?? 0
-                // HARD conditional — not opacity. Off-screen tabs don't exist.
                 if loadedCategoryIds.contains(catId) {
                     BoardListViewNew(
                         tabBarController: tabBarController,
@@ -86,8 +86,6 @@ struct BoardHomeView: View {
                         navigationController: boardNav,
                         isActive: selectedCategoryId == catId
                     )
-                    // Use offset instead of opacity so scroll position is preserved
-                    // for the immediate neighbours, but they're off-screen
                     .offset(x: selectedCategoryId == catId ? 0 : UIScreen.main.bounds.width)
                     .allowsHitTesting(selectedCategoryId == catId)
                 }
@@ -105,48 +103,33 @@ struct BoardHomeView: View {
         )
     }
 
-    // MARK: - LRU Tab Management
-
     private func markTabLoaded(_ id: Int) {
         guard id > 0 else { return }
-
         if let idx = loadedCategoryIds.firstIndex(of: id) {
             loadedCategoryIds.remove(at: idx)
             loadedCategoryIds.insert(id, at: 0)
             return
         }
-
-        // Evict when over cap
         while loadedCategoryIds.count >= maxLoadedTabs {
             let evictId = loadedCategoryIds.removeLast()
             boardStore.evict(id: evictId)
-            // Also clear Kingfisher memory for images associated with this tab
             ImageCache.default.clearMemoryCache()
         }
-
         loadedCategoryIds.insert(id, at: 0)
     }
 
-    /// Pre-load left and right neighbours so swipe feels instant
     private func prefetchNeighbours(of id: Int) {
         guard let list = categoryVM.listArray,
-              let idx  = list.firstIndex(where: { $0.id == id }) else { return }
-
+              let idx = list.firstIndex(where: { $0.id == id }) else { return }
         if idx > 0 {
             let leftId = list[idx - 1].id ?? 0
-            if !loadedCategoryIds.contains(leftId) {
-                markTabLoaded(leftId)
-            }
+            if !loadedCategoryIds.contains(leftId) { markTabLoaded(leftId) }
         }
         if idx < list.count - 1 {
             let rightId = list[idx + 1].id ?? 0
-            if !loadedCategoryIds.contains(rightId) {
-                markTabLoaded(rightId)
-            }
+            if !loadedCategoryIds.contains(rightId) { markTabLoaded(rightId) }
         }
     }
-
-    // MARK: - Notification / Swipe Handlers
 
     private func handleInterestRefresh() {
         selectedCategoryId = 55555
@@ -161,15 +144,13 @@ struct BoardHomeView: View {
         guard let list = categoryVM.listArray,
               let currentIndex = list.firstIndex(where: { $0.id == selectedCategoryId })
         else { return }
-
         let newIndex = left
             ? min(currentIndex + 1, list.count - 1)
             : max(currentIndex - 1, 0)
-
         let newCat = list[newIndex]
         withAnimation(.none) {
             selectedCategoryId = newCat.id ?? 0
-            selectedName       = newCat.name ?? ""
+            selectedName = newCat.name ?? ""
         }
     }
 
@@ -177,18 +158,316 @@ struct BoardHomeView: View {
         Task.detached(priority: .utility) {
             await FaceBookAppEvents.facebookEvents(type: .board, categoryName: selectedName)
         }
-      //  SocketIOManager.sharedInstance.checkSocketStatus()
-        
         Task.detached(priority: .background) {
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
-       /* NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
-            })
-        }*/
+        
+        if Local.shared.getUserId() > 0{
+            getpopupApi()
+        }
     }
 }
+
+
+
+extension BoardHomeView{
+    
+    //MARK: Api methods
+    func getpopupApi(){
+
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { (obj:PopupParseModel) in
+            
+            if obj.code == 200,obj.error == false{
+                
+                /*
+                 // =========== If any add in Draft message will get popped up to Buy Plans ===========
+                 $type = 1;
+                 // =========== If user has Free Approved Add then pop up message to Buy  Plan ===========
+                 $type = 2;
+                 
+                 // =========== If user has Paid Ad from Listing Plan then Pop up message to Boost Plan ===========
+                 $type = 3;
+                 
+                 // =========== If User has just registered and not posted any ad than Pop up message to Run Ad  ===========
+                 $type = 4;
+                 */
+                
+                if (obj.data.type ?? 0) == 0{
+                    DispatchQueue.main.async {
+                        if let destVc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "PopupVC") as? PopupVC{
+                            destVc.objPopup = obj.data
+                            destVc.modalPresentationStyle = .overFullScreen
+                            destVc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                            destVc.modalPresentationStyle = .overCurrentContext
+                            destVc.modalTransitionStyle = .coverVertical
+                            AppDelegate.sharedInstance.navigationController?.present(destVc, animated: false)
+                        }
+                    }
+                /*  } else if (obj.data.type ?? 0) == 1 || (obj.data.type ?? 0) == 2 || (obj.data.type ?? 0) == 3  || (obj.data.type ?? 0) == 4 || (obj.data.type ?? 0) == 5 {
+                     self?.presentHostingController(objPopup: obj.data)
+                    */
+                }else if (obj.data.type ?? 0) == 5{
+                    self.presentHostingController(objPopup: obj.data)
+                
+                }else if (obj.data.type ?? 0) == 6{
+                    //Boost board
+                    self.showBoostYourBoardPopup(obj: obj.data)
+                    
+                }
+            }
+        }
+    }
+    
+    
+    func presentHostingController(objPopup:PopupModel){
+        
+        let controller = UIHostingController(
+            rootView: BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in }))
+        
+        controller.title = ""
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+        
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius : 0 , useInlineMode: true))
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnPull = false
+       // sheet.gripColor = Color.clear
+        
+        sheet.allowGestureThroughOverlay = false
+        sheet.cornerRadius = 15
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        //sheet.gripColor = Color.clear
+        
+        if (objPopup.mandatoryClick ?? false){
+            
+            sheet.dismissOnOverlayTap = false
+            sheet.dismissOnPull = false
+            sheet.allowPullingPastMaxHeight = false
+            sheet.allowPullingPastMinHeight = false
+            sheet.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.allowGestureThroughOverlay = false
+            sheet.sheetViewController?.dismissOnPull = false
+            sheet.allowPullingPastMinHeight = false
+        }
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+
+        let settingView =  BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in
+            
+            if sheet.options.useInlineMode == true {
+                sheet.attemptDismiss(animated: true)
+            } else {
+                sheet.dismiss(animated: true, completion: nil)
+            }
+            
+            
+            if dismissOnly{
+                
+            }else{
+               if (obj.type ?? 0) == 5  {
+                    //5 banner promotion
+                    let destVC = UIHostingController(rootView:  BannerPromotionsView(navigationController: boardNav))
+                    destVC.hidesBottomBarWhenPushed = true
+                   boardNav?.pushViewController(destVC, animated: true)
+                    
+                }else if (obj.type ?? 0) == 6  {
+                    //Boost board
+                    
+                }
+            }
+        })
+        
+        
+        controller.rootView = settingView
+        
+        if let view = (AppDelegate.sharedInstance.navigationController?.topViewController)?.view {
+            sheet.animateIn(to: view, in: (AppDelegate.sharedInstance.navigationController?.topViewController)!)
+        } else {
+
+            boardNav?.present(sheet, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+    func showBoostYourBoardPopup(obj:PopupModel) {
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+
+        let popupView = BoostYourBoardPopupView(
+            onBoost: {
+                print("Boost tapped")
+                boardNav?.dismiss(animated: true)
+                
+                if (obj.itemID ?? 0) > 0{
+                    let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: boardNav, boardId: obj.itemID ?? 0,isFromBoostPopup: true))
+                    destVC.hidesBottomBarWhenPushed = true
+                    boardNav?.pushViewController(destVC, animated: true)
+                }else{
+                    let destVC = UIHostingController(rootView: MyBoardsView(navigationController: boardNav))
+                    destVC.hidesBottomBarWhenPushed = true
+                    boardNav?.pushViewController(destVC, animated: true)
+                }
+            },
+            onLater: {
+                print("Later tapped")
+                boardNav?.dismiss(animated: true)
+                
+            },
+            onClose: {
+                boardNav?.dismiss(animated: true)
+            },
+            objPopup:obj
+        )
+        
+        let hostingVC = UIHostingController(rootView: popupView)
+        hostingVC.modalPresentationStyle = .overFullScreen
+        hostingVC.view.backgroundColor = .clear
+        boardNav?.present(hostingVC, animated: false)
+    }
+    
+    
+}
+
+//MARK: - Extension BoardHomeView
+extension BoardHomeView {
+    
+    var headerView: some View {
+        HStack {
+            Image("Logo").resizable().aspectRatio(contentMode: .fit)
+                .frame(width: 140,height: 50)
+            Spacer()
+            interestButton
+        }
+        .padding(.horizontal, 8)
+        .background(Color(.systemBackground))
+    }
+
+    
+    var interestButton: some View {
+        Button {
+            guard let tabBar = tabBarController,
+                  let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
+            let vc = UIHostingController(
+                rootView: BoardInterestView(navigationController: boardNav)
+            )
+            vc.hidesBottomBarWhenPushed = true
+            boardNav.pushViewController(vc, animated: true)
+        } label: {
+            Image("magic").renderingMode(.template).foregroundColor(Color(.label)).padding(8)
+        }
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+    
+    var emptyView: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image("no_data_found_illustrator")
+            Text("No Data Found")
+                .foregroundColor(.orange)
+            Spacer()
+        }
+    }
+}
+
+
+#Preview {
+    BoardHomeView(tabBarController: nil)
+}
+
+//MARK: - Category Optimized
+struct CategoryTabsOtimized: View {
+
+    @Binding var selected: String
+    @Binding var selectedCategoryId: Int
+    @ObservedObject var categoryVM: CategoryViewModelOptimized
+    @Environment(\.scrollToTopProxy) private var scrollToTopProxy
+    @State private var categoryScrollProxy: ScrollViewProxy?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 20) {
+                        ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
+                            categoryTab(cat)
+                                .id(cat.id)
+                                .onTapGesture {
+                                    selectCategory(cat, proxy: proxy)
+                                }
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                }
+                .onAppear {
+                    categoryScrollProxy = proxy
+                    //  Scroll to the already-selected "All" tab on first appear
+                    // (proxy is ready now; selectedCategoryId is already 55555)
+                    scrollCategoryToCenter(selectedCategoryId, proxy: proxy)
+                }
+            }
+            Divider()
+        }
+        //  When the full category list arrives from the API, just scroll to
+        // the current selection — no list mutation, no ID reset needed.
+        .onChange(of: categoryVM.listArray?.count) { _ in
+            scrollCategoryToCenter(selectedCategoryId)
+        }
+        // Keeps the tab bar in sync when the parent changes the selection
+        // (e.g. swipe gesture in BoardHomeView)
+        .onChange(of: selectedCategoryId) { newId in
+            scrollCategoryToCenter(newId)
+        }
+    }
+
+    // MARK: - Actions
+
+    private func selectCategory(_ cat: CategoryModel, proxy: ScrollViewProxy) {
+        withAnimation(.easeInOut) {
+            selectedCategoryId = cat.id ?? 0
+            selected = cat.name ?? ""
+            proxy.scrollTo(cat.id, anchor: .center)
+            scrollToTopProxy?.scrollTo("TOP", anchor: .top)
+        }
+    }
+
+    // Overload used by onChange (proxy captured in state)
+    private func scrollCategoryToCenter(_ id: Int) {
+        guard let proxy = categoryScrollProxy else { return }
+        scrollCategoryToCenter(id, proxy: proxy)
+    }
+
+    private func scrollCategoryToCenter(_ id: Int, proxy: ScrollViewProxy) {
+        withAnimation(.easeInOut) {
+            proxy.scrollTo(id, anchor: .center)
+        }
+    }
+
+    // MARK: - UI
+
+    private func categoryTab(_ cat: CategoryModel) -> some View {
+        let isSelected = selectedCategoryId == cat.id
+        return VStack(spacing: 6) {
+            Text(cat.name ?? "")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(isSelected ? .primary : .secondary) //  visual clarity
+            Rectangle()
+                .fill(isSelected ? Color.orange : .clear)
+                .frame(height: 3)
+        }
+        .contentShape(Rectangle())
+    }
+}
+
 
 struct BoardListViewNew: View {
     
@@ -207,28 +486,15 @@ struct BoardListViewNew: View {
 
                 if vm.isLoading && vm.items.isEmpty && !vm.hasLoadedOnce{
                     PinterestSkeletonGrid()
-                    // .padding(.top, 5)
                     
                 }else if vm.items.isEmpty && !vm.isLoading && vm.hasLoadedOnce {
                     emptyView.padding(.top, 100)
                     
                 } else {
-//                    PinterestMasonryFeed(
-//                        items: vm.items,
-//                        spacing: 6,
-//                        itemView: { item in (itemCellView(item: item) },
-//                        onLastItemAppear: {
-//                            guard !vm.isLoading, !vm.isLastPage else { return }
-//                            vm.tryLoadNextPage()
-//                        }, onOpenURL: {url in
-//                            safariURL = url
-//                        }
-//                    )
-                    
-                    
+
                     PinterestMasonryFeed(
                         items: vm.items,
-                        spacing: 6,
+                        spacing: 8,
                         itemView: { item in itemCellView(item: item) },  // no AnyView wrapper
                         onLastItemAppear: {
                             guard !vm.isLoading, !vm.isLastPage else { return }
@@ -253,7 +519,6 @@ struct BoardListViewNew: View {
                 FeedVideoManager.shared.pauseAll()
                 frameStore.removeAll()
             }
-            
             
             .refreshable {
                 await vm.refresh()
@@ -319,7 +584,6 @@ struct BoardListViewNew: View {
     }
 
     // MARK: - Item Cell
-
     @ViewBuilder
     private func itemCellView(item: ItemModel) -> some View {
         if item.boardType == 2 {
@@ -370,7 +634,6 @@ struct BoardListViewNew: View {
     }
 
     // MARK: - Helpers
-
     private func prefetchNextVideos(from currentItem: ItemModel) {
         guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }
         let start = index + 1
@@ -426,6 +689,7 @@ struct BoardListViewNew: View {
     }    
 }
 
+
 final class FrameStore: ObservableObject {
 
     private var frames: [Int: CGRect] = [:]
@@ -473,7 +737,7 @@ final class FrameStore: ObservableObject {
 
 enum FeedSegment: Identifiable {
     case banner(ItemModel)
-    case staggeredChunk([ItemModel])   // always non-banner items only
+    case staggeredChunk([ItemModel]) // always non-banner items only
 
     var id: String {
         switch self {
@@ -486,7 +750,508 @@ enum FeedSegment: Identifiable {
     }
 }
 
+//MARK: PinterestMasonryFeed
+
 struct PinterestMasonryFeed<ItemContent: View>: View {
+
+    let items: [ItemModel]
+    var spacing: CGFloat = 8
+
+    let itemView: (ItemModel) -> ItemContent
+    let onLastItemAppear: () -> Void
+    let onOpenURL: (URL) -> Void
+
+    @State private var lastTriggeredItemId: Int?
+
+    private let paginationThreshold = 6
+    private let chunkSize = 10
+
+    // MARK: - Segment
+
+    private enum Segment: Identifiable {
+        case chunk([ItemModel])
+        case banner(ItemModel)
+
+        var id: String {
+            switch self {
+            case .chunk(let items):
+                return "chunk-\(items.first?.id ?? 0)-\(items.last?.id ?? 0)"
+
+            case .banner(let item):
+                return "banner-\(item.id ?? 0)"
+            }
+        }
+    }
+
+    // MARK: - Build Segments
+
+    private var segments: [Segment] {
+
+        var result: [Segment] = []
+        var buffer: [ItemModel] = []
+
+        func flush() {
+            guard !buffer.isEmpty else { return }
+
+            var index = 0
+
+            while index < buffer.count {
+
+                let end = min(index + chunkSize, buffer.count)
+
+                result.append(
+                    .chunk(Array(buffer[index..<end]))
+                )
+
+                index += chunkSize
+            }
+
+            buffer.removeAll()
+        }
+
+        for item in items {
+
+            if item.boardType == 4 || item.boardType == 5 {
+
+                flush()
+
+                result.append(.banner(item))
+
+            } else {
+
+                buffer.append(item)
+            }
+        }
+
+        flush()
+
+        return result
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+
+        LazyVStack(spacing: spacing) {
+
+            ForEach(segments) { segment in
+
+                switch segment {
+
+                case .banner(let item):
+
+                    bannerView(item: item)
+                        .frame(maxWidth: .infinity)
+                        .onAppear {
+                            checkPagination(item)
+                        }
+
+                case .chunk(let chunkItems):
+
+                    
+                   /* TwoColumnMasonryLayout(
+                        spacing: spacing,
+                        shouldEqualizeBottom: true
+                    ) {
+
+                        ForEach(chunkItems, id: \.id) { item in
+
+                            itemView(item)
+                                .onAppear {
+                                    checkPagination(item)
+                                }
+                        }
+                    }*/
+                    
+                    TwoColumnMasonryLayout(
+                        items: chunkItems,
+                        spacing: spacing,
+                        shouldEqualizeBottom: true
+                    ) {
+                        ForEach(chunkItems, id: \.id) { item in
+                            itemView(item)
+                                .onAppear {
+                                    checkPagination(item)
+                                }
+                        }
+                    }
+                }
+            }
+
+            // Backup pagination trigger
+            Color.clear
+                .frame(height: 1)
+                .id("bottom-\(items.count)")
+                .onAppear {
+
+                    guard items.count >= paginationThreshold else {
+                        return
+                    }
+
+                    onLastItemAppear()
+                }
+        }
+        .onChange(of: items.count) { _ in
+            lastTriggeredItemId = nil
+        }
+    }
+
+    // MARK: - Pagination
+
+    private func checkPagination(_ item: ItemModel) {
+
+        guard let itemId = item.id else {
+            return
+        }
+
+        guard let currentIndex = items.firstIndex(where: {
+            $0.id == itemId
+        }) else {
+            return
+        }
+
+        let triggerIndex = max(
+            items.count - paginationThreshold,
+            0
+        )
+
+        guard currentIndex >= triggerIndex else {
+            return
+        }
+
+        guard lastTriggeredItemId != itemId else {
+            return
+        }
+
+        lastTriggeredItemId = itemId
+
+        DispatchQueue.main.async {
+            onLastItemAppear()
+        }
+    }
+
+    // MARK: - Banner
+
+    @ViewBuilder
+    private func bannerView(item: ItemModel) -> some View {
+
+        if item.boardType == 5 {
+
+            BoardVideoBannerCard(product: item) { url in
+                onOpenURL(url)
+            }
+
+        } else {
+
+            BoardBannerCard(product: item) { url in
+                onOpenURL(url)
+            }
+        }
+    }
+}
+
+//MARK: - TwoColumnMasonryLayout
+struct TwoColumnMasonryLayout: Layout {
+
+    let items: [ItemModel]
+    var spacing: CGFloat = 8
+    var shouldEqualizeBottom: Bool = true
+
+    private static let screenWidth = UIScreen.main.bounds.width
+
+    struct CacheData {
+        var frames: [CGRect] = []
+        var size: CGSize = .zero
+    }
+
+    func makeCache(subviews: Subviews) -> CacheData {
+        CacheData()
+    }
+/*
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout CacheData
+    ) -> CGSize {
+
+        let totalWidth = proposal.width ?? Self.screenWidth
+        let columnWidth = (totalWidth - spacing) / 2
+
+        var frames = Array(
+            repeating: CGRect.zero,
+            count: subviews.count
+        )
+
+        var columnHeights: [CGFloat] = [0, 0]
+        var lastInColumn: [Int?] = [nil, nil]
+
+        for index in subviews.indices {
+
+            let column = columnHeights[0] <= columnHeights[1] ? 0 : 1
+
+            let size = subviews[index].sizeThatFits(
+                ProposedViewSize(
+                    width: columnWidth,
+                    height: nil
+                )
+            )
+
+            let x = column == 0
+                ? 0
+                : columnWidth + spacing
+
+            let y = columnHeights[column]
+
+            frames[index] = CGRect(
+                x: x,
+                y: y,
+                width: columnWidth,
+                height: size.height
+            )
+
+            columnHeights[column] += size.height + spacing
+            lastInColumn[column] = index
+        }
+
+        let leftHeight = max(
+            columnHeights[0] - spacing,
+            0
+        )
+
+        let rightHeight = max(
+            columnHeights[1] - spacing,
+            0
+        )
+
+        let maxHeight = max(
+            leftHeight,
+            rightHeight
+        )
+
+       
+        if shouldEqualizeBottom {
+
+            let leftIndex = lastInColumn[0]
+            let rightIndex = lastInColumn[1]
+
+            let leftIsVideo: Bool = {
+                guard let idx = leftIndex,
+                      idx < items.count else {
+                    return false
+                }
+
+                return items[idx].boardType == 2
+            }()
+
+            let rightIsVideo: Bool = {
+                guard let idx = rightIndex,
+                      idx < items.count else {
+                    return false
+                }
+
+                return items[idx].boardType == 2
+            }()
+
+            if leftHeight < rightHeight {
+
+                let diff = rightHeight - leftHeight
+
+                if leftIsVideo {
+
+                    // Keep video fixed.
+                    // Don't stretch anything.
+                }
+                else if let idx = leftIndex {
+
+                    frames[idx].size.height += diff
+                }
+
+            } else if rightHeight < leftHeight {
+
+                let diff = leftHeight - rightHeight
+
+                if rightIsVideo {
+
+                    // Keep video fixed.
+                    // Don't stretch anything.
+                }
+                else if let idx = rightIndex {
+
+                    frames[idx].size.height += diff
+                }
+            }
+        }
+
+        cache.frames = frames
+        cache.size = CGSize(
+            width: totalWidth,
+            height: maxHeight
+        )
+
+        return cache.size
+    }
+*/
+    
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout CacheData
+    ) -> CGSize {
+
+        let totalWidth = proposal.width ?? Self.screenWidth
+        let columnWidth = (totalWidth - spacing) / 2
+
+        var frames = Array(repeating: CGRect.zero, count: subviews.count)
+        var columnHeights: [CGFloat] = [0, 0]
+        var lastInColumn: [Int?] = [nil, nil]
+
+        for index in subviews.indices {
+            
+            // ✅ Strict alternation: 0,1,0,1...
+            let column = index % 2
+
+            let size = subviews[index].sizeThatFits(
+                ProposedViewSize(width: columnWidth, height: nil)
+            )
+
+            let x = column == 0 ? 0 : columnWidth + spacing
+            let y = columnHeights[column]
+
+            frames[index] = CGRect(x: x, y: y, width: columnWidth, height: size.height)
+
+            columnHeights[column] += size.height + spacing
+            lastInColumn[column] = index
+        }
+
+        let leftHeight  = max(columnHeights[0] - spacing, 0)
+        let rightHeight = max(columnHeights[1] - spacing, 0)
+        let maxHeight   = max(leftHeight, rightHeight)
+
+        // ✅ Equalize bottom - but now it's always a small diff since columns are balanced
+        if shouldEqualizeBottom {
+//            let leftIsVideo: Bool = {
+//                return false
+//                guard let idx = lastInColumn[0], idx < items.count else { return false }
+//                return items[idx].boardType == 2
+//            }()
+//
+//            let rightIsVideo: Bool = {
+//                return false
+//
+//                guard let idx = lastInColumn[1], idx < items.count else { return false }
+//                return items[idx].boardType == 2
+//            }()
+
+            if leftHeight < rightHeight {
+                let diff = rightHeight - leftHeight
+                if let idx = lastInColumn[0] {
+                    frames[idx].size.height += diff
+                }
+            } else if rightHeight < leftHeight {
+                let diff = leftHeight - rightHeight
+                if  let idx = lastInColumn[1] {
+                    frames[idx].size.height += diff
+                }
+            }
+        }
+
+        cache.frames = frames
+        cache.size = CGSize(width: totalWidth, height: maxHeight)
+        return cache.size
+    }
+    
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout CacheData
+    ) {
+
+        for index in subviews.indices {
+
+            let frame = cache.frames[index]
+
+            subviews[index].place(
+                at: CGPoint(
+                    x: bounds.minX + frame.minX,
+                    y: bounds.minY + frame.minY
+                ),
+                proposal: ProposedViewSize(
+                    width: frame.width,
+                    height: frame.height
+                )
+            )
+        }
+    }
+}
+/*struct TwoColumnMasonryLayout: Layout {
+ 
+    var spacing:              CGFloat = 6
+    var shouldEqualizeBottom: Bool    = true
+ 
+    // ── FIX: computed once, not per-frame ─────────────────────────────────────
+    private static let screenWidth = UIScreen.main.bounds.width
+ 
+    struct CacheData {
+        var frames: [CGRect] = []
+        var size:   CGSize   = .zero
+    }
+ 
+    func makeCache(subviews: Subviews) -> CacheData { CacheData() }
+ 
+    func sizeThatFits(proposal: ProposedViewSize,
+                      subviews: Subviews,
+                      cache: inout CacheData) -> CGSize {
+ 
+        let totalW = proposal.width ?? Self.screenWidth
+        let colW   = (totalW - spacing) / 2
+ 
+        var frames              = Array(repeating: CGRect.zero, count: subviews.count)
+        var colHeights: [CGFloat] = [0, 0]
+        var lastInCol:  [Int?]    = [nil, nil]
+ 
+        for index in subviews.indices {
+            let col  = colHeights[0] <= colHeights[1] ? 0 : 1
+            let size = subviews[index].sizeThatFits(ProposedViewSize(width: colW, height: nil))
+            let x    = col == 0 ? 0 : colW + spacing
+            let y    = colHeights[col]
+            frames[index]    = CGRect(x: x, y: y, width: colW, height: size.height)
+            colHeights[col] += size.height + spacing
+            lastInCol[col]   = index
+        }
+ 
+        let leftH  = max(colHeights[0] - spacing, 0)
+        let rightH = max(colHeights[1] - spacing, 0)
+        let maxH   = max(leftH, rightH)
+ 
+        if shouldEqualizeBottom {
+            if leftH < rightH, let idx = lastInCol[0] {
+                frames[idx].size.height += rightH - leftH
+            } else if rightH < leftH, let idx = lastInCol[1] {
+                frames[idx].size.height += leftH - rightH
+            }
+        }
+ 
+        cache.frames = frames
+        cache.size   = CGSize(width: totalW, height: maxH)
+        return cache.size
+    }
+ 
+    func placeSubviews(in bounds: CGRect,
+                       proposal: ProposedViewSize,
+                       subviews: Subviews,
+                       cache: inout CacheData) {
+        for index in subviews.indices {
+            let frame = cache.frames[index]
+            subviews[index].place(
+                at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
+                proposal: ProposedViewSize(width: frame.width, height: frame.height)
+            )
+        }
+    }
+}
+*/
+/*struct PinterestMasonryFeed<ItemContent: View>: View {
 
     let items:            [ItemModel]
     var spacing:          CGFloat = 6
@@ -498,10 +1263,10 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
     private let paginationThreshold = 8
     private let chunkSize = 10
 
-    // MARK: - Segment Model
+//MARK: - Segment Model
 
     private enum Segment: Identifiable {
-        case chunk([ItemModel])           // ✅ raw chunk, TwoColumnMasonryLayout handles placement
+        case chunk([ItemModel])           //  raw chunk, TwoColumnMasonryLayout handles placement
         case banner(ItemModel)
         case paginationTrigger(itemId: Int)
 
@@ -574,10 +1339,14 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
                     //    only max 10 items per chunk so no memory pressure
                     TwoColumnMasonryLayout(
                         spacing: spacing,
-                        shouldEqualizeBottom: isBannerNext(after: chunkItems)
+                        shouldEqualizeBottom: true //isBannerNext(after: chunkItems)
                     ) {
                         ForEach(chunkItems, id: \.id) { item in
                             itemView(item)
+                                .onAppear {
+                                    
+                                   //checkPagination(item)
+                                }
                         }
                     }
 
@@ -589,17 +1358,18 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
                             lastTriggeredItemId = triggerItemId
                             onLastItemAppear()
                         }
+                    
                 }
             }
             
-            Color.clear.frame(height: 1)
-                            .id("bottom-\(items.count)")  // ✅ id changes with each page load
+        /*   Color.clear.frame(height: 1)
+                           // .id("bottom-\(items.count)")  // ✅ id changes with each page load
                             .onAppear {
-                                guard !items.isEmpty else { return }
-                                guard lastTriggeredItemId != -items.count else { return }
-                                lastTriggeredItemId = -items.count  // negative so no clash with item ids
-                                onLastItemAppear()
-                            }
+//                                guard !items.isEmpty else { return }
+//                                guard lastTriggeredItemId != -items.count else { return }
+//                                lastTriggeredItemId = -items.count  // negative so no clash with item ids
+                               // onLastItemAppear()
+                            }.layoutPriority(1)*/
         }
         .onChange(of: items.count) { _ in
             lastTriggeredItemId = nil
@@ -607,7 +1377,20 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
     }
 
     // MARK: - Helpers
+    private func checkPagination(_ item: ItemModel) {
+        
+        guard lastTriggeredItemId != item.id else { return }
+        guard let currentIndex = items.firstIndex(where: { $0.id == item.id }) else {
+            return
+        }
 
+        let thresholdIndex = max(items.count - paginationThreshold, 0)
+
+        
+        if currentIndex >= thresholdIndex {
+            onLastItemAppear()
+        }
+    }
     // ✅ Equalize bottom only when next segment is a banner — removes gap
     private func isBannerNext(after chunkItems: [ItemModel]) -> Bool {
         guard let lastId = chunkItems.last?.id else { return false }
@@ -627,534 +1410,84 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
             BoardBannerCard(product: item) { url in onOpenURL(url) }
         }
     }
+}*/
+
+private var goldenGradient: LinearGradient {
+    LinearGradient(
+        colors: [
+            Color(red: 248/255, green: 233/255, blue: 143/255),
+            Color(red: 231/255, green: 193/255, blue: 71/255),
+            Color(red: 214/255, green: 169/255, blue: 27/255)
+        ],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
 }
 
-/*
-struct PinterestMasonryFeed<ItemContent: View>: View {
-
-    let items:            [ItemModel]
-    var spacing:          CGFloat = 6
-    let itemView:         (ItemModel) -> ItemContent
-    let onLastItemAppear: () -> Void
-    let onOpenURL:        (URL) -> Void
-
-    @State private var lastTriggeredItemId: Int?
-    private let paginationThreshold = 8
-    private let chunkSize = 10
-
-    // MARK: - Segment Model
-
-    private enum Segment: Identifiable {
-        case columns(left: [ItemModel], right: [ItemModel])
-        case banner(ItemModel)
-        case paginationTrigger(itemId: Int)  // ✅ dedicated segment type
-
-        var id: String {
-            switch self {
-            case .columns(let l, let r):
-                return "col-\(l.first?.id ?? 0)-\(r.first?.id ?? 0)"
-            case .banner(let i):
-                return "ban-\(i.id ?? 0)"
-            case .paginationTrigger(let id):
-                return "page-trigger-\(id)"
-            }
-        }
-    }
-
-    // MARK: - Segment Builder
-    // ✅ Pagination trigger is injected as its own segment so LazyVStack
-    //    only renders it when it actually scrolls into view
-
-    private var segments: [Segment] {
-        var result:  [Segment]   = []
-        var buffer:  [ItemModel] = []
-        var allNonBannerItems:   [ItemModel] = items.filter {
-            $0.boardType != 4 && $0.boardType != 5
-        }
-
-        // Find the trigger item id (paginationThreshold from end of ALL items)
-        let triggerItemId: Int? = {
-            guard items.count >= paginationThreshold else { return nil }
-            return items[items.count - paginationThreshold].id
-        }()
-
-        func flush(isLast: Bool = false) {
-            guard !buffer.isEmpty else { return }
-            var i = 0
-            while i < buffer.count {
-                let chunk = Array(buffer[i..<min(i + chunkSize, buffer.count)])
-                var left:  [ItemModel] = []
-                var right: [ItemModel] = []
-                for (idx, item) in chunk.enumerated() {
-                    if idx % 2 == 0 { left.append(item) } else { right.append(item) }
-                }
-                result.append(.columns(left: left, right: right))
-
-                // ✅ After the chunk that contains the trigger item,
-                //    insert the pagination trigger as its own lazy row
-                let chunkIds = chunk.compactMap { $0.id }
-                if let tid = triggerItemId, chunkIds.contains(tid) {
-                    result.append(.paginationTrigger(itemId: tid))
-                }
-
-                i += chunkSize
-            }
-            buffer.removeAll()
-        }
-
-        for item in items {
-            if item.boardType == 4 || item.boardType == 5 {
-                flush()
-                result.append(.banner(item))
-            } else {
-                buffer.append(item)
-            }
-        }
-        flush(isLast: true)
-        return result
-    }
-
-    private var columnWidth: CGFloat {
-        (UIScreen.main.bounds.width - 10 - spacing) / 2
-    }
-
-    // MARK: - Body
-
-    var body: some View {
-        LazyVStack(spacing: spacing) {
-            ForEach(segments) { segment in
-                switch segment {
-
-                case .banner(let item):
-                    bannerView(item: item)
-                        .frame(maxWidth: .infinity)
-
-                case .columns(let left, let right):
-                    HStack(alignment: .top, spacing: spacing) {
-                        VStack(spacing: spacing) {
-                            ForEach(left, id: \.id) { item in
-                                itemView(item)
-                                    .frame(width: columnWidth)
-                            }
-                        }
-                        .frame(width: columnWidth, alignment: .top)
-
-                        VStack(spacing: spacing) {
-                            ForEach(right, id: \.id) { item in
-                                itemView(item)
-                                    .frame(width: columnWidth)
-                            }
-                        }
-                        .frame(width: columnWidth, alignment: .top)
-
-                        Spacer(minLength: 0)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                // ✅ This row only enters the view tree when LazyVStack
-                //    scrolls to it — guaranteed to fire onAppear at the right time
-                case .paginationTrigger(let triggerItemId):
-                    Color.clear
-                        .frame(height: 1)
-                        .onAppear {
-                            guard lastTriggeredItemId != triggerItemId else { return }
-                            lastTriggeredItemId = triggerItemId
-                            print("✅ Pagination triggered at item: \(triggerItemId)")
-                            onLastItemAppear()
-                        }
-                }
-            }
-        }
-        .onChange(of: items.count) { _ in
-            lastTriggeredItemId = nil
-        }
-    }
-
-    // MARK: - Banner View
-
-    @ViewBuilder
-    private func bannerView(item: ItemModel) -> some View {
-        if item.boardType == 5 {
-            BoardVideoBannerCard(product: item) { url in onOpenURL(url) }
-        } else {
-            BoardBannerCard(product: item) { url in onOpenURL(url) }
-        }
-    }
-}
-*/
-/*struct PinterestMasonryFeed<ItemContent: View>: View {
-    let items:            [ItemModel]
-    var spacing:          CGFloat = 6
-    let itemView:         (ItemModel) -> ItemContent
-    let onLastItemAppear: () -> Void
-    let onOpenURL:        (URL) -> Void
-
-    @State private var lastTriggeredItemId: Int?
-    private let paginationThreshold = 5
-
-    private enum Segment: Identifiable {
-        case columns(left: [ItemModel], right: [ItemModel])
-        case banner(ItemModel)
-
-        var id: String {
-            switch self {
-            case .columns(let l, _): return "col-\(l.first?.id ?? 0)"
-            case .banner(let i):     return "ban-\(i.id ?? 0)"
-            }
-        }
-    }
-
-    private var segments: [Segment] {
-        var result: [Segment] = []
-        var buffer: [ItemModel] = []
-
-        func flushBuffer() {
-            guard !buffer.isEmpty else { return }
-            var left: [ItemModel] = []
-            var right: [ItemModel] = []
-            for (i, item) in buffer.enumerated() {
-                if i % 2 == 0 { left.append(item) } else { right.append(item) }
-            }
-            result.append(.columns(left: left, right: right))
-            buffer.removeAll()
-        }
-
-        for item in items {
-            if item.boardType == 4 || item.boardType == 5 {
-                flushBuffer()
-                result.append(.banner(item))
-            } else {
-                buffer.append(item)
-            }
-        }
-        flushBuffer()
-        return result
-    }
-
-    var body: some View {
-        LazyVStack(spacing: spacing) {
-            ForEach(segments) { segment in
-                switch segment {
-                case .banner(let item):
-                    bannerView(item: item)
-                        .frame(maxWidth: .infinity)
-
-                case .columns(let left, let right):
-                    let nextSegmentIsBanner: Bool = {
-                        guard let currentIndex = segments.firstIndex(where: {
-                            if case .columns(let l, _) = $0 { return l.first?.id == left.first?.id }
-                            return false
-                        }) else { return false }
-                        let nextIndex = currentIndex + 1
-                        guard nextIndex < segments.count else { return false }
-                        if case .banner = segments[nextIndex] { return true }
-                        return false
-                    }()
-
-                    HStack(alignment: .top, spacing: spacing) {
-                        LazyVStack(spacing: spacing) {
-                            ForEach(left, id: \.id) { item in
-                                itemView(item)
-                            }
-                            // ✅ Push left column down if right is taller and next is banner
-                            if nextSegmentIsBanner && right.count > left.count {
-                                Color.clear.frame(height: 1)
-                            }
-                        }
-                        LazyVStack(spacing: spacing) {
-                            ForEach(right, id: \.id) { item in
-                                itemView(item)
-                            }
-                        }
-                    }
-                }
-            }
-            Color.clear
-                 .frame(height: 1)
-                 .onAppear {
-                     onLastItemAppear()
-                 }
-//            if items.count >= paginationThreshold {
-//                let triggerItem = items[items.count - paginationThreshold]
-//                Color.clear
-//                    .frame(height: 1)
-//                    .id("trigger-\(triggerItem.id ?? 0)")
-//                    .onAppear {
-//                        guard lastTriggeredItemId != triggerItem.id else { return }
-//                        lastTriggeredItemId = triggerItem.id
-//                        onLastItemAppear()
-//                    }
-//            }
-        }
-//        .onChange(of: items.count) { _ in
-//            lastTriggeredItemId = nil
-//        }
-    }
-
-    @ViewBuilder
-    private func bannerView(item: ItemModel) -> some View {
-        if item.boardType == 5 {
-            BoardVideoBannerCard(product: item) { url in onOpenURL(url) }
-        } else {
-            BoardBannerCard(product: item) { url in onOpenURL(url) }
-        }
-    }
-
-    private func triggerPaginationIfNeeded(item: ItemModel) {
-        guard items.count >= paginationThreshold else { return }
-        let triggerItem = items[items.count - paginationThreshold]
-        guard item.id == triggerItem.id,
-              lastTriggeredItemId != triggerItem.id else { return }
-        lastTriggeredItemId = triggerItem.id
-        onLastItemAppear()
-    }
-}
-*/
-/*
-struct PinterestMasonryFeed: View {
-
-    let items:            [ItemModel]
-    var spacing:          CGFloat = 6
-    let itemView:         (ItemModel) -> AnyView
-    let onLastItemAppear: () -> Void
-    let onOpenURL: (URL) -> Void
-
-   // @State private var safariURL: URL?
-    @State private var lastTriggeredItemId: Int?
-    private let paginationThreshold = 5
-    // ── Segment model ────────────────────────────────────────────────────────
-    private enum Segment: Identifiable {
-        case columns([ItemModel])
-        case banner(ItemModel)
-
-        var id: String {
-            switch self {
-            case .columns(let a): return "col-\(a.first?.id ?? 0)-\(a.last?.id ?? 0)"
-            case .banner(let i):  return "ban-\(i.id ?? 0)"
-            }
-        }
-    }
-
-    private var segments: [Segment] {
-        var result: [Segment]   = []
-        var buffer: [ItemModel] = []
-        for item in items {
-           // if item.boardType == 4 {
-            if item.boardType == 4 || item.boardType == 5 {
-                if !buffer.isEmpty { result.append(.columns(buffer)); buffer.removeAll() }
-                result.append(.banner(item))
-            } else {
-                buffer.append(item)
-            }
-        }
-        if !buffer.isEmpty { result.append(.columns(buffer)) }
-        return result
-    }
-
-    // Last non-banner item id — used to fire pagination
-    private var lastNonBannerId: Int? {
-        items.last(where: { $0.boardType != 4 })?.id
-    }
-
-    var body: some View {
-
-        LazyVStack(spacing: spacing) {
-
-            ForEach(segments) { segment in
-                switch segment {
-
-                    
-                case .banner(let item):
-
-                    Group {
-                        if item.boardType == 5 {
-
-                            BoardVideoBannerCard(product: item, onClickedView: {url in
-                                onOpenURL(url)
-                               // safariURL = url
-                            })
-
-                        } else {
-
-                            BoardBannerCard(product: item, onClickedView: {url in
-                                //safariURL = url
-                                onOpenURL(url)
-
-                            })
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-
-               /* case .columns(let chunkItems):
-
-                    TwoColumnMasonryLayout(spacing: spacing) {
-
-                        ForEach(chunkItems, id: \.id) { item in
-                            itemView(item)
-                        }
-                        
-                    }*/
-                    
-                case .columns(let chunkItems):
-
-                    let lastChunkItemId = chunkItems.last?.id
-
-                    let lastChunkGlobalIndex = items.firstIndex {
-                        $0.id == lastChunkItemId
-                    } ?? -1
-
-                    let nextItemIsBanner: Bool = {
-
-                        let nextIndex = lastChunkGlobalIndex + 1
-
-                        guard nextIndex < items.count else {
-                            return false
-                        }
-
-                        let nextItem = items[nextIndex]
-
-                        return nextItem.boardType == 4 || nextItem.boardType == 5
-
-                    }()
-
-                    TwoColumnMasonryLayout(
-                        spacing: spacing,
-                        shouldEqualizeBottom: nextItemIsBanner
-                    ) {
-
-                        ForEach(chunkItems, id: \.id) { item in
-                            itemView(item)
-                        }
-                    }
-                    
-                    
-                }
-            }
-
-            // Pagination trigger
-           /* Color.clear
-                .frame(height: 1)
-                .onAppear {
-                    onLastItemAppear()
-                }*/
-            
-            
-            if items.count >= paginationThreshold {
-                
-                let triggerItem = items[items.count - paginationThreshold]
-                
-                Color.clear
-                    .frame(height: 1)
-                    .id(triggerItem.id ?? 0)
-                    .onAppear {
-                        
-                        guard lastTriggeredItemId != triggerItem.id else {
-                            return
-                        }
-                        
-                        lastTriggeredItemId = triggerItem.id
-                        
-                        onLastItemAppear()
-                    }
-            }
-        }
-        .onChange(of: items.count) { _ in
-            lastTriggeredItemId = nil
-        }
-    }
-}
-*/
-
-struct TwoColumnMasonryLayout: Layout {
- 
-    var spacing:              CGFloat = 6
-    var shouldEqualizeBottom: Bool    = true
- 
-    // ── FIX: computed once, not per-frame ─────────────────────────────────────
-    private static let screenWidth = UIScreen.main.bounds.width
- 
-    struct CacheData {
-        var frames: [CGRect] = []
-        var size:   CGSize   = .zero
-    }
- 
-    func makeCache(subviews: Subviews) -> CacheData { CacheData() }
- 
-    func sizeThatFits(proposal: ProposedViewSize,
-                      subviews: Subviews,
-                      cache: inout CacheData) -> CGSize {
- 
-        let totalW = proposal.width ?? Self.screenWidth
-        let colW   = (totalW - spacing) / 2
- 
-        var frames              = Array(repeating: CGRect.zero, count: subviews.count)
-        var colHeights: [CGFloat] = [0, 0]
-        var lastInCol:  [Int?]    = [nil, nil]
- 
-        for index in subviews.indices {
-            let col  = colHeights[0] <= colHeights[1] ? 0 : 1
-            let size = subviews[index].sizeThatFits(ProposedViewSize(width: colW, height: nil))
-            let x    = col == 0 ? 0 : colW + spacing
-            let y    = colHeights[col]
-            frames[index]    = CGRect(x: x, y: y, width: colW, height: size.height)
-            colHeights[col] += size.height + spacing
-            lastInCol[col]   = index
-        }
- 
-        let leftH  = max(colHeights[0] - spacing, 0)
-        let rightH = max(colHeights[1] - spacing, 0)
-        let maxH   = max(leftH, rightH)
- 
-        if shouldEqualizeBottom {
-            if leftH < rightH, let idx = lastInCol[0] {
-                frames[idx].size.height += rightH - leftH
-            } else if rightH < leftH, let idx = lastInCol[1] {
-                frames[idx].size.height += leftH - rightH
-            }
-        }
- 
-        cache.frames = frames
-        cache.size   = CGSize(width: totalW, height: maxH)
-        return cache.size
-    }
- 
-    func placeSubviews(in bounds: CGRect,
-                       proposal: ProposedViewSize,
-                       subviews: Subviews,
-                       cache: inout CacheData) {
-        for index in subviews.indices {
-            let frame = cache.frames[index]
-            subviews[index].place(
-                at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
-                proposal: ProposedViewSize(width: frame.width, height: frame.height)
-            )
-        }
-    }
-}
-
-
+//MARK: - BoardBannerCard
 struct BoardBannerCard: View {
     
     let product: ItemModel
     let onClickedView:(_ url:URL)->Void
     
+    private var isSponsored: Bool {
+        product.banner?.isCampaign ?? false
+    }
     var body: some View {
-        KFImage(URL(string: product.banner?.image ?? "")).onSuccess { result in
+        VStack(spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                KFImage(URL(string: product.banner?.image ?? "")).onSuccess { result in
+                    
+                }
+                .scaleFactor(UIScreen.main.scale)
+                .cacheOriginalImage(false)
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, minHeight: 190, maxHeight: 250)
+                .clipped()
+                
+                if isSponsored {
+                    sponsoredBadge
+                        .padding(12)
+                }
+            }
+            
+            if isSponsored {
+                learnMoreBar
+            }
+        }
+        .background(Color(.systemBackground))
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: isSponsored ? 12 : 8,
+                style: .continuous
+            )
+        )
+        .overlay {
+                if isSponsored {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Color(hex: "#F7E58D"),
+                                        Color(hex: "#D4AF37")
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                                lineWidth: 5
+                            )
+                    }
             
         }
-        .scaleFactor(UIScreen.main.scale)
-        .cacheOriginalImage(false)
-        .resizable()
-        .scaledToFill()
-        .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 220)
-        .clipped()
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        //.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        //.shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         .contentShape(Rectangle())
         .onTapGesture {
             recordOutboundClick()
         }
+        
     }
     
     private func recordOutboundClick() {
@@ -1193,10 +1526,68 @@ struct BoardBannerCard: View {
         URLhandler.sharedinstance.makeCall(url: Constant.shared.capture_slider_click, param: params,methodType:.post,showLoader: false) { responseObject, error in
         }
     }
+    private var sponsoredBadge: some View {
+        HStack(spacing: 4) {
+
+            Image(systemName: "star.fill")
+                .font(.system(size: 8))
+                .foregroundColor(.yellow)
+
+            Text("Sponsored")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(.black)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(.white)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "#F7E58D"),
+                            Color(hex: "#D4AF37")
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    lineWidth: 1.5
+                )
+        )
+    }
+    private var learnMoreBar: some View {
+      
+        HStack {
+            Text("Learn more")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.black)
+
+            Spacer()
+
+            Image(systemName: "arrow.up.right")
+                .foregroundColor(.black)
+        }
+        .padding(.horizontal, 14)
+        .frame(height: 38)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(hex: "#F7E58D"),
+                    Color(hex: "#D4AF37")
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .onTapGesture {
+            recordOutboundClick()
+        }
+    }
 }
 
 
-
+//MARK: - Board Video Banner
 struct BoardVideoBannerCard: View {
     
     let product: ItemModel
@@ -1324,87 +1715,100 @@ struct BoardVideoBannerCard: View {
     }
 }
 
-extension BoardHomeView {
-    
-    var headerView: some View {
-        HStack {
-            
-            Image("Logo").resizable().aspectRatio(contentMode: .fit).frame(width: 115,height: 50)
-            Spacer()
-            // searchBar
-            
-            interestButton
-        }
-        .padding(.horizontal, 6)
-        
-        .background(Color(.systemBackground))
-    }
-    
-    var searchBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.orange)
-            Text("Search any item...")
-                .foregroundColor(.gray)
-            Spacer()
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 14)
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .onTapGesture {
-            pushSearchBoard()
-        }
-    }
-    
-    func pushSearchBoard() {
-        guard let tabBar = tabBarController,
-              let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
-        
-        let vc = UIHostingController(
-            rootView: SearchBoardResultView(
-                navigationController: boardNav,
-                isByDefaultOpenSearch: true
-            )
-        )
-        vc.hidesBottomBarWhenPushed = true
-        boardNav.pushViewController(vc, animated: false)
-    }
-    
-    var interestButton: some View {
-        Button {
-            guard let tabBar = tabBarController,
-                  let boardNav = tabBar.viewControllers?[0] as? UINavigationController else { return }
-            let vc = UIHostingController(
-                rootView: BoardInterestView(navigationController: boardNav)
-            )
-            vc.hidesBottomBarWhenPushed = true
-            boardNav.pushViewController(vc, animated: true)
-        } label: {
-            Image("magic").renderingMode(.template).foregroundColor(Color(.label)).padding(8)
-        }
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-    }
-    
-    var emptyView: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            Image("no_data_found_illustrator")
-            Text("No Data Found")
-                .foregroundColor(.orange)
-            Spacer()
-        }
-    }
-}
 
 
-#Preview {
-    BoardHomeView(tabBarController: nil)
-}
 
 private let columnWidth: CGFloat = UIScreen.main.bounds.width / 2 - 10
+  
+
+//MARK: - CardItemViewNew
+struct CardItemViewNew: View {
+    let item:             ItemModel
+    let onLike:           (Bool, Int) -> Void
+    let onTap:            () -> Void
+    let onTapBoostButton: () -> Void
+    var isToShowBoostButton = true
+    var imageRatio: CGFloat = 1.2
  
+    var body: some View {
+        if item.boardType == 1 {
+            PromotionalAdsCardStaggeredNew(product: item, onTapBottomtButton: onTapBoostButton)
+        } else if item.boardType == 3 {
+            IdeaCardStaggeredNew(product: item).onTapGesture(perform: onTap)
+        } else {
+            ProductCardStaggeredNew(
+                product: item,
+                sendLikeUnlikeObject: onLike,
+                onTapBoostButton: onTapBoostButton,
+                isToShowBoostButton: isToShowBoostButton
+            )
+            .onTapGesture(perform: onTap)
+        }
+    }
+}
+
+//MARK: - IdeaCardStaggeredNew
+struct IdeaCardStaggeredNew: View {
+    
+    let product: ItemModel
+    private var kfImage: some View {
+        let cellular = NetworkCondition.isCellular
+        let scale: CGFloat = cellular ? 1.0 : UIScreen.main.scale
+        let targetSize = CGSize(
+            width:  columnWidth * scale,
+            height: columnWidth * scale * 1.3
+        )
+        return KFImage(URL(string: product.image ?? ""))
+            .setProcessor(DownsamplingImageProcessor(size: targetSize))
+            .scaleFactor(cellular ? 1.0 : UIScreen.main.scale)
+            .cacheOriginalImage(true)
+            .memoryCacheExpiration(.seconds(300))
+            .diskCacheExpiration(.days(7))
+            .placeholder { Color(.systemGray5) }
+            .fade(duration: 0.25)          // ← Kingfisher's own fade, not .transition(.fade)
+            .resizable()                   // ← must come after all KFImage config modifiers
+            .scaledToFill()
+            .frame(width: columnWidth)
+            .clipped()
+    }
+    
+    var body: some View {
+       /* KFImage(URL(string: product.image ?? ""))
+            .setProcessor(DownsamplingImageProcessor(
+                size: CGSize(width: columnWidth * UIScreen.main.scale,
+                             height: columnWidth * UIScreen.main.scale * 1.3)))
+            .scaleFactor(1)
+            .cacheOriginalImage(false)
+            .memoryCacheExpiration(.seconds(120))
+            .diskCacheExpiration(.days(3))
+            .resizable()
+            .scaledToFill()
+            .frame(width: columnWidth)
+            .clipped()*/
+        kfImage.cornerRadius(10)
+            .overlay(
+                Group {
+                    if product.isFeature == true {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                Text("Sponsored").foregroundColor(.white)
+                                    .font(.inter(.bold, size: 14))
+                                    .padding([.bottom, .trailing], 8)
+                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
+                            }
+                        }
+                    }
+                }
+            )
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .contentShape(Rectangle())
+    }
+}
+ 
+//MARK: - ProductCardStaggeredNew
 struct ProductCardStaggeredNew: View {
 
     @State private var showSafari = false
@@ -1412,26 +1816,48 @@ struct ProductCardStaggeredNew: View {
     let sendLikeUnlikeObject:  (Bool, Int) -> Void
     let onTapBoostButton:      () -> Void
     var isToShowBoostButton    = true
+    
+    
+    private var kfImage: some View {
+        let cellular = NetworkCondition.isCellular
+        let scale: CGFloat = cellular ? 1.0 : UIScreen.main.scale
+        let targetSize = CGSize(
+            width:  columnWidth * scale,
+            height: columnWidth * scale * 1.3
+        )
+        return KFImage(URL(string: product.image ?? ""))
+            .setProcessor(DownsamplingImageProcessor(size: targetSize))
+            .scaleFactor(cellular ? 1.0 : UIScreen.main.scale)
+            .cacheOriginalImage(true)
+            .memoryCacheExpiration(.seconds(300))
+            .diskCacheExpiration(.days(7))
+            .placeholder { Color(.systemGray5) }
+            .fade(duration: 0.25)          // ← Kingfisher's own fade, not .transition(.fade)
+            .resizable()                   // ← must come after all KFImage config modifiers
+            .scaledToFill()
+            .frame(width: columnWidth)
+            .clipped()
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
 
-            // ✅ image stretches to fill remaining space after bottom content
             ZStack(alignment: .bottomTrailing) {
-                KFImage(URL(string: product.image ?? ""))
+              /*  KFImage(URL(string: product.image ?? ""))
                     .setProcessor(DownsamplingImageProcessor(
-                        size: CGSize(width: columnWidth, height: 350)))
-                    .scaleFactor(UIScreen.main.scale)
+                        size: CGSize(width: columnWidth * UIScreen.main.scale,
+                                     height: columnWidth * UIScreen.main.scale * 1.3)))
+            
+                    .scaleFactor(1)
                     .cacheOriginalImage(false)
-                    //.memoryCacheExpiration(.seconds(120))
-                   // .loadDiskFileSynchronously()
-                   // .diskCacheExpiration(.days(3))
-                   // .fade(duration: 0.15)
+                    .memoryCacheExpiration(.seconds(120))
+                    .diskCacheExpiration(.days(3))
                     .resizable()
-                    .scaledToFit()
-                    .clipped()
+                    .scaledToFill()
+                   .frame(width: columnWidth)
+                    .clipped()*/
+                kfImage
                     .cornerRadius(10)
-
                 VStack {
                     if product.isFeature == true {
                         HStack {
@@ -1468,11 +1894,8 @@ struct ProductCardStaggeredNew: View {
                     }
                 }
             }
-            //.frame(width: columnWidth)
-            .layoutPriority(1)   // ✅ image ZStack gets extra space first
-
-            // ── bottom content — fixed height, never stretches ──────────────
-
+            .layoutPriority(1)
+            
             HStack(spacing: 12) {
                 if (product.user?.id ?? 0) != Local.shared.getUserId() {
                     Button { manageLike(boardId: product.id ?? 0) } label: {
@@ -1541,7 +1964,6 @@ struct ProductCardStaggeredNew: View {
                 .padding(.horizontal, 10).padding(.bottom, 10)
             }
         }
-        //.frame(width: columnWidth)          // ✅ fixed width
         .background(Color(.systemBackground))
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -1570,103 +1992,56 @@ struct ProductCardStaggeredNew: View {
         [Color.white, Color(hex: "#B6EEF5"), Color(hex: "#FFBC55")][id % 3]
     }
 }
- 
- 
-struct IdeaCardStaggeredNew: View {
 
-    let product: ItemModel
+//MARK: - PromotionalAdsCardStaggeredNew
 
-    var body: some View {
-        KFImage(URL(string: product.image ?? ""))
-            .setProcessor(DownsamplingImageProcessor(
-                size: CGSize(width: columnWidth, height: 410)))
-            .scaleFactor(UIScreen.main.scale)
-            .cacheOriginalImage(false)
-            //.memoryCacheExpiration(.seconds(120))
-            //.fade(duration: 0.15)
-            .resizable()
-            .scaledToFill()
-            .frame(width: columnWidth)
-            .frame(maxHeight:.infinity)
-            .clipped()
-            .cornerRadius(10)
-            .shadow(color: .black.opacity(0.10), radius: 7, x: 0, y: 2)
-            .overlay(
-                Group {
-                    if product.isFeature == true {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Text("Sponsored").foregroundColor(.white)
-                                    .font(.inter(.bold, size: 14))
-                                    .padding([.bottom, .trailing], 8)
-                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
-                            }
-                        }
-                    }
-                }
-            )
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .contentShape(Rectangle())
-    }
-}
- 
-struct CardItemViewNew: View {
-    let item:             ItemModel
-    let onLike:           (Bool, Int) -> Void
-    let onTap:            () -> Void
-    let onTapBoostButton: () -> Void
-    var isToShowBoostButton = true
-    var imageRatio: CGFloat = 1.2
- 
-    var body: some View {
-        if item.boardType == 1 {
-            PromotionalAdsCardStaggeredNew(product: item, onTapBottomtButton: onTapBoostButton)
-        } else if item.boardType == 3 {
-            IdeaCardStaggeredNew(product: item).onTapGesture(perform: onTap)
-        } else {
-            ProductCardStaggeredNew(
-                product: item,
-                sendLikeUnlikeObject: onLike,
-                onTapBoostButton: onTapBoostButton,
-                isToShowBoostButton: isToShowBoostButton
-            )
-            .onTapGesture(perform: onTap)
-        }
-    }
-}
- 
- 
 struct PromotionalAdsCardStaggeredNew: View {
 
     let product: ItemModel
     let onTapBottomtButton: () -> Void
+    
+    private var kfImage: some View {
+        let cellular = NetworkCondition.isCellular
+        let scale: CGFloat = cellular ? 1.0 : UIScreen.main.scale
+        let targetSize = CGSize(
+            width:  columnWidth * scale,
+            height: columnWidth * scale * 1.3
+        )
+        return KFImage(URL(string: product.image ?? ""))
+            .setProcessor(DownsamplingImageProcessor(size: targetSize))
+            .scaleFactor(cellular ? 1.0 : UIScreen.main.scale)
+            .cacheOriginalImage(true)
+            .memoryCacheExpiration(.seconds(300))
+            .diskCacheExpiration(.days(7))
+            .placeholder { Color(.systemGray5) }
+            .fade(duration: 0.25)          // ← Kingfisher's own fade, not .transition(.fade)
+            .resizable()                   // ← must come after all KFImage config modifiers
+            .scaledToFill()
+            .frame(width: columnWidth)
+            .clipped()
+    }
 
     var body: some View {
         VStack(spacing: 0) {
 
             ZStack(alignment: .topTrailing) {
-                KFImage(URL(string: product.image ?? ""))
-                    .setProcessor(
-                        DownsamplingImageProcessor(size: CGSize(
-                            width: (UIScreen.main.bounds.width / 2 - 10),
-                            height: 400
-                        ))
-                    )
-                    .scaleFactor(UIScreen.main.scale)
+                kfImage
+              /*  KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(DownsamplingImageProcessor(
+                        size: CGSize(width: columnWidth * UIScreen.main.scale,
+                                     height: columnWidth * UIScreen.main.scale * 1.3)))
+                    .scaleFactor(1)
                     .cacheOriginalImage(false)
-                   // .memoryCacheExpiration(.seconds(120))
-                   // .fade(duration: 0.15)
+                    .memoryCacheExpiration(.seconds(200))
+                    .diskCacheExpiration(.days(3))
                     .resizable()
-                    .scaledToFill()              //  was .scaledToFit() — fills assigned height
-                    .clipped()                   //  crops overflow
-                    .shadow(color: Color.black.opacity(0.10), radius: 7, x: 0, y: 2)
+                    .scaledToFill()
+                    .frame(width: columnWidth)*/
+               
             }
-            .frame(maxWidth: columnWidth)  //  fixed width, min height
+            .frame(maxWidth: columnWidth)
             .frame(maxHeight:.infinity)
-            .layoutPriority(1)                           //  takes all extra height first
+            .layoutPriority(1)
 
             // CTA bar — fixed height, never stretches
             HStack {
@@ -1683,7 +2058,7 @@ struct PromotionalAdsCardStaggeredNew: View {
             .frame(height: 35)
             .frame(maxWidth: .infinity)
             .background(Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
             .onTapGesture {
                 onTapBottomtButton()
                 outboundClickApi()
@@ -1710,50 +2085,12 @@ struct PromotionalAdsCardStaggeredNew: View {
         }
     }
 }
-struct HorizontalBannerCard: View {
-    let product:     ItemModel
-    let onTapButton: () -> Void
-    
-    var body: some View {
-        KFImage(URL(string: product.banner?.image ?? "")).onSuccess { result in
-            
-        }
-        .scaleFactor(UIScreen.main.scale)
-        .cacheOriginalImage(false)
-        .resizable()
-        .scaledToFill()
-        .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 220)
-        .clipped()
-        .shadow(color: .black.opacity(0.10), radius: 7, x: 0, y: 2)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTapButton()
-            outboundClickApi()
-        }
-    }
-    
-    private func outboundClickApi() {
-        URLhandler.sharedinstance.makeCall(
-            url: Constant.shared.board_outbond_click,
-            param: ["board_id": product.id ?? 0],
-            methodType: .post
-        ) { responseObject, error in
-            guard error == nil,
-                  let result = responseObject as? NSDictionary,
-                  (result["code"] as? Int) == 200 else { return }
-        }
-    }
-}
- 
- 
-struct ImageRatioKey: PreferenceKey {
-    static var defaultValue: [Int: CGFloat] = [:]
-    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
-    }
-}
+
+
+
+
+
+
 
 
 
@@ -2657,3 +2994,175 @@ struct BoardListViewNew: View {
 }
 
 */
+
+
+/*struct BoardHomeView: View {
+
+    @State private var selectedCategoryId: Int = 0
+    @State private var selectedName: String = ""
+    let tabBarController: UITabBarController?
+    @StateObject private var categoryVM = CategoryViewModel(type: 2, isToShowLoader: false)
+    @StateObject private var boardStore = BoardStore()
+    // Only keep selected tab + 1 neighbour each side alive (max 3 total)
+    @State private var loadedCategoryIds: [Int] = []
+    private let maxLoadedTabs = 3
+    @State private var isUpdatedEvents: Bool = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            headerView
+                .background(Color(.systemBackground))
+        
+
+            CategoryTabsNew(
+                selected: $selectedName,
+                selectedCategoryId: $selectedCategoryId,
+                categoryVM: categoryVM
+            )
+            .background(Color(.systemBackground))
+
+            if selectedCategoryId > 0 {
+                tabContentView
+            } else {
+                HStack{Spacer()}.frame(height:30).padding()
+                PinterestSkeletonGrid() .padding(.top, 5)
+            }
+        }
+        .onChange(of: selectedCategoryId) { newId in
+            FeedVideoManager.shared.pauseAll()
+            FeedVideoManager.shared.muteAll()
+            markTabLoaded(newId)
+            prefetchNeighbours(of: newId)
+        }
+        .onAppear {
+          //  markTabLoaded(selectedCategoryId)
+            if isUpdatedEvents{
+                updateEvents()
+                isUpdatedEvents = true
+            }
+        }
+        .background(Color(.systemGray6))
+        .onDisappear { FeedVideoManager.shared.muteAll() }
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notification.Name(NotificationKeys.refreshInterestChangeBoardScreen.rawValue)
+            )
+        ) { _ in handleInterestRefresh() }
+    }
+
+    // MARK: - Tab Content
+    // This is the critical change: instead of ZStack with all tabs at opacity 0/1,
+    // we only insert the active tab (+ loaded neighbours) into the view tree.
+    // Views not in the tree = zero memory for their scroll state, image cache refs, etc.
+
+    @ViewBuilder
+    private var tabContentView: some View {
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+
+        ZStack {
+            ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
+                let catId = cat.id ?? 0
+                // HARD conditional — not opacity. Off-screen tabs don't exist.
+                if loadedCategoryIds.contains(catId) {
+                    BoardListViewNew(
+                        tabBarController: tabBarController,
+                        vm: boardStore.vm(for: catId),
+                        navigationController: boardNav,
+                        isActive: selectedCategoryId == catId
+                    )
+                    // Use offset instead of opacity so scroll position is preserved
+                    // for the immediate neighbours, but they're off-screen
+                    .offset(x: selectedCategoryId == catId ? 0 : UIScreen.main.bounds.width)
+                    .allowsHitTesting(selectedCategoryId == catId)
+                }
+            }
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 15)
+                .onEnded { value in
+                    let h = value.translation.width
+                    let v = value.translation.height
+                    guard abs(h) > abs(v) else { return }
+                    if h < -70 { swipeCategory(left: true) }
+                    else if h > 70 { swipeCategory(left: false) }
+                }
+        )
+    }
+
+    // MARK: - LRU Tab Management
+    private func markTabLoaded(_ id: Int) {
+        guard id > 0 else { return }
+
+        if let idx = loadedCategoryIds.firstIndex(of: id) {
+            loadedCategoryIds.remove(at: idx)
+            loadedCategoryIds.insert(id, at: 0)
+            return
+        }
+
+        // Evict when over cap
+        while loadedCategoryIds.count >= maxLoadedTabs {
+            let evictId = loadedCategoryIds.removeLast()
+            boardStore.evict(id: evictId)
+            // Also clear Kingfisher memory for images associated with this tab
+            ImageCache.default.clearMemoryCache()
+        }
+
+        loadedCategoryIds.insert(id, at: 0)
+    }
+
+    /// Pre-load left and right neighbours so swipe feels instant
+    private func prefetchNeighbours(of id: Int) {
+        guard let list = categoryVM.listArray,
+              let idx  = list.firstIndex(where: { $0.id == id }) else { return }
+
+        if idx > 0 {
+            let leftId = list[idx - 1].id ?? 0
+            if !loadedCategoryIds.contains(leftId) {
+                markTabLoaded(leftId)
+            }
+        }
+        if idx < list.count - 1 {
+            let rightId = list[idx + 1].id ?? 0
+            if !loadedCategoryIds.contains(rightId) {
+                markTabLoaded(rightId)
+            }
+        }
+    }
+
+    // MARK: - Notification / Swipe Handlers
+
+    private func handleInterestRefresh() {
+        selectedCategoryId = 55555
+        selectedName = "All"
+        NotificationCenter.default.post(
+            name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue),
+            object: nil
+        )
+    }
+
+    private func swipeCategory(left: Bool) {
+        guard let list = categoryVM.listArray,
+              let currentIndex = list.firstIndex(where: { $0.id == selectedCategoryId })
+        else { return }
+
+        let newIndex = left
+            ? min(currentIndex + 1, list.count - 1)
+            : max(currentIndex - 1, 0)
+
+        let newCat = list[newIndex]
+        withAnimation(.none) {
+            selectedCategoryId = newCat.id ?? 0
+            selectedName       = newCat.name ?? ""
+        }
+    }
+
+    func updateEvents() {
+        Task.detached(priority: .utility) {
+            await FaceBookAppEvents.facebookEvents(type: .board, categoryName: selectedName)
+        }
+        
+        Task.detached(priority: .background) {
+            SocketIOManager.sharedInstance.checkSocketStatus()
+        }
+    }
+}*/

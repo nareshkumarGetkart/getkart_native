@@ -10,8 +10,10 @@ import Kingfisher
 
 class AudioTableViewCell: ChatterCell {
 
+    
     override func awakeFromNib() {
         super.awakeFromNib()
+        lblMessage.isHidden = true
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {

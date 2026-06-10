@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -33,7 +33,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1w3-Ic-OEe">
-                                <rect key="frame" x="10" y="240" width="190" height="10"/>
+                                <rect key="frame" x="10" y="240" width="195" height="10"/>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -48,14 +48,14 @@
                             <constraint firstItem="1w3-Ic-OEe" firstAttribute="leading" secondItem="pJ6-Pj-JzQ" secondAttribute="leading" constant="10" id="pXo-wm-shp"/>
                             <constraint firstItem="1w3-Ic-OEe" firstAttribute="top" secondItem="04F-ab-3zT" secondAttribute="bottom" constant="5" id="qfj-Up-tVq"/>
                             <constraint firstItem="04F-ab-3zT" firstAttribute="top" secondItem="pJ6-Pj-JzQ" secondAttribute="top" id="wro-Er-0Kb"/>
-                            <constraint firstAttribute="trailing" secondItem="1w3-Ic-OEe" secondAttribute="trailing" constant="10" id="yMH-zE-nYm"/>
+                            <constraint firstAttribute="trailing" secondItem="1w3-Ic-OEe" secondAttribute="trailing" constant="5" id="yMH-zE-nYm"/>
                         </constraints>
                     </view>
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="MGI-Y1-qFh">
-                        <rect key="frame" x="14.999999999999996" y="283.33333333333331" width="37.666666666666657" height="11.666666666666686"/>
+                        <rect key="frame" x="15" y="283" width="40" height="12"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3:02 PM" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9pW-6v-xJn">
-                                <rect key="frame" x="0.0" y="0.0" width="37.666666666666664" height="11.666666666666666"/>
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="12"/>
                                 <fontDescription key="fontDescription" name="Inter-Regular" family="Inter" pointSize="10"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>

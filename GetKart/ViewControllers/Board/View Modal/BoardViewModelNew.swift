@@ -45,6 +45,9 @@ final class BoardViewModelNew: ObservableObject {
         requestedPages.insert(nextPage)
         loadPage(nextPage)
     }
+    
+    
+   
 
     // MARK: - Page loader
     private func loadPage(_ page: Int) {

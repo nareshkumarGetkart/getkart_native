@@ -139,8 +139,7 @@ class ChatVC: UIViewController {
         self.btnMic.addTarget(self, action: #selector(cancelRecordVoice), for: [.touchUpOutside, .touchCancel])
         
          checkOnlineOfflineStatus()
-        
-        getMessageList()
+         getMessageList()
         
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: {
@@ -286,7 +285,7 @@ class ChatVC: UIViewController {
     
     @IBAction func sendMessageButtonAction(sender : UIButton){
         
-        self.view.endEditing(true)
+       // self.view.endEditing(true)
         if !AppDelegate.sharedInstance.isInternetConnected{
             self.view.endEditing(true)
             
@@ -549,7 +548,10 @@ class ChatVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.clearAllMessage),
                                                name: NSNotification.Name(rawValue: SocketEvents.clearAllMessage.rawValue), object: nil)
         
-    }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.deleteMessage),
+                                               name: NSNotification.Name(rawValue: SocketEvents.deleteMessage.rawValue), object: nil)
+        }
     
     //MARK: Other helpful methods
     func registerTblCell(){
@@ -574,7 +576,14 @@ class ChatVC: UIViewController {
         tblView.register(UINib(nibName: "RecieveOfferChatCell", bundle: nil), forCellReuseIdentifier: "RecieveOfferChatCell")
   
     }
-  
+    
+    func emitDeleteMessage(msgId:Int,isEveryone:Bool) {
+        
+        let deleteType = isEveryone ? "everyone" : "me" //"delete_type":"everyone" //me, everyone
+        let params = ["room_id":item_offer_id,"message_id":msgId,"delete_type":deleteType] as [String : Any]
+        SocketIOManager.sharedInstance.emitEvent(SocketEvents.deleteMessage.rawValue, params)
+    }
+     
     
     func clearChat(){
         
@@ -800,6 +809,58 @@ class ChatVC: UIViewController {
     }
     
     
+    @objc func deleteMessage(notification:Notification){
+        guard let data = notification.userInfo else{ return }
+        if (data["code"] as? Int ?? 0) == 200{
+            //let  message = data["message"] as? String ?? ""
+            
+            if let dataDict = data["data"] as? Dictionary<String,Any>{
+                let id = dataDict["id"] as? Int ?? 0
+                //let sender_id = dataDict["sender_id"] as? Int ?? 0
+                self.deleteMessageUpdateCell(msgId:id)
+            }
+        }
+    }
+   
+    func deleteMessageUpdateCell(msgId: Int) {
+        let rowIndex = chatArray.firstIndex{ $0.id == msgId } ?? 0
+        if chatArray.count > rowIndex{
+            self.chatArray.remove(at: rowIndex)
+            self.tblView.reloadData()
+        }
+        Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+    }
+
+  
+    func deleteMessageUpdateCell(msgIds: [Int]) {
+        
+        var indexPaths: [IndexPath] = []
+
+        for (index, chatObj) in chatArray.enumerated() {
+            
+            guard let id = chatObj.id,
+                  msgIds.contains(id) else { continue }
+
+            chatArray[index].isDelete = 1
+
+            if chatObj.senderID == Local.shared.getUserId() {
+                chatArray[index].message = "🚫 You deleted this message"
+            } else {
+                chatArray[index].message = "🚫 This message was deleted"
+            }
+
+            indexPaths.append(IndexPath(row: index, section: 0))
+          
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER = true
+        }
+
+        guard !indexPaths.isEmpty else { return }
+
+        DispatchQueue.main.async {
+            self.tblView.reloadRows(at: indexPaths, with: .fade)
+        }
+    }
+    
     
     @objc func clearAllMessage(notification: Notification) {
         
@@ -897,28 +958,7 @@ class ChatVC: UIViewController {
     }
     
     
-//    @objc func typingStatus(notification: Notification) {
-//        guard let data = notification.userInfo else{
-//            return
-//        }
-//        
-//        if let dataDict = data["data"] as? Dictionary<String,Any>{
-//            
-//            let typing = dataDict["typing"] as? Int ?? 0
-//            let item_offer_id =  dataDict["room_id"] as? Int ?? 0
-//           // let receiver_id =  dataDict["receiver_id"] as? Int ?? 0
-//            
-//            if self.item_offer_id == item_offer_id {
-//                self.lblTypingStatus.isHidden = (typing == 1) ? false : true
-//                typingOtherTimer?.invalidate()
-//                typingOtherTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
-//                    self?.lblTypingStatus.isHidden = true
-//                    self?.typingOtherTimer?.invalidate()
-//                 }
-//            }
-//            
-//        }
-//    }
+
     func chatDeleteInfo(invalidatedAt: String) -> String? {
         
         let formatter = DateFormatter()
@@ -1110,10 +1150,10 @@ class ChatVC: UIViewController {
                 item_offer_id = response.data?.roomId ?? 0
             }
             if var obj = response.data ,obj.roomId == item_offer_id {
-                
-                if Local.shared.getUserId() != (obj.senderID ?? 0) {
-                    obj.isCautionExpanded = 1
-                }
+//                
+//                if Local.shared.getUserId() != (obj.senderID ?? 0) {
+//                    obj.isCautionExpanded = 1
+//                }
 
                
                 self.chatArray.append(obj)
@@ -1646,6 +1686,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                 
                 cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
                 
+                
                 DispatchQueue.main.async {
                     cell.bgview.roundCorners(corners: [.bottomLeft,.topLeft,.topRight], radius: 15.0)
                     cell.bgview.updateConstraints()
@@ -1659,11 +1700,18 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     cell.lblSeen.text =  ((indexPath.row + 1) == chatArray.count) ? "Seen" : ""
                 }
                 cell.lblTime.text = dateFormatter.string(from: date)
-                cell.imgView.kf.indicatorType = .activity
-                cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
-                cell.imgView.isUserInteractionEnabled = true
-                cell.imgView.tag = indexPath.row
-                cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+             
+                
+                if chatObj.isDelete == 1{
+                    cell.imgView.isHidden = true
+                }else{
+                    cell.imgView.isHidden = false
+                    cell.imgView.kf.indicatorType = .activity
+                    cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
+                    cell.imgView.isUserInteractionEnabled = true
+                    cell.imgView.tag = indexPath.row
+                    cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+                }
             }
                 
                
@@ -1671,9 +1719,16 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             case "audio": do{
                 cell = tableView.dequeueReusableCell(withIdentifier: "outgoingAudio", for: indexPath) as! AudioTableViewCell
               //  cell.lblMessage.attributedText = NSAttributedString(string:"")
-                cell.playPauseButton.tag = indexPath.row
-                cell.playPauseButton.addTarget(self, action: #selector(playPauseTapped(sender:)), for: .touchUpInside)
-              
+                
+                if chatObj.isDelete == 1{
+                    cell.lblMessage.isHidden = false
+                    cell.lblMessage.backgroundColor = UIColor(hexString:"#FFE8C5")
+                    cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                }else{
+                    cell.lblMessage.isHidden = true
+                    cell.playPauseButton.tag = indexPath.row
+                    cell.playPauseButton.addTarget(self, action: #selector(playPauseTapped(sender:)), for: .touchUpInside)
+                }
                  if (chatObj.readAt?.count ?? 0) == 0{
                     cell.imgViewSeen.setImageTintColor(color: .gray)
                     cell.lblSeen.isHidden = true
@@ -1805,8 +1860,6 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     }else{
                         cell.cautionBgView.isHidden = true
                         cell.btnCautionOnOff.isHidden = true
-                        
-
                     }
                     
                     
@@ -1848,12 +1901,18 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                      cell.lblSeen.isHidden = false
                      }*/
                     cell.lblTime.text = dateFormatter.string(from: date)
-                    cell.imgView.kf.indicatorType = .activity
-                    cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
                     
-                    cell.imgView.isUserInteractionEnabled = true
-                    cell.imgView.tag = indexPath.row
-                    cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+                    if chatObj.isDelete == 1{
+                        cell.imgView.isHidden = true
+                    }else{
+                        cell.imgView.isHidden = false
+                        cell.imgView.kf.indicatorType = .activity
+                        cell.imgView.kf.setImage(with: URL(string: chatObj.file ?? ""), options: [.cacheOriginalImage])
+                        
+                        cell.imgView.isUserInteractionEnabled = true
+                        cell.imgView.tag = indexPath.row
+                        cell.imgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageTapped)))
+                    }
                     
                 }
                  
@@ -1861,8 +1920,17 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                     
                     cell = tableView.dequeueReusableCell(withIdentifier: "incomingAudio", for: indexPath) as! AudioTableViewCell
                     
-                    cell.playPauseButton.tag = indexPath.row
-                   cell.playPauseButton.addTarget(self, action: #selector(playPauseTapped(sender:)), for: .touchUpInside)
+                   
+                    
+                    if chatObj.isDelete == 1{
+                        cell.lblMessage.backgroundColor = .systemBackground
+                        cell.lblMessage.isHidden = false
+                        cell.lblMessage.attributedText = NSAttributedString(string:  chatObj.message ?? "")
+                    }else{
+                        cell.lblMessage.isHidden = true
+                        cell.playPauseButton.tag = indexPath.row
+                        cell.playPauseButton.addTarget(self, action: #selector(playPauseTapped(sender:)), for: .touchUpInside)
+                    }
                    /* cell.lblTime.text = dateFormatter.string(from: date)
                     cell.audioDuration.text = "\(chatObj.mediaDuration ?? 0)"
                     cell.audioSlider.value = Float(chatObj.mediaDuration ?? 0) / 180
@@ -1908,13 +1976,19 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             
         }
       
-        if (chatObj.messageType ?? "") == "text"{
+       // if (chatObj.messageType ?? "") == "text"{
             cell.contentView.tag = indexPath.row
             
             let long = UILongPressGestureRecognizer(target: self, action: #selector(self.longGestureCellAction(_:)))
             // long.delegate = self
             cell.contentView.addGestureRecognizer(long)
-        }
+//        }else if (chatObj.messageType ?? "") == "file"{
+//            cell.contentView.tag = indexPath.row
+//            let long = UILongPressGestureRecognizer(target: self, action: #selector(self.longGestureCellAction(_:)))
+//            // long.delegate = self
+//            cell.contentView.addGestureRecognizer(long)
+//        }
+
         //            let pan = UIPanGestureRecognizer(target: self, action: #selector(self.panGestureCellAction(_:)))
         //            pan.delegate = self
         //             cell1.contentView.addGestureRecognizer(pan)
@@ -2076,9 +2150,9 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                      }
                     
                      
-//                     if messageFrame.isDeleted == 1{
-//                         return
-//                     }
+                     if messageFrame.isDelete == 1{
+                         return
+                     }
      //                if messageFrame.message.replyObj == nil {
      //                    messageFrame.message.replyObj = ReplyInfo(respDict: [:])
      //                }
@@ -2128,7 +2202,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                                  vc.planBoughtDelegate = self
                                  AppDelegate.sharedInstance.navigationController?.pushViewController(vc, animated: true)
                                  
-                             }else{
+                             }else{*/
                                  let messageFrame = self.chatArray[index.row]
                                  
                                  
@@ -2138,18 +2212,19 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                                  
                                  let deleteForMe = UIAlertAction(title: "Delete for me", style: .default) { (action) in
                                      
-                                     self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 0)
+                                     self.emitDeleteMessage(msgId: self.chatArray[index.row].id ?? 0, isEveryone: false)
+
                                      
                                  }
                                  
                                  let deleteChatBoth = UIAlertAction(title: "Delete for everyone", style: .default) { (action) in
                                      
-                                     self.singleMessageDelete(messageId:self.chatArray[index.row].messageId ?? "", deleteFlag: 1)
-                                 }
+                                     self.emitDeleteMessage(msgId: self.chatArray[index.row].id ?? 0, isEveryone: true)
+                                   }
                                  
-                                 if self.checkTimeStampMorethan5Mins(timestamp: Int(messageFrame.createdAt ?? 0)){
+                              if self.checkTimeStampMorethan5Mins(createdAt: messageFrame.createdAt ?? ""){
                                      
-                                     if messageFrame.sender == Local.shared.getUserId(){
+                                    if messageFrame.senderID == Local.shared.getUserId(){
                                          actionSheetAlertController.addAction(deleteChatBoth)
                                          actionSheetAlertController.addAction(deleteForMe)
                                      }else{
@@ -2162,8 +2237,8 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                                  actionSheetAlertController.addAction(cancelActionButton)
                                  self.present(actionSheetAlertController, animated: true, completion: nil)
                                  
-                             }
-                             */
+                            // }
+                             
                          }else if(action == "Reply")
                          {
                            //  self.ShowReplyView(messageFrame)
@@ -2184,10 +2259,10 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
         
         var menuOptionNameArray : [String] = []
         var menuOptionImageNameArray : [String] = []
-    /*
-        menuOptionNameArray = ["Reply","Copy","Delete"]
-        menuOptionImageNameArray = [ "menu_reply", "menu_copy", "menu_delete"]
-        
+    
+//        menuOptionNameArray = ["Reply","Copy","Delete"]
+//        menuOptionImageNameArray = [ "menu_reply", "menu_copy", "menu_delete"]
+//        
         /* 0-Text, 1-Media (Image,video,GIF, Document), 2-Link, 3-Contact, 4-Location, 6-Music, 7-gift */
 
         if messageFrame.messageType != "text"{
@@ -2196,40 +2271,57 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
 //            menuOptionNameArray = ["Reply","Delete"]
 //            menuOptionImageNameArray = [ "menu_reply", "menu_delete"]
             
-            menuOptionNameArray = ["Reply"]
-            menuOptionImageNameArray = [ "menu_reply"]
+            menuOptionNameArray = ["Delete"]
+            menuOptionImageNameArray = [ "menu_delete"]
+        }else{
+            menuOptionNameArray = ["Copy","Delete"]
+            menuOptionImageNameArray = ["menu_copy", "menu_delete"]
         }
         
         
-        let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
+        let objLoggedInUser = Local.shared.getUserId()
 
         
-        if messageFrame.senderID != objLoggedInUser.id{
+        if messageFrame.senderID != objLoggedInUser{
             if messageFrame.messageType == "text"{
 //                menuOptionNameArray = ["Reply","Copy","Delete"]
 //                menuOptionImageNameArray = [ "menu_reply", "menu_copy", "menu_delete"]
                 
-                menuOptionNameArray = ["Reply","Copy"]
-                menuOptionImageNameArray = [ "menu_reply", "menu_copy"]
+                menuOptionNameArray = ["Copy","Delete"]
+                menuOptionImageNameArray = [ "menu_copy", "menu_delete"]
             }else{
 //                menuOptionNameArray = ["Reply","Delete"]
 //                menuOptionImageNameArray = [ "menu_reply", "menu_delete"]
                 
-                menuOptionNameArray = ["Reply"]
-                menuOptionImageNameArray = [ "menu_reply"]
+                menuOptionNameArray = ["Delete"]
+                menuOptionImageNameArray = [ "menu_delete"]
             }
             
         }
         
-        */
-        menuOptionNameArray = ["Copy"]
-        menuOptionImageNameArray = ["menu_copy"]
+        
+//        menuOptionNameArray = ["Copy"]
+//        menuOptionImageNameArray = ["menu_copy"]
         
         return (menuOptionNameArray, menuOptionImageNameArray)
     }
     
-    /*
-    func checkTimeStampMorethan5Mins(timestamp : Int) -> Bool
+  
+    func checkTimeStampMorethan5Mins(createdAt: String) -> Bool {
+        let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [
+                .withInternetDateTime,
+                .withFractionalSeconds
+            ]
+
+            guard let createdDate = formatter.date(from: createdAt) else {
+                return false
+            }
+
+            return Date().timeIntervalSince(createdDate) <= 10 * 60
+    }
+    
+  /*  func checkTimeStampMorethan5Mins(timestamp : Int) -> Bool
     {
         if(timestamp > 0)
         {
@@ -2245,9 +2337,9 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
         return false
-    }
+    }*/
     
-    
+    /*
     
     @objc func didClickCellButton(_ sender: UIButton){
         
@@ -2537,5 +2629,78 @@ extension ChatVC{
    
     
 }
+/*
 
 
+extension ChatVC{
+    
+    func deleteMessageUpdateCell(msgIdArray:[Int]){
+    chatArray.forEach({ chatObj in
+          //  if let chatObj = chatObj as? UUMessageFrame{
+                
+       
+                if msgIdArray.contains(chatObj.id ?? 0){
+                    
+                    let index = chatArray.firstIndex(where: { $0
+                        $0.id == chatObj.id ?? 0
+                    })
+                        
+                        .index(of: chatObj)
+                    chatObj.message.is_deleted = "1"
+                    chatObj.message.type = MessageType(rawValue: 0)!
+                    chatObj.message.message_type = "0"
+                    
+                    if(chatObj.message.from == MessageFrom(rawValue: 1))
+                    {
+                        chatObj.message.payload = "🚫 You deleted this message."
+                    }else
+                    {
+                        chatObj.message.payload = "🚫 This message was deleted."
+                    }
+                    DispatchQueue.main.async{
+                        self.tblChat.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+                    }
+                }
+           // }
+        })
+    }
+    
+    @objc func deleteMsgFromToStatus(notification:Notification){
+        
+        /*if  let response = notification.userInfo as? Dictionary<String, Any> {
+            
+            let deleteFlag = response["deleteFlag"] as? Int ?? 0
+            let from = response["from"] as? String ?? ""
+            let to = response["to"] as? String ?? ""
+            if toChat == to &&  from == Themes.sharedInstance.Getuser_id() && deleteFlag == 2 {
+                if let payloadDict = response["mssgid"] as? [String]{
+                    var index = 0
+                    
+                    for obj in self.chatHistory {
+                        
+                        if (obj as! UUMessageFrame).message.msgId == payloadDict.first {
+                            
+                            self.chatHistory.removeObject(at: index)
+                            self.tblChat.reloadData()
+                            break
+                        }
+                        index = index + 1
+                    }
+                }
+            }
+        }*/
+    }
+    
+    
+//    @objc func deleteMsgStatus(notification:Notification){
+//        
+//        if  let response = notification.userInfo as? Dictionary<String, Any> {
+//            
+//            if let payloadArray = response["payload"] as? [String]{
+//                
+//               // self.deleteMessageUpdateCell(msgIdArray: payloadArray)
+//            }
+//        }
+//    }
+    
+}*/

@@ -15,7 +15,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .live
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -174,6 +174,7 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/delete-comment"
         }
     }
+   
     var update_promotional_board:String{
         
         get{
@@ -334,6 +335,15 @@ final class Constant: NSObject {
           // return "\(baseURL)/v1/get-public-board"
             
            return "\(baseURL)/v2/get-public-board"
+
+            
+        }
+    }
+    
+    var  public_board_search:String {
+        get {
+            
+           return "\(baseURL)/v2/public-board-search"
 
             
         }

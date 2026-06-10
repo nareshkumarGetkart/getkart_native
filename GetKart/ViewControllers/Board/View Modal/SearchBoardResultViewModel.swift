@@ -131,9 +131,13 @@ final class SearchBoardResultViewModel: ObservableObject {
         guard !isLoading else { return }
 
         isLoading = true
+     
+       
+//      let strUrl = Constant.shared.get_public_board + "?page=\(page)&search=\(searchText)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
 
-      let strUrl = Constant.shared.get_public_board + "?page=\(page)&search=\(searchText)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
+        let strUrl = Constant.shared.public_board_search + "?page=\(page)&search=\(searchText)&category_id=\(selectedCategoryId > 0 ? "\(selectedCategoryId)" : "")"
 
+        
         ApiHandler.sharedInstance.makeGetGenericData(
             isToShowLoader: showLoader,
             url: strUrl,

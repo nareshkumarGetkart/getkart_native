@@ -5,6 +5,11 @@
 //  Created by gurmukh singh on 2/19/25.
 //
 
+
+//======= New Optimized code
+
+
+
 import UIKit
 import IQKeyboardManagerSwift
 import FirebaseCore
@@ -19,6 +24,810 @@ import FacebookAEM
 import AppTrackingTransparency
 import FBSDKCoreKit
 
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    // MARK: - Properties
+
+    let reachability = Reachability()
+    var isInternetConnected: Bool = false
+    var byreachable: String = ""
+
+    static var sharedInstance: AppDelegate {
+        return UIApplication.shared.delegate as? AppDelegate ?? AppDelegate()
+    }
+
+    var window: UIWindow?
+    var navigationController: UINavigationController?
+    var sharedProfileID = ""
+    var notificationType = ""
+    var userId = 0
+    var roomId = 0
+    var itemId = 0
+
+    private let isForceAppUpdate = true
+    private var isDeviceRegistered = false
+    private var hasCheckedUpdateThisSession = false
+    private var isBackgroundCalled = false
+    private var backgroundCalledTime: TimeInterval = 0
+    private var socketConnectToken: NSObjectProtocol?
+
+    // MARK: - App Launch
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+
+        // ── Critical path: window must be visible before anything else ──────
+        window = UIWindow(frame: UIScreen.main.bounds)
+        applyTheme()
+
+        navigationController = UINavigationController()
+        navigationController?.isNavigationBarHidden = true
+
+        let splashVC = SplashViewController()
+        navigationController?.viewControllers = [splashVC]
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
+
+        // ── Services needed before first network call ────────────────────────
+        FirebaseApp.configure()
+        setupImageCache()
+        configureAudioSession()
+        reachabilityListener()
+        registerForRemoteNotification(application: application)
+
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions
+        )
+
+        IQKeyboardManager.shared.isEnabled = true
+        IQKeyboardManager.shared.resignOnTouchOutside = true
+
+        // Parse cold-launch notification payload before navigateToHomeOrLogin runs
+        if let remote = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+            parseNotificationPayload(remote)
+            Constant.shared.isLaunchFirstTime = 1
+        }
+
+        // ── Defer non-critical work until after first frame ──────────────────
+        DispatchQueue.main.async { [weak self] in
+            self?.setupTabBarFont()
+            self?.deviceRegisterApi()
+            self?.checkAppUpdate()
+        }
+
+        return true
+    }
+
+    // MARK: - Image Cache Setup
+
+    func setupImageCache() {
+        let cache = ImageCache.default
+        cache.memoryStorage.config.totalCostLimit = 80 * 1024 * 1024   // 80 MB
+        cache.memoryStorage.config.countLimit     = 60
+        cache.memoryStorage.config.cleanInterval  = 30
+        cache.diskStorage.config.sizeLimit        = 300 * 1024 * 1024  // 300 MB
+        cache.diskStorage.config.expiration       = .days(7)
+
+        let downloader = KingfisherManager.shared.downloader
+        downloader.downloadTimeout = 15
+        downloader.sessionConfiguration.timeoutIntervalForRequest  = 15
+        downloader.sessionConfiguration.timeoutIntervalForResource = 30
+    }
+
+    // MARK: - Audio Session
+
+    func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session error: \(error)")
+        }
+    }
+
+    // MARK: - App Update
+
+    private func checkAppUpdate() {
+        guard let updater = ATAppUpdater.sharedUpdater() as? ATAppUpdater else { return }
+        updater.delegate = self
+        isForceAppUpdate ? updater.showUpdateWithForce() : updater.showUpdateWithConfirmation()
+    }
+
+    // MARK: - Tab Bar Font
+
+    private func setupTabBarFont() {
+        guard let font = UIFont(name: "Inter-Regular", size: 12) else { return }
+        let appearance = UITabBarAppearance()
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes   = [.font: font]
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.font: font]
+        UITabBar.appearance().standardAppearance = appearance
+        if #available(iOS 15, *) {
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+
+    // MARK: - Navigation
+
+    private func navigateToHomeOrLogin() {
+        if Local.shared.getUserId() > 0 {
+            if let landingVC = StoryBoard.main.instantiateViewController(withIdentifier: "HomeBaseVC") as? HomeBaseVC {
+                navigationController?.viewControllers = [landingVC]
+            }
+        } else {
+            let isFirstTime = UserDefaults.standard.object(forKey: "isFirstTime") as? Bool ?? true
+            if isFirstTime {
+                UserDefaults.standard.set(false, forKey: "isFirstTime")
+                UserDefaults.standard.synchronize()
+                let vc = UIHostingController(rootView: DemoView())
+                navigationController?.viewControllers = [vc]
+            } else {
+                if let landingVC = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as? LoginVC {
+                    navigationController?.viewControllers = [landingVC]
+                }
+            }
+        }
+        navigationController?.navigationBar.isHidden = true
+        window?.setRootViewController(navigationController!, options: .init(direction: .fade, style: .easeOut))
+    }
+
+    // MARK: - Orientation
+
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        return .portrait
+    }
+
+    // MARK: - URL Handling
+
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        return ApplicationDelegate.shared.application(app, open: url, options: options)
+    }
+
+    // MARK: - Universal Links
+
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let myUrl = userActivity.webpageURL?.absoluteString else { return true }
+
+        let urlArray = myUrl.components(separatedBy: "/")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            if myUrl.contains("/seller/") {
+                let userId = urlArray.last ?? ""
+                let vc = UIHostingController(
+                    rootView: SellerProfileView(navController: self.navigationController, userId: Int(userId) ?? 0)
+                )
+                self.navigationController?.pushViewController(vc, animated: true)
+
+            } else if myUrl.contains("/board/") {
+                let boardId = urlArray.last ?? ""
+                self.getBoardDetailApi(boardId: Int(boardId) ?? 0)
+            }
+        }
+        return true
+    }
+
+    // MARK: - Memory Warning
+
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        ImageCache.default.clearMemoryCache()
+        FeedVideoManager.shared.pauseAll()
+        FeedVideoManager.shared.reset()
+        URLCache.shared.removeAllCachedResponses()
+    }
+
+    // MARK: - App Lifecycle
+
+    func applicationWillResignActive(_ application: UIApplication) {}
+
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        isBackgroundCalled = true
+        backgroundCalledTime = Date().timeIntervalSince1970
+    }
+
+    func applicationWillEnterForeground(_ application: UIApplication) {}
+
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        AppEvents.shared.activateApp()
+        requestTrackingPermission()
+        SocketIOManager.sharedInstance.checkSocketStatus()
+
+        // Check for update once per session only
+        if !hasCheckedUpdateThisSession {
+            hasCheckedUpdateThisSession = true
+            checkAppUpdate()
+        }
+
+        guard isDeviceRegistered else { return }
+
+        if isBackgroundCalled {
+            guard backgroundCalledTime > 0 else { return }
+            let elapsed = Date().timeIntervalSince1970 - backgroundCalledTime
+            if elapsed >= 3600 { deviceRefreshApi() }
+            isBackgroundCalled = false  // reset for next background cycle
+        } else {
+            deviceRefreshApi()
+        }
+    }
+
+    func applicationWillTerminate(_ application: UIApplication) {}
+
+    // MARK: - ATT
+
+    private func requestTrackingPermission() {
+        guard #available(iOS 14, *) else { return }
+        // Only prompt if not yet determined — avoids re-prompting on every foreground
+        guard ATTrackingManager.trackingAuthorizationStatus == .notDetermined else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                print("ATT status: \(status.rawValue)")
+            }
+        }
+    }
+
+    // MARK: - Theme
+
+    func applyTheme() {
+        let saved = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.light.rawValue
+        switch AppTheme(rawValue: saved) ?? .light {
+        case .light:  window?.overrideUserInterfaceStyle = .light
+        case .dark:   window?.overrideUserInterfaceStyle = .dark
+        case .system: window?.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
+    // MARK: - Reachability
+
+    func reachabilityListener() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reachabilityChanged),
+            name: ReachabilityChangedNotification,
+            object: reachability
+        )
+        do {
+            try reachability?.startNotifier()
+        } catch {
+            print("Could not start reachability notifier")
+        }
+    }
+
+    @objc func reachabilityChanged(note: NSNotification) {
+        guard let reachability = note.object as? Reachability else { return }
+
+        if reachability.isReachable {
+            isInternetConnected = true
+            byreachable = reachability.isReachableViaWiFi ? "1" : "2"
+            NotificationCenter.default.post(
+                name: NSNotification.Name(NotificationKeys.reconnectInternet.rawValue),
+                object: nil
+            )
+            /*
+             if Local.shared.getUserId() > 0 {
+                 SocketIOManager.sharedInstance.establishConnection()
+             }
+             */
+            DispatchQueue.main.async{
+                if Local.shared.getUserId() > 0 {
+                    SocketIOManager.sharedInstance.establishConnection()
+                }
+            }
+            
+        } else {
+            isInternetConnected = false
+            byreachable = ""
+            NotificationCenter.default.post(
+                name: NSNotification.Name(NotificationKeys.noInternet.rawValue),
+                object: nil
+            )
+        }
+    }
+
+    // MARK: - Login / Auth
+
+    func showLoginScreen() {
+        navigationController?.viewControllers.removeAll()
+        if let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "LoginVC") as? LoginVC {
+            navigationController?.viewControllers = [vc]
+        }
+    }
+
+    func isUserLoggedInRequest() -> Bool {
+        guard Local.shared.getUserId() > 0 else {
+            let vc = UIHostingController(rootView: LoginRequiredView(loginCallback: {
+                AppDelegate.sharedInstance.navigationController?.popToRootViewController(animated: true)
+            }))
+            vc.modalPresentationStyle = .overFullScreen
+            vc.modalTransitionStyle   = .crossDissolve
+            vc.view.backgroundColor   = UIColor.black.withAlphaComponent(0.5)
+            navigationController?.present(vc, animated: true)
+            return false
+        }
+        return true
+    }
+
+    // MARK: - Verified Info Sheet
+
+    func presentVerifiedInfoView() {
+        let controller = UIHostingController(rootView: SellerVeriedSheetView())
+        controller.navigationController?.navigationBar.isHidden = true
+
+        var fixedSize = 0.27
+        if !UIDevice().hasNotch, UIScreen.main.bounds.height <= 700 {
+            fixedSize = 0.38
+        }
+
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        controller.modalTransitionStyle = .coverVertical
+        controller.modalPresentationStyle = .fullScreen
+
+        let sheet = SheetViewController(
+            controller: nav,
+            sizes: [.percent(Float(fixedSize)), .intrinsic],
+            options: SheetOptions(presentingViewCornerRadius: 0, useInlineMode: true)
+        )
+        sheet.cornerRadius = 15
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+        sheet.allowGestureThroughOverlay = false
+        controller.rootView = SellerVeriedSheetView()
+
+        if let topVC = navigationController?.topViewController {
+            sheet.animateIn(to: topVC.view, in: topVC)
+        } else {
+            navigationController?.present(sheet, animated: true)
+        }
+    }
+}
+
+// MARK: - Notification Routing
+
+extension AppDelegate {
+
+    // Shared helper — parses any notification payload dict into instance vars
+    private func parseNotificationPayload(_ info: [AnyHashable: Any]) {
+        notificationType = info["type"]          as? String ?? ""
+        userId           = Int(info["sender_id"]     as? String ?? "0") ?? 0
+        roomId           = Int(info["item_offer_id"] as? String ?? "0") ?? 0
+        itemId           = Int(info["item_id"]       as? String ?? "0") ?? 0
+       
+        if userId == 0 { userId = Int(info["user_id"]   as? String ?? "0") ?? 0 }
+        if userId == 0 { userId = Int(info["seller_id"] as? String ?? "0") ?? 0 }
+        if userId == 0{   userId =  Int(info["userId"] as? String ?? "0") ?? 0 }
+        
+        if roomId == 0{
+            roomId = Int(info["roomId"] as? String ?? "0") ?? 0
+        }
+
+     
+            
+        
+    }
+
+    // Shared helper — switches to a tab and pushes a view controller once
+    private func switchToTab(
+        _ index: Int,
+        in tabBar: HomeBaseVC,
+        push: @escaping (UINavigationController) -> Void
+    ) {
+        tabBar.selectedIndex = index
+        DispatchQueue.main.async {
+            guard let nav = tabBar.selectedViewController as? UINavigationController else { return }
+            nav.popToRootViewController(animated: false)
+            push(nav)
+        }
+    }
+
+    func navigateToNotificationType() {
+        guard !notificationType.isEmpty else { return }
+
+        // Capture locally so clearReceivedNotification() doesn't race
+        let type          = notificationType
+        let userIdLocal   = userId
+        let roomIdLocal   = roomId
+        let itemIdLocal   = itemId
+
+        SocketIOManager.sharedInstance.checkSocketStatus()
+
+        switch type {
+
+        case "chat", "offer":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            // Already on chat tab and same chat open — just refresh
+            if tabBar.selectedIndex == 3,
+               let nav = tabBar.viewControllers?[3] as? UINavigationController,
+               let chatVC = nav.topViewController as? ChatVC,
+               chatVC.userId == userIdLocal {
+                NotificationCenter.default.post(
+                    name: NSNotification.Name(NotificationKeys.refreshChatTblViewScreen.rawValue),
+                    object: nil
+                )
+                break
+            }
+
+            switchToTab(3, in: tabBar) { nav in
+                let vc = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                vc.userId           = userIdLocal
+                vc.item_offer_id    = roomIdLocal
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            }
+
+        case "payment":
+            let vc = UIHostingController(
+                rootView: TransactionHistoryView(navigation: navigationController)
+            )
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+
+        case "board-update":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            // Already on profile tab showing MyBoardsView — just refresh
+            if tabBar.selectedIndex == 4,
+               let nav = tabBar.viewControllers?[4] as? UINavigationController,
+               nav.topViewController is UIHostingController<MyBoardsView> {
+                NotificationCenter.default.post(
+                    name: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue),
+                    object: nil
+                )
+                break
+            }
+
+            switchToTab(4, in: tabBar) { nav in
+                let vc = UIHostingController(rootView: MyBoardsView(navigationController: nav))
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            }
+
+        case "item-update", "draftItemReminder":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            if tabBar.selectedIndex == 4,
+               let nav = tabBar.viewControllers?[4] as? UINavigationController,
+               let topVC = nav.topViewController as? MyAdsVC {
+                topVC.refreshMyAds()
+                break
+            }
+
+            switchToTab(4, in: tabBar) { nav in
+                let vc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            }
+
+        case "campaign-update":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            if tabBar.selectedIndex == 4,
+               let nav = tabBar.viewControllers?[4] as? UINavigationController,
+               let topVC = nav.topViewController as? MyAdsVC {
+                topVC.refreshMyAds()
+                break
+            }
+
+            switchToTab(4, in: tabBar) { nav in
+                let vc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            }
+
+        case "verifcation-request-update":
+            Local.shared.isToRefreshVerifiedStatusApi = true
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            // Pop all nav stacks to root first
+            tabBar.viewControllers?
+                .compactMap { $0 as? UINavigationController }
+                .forEach { $0.popToRootViewController(animated: false) }
+
+            tabBar.selectedIndex = 4
+            if let nav = tabBar.viewControllers?[4] as? UINavigationController {
+                nav.popToRootViewController(animated: false)
+                (nav.viewControllers.first as? ProfileVC)?.getVerificationStatusApi()
+            }
+
+        case "notification":
+            if itemIdLocal == 0 {
+                let vc = UIHostingController(rootView: NotificationView(navigation: navigationController))
+                vc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(vc, animated: true)
+            }
+
+        case "board-notification":
+            if itemIdLocal == 0 {
+                let vc = UIHostingController(rootView: NotificationView(navigation: navigationController))
+                vc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(vc, animated: true)
+            } else {
+                getBoardDetailApi(boardId: itemIdLocal)
+            }
+
+        case "seller-profile":
+            let vc = UIHostingController(
+                rootView: SellerProfileView(navController: navigationController, userId: userIdLocal)
+            )
+            navigationController?.pushViewController(vc, animated: true)
+
+        case "chatReminder":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+
+            tabBar.viewControllers?
+                .compactMap { $0 as? UINavigationController }
+                .forEach { $0.popToRootViewController(animated: false) }
+
+            switchToTab(3, in: tabBar) { nav in
+                (nav.viewControllers.first as? ChatListVC)?.updateandcheckStatus()
+            }
+
+        default:
+            break
+        }
+
+        clearReceivedNotification()
+    }
+
+    func clearReceivedNotification() {
+        itemId = 0
+        userId = 0
+        roomId = 0
+        notificationType = ""
+    }
+}
+
+// MARK: - Push Notifications
+
+extension AppDelegate: UNUserNotificationCenterDelegate, MessagingDelegate {
+
+    func registerForRemoteNotification(application: UIApplication) {
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
+        application.registerForRemoteNotifications()
+
+        Messaging.messaging().delegate = self
+        Messaging.messaging().token { token, error in
+            if let token {
+                Local.shared.saveFCMToken(token: token)
+            }
+        }
+    }
+
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        if let token = fcmToken {
+            Local.shared.saveFCMToken(token: token)
+        }
+        NotificationCenter.default.post(
+            name: Notification.Name("FCMToken"),
+            object: nil,
+            userInfo: ["token": fcmToken ?? ""]
+        )
+    }
+
+    func application(
+        application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        Messaging.messaging().apnsToken = deviceToken
+    }
+
+    // Notification tapped from background / killed state
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        defer { completionHandler() }   // always called, even on early return
+
+        let info = response.notification.request.content.userInfo
+        parseNotificationPayload(info)
+        // roomId key differs between tap and launch payload
+        if roomId == 0 {
+            roomId = Int(info["roomId"] as? String ?? "0") ?? 0
+        }
+
+        guard Local.shared.getUserId() > 0 else { return }
+        guard Constant.shared.isLaunchFirstTime == 0 else { return }
+        navigateToNotificationType()
+    }
+
+    // Notification received while app is in foreground
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        let info = notification.request.content.userInfo
+        let type = info["type"] as? String ?? ""
+        var uid  = Int(info["sender_id"] as? String ?? "0") ?? 0
+        if uid == 0 { uid = Int(info["user_id"]   as? String ?? "0") ?? 0 }
+        if uid == 0 { uid = Int(info["userId"]     as? String ?? "0") ?? 0 }
+
+        if type == "offer" {
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+        }
+
+        if type == "chat" {
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_SELLER = true
+            Themes.sharedInstance.is_CHAT_NEW_SEND_OR_RECIEVE_BUYER  = true
+
+            // Suppress banner if user is already in that exact chat
+            if let tabBar = navigationController?.topViewController as? HomeBaseVC,
+               tabBar.selectedIndex == 3,
+               let nav = tabBar.viewControllers?[3] as? UINavigationController,
+               let chatVC = nav.topViewController as? ChatVC,
+               chatVC.userId == uid {
+                return  // suppress — user is already reading this chat
+            }
+        }
+
+        if type == "verifcation-request-update" {
+            Local.shared.isToRefreshVerifiedStatusApi = true
+        }
+
+        completionHandler([.banner, .list, .sound])
+    }
+}
+
+// MARK: - API Calls
+
+extension AppDelegate: ATAppUpdaterDelegate {
+
+    func appUpdaterDidShowUpdateDialog() {}
+    func appUpdaterUserDidLaunchAppStore() {}
+    func appUpdaterUserDidCancel() {}
+
+    func deviceRegisterApi() {
+        let params: [String: Any] = ["device_id": UIDevice.getDeviceUIDid()]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.device_register,
+            param: params,
+            methodType: .post,
+            showLoader: false
+        ) { [weak self] responseObject, error in
+            guard let self else { return }
+            self.isDeviceRegistered = true
+            guard error == nil,
+                  let result = responseObject,
+                  let data = result["data"] as? [String: Any] else { return }
+
+            if let key = data["key"] as? String, !key.isEmpty {
+                Constant.shared.xApiKey = key
+            }
+            DispatchQueue.main.async {
+                self.navigateToHomeOrLogin()
+            }
+            self.getSettingsApi()
+        }
+    }
+
+    func deviceRefreshApi() {
+        let params: [String: Any] = ["device_id": UIDevice.getDeviceUIDid()]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.device_refresh,
+            param: params,
+            methodType: .post
+        ) { responseObject, error in
+            guard error == nil,
+                  let result = responseObject,
+                  let data = result["data"] as? [String: Any],
+                  let key = data["key"] as? String,
+                  !key.isEmpty else { return }
+            Constant.shared.xApiKey = key
+        }
+    }
+
+    func getSettingsApi() {
+        ApiHandler.sharedInstance.makeGetGenericData(
+            isToShowLoader: false,
+            url: Constant.shared.get_system_settings
+        ) { (obj: SettingsParse) in
+            guard obj.code == 200 else { return }
+            Local.shared.currencySymbol       = obj.data?.currencySymbol    ?? "₹"
+            Local.shared.companyEmail         = obj.data?.companyEmail      ?? "support@getkart.com"
+            Local.shared.companyTelelphone1   = obj.data?.companyTel1       ?? "8800957957"
+            Local.shared.iosNudityThreshold   = obj.data?.iosNudityThreshold ?? 0.15
+        }
+    }
+
+    func checkUserStatusApi() {
+        let url = Constant.shared.user_status + "/\(Local.shared.getUserId())"
+        URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get) { responseObject, error in
+            guard error == nil,
+                  let result = responseObject,
+                  let data   = result["data"] as? [String: Any],
+                  let isActive = data["is_active"] as? Int else { return }
+            URLhandler.sharedinstance.isLogoutPresented = false
+            if isActive == 0 {
+                Local.shared.removeUserData()
+                AppDelegate.sharedInstance.showLoginScreen()
+            }
+        }
+    }
+
+    private func getBoardDetailApi(boardId: Int) {
+        let url = Constant.shared.get_board_details + "?board_id=\(boardId)"
+        ApiHandler.sharedInstance.makeGetGenericData(
+            isToShowLoader: true,
+            url: url,
+            loaderPos: .mid
+        ) { [weak self] (obj: SingleItemParse) in
+            guard obj.code == 200,
+                  let board = obj.data?.first else { return }
+            DispatchQueue.main.async {
+                let vc = UIHostingController(
+                    rootView: BoardDetailView(navigationController: self?.navigationController, itemObj: board)
+                )
+                vc.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+    }
+}
+
+// MARK: - Splash Screen
+
+class SplashViewController: UIViewController {
+
+    private let logoImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.image = UIImage(named: "Logo")
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        view.addSubview(logoImageView)
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 200),
+            logoImageView.heightAnchor.constraint(equalToConstant: 90)
+        ])
+        if !AppDelegate.sharedInstance.isInternetConnected {
+            AlertView.sharedManager.showToast(message: "No internet connection")
+        }
+    }
+}
+
+
+
+//============ OLD CODE =============
+/*
+ 
+ import UIKit
+ import IQKeyboardManagerSwift
+ import FirebaseCore
+ import FirebaseMessaging
+ import SwiftUI
+ import Kingfisher
+ import GooglePlaces
+ import FittedSheets
+ import AVFoundation
+ import FacebookCore
+ import FacebookAEM
+ import AppTrackingTransparency
+ import FBSDKCoreKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
    
@@ -52,10 +861,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController = UINavigationController()
         self.navigationController?.isNavigationBarHidden = true
         
-           let splashVC = SplashViewController() // simple UIViewController with logo/loader
-          navigationController?.viewControllers = [splashVC]
-          self.window?.rootViewController = navigationController
-          self.window?.makeKeyAndVisible()
+        let splashVC = SplashViewController() // simple UIViewController with logo/loader
+        navigationController?.viewControllers = [splashVC]
+        self.window?.rootViewController = navigationController
+        self.window?.makeKeyAndVisible()
         
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
@@ -68,16 +877,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             didFinishLaunchingWithOptions: launchOptions
         )
        
-//        if #available(iOS 14, *) {
-//            print("ATT Status: \(ATTrackingManager.trackingAuthorizationStatus.rawValue)")
-//        }
-        
 
-        
-        
         //by me kingfisher
         setupImageCache()
-       
         configureAudioSession()
 
         // Define the desired large font
@@ -126,7 +928,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
 
-        self.setupKingfisherSettings()
+      //  self.setupKingfisherSettings()
         
         if let updateChecker : ATAppUpdater =  ATAppUpdater.sharedUpdater() as? ATAppUpdater{
             updateChecker.delegate = self
@@ -136,6 +938,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 updateChecker.showUpdateWithConfirmation()
             }
         }
+        
         
         IQKeyboardManager.shared.isEnabled = true
         IQKeyboardManager.shared.resignOnTouchOutside = true
@@ -1200,15 +2003,16 @@ extension AppDelegate : ATAppUpdaterDelegate{
                 Local.shared.currencySymbol = obj.data?.currencySymbol ?? "₹"
                 Local.shared.companyEmail = obj.data?.companyEmail ?? "support@getkart.com"
                 Local.shared.companyTelelphone1 = obj.data?.companyTel1 ?? "8800957957"
-                Local.shared.placeApiKey = obj.data?.iosPlaceKey ?? ""
-                Local.shared.bannerScrollInterval = obj.data?.bannerScrollInterval ?? 3
+               // Local.shared.placeApiKey = obj.data?.iosPlaceKey ?? ""
+               // Local.shared.bannerScrollInterval = obj.data?.bannerScrollInterval ?? 3
                // print(" \( Local.shared.bannerScrollInterval) bannerScrollInterval val = \(obj.data?.bannerScrollInterval ?? 0)")
                 
                 Local.shared.iosNudityThreshold = obj.data?.iosNudityThreshold ?? 0.15
                 
-                if (obj.data?.iosPlaceKey ?? "").count > 0{
+               /* if (obj.data?.iosPlaceKey ?? "").count > 0{
                     GMSPlacesClient.provideAPIKey(obj.data?.iosPlaceKey ?? "")
                 }
+                */
                 
             }
             
@@ -1306,10 +2110,13 @@ class SplashViewController: UIViewController {
         NSLayoutConstraint.activate([
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            logoImageView.widthAnchor.constraint(equalToConstant: 250),
-            logoImageView.heightAnchor.constraint(equalToConstant: 140)
+            logoImageView.widthAnchor.constraint(equalToConstant: 200),
+            logoImageView.heightAnchor.constraint(equalToConstant: 90)
         ])
     }
     
    
 }
+
+
+*/

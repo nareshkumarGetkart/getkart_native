@@ -25,7 +25,6 @@ struct CreateBoardView: View {
     @State private var showCategoryPopup = false
     @State private var showCallToActionPopup = false
     @State private var showPostDurationPopup = false
-
     @State private var strUrl: String = ""
     @State private var strTitle: String = ""
     @State private var strDescription: String = ""
@@ -40,6 +39,11 @@ struct CreateBoardView: View {
     @State private var deletedImgIdArray = [String]()
     @State  var isPostValidate:Int = 0
     @State private var strPostDuration: String?
+    @State private var showSheet: Bool = false
+    @State private var isFreePost: Bool = true
+    @State private var showBoostSheet: Bool = false
+    @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var createdBoardObj: ItemModel?
 
    
     // MARK: - Grid Layout
@@ -57,7 +61,6 @@ struct CreateBoardView: View {
             HStack {
                 Button {
                     navigationController?.popToRootViewController(animated: true)
-                    //navigationController?.popViewController(animated: true)
                 } label: {
                     Image("arrow_left")
                         .renderingMode(.template)
@@ -118,9 +121,7 @@ struct CreateBoardView: View {
                                             } placeholder: {
                                                
                                             }
-                                            
                                         }
-                                       
                                     }
                                     
                                     Button {
@@ -375,13 +376,13 @@ struct CreateBoardView: View {
                         Text(isFromEdit ? "Update" : "Submit")
                             .font(.inter(.medium, size: 18))
                             .foregroundColor(isFilled ? .white : .gray)
+                            .frame(height: 55)
+                            .frame(maxWidth: .infinity)
+                            .background(isFilled ? Color(hexString: "#FF9900")
+                                        : Color(hexString: "#DFDFDF"))
+                            .cornerRadius(8)
+                            .contentShape(Rectangle())
                     }
-                    .frame(height: 55)
-                    .frame(maxWidth: .infinity)
-                    .background(isFilled ? Color(hexString: "#FF9900")
-                                : Color(hexString: "#DFDFDF"))
-                    .cornerRadius(8)
-                    
                 }
                 .padding()
             }
@@ -430,11 +431,50 @@ struct CreateBoardView: View {
                               selectedOption: $strPostDuration)
                 .presentationBackground(.clear)
         }
+        .sheet(isPresented: $showSheet) {
+            BoostBottomSheet(
+                onBoostTap: {
+                    isFreePost = false
+                    showSheet = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showBoostSheet = true
+                    }
+                },
+                onFreePostTap: {
+                    isFreePost = true
+                    showSheet = false
+                    isDataUploading = true
+                    createBoardApi()
+                }
+            )
+            .presentationDetents([.height(270)])
+            .presentationCornerRadius(20)
+        }
+        
+         .sheet(isPresented: $showBoostSheet) {
+            BoostBoardPlanView(categoryId:selectedCategoryId ?? 0,packageSelectedPressed: { selPkgObj in
+                
+                isDataUploading = true
+                showBoostSheet = false
+                createBoardApi(selPkgObj:selPkgObj)
+           },boardType: 0)
+           
+           .presentationDetents([.height(410)])
+           .presentationDragIndicator(.hidden)
+           .presentationCornerRadius(20)   //  THIS
+           .presentationBackground(Color(.systemBackground)) // ✅ sheet background
+           
+       }
+
     }
+    
+    
     
     func validateField(){
         UIApplication.shared.endEditing()
-       
+        
+        
         if selectedImages.count == 0 { //}&& !isFromEdit {
             
             AlertView.sharedManager.showToast(message: "Please upload board image")
@@ -467,8 +507,13 @@ struct CreateBoardView: View {
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your board")
         }else{
-            isDataUploading = true
-            createBoardApi()
+            if isFromEdit{
+                isDataUploading = true
+                createBoardApi()
+            }else{
+                showSheet = true
+            }
+
         }
     }
     
@@ -580,7 +625,7 @@ struct CreateBoardView: View {
         }
     }
     
-    func createBoardApi(){
+    func createBoardApi(selPkgObj:PlanModel? = nil){
         
         var params:Dictionary<String,Any> = [:]
        
@@ -627,11 +672,16 @@ struct CreateBoardView: View {
         for anyData in selectedImages{
             
             if let img = anyData as? UIImage{
-                if let imgData = img.wxCompress().pngData(){
+                if let imgData = img.wxCompressedData(){
                     galleryImagesData.append(imgData)
                     imgNames.append("gallery_images[]")
                 }
             }
+        }
+        if isFreePost{
+            params["post_with_boost"] = 0
+        }else{
+            params["post_with_boost"] = 1
         }
        
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: nil, imageName: "", imagesData: galleryImagesData, imageNames: imgNames, url:strApiUrl , params: params, completionHandler: { responseObject, error in
@@ -645,18 +695,76 @@ struct CreateBoardView: View {
                 
                 if code == 200{
                     if self.isFromEdit{
+                        
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
+                        
                     }
-                    AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                       // self.navigationController?.popViewController(animated: true)
-                        self.navigationController?.popToRootViewController(animated: true)
+                    if self.isFreePost == true{
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
+                    }else{
+                        if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted){
+                            
+                            do{
+                                let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                                if let itemObj = item.data?.first{
 
+                                    if let pkgObj = selPkgObj{
+                                        self.paymentGatewayOpen(selPlan: pkgObj, item: itemObj)
+                                    }
+                                }
+                            }catch{
+                                
+                            }
+                        }else {
+                            print("Something is wrong while converting dictionary to JSON data.")
+                            
+                            AlertView.sharedManager.showToast(message: message)
+                            
+                        }
                     }
+                   
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                 }
             }
         })
+    }
+    
+    
+  
+    
+    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
+        
+        paymentGateway = PaymentGatewayCentralized()   //STRONG REFERENCE
+        paymentGateway?.planObj = selPlan
+        paymentGateway?.categoryId = item.categoryID ?? 0
+        paymentGateway?.itemId = item.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                self.navigationController?.present(vc, animated: true)
+            }
+            
+            //  RELEASE
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
     }
 }
 

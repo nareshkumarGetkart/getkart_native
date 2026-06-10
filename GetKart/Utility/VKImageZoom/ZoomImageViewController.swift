@@ -285,6 +285,7 @@ class ZoomImageViewController: UIViewController {
         zoomAction(tappedIndex: currentTag)
         btnBack.setImageColor(color: Themes.sharedInstance.themeColor)
         btnDownload.setImageColor(color: Themes.sharedInstance.themeColor)
+        btnDownload.setTitleColor(.black, for: .normal)
         pager.isHidden = imageArrayUrl.count <= 1
         
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture(gesture:)))

@@ -24,10 +24,11 @@ class HomeBaseVC: UITabBarController {
         self.setValue(customTabBar, forKey: "tabBar")
     }
 
-    //MARK: Controller life cycle methods
+    //MARK: - Controller life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(self.chatUnreadCount),
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.chatUnreadCount),
                                                name: NSNotification.Name(rawValue: SocketEvents.chatUnreadCount.rawValue), object: nil)
         
         UITabBar.appearance().unselectedItemTintColor = UIColor.label
@@ -36,9 +37,6 @@ class HomeBaseVC: UITabBarController {
         delegate = self
         self.setViewControllers(getControllers(), animated: false)
 
-//        let images = ["home","gridUnSel","","chat","profile"]
-//        let imagesSel = ["home_active","gridSel","","chat_active","profile_active"]
-       
         let images = ["gridUnSel","search","","chat","profile"]
         let imagesSel = ["gridSel","search","","chat_active","profile_active"]
         
@@ -59,15 +57,9 @@ class HomeBaseVC: UITabBarController {
         if let customTabBar = tabBar as? CustomTabBar {
             customTabBar.middleButton = middleButton
         }
-
-//        SocketIOManager.sharedInstance.checkSocketStatus()
-        // badge is added in viewDidLayoutSubviews so frames are ready
-//        
-//        NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
-//            SocketIOManager.sharedInstance.emitEvent(SocketEvents.chatUnreadCount.rawValue, [:])
-//
-//        }
-
+        
+      
+        
     }
    
     
@@ -79,22 +71,15 @@ class HomeBaseVC: UITabBarController {
             
             NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
                 AppDelegate.sharedInstance.navigateToNotificationType()
-                
             }
             // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
         }
-        
-
-      
-
     }
 
     // reposition middle button and badge after layout so frames are correct on all iOS versions including iOS 26
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-            
-        
         let buttonSize: CGFloat = 65
         middleButton.frame = CGRect(
             x: (view.bounds.width / 2) - (buttonSize / 2),
@@ -103,16 +88,13 @@ class HomeBaseVC: UITabBarController {
             height: buttonSize
         )
         tabBar.bringSubviewToFront(middleButton)
-        
-        
-        
-        // ✅ stable visibility check (no flicker)
+                
+        //  stable visibility check (no flicker)
             let tabBarVisible = tabBar.alpha > 0.01 && tabBar.frame.height > 10
 
             middleButton.isHidden = !tabBarVisible
             middleButton.isUserInteractionEnabled = tabBarVisible
         
-
         // only add badge once after frames are ready
       /*  if !hasLayedOutBadge {
             hasLayedOutBadge = true
@@ -120,7 +102,7 @@ class HomeBaseVC: UITabBarController {
         }*/
     }
 
-    //MARK: Other Helpful Methods
+    //MARK: - Other Helpful Methods
     func setupMiddleButton() {
         let buttonSize: CGFloat = 65
         let buttonRadius: CGFloat = buttonSize / 2
@@ -191,28 +173,32 @@ class HomeBaseVC: UITabBarController {
         boardVc.tabBarItem = UITabBarItem(title: "Board", image: UIImage(named: "gridUnSel")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"gridSel")?.withRenderingMode(.alwaysOriginal))
        */
         
+        /* let adsVc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
+        adsVc.tabBarItem = UITabBarItem(title: "My ads", image: UIImage(named: "myads")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"myads_active")?.withRenderingMode(.alwaysOriginal))
+        */
         
-        
+       /*
         let homeVc = UIHostingController(rootView: BoardSearchView(tabBarController: self))
         homeVc.tabBarItem = UITabBarItem(title: "Search", image: UIImage(named: "search")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"search")?.withRenderingMode(.alwaysOriginal))
+        */
         
+        let searchVc = LazyHostingController { [weak self] in
+            BoardSearchView(tabBarController: self)
+        }
+        searchVc.tabBarItem = UITabBarItem(title: "Search", image: UIImage(named: "search")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"search")?.withRenderingMode(.alwaysOriginal))
+
          
         let boardVc = UIHostingController(rootView: BoardHomeView(tabBarController: self))
-
-      //let boardVc = UIHostingController(rootView: PublicBoardView(tabBarController: self))
         boardVc.tabBarItem = UITabBarItem(title: "Board", image: UIImage(named: "gridUnSel")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"gridSel")?.withRenderingMode(.alwaysOriginal))
                 
 
         let chatVc = StoryBoard.main.instantiateViewController(withIdentifier: "ChatListVC") as! ChatListVC
         chatVc.tabBarItem = UITabBarItem(title: "Chat", image: UIImage(named: "chat")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"chat_active")?.withRenderingMode(.alwaysOriginal))
 
-       /* let adsVc = StoryBoard.main.instantiateViewController(withIdentifier: "MyAdsVC") as! MyAdsVC
-        adsVc.tabBarItem = UITabBarItem(title: "My ads", image: UIImage(named: "myads")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"myads_active")?.withRenderingMode(.alwaysOriginal))
-        */
+        
         let profileVc = StoryBoard.main.instantiateViewController(withIdentifier: "ProfileVC") as! ProfileVC
          profileVc.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "profile")?.withTintColor(.label, renderingMode: .alwaysOriginal), selectedImage: UIImage(named:"profile_active")?.withRenderingMode(.alwaysOriginal))
         
-        //let images = ["home","chat","","myads","profile"]
 
         let dummyVC = UIViewController() // Empty view controller for spacing
         dummyVC.tabBarItem = UITabBarItem(title: "", image: nil, tag: 2)
@@ -220,24 +206,18 @@ class HomeBaseVC: UITabBarController {
         let dummyNav = UINavigationController(rootViewController: dummyVC)
         dummyNav.navigationBar.isHidden = true
 
-//        let vc1 = UINavigationController(rootViewController: homeVc)
-//        let vc2 = UINavigationController(rootViewController: boardVc)
-        
         let vc1 = UINavigationController(rootViewController: boardVc)
-        let vc2 = UINavigationController(rootViewController: homeVc)
-        
+        let vc2 = UINavigationController(rootViewController: searchVc)
         let vc3 = UINavigationController(rootViewController: chatVc)
         let vc4 = UINavigationController(rootViewController: profileVc)
-        
-        
-        
+                
         vc1.navigationBar.isHidden = true
         vc2.navigationBar.isHidden = true
         vc3.navigationBar.isHidden = true
         vc4.navigationBar.isHidden = true
         
-        vc1.title = "Used"
-        vc2.title = "Board"
+        vc1.title = "Board"
+        vc2.title = "Search"
         vc3.title = "Chat"
         vc4.title = "Profile"
         
@@ -269,7 +249,7 @@ class HomeBaseVC: UITabBarController {
     }
 
     
-    func presentHostingController(){
+  /*  func presentHostingController(){
         
         let controller = UIHostingController(
             rootView: PostOptionsSheet(onBoardTap: {}, onBannerTap: {}, onIdeaTap: {}, onClose: {}))
@@ -376,7 +356,63 @@ class HomeBaseVC: UITabBarController {
         
     }
 
+*/
+    
 
+    // FIX — build the real view first, then wrap it once
+    private func presentHostingController() {
+        // Build sheet first so closures can reference it
+        var sheet: SheetViewController!  // set below
+
+        let settingView = PostOptionsSheet(
+            onBoardTap: { [weak self] in
+                sheet.attemptDismiss(animated: true)
+                guard AppDelegate.sharedInstance.isUserLoggedInRequest(),
+                      let nav = self?.selectedViewController as? UINavigationController else { return }
+                let vc = UIHostingController(rootView: UploadImageVideoView(navigationController: nav))
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            },
+            onBannerTap: { [weak self] in
+                sheet.attemptDismiss(animated: true)
+                guard AppDelegate.sharedInstance.isUserLoggedInRequest(),
+                      let nav = self?.selectedViewController as? UINavigationController else { return }
+                let vc = UIHostingController(rootView: BannerPromotionsView(navigationController: nav))
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            },
+            onIdeaTap: { [weak self] in
+                sheet.attemptDismiss(animated: true)
+                guard AppDelegate.sharedInstance.isUserLoggedInRequest(),
+                      let nav = self?.selectedViewController as? UINavigationController else { return }
+                let vc = UIHostingController(rootView: CreateIdeaView(navigationController: nav))
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            },
+            onClose: { sheet.attemptDismiss(animated: true) }
+        )
+
+        let controller = UIHostingController(rootView: settingView)  // ← only one, correct view
+        controller.navigationController?.navigationBar.isHidden = true
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+
+        sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic],
+            options: SheetOptions(presentingViewCornerRadius: 0, useInlineMode: view != nil)
+        )
+        sheet.cornerRadius = 18
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+        sheet.gripColor = .clear
+
+        if let topVC = AppDelegate.sharedInstance.navigationController?.topViewController {
+            sheet.animateIn(to: topVC.view, in: topVC)
+        } else {
+            navigationController?.present(sheet, animated: true)
+        }
+    }
    
     
     func addNewBadgeOnBoardTab() {
@@ -440,11 +476,7 @@ class HomeBaseVC: UITabBarController {
     func removeNewBadgeFromBoardTab() {
         tabBar.viewWithTag(7777)?.removeFromSuperview()
     }
-}
-
-
-extension HomeBaseVC: UITabBarControllerDelegate {
-    //MARK: Delegate
+    
     
     func showNChatUnreadCountRedDot(count: Int) {
         // Chat is at index 3
@@ -520,6 +552,11 @@ extension HomeBaseVC: UITabBarControllerDelegate {
         tabBar.viewWithTag(dotTag)?.removeFromSuperview()
     }
     
+}
+
+extension HomeBaseVC: UITabBarControllerDelegate {
+    //MARK: Delegate
+  
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
 
@@ -595,12 +632,12 @@ class CustomTabBar: UITabBar {
    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
 
-        // ✅ If tabBar is hidden OR not interactable, ignore all touches
+        //  If tabBar is hidden OR not interactable, ignore all touches
         if self.isHidden || self.alpha < 0.01 || self.isUserInteractionEnabled == false {
             return nil
         }
 
-        // ✅ If touch is on middle button, forward it
+        //  If touch is on middle button, forward it
         if let middleButton = middleButton,
            middleButton.isHidden == false,
            middleButton.alpha > 0.01,
@@ -627,6 +664,28 @@ extension UIView {
 }
 
 
+// Lazy wrapper — ViewController only loads its rootView on first access
+private class LazyHostingController<Content: View>: UIViewController {
+    private let builder: () -> Content
+    private var hosted: UIHostingController<Content>?
+
+    init(builder: @escaping () -> Content) {
+        self.builder = builder
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) { fatalError() }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let hc = UIHostingController(rootView: builder())
+        addChild(hc)
+        hc.view.frame = view.bounds
+        hc.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(hc.view)
+        hc.didMove(toParent: self)
+        hosted = hc
+    }
+}
 
 
 

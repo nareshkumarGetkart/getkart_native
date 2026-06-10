@@ -31,6 +31,7 @@ enum SocketEvents: String, CaseIterable {
     case chatList = "chatList"
     case clearAllMessage = "clearAllMessage"
     case deleteChatList = "deleteChatList"
+    case deleteMessage = "deleteMessage"
 
 }
 
@@ -106,7 +107,7 @@ final class SocketIOManager: NSObject {
     }
 */
     
-    func establishConnection() {
+   /* func establishConnection() {
 
         guard Local.shared.getUserId() > 0 else { return }
 
@@ -147,6 +148,85 @@ final class SocketIOManager: NSObject {
             socket.connect()
         }
     }
+    */
+    
+    func establishConnection() {
+
+        DispatchQueue.main.async { [weak self] in
+
+            guard let self = self else { return }
+
+            guard Local.shared.getUserId() > 0 else {
+                print("User not logged in. Skipping socket connection.")
+                return
+            }
+
+            if self.socket == nil {
+                self.initializeSocket()
+            }
+
+            guard let socket = self.socket else {
+                print("Socket not initialized. Cannot connect.")
+                return
+            }
+
+            // Prevent multiple simultaneous connects
+            if socket.status == .connected {
+                print("Socket already connected")
+                return
+            }
+
+            if socket.status == .connecting {
+                print("Socket already connecting")
+                return
+            }
+
+            // Remove existing handlers before re-registering
+            socket.removeAllHandlers()
+
+            socket.on(clientEvent: .connect) { [weak self] data, ack in
+
+                guard let self = self else { return }
+
+                print("Socket connected")
+
+                // Re-register custom listeners after successful connection
+                self.addListeners()
+
+                NotificationCenter.default.post(
+                    name: Notification.Name(SocketEvents.socketConnected.rawValue),
+                    object: nil
+                )
+
+                if Local.shared.getUserId() > 0 {
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+
+                        SocketIOManager.sharedInstance.emitEvent(
+                            SocketEvents.chatUnreadCount.rawValue,
+                            [:]
+                        )
+
+                        // SocketIOManager.sharedInstance.emitEvent(
+                        //     SocketEvents.onlineOfflineStatus.rawValue,
+                        //     ["user_id": Local.shared.getUserId()]
+                        // )
+                    }
+                }
+            }
+
+            socket.on(clientEvent: .error) { data, ack in
+                print("Socket error: \(data)")
+            }
+
+            socket.on(clientEvent: .disconnect) { data, ack in
+                print("Socket disconnected: \(data)")
+            }
+
+            socket.connect()
+        }
+    }
+    
     func emitEvent(_ event: String, _ param: Dictionary<String, Any>) {
         guard AppDelegate.sharedInstance.isInternetConnected else {
             AlertView.sharedManager.showToast(message: "No internet connection")
@@ -161,12 +241,23 @@ final class SocketIOManager: NSObject {
     }
 
     func safeOn(event: String, callback: @escaping NormalCallback) {
+
+        guard let socket = socket else {
+            print("Add handler failed. Socket is nil for event: \(event)")
+            return
+        }
+
+        socket.off(event)
+
+        socket.on(event, callback: callback)
+    }
+   /* func safeOn(event: String, callback: @escaping NormalCallback) {
         guard let socket = socket else {
             print("Add handler failed. Socket is nil for event: \(event)")
             return
         }
         socket.on(event, callback: callback)
-    }
+    }*/
 
     func addListeners() {
         for event in SocketEvents.allCases {

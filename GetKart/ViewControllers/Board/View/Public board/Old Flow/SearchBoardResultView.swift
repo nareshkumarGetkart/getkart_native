@@ -22,7 +22,8 @@ struct SearchBoardResultView: View {
        @State private var safariURL: URL?
        @State private var visibilityWorkItem: DispatchWorkItem?
        @State private var didLoad = false
-
+      @State private var scrollToTopTrigger = false
+    
        init(
            navigationController: UINavigationController?,
            searchText: String = "",
@@ -73,6 +74,7 @@ struct SearchBoardResultView: View {
                                 if searchText != srchTxt{
                                     searchText = srchTxt
                                     vm.searchText = searchText
+                                    scrollToTopTrigger.toggle()
                                     vm.loadInitial()
                                 }
                             }))
@@ -109,6 +111,7 @@ struct SearchBoardResultView: View {
                 )
                 
             } .background(Color(.systemBackground))
+                
             
             if vm.items.count == 0 && !vm.isLoading {
                 HStack{
@@ -123,55 +126,57 @@ struct SearchBoardResultView: View {
                     Spacer()
                 }
             }else{
-                
-                
+            ScrollViewReader { proxy in
+
                 ScrollView {
                     
-                    
+                    Color.clear
+                        .frame(height: 0.1)
+                               .id("TOP")
                     
                     LazyVStack {
                         StaggeredGrid(columns: 2, spacing: 5) {
-                        ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
-                               
-                               // ForEach(vm.items, id: \.id) { item in
-
-                                 if item.boardType == 2{
-                                   
+                            ForEach(Array(vm.items.enumerated()), id: \.offset) { index, item in
+                                
+                                // ForEach(vm.items, id: \.id) { item in
+                                
+                                if item.boardType == 2{
+                                    
                                     SmartVideoPlayerView(
                                         item: item,
                                         onTapBottomButton: {
-                                        //Tapped video
+                                            //Tapped video
                                             if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
                                         }
                                     ).background(
-                                            GeometryReader { geo in
-                                                Color.clear
-                                                    .onAppear {
-                                                        videoFrames[item.id ?? 0] = geo.frame(in: .global)
-                                                        scheduleVisibilityUpdate()
-
-                                                    }.onDisappear{
-                                                        videoFrames.removeValue(forKey: item.id ?? 0)
-                                                        FeedVideoManager.shared.pause(id: item.id ?? 0)
-                                                    }
-                                                    .onChange(of: geo.frame(in: .global)) { frame in
-                                                        videoFrames[item.id ?? 0] = frame
-                                                        scheduleVisibilityUpdate()
-
-                                                    }
-                                            }
-                                        )
-                                        .measureHeight(id: item.id ?? 0)
-                                        .onAppear {
-                                            vm.loadNextPageIfNeeded(currentIndex: index)
-                                            prefetchNextVideos(from: item)
-
+                                        GeometryReader { geo in
+                                            Color.clear
+                                                .onAppear {
+                                                    videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }.onDisappear{
+                                                    videoFrames.removeValue(forKey: item.id ?? 0)
+                                                    FeedVideoManager.shared.pause(id: item.id ?? 0)
+                                                }
+                                                .onChange(of: geo.frame(in: .global)) { frame in
+                                                    videoFrames[item.id ?? 0] = frame
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }
                                         }
+                                    )
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                        vm.loadNextPageIfNeeded(currentIndex: index)
+                                        prefetchNextVideos(from: item)
+                                        
+                                    }
                                 }else{
-                                
+                                    
                                     CardItemView(
                                         item: item,
                                         onLike: { isLiked, boardId in
@@ -215,6 +220,16 @@ struct SearchBoardResultView: View {
                         }
                     }
                 }
+                .onChange(of: vm.selectedCategoryId) { _ in
+                        DispatchQueue.main.async {
+                            proxy.scrollTo("TOP", anchor: .top)
+                        }
+                    }
+                .onChange(of: scrollToTopTrigger) { _ in
+                        DispatchQueue.main.async {
+                            proxy.scrollTo("TOP", anchor: .top)
+                        }
+                    }
                 .onPreferenceChange(ScrollBottomKey.self) { bottomY in
                     vm.handleScrollBottom(bottomY: bottomY)
                 }
@@ -225,6 +240,8 @@ struct SearchBoardResultView: View {
                                     scheduleVisibilityUpdate()
                                 }
                         )
+                
+            }
                     
             }
         }
@@ -235,12 +252,14 @@ struct SearchBoardResultView: View {
              videoFrames.removeAll()
             
         }
+            
         .onAppear{
             if isByDefaultOpenSearch{
                 let hostingVC = UIHostingController(rootView: SearchBoardView(navigationController: self.navigationController, isToCloseToSearchResultScreen:isByDefaultOpenSearch,searchedItem: { srchTxt in
                     if searchText != srchTxt{
                         searchText = srchTxt
                         vm.searchText = searchText
+                        scrollToTopTrigger.toggle()
                         if !vm.isLoading{
                             vm.loadInitial()
                         }

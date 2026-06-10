@@ -12,12 +12,53 @@ struct BoostBoardPlanView: View {
     @State private var planListArray:Array<PlanModel>?
     let categoryId:Int
     var packageSelectedPressed: ((_ selPkgObj:PlanModel)->Void)?
-    var boardType:Int = 0
+    let boardType:Int
 
+    init(
+        categoryId: Int,
+        packageSelectedPressed: ((_ selPkgObj: PlanModel) -> Void)? = nil,
+        boardType: Int
+    ) {
+
+        self.categoryId = categoryId
+        self.packageSelectedPressed = packageSelectedPressed
+        self.boardType = boardType
+
+        print("INIT BOARD TYPE =", boardType)
+        print(" self INIT BOARD TYPE =",  self.boardType)
+
+    }
     var body: some View {
         VStack(spacing: 16) {
             
-            header
+            HStack {
+                Spacer()
+            
+                if boardType == 0{
+                    Text("Boost your board")
+                        .font(.inter(.semiBold, size: 18))
+                }else  if boardType == 1{
+                    Text("Boost your Promotional Ad")
+                        .font(.inter(.semiBold, size: 18))
+                }else  if boardType == 2{
+                    Text("Boost your Promotional Ad")
+                        .font(.inter(.semiBold, size: 18))
+                }else  if boardType == 3{
+                    
+                    Text("Boost your idea")
+                        .font(.inter(.semiBold, size: 18))
+                }
+//                Text(getTitle())
+//                    .font(.inter(.semiBold, size: 18))
+                Spacer()
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark").renderingMode(.template)
+                        .foregroundColor(Color(.label))
+                        .padding(8)
+                }
+            }
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 10) {
@@ -62,34 +103,19 @@ struct BoostBoardPlanView: View {
         }
     }
 
-    private var header: some View {
-        HStack {
-            Spacer()
-            Text(getTitle())
-                .font(.inter(.semiBold, size: 18))
-            Spacer()
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark").renderingMode(.template)
-                    .foregroundColor(Color(.label))
-                    .padding(8)
-            }
-        }
-    }
+   
     
     func getTitle() ->String{
         if boardType == 0{
             return "Boost your board"
-        }else  if boardType == 0{
-            return "Boost your board"
+        }else  if boardType == 1{
+            return "Boost your Promotional Ad"
 
-        }else  if boardType == 0{
-            return "Boost your board"
+        }else  if boardType == 2{
+            return "Boost your Promotional Ad"
 
         }else  if boardType == 3{
             return "Boost your idea"
-
         }
         return "Boost your board"
     }

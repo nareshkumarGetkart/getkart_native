@@ -113,7 +113,7 @@ struct BannerAlalyticsView: View {
                
                 HStack{
                     Spacer()
-                    Text(getFormattedCreatedDate(date:objBanner?.startDate ?? ""))
+                    Text(convertServerDateTime(objBanner?.startDate ?? ""))
                     Spacer()
                 }
                 
@@ -417,6 +417,44 @@ struct BannerAlalyticsView: View {
         }
     }
     
+    func convertServerDateTime(_ dateString: String) -> String {
+
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [
+            .withInternetDateTime,
+            .withFractionalSeconds
+        ]
+
+        guard let date = isoFormatter.date(from: dateString) else {
+            return dateString
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "d MMM yyyy 'at' h:mma"
+
+        var formatted = formatter.string(from: date)
+
+        // Add ordinal suffix
+        let day = Calendar.current.component(.day, from: date)
+
+        let suffix: String
+        switch day {
+        case 1, 21, 31: suffix = "st"
+        case 2, 22: suffix = "nd"
+        case 3, 23: suffix = "rd"
+        default: suffix = "th"
+        }
+
+        formatted = formatted.replacingOccurrences(
+            of: "^\(day)",
+            with: "\(day)\(suffix)",
+            options: .regularExpression
+        )
+
+        return formatted.lowercased()
+    }
     func getFormattedCreatedDate(date:String) -> String{
         
         
@@ -473,6 +511,10 @@ struct BannerAlalyticsView: View {
         return date
 
     }
+    
+    
+    
+    
     
     
 }

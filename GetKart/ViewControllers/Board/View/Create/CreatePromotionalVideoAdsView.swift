@@ -30,10 +30,15 @@ struct CreatePromotionalVideoAdsView: View {
     @State private var boardObj:ItemModel?
     @State  var videoSelected: AVURLAsset?
     @State  private var selectedImage: UIImage? = nil
-
+    
+    
     var isFromEdit:Bool = false
     var boardId = 0
     @State  private var isFirstTime = true
+    @State private var showSheet: Bool = false
+    @State private var isFreePost: Bool = true
+    @State private var showBoostSheet: Bool = false
+    @State private var paymentGateway: PaymentGatewayCentralized?
 
     var body: some View {
         HStack(spacing:0){
@@ -258,9 +263,11 @@ struct CreatePromotionalVideoAdsView: View {
                } label: {
                    let strText = (isFromEdit) ? "Update" : "Submit"
                    Text(strText).font(.inter(.medium, size: 18.0)).foregroundColor(isFilled ? .white : .gray)
+                       .frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                            .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+                            .contentShape(Rectangle())
                      
-               }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                    .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+               }
                 
                 Spacer()
             }.padding()
@@ -299,7 +306,7 @@ struct CreatePromotionalVideoAdsView: View {
                 .presentationBackground(.clear)
                
             }
-            .sheet(isPresented: $showSheetpackages) {
+           /* .sheet(isPresented: $showSheetpackages) {
                 if #available(iOS 16.0, *) {
                     PromotionPackagesView(navigationController: self.navigationController, packageSelectedPressed: {selPkgObj in
                         selectedPkgObj = selPkgObj
@@ -331,8 +338,40 @@ struct CreatePromotionalVideoAdsView: View {
                     // Fallback on earlier versions
                 }
             }
+        */
         
-        
+            .sheet(isPresented: $showSheet) {
+                BoostBottomSheet(
+                    onBoostTap: {
+                        isFreePost = false
+                        showSheet = false
+                        showBoostSheet = true
+                    },
+                    onFreePostTap: {
+                        isFreePost = true
+                        showSheet = false
+                        isDataUploading = true
+                        uploadFIleToServer()
+                    }
+                )
+                .presentationDetents([.height(270)])
+                .presentationCornerRadius(32)
+            }
+            
+         .sheet(isPresented: $showBoostSheet) {
+
+                BoostBoardPlanView(
+                    categoryId: selectedCategoryId ?? 0,
+                    packageSelectedPressed: { selPkgObj in
+                        isDataUploading = true
+                        uploadFIleToServer(selPkgObj:selPkgObj)
+                                         },
+                    boardType: 2)
+                .presentationDetents([.height(410)])
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(20)
+                .presentationBackground(Color(.systemBackground))
+            }
     }
     
     
@@ -359,9 +398,13 @@ struct CreatePromotionalVideoAdsView: View {
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your ad")
         } else{
-            isDataUploading = true
-            uploadFIleToServer()
 
+            if isFromEdit{
+                isDataUploading = true
+                uploadFIleToServer()
+            }else{
+                showSheet = true
+            }
         }
     }
         
@@ -399,7 +442,7 @@ struct CreatePromotionalVideoAdsView: View {
         }
     }
     
-    func uploadFIleToServer(){
+    func uploadFIleToServer(selPkgObj:PlanModel? = nil){
         
         var params:Dictionary<String,Any> = [:]
      
@@ -420,6 +463,11 @@ struct CreatePromotionalVideoAdsView: View {
             selectedVideoArray.append(asset)
         }
    
+        if isFreePost{
+            params["post_with_boost"] = 0
+        }else{
+            params["post_with_boost"] = 1
+        }
     
         
         URLhandler.sharedinstance.uploadVideoArrayWithParameters(videoAssets: selectedVideoArray, videoParamName: "gallery_images[]", url: strApiUrl, params: params) { responseObject, error in
@@ -434,10 +482,42 @@ struct CreatePromotionalVideoAdsView: View {
                 if code == 200{
                     if self.isFromEdit{
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
+                        
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                         
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
                     }
-                    AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                     
-                        self.navigationController?.popToRootViewController(animated: true)
+                  
+                    
+                    if self.isFreePost{
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            //self.navigationController?.popViewController(animated: true)
+                            self.navigationController?.popToRootViewController(animated: true)
+
+                        }
+                    }else{
+                        if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted){
+                            
+                            do{
+                                let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                                if let itemObj = item.data?.first{
+                                    
+                                    if let pkgObj = selPkgObj{
+                                        self.paymentGatewayOpen(selPlan: pkgObj, item: itemObj)
+                                    }
+                                }
+                            }catch{
+                                
+                            }
+                        }else {
+                            print("Something is wrong while converting dictionary to JSON data.")
+                            
+                            AlertView.sharedManager.showToast(message: message)
+                            
+                        }
+                        
+                      
                     }
                 }else{
                     AlertView.sharedManager.showToast(message: message)
@@ -517,6 +597,38 @@ struct CreatePromotionalVideoAdsView: View {
             return nil
         }
     }
+    
+    
+    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
+        
+        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
+        paymentGateway?.planObj = selPlan
+        paymentGateway?.categoryId = item.categoryID ?? 0
+        paymentGateway?.itemId = item.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                self.navigationController?.present(vc, animated: true)
+            }
+            
+            //  RELEASE
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
+    }
+
+    
 }
 
 #Preview {

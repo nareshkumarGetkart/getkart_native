@@ -565,7 +565,8 @@ class URLhandler: NSObject{
     
         if isConnectedToNetwork() == true {
             if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
-                Themes.sharedInstance.showActivityViewTop(uiView:  topView, position: .mid)
+                Themes.sharedInstance.activityView(uiView: topView, isUserInteractionenabled: false)
+               // showActivityViewTop(uiView:  topView, position: .mid)
             }
             
             if ISDEBUG{
@@ -579,7 +580,6 @@ class URLhandler: NSObject{
                 if let imgData = imageData{
                     multipartFormData.append(imgData, withName: imageName, fileName: "\(imageName).jpeg", mimeType: "image/jpeg")
                 }
-                
                 
                 
                 
@@ -685,7 +685,7 @@ class URLhandler: NSObject{
         if isConnectedToNetwork() {
             
             if let topView = AppDelegate.sharedInstance.navigationController?.topViewController?.view {
-                Themes.sharedInstance.showActivityViewTop(uiView: topView, position: .mid)
+                Themes.sharedInstance.activityView(uiView: topView, isUserInteractionenabled: false)
             }
             
             if ISDEBUG {

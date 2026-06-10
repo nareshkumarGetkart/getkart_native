@@ -549,7 +549,7 @@ struct PDFViewer: UIViewRepresentable {
         } else {
             // if not a PDF, try to show image
             if let img = UIImage(contentsOfFile: url.path) {
-                let data = img.pngData()
+                let data = img.wxCompressedData()
                 if let data = data, let doc = PDFDocument(data: data) {
                     v.document = doc
                 }

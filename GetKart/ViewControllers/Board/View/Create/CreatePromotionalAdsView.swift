@@ -30,6 +30,12 @@ struct CreatePromotionalAdsView: View {
     @State private var selectedCallToACtion: String?
     @State private var selectedCallToACtionId: Int?
     @State private var boardObj:ItemModel?
+    
+    
+    @State private var showSheet: Bool = false
+    @State private var isFreePost: Bool = true
+    @State private var showBoostSheet: Bool = false
+    @State private var paymentGateway: PaymentGatewayCentralized?
 
     var isFromEdit:Bool = false
     var boardId = 0
@@ -218,9 +224,11 @@ struct CreatePromotionalAdsView: View {
                } label: {
                    let strText = (isFromEdit) ? "Update" : "Submit"
                    Text(strText).font(.inter(.medium, size: 18.0)).foregroundColor(isFilled ? .white : .gray)
-                     
-               }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                    .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+                       .frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                       .background(isFilled ? Color(hexString: "#FF9900") : Color(hexString: "#DFDFDF")) .cornerRadius(8)
+                       .contentShape(Rectangle())
+                   
+               }
                 
                 Spacer()
             }.padding()
@@ -270,7 +278,7 @@ struct CreatePromotionalAdsView: View {
                 .presentationBackground(.clear)
                
             }
-            .sheet(isPresented: $showSheetpackages) {
+           /* .sheet(isPresented: $showSheetpackages) {
                 if #available(iOS 16.0, *) {
                     PromotionPackagesView(navigationController: self.navigationController, packageSelectedPressed: {selPkgObj in
                         selectedPkgObj = selPkgObj
@@ -301,6 +309,39 @@ struct CreatePromotionalAdsView: View {
                 } else {
                     // Fallback on earlier versions
                 }
+            }*/
+        
+            .sheet(isPresented: $showSheet) {
+                BoostBottomSheet(
+                    onBoostTap: {
+                        isFreePost = false
+                        showSheet = false
+                        showBoostSheet = true
+                    },
+                    onFreePostTap: {
+                        isFreePost = true
+                        showSheet = false
+                        isDataUploading = true
+                        uploadFIleToServer()
+                    }
+                )
+                .presentationDetents([.height(270)])
+                .presentationCornerRadius(32)
+            }
+            
+         .sheet(isPresented: $showBoostSheet) {
+
+                BoostBoardPlanView(
+                    categoryId: selectedCategoryId ?? 0,
+                    packageSelectedPressed: { selPkgObj in
+                        isDataUploading = true
+                        uploadFIleToServer(selPkgObj:selPkgObj)
+                                         },
+                    boardType: 1)
+                .presentationDetents([.height(410)])
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(20)
+                .presentationBackground(Color(.systemBackground))
             }
         
         
@@ -325,9 +366,12 @@ struct CreatePromotionalAdsView: View {
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your ad")
         }else{
-            isDataUploading = true
-            uploadFIleToServer()
-
+            if isFromEdit{
+                isDataUploading = true
+                uploadFIleToServer()
+            }else{
+                showSheet = true
+            }
         }
     }
     
@@ -399,7 +443,7 @@ struct CreatePromotionalAdsView: View {
         }
     }
     
-    func uploadFIleToServer(){
+    func uploadFIleToServer(selPkgObj:PlanModel? = nil){
         
         var params:Dictionary<String,Any> = [:]
         
@@ -423,12 +467,18 @@ struct CreatePromotionalAdsView: View {
         var galleryImagesData = [Data]()
                     
         if let img = selectedImage{
-            if let imgData = img.wxCompress().pngData(){
+            if let imgData = img.wxCompressedData(){
                 galleryImagesData.append(imgData)
                 imgNames.append("gallery_images[]")
             }
         }
        
+        if isFreePost{
+            params["post_with_boost"] = 0
+        }else{
+            params["post_with_boost"] = 1
+        }
+        
         URLhandler.sharedinstance.uploadImageArrayWithParameters(imageData: nil, imageName: "", imagesData: galleryImagesData, imageNames: imgNames, url:strApiUrl , params: params, completionHandler: { responseObject, error in
         
             self.isDataUploading = false
@@ -439,13 +489,46 @@ struct CreatePromotionalAdsView: View {
                 let message = result["message"] as? String ?? ""
                 
                 if code == 200{
+                    
+                    
                     if self.isFromEdit{
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshMyBoardsScreen.rawValue), object: nil, userInfo: nil)
-                    }
-                    AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
-                        //self.navigationController?.popViewController(animated: true)
-                        self.navigationController?.popToRootViewController(animated: true)
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            //self.navigationController?.popViewController(animated: true)
+                            self.navigationController?.popToRootViewController(animated: true)
 
+                        }
+                    }
+                   
+                    
+                    
+                    if self.isFreePost{
+                        AlertView.sharedManager.presentAlertWith(title: "", msg: message as NSString, buttonTitles: ["Ok"], onController: (self.navigationController?.topViewController)!) { title, index in
+                            //self.navigationController?.popViewController(animated: true)
+                            self.navigationController?.popToRootViewController(animated: true)
+
+                        }
+                    }else{
+                        if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted){
+                            
+                            do{
+                                let item = try JSONDecoder().decode(SingleItemParse.self, from: jsonData)
+                                if let itemObj = item.data?.first{
+                                    if let pkgObj = selPkgObj{
+                                        self.paymentGatewayOpen(selPlan: pkgObj, item: itemObj)
+                                    }
+                                }
+                            }catch{
+                                
+                            }
+                        }else {
+                            print("Something is wrong while converting dictionary to JSON data.")
+                            
+                            AlertView.sharedManager.showToast(message: message)
+                            
+                        }
+                        
+                      
                     }
                 }else{
                     AlertView.sharedManager.showToast(message: message)
@@ -507,6 +590,37 @@ struct CreatePromotionalAdsView: View {
             self.navigationController?.present(sheet, animated: true, completion: nil)
         }
     }
+    
+    
+    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
+        
+        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
+        paymentGateway?.planObj = selPlan
+        paymentGateway?.categoryId = item.categoryID ?? 0
+        paymentGateway?.itemId = item.id ?? 0
+        paymentGateway?.paymentFor = .boostBoard
+        
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigationController
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                self.navigationController?.present(vc, animated: true)
+            }
+            
+            //  RELEASE
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
+    }
+
 }
 
 #Preview {

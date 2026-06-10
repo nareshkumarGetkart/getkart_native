@@ -394,17 +394,21 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             
             
             if titleArray[indexPath.row] == "My Connections"{
-                
-                let hostingController = UIHostingController(rootView: MyConnectionsView(navigation: navigationController))
-                hostingController.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(hostingController, animated: true)
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    
+                    let hostingController = UIHostingController(rootView: MyConnectionsView(navigation: navigationController))
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                }
             }
             else if titleArray[indexPath.row] == "Blocked Users"{
-                let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
-                hostingController.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(hostingController, animated: true)
-            }
-            else if titleArray[indexPath.row] == "Contact us"{
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    
+                    let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                }
+            } else if titleArray[indexPath.row] == "Contact us"{
                 
                 let destVC = UIHostingController(rootView: ContactUsView(navigationController:self.navigationController))
                 destVC.hidesBottomBarWhenPushed = true

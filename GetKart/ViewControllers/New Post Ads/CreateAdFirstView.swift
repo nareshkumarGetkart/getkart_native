@@ -355,7 +355,7 @@ struct CreateAdFirstView: View {
     
     
     func updateGalleryDeletedId(index:Int){
-        let data = selectedImages[index].pngData()
+        let data = selectedImages[index].wxCompressedData()
         for obj in self.itemObj?.galleryImages ?? []{
             if obj.imgData == data {
                 if self.delete_item_image_id.count == 0 {
@@ -404,18 +404,18 @@ struct CreateAdFirstView: View {
                         
                         var galleryImgData = [Data]()
                         for image in selectedImages {
-                            if let imgData = image.wxCompress().pngData(){
+                            if let imgData = image.wxCompressedData(){
                                 galleryImgData.append(imgData)
                             }
                         }
 
                         
-                        let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.selectedMainImage?.pngData(), imgName: self.imgName, gallery_images: galleryImgData, gallery_imageNames: galleryImgName, navigationController: self.navigationController, popType: self.popType, params: self.params))
+                        let vc = ConfirmLocationHostingController(rootView: ConfirmLocationCreateAdd(imgData: self.selectedMainImage?.wxCompressedData(), imgName: self.imgName, gallery_images: galleryImgData, gallery_imageNames: galleryImgName, navigationController: self.navigationController, popType: self.popType, params: self.params))
                         self.navigationController?.pushViewController(vc, animated: true)
 
                     }else{
                         
-                        var pushImgData = self.selectedMainImage?.wxCompress().pngData()
+                        var pushImgData = self.selectedMainImage?.wxCompress().wxCompressedData()
                         var pushImgName = self.imgName
                         var pushGalleryImg : Array<Data> = []
                         var pushGallery_imageNames : Array<String> = []
@@ -424,7 +424,7 @@ struct CreateAdFirstView: View {
                             params["delete_item_image_id"] = delete_item_image_id.trimmingCharacters(in: .whitespacesAndNewlines)
                         }
                         
-                        if let imgData = selectedMainImage?.wxCompress().pngData(){
+                        if let imgData = selectedMainImage?.wxCompress().wxCompressedData(){
                             
                             if self.imgDataMain != imgData {
                                 pushImgData = imgData
@@ -464,12 +464,12 @@ struct CreateAdFirstView: View {
                         
                         var galleryImgData = [Data]()
                         for image in selectedImages {
-                            if let imgData = image.wxCompress().pngData(){
+                            if let imgData = image.wxCompress().wxCompressedData(){
                                 galleryImgData.append(imgData)
                             }
                         }
                         
-                        vc.imgData = self.selectedMainImage?.pngData()
+                        vc.imgData = self.selectedMainImage?.wxCompressedData()
                         vc.imgName = self.imgName
                         vc.gallery_images = galleryImgData
                         vc.gallery_imageNames = Array(repeating: "gallery_images[]", count: galleryImgData.count)
@@ -481,7 +481,7 @@ struct CreateAdFirstView: View {
                         }
                         
                         
-                        if let imgData = selectedMainImage?.wxCompress().pngData(){
+                        if let imgData = selectedMainImage?.wxCompress().wxCompressedData(){
                             
                             if self.imgDataMain != imgData {
                                 vc.imgData = imgData

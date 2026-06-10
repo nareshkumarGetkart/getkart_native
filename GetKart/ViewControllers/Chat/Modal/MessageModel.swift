@@ -49,7 +49,7 @@ struct MessageModel: Codable {
     var readAt: String?
     let id: Int?
     let createdAt, file: String?
-    let message: String?
+    var message: String?
     let messageType: String?
     let updatedAt: String?
     let senderID: Int?
@@ -58,6 +58,7 @@ struct MessageModel: Codable {
     var isCautionExpanded = 0
     let roomId:Int?
     let warning:String?
+    var isDelete:Int = 0
     
     enum CodingKeys: String, CodingKey {
         case readAt = "read_at"
