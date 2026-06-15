@@ -57,35 +57,32 @@ class ChatVC: UIViewController {
     @IBOutlet weak var imgVwVerified:UIImageView!
 
     
-    private  lazy var topRefreshControl: UIRefreshControl = {
+    /*private  lazy var topRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
                                     #selector(handlePullDownRefresh(_:)),
                                  for: .valueChanged)
         refreshControl.tintColor = UIColor.systemYellow
         return refreshControl
-    }()
+    }()*/
     
     var name = ""
     var profileImg = ""
     var isDataLoading = true
     var userId = 0
 
-    
-//    var typingTimer: Timer?
-//    var isTyping = false
-//    var typingOtherTimer: Timer?
+    private var isUserAtBottom = true
+    private var unreadNewMessagesCount = 0
+    @IBOutlet weak var newMessageButton:UIButton!
+
     var youBlockedByUser = ""
     var youBlockedUser = ""
     var popovershow = false
     var mobileNumber = ""
     
-    
     private var typingSendTimer: Timer?
     private var typingReceiveTimer: Timer?
-
     private var isTyping = false
-
 
     private let typingTimeout: TimeInterval = 3.0
     private var stopTypingWorkItem: DispatchWorkItem?
@@ -106,6 +103,12 @@ class ChatVC: UIViewController {
         btnSend.clipsToBounds = true
         btnSend.translatesAutoresizingMaskIntoConstraints = false
         
+        newMessageButton.isHidden = true
+        newMessageButton.layer.cornerRadius = newMessageButton.frame.size.height/2.0
+        newMessageButton.clipsToBounds = true
+        newMessageButton.titleLabel?.textColor = .white
+        newMessageButton.titleLabel?.font = UIFont.Inter.medium(size: 11.0).font
+       
         blockedView.isHidden = true
         
         // Configure the button
@@ -235,6 +238,12 @@ class ChatVC: UIViewController {
       
     
     //MARK: UIButton Action Methods
+    @IBAction func newMessageButtonTapped(_ sender: UIButton) {
+
+        unreadNewMessagesCount = 0
+        sender.isHidden = true
+        scrollToBottom(animated: true)
+    }
     
     @IBAction func btnInfoMarqueeAction(sender : UIButton){
         
@@ -639,6 +648,7 @@ class ChatVC: UIViewController {
         }
     }
     
+    
     func uploadFIleToServer(img:UIImage,name:String){
         
         Themes.sharedInstance.showActivityViewTop(uiView: self.view, position: .mid)
@@ -812,12 +822,15 @@ class ChatVC: UIViewController {
     @objc func deleteMessage(notification:Notification){
         guard let data = notification.userInfo else{ return }
         if (data["code"] as? Int ?? 0) == 200{
-            //let  message = data["message"] as? String ?? ""
             
             if let dataDict = data["data"] as? Dictionary<String,Any>{
                 let id = dataDict["id"] as? Int ?? 0
                 //let sender_id = dataDict["sender_id"] as? Int ?? 0
                 self.deleteMessageUpdateCell(msgId:id)
+            }
+        }else{
+            if let  message = data["message"] as? String {
+                AlertView.sharedManager.showToast(message: message)
             }
         }
     }
@@ -1149,8 +1162,8 @@ class ChatVC: UIViewController {
             if item_offer_id == 0{
                 item_offer_id = response.data?.roomId ?? 0
             }
-            if var obj = response.data ,obj.roomId == item_offer_id {
-//                
+            if let obj = response.data ,obj.roomId == item_offer_id {
+//
 //                if Local.shared.getUserId() != (obj.senderID ?? 0) {
 //                    obj.isCautionExpanded = 1
 //                }
@@ -1158,7 +1171,15 @@ class ChatVC: UIViewController {
                
                 self.chatArray.append(obj)
                 self.tblView.reloadData()
-                self.scrollToBottom(animated: true)
+                if isUserAtBottom{
+                    unreadNewMessagesCount = 0
+                    newMessageButton.isHidden = true
+                    self.scrollToBottom(animated: true)
+                }else{
+                    unreadNewMessagesCount += 1
+                    newMessageButton.isHidden = false
+                    newMessageButton.setTitle("\(unreadNewMessagesCount)", for: .normal)
+                }
         
                 if Local.shared.getUserId() != (obj.senderID ?? 0) {
 
@@ -1530,6 +1551,22 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard scrollView == tblView else { return }
 
+        let contentHeight = scrollView.contentSize.height
+        let visibleHeight = scrollView.frame.size.height
+        let offsetY = scrollView.contentOffset.y
+
+        let distanceFromBottom = contentHeight - offsetY - visibleHeight
+
+       
+        
+        
+        let wasAtBottom = isUserAtBottom
+        isUserAtBottom = distanceFromBottom < 100 // User reached bottom
+        if isUserAtBottom && !wasAtBottom {
+            unreadNewMessagesCount = 0
+            newMessageButton.isHidden = true
+        }
+        
         // Only trigger when the user is pulling down
         let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
         
@@ -1549,7 +1586,7 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
-
+    
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
@@ -2212,14 +2249,14 @@ extension ChatVC:UITableViewDelegate,UITableViewDataSource {
                                  
                                  let deleteForMe = UIAlertAction(title: "Delete for me", style: .default) { (action) in
                                      
-                                     self.emitDeleteMessage(msgId: self.chatArray[index.row].id ?? 0, isEveryone: false)
+                                     self.emitDeleteMessage(msgId:messageFrame.id ?? 0, isEveryone: false)
 
                                      
                                  }
                                  
                                  let deleteChatBoth = UIAlertAction(title: "Delete for everyone", style: .default) { (action) in
                                      
-                                     self.emitDeleteMessage(msgId: self.chatArray[index.row].id ?? 0, isEveryone: true)
+                                     self.emitDeleteMessage(msgId: messageFrame.id ?? 0, isEveryone: true)
                                    }
                                  
                               if self.checkTimeStampMorethan5Mins(createdAt: messageFrame.createdAt ?? ""){

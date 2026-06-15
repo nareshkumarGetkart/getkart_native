@@ -284,6 +284,19 @@
                                     <constraint firstItem="r1V-43-Wae" firstAttribute="top" secondItem="Keo-uy-IIU" secondAttribute="top" constant="5" id="qBT-Qi-rg4"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BBI-eT-DFe">
+                                <rect key="frame" x="353" y="679" width="30" height="30"/>
+                                <color key="backgroundColor" red="0.9483141303" green="0.61419290299999996" blue="0.21897444129999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="ayU-Nk-6Zp"/>
+                                    <constraint firstAttribute="width" constant="30" id="wcV-gS-8yx"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="0"/>
+                                <connections>
+                                    <action selector="newMessageButtonTapped:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="U6E-FL-eCL"/>
+                                </connections>
+                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lh1-jd-OsJ" customClass="UIViewX" customModule="GetKart" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="674" width="393" height="40"/>
                                 <subviews>
@@ -310,6 +323,7 @@
                             <constraint firstItem="lh1-jd-OsJ" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="117-Gw-4f4"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="lh1-jd-OsJ" secondAttribute="bottom" id="1L1-bX-8Ao"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="Keo-uy-IIU" secondAttribute="bottom" id="3AM-Ao-yCF"/>
+                            <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="BBI-eT-DFe" secondAttribute="bottom" constant="5" id="7Ts-0k-48T"/>
                             <constraint firstItem="trq-gm-Gnt" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="Apw-JU-oKn"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="top" secondItem="trq-gm-Gnt" secondAttribute="bottom" id="BaN-MK-qo9"/>
                             <constraint firstItem="lTF-SZ-ppU" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="LbQ-Td-Ovt"/>
@@ -320,6 +334,7 @@
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="LiT-9T-mg8" secondAttribute="trailing" id="Xls-9a-0gH"/>
                             <constraint firstItem="LiT-9T-mg8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="bK5-VJ-glh"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="eGe-ba-rgS"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="BBI-eT-DFe" secondAttribute="trailing" constant="10" id="jug-6R-0RV"/>
                             <constraint firstAttribute="bottom" secondItem="LiT-9T-mg8" secondAttribute="bottom" id="qZO-Ow-3HH"/>
                             <constraint firstItem="Keo-uy-IIU" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="rvf-db-sht"/>
                             <constraint firstItem="trq-gm-Gnt" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="w2D-R3-u2C"/>
@@ -344,6 +359,7 @@
                         <outlet property="lblBlockedMsg" destination="Stg-b6-sCa" id="Rut-hy-ksu"/>
                         <outlet property="lblName" destination="LMy-r3-KYs" id="6ub-Oq-qw7"/>
                         <outlet property="lblTypingStatus" destination="jLn-OX-HQl" id="c8c-NE-hP1"/>
+                        <outlet property="newMessageButton" destination="BBI-eT-DFe" id="Ef3-RT-gSu"/>
                         <outlet property="onlineOfflineView" destination="hsm-Nk-Acy" id="yNK-p1-TGg"/>
                         <outlet property="tblView" destination="trq-gm-Gnt" id="0DL-5E-hfM"/>
                         <outlet property="textView" destination="fbm-iP-lWR" id="zgI-WY-whc"/>

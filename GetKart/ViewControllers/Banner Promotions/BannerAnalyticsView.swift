@@ -8,7 +8,7 @@
 import SwiftUI
 import FittedSheets
 
-struct BannerAlalyticsView: View {
+struct BannerAnalyticsView: View {
     
     var navigationController:UINavigationController?
     let  bannerId:Int

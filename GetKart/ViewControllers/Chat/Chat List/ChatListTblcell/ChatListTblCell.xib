@@ -34,9 +34,9 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7fd-9i-iXu">
-                                <rect key="frame" x="220" y="10.000000000000002" width="70" height="16.666666666666671"/>
+                                <rect key="frame" x="217" y="10.000000000000002" width="73" height="16.666666666666671"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="70" id="I9A-VX-g46"/>
+                                    <constraint firstAttribute="width" constant="73" id="I9A-VX-g46"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Manrope-Regular" family="Manrope" pointSize="12"/>
                                 <nil key="textColor"/>

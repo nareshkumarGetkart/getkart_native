@@ -512,9 +512,16 @@ extension BannerPromotionsView {
 //            AlertView.sharedManager.showToast(
 //                message: "Please select location"
 //            )
-//            
+//
+        
 //        }
-        else if strUrl.count > 0 &&
+        else if strUrl.count <= 4 {
+            
+            AlertView.sharedManager.showToast(
+                message: "Please enter valid url"
+            )
+            
+        } else if strUrl.count > 0 &&
                     !strUrl.isValidWebsiteURL() {
             
             AlertView.sharedManager.showToast(

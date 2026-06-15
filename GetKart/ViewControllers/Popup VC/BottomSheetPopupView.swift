@@ -77,12 +77,30 @@ struct BottomSheetPopupView: View {
                 pushToScreenFromPopup(objPopup, false)
             } label: {
                 let strTitle = (objPopup.buttonTitle ?? "").count > 0 ?  objPopup.buttonTitle ?? "Okay" : "Okay"
-                Text(strTitle)
+               /* Text(strTitle)
                     .foregroundColor(.white)
                     .font(.inter(.semiBold, size: 18))
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color(hexString: "#FF9900"))
                     .cornerRadius(10)
+                */
+                
+                Text(strTitle) .font(.inter(.semiBold, size: 18))
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 55)
+                                            .background(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color.orange,
+                                                        Color.pink,
+                                                        Color.purple
+                                                    ],
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                )
+                                            )
+                                            .cornerRadius(18)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 25)
@@ -124,7 +142,7 @@ struct BottomSheetPopupView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 160, maxHeight: 250)
+                    .frame(minHeight: 330, maxHeight: 330)
                    // .padding(.top,1)
                 
             } placeholder: {
@@ -132,7 +150,7 @@ struct BottomSheetPopupView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 160, maxHeight: 250)
+                    .frame(minHeight: 330, maxHeight: 330)
                   //  .padding(.top,1)
                 
             }
@@ -160,6 +178,156 @@ struct BottomSheetPopupView: View {
     }
 }
 
+
+struct BottomSheetPopupView1: View {
+    var objPopup: PopupModel
+    var preloadedImage: UIImage?       // ✅ Already downloaded
+    var preloadedImageHeight: CGFloat  // ✅ Already computed
+    var pushToScreenFromPopup: (_ obj: PopupModel, _ dismissOnly: Bool) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            content
+        }
+        .background(Color.white)
+    }
+
+    private var content: some View {
+        VStack(spacing: 10) {
+
+            // IMAGE OR CLOSE BUTTON
+            if let imageUrl = objPopup.image, !imageUrl.isEmpty {
+                popupImage
+            } else {
+                HStack {
+                    Spacer()
+                    closeButton
+                        .padding(.top, 12)
+                        .padding(.trailing, 12)
+                }
+            }
+
+            // TEXT CONTENT
+            VStack(spacing: 10) {
+                if let title = objPopup.title, !title.isEmpty {
+                    if title.isHTML {
+                        HTMLOrTextView(
+                            htmlContent: title,
+                            defaultFont: UIFont.Inter.semiBold(size: 22.0).font
+                                ?? UIFont.systemFont(ofSize: 22, weight: .semibold)
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(title)
+                            .foregroundColor(.black)
+                            .font(.inter(.semiBold, size: 18))
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                if let subtitle = objPopup.subtitle, !subtitle.isEmpty {
+                    if subtitle.isHTML {
+                        HTMLOrTextView(
+                            htmlContent: subtitle,
+                            defaultFont: UIFont.Inter.medium(size: 17.0).font
+                                ?? UIFont.systemFont(ofSize: 17, weight: .medium)
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(subtitle)
+                            .foregroundColor(.black)
+                            .font(.inter(.medium, size: 17))
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                if let html = objPopup.description, !html.isEmpty {
+                    HTMLTextView(htmlContent: html)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.horizontal, 20)
+
+            // MAIN BUTTON
+            Button {
+                pushToScreenFromPopup(objPopup, false)
+            } label: {
+                let strTitle = (objPopup.buttonTitle ?? "").isEmpty
+                    ? "Okay"
+                    : (objPopup.buttonTitle ?? "Okay")
+                Text(strTitle)
+                    .font(.inter(.semiBold, size: 18))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 55)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.orange, Color.pink, Color.purple],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(18)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 25)
+        }
+    }
+
+    private var popupImage: some View {
+        ZStack(alignment: .topTrailing) {
+
+            if let uiImage = preloadedImage {
+                // ✅ Use preloaded image directly — no async needed, no delay
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: preloadedImageHeight) // ✅ Exact height, known before open
+            } else {
+                // Fallback placeholder if download failed
+                Image("getkartplaceholder")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 220)
+            }
+
+            if !(objPopup.mandatoryClick ?? false) {
+                closeButton
+                    .padding(.top, 10)
+                    .padding(.trailing, 12)
+            }
+        }
+    }
+
+//    private var closeButton: some View {
+//        Button {
+//            pushToScreenFromPopup(objPopup, true)
+//        } label: {
+//            Image("Cross")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
+//                .frame(width: 25, height: 25)
+//        }
+//    }
+    
+    private var closeButton: some View {
+        Button {
+            pushToScreenFromPopup(objPopup, true)
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.black)
+                .frame(width: 32, height: 32)
+                .background(Color.white)
+                .clipShape(Circle())
+                .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+        }
+    }
+}
 
 struct HTMLTextView: UIViewRepresentable {
     let htmlContent: String

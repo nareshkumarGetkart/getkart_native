@@ -375,7 +375,7 @@ private func detailsCard() -> some View {
     func pushToBannerAnalytics(){
        
         if let bannerId = transaction?.banners?.first?.id{
-            let swiftView = BannerAlalyticsView(navigationController: self.navController, bannerId: bannerId)
+            let swiftView = BannerAnalyticsView(navigationController: self.navController, bannerId: bannerId)
             let destVC = UIHostingController(rootView: swiftView)
             self.navController?.pushViewController(destVC, animated: true)
         }else{

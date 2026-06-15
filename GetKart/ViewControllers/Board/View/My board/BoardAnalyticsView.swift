@@ -365,6 +365,7 @@ struct BoardAnalyticsView: View {
                 vc.modalTransitionStyle = .crossDissolve
                 vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
                 self.navigationController?.present(vc, animated: true)
+                self.getBoardAnanlytics()
             }
             
                self.paymentGateway = nil

@@ -525,7 +525,7 @@ extension MyAdsVC:UITableViewDelegate,UITableViewDataSource{
         
         //if apiStatus == "banner details"{
             
-            let swiftView = BannerAlalyticsView(navigationController: self.navigationController,bannerId: userBannerArray[indexPath.row].id ?? 0)
+            let swiftView = BannerAnalyticsView(navigationController: self.navigationController,bannerId: userBannerArray[indexPath.row].id ?? 0)
             let destVC = UIHostingController(rootView: swiftView)
             destVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destVC, animated: true)

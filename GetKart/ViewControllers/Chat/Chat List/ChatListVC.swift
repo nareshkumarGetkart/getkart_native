@@ -348,7 +348,8 @@ extension ChatListVC:UITableViewDelegate,UITableViewDataSource{
 
         // NORMAL OPEN CHAT
         listArray[indexPath.item].readAt = listArray[indexPath.item].lastMessage?.updatedAt
-
+        listArray[indexPath.item].unreadCount = 0
+        
         self.tblView.reloadData()
 
         let destVC = StoryBoard.chat.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC

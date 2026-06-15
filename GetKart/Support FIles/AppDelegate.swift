@@ -414,11 +414,7 @@ extension AppDelegate {
         
         if roomId == 0{
             roomId = Int(info["roomId"] as? String ?? "0") ?? 0
-        }
-
-     
-            
-        
+        }        
     }
 
     // Shared helper — switches to a tab and pushes a view controller once

@@ -9,6 +9,7 @@ import SwiftUI
 import Kingfisher
 import AVKit
 import FittedSheets
+import Kingfisher
 
 //MARK: - BoardHomeView
 
@@ -174,6 +175,18 @@ extension BoardHomeView{
     
     //MARK: Api methods
     func getpopupApi(){
+        
+        
+/* self.presentHostingController(objPopup: PopupModel(userID:639, title:""
+                                                               ,
+                                                               subtitle: "",
+                                                               description: "", image:"https://d3se71s7pdncey.cloudfront.net/getkart/v1/chat/2026/06/Pop-up1.jpg", mandatoryClick: false,
+                                                               buttonTitle: "Check Now",
+                                                               type: 5, itemID: 49625, secondButtonTitle: ""))
+            
+        
+            
+            return*/
 
         ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { (obj:PopupParseModel) in
             
@@ -217,9 +230,135 @@ extension BoardHomeView{
             }
         }
     }
+  
+    func presentHostingController(objPopup: PopupModel) {
+        
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+        
+        guard let topVC = AppDelegate.sharedInstance.navigationController?.topViewController,
+              let topView = topVC.view else { return }
+        
+        if let imageUrl = objPopup.image, !imageUrl.isEmpty, let url = URL(string: imageUrl) {
+            
+            KingfisherManager.shared.retrieveImage(with: url) { result in  // ✅ No [weak self]
+                
+                DispatchQueue.main.async {
+                    var imageHeight: CGFloat = 220
+                    var downloadedImage: UIImage? = nil
+                    
+                    switch result {
+                    case .success(let value):
+                        downloadedImage = value.image
+                        let screenWidth = UIScreen.main.bounds.width
+                        let aspectRatio = value.image.size.height / value.image.size.width
+                        let computed = screenWidth * aspectRatio
+                        imageHeight = min(max(computed, 160), 420)
+                        
+                    case .failure:
+                        imageHeight = 220
+                    }
+                    
+                    self.showSheet(  // ✅ Just self — safe for structs
+                        objPopup: objPopup,
+                        image: downloadedImage,
+                        imageHeight: imageHeight,
+                        topVC: topVC,
+                        topView: topView,
+                        boardNav: boardNav
+                    )
+                }
+            }
+            
+        } else {
+            showSheet(
+                objPopup: objPopup,
+                image: nil,
+                imageHeight: 0,
+                topVC: topVC,
+                topView: topView,
+                boardNav: boardNav
+            )
+        }
+    }
+
+    private func showSheet(
+        objPopup: PopupModel,
+        image: UIImage?,
+        imageHeight: CGFloat,
+        topVC: UIViewController,
+        topView: UIView,
+        boardNav: UINavigationController?
+    ) {
+        var sheet: SheetViewController!
+
+        let settingView = BottomSheetPopupView1(
+            objPopup: objPopup,
+            preloadedImage: image,        // ✅ Pass already downloaded image
+            preloadedImageHeight: imageHeight, // ✅ Pass already computed height
+            pushToScreenFromPopup: { obj, dismissOnly in
+               // guard let self = self else { return }
+                
+                if sheet.options.useInlineMode {
+                    sheet.attemptDismiss(animated: true)
+                } else {
+                    sheet.dismiss(animated: true, completion: nil)
+                }
+                
+                guard !dismissOnly else { return }
+                
+                switch obj.type ?? 0 {
+                case 5:
+                    let destVC = UIHostingController(
+                        rootView: BannerPromotionsView(navigationController: boardNav)
+                    )
+                    destVC.hidesBottomBarWhenPushed = true
+                    boardNav?.pushViewController(destVC, animated: true)
+                case 6:
+                    break
+                default:
+                    break
+                }
+            }
+        )
+
+        let controller = UIHostingController(rootView: settingView)
+        controller.view.backgroundColor = .white
+        controller.disableSafeArea()
+
+        let nav = UINavigationController(rootViewController: controller)
+        nav.navigationBar.isHidden = true
+        nav.view.backgroundColor = .white
+
+        sheet = SheetViewController(
+            controller: nav,
+            sizes: [.intrinsic],
+            options: SheetOptions(
+                presentingViewCornerRadius: 0,
+                shrinkPresentingViewController: false, useInlineMode: true
+            )
+        )
+
+        sheet.cornerRadius = 15
+        sheet.allowGestureThroughOverlay = false
+        sheet.dismissOnOverlayTap = true
+        sheet.dismissOnPull = false
+
+        if objPopup.mandatoryClick ?? false {
+            sheet.dismissOnOverlayTap = false
+            sheet.dismissOnPull = false
+            sheet.allowPullingPastMaxHeight = false
+            sheet.allowPullingPastMinHeight = false
+            sheet.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.shouldRecognizePanGestureWithUIControls = false
+            sheet.sheetViewController?.allowGestureThroughOverlay = false
+            sheet.sheetViewController?.dismissOnPull = false
+            sheet.allowPullingPastMinHeight = false
+        }
+
+        sheet.animateIn(to: topView, in: topVC)
+    }
     
-    
-    func presentHostingController(objPopup:PopupModel){
+  /*  func presentHostingController(objPopup:PopupModel){
         
         let controller = UIHostingController(
             rootView: BottomSheetPopupView(objPopup: objPopup,pushToScreenFromPopup: {  (obj,dismissOnly) in }))
@@ -296,7 +435,7 @@ extension BoardHomeView{
         }
         
     }
-    
+    */
     
     func showBoostYourBoardPopup(obj:PopupModel) {
         let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
@@ -1604,6 +1743,11 @@ struct BoardVideoBannerCard: View {
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
+        .onDisappear{
+           self.player?.pause()
+           self.player?.isMuted = true
+        }
+
     }
     
     // MARK: - Sub-views
@@ -1632,7 +1776,12 @@ struct BoardVideoBannerCard: View {
         .background(Color(.systemBackground))
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: -2)
         .contentShape(Rectangle())
-        .onTapGesture(perform: recordOutboundClick)
+        .onTapGesture {
+            recordOutboundClick()
+            self.player?.pause()
+            self.player?.isMuted = true
+        }
+       // .onTapGesture(perform: recordOutboundClick)
     }
     
     // MARK: - Playback Lifecycle
@@ -3166,3 +3315,37 @@ struct BoardListViewNew: View {
         }
     }
 }*/
+
+
+import UIKit
+import ObjectiveC
+
+extension UIHostingController {
+    func disableSafeArea() {
+        guard let viewClass = object_getClass(view) else { return }
+        
+        let viewSubclassName = String(cString: class_getName(viewClass))
+            .appending("_IgnoreSafeArea")
+        
+        // Reuse if already created
+        if let viewSubclass = NSClassFromString(viewSubclassName) {
+            object_setClass(view, viewSubclass)
+            return
+        }
+        
+        guard let viewSubclass = objc_allocateClassPair(viewClass, viewSubclassName, 0) else { return }
+        
+        if let method = class_getInstanceMethod(UIView.self, #selector(getter: UIView.safeAreaInsets)) {
+            let block: @convention(block) (AnyObject) -> UIEdgeInsets = { _ in .zero }
+            class_addMethod(
+                viewSubclass,
+                #selector(getter: UIView.safeAreaInsets),
+                imp_implementationWithBlock(block),
+                method_getTypeEncoding(method)
+            )
+        }
+        
+        objc_registerClassPair(viewSubclass)
+        object_setClass(view, viewSubclass)
+    }
+}

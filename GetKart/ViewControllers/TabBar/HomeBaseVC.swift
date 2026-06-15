@@ -56,9 +56,7 @@ class HomeBaseVC: UITabBarController {
         // link middleButton reference into CustomTabBar so hitTest works
         if let customTabBar = tabBar as? CustomTabBar {
             customTabBar.middleButton = middleButton
-        }
-        
-      
+        }      
         
     }
    
@@ -69,11 +67,15 @@ class HomeBaseVC: UITabBarController {
         if Constant.shared.isLaunchFirstTime == 1 {
             Constant.shared.isLaunchFirstTime = 0
             
-            NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
+          /*  NotificationCenter.default.addObserver(forName: NSNotification.Name(SocketEvents.socketConnected.rawValue), object: nil, queue: .main) { _ in
                 AppDelegate.sharedInstance.navigateToNotificationType()
             }
             // Trigger connection if not already started
+            SocketIOManager.sharedInstance.checkSocketStatus()*/
+            
+            // Trigger connection if not already started
             SocketIOManager.sharedInstance.checkSocketStatus()
+            AppDelegate.sharedInstance.navigateToNotificationType()
         }
     }
 
