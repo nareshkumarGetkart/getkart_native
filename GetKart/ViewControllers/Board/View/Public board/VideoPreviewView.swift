@@ -38,7 +38,7 @@ struct VideoPreviewView: View {
                     vm.toggleControls()
                 }
 
-            // Double tap seek
+           /* // Double tap seek
             HStack {
 
                 Color.clear
@@ -53,7 +53,7 @@ struct VideoPreviewView: View {
                         vm.seek(by: 10)
                     }
             }
-            .ignoresSafeArea()
+            .ignoresSafeArea()*/
 
             if vm.showControls {
 
@@ -187,7 +187,9 @@ struct VideoPreviewView: View {
         }
         .onDisappear {
             vm.player.pause()
-        }
+        }.onTapGesture(perform: {
+            vm.toggleControls()
+        })
         .sheet(isPresented: $openSafari) {
 
             if let url = URL(string: vm.itemObj?.outbondUrl?.getValidUrl() ?? "") {

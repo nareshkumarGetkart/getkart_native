@@ -537,11 +537,11 @@ extension BannerPromotionsView {
     func pushToPreviewScreen() {
         
         
-        if let url = URL(string: Constant.shared.BANNER_DEMO){
+       // if let url = URL(string: Constant.shared.BANNER_DEMO){
             let vc = UIHostingController(rootView:  PreviewURL(fileURLString:Constant.shared.BANNER_DEMO))
             self.navigationController?.pushViewController(vc, animated: true)
 
-        }
+       // }
 //        switch selectedMedia {
 //            
 //        case .image(let img):

@@ -15,7 +15,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -51,9 +51,9 @@ final class Constant: NSObject {
         }
     }
     
-   let BOOSTEDADS_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
-   let BOARDBOOST_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop.gif"
-   let BANNER_DEMO="https://d3se71s7pdncey.cloudfront.net/getkart/v1/settings/getkart-Tutorial.gif"
+   let BOOSTEDADS_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
+   let BOARDBOOST_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/campaignBanners/2026/06/Getkart-Loop-New.gif"
+   let BANNER_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/campaignBanners/2026/06/Getkart-Tutorial-Gif-New.gif"
 
     
     

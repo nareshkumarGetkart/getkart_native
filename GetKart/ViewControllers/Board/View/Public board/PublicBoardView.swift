@@ -1416,7 +1416,7 @@ struct PromotionalAdsCardStaggered: View {
                 
                 let result = responseObject! as NSDictionary
                 let status = result["code"] as? Int ?? 0
-                let message = result["message"] as? String ?? ""
+               // let message = result["message"] as? String ?? ""
                 
                 if status == 200{
                     

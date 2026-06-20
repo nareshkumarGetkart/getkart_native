@@ -10,6 +10,13 @@ import Alamofire
 import Kingfisher
 
 
+
+
+
+struct BannerItem: Identifiable {
+    let id = UUID()
+    let image: String
+}
 struct BoardSearchView: View {
 
     @State  private var searchText = ""
@@ -22,6 +29,13 @@ struct BoardSearchView: View {
         return tabBarController?.viewControllers?[1].navigationController
     }
     
+    @State private var currentBanner = 0
+
+        let banners = [
+            BannerItem(image: "products"),
+            BannerItem(image: "products"),
+            BannerItem(image: "products")
+        ]
     
     var body: some View {
         
@@ -43,12 +57,13 @@ struct BoardSearchView: View {
 
                     Spacer()
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 12)
                 .padding(.horizontal, 14)
                 .frame(maxWidth: .infinity)
-                .contentShape(Capsule())
+               // .contentShape(Capsule())
+                .cornerRadius(10.0)
                 .overlay(
-                    Capsule()
+                    RoundedRectangle(cornerRadius: 10.0)
                         .strokeBorder(Color(UIColor.separator), lineWidth: 0.5)
                 )
                 .onTapGesture {
@@ -108,9 +123,13 @@ struct BoardSearchView: View {
         }
         
         VStack(spacing: 0) {
+            
                         
             // List of Recent Items
             ScrollView {
+                
+                bannerSection
+                
                 if !viewModel.items.isEmpty{
                     
                     HStack {
@@ -326,6 +345,48 @@ struct BoardSearchView: View {
         navigationController?.pushViewController(vc, animated: false)
    }
     
+}
+
+
+
+extension BoardSearchView {
+
+    var bannerSection: some View {
+
+        VStack(spacing: 10) {
+
+            TabView(selection: $currentBanner) {
+
+                ForEach(0..<banners.count, id: \.self) { index in
+
+                    Image(banners[index].image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 180)
+                        .clipped()
+                        .cornerRadius(14)
+                        .tag(index)
+                }
+            }
+            .frame(height: 180)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+
+            HStack(spacing: 6) {
+
+                ForEach(0..<banners.count, id: \.self) { index in
+
+                    Circle()
+                        .fill(
+                            currentBanner == index
+                            ? Color.orange
+                            : Color.gray.opacity(0.4)
+                        )
+                        .frame(width: 8, height: 8)
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
 }
 
 #Preview {
