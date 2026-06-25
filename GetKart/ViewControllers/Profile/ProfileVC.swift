@@ -30,9 +30,9 @@ class ProfileVC: UIViewController {
     //,"Buy Packages"
   
     
-    var titleArray =  ["Anonymous","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
+    var titleArray =  ["Anonymous","My Wallet","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       //,"buyPackages"
-    var iconArray =  ["","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
+    var iconArray =  ["","wallet","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
       
     var verifiRejectedReason:String = ""
     var verifyStatus:String = ""
@@ -359,41 +359,46 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
             let theme = AppTheme(rawValue: savedTheme) ?? .system
             
-            if theme == .dark{
+           if theme == .dark{
                 cell.bgviewIcon.backgroundColor = UIColor(hexString: "#342b1e")
 
             }else{
                 cell.bgviewIcon.backgroundColor = UIColor(hexString: "#FFF7EA")
-            }            
+            }  
             
             if titleArray[indexPath.row] == "Dark Theme"{
+                
                 cell.imgVwArrow.isHidden = true
                 cell.btnSwitch.isHidden = false
                 cell.btnSwitch.addTarget(self, action: #selector(didTapSwitch(_:)), for: .touchUpInside)
-              
-                
                 cell.btnSwitch.isOn = (theme == .dark) ? true : false
                 cell.bgviewArrow.isHidden = true
+                
             }else{
                 cell.imgVwArrow.isHidden = false
                 cell.btnSwitch.isHidden = true
                 cell.bgviewArrow.isHidden = false
-
             }
             
             return cell
         }
         
-        // return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
+       
         }else{
             
-            
-            
-            if titleArray[indexPath.row] == "My Connections"{
+            if titleArray[indexPath.row] == "My Wallet"{
+                if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                    
+                    let hostingController = UIHostingController(rootView: MyWalletView(navigation: navigationController))
+                    hostingController.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(hostingController, animated: true)
+                }
+                
+            }else if titleArray[indexPath.row] == "My Connections"{
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
                     let hostingController = UIHostingController(rootView: MyConnectionsView(navigation: navigationController))

@@ -20,11 +20,10 @@ struct FilterView: View {
     var onApplyFilter: ([String: Any],[CustomField]) -> Void
     var selectedIndex = -1
     @State var searchText = ""
-    
     @State var showClearAlert:Bool = false
     
     var body: some View {
-
+        
         HStack{
             Text("FILTER").padding(.top)
             Spacer()
@@ -35,7 +34,7 @@ struct FilterView: View {
                     .foregroundColor(Color(.label))
                     .padding(5).padding(.top)
             }
-
+            
         }.padding([.leading,.trailing])
             .onAppear{
                 if  fieldVM.fieldsArray.count == 0{
@@ -45,50 +44,50 @@ struct FilterView: View {
                         fieldVM.dictCustomFields = filterDict ?? [:]
                         fieldVM.selectedIndex = selectedIndex
                     }else{
-
+                        
                         fieldVM.getCustomFieldsListApi(category_ids: self.categoryId ?? "")
                     }
-                   
+                    
                 }
             }
         Divider().background(Color.gray)
         HStack{
             VStack{
                 ScrollView{
-                ForEach(fieldVM.fieldsArray.indices, id: \.self) { index in
-                    let item = fieldVM.fieldsArray[index]
-                    
-                    HStack {
-                        // Left vertical colored bar
-                        Rectangle()
-                            .fill(index == fieldVM.selectedIndex ? Color.orange : Color.clear)
-                            .frame(width: 3).cornerRadius(8.0)
+                    ForEach(fieldVM.fieldsArray.indices, id: \.self) { index in
+                        let item = fieldVM.fieldsArray[index]
                         
-                        
-                        Text(item.name ?? "")
-                            .font(Font.manrope(.medium, size: 16))
-                            .foregroundColor(index == fieldVM.selectedIndex ? .orange : Color(.label))
+                        HStack {
+                            // Left vertical colored bar
+                            Rectangle()
+                                .fill(index == fieldVM.selectedIndex ? Color.orange : Color.clear)
+                                .frame(width: 3).cornerRadius(8.0)
+                            
+                            
+                            Text(item.name ?? "")
+                                .font(Font.manrope(.medium, size: 16))
+                                .foregroundColor(index == fieldVM.selectedIndex ? .orange : Color(.label))
+                                .background(Color.clear)
+                                .contentShape(Rectangle()) // makes full area tappable
+                            Spacer()
+                        }.frame(minHeight:35)//.padding([.leading,.trailing])
                             .background(Color.clear)
-                            .contentShape(Rectangle()) // makes full area tappable
-                        Spacer()
-                    }.frame(minHeight:35)//.padding([.leading,.trailing])
-                        .background(Color.clear)
-                    
-                    
-                        .onTapGesture {
-                            if fieldVM.selectedIndex != index{
-                                searchText = ""
+                        
+                        
+                            .onTapGesture {
+                                if fieldVM.selectedIndex != index{
+                                    searchText = ""
+                                }
+                                fieldVM.selectedIndex = index
                             }
-                            fieldVM.selectedIndex = index
-                        }
-                }
-                
-                Spacer()
-                
+                    }
+                    
+                    Spacer()
+                    
                 }//.padding(0)
                 
             }.frame(width: 140)
-             //.padding()
+            //.padding()
             Divider().background(Color.gray)
             
             VStack{
@@ -101,11 +100,11 @@ struct FilterView: View {
                                 .padding(8)
                                 .background(Color(.systemGray6))
                                 .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                                        )
-                               // .cornerRadius(8)
-                                //.padding(.horizontal)
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                                )
+                            // .cornerRadius(8)
+                            //.padding(.horizontal)
                                 .onChange(of: searchText) { newValue in
                                     
                                 }
@@ -121,23 +120,23 @@ struct FilterView: View {
                                 Text("\((item.name ?? "").capitalized)")
                                     .font(Font.manrope(.medium, size: 16.0))
                             }else{
-//                                if item.type == .range{
-//                                    VStack(alignment:.leading){
-//                                        Text("FILTER BY \((item.name ?? ""))".capitalized)
-//                                            .font(Font.manrope(.medium, size: 16.0))
-//                                        Text("Choose From Below Options").font(Font.manrope(.regular, size: 11.0))
-//                                    }
-//                                }else{
-                                    Text("FILTER BY \(item.name ?? "")".capitalized)
-                                        .font(Font.manrope(.medium, size: 16.0))
-                               // }
+                                //                                if item.type == .range{
+                                //                                    VStack(alignment:.leading){
+                                //                                        Text("FILTER BY \((item.name ?? ""))".capitalized)
+                                //                                            .font(Font.manrope(.medium, size: 16.0))
+                                //                                        Text("Choose From Below Options").font(Font.manrope(.regular, size: 11.0))
+                                //                                    }
+                                //                                }else{
+                                Text("FILTER BY \(item.name ?? "")".capitalized)
+                                    .font(Font.manrope(.medium, size: 16.0))
+                                // }
                             }
                             Spacer()
                         }
                         
-                     
-                       
-                       // if fieldVM.selectedIndex > 0{
+                        
+                        
+                        // if fieldVM.selectedIndex > 0{
                         if (item.values?.count ?? 0) > 0 || ((item.ranges?.count ?? 0) > 0){
                             
                             HStack{
@@ -146,24 +145,24 @@ struct FilterView: View {
                                 Spacer()
                             }.padding(.bottom,10)
                         }
-                    
+                        
                         if item.type == .category{
-                    
+                            
                             CategoryViewFilter(title: categoryName ?? "", icomImgUrl: categImg ?? "")
                             
                         }else if item.type == .checkbox{
                             //Checkbox View
                             if let unwrappedVal = item.values {
-                              
+                                
                                 let unwrappedValues = returnSearchedText(mainArray: item.values)
-                               // unwrappedValues = returnSearchedText(mainArray: item.values)
+                                // unwrappedValues = returnSearchedText(mainArray: item.values)
                                 
                                 ForEach(Array(unwrappedValues.enumerated()), id: \.offset) { index, value in
                                     
                                     CheckBoxSelectionView(
-                                               title: value ?? "",
-                                               isSelected: fieldVM.fieldsArray[fieldVM.selectedIndex].value?.contains(value) == true
-                                           )
+                                        title: value ?? "",
+                                        isSelected: fieldVM.fieldsArray[fieldVM.selectedIndex].value?.contains(value) == true
+                                    )
                                     
                                     .onTapGesture {
                                         // handle tap on index
@@ -175,7 +174,7 @@ struct FilterView: View {
                                             objCustomField.value?.removeAll { $0 == value }
                                             let joinedStr = objCustomField.value?.compactMap{$0}.joined(separator: ",")
                                             fieldVM.dictCustomFields["\(objCustomField.id ?? 0)"] = joinedStr
-
+                                            
                                         } else {
                                             if objCustomField.value == nil {
                                                 objCustomField.value = []
@@ -194,7 +193,7 @@ struct FilterView: View {
                             
                             
                             
-                        }else   if item.type == .radio{
+                        }else if item.type == .radio{
                             
                             if let unwrappedValues = item.values {
                                 ForEach(Array(unwrappedValues.enumerated()), id: \.offset) { index, value in
@@ -209,13 +208,13 @@ struct FilterView: View {
                                             var objCustomField = fieldVM.fieldsArray[fieldVM.selectedIndex]
                                             objCustomField.value?.removeAll()
                                             fieldVM.dictCustomFields["\(objCustomField.id ?? 0)"] = ""
-
+                                            
                                             if objCustomField.value == nil {
                                                 objCustomField.value = []
                                             }
                                             objCustomField.value?.append(value)
                                             fieldVM.dictCustomFields["\(objCustomField.id ?? 0)"] = value
-
+                                            
                                             // Replace the whole struct to trigger  update
                                             fieldVM.fieldsArray[fieldVM.selectedIndex] = objCustomField
                                         }
@@ -241,7 +240,7 @@ struct FilterView: View {
                                             }
                                             objCustomField.value?.append(value)
                                             
-                                             let str = value.lowercased()
+                                            let str = value.lowercased()
                                                 .replacingOccurrences(of: " ", with: "-")
                                             fieldVM.dictCustomFields["sort_by"] = str
                                             // Replace the whole struct to trigger  update
@@ -254,11 +253,11 @@ struct FilterView: View {
                             if let unwrappedValues = item.ranges {
                                 buildRangeList(for: unwrappedValues)
                             }
-
-                            rangeSliderView
-
                             
-                           
+                            // rangeSliderView
+                            
+                            
+                            
                         }
                         
                     }
@@ -266,7 +265,7 @@ struct FilterView: View {
                     Spacer()
                 }//.padding(0)
             }.padding([.leading,.trailing],8)
-                        
+            
         }.padding([.top,.bottom],0)
         
         Divider()
@@ -274,42 +273,42 @@ struct FilterView: View {
             
             Button {
                 
-              /*  fieldVM.selectedIndex = 0
-                fieldVM.dictCustomFields.removeAll()
-                for (index,_) in fieldVM.fieldsArray.enumerated(){
-                    var objCustomField = self.fieldVM.fieldsArray[index]
-                    if objCustomField.value?.count ?? 0 > 0 {
-                    }
-                    // objCustomField.value?[0] = ""
-                    objCustomField.value?.removeAll()
-                    
-                    // dictCustomFields["\(objCustomField.id ?? 0)"] = ""
-                    objCustomField.selectedMaxValue = nil // objCustomField.maxPrice
-                    objCustomField.selectedMinValue = nil //objCustomField.minPrice
-                    fieldVM.fieldsArray[index] = objCustomField
-                    */
-                showClearAlert = true
+                /*  fieldVM.selectedIndex = 0
+                 fieldVM.dictCustomFields.removeAll()
+                 for (index,_) in fieldVM.fieldsArray.enumerated(){
+                 var objCustomField = self.fieldVM.fieldsArray[index]
+                 if objCustomField.value?.count ?? 0 > 0 {
+                 }
+                 // objCustomField.value?[0] = ""
+                 objCustomField.value?.removeAll()
                  
+                 // dictCustomFields["\(objCustomField.id ?? 0)"] = ""
+                 objCustomField.selectedMaxValue = nil // objCustomField.maxPrice
+                 objCustomField.selectedMinValue = nil //objCustomField.minPrice
+                 fieldVM.fieldsArray[index] = objCustomField
+                 */
+                showClearAlert = true
+                
             } label: {
                 Text("Clear Filters")
                     .frame(width: 120)
                     .foregroundColor(Color(Themes.sharedInstance.themeColor))
-
+                
             }
             
             
             
             Button {
-                      
+                
                 for (index,obj) in fieldVM.fieldsArray.enumerated(){
-
+                    
                     if obj.type == .range{
                         if let min = obj.selectedMinValue, let max = obj.selectedMaxValue{
                             fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(min)),\(Int(max))"
                         }else if let min = obj.selectedMinValue{
                             fieldVM.fieldsArray[index].selectedMaxValue = obj.maxPrice ?? 0
                             fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(min)),\(Int(obj.maxPrice ?? 0))"
-
+                            
                         }else if let max = obj.selectedMaxValue{
                             fieldVM.fieldsArray[index].selectedMinValue = obj.minPrice ?? 0
                             fieldVM.dictCustomFields["\(obj.id ?? 0)"] = "\(Int(obj.minPrice ?? 0)),\(Int(max))"
@@ -319,9 +318,9 @@ struct FilterView: View {
                 }
                 self.navigation?.dismiss(animated: true, completion: {
                     onApplyFilter(fieldVM.dictCustomFields, fieldVM.fieldsArray)
-
+                    
                 })
-    
+                
                 
             } label: {
                 Text("Apply")
@@ -332,27 +331,25 @@ struct FilterView: View {
                     .cornerRadius(10)
                     .padding(.horizontal)
             }.padding(.leading,30).padding(.trailing,10)
-
+            
         }.ignoresSafeArea()
         
         
             .alert("Want to clear all filter changes?", isPresented: $showClearAlert) {
                 Button("Cancel", role: .none) {
-                            // Cancel action
-                        }.foregroundColor(.blue)
+                    // Cancel action
+                }.foregroundColor(.blue)
                 
                 Button("Clear", role: .none) {
-                            // Clear action
-                            print("Filters cleared")
-                            clearFilterAlert()
-                        }.foregroundColor(.blue)
+                    // Clear action
+                    print("Filters cleared")
+                    clearFilterAlert()
+                }.foregroundColor(.blue)
                 
-               
-                    } message: {
-                        Text("You modified some filters. This action will clear all the filter selections.")
-                    }
+            } message: {
+                Text("You modified some filters. This action will clear all the filter selections.")
+            }
         
-
     }
     
     
@@ -509,13 +506,12 @@ struct CheckBoxSelectionView: View {
     }
 }
 
-
+/*
 struct RangePriceView:View {
     var isSelected:Bool
     var obj:PriceRange
     
     var body: some View {
-        
         HStack{
             Text(obj.label ?? "").font(Font.manrope(.regular, size: 12)).padding(.leading)
             Spacer()
@@ -533,6 +529,52 @@ struct RangePriceView:View {
                 .stroke(Color.gray, lineWidth: 0.5).shadow(radius: 10.0)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .contentShape(Rectangle())
+    }
+}
+ */
+
+struct RangePriceView: View {
+    
+    var isSelected: Bool
+    var obj: PriceRange
+
+    var body: some View {
+        
+        HStack {
+            
+            Text(obj.label ?? "")
+                .font(Font.manrope(.medium, size: 16))
+                .foregroundColor(.black)
+            
+            Spacer()
+            
+            if (obj.count ?? 0) > 0 {
+                Text("\(obj.count ?? 0)+ items")
+                    .font(Font.manrope(.medium, size: 14))
+                    .foregroundColor(isSelected ? .black : .black)
+            }
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .background(Color.white)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    isSelected
+                    ? Color.orange
+                    : Color.gray.opacity(0.25),
+                    lineWidth: isSelected ? 1.5 : 1
+                )
+        )
+        .cornerRadius(10)
+        .shadow(
+            color: .black.opacity(0.08),
+            radius: 3,
+            x: 0,
+            y: 1
+        )
+        .padding(.vertical, 4)
         .contentShape(Rectangle())
     }
 }

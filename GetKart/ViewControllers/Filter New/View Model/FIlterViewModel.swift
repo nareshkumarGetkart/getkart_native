@@ -20,7 +20,7 @@ class FIlterViewModel:ObservableObject{
     
     
     func getCustomFieldsListApi(category_ids:String){
-        
+        /*
        let city = Local.shared.getUserCity()
        let country = Local.shared.getUserCountry()
        let  state = Local.shared.getUserState()
@@ -34,7 +34,8 @@ class FIlterViewModel:ObservableObject{
         }
         
         
-        var strUrl = Constant.shared.getFilterCustomfields + "?category_ids=\(category_ids)"
+        var strUrl = Constant.shared.getFilterCustomfields 
+       + "?category_ids=\(category_ids)"
         
         if city.count > 0{
             strUrl.append("&city=\(city)")
@@ -55,8 +56,10 @@ class FIlterViewModel:ObservableObject{
         if longitude.count > 0 && (state.count > 0 || city.count > 0){
             strUrl.append("&longitude=\(longitude)")
         }
+        */
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:CustomFieldsParse) in
+        
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.getFilterCustomfields) {[weak self] (obj:CustomFieldsParse) in
             
             if obj.data != nil {
                 self?.fieldsArray = obj.data ?? []
@@ -66,7 +69,7 @@ class FIlterViewModel:ObservableObject{
 //                    self?.fieldsArray.insert(objCategory, at: 0)
 //                }
 //                
-                let objSortBY = CustomField(id: 345676, name: "Sort By", type: .sortby, image: "", customFieldRequired: nil, values: [
+              /*  let objSortBY = CustomField(id: 345676, name: "Sort By", type: .sortby, image: "", customFieldRequired: nil, values: [
                    // "Default",
                     "New to Old",
                     "Old to New",
@@ -74,7 +77,7 @@ class FIlterViewModel:ObservableObject{
                     "Price Low to High"
                 ], minLength: nil, maxLength: 0, status: 0, value: nil, customFieldValue: nil, arrIsSelected: [], selectedValue: nil,ranges: [])
                 self?.fieldsArray.append(objSortBY)
-                
+                */
                 self?.selectedIndex = 0
 
             }

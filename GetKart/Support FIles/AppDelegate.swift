@@ -556,6 +556,8 @@ extension AppDelegate {
             } else {
                 getBoardDetailApi(boardId: itemIdLocal)
             }
+        case "item_comment":
+            getBoardDetailApi(boardId: itemIdLocal)
 
         case "seller-profile":
             let vc = UIHostingController(

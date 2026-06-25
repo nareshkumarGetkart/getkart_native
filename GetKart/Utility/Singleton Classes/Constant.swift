@@ -15,7 +15,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = false
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
@@ -88,7 +88,28 @@ final class Constant: NSObject {
 //    let payuSuccessURL = "https://payu.herokuapp.com/success"
 //    let payuFailureURL = "https://payu.herokuapp.com/failure"
 //       
-   
+    
+    var get_popular_items:String{
+        get{
+            return "\(baseURL)/v2/get-popular-items"
+        }
+    }
+
+    var get_featured_board:String{
+        get{
+            return "\(baseURL)/v2/get-featured-board"
+        }
+    }
+    var get_ideas_foru:String{
+        get{
+            return "\(baseURL)/v2/get-ideas-foru"
+        }
+    }
+    var get_search_banners:String{
+        get{
+            return "\(baseURL)/v2/get-search-banners"
+        }
+    }
 
     
     
@@ -690,8 +711,9 @@ final class Constant: NSObject {
     
     var getFilterCustomfields:String{
         get{
-            return "\(Constant.shared.baseURL)/v1/get-filterfields"
-            
+            //for classified return "\(Constant.shared.baseURL)/v1/get-filterfields"
+
+            return "\(Constant.shared.baseURL)/v2/get-price-range"
         }
     }
     

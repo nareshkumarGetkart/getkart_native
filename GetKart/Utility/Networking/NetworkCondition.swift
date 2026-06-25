@@ -27,3 +27,24 @@ struct NetworkCondition {
         return slow.contains(tech)
     }
 }
+
+
+import Network
+
+final class NetworkMonitor: ObservableObject {
+    static let shared = NetworkMonitor()
+
+    @Published var isCellular = false
+
+    private let monitor = NWPathMonitor()
+
+    private init() {
+        monitor.pathUpdateHandler = { path in
+            DispatchQueue.main.async {
+                self.isCellular = path.usesInterfaceType(.cellular)
+            }
+        }
+
+        monitor.start(queue: DispatchQueue.global(qos: .background))
+    }
+}
