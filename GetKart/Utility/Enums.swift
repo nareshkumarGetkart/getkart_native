@@ -31,5 +31,6 @@ enum PaymentForEnum{
     case bannerPromotion
     case bannerPromotionDraft
     case boostBoard
+    case wallet
     
 }

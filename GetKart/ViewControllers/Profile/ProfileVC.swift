@@ -28,8 +28,8 @@ class ProfileVC: UIViewController {
 
 
     //,"Buy Packages"
-  
-    
+  //,"My Wallet"
+    //,"wallet"
     var titleArray =  ["Anonymous","My Wallet","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       //,"buyPackages"
     var iconArray =  ["","wallet","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
@@ -53,9 +53,7 @@ class ProfileVC: UIViewController {
         cnstrntHtNavBar.constant = self.getNavBarHt
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
-        
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
-        
         getUserProfileApi()
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
@@ -234,6 +232,24 @@ class ProfileVC: UIViewController {
         destVC.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destVC, animated: true)
     }
+    
+    
+    func updateUserTypeApi(type:Int){
+        
+        let reqDict = ["user_type":type]
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.update_user_type, param: reqDict,methodType: .post,showLoader: true) { responseObject, error in
+            
+            if error == nil{
+                if let result = responseObject{
+                    let code = result["code"] as? Int ?? 0
+                    if code == 200{
+                        RealmManager.shared.updateUserType(type: type)
+                    }
+                }
+            }
+            
+        }
+    }
 }
 
 
@@ -405,8 +421,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
                     hostingController.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(hostingController, animated: true)
                 }
-            }
-            else if titleArray[indexPath.row] == "Blocked Users"{
+            }else if titleArray[indexPath.row] == "Blocked Users"{
                 if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                     
                     let hostingController = UIHostingController(rootView: BlockedUserView(navigationController: self.navigationController)) // Wrap in UIHostingController
@@ -604,6 +619,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             }else if action == "delete"{
                 self?.presentDeleteAccountView()
               
+            } else if action == "buyerSeller"{
+                self?.showBuyerSellerPopup()
             }
         }
         
@@ -617,6 +634,30 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     }
     
  
+    func showBuyerSellerPopup(){
+        
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+
+        let selType:UserMode = (RealmManager.shared.fetchLoggedInUserInfo().userType == 1) ? .buyer : .seller
+        
+        let popupView = SellerBuyerPopup(selectedMode: selType, isToShowCancelButton: true) {[weak self] mode in
+            
+            print(mode)
+            
+            if mode == .seller{
+                self?.updateUserTypeApi(type: 2)
+
+            }else{
+                self?.updateUserTypeApi(type: 1)
+
+            }
+        }
+        
+        let hostingVC = UIHostingController(rootView: popupView)
+        hostingVC.modalPresentationStyle = .overFullScreen
+        hostingVC.view.backgroundColor = .clear
+        boardNav?.present(hostingVC, animated: false)
+    }
     
     func presentLogoutView(){
         let logoutView = UIHostingController(rootView: LogoutView(navigationController: self.navigationController))

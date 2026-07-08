@@ -14,6 +14,8 @@ struct MyViews: View {
     @StateObject private var vm:MyViewViewModel
     @State private var safariURL: URL?
     @State private var itemHeights: [Int: CGFloat] = [:] //  Measured heights for staggered layout
+    @State private var videoFrames: [Int: CGRect] = [:]
+    @State private var visibilityWorkItem: DispatchWorkItem?
     
     init(navigationController: UINavigationController?, seeallType: SeeAllType) {
         self.navigationController = navigationController
@@ -82,7 +84,39 @@ struct MyViews: View {
                                 
                                 if item.boardType == 2 {
                                     
-                                    
+                                    SmartVideoPlayerView(
+                                        item: item,
+                                        onTapBottomButton: {
+                                            //Tapped video
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                                FeedVideoManager.shared.muteAll()
+                                            }
+                                        }
+                                    ).background(
+                                        GeometryReader { geo in
+                                            Color.clear
+                                                .onAppear {
+                                                    videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }.onDisappear{
+                                                    videoFrames.removeValue(forKey: item.id ?? 0)
+                                                    FeedVideoManager.shared.pause(id: item.id ?? 0)
+                                                }
+                                                .onChange(of: geo.frame(in: .global)) { frame in
+                                                    videoFrames[item.id ?? 0] = frame
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }
+                                        }
+                                    )
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                       
+                                        prefetchNextVideos(from: item)
+                                        
+                                    }
                                 } else {
                                     CardItemView(
                                         item: item,
@@ -91,6 +125,7 @@ struct MyViews: View {
                                         },
                                         onTap: { pushToDetailScreen(item: item) },
                                         onTapBoostButton:{
+                                           
                                             if item.boardType == 1{
                                                 //Clicking on bottom prmotional
                                                 if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
@@ -124,6 +159,39 @@ struct MyViews: View {
                                 
                                 if item.boardType == 2 {
                                     
+                                    SmartVideoPlayerView(
+                                        item: item,
+                                        onTapBottomButton: {
+                                            //Tapped video
+                                            if let url = URL(string:(item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                                FeedVideoManager.shared.muteAll()
+                                            }
+                                        }
+                                    ).background(
+                                        GeometryReader { geo in
+                                            Color.clear
+                                                .onAppear {
+                                                    videoFrames[item.id ?? 0] = geo.frame(in: .global)
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }.onDisappear{
+                                                    videoFrames.removeValue(forKey: item.id ?? 0)
+                                                    FeedVideoManager.shared.pause(id: item.id ?? 0)
+                                                }
+                                                .onChange(of: geo.frame(in: .global)) { frame in
+                                                    videoFrames[item.id ?? 0] = frame
+                                                    scheduleVisibilityUpdate()
+                                                    
+                                                }
+                                        }
+                                    )
+                                    .measureHeight(id: item.id ?? 0)
+                                    .onAppear {
+                                     
+                                        prefetchNextVideos(from: item)
+                                        
+                                    }
                                 } else {
                                     CardItemView(
                                         item: item,
@@ -178,6 +246,14 @@ struct MyViews: View {
                 .onPreferenceChange(ScrollBottomKey.self) { bottomY in
                     vm.handleScrollBottom(bottomY: bottomY)
                 }
+                
+                //  Detect REAL user scroll
+                    .simultaneousGesture(
+                            DragGesture()
+                                .onEnded { _ in
+                                    scheduleVisibilityUpdate()
+                                }
+                        )
             }
         }.background(Color(.systemGray6))
             .onAppear {
@@ -232,6 +308,7 @@ struct MyViews: View {
                 
                 vm.updateBoost(isBoosted: true, boardId: boardId)
             }
+            .fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
         
     }
     
@@ -267,6 +344,78 @@ struct MyViews: View {
     private func globalIndex(of item: ItemModel) -> Int? {
         vm.items.firstIndex { $0.id == item.id }
     }
+   
+    private func prefetchNextVideos(from currentItem: ItemModel) {
+
+        guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }
+
+        let start = index + 1
+        let end = min(index + 2, vm.items.count - 1)
+
+        guard start <= end else { return }
+
+        var urls: [URL] = []
+
+        for i in start...end {
+
+            let item = vm.items[i]
+
+            if item.boardType == 2,
+               let link = item.videoLink,
+               let url = URL(string: link) {
+
+                urls.append(url)
+            }
+        }
+
+        VideoPreloadManagerDefault.shared.set(waiting: urls)
+    }
+    
+    
+    private func scheduleVisibilityUpdate() {
+        
+        visibilityWorkItem?.cancel()
+        
+        let work = DispatchWorkItem {
+            calculateVisibleVideos()
+        }
+        
+        visibilityWorkItem = work
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
+ 
+    private func calculateVisibleVideos() {
+        
+//        guard isActive else {
+//            FeedVideoManager.shared.pauseAll()
+//            return
+//        }
+
+        let screenHeight = UIScreen.main.bounds.height
+        var visibleSet: Set<Int> = []
+
+        for (id, frame) in videoFrames {
+
+            if frame.maxY <= 0 || frame.minY >= screenHeight {
+                continue
+            }
+
+            let visibleHeight =
+                min(frame.maxY, screenHeight)
+                - max(frame.minY, 0)
+
+            let percent = visibleHeight / frame.height
+
+            if percent >= 0.6 {
+                visibleSet.insert(id)
+            }
+        }
+
+        FeedVideoManager.shared.updatePlayback(visibleIDs: visibleSet)
+        
+    }
+    
 }
 
 #Preview {

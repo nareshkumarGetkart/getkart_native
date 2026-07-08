@@ -24,8 +24,9 @@ struct SearchBoardView: View {
         VStack(spacing:8){
         HStack {
             Button {
-                navigationController?.popToRootViewController(animated: true)
-                
+             //   navigationController?.popViewController(animated: true)
+               // popToRootViewController(animated: true)
+                navigateToRootSearchScreen()
             } label: {
                 Image("arrow_left").renderingMode(.template).foregroundColor(Color(UIColor.label))
             }.frame(width: 40,height: 40)
@@ -210,8 +211,8 @@ struct SearchBoardView: View {
                                     if item.boardType == 3{
                                         //Idea View
                                         IdeaCardSearch(product: item,
-                                                          defaultImgWidth: 170,
-                                                          defaultImgHeight: 190).frame(width:170,height: 260)
+                                                          defaultImgWidth: 175,
+                                                          defaultImgHeight: 190).frame(width:175,height: 260)
                                             .onTapGesture{
                                                 pushToDetailScreen(item: item)
 
@@ -219,8 +220,8 @@ struct SearchBoardView: View {
                                     }else{
                                         //Normal board
                                         BoardCardView(product: item,
-                                                      defaultImgWidth: 170,
-                                                      defaultImgHeight: 190).frame(width:170,height: 260)
+                                                      defaultImgWidth: 175,
+                                                      defaultImgHeight: 190).frame(width:175,height: 260)
                                         .onTapGesture {
                                             pushToDetailScreen(item: item)
                                         }
@@ -244,6 +245,31 @@ struct SearchBoardView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
+    
+    func navigateToRootSearchScreen(){
+        print(self.navigationController?.viewControllers ?? [])
+
+        if let homeVC = navigationController?.viewControllers.first as? HomeBaseVC {
+            navigationController?.popToViewController(homeVC, animated: true)
+
+            // Select Search tab
+            homeVC.tabBarController?.selectedIndex = 1
+        }else{
+            self.navigationController?.popViewController(animated: true)
+        }
+//        var isFound = false
+//        for controller in self.navigationController?.viewControllers ?? []{
+//            if controller.isKind(of: UIHostingController<BoardSearchView>.self) == true{
+//                
+//                self.navigationController?.popToViewController(controller, animated: true)
+//                isFound = true
+//                break
+//            }
+//        }
+//        if !isFound{
+//            self.navigationController?.popViewController(animated: true)
+//        }
+    }
     
     func goBackToSearchResults(tagText:String){
         viewModel.cancelSearchRequest()
@@ -382,7 +408,7 @@ struct BoardCardView: View {
                 .resizable()
                 .scaledToFill()
                 .frame(
-                    width: defaultImgWidth > 0 ? defaultImgWidth : 170,
+                    width: defaultImgWidth > 0 ? defaultImgWidth : 175,
                     height: defaultImgHeight > 0 ? defaultImgHeight : 190
                 )
                 .cornerRadius(12)
@@ -396,17 +422,19 @@ struct BoardCardView: View {
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
-                PriceView(
-                    price: product.price ?? 0.0,
-                    specialPrice: product.specialPrice ?? 0.0,
-                    currencySymbol: Local.shared.currencySymbol
-                )
-                .padding(.top, 2)
-                .padding(.bottom, 8)
+                if product.boardType == 0{
+                    PriceView(
+                        price: product.price ?? 0.0,
+                        specialPrice: product.specialPrice ?? 0.0,
+                        currencySymbol: Local.shared.currencySymbol
+                    )
+                    .padding(.top, 2)
+                    .padding(.bottom, 8)
+                }
             }
             .padding(.horizontal, 8)
             .padding(.top, 6)
-        }.frame(width: defaultImgWidth, height: 260, alignment: .top) // ✅ fixed card height
+        }.frame(width: defaultImgWidth, height: 260, alignment: .top) // fixed card height
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
@@ -418,7 +446,7 @@ struct BoardCardView: View {
 struct IdeaCardSearch: View {
 
     let product: ItemModel
-    var defaultImgWidth: CGFloat = 170
+    var defaultImgWidth: CGFloat = 175
     var defaultImgHeight: CGFloat = 190
 
     var body: some View {
@@ -432,7 +460,7 @@ struct IdeaCardSearch: View {
                     .cacheOriginalImage(false)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: defaultImgWidth, height: defaultImgHeight)   // ✅ fixed image height
+                    .frame(width: defaultImgWidth, height: defaultImgHeight)   //  fixed image height
                     .clipped()
                     .cornerRadius(12)
 
@@ -452,12 +480,81 @@ struct IdeaCardSearch: View {
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal, 6)
 
-            Spacer(minLength: 8)   // ✅ this gives bottom space always
+            Spacer(minLength: 5)   //  this gives bottom space always
         }
-        .frame(width: defaultImgWidth, height: 260, alignment: .top) // ✅ fixed card height
+        .frame(width: defaultImgWidth, height: 260, alignment: .top) //  fixed card height
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
         .contentShape(Rectangle())
+    }
+}
+
+
+
+struct PromotionalAdsSearch: View {
+
+    let product: ItemModel
+    var defaultImgWidth: CGFloat = 175
+    var defaultImgHeight: CGFloat = 190
+    let onTapBottomtButton: () -> Void
+
+ 
+    var body: some View {
+        VStack(spacing: 0) {
+
+            ZStack(alignment: .topTrailing) {
+                KFImage(URL(string: product.image ?? ""))
+                    .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 400, height: 500)))
+                    .cacheOriginalImage(false)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: defaultImgWidth, height: defaultImgHeight)   //  fixed image height
+                    .clipped()
+                    
+            }
+          
+            .layoutPriority(1)
+
+            // CTA bar — fixed height, never stretches
+            HStack {
+                Text(product.ctaLabel ?? "Learn more")
+                    .foregroundColor(.primary)
+                    .font(.system(size: 14, weight: .medium))
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .renderingMode(.template)
+                    .foregroundColor(.primary)
+                    .font(.system(size: 12))
+            }
+            .padding(.horizontal, 10)
+            .frame(height: 35)
+            .frame(maxWidth: .infinity)
+            .background(Color(.systemBackground))
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
+            .onTapGesture {
+                onTapBottomtButton()
+                outboundClickApi()
+            }
+        }.cornerRadius(12)
+        .background(Color(.systemBackground))
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .contentShape(Rectangle())
+    }
+
+    func outboundClickApi() {
+        let params = ["board_id": product.id ?? 0]
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.board_outbond_click,
+            param: params,
+            methodType: .post
+        ) { responseObject, error in
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                if status == 200 { }
+            }
+        }
     }
 }

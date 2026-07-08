@@ -119,15 +119,20 @@ class RealmManager: ObservableObject {
     }
 
     private func configureRealm() {
-        let config = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
-            if oldSchemaVersion < 1 {
+        let config = Realm.Configuration(schemaVersion: 2, migrationBlock: { migration, oldSchemaVersion in
+            if oldSchemaVersion < 2 {
                 // Handle migration if needed
+                migration.enumerateObjects(ofType: DBUserInfo.className()) { _, newObject in
+                    newObject?["userType"] = 0
+                }
             }
         })
         Realm.Configuration.defaultConfiguration = config
     }
 
     private var realm: Realm {
+        print("Opening Realm")
+        print(Realm.Configuration.defaultConfiguration.schemaVersion)
         return try! Realm()
     }
 
@@ -201,6 +206,13 @@ class RealmManager: ObservableObject {
     }
 
 
+    func updateUserType(type:Int){
+        if let user = realm.object(ofType: DBUserInfo.self, forPrimaryKey: Local.shared.getUserId()){
+           try? realm.write {
+                user.userType = type
+            }
+        }
+    }
 
     func clearDB() {
         try? realm.write {

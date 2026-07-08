@@ -23,11 +23,15 @@ extension Color {
 struct MyWalletView: View {
     var navigation: UINavigationController?
 
-    @State private var addAmount: String = "1000"
-    @State private var selectedAmount: Int? = 1000
+    @State private var addAmount: String = "2000"
+    @State private var selectedAmount: Int? = 2000
 
     let quickAmounts = [500, 1000, 2000, 5000]
-
+    
+    @StateObject private var walletObj = MyWalletViewModel()
+    @State private var paymentGateway: PaymentGatewayCentralized?
+    @State private var showSheet = false
+    
     var body: some View {
         VStack(spacing: 0) {
 
@@ -41,7 +45,7 @@ struct MyWalletView: View {
                 VStack(spacing: 16) {
 
                     // Balance Card
-                    BalanceCard {
+                    BalanceCard(availableAmt: walletObj.balance) {
                         self.pushToHistoryButtonAction()
                     }
 
@@ -49,7 +53,11 @@ struct MyWalletView: View {
                     AddAmountCard(
                         addAmount: $addAmount,
                         selectedAmount: $selectedAmount,
-                        quickAmounts: quickAmounts
+                        quickAmounts: quickAmounts,
+                        onSumbitToAddAmount: {
+                            print("selected Amount == \(addAmount) to add")
+                            paymentGatewayOpen()
+                        }
                     )
 
                     // Promo Banner
@@ -59,7 +67,9 @@ struct MyWalletView: View {
                     AdBanner()
 
                     // How It Works
-                    HowItWorksRow()
+                    HowItWorksRow(onClickOfRow: {
+                        showSheet = true
+                    })
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
@@ -69,16 +79,57 @@ struct MyWalletView: View {
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(edges: .bottom)
+        .sheet(isPresented: $showSheet) {
+
+            WalletInfoSheetView()
+                .presentationDetents([.fraction(0.72)])
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(28)
+        }
+    }
+    
+    
+    func paymentGatewayOpen() {
+        
+        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
+        paymentGateway?.planObj = nil
+        paymentGateway?.paymentFor = .wallet
+        paymentGateway?.amount = Int(addAmount) ?? 0
+        paymentGateway?.callbackPaymentSuccess = { (isSuccess) in
+            
+            if isSuccess {
+                addAmount = ""
+                selectedAmount = 0
+                self.walletObj.getMyWalletBalance()
+                let vc = UIHostingController(
+                    rootView: PlanBoughtSuccessView(
+                        navigationController: self.navigation,paymentType:.wallet
+                    )
+                )
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                vc.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                self.navigation?.present(vc, animated: true)
+            }
+            
+            //  RELEASE
+            self.paymentGateway = nil
+        }
+        
+        paymentGateway?.initializeDefaults()
     }
     
     func pushToHistoryButtonAction(){
         let vc = UIHostingController(rootView: WalletTransactionsView(navigation: self.navigation))
         self.navigation?.pushViewController(vc, animated: true)
     }
+    
+    
 }
 
 // MARK: - Balance Card
 struct BalanceCard: View {
+    let availableAmt:String
     let clickOnHistor:()->Void
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -95,7 +146,7 @@ struct BalanceCard: View {
                     .foregroundColor(.textSecondary)
                     .padding(.top, 20)
 
-                Text("₹1000.00")
+                Text("₹\(availableAmt)")
                     .font(.system(size: 44, weight: .bold))
                     .foregroundColor(.black)
                     .padding(.bottom, 20)
@@ -129,6 +180,7 @@ struct AddAmountCard: View {
     @Binding var addAmount: String
     @Binding var selectedAmount: Int?
     let quickAmounts: [Int]
+    let onSumbitToAddAmount:()->Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -171,14 +223,21 @@ struct AddAmountCard: View {
             }
 
             // Add Balance Button
-            Button(action: {}) {
+            Button(action: {
+                
+                if addAmount.trim().count > 0{
+                    onSumbitToAddAmount()
+                }
+              
+            }) {
                 Text("Add Balance")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.brandOrange)
+                    .background( addAmount.isEmpty ? Color.gray : Color.brandOrange)
                     .cornerRadius(12)
+                    .disabled(addAmount.isEmpty)
             }
         }
         .padding(16)
@@ -318,8 +377,13 @@ struct AdFeaturePill: View {
 
 // MARK: - How It Works Row
 struct HowItWorksRow: View {
+    
+    let onClickOfRow:()->Void
     var body: some View {
-        Button(action: {}) {
+        Button(action: {
+            
+            onClickOfRow()
+        }) {
             HStack {
                 Image(systemName: "info.circle")
                     .font(.system(size: 20))

@@ -21,6 +21,9 @@ struct FilterView: View {
     var selectedIndex = -1
     @State var searchText = ""
     @State var showClearAlert:Bool = false
+   
+    var globalSearchedTextFromBack = ""
+    
     
     var body: some View {
         
@@ -45,7 +48,7 @@ struct FilterView: View {
                         fieldVM.selectedIndex = selectedIndex
                     }else{
                         
-                        fieldVM.getCustomFieldsListApi(category_ids: self.categoryId ?? "")
+                        fieldVM.getCustomFieldsListApi(category_ids: self.categoryId ?? "", srchTxt: globalSearchedTextFromBack)
                     }
                     
                 }
@@ -141,7 +144,7 @@ struct FilterView: View {
                             
                             HStack{
                                 
-                                Text("Choose from below options").font(Font.manrope(.regular, size: 11.0))
+                                Text("Choose from options below").font(Font.manrope(.regular, size: 11.0))
                                 Spacer()
                             }.padding(.bottom,10)
                         }
@@ -435,6 +438,12 @@ struct FilterView: View {
             objCustomField.selectedMinValue = nil //objCustomField.minPrice
             fieldVM.fieldsArray[index] = objCustomField
         }
+        
+        //Reported by tester that during clear it should get clear
+        self.navigation?.dismiss(animated: true, completion: {
+            onApplyFilter(fieldVM.dictCustomFields, fieldVM.fieldsArray)
+            
+        })
     }
 
 }
@@ -562,9 +571,9 @@ struct RangePriceView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(
                     isSelected
-                    ? Color.orange
+                    ? Color(hex: "#FF7A00")
                     : Color.gray.opacity(0.25),
-                    lineWidth: isSelected ? 1.5 : 1
+                    lineWidth: isSelected ? 3 : 1
                 )
         )
         .cornerRadius(10)

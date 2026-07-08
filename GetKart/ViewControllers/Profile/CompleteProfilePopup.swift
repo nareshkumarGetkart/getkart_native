@@ -24,6 +24,7 @@ struct CompleteProfilePopup: View {
 
             VStack(spacing: 0) {
 
+                /*
                 // Close Button
                 HStack {
                     Spacer()
@@ -41,7 +42,7 @@ struct CompleteProfilePopup: View {
                 }
                 .padding(.top, 10)
                 .padding(.horizontal, 20)
-
+*/
                 Spacer()
                     .frame(height: 5)
 
@@ -92,7 +93,8 @@ struct CompleteProfilePopup: View {
                 VStack(alignment: .leading, spacing: 10) {
 
                     Text("Full Name")
-                        .font(.inter(.semiBold, size: 15.0))                        .foregroundColor(Color(red: 0.05, green: 0.08, blue: 0.18))
+                        .font(.inter(.semiBold, size: 15.0))
+                        .foregroundColor(Color(red: 0.05, green: 0.08, blue: 0.18))
 
                     HStack(spacing: 15) {
 
@@ -106,11 +108,29 @@ struct CompleteProfilePopup: View {
                         )
                         .font(.inter(.regular, size: 15.0))
                         .onChange(of: fullName) { value in
-                                errorMessage = ""
-                                fullName = value.filter {
-                                    $0.isLetter || $0.isWhitespace
-                                }
+                            errorMessage = ""
+
+//                            var filtered = value.filter {
+//                                $0.isLetter || $0.isWhitespace
+//                            }
+//                            
+                            var filtered = value
+
+                            // Remove consecutive spaces
+                            filtered = filtered.replacingOccurrences(
+                                of: "\\s+",
+                                with: " ",
+                                options: .regularExpression
+                            )
+
+                            if filtered.count > 50 {
+                                filtered = String(filtered.prefix(50))
                             }
+
+                            if filtered != fullName {
+                                fullName = filtered
+                            }
+                        }
                     }
                     .padding()
                     .frame(height: 55)
@@ -179,12 +199,13 @@ struct CompleteProfilePopup: View {
             return "Name must contain at least 2 characters"
         }
 
-        let regex = "^[A-Za-z]+(?:\\s+[A-Za-z]+)+$"
+     /*  // let regex = "^[A-Za-z]+(?:\\s+[A-Za-z]+)+$"
+        let regex = "^[A-Za-z]+(?:\\s+[A-Za-z]+)*$"
 
         if NSPredicate(format: "SELF MATCHES %@", regex)
             .evaluate(with: trimmed) == false {
             return "Please enter a valid full name"
-        }
+        }*/
 
         return nil
     }

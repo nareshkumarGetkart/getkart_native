@@ -20,20 +20,39 @@ struct SettingsView: View {
     var body: some View {
         
         VStack(spacing: 15){
-            HStack{ Spacer()}.frame(height: 25)
+            HStack{ Spacer()}.frame(height: 10)
    
 //            if isMobileAvailable{
 //                SettingRowView(iconStr: "call", title: "Show mobile number in my Ads", isToggle:true , isOn: $isContactInfoVisible)
 //            }
-//            
-            SettingRowView(iconStr: "notification", title: "Receive Notification", isToggle:true , isOn: $isNotificationsEnabled)
+//
+            let obj = RealmManager.shared.fetchLoggedInUserInfo()
             
-            SettingRowView(iconStr: "delete_account", title: "Delete Account", isToggle:false , isOn: .constant(false))
+            if obj.userType == 1{
+                SettingRowView(iconStr: "buyer_icon", title: "You are in Buyer mode", subTitle: "Seller mode unlocks tools to grow your business.", isToggle:false , isOn: .constant(false))
+                    .onTapGesture {
+                        navigationController?.dismiss(animated: true)
+                        callbackAction("buyerSeller")
+                    }
+
+            }else if obj.userType == 2{
+                SettingRowView(iconStr: "store_icon", title: "You are in Seller mode", subTitle: "Buyer mode unlocks tools to grow your shopping experience.", isToggle:false , isOn: .constant(false))
+                    .onTapGesture {
+                        navigationController?.dismiss(animated: true)
+                        callbackAction("buyerSeller")
+                    }
+            }
+            
+            
+
+            SettingRowView(iconStr: "notification", title: "Receive Notification", subTitle: "", isToggle:true , isOn: $isNotificationsEnabled)
+            
+            SettingRowView(iconStr: "delete_account", title: "Delete Account", subTitle: "", isToggle:false , isOn: .constant(false))
                 .onTapGesture {
                     navigationController?.dismiss(animated: true)
                     callbackAction("delete")
                 }
-            SettingRowView(iconStr: "logout", title: "Logout", isToggle:false , isOn: .constant(false))
+            SettingRowView(iconStr: "logout", title: "Logout", subTitle: "", isToggle:false , isOn: .constant(false))
                 .onTapGesture {
 
                     callbackAction("logout")
@@ -64,6 +83,7 @@ struct SettingRowView:View {
    
     let iconStr:String
     let title:String
+    let subTitle:String
     let isToggle:Bool
     @Binding var isOn:Bool
     var body: some View {
@@ -84,9 +104,13 @@ struct SettingRowView:View {
             }
             .frame(width: 40, height: 40)
             
-            Text(title).font(.manrope(.medium, size: 16.0))
-                .truncationMode(.tail)
+            VStack(alignment:.leading){
+                Text(title).font(.inter(.medium, size: 16.0))
+                    .truncationMode(.tail)
                 //.layoutPriority(1)
+                Text(subTitle).font(.inter(.regular, size: 10.0))
+                   // .truncationMode(.tail)
+            }
             
             Spacer(minLength: 0)
             

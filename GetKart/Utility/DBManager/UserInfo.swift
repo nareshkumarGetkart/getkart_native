@@ -29,6 +29,8 @@ struct UserInfo {
     var type:String?
     var updated_at:String?
     var token:String?
+    var userType:Int?
+    
     init(){ }
     init(dict:Dictionary<String, Any>, token:String){
         
@@ -40,6 +42,8 @@ struct UserInfo {
         self.email_verified_at = dict["email_verified_at"] as? String ?? ""
         self.fcm_id = dict["fcm_id"] as? String ?? ""
         
+        userType = dict["user_type"] as? Int ?? 0
+
         firebase_id = dict["firebase_id"] as? String ?? ""
         id = dict["id"] as? Int ?? 0
         is_verified = dict["is_verified"] as? Int ?? 0
@@ -88,6 +92,8 @@ struct UserInfo {
         updated_at = dbUserInfo.updated_at ?? ""
         
         self.token = dbUserInfo.token
+        self.userType = dbUserInfo.userType
+
     }
 }
 

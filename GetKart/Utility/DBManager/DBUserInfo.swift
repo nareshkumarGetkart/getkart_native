@@ -31,6 +31,8 @@ class DBUserInfo: Object {
     @Persisted var show_personal_details:Int?
     @Persisted var type:String?
     @Persisted var token:String?
+    @Persisted var userType: Int?   // New property
+
     override init(){ }
    
     init(userInfo:UserInfo) {
@@ -58,6 +60,9 @@ class DBUserInfo: Object {
         self.type = userInfo.type
         self.updated_at = userInfo.updated_at
         self.token = userInfo.token
+
+        self.userType = userInfo.userType
+
     }
 }
 

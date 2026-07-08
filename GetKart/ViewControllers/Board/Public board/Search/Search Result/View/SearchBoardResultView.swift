@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchBoardResultView: View {
     
-    let navigationController: UINavigationController?
+       let navigationController: UINavigationController?
 
        @State var isByDefaultOpenSearch: Bool
        @State var searchText: String
@@ -437,14 +437,14 @@ struct SearchBoardResultView: View {
             scrollToTopTrigger.toggle()
             newFieldArray = filterFieldsArr
             vm.dictCustomFields = filterDict
-           // self.objVM.getSearchItemApi(srchTxt: srchTxt)
+            // self.objVM.getSearchItemApi(srchTxt: srchTxt)
             vm.loadInitial()
             
             print(filterDict)
             print(filterFieldsArr)
-
             
-        }, selectedIndex:selIndex)
+            
+        }, selectedIndex:selIndex, globalSearchedTextFromBack:searchText)
         
         let hostingVC = UIHostingController(rootView: BottomSheetHost(content: filterView))
 

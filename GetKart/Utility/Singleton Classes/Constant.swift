@@ -21,9 +21,9 @@ final class Constant: NSObject {
     
     static let shared = Constant()
     let ErrorMessage = "No Network Connection. Please check your internet connection."
-    var userActiveStatus = 0 //0-> account Unapproved ,1 - account Approved
     var isLaunchFirstTime = 1
     var xApiKey = ""
+   
     private override init(){ }
     
     var baseURL:String {
@@ -54,8 +54,6 @@ final class Constant: NSObject {
    let BOOSTEDADS_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/sliders/2025/12/Getkart-Loop-ads1.gif"
    let BOARDBOOST_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/campaignBanners/2026/06/Getkart-Loop-New.gif"
    let BANNER_DEMO = "https://d3se71s7pdncey.cloudfront.net/getkart/v1/campaignBanners/2026/06/Getkart-Tutorial-Gif-New.gif"
-
-    
     
     var payuSuccessURL:String {
         get {
@@ -77,14 +75,10 @@ final class Constant: NSObject {
             }
         }
     }
-    
-    
 
-//    
 //    let payuSuccessURL = "\(payuBaseURL)/payments?status=success"
 //    let payuFailureURL = "\(payuBaseURL)/payments?status=fail"
 //
-//    
 //    let payuSuccessURL = "https://payu.herokuapp.com/success"
 //    let payuFailureURL = "https://payu.herokuapp.com/failure"
 //       
@@ -100,33 +94,30 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/get-featured-board"
         }
     }
+    
     var get_ideas_foru:String{
         get{
             return "\(baseURL)/v2/get-ideas-foru"
         }
     }
+    
     var get_search_banners:String{
         get{
             return "\(baseURL)/v2/get-search-banners"
         }
     }
 
-    
-    
     var search_room_users:String{
         get{
             return "\(baseURL)/v2/search-room-users"
         }
     }
     
-    
     var search_global_users:String{
         get{
             return "\(baseURL)/v2/search-global-users"
         }
     }
-    
-     
     
     
     var edit_comment:String{
@@ -164,7 +155,6 @@ final class Constant: NSObject {
             return "\(baseURL)/v2/add-reply"
         }
     }
-    
     
     var get_replies:String{
         get{
@@ -584,6 +574,9 @@ final class Constant: NSObject {
     }
     
     
+    
+    
+    
     var alert_popup:String{
         get {
             return "\(Constant.shared.baseURL)/v1/alert-popup"
@@ -971,6 +964,8 @@ final class Constant: NSObject {
     var order_update:String{
         get {
             return "\(Constant.shared.baseURL)/v1/order-update"
+           // return "\(Constant.shared.baseURL)/v2/order-update"
+
         }
     }
     
@@ -1043,6 +1038,41 @@ final class Constant: NSObject {
             return "\(Constant.shared.baseURL)/v1/post-draft-item"
         }
     }
+    
+    
+    var update_user_type:String{
+        get{
+            return "\(Constant.shared.baseURL)/v2/update-user-type"
+        }
+    }
+    
+    var get_userSelection_popup:String{
+        
+        get{
+            return "\(Constant.shared.baseURL)/v2/get-userSelection-popup"
+        }
+    }
+ 
+   
+    var get_wallet_balance:String{
+        get {
+            return "\(Constant.shared.baseURL)/v2/get-wallet-balance"
+        }
+    }
+    
+    var payu_wallet_payment_intent:String{
+        get{
+            return "\(Constant.shared.baseURL)/v2/payu-wallet-payment-intent"
+        }
+    }
+    
+    var get_wallet_history:String{
+        
+        get{
+            return "\(Constant.shared.baseURL)/v2/get-wallet-history"
+        }
+    }
+    
 }
 
 

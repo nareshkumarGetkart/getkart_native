@@ -19,7 +19,7 @@ class FIlterViewModel:ObservableObject{
     }
     
     
-    func getCustomFieldsListApi(category_ids:String){
+    func getCustomFieldsListApi(category_ids:String,srchTxt:String){
         /*
        let city = Local.shared.getUserCity()
        let country = Local.shared.getUserCountry()
@@ -58,8 +58,9 @@ class FIlterViewModel:ObservableObject{
         }
         */
         
+        let strUrl = Constant.shared.getFilterCustomfields + "?search=\(srchTxt)"
         
-        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.getFilterCustomfields) {[weak self] (obj:CustomFieldsParse) in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: strUrl) {[weak self] (obj:CustomFieldsParse) in
             
             if obj.data != nil {
                 self?.fieldsArray = obj.data ?? []

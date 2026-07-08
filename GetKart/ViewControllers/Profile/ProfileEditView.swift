@@ -256,11 +256,11 @@ struct ProfileEditView: View {
     // Form Validation
     private func validateForm() {
         
-        if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
+         if fullName.isEmpty || email.isEmpty || phoneNumber.isEmpty || address.isEmpty {
            
             AlertView.sharedManager.showToast(message: "Please fill all the fields.")
 
-        }else if !fullName.isValidName() || fullName.lowercased() == "guest user" {
+         }else if !fullName.isValidName() || fullName.lowercased() == "guest user" || fullName.count > 50 {
             AlertView.sharedManager.showToast(message: "Please enter valid name")
             
         }else if !email.isValidEmail(){

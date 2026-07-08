@@ -65,7 +65,7 @@ final class BoardViewModelNew: ObservableObject {
         ) { [weak self] responseObject, error in
             guard let self else { return }
 
-           // DispatchQueue.main.async {
+          //  DispatchQueue.main.async {
                 defer {
                     
                     self.isLoading = false
@@ -101,7 +101,7 @@ final class BoardViewModelNew: ObservableObject {
                 self.currentPage = dataDict["current_page"] as? Int ?? page
                 let last = dataDict["last_page"] as? Int ?? page
                 self.isLastPage = self.currentPage >= last
-           // }
+            //}
         }
     }
 

@@ -9,6 +9,9 @@ import SwiftUI
 import Alamofire
 import Kingfisher
 
+extension Notification.Name {
+    static let resumeBannerVideo = Notification.Name("resumeBannerVideo")
+}
 
 struct BoardSearchView: View {
    
@@ -20,11 +23,10 @@ struct BoardSearchView: View {
         return tabBarController?.viewControllers?[1].navigationController
     }
     @State private var safariURL: URL?
-
     @State private var currentBanner = 0
-
+    @State private var timer: Timer?
+    
     var body: some View {
-     
         
         VStack(spacing: 0) {
             
@@ -62,6 +64,7 @@ struct BoardSearchView: View {
                 if !viewModel.banners.isEmpty{
                     
                     bannerSection.padding(.top,5)
+                       
                 }
                 
                 if !viewModel.featuredBoards.isEmpty{
@@ -87,12 +90,20 @@ struct BoardSearchView: View {
                             HStack(spacing: 10) {
                                 
                                 ForEach(viewModel.featuredBoards, id: \.id) { item in
-
-                                    if item.boardType == 3{
+                                    if (item.boardType == 1){
+                                        //Promotional Ads image
+                                        PromotionalAdsSearch(product: item,defaultImgHeight: 225) {
+                                            if let url = URL(string: (item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                            }
+                                            
+                                        }.frame(width:175,height: 260)
+                                           
+                                    }else if item.boardType == 3{
                                         //Idea View
                                         IdeaCardSearch(product: item,
-                                                          defaultImgWidth: 170,
-                                                          defaultImgHeight: 190).frame(width:170,height: 260)
+                                                          defaultImgWidth: 175,
+                                                          defaultImgHeight: 215).frame(width:175,height: 260)
                                             .onTapGesture{
                                                 pushToDetailScreen(item: item)
 
@@ -100,15 +111,15 @@ struct BoardSearchView: View {
                                     }else{
                                         //Normal board
                                         BoardCardView(product: item,
-                                                      defaultImgWidth: 170,
-                                                      defaultImgHeight: 190).frame(width:170,height: 260)
+                                                      defaultImgWidth: 175,
+                                                      defaultImgHeight: 195).frame(width:175,height: 260)
                                         .onTapGesture {
                                             pushToDetailScreen(item: item)
                                         }
                                     }
                                 }
                             }.padding(.vertical,8)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 10)
                             //.padding(.bottom, 4)
                         }
                     }//.padding(.bottom, 30)
@@ -141,8 +152,8 @@ struct BoardSearchView: View {
                                     if item.boardType == 3{
                                         //Idea View
                                         IdeaCardSearch(product: item,
-                                                          defaultImgWidth: 170,
-                                                          defaultImgHeight: 190).frame(width:170,height: 260)
+                                                          defaultImgWidth: 175,
+                                                          defaultImgHeight: 215).frame(width:175,height: 260)
                                             .onTapGesture{
                                                 pushToDetailScreen(item: item)
 
@@ -150,22 +161,22 @@ struct BoardSearchView: View {
                                     }else{
                                         //Normal board
                                         BoardCardView(product: item,
-                                                      defaultImgWidth: 170,
-                                                      defaultImgHeight: 190).frame(width:170,height: 260)
+                                                      defaultImgWidth: 175,
+                                                      defaultImgHeight: 195).frame(width:175,height: 260)
                                         .onTapGesture {
                                             pushToDetailScreen(item: item)
                                         }
                                     }
                                 }
                             }.padding(.vertical,8)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 10)
                             //.padding(.bottom, 4)
                         }
                     }//.padding(.bottom, 30)
                 }
                 
                 if !viewModel.popular.isEmpty{
-                    //MARK: My view
+                    //MARK: Popular on getkart view
                     VStack(alignment: .leading, spacing: 5) {
                         
                         HStack {
@@ -188,11 +199,21 @@ struct BoardSearchView: View {
                                 
                                 ForEach(viewModel.popular, id: \.id) { item in
 
-                                    if item.boardType == 3{
+                                   
+                                    if (item.boardType == 1){
+                                        //Promotional Ads image
+                                        PromotionalAdsSearch(product: item,defaultImgHeight: 225) {
+                                            if let url = URL(string: (item.outbondUrl ?? "").getValidUrl()) {
+                                                safariURL = url
+                                            }
+                                            
+                                        }.frame(width:175,height: 260)
+                                           
+                                    }else if (item.boardType == 3){
                                         //Idea View
                                         IdeaCardSearch(product: item,
-                                                          defaultImgWidth: 170,
-                                                          defaultImgHeight: 190).frame(width:170,height: 260)
+                                                          defaultImgWidth: 175,
+                                                          defaultImgHeight: 215).frame(width:175,height: 260)
                                             .onTapGesture{
                                                 pushToDetailScreen(item: item)
 
@@ -200,15 +221,15 @@ struct BoardSearchView: View {
                                     }else{
                                         //Normal board
                                         BoardCardView(product: item,
-                                                      defaultImgWidth: 170,
-                                                      defaultImgHeight: 190).frame(width:170,height: 260)
+                                                      defaultImgWidth: 175,
+                                                      defaultImgHeight: 195).frame(width:175,height: 260)
                                         .onTapGesture {
                                             pushToDetailScreen(item: item)
                                         }
                                     }
                                 }
                             }.padding(.vertical,8)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 10)
                             //.padding(.bottom, 4)
                         }
                     }.padding(.bottom, 5)
@@ -221,11 +242,26 @@ struct BoardSearchView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .refreshable {
             if !viewModel.isLoading{
+                currentBanner = 0
+                timer?.invalidate()
                 viewModel.fetchBanners()
                 viewModel.fetchFeaturedBoard()
                 viewModel.fetchIdeas()
+                viewModel.fetchPopuplarItems()
             }
-        }.fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
+        }.fullScreenCover(item: $safariURL,
+                          onDismiss: {
+            print("Safari dismissed")
+                   NotificationCenter.default.post(name: .resumeBannerVideo, object: nil)
+        }) { url in SafariView(url: url) }
+            
+            .onChange(of: viewModel.banners.count) { count in
+                guard count > 0 else { return }
+                startImageTimer()
+            }
+            .onDisappear {
+                timer?.invalidate()
+            }
     }
     
     
@@ -233,8 +269,10 @@ struct BoardSearchView: View {
     
     func pushToMyViewsScreen(type:SeeAllType){
 
-        let hostingVC = UIHostingController(rootView: MyViews(navigationController:navigationController, seeallType: type))
-        navigationController?.pushViewController(hostingVC, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            let hostingVC = UIHostingController(rootView: MyViews(navigationController:navigationController, seeallType: type))
+            navigationController?.pushViewController(hostingVC, animated: true)
+        }
     }
    
    
@@ -269,8 +307,45 @@ struct BoardSearchView: View {
         navigationController?.pushViewController(vc, animated: false)
    }
     
-}
+    private func startImageTimer() {
 
+        timer?.invalidate()
+
+        guard !viewModel.banners.isEmpty else { return }
+        let banner = viewModel.banners[currentBanner]
+
+        let isVideo = (banner.image ?? "").lowercased().contains(".mp4")
+
+        guard !isVideo else { return }
+
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+
+            moveToNextBanner()
+        }
+    }
+    
+
+    private func moveToNextBanner() {
+
+        timer?.invalidate()
+
+        print("Current:", currentBanner, "Count:", viewModel.banners.count)
+
+        withAnimation {
+            currentBanner = (currentBanner + 1) % viewModel.banners.count
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+
+            NotificationCenter.default.post(
+                name: .resumeBannerVideo,
+                object: nil
+            )
+        }
+
+        print("Next:", currentBanner)
+    }
+    
+}
 
 
 extension BoardSearchView {
@@ -283,29 +358,34 @@ extension BoardSearchView {
 
                 ForEach(0..<viewModel.banners.count, id: \.self) { index in
 
-                    BannerMediaView(urlString: viewModel.banners[index].image ?? "", shouldPlay: currentBanner == index,
-                                    action: {
-                       
-                        
-                        
-                        if let url = URL(string: (viewModel.banners[index].url ?? "").getValidUrl()) {
-                            safariURL = url
+                    BannerMediaView(
+                        urlString: viewModel.banners[index].image ?? "",
+                        shouldPlay: currentBanner == index,
+                        action: {
+
+                            if let url = URL(string: (viewModel.banners[index].url ?? "").getValidUrl()) {
+                                safariURL = url
+                            }
+
+                            updateApi(index: index)
+                        },
+                        onVideoFinished: {
+                            print("Video finished")
+                            moveToNextBanner()
                         }
-                        self.updateApi(index: index)
-                        
-                    })
+                    )
                     
-                    .frame(maxWidth:.infinity,minHeight:190, maxHeight: 190)
+                    .frame(maxWidth:.infinity,minHeight:200, maxHeight: 200)
                     .tag(index)
                 }
             }
-            .frame(height: 190)
+            .frame(height: 200)
             .tabViewStyle(.page(indexDisplayMode: .never))
             .cornerRadius(10)
             HStack(spacing: 6) {
-
+                
                 ForEach(0..<viewModel.banners.count, id: \.self) { index in
-
+                    
                     Circle()
                         .fill(
                             currentBanner == index
@@ -317,6 +397,15 @@ extension BoardSearchView {
             }
         }
         .padding(.horizontal)
+        
+        .onAppear {
+
+            startImageTimer()
+        }
+        .onChange(of: currentBanner) { _ in
+
+            startImageTimer()
+        }
     }
     
     func updateApi(index:Int){
@@ -334,244 +423,7 @@ extension BoardSearchView {
 }
 
 
-/*
 
-import SwiftUI
-import AVKit
 
-struct BannerMediaView: View {
 
-    let urlString: String
 
-    @State private var player: AVPlayer?
-    let action: (() -> Void)?
-
-    var isVideo: Bool {
-        let lower = urlString.lowercased()
-        return lower.contains(".mp4") ||
-               lower.contains(".mov") ||
-               lower.contains(".m4v") ||
-               lower.contains(".avi")
-    }
-
-    var body: some View {
-
-        ZStack {
-
-            if isVideo {
-
-                if let player {
-                    VideoPlayer(player: player)
-                       
-                        .onAppear {
-                            player.play()
-                            player.isMuted = false
-                        }
-                        .onDisappear {
-                            player.pause()
-                        }
-                } else {
-                    Image("getkartplaceholder")
-                        .resizable()
-                        .scaledToFill()
-                }
-
-            } else {
-
-                AsyncImage(url: URL(string: urlString)) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Image("getkartplaceholder")
-                        .resizable()
-                        .scaledToFill()
-                }
-            }
-        }.contentShape(Rectangle())
-            .onTapGesture {
-                action?()
-            }
-        .onAppear {
-            if isVideo,
-               player == nil,
-               let url = URL(string: urlString) {
-                player = AVPlayer(url: url)
-            }
-        }
-        
-    }
-}
-*/
-
-import SwiftUI
-import AVFoundation
-
-struct BannerMediaView: View {
-
-    let urlString: String
-    let shouldPlay: Bool
-    let action: (() -> Void)?
-    @State private var isMuted = false
-    @State private var player: AVQueuePlayer?
-    @State private var looper: AVPlayerLooper?
-
-    var isVideo: Bool {
-
-        let lower = urlString.lowercased()
-
-        return lower.contains(".mp4")
-        || lower.contains(".mov")
-        || lower.contains(".m4v")
-        || lower.contains(".avi")
-    }
-
-    var body: some View {
-
-        ZStack {
-
-            if isVideo {
-
-                if let player {
-
-                    VideoBannerPlayer(player: player)
-
-                } else {
-
-                    Image("getkartplaceholder")
-                        .resizable()
-                        .scaledToFill()
-                }
-
-            } else {
-
-                AsyncImage(
-                    url: URL(string: urlString)
-                ) { image in
-
-                    image
-                        .resizable()
-                        .scaledToFill()
-
-                } placeholder: {
-
-                    Image("getkartplaceholder")
-                        .resizable()
-                        .scaledToFill()
-                }
-            }
-        }.overlay(alignment: .topTrailing) {
-            if isVideo{
-                Button {
-                    
-                    isMuted.toggle()
-                    player?.isMuted = isMuted
-                    
-                } label: {
-                    
-                    Image(systemName:
-                            isMuted
-                          ? "speaker.slash.fill"
-                          : "speaker.wave.2.fill")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.black.opacity(0.6))
-                    .clipShape(Circle())
-                }
-                .padding(.top, 10)
-                .padding(.trailing, 10)
-            }
-        }
-        .clipped()
-        .contentShape(Rectangle())
-        .onTapGesture {
-
-            player?.pause()
-            action?()
-        }
-        .onAppear {
-
-            createPlayerIfNeeded()
-
-            if shouldPlay {
-                player?.play()
-            }
-        }
-        .onDisappear {
-
-            player?.pause()
-        }
-        .onChange(of: shouldPlay) { play in
-
-            if play {
-
-                player?.play()
-
-            } else {
-
-                player?.pause()
-            }
-        }
-    }
-
-    private func createPlayerIfNeeded() {
-
-        guard isVideo else { return }
-
-        guard player == nil else { return }
-
-        guard let url = URL(string: urlString) else { return }
-
-        let item = AVPlayerItem(url: url)
-
-        let queuePlayer = AVQueuePlayer()
-
-        queuePlayer.isMuted = false
-
-        let looper = AVPlayerLooper(
-            player: queuePlayer,
-            templateItem: item
-        )
-
-        self.player = queuePlayer
-        self.looper = looper
-    }
-}
-import SwiftUI
-import AVFoundation
-
-struct VideoBannerPlayer: UIViewRepresentable {
-
-    let player: AVPlayer
-
-    func makeUIView(context: Context) -> UIView {
-
-        let view = UIView()
-
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        playerLayer.frame = UIScreen.main.bounds
-
-        view.layer.addSublayer(playerLayer)
-
-        context.coordinator.playerLayer = playerLayer
-
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-
-        DispatchQueue.main.async {
-            context.coordinator.playerLayer?.frame = uiView.bounds
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    class Coordinator {
-        var playerLayer: AVPlayerLayer?
-    }
-}

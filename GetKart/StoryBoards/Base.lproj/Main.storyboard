@@ -856,7 +856,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Logo" width="420" height="159.66667175292969"/>
+        <image name="Logo" width="461" height="154"/>
         <image name="arrow_left" width="24" height="24"/>
         <image name="editNew" width="22" height="22"/>
         <image name="filterRound" width="45.333332061767578" height="45.333332061767578"/>

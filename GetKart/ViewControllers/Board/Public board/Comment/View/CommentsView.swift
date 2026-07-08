@@ -81,13 +81,19 @@ struct CommentsView: View {
                                     }
                                 )
                                 .id(comment.id)
+                                
+                                .onAppear {
+
+                                    if comment.id == objVM.commentsArray.last?.id ,!objVM.isDataLoading,!objVM.isLastPage{
+                                            objVM.getComment(itemId: itemObj?.id ?? 0)
+                                        }
+                                    }
                             }
 
                             Spacer().frame(height:20)
                         }
                         .padding()
                     }
-                   
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .simultaneousGesture(

@@ -8,11 +8,18 @@
 import SwiftUI
 
 
+enum PaymentSuccessType{
+    case boost
+    case banner
+    case wallet
+}
 
 struct PlanBoughtSuccessView: View {
     
     @Environment(\.presentationMode) var presentationMode
     var navigationController: UINavigationController?
+    
+    var paymentType:PaymentSuccessType? = .boost
     
     var body: some View {
         ZStack {
@@ -33,7 +40,9 @@ struct PlanBoughtSuccessView: View {
                     
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
-                        self.navigationController?.popToRootViewController(animated: true)
+                        if paymentType != .wallet{
+                            self.navigationController?.popToRootViewController(animated: true)
+                        }
                        
                     }) {
                         Text("OK").font(Font.manrope(.regular, size: 16)).foregroundColor(.white).padding()

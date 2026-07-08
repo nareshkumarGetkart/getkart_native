@@ -54,6 +54,8 @@ class PaymentGatewayCentralized{
     var selectedPlanId = 0
     var selIOSProductID = ""
     
+    var amount:Int = 0
+    
     //MARK: Initialization Methods
     func initializeDefaults(){
         if selectedPlanId == 0{
@@ -152,19 +154,20 @@ class PaymentGatewayCentralized{
           
       }else if payment_method_type == 3 {
           //Phone Pay
-            
-            if paymentFor == .bannerPromotion{
-                
-                getIntentForBannerPromotions(package_id: selectedPlanId)
-           
-            } else if paymentFor == .bannerPromotionDraft{
-                
-                revokeCampaignPaymentApi(package_id: selectedPlanId)
-                
-            }else{
-                
-                self.createPhonePayOrder(package_id: selectedPlanId)
-            }
+          
+          if paymentFor == .bannerPromotion{
+              
+              getIntentForBannerPromotions(package_id: selectedPlanId)
+              
+          } else if paymentFor == .bannerPromotionDraft{
+              
+              revokeCampaignPaymentApi(package_id: selectedPlanId)
+              
+          }else{
+              
+              self.createPhonePayOrder(package_id: selectedPlanId)
+          }
+          
       }else if payment_method_type == 4 {
           
           //Payu Pay
@@ -175,6 +178,10 @@ class PaymentGatewayCentralized{
           } else if paymentFor == .bannerPromotionDraft{
               
               revokeCampaignPaymentApi(package_id: selectedPlanId)
+              
+          }else if paymentFor == .wallet{
+              
+              createPayuWalletPaymentIntent()
               
           }else{
               self.createPayUIntent(package_id: selectedPlanId)
@@ -609,7 +616,56 @@ class PaymentGatewayCentralized{
 
 
 extension PaymentGatewayCentralized{
+    //MARK: Wallet
+    
+    func createPayuWalletPaymentIntent(){
+        
+        let params:Dictionary<String, Any> = ["amount":amount, "payment_method":payment_method, "platform_type":"app"]
+      
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.payu_wallet_payment_intent, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        /*if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                            
+                            let hash = payment_intentDict["hash"] as? String ?? ""
+                            let payment_transaction_id = payment_intentDict["payment_transaction_id"] as? Int ?? 0
+                        }*/
+
+                      
+                        if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                            let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                            let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                            self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                            self?.openPayuMoney(order_id: order_id, amount: amount)
+
+                        }
+                    }
+                    
+                    
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+                    //self?.delegate?.showError(message: message)
+                }
+                
+            }
+        }
+    }
+    
     //MARK: Payu
+    
     
     func createPayUIntent(package_id:Int){
                 

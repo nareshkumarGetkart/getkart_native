@@ -581,11 +581,15 @@ struct BoardDetailView: View{
     }
     
     private func pushToProfileScreen(user: User) {
-        let vc = UIHostingController(
-            rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
-        )
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
+       
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(
+                rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
+            )
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // MARK: - Like update

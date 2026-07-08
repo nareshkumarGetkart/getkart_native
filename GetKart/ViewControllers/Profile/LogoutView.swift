@@ -64,12 +64,13 @@ struct LogoutView: View {
     
     func LogoutApi(){
         let strUrl =  Constant.shared.logout + "?fcm_id=\(Local.shared.getFCMToken())"
+      
         URLhandler.sharedinstance.makeCall(url:strUrl , param: Dictionary(), methodType: .post,showLoader:true) {  responseObject, error in
             
         
             if(error != nil)
             {
-                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+               // self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
                 print(error ?? "defaultValue")
                 
             }else{
@@ -78,7 +79,8 @@ struct LogoutView: View {
                 let status = result["code"] as? Int ?? 0
                 let message = result["message"] as? String ?? ""
                 
-              /*  AppDelegate.sharedInstance.sharedProfileID = ""
+              /*
+               AppDelegate.sharedInstance.sharedProfileID = ""
                 AppDelegate.sharedInstance.notificationType = ""
                 AppDelegate.sharedInstance.roomId = 0
                 AppDelegate.sharedInstance.userId = 0

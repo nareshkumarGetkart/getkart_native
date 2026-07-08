@@ -51,6 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var isBackgroundCalled = false
     private var backgroundCalledTime: TimeInterval = 0
     private var socketConnectToken: NSObjectProtocol?
+    
 
     // MARK: - App Launch
 
@@ -70,6 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationController?.viewControllers = [splashVC]
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+
 
         // ── Services needed before first network call ────────────────────────
         FirebaseApp.configure()
@@ -757,6 +759,21 @@ extension AppDelegate: ATAppUpdaterDelegate {
                 Local.shared.removeUserData()
                 AppDelegate.sharedInstance.showLoginScreen()
             }
+            
+            /*
+             if let respDict =  responseObject as? Dictionary<String,Any>{
+                 let message = respDict["message"] as? String ?? ""
+                 let code = respDict["code"] as? Int ?? 0
+                 
+                 if code == 103 || message.lowercased() == "user not found"{
+                     URLhandler.sharedinstance.isLogoutPresented = false
+                     Local.shared.removeUserData()
+                     AppDelegate.sharedInstance.showLoginScreen()
+                     return
+                 }
+             }
+          
+             */
         }
     }
 

@@ -983,7 +983,7 @@ extension PublicBoardView{
     PublicBoardView(tabBarController: nil)
 }
 
-
+private var columnWidth = UIScreen.ft_width()/2 - 10
 
 struct ProductCardStaggered: View {
 
@@ -1044,6 +1044,8 @@ struct ProductCardStaggered: View {
                             x: 0,
                             y: 2
                         )
+                        .frame(width:columnWidth)
+                        .frame(maxHeight:370)
                     
                 }
                
@@ -1318,7 +1320,9 @@ struct IdeaCardStaggered: View {
                             x: 0,
                             y: 2
                         )
-                    
+                       
+                        .frame(width:columnWidth)
+                        .frame(maxHeight:450)
                 }
                 
                 if (product.isFeature ?? false){

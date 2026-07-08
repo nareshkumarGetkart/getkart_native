@@ -489,7 +489,7 @@ struct SmartVideoPlayerView: View {
                     if let player {
 
                         PlayerLayerView(player: player)
-                            .frame(minHeight: 265,maxHeight: 350)
+                            .frame(minHeight: 275,maxHeight: 360)
                             .frame(width:geo.size.width)
                             .clipped()
 
@@ -545,7 +545,7 @@ struct SmartVideoPlayerView: View {
                        .diskCacheExpiration(.days(3))
                        .fade(duration: 0.15)
                        .frame(width:geo.size.width)
-                       .frame(minHeight: 265,maxHeight: 350)
+                       .frame(minHeight: 275,maxHeight: 360)
                        .clipped()
                        .opacity(isReadyToPlay ? 0 : 1)
                        .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
@@ -553,7 +553,7 @@ struct SmartVideoPlayerView: View {
                     overlayUI
                 }
             }
-            .frame(minHeight: 265,maxHeight: 350)
+            .frame(minHeight: 275,maxHeight: 360)
             
 
             bottomCTA
@@ -582,6 +582,7 @@ struct SmartVideoPlayerView: View {
         }
     }
 }
+
 private extension SmartVideoPlayerView {
 
     var bottomCTA: some View {
@@ -604,13 +605,14 @@ private extension SmartVideoPlayerView {
         .frame(maxWidth: .infinity)
         .background(Color(.systemBackground))
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
-
         .onTapGesture {
             onTapBottomButton()
             outboundClickApi(boardId: item.id ?? 0)
         }
     }
 }
+
+
 private extension SmartVideoPlayerView {
 
     var overlayUI: some View {
@@ -671,6 +673,7 @@ private extension SmartVideoPlayerView {
         .padding(8)
     }
 }
+
 private extension SmartVideoPlayerView {
     
     private func observeReadyState(player: AVPlayer) {
@@ -834,6 +837,7 @@ final class FeedVideoManager: ObservableObject {
             players.values.forEach { $0.rate = 0 }
         }
     
+    
     func player(for id: Int, url: URL) -> AVQueuePlayer {
 
         if let existing = players[id] {
@@ -850,7 +854,7 @@ final class FeedVideoManager: ObservableObject {
             return existing
         }
 
-       // print("🎬 Creating player:", id)
+       // print(" Creating player:", id)
 
         let item = AVPlayerItem(url: url)
         item.preferredForwardBufferDuration = 2
