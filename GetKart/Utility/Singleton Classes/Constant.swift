@@ -14,7 +14,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .staging
+var devEnvironment: DevEnvironment = .live
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -579,7 +579,8 @@ final class Constant: NSObject {
     
     var alert_popup:String{
         get {
-            return "\(Constant.shared.baseURL)/v1/alert-popup"
+//            return "\(Constant.shared.baseURL)/v1/alert-popup"
+            return "\(Constant.shared.baseURL)/v2/alert-popup"
 
         }
     }
@@ -795,7 +796,9 @@ final class Constant: NSObject {
     
     var payment_transactions:String{
         get{
-            return "\(Constant.shared.baseURL)/v1/payment-transactions"
+//            return "\(Constant.shared.baseURL)/v1/payment-transactions"
+            return "\(Constant.shared.baseURL)/v2/payment-transactions"
+
             
         }
     }
@@ -1073,10 +1076,16 @@ final class Constant: NSObject {
         }
     }
     
+    var purchase_by_wallet:String{
+        get{
+            return "\(Constant.shared.baseURL)/v2/purchase-by-wallet"
+        }
+    }
 }
 
 
 enum StoryBoard {
+    
     static let main = UIStoryboard(name: "Main", bundle: nil)
     static let preLogin = UIStoryboard(name: "PreLogin", bundle: nil)
     static let postAdd = UIStoryboard(name: "PostAdd", bundle: nil)
@@ -1164,13 +1173,7 @@ extension UIFont{
         }
     }
 }
-    
-
-
-
-
-
-
+ 
 
 enum MediaShareType{
     
@@ -1240,31 +1243,28 @@ class ShareMedia{
         }
     }
 }
-    class ActionExtensionBlockerItem: NSObject, UIActivityItemSource {
-        func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {
-            return "group.NHBQDLLJN4.com.PickZonGroup"
-        }
-
-        func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-            return NSObject()
-        }
-
-        func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
-            return String()
-        }
-
-        func activityViewController(_ activityViewController: UIActivityViewController, thumbnailImageForActivityType activityType: UIActivity.ActivityType?, suggestedSize size: CGSize) -> UIImage? {
-            return nil
-        }
-
-        func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-            return String()
-        }
+    
+class ActionExtensionBlockerItem: NSObject, UIActivityItemSource {
+    func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {
+        return "group.NHBQDLLJN4.com.PickZonGroup"
     }
-
-
-
-
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return NSObject()
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        return String()
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, thumbnailImageForActivityType activityType: UIActivity.ActivityType?, suggestedSize size: CGSize) -> UIImage? {
+        return nil
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return String()
+    }
+}
 
 
 enum NotificationKeys:String,CaseIterable{
@@ -1280,12 +1280,11 @@ enum NotificationKeys:String,CaseIterable{
     static let scrollBoardToTop = "scrollBoardToTop"
     case boardBoostedRefresh = "boardBoostedRefresh"
     case refreshCommentCountBoard = "refreshCommentCountBoard"
-
-
 }
 
 
 enum NotiKeysLocSelected:String,CaseIterable{
+    
     case homeNewLocation = "homeNewLocation"
     case filterNewLocation = "filterNewLocation"
     case createPostNewLocation = "createPostNewLocation"
@@ -1295,19 +1294,18 @@ enum NotiKeysLocSelected:String,CaseIterable{
 
 
 enum ImageName {
+    
     static let userPlaceHolder = UIImage(named: "user-circle")
     static let getKartplaceHolder = UIImage(named: "getkartplaceholder")
 }
 
 extension UIDevice{
-    
 
     static  var appVersion : String{
         return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     }
    
    static func getDeviceUIDid() ->String{
-        
 
         return UIDevice.current.identifierForVendor?.uuidString ?? ""
     }
@@ -1316,13 +1314,13 @@ extension UIDevice{
     static func getDeviceModelName() -> String {
         var systemInfo = utsname()
         uname(&systemInfo)
-
+        
         let identifier = withUnsafePointer(to: &systemInfo.machine) {
             $0.withMemoryRebound(to: CChar.self, capacity: 1) {
                 ptr in String(cString: ptr)
             }
         }
-
+        
         let deviceList: [String: String] = [
             // iPhone
             "iPhone6,1": "iPhone 5s", "iPhone6,2": "iPhone 5s",
@@ -1348,11 +1346,11 @@ extension UIDevice{
             "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus",
             "iPhone16,1": "iPhone 15 Pro", "iPhone16,2": "iPhone 15 Pro Max",
             "iPhone15,4": "iPhone 15", "iPhone15,5": "iPhone 15 Plus",
-
+            
             // Simulators
             "i386": "Simulator", "x86_64": "Simulator", "arm64": "Simulator"
         ]
-
+        
         return deviceList[identifier] ?? identifier
     }
     

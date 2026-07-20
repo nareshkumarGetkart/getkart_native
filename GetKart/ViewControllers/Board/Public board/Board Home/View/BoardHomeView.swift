@@ -27,6 +27,9 @@ struct BoardHomeView: View {
     private let maxLoadedTabs = 3
     @State private var isUpdatedEvents: Bool = true
     @State private var showCompleteProfilePopup = false
+   // @State private var showWalletRewardPopup = false
+    @StateObject private var popupState = PopupState()
+
     
     var body: some View {
         VStack(spacing: 0) {
@@ -40,8 +43,6 @@ struct BoardHomeView: View {
             )
             .background(Color(.systemBackground))
 
-            //  FIX 4: selectedCategoryId is 55555 from the start, so
-            // tabContentView renders immediately without waiting for the API.
             if selectedCategoryId > 0 {
                 tabContentView
             } else {
@@ -49,12 +50,7 @@ struct BoardHomeView: View {
                 PinterestSkeletonGrid().padding(.top, 5)
             }
         }
-        //  FIX 5: Kick off the "All" feed load as early as possible —
-        // before the category API even returns.
-//        .task {
-//            markTabLoaded(55555)
-//            prefetchNeighbours(of: 55555)
-//        }
+
       .onChange(of: selectedCategoryId) { newId in
             FeedVideoManager.shared.pauseAll()
             FeedVideoManager.shared.muteAll()
@@ -82,12 +78,36 @@ struct BoardHomeView: View {
                     },
                     onSave: { name in
                         print(name)
-                        updateProfile(fullName: name)
                         showCompleteProfilePopup = false
+                        updateProfile(fullName: name)
+
                     }
                 )
                 .background(.clear)
                 .presentationBackground(.clear)
+            }
+        
+            .fullScreenCover(isPresented: $popupState.showWalletRewardPopup) {
+                
+               
+                if let obj = popupState.popupObj{
+                    
+                    RewardWalletPopup(
+                        objPopup:obj,
+                        buttonAction: {
+                            
+                            print("Button tapped")
+                            popupState.showWalletRewardPopup = false
+                            pushToMyWalletView()
+                        },
+                        closeAction: {
+                            
+                            popupState.showWalletRewardPopup = false
+                        }
+                    )
+                    .background(.clear)
+                    .presentationBackground(.clear)
+                }
             }
     }
 
@@ -183,7 +203,7 @@ struct BoardHomeView: View {
         }
         
         if Local.shared.getUserId() > 0{
-            getpopupApi()
+            getAlertPopupApi()
         }
     }
     
@@ -207,6 +227,10 @@ struct BoardHomeView: View {
                         
                         
                         RealmManager.shared.updateUserData(dict: data)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.getAlertPopupApi()
+                        }
                        
                         
                     }
@@ -218,9 +242,20 @@ struct BoardHomeView: View {
         }
     }
     
+    
+    func pushToMyWalletView(){
+        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+        let hostingController = UIHostingController(rootView: MyWalletView(navigation: boardNav))
+        hostingController.hidesBottomBarWhenPushed = true
+        boardNav?.pushViewController(hostingController, animated: true)
+    }
 }
 
 
+final class PopupState: ObservableObject {
+    @Published var popupObj: PopupModel?
+    @Published var showWalletRewardPopup = false
+}
 
 extension BoardHomeView{
     
@@ -237,6 +272,11 @@ extension BoardHomeView{
                     let code = result["code"] as? Int ?? 0
                     if code == 200{
                         RealmManager.shared.updateUserType(type: type)
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.getAlertPopupApi()
+                        }
+
                     }
                 }
             }
@@ -265,7 +305,7 @@ extension BoardHomeView{
        
     }
     
-    func getpopupApi(){
+    func getAlertPopupApi(){
       
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         
@@ -283,6 +323,7 @@ extension BoardHomeView{
             showCompleteProfilePopup = true
        
         }else{
+            
             ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: false, url: Constant.shared.alert_popup) { (obj:PopupParseModel) in
                 
                 if obj.code == 200,obj.error == false{
@@ -321,11 +362,18 @@ extension BoardHomeView{
                         //Boost board
                         self.showBoostYourBoardPopup(obj: obj.data)
                         
+                    }else if (obj.data.type ?? 0) == 7{
+                        //Wallet reward
+                        DispatchQueue.main.async {
+                            self.popupState.popupObj = obj.data
+                            self.popupState.showWalletRewardPopup = true
+                        }
                     }
                 }
             }
         }
     }
+    
   
     func presentHostingController(objPopup: PopupModel) {
         
@@ -389,8 +437,8 @@ extension BoardHomeView{
 
         let settingView = BottomSheetPopupView1(
             objPopup: objPopup,
-            preloadedImage: image,        // ✅ Pass already downloaded image
-            preloadedImageHeight: imageHeight, // ✅ Pass already computed height
+            preloadedImage: image,        //  Pass already downloaded image
+            preloadedImageHeight: imageHeight, //  Pass already computed height
             pushToScreenFromPopup: { obj, dismissOnly in
                // guard let self = self else { return }
                 
@@ -575,6 +623,7 @@ extension BoardHomeView{
         let popupView = SellerBuyerPopup(selectedMode:.none, isToShowCancelButton: false) { mode in
             
             print(mode)
+            
             if mode == .seller{
                 self.updateUserTypeApi(type: 2)
 
@@ -640,356 +689,8 @@ extension BoardHomeView {
     BoardHomeView(tabBarController: nil)
 }
 
-//MARK: - Category Optimized
-struct CategoryTabsOtimized: View {
-
-    @Binding var selected: String
-    @Binding var selectedCategoryId: Int
-    @ObservedObject var categoryVM: CategoryViewModelOptimized
-    @Environment(\.scrollToTopProxy) private var scrollToTopProxy
-    @State private var categoryScrollProxy: ScrollViewProxy?
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 20) {
-                        ForEach(categoryVM.listArray ?? [], id: \.id) { cat in
-                            categoryTab(cat)
-                                .id(cat.id)
-                                .onTapGesture {
-                                    selectCategory(cat, proxy: proxy)
-                                }
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
-                }
-                .onAppear {
-                    categoryScrollProxy = proxy
-                    //  Scroll to the already-selected "All" tab on first appear
-                    // (proxy is ready now; selectedCategoryId is already 55555)
-                    scrollCategoryToCenter(selectedCategoryId, proxy: proxy)
-                }
-            }
-            Divider()
-        }
-        //  When the full category list arrives from the API, just scroll to
-        // the current selection — no list mutation, no ID reset needed.
-        .onChange(of: categoryVM.listArray?.count) { _ in
-            scrollCategoryToCenter(selectedCategoryId)
-        }
-        // Keeps the tab bar in sync when the parent changes the selection
-        // (e.g. swipe gesture in BoardHomeView)
-        .onChange(of: selectedCategoryId) { newId in
-            scrollCategoryToCenter(newId)
-        }
-    }
-
-    // MARK: - Actions
-
-    private func selectCategory(_ cat: CategoryModel, proxy: ScrollViewProxy) {
-        withAnimation(.easeInOut) {
-            selectedCategoryId = cat.id ?? 0
-            selected = cat.name ?? ""
-            proxy.scrollTo(cat.id, anchor: .center)
-            scrollToTopProxy?.scrollTo("TOP", anchor: .top)
-        }
-    }
-
-    // Overload used by onChange (proxy captured in state)
-    private func scrollCategoryToCenter(_ id: Int) {
-        guard let proxy = categoryScrollProxy else { return }
-        scrollCategoryToCenter(id, proxy: proxy)
-    }
-
-    private func scrollCategoryToCenter(_ id: Int, proxy: ScrollViewProxy) {
-        withAnimation(.easeInOut) {
-            proxy.scrollTo(id, anchor: .center)
-        }
-    }
-
-    // MARK: - UI
-
-    private func categoryTab(_ cat: CategoryModel) -> some View {
-        let isSelected = selectedCategoryId == cat.id
-        return VStack(spacing: 6) {
-            Text(cat.name ?? "")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(isSelected ? .primary : .secondary) //  visual clarity
-            Rectangle()
-                .fill(isSelected ? Color.orange : .clear)
-                .frame(height: 3)
-        }
-        .contentShape(Rectangle())
-    }
-}
 
 
-struct BoardListViewNew: View {
-    
-    let tabBarController: UITabBarController?
-    @ObservedObject var vm: BoardViewModelNew
-    let navigationController: UINavigationController?
-    let isActive: Bool
-    @State private var paymentGateway: PaymentGatewayCentralized?
-    @StateObject private var frameStore = FrameStore()
-    @State private var safariURL: URL?
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                Color.clear.frame(height: 0).id("TOP")
-
-                if vm.isLoading && vm.items.isEmpty && !vm.hasLoadedOnce{
-                    PinterestSkeletonGrid()
-                    
-                }else if vm.items.isEmpty && !vm.isLoading && vm.hasLoadedOnce {
-                    emptyView.padding(.top, 100)
-                    
-                } else {
-
-                    PinterestMasonryFeed(
-                        items: vm.items,
-                        spacing: 8,
-                        itemView: { item in itemCellView(item: item) },  // no AnyView wrapper
-                        onLastItemAppear: {
-                            guard !vm.isLoading, !vm.isLastPage else { return }
-                            vm.tryLoadNextPage()
-                        },
-                        onOpenURL: { url in safariURL = url }
-                    )
-                    
-                    .padding(.horizontal, 5)
-                    .transaction { t in
-                        t.animation = nil
-                    }
-                }
-
-                if vm.isLoading {
-                    ProgressView().padding(.vertical, 12)
-                }
-            }
-            .padding(.bottom, tabBarController?.tabBar.frame.height ?? 83)
-            .ignoresSafeArea(edges: .bottom)
-            .onDisappear {
-                FeedVideoManager.shared.pauseAll()
-                frameStore.removeAll()
-            }
-            
-            .refreshable {
-                await vm.refresh()
-                FeedVideoManager.shared.reset()
-                frameStore.removeAll()
-            }
-            .task {
-                if vm.items.isEmpty { vm.loadIfNeeded() }
-            }
-            .onChange(of: isActive) { active in
-                if !active { FeedVideoManager.shared.pauseAll() }
-            }
-            .onReceive(NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.refreshLikeDislikeBoard.rawValue)
-            )) { n in
-                guard let d = n.object as? [String: Any] else { return }
-                vm.update(likeCount: d["count"] as? Int ?? 0,
-                          isLike:    d["isLike"] as? Bool ?? false,
-                          boardId:   d["boardId"] as? Int ?? 0)
-            }
-            .onReceive(NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.refreshCommentCountBoard.rawValue)
-            )) { n in
-                guard let d = n.object as? [String: Any] else { return }
-                vm.updateCommentCount(commentCount: d["count"] as? Int ?? 0,
-                                      commentObj:   d["lastComment"] as? CommentModel,
-                                      boardId:      d["boardId"] as? Int ?? 0)
-            }
-            .onReceive(NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.scrollBoardToTop)
-            )) { _ in
-                withAnimation(.easeInOut) { proxy.scrollTo("TOP", anchor: .top) }
-            }
-            .onReceive(NotificationCenter.default.publisher(
-                for: Notification.Name(NotificationKeys.boardBoostedRefresh.rawValue)
-            )) { n in
-                guard let d = n.object as? [String: Any] else { return }
-                vm.updateBoost(isBoosted: true, boardId: d["boardId"] as? Int ?? 0)
-            }
-            .onReceive(NotificationCenter.default.publisher(
-                for: NSNotification.Name(NotificationKeys.refreshMyBoardsScreen.rawValue)
-            )) { _ in
-                Task {
-                    await vm.refresh()
-                    FeedVideoManager.shared.reset()
-                    frameStore.removeAll()
-                }
-            }
-            
-            .onReceive( NotificationCenter.default.publisher(
-                                for: UIApplication.didReceiveMemoryWarningNotification
-                            )
-                        ) { _ in
-                            ImageCache.default.clearMemoryCache()
-                            KingfisherManager.shared.downloader.cancelAll()
-                            FeedVideoManager.shared.pauseAndSuspendAll()
-                            frameStore.removeAll()
-                            VideoPreloadManagerDefault.shared.cancelAll()
-                        }
-            
-            .fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
-        }
-    }
-
-    // MARK: - Item Cell
-    @ViewBuilder
-    private func itemCellView(item: ItemModel) -> some View {
-        if item.boardType == 2 {
-            SmartVideoPlayerView(
-                item: item,
-                onTapBottomButton: {
-                    if let url = URL(string: (item.outbondUrl ?? "").getValidUrl()) {
-                        safariURL = url
-                        FeedVideoManager.shared.muteAll()
-                    }
-                }
-            )
-            .background(
-                GeometryReader { geo in
-                    Color.clear
-                        .onAppear {
-                            frameStore.set(id: item.id ?? 0, frame: geo.frame(in: .global))
-                            frameStore.scheduleVisibilityUpdate(isActive: isActive)
-                        }
-                        .onChange(of: geo.frame(in: .global)) { frame in
-                            frameStore.set(id: item.id ?? 0, frame: frame)
-                            frameStore.scheduleVisibilityUpdate(isActive: isActive)
-                        }
-                }
-            )
-            .onAppear { prefetchNextVideos(from: item) }
-            .onDisappear {
-                frameStore.remove(id: item.id ?? 0)
-                FeedVideoManager.shared.pause(id: item.id ?? 0)
-            }
-        } else {
-            CardItemViewNew(
-                item: item,
-                onLike: { isLiked, boardId in vm.updateLike(boardId: boardId, isLiked: isLiked) },
-                onTap:  { pushToDetail(item: item) },
-                onTapBoostButton: {
-                    if item.boardType == 1 {
-                        if let url = URL(string: (item.outbondUrl ?? "").getValidUrl()) {
-                            safariURL = url
-                        }
-                    } else {
-                        paymentGatewayOpen(product: item)
-                    }
-                },
-                isToShowBoostButton: true
-            )
-        }
-    }
-
-    // MARK: - Helpers
-    private func prefetchNextVideos(from currentItem: ItemModel) {
-        guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }
-        let start = index + 1
-        let end   = min(index + 2, vm.items.count - 1)
-        guard start <= end else { return }
-        let urls: [URL] = (start...end).compactMap { i in
-            let it = vm.items[i]
-            guard it.boardType == 2, let link = it.videoLink else { return nil }
-            return URL(string: link)
-        }
-        VideoPreloadManagerDefault.shared.set(waiting: urls)
-    }
-
-    private var emptyView: some View {
-        VStack(spacing: 20) {
-            Image("no_data_found_illustrator")
-            Text("No Data Found").foregroundColor(.orange)
-        }
-    }
-
-    private func pushToDetail(item: ItemModel) {
-        let vc = UIHostingController(
-            rootView: BoardDetailView(navigationController: navigationController, itemObj: item)
-        )
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
-    }
-
-    func paymentGatewayOpen(product: ItemModel) {
-        paymentGateway = PaymentGatewayCentralized()
-        paymentGateway?.selectedPlanId  = product.package?.id           ?? 0
-        paymentGateway?.categoryId      = product.categoryID            ?? 0
-        paymentGateway?.itemId          = product.id                    ?? 0
-        paymentGateway?.paymentFor      = .boostBoard
-        paymentGateway?.selIOSProductID = product.package?.iosProductID ?? ""
-        paymentGateway?.callbackPaymentSuccess = { [self] isSuccess in
-            if isSuccess {
-                let vc = UIHostingController(
-                    rootView: PlanBoughtSuccessView(navigationController: navigationController)
-                )
-                vc.modalPresentationStyle = .overFullScreen
-                vc.modalTransitionStyle   = .crossDissolve
-                vc.view.backgroundColor   = UIColor.black.withAlphaComponent(0.5)
-                navigationController?.present(vc, animated: true)
-                NotificationCenter.default.post(
-                    name:   NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue),
-                    object: ["boardId": product.id ?? 0]
-                )
-            }
-            self.paymentGateway = nil
-        }
-        paymentGateway?.initializeDefaults()
-    }    
-}
-
-
-final class FrameStore: ObservableObject {
-
-    private var frames: [Int: CGRect] = [:]
-    private var visibilityWorkItem: DispatchWorkItem?
-
-    func set(id: Int, frame: CGRect) {
-        frames[id] = frame
-    }
-
-    func remove(id: Int) {
-        frames.removeValue(forKey: id)
-    }
-
-    func removeAll() {
-        frames.removeAll()
-    }
-
-    func scheduleVisibilityUpdate(isActive: Bool) {
-        visibilityWorkItem?.cancel()
-        let work = DispatchWorkItem { [weak self] in
-            self?.calculateVisibleVideos(isActive: isActive)
-        }
-        visibilityWorkItem = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
-    }
-
-    private func calculateVisibleVideos(isActive: Bool) {
-        guard isActive else { FeedVideoManager.shared.pauseAll(); return }
-
-        let screenH = UIScreen.main.bounds.height
-        var visible: Set<Int> = []
-
-        for (id, frame) in frames {
-            guard frame.maxY > 0, frame.minY < screenH else { continue }
-            let visH = min(frame.maxY, screenH) - max(frame.minY, 0)
-            if frame.height > 0, (visH / frame.height) >= 0.6 {
-                visible.insert(id)
-            }
-        }
-
-        FeedVideoManager.shared.updatePlayback(visibleIDs: visible)
-    }
-}
 
 
 enum FeedSegment: Identifiable {
@@ -1508,6 +1209,7 @@ private var goldenGradient: LinearGradient {
     )
 }
 
+
 //MARK: - BoardBannerCard
 struct BoardBannerCard: View {
     
@@ -1527,7 +1229,7 @@ struct BoardBannerCard: View {
                 .cacheOriginalImage(false)
                 .resizable()
                 .scaledToFill()
-                .frame(maxWidth: .infinity, minHeight: 190, maxHeight: 250)
+                .frame(maxWidth: .infinity, minHeight: 190, maxHeight: 220)
                 .clipped()
                 
                 if isSponsored {
@@ -1812,208 +1514,8 @@ struct BoardVideoBannerCard: View {
 
 */
 
-import SwiftUI
-import AVFoundation
-
-struct BoardVideoBannerCard: View {
-
-    let product: ItemModel
-
-    let onClickedView: (URL) -> Void
-
-    @StateObject
-    private var video = BannerVideoPlayer()
-
-    @State
-    private var isMuted = true
-
-    var body: some View {
-
-        VStack(spacing: 0) {
-
-            ZStack(alignment: .topTrailing) {
-
-                PlayerLayerView(player: video.player)
-                    .frame(height: 210)
-                    .clipped()
-
-                Button {
-
-                    isMuted.toggle()
-
-                    video.mute(isMuted)
-
-                } label: {
-
-                    Image(systemName: isMuted ?
-                          "speaker.slash.fill" :
-                          "speaker.wave.2.fill")
-                        .font(.system(size: 18))
-                        .foregroundColor(.white)
-                        .padding(10)
-                        .background(.black.opacity(0.55))
-                        .clipShape(Circle())
-                }
-                .padding()
-            }
-
-            learnMoreBar
-        }
-        .background(.black)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(radius: 5)
-        .task {
-
-            guard
-                let url = URL(string: product.banner?.image ?? "")
-            else {
-                return
-            }
-
-            video.load(url: url)
-
-            video.play()
-        }
-        .onDisappear {
-
-            video.pause()
-
-            video.mute(true)
-
-            isMuted = true
-        }
-    }
-
-    private var learnMoreBar: some View {
-
-        HStack {
-
-            Text("Learn more")
-
-            Spacer()
-
-            Image(systemName: "arrow.up.right")
-        }
-        .padding(.horizontal)
-        .frame(height: 36)
-        .background(Color(.systemBackground))
-        .onTapGesture {
-            isMuted = true
-            video.mute(true)
-            recordOutboundClick()
-        }
-    }
-    
-    // MARK: - Analytics / Navigation
-    
-    private func recordOutboundClick() {
-        let banner = product.banner
-                        
-        if let raw = banner?.thirdPartyLink ?? banner?.url,
-           let url = URL(string: raw.getValidUrl()) {
-            onClickedView(url)
-        }
-        if banner?.isCampaign == true {
-            campaignClickEventApi(campaignBannerId: banner?.campaignID ?? 0)
-        } else {
-            captureSliderClickApi(campaignBannerId: banner?.campaignID ?? 0)
-        }
-    }
-    
-    private func campaignClickEventApi(campaignBannerId: Int) {
-        let params: [String: Any] = [
-            "campaign_banner_id": campaignBannerId,
-            "event_type": "click",
-            "referrer_url": "HOME"
-        ]
-        URLhandler.sharedinstance.makeCall(
-            url: Constant.shared.campaign_event,
-            param: params,
-            methodType: .post,
-            showLoader: false
-        ) { _, _ in }
-    }
-    
-    private func captureSliderClickApi(campaignBannerId: Int) {
-        let params: [String: Any] = ["id": campaignBannerId]
-        URLhandler.sharedinstance.makeCall(
-            url: Constant.shared.capture_slider_click,
-            param: params,
-            methodType: .post,
-            showLoader: false
-        ) { _, _ in }
-    }
-}
 
 
-import SwiftUI
-import AVFoundation
-
-final class BannerVideoPlayer: ObservableObject {
-
-    let player = AVPlayer()
-
-    private var observer: NSObjectProtocol?
-
-    func load(url: URL) {
-
-        // Already loaded
-        if let asset = player.currentItem?.asset as? AVURLAsset,
-           asset.url == url {
-            return
-        }
-
-        cleanup()
-
-        let item = AVPlayerItem(url: url)
-
-        player.replaceCurrentItem(with: item)
-
-        player.actionAtItemEnd = .none
-        player.isMuted = true
-
-        observer = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: item,
-            queue: .main
-        ) { [weak self] _ in
-
-            self?.player.seek(to: .zero)
-
-            self?.player.play()
-        }
-    }
-
-    func play() {
-
-        player.play()
-    }
-
-    func pause() {
-
-        player.pause()
-    }
-
-    func mute(_ mute: Bool) {
-
-        player.isMuted = mute
-    }
-
-    deinit {
-
-        cleanup()
-    }
-
-    private func cleanup() {
-
-        if let observer {
-
-            NotificationCenter.default.removeObserver(observer)
-
-            self.observer = nil
-        }
-    }
-}
 private let columnWidth: CGFloat = UIScreen.main.bounds.width / 2 - 10
   
 

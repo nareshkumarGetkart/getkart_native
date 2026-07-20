@@ -67,11 +67,11 @@ struct WalletHistoryData: Codable {
 // MARK: - Wallet Transaction
 struct WalletTransaction: Codable, Identifiable {
     let id: Int
-    let amount: String
+    let amount: Int
     let createdAt: String
     let description: String?
     let meta: WalletMeta?
-    let paymentTransactionID: Int
+    let paymentTransactionID: Int?
     let status: String
     let title: String
     let txnID: String

@@ -23,6 +23,7 @@ struct BoardAnalyticsView: View {
     @State var isFromBoostPopup:Bool = false
     
     var body: some View {
+        VStack{
         HStack(spacing:5){
             Button {
                 navigationController?.popViewController(animated: true)
@@ -41,37 +42,37 @@ struct BoardAnalyticsView: View {
                 Text("Board analytics").font(.inter(.medium, size: 18.0))
                     .foregroundColor(Color(UIColor.label))
             }
-          
+            
             Spacer()
             
-          
+            
+            
+            Button {
+                pushToEditBanner()
                 
-                Button {
-                    pushToEditBanner()
-                    
-                } label: {
+            } label: {
+                
+                Image("editWithBg")
+                
+            }
+            Button {
+                openActionSheet()
+            } label: {
+                
+                Image("more").renderingMode(.template).foregroundColor(Color(UIColor.label))
+                
+            }.padding(.trailing)
             
-                    Image("editWithBg")
-                    
-                }
-                Button {
-                    openActionSheet()
-                } label: {
-                    
-                    Image("more").renderingMode(.template).foregroundColor(Color(UIColor.label))
-                    
-                }.padding(.trailing)
-            
-         }.frame(height:44).background(Color(UIColor.systemBackground))
+        }.frame(height:44).background(Color(UIColor.systemBackground)).zIndex(1)
         
             .onAppear {
-            getBoardAnanlytics()
+                getBoardAnanlytics()
                 
             }
         
         ScrollView{
             VStack(alignment: .leading,spacing: 15){
-      
+                
                 
                 HStack{
                     
@@ -79,13 +80,13 @@ struct BoardAnalyticsView: View {
                     VStack{
                         if (objAnalytics?.board?.boardType ?? 0) == 1 {
                             Text("Promotional Ad image").font(.inter(.medium, size: 18.0))
-
+                            
                         }else if (objAnalytics?.board?.boardType ?? 0) == 2{
                             Text("Promotional Video").font(.inter(.medium, size: 18.0))
-
+                            
                         }else if (objAnalytics?.board?.boardType ?? 0) == 3{
                             Text("Idea image").font(.inter(.medium, size: 18.0))
-
+                            
                         }else{
                             Text("Board image").font(.inter(.medium, size: 18.0))
                         }
@@ -124,19 +125,19 @@ struct BoardAnalyticsView: View {
                         }
                         
                         Text(getFormattedCreatedDate(date:objAnalytics?.board?.createdAt ?? "")).font(.inter(.regular, size: 14.0)).foregroundColor(Color(.gray))
-
+                        
                     }
-
+                    
                     
                     Spacer()
                 }.padding(.top)
-               
+                
                 if ((objAnalytics?.board?.rejectionReason?.count ?? 0) > 0)  && ((objAnalytics?.board?.status?.lowercased() ?? "") == "rejected"){
                     Text(objAnalytics?.board?.rejectionReason ?? "").foregroundColor(Color(.systemRed)).font(.inter(.regular, size: 16.0))
                 }
                 
                 
-               
+                
                 if (objAnalytics?.board?.outbondURL ?? "").count > 0 {
                     VStack(alignment: .leading, spacing: 8) {
                         
@@ -159,25 +160,13 @@ struct BoardAnalyticsView: View {
                             Spacer()
                             Button {
                                 showSafari = true
-                              /*  if var urlString = objAnalytics?.board?.outbondURL {
-                                    // Add scheme if missing
-                                    if !urlString.lowercased().hasPrefix("http://") &&
-                                          !urlString.lowercased().hasPrefix("https://") {
-                                           urlString = "https://" + urlString
-                                       }
-                                    if let url = URL(string: urlString) {
-                                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                                    } else {
-                                        print("Invalid URL: \(urlString)")
-                                    }
-                                }*/
-
+                                
                             } label: {
-                                Image("globe")//.frame(width: 40, height: 40)//.aspectRatio(contentMode: .fill)
+                                Image("globe")
                             }
-
+                            
                         }.padding(.horizontal)
-                            .frame(maxWidth: .infinity, minHeight: 55, maxHeight: 55, alignment: .leading) // ✅ keeps text left-aligned
+                            .frame(maxWidth: .infinity, minHeight: 55, maxHeight: 55, alignment: .leading)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(.systemBackground))
@@ -190,10 +179,10 @@ struct BoardAnalyticsView: View {
                 }
                 
                 Divider()
-                  
+                
                 HStack{
                     Text("Overview").font(.inter(.semiBold, size: 16.0))
-
+                    
                     Spacer()
                     
                     if (objAnalytics?.board?.boardType ?? 0) == 0 , let expiryDate = objAnalytics?.board?.expiryDate,expiryDate.count > 0{
@@ -203,7 +192,7 @@ struct BoardAnalyticsView: View {
                         }
                     }
                 }
-             
+                
                 VStack(spacing:15){
                     
                     
@@ -211,7 +200,7 @@ struct BoardAnalyticsView: View {
                         
                         if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
                             BoardAnalyticCell(title: "Promotional Ad Status", value: "", isActive: true)
-
+                            
                         }else if (objAnalytics?.board?.boardType ?? 0) == 3{
                             BoardAnalyticCell(title: "Idea Status", value: "", isActive: true)
                         }else{
@@ -224,12 +213,12 @@ struct BoardAnalyticsView: View {
                             BoardAnalyticWithStatusGrayCell(title: "Promotional Ad Status", value: "\(status.capitalized )")
                         }else if (objAnalytics?.board?.boardType ?? 0) == 3{
                             BoardAnalyticWithStatusGrayCell(title: "Idea Status", value: "\(status.capitalized )")
-
+                            
                         }else{
                             BoardAnalyticWithStatusGrayCell(title: "Board Status", value: "\(status.capitalized )")
                         }
                     }
-          
+                    
                     
                     GeometryReader { geometry in
                         Path { path in
@@ -239,20 +228,17 @@ struct BoardAnalyticsView: View {
                         .stroke(Color.gray, style: StrokeStyle(lineWidth: 1.5, dash: [5]))
                     }
                     .frame(height: 1.5)
-                   
+                    
                     BoardAnalyticCell(title: "Impressions", value: "\(objAnalytics?.analytics?.impressions ?? 0)", isActive: false)
-//                    if (objAnalytics?.board?.boardType ?? 0) == 1 || (objAnalytics?.board?.boardType ?? 0) == 2{
-//                        BoardAnalyticCell(title: "Promotional Ad Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
-//                        
-//                    }
+                   
                     
                     if (objAnalytics?.board?.boardType ?? 0) == 3{
                         BoardAnalyticCell(title: "Idea Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
-
+                        
                     }else if (objAnalytics?.board?.boardType ?? 0) == 0{
                         BoardAnalyticCell(title: "Board Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
                     }
-                   
+                    
                     if (objAnalytics?.board?.boardType ?? 0) == 0  || (objAnalytics?.board?.boardType ?? 0) == 3{
                         
                         BoardAnalyticCell(title: "Favorites", value: "\(objAnalytics?.analytics?.favorites ?? 0)", isActive: false)
@@ -262,8 +248,8 @@ struct BoardAnalyticsView: View {
                     }else{
                         BoardAnalyticCell(title: "Outbound Clicks", value: "\(objAnalytics?.analytics?.outboundClicks ?? 0)", isActive: false)
                     }
-                   
-                                      
+                    
+                    
                 }.padding()
                 
                     .background(
@@ -277,10 +263,10 @@ struct BoardAnalyticsView: View {
                     .clipShape(
                         RoundedRectangle(cornerRadius: 8)
                     )
-                  
+                
                 
                 if (objAnalytics?.board?.isFeature ?? false) == false && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
-                 
+                    
                     Button(action: {
                         showSheetpackages = true
                     }) {
@@ -292,23 +278,24 @@ struct BoardAnalyticsView: View {
                             .cornerRadius(12)
                     }
                     .buttonStyle(.plain)
-
-               }
-
-            }
+                    
+                }
+                
+            }.padding(.top)
         }.padding([.horizontal])
             .scrollIndicators(.hidden, axes: .vertical)
         
-        .background(Color(.systemGray6))
+            .background(Color(.systemGray6))
+    }
         .sheet(isPresented: $showSheetpackages) {
             
-            BoostBoardPlanView(categoryId:objAnalytics?.board?.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
+            BoostBoardPlanView(categoryId:objAnalytics?.board?.categoryID ?? 0,packageSelectedPressed: { (selPkgObj,selPaymentMethod) in
                 self.showSheetpackages = false
                 selectedPkgObj = selPkgObj
-                paymentGatewayOpen()
+                paymentGatewayOpen(selPaymentMethod:selPaymentMethod)
             },boardType: objAnalytics?.board?.boardType ?? 0)
             
-            .presentationDetents([.height(410)])
+            .presentationDetents([.height(615)])
             .presentationDragIndicator(.hidden)
             .presentationCornerRadius(20)   //  THIS
 
@@ -345,7 +332,7 @@ struct BoardAnalyticsView: View {
     }
     
     
-    func paymentGatewayOpen() {
+    func paymentGatewayOpen(selPaymentMethod:SelPaymentMethod) {
 
         paymentGateway = PaymentGatewayCentralized()
         paymentGateway?.planObj = selectedPkgObj
@@ -371,7 +358,8 @@ struct BoardAnalyticsView: View {
                self.paymentGateway = nil
         }
 
-        paymentGateway?.initializeDefaults()
+        paymentGateway?.initializeDefaults(selpaymentMethod: selPaymentMethod)
+
     }
     
     func pushToEditBanner(){

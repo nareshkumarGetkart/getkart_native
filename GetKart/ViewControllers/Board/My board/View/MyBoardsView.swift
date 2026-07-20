@@ -20,45 +20,7 @@ struct MyBoardsView: View {
     @State private var showFilterScreen = false
 
     var body: some View {
-       /* HStack{
-            Button {
-                navigationController?.popViewController(animated: true)
-            } label: {
-                Image("arrow_left").renderingMode(.template)
-                    .foregroundColor(Color(UIColor.label))
-            }
-            
-            Text("My Boards & Ideas").font(.inter(.medium, size: 18))
-            Spacer()
-            
-            
-            Button {
-                showFilterScreen = true
-                
-            } label: {
-                
-                if getFilterAppliedCount() > 0{
-                    HStack{
-                        Text("\(getFilterAppliedCount())").font(.inter(.regular, size: 16)).foregroundColor(Color.gray)
-                        Image("FilterLine")
-                    }
-                }else{
-                    Image("FilterLine")
-                }
-            }
-            
-            
-        }.padding().frame(height:44)
-            .sheet(isPresented: $showFilterScreen) {
-                BoardFilterView(onFilterApplied: {
-                    self.page = 1
-                    getAdsListApi()
-                })
-                .presentationDetents([.height(550)])   // fixed height
-                .presentationDragIndicator(.visible)
-                .cornerRadius(20.0)
-            }
-        */
+ 
         HStack {
             Button {
                 navigationController?.popViewController(animated: true)
@@ -125,8 +87,8 @@ struct MyBoardsView: View {
                 LazyVStack(spacing:10){
                     
                     ForEach(listArray ,id: \.id) { myBroad in
-                        MyBoardCell(itemObj: myBroad,onBoostTapped: { item, plan in
-                            paymentGatewayOpen(selPlan: plan, item: item)
+                        MyBoardCell(itemObj: myBroad,onBoostTapped: { (item, plan,selPaymentMethod) in
+                            paymentGatewayOpen(selPlan: plan, item: item, selPaymentMethod: selPaymentMethod)
                         })
                         
                         .onTapGesture {
@@ -173,11 +135,11 @@ struct MyBoardsView: View {
     
     func pushToBoardAnalytics(myBroad:ItemModel){
         
-        
         let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: myBroad.id ?? 0))
         self.navigationController?.pushViewController(destVC, animated: true)
         
     }
+    
     func loadNextPageIfAllowed() {
         guard
             hasUserScrolled,   //  user actually scrolled
@@ -258,7 +220,9 @@ struct MyBoardsView: View {
         }
     }
     
-    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel) {
+    func paymentGatewayOpen(selPlan: PlanModel,item:ItemModel,selPaymentMethod:SelPaymentMethod) {
+        
+        
         
         paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
         paymentGateway?.planObj = selPlan
@@ -283,8 +247,9 @@ struct MyBoardsView: View {
             //  RELEASE
             self.paymentGateway = nil
         }
+        paymentGateway?.initializeDefaults(selpaymentMethod: selPaymentMethod)
+
         
-        paymentGateway?.initializeDefaults()
     }
 }
 
@@ -292,11 +257,12 @@ struct MyBoardsView: View {
     MyBoardsView(navigationController:nil)
 }
 
+
 struct MyBoardCell:View {
     
     let itemObj:ItemModel
     @State private var showBoostSheet = false
-    var onBoostTapped: (_ item: ItemModel, _ plan: PlanModel) -> Void
+    var onBoostTapped: (_ item: ItemModel, _ plan: PlanModel, _ selPaymentMethod:SelPaymentMethod) -> Void
 
     var body: some View {
         VStack(spacing:0){
@@ -360,7 +326,6 @@ struct MyBoardCell:View {
                                         .cornerRadius(12)
                                         .clipped()
                                         .padding(.trailing,5)
-                                    
                                 }
                                 
                                 HStack{
@@ -497,14 +462,14 @@ struct MyBoardCell:View {
             }
             
         } .sheet(isPresented: $showBoostSheet) {
-            BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { selPkgObj in
-                onBoostTapped(itemObj,selPkgObj)
+            BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { (selPkgObj,selPaymentMethod) in
+                onBoostTapped(itemObj,selPkgObj,selPaymentMethod)
             },boardType: itemObj.boardType ?? 0)
             
-            .presentationDetents([.height(410)])
+            .presentationDetents([.height(615)])
             .presentationDragIndicator(.hidden)
-            .presentationCornerRadius(20)   //  THIS
-            .presentationBackground(Color(.systemBackground)) // ✅ sheet background
+            .presentationCornerRadius(20)
+            .presentationBackground(Color(.systemBackground)) //sheet background
             
         }
     }

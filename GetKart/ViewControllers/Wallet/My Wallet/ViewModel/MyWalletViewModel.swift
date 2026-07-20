@@ -10,7 +10,7 @@ import Foundation
 
 class MyWalletViewModel:ObservableObject{
     
-    @Published var balance:String = "0"
+    @Published var walletObj:WalletModal?
     
      init(){
          getMyWalletBalance()
@@ -18,21 +18,12 @@ class MyWalletViewModel:ObservableObject{
     
     func getMyWalletBalance(){
         
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.get_wallet_balance, param: nil, methodType:.get, showLoader: true) {[weak self] responseObject, error in
+        ApiHandler.sharedInstance.makeGetGenericData(isToShowLoader: true, url: Constant.shared.get_wallet_balance) { (obj:WalletResponse) in
             
-            if error == nil{
+            if obj.code == 200{
                 
-                if let result = responseObject{
-                    if let data = result["data"] as? Dictionary<String,Any>{
-                        self?.balance = data["balance"] as? String ?? "0"
-                        let  total_added = data["total_added"] as? String ?? "0"
-                    }
-                }
-            }else{
-                
+                self.walletObj = obj.data
             }
-            
         }
-        
     }
 }

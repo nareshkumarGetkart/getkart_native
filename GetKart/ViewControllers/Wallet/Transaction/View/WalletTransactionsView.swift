@@ -16,12 +16,15 @@ struct WalletTransactionsView: View {
     var body: some View {
         VStack(spacing: 0) {
 
-            // ── Custom header (matches your app-wide HeaderView pattern) ──
             HeaderView(navigation: navigation, title: "Wallet History")
 
             // ── Page content ──
             ZStack {
-                Color(hex: "#F5F6FA").ignoresSafeArea()
+                if getThemeSelected() == .light{
+                    Color(hex: "#F5F6FA").ignoresSafeArea()
+                }else{
+                    Color(.systemGray5).ignoresSafeArea()
+                }
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
@@ -31,7 +34,7 @@ struct WalletTransactionsView: View {
                             balance:    transactionObj.currentBalance,
                             totalAdded: transactionObj.totalAdded
                         )
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 10)
 
                         // Filter tabs
                         if #available(iOS 17.0, *) {
@@ -50,22 +53,27 @@ struct WalletTransactionsView: View {
                         VStack(spacing: 10) {
                             if transactionObj.transacrions.isEmpty {
                                 VStack(spacing: 12) {
-                                    Image(systemName: "tray")
-                                        .font(.system(size: 40))
+                                    Image("no_data_found_illustrator")
+                                        .font(.system(size: 70))
                                         .foregroundColor(Color(hex: "#D1D5DB"))
                                     Text("No transactions found")
-                                        .font(.system(size: 15))
+                                        .font(.inter(.regular,size: 15))
                                         .foregroundColor(Color(hex: "#9CA3AF"))
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.top, 40)
                             } else {
-                                ForEach(transactionObj.transacrions) { txn in
+                                ForEach(transactionObj.transacrions,id: \.id) { txn in
                                     WalletTransactionRowView(transaction: txn)
+                                        .onAppear{
+                                            if txn.id == transactionObj.transacrions.last?.id {
+                                                loadNextPageIfAllowed()
+                                            }
+                                        }
                                 }
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 10)
                         .padding(.bottom, 30)
                     }
                     .padding(.top, 16)
@@ -74,6 +82,22 @@ struct WalletTransactionsView: View {
         }
         // Hides the system navigation bar so HeaderView is the only header
         .navigationBarHidden(true)
+    }
+    
+    func loadNextPageIfAllowed() {
+        guard
+            !transactionObj.isDataLoading,
+            transactionObj.hasMoreData
+        else { return }
+        
+        transactionObj.getWalletHistory()
+    }
+    
+    func getThemeSelected() ->AppTheme{
+        
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        return theme
     }
 }
 
@@ -84,8 +108,8 @@ struct WalletTransactionsView: View {
 
 
 struct WalletBalanceCardView: View {
-    let balance: String
-    let totalAdded: String
+    let balance: Int
+    let totalAdded: Int
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -111,6 +135,7 @@ struct WalletBalanceCardView: View {
                     }
                     .stroke(Color.white.opacity(0.35), lineWidth: 1)
                 }
+              
                 ForEach(0..<rowCount, id: \.self) { row in
                     Path { path in
                         let y = CGFloat(row) * (geo.size.height / CGFloat(rowCount - 1))
@@ -124,11 +149,11 @@ struct WalletBalanceCardView: View {
             // Text content
             VStack(alignment: .leading, spacing: 8) {
                 Text("Current Balance")
-                    .font(.system(size: 15, weight: .regular))
+                    .font(.inter(.regular,size: 15))
                     .foregroundColor(Color(hex: "#8A7560"))
 
                 Text("₹\(balance)")
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.inter(.bold,size: 36))
                     .foregroundColor(Color(hex: "#1A1206"))
 
                 Spacer()
@@ -138,7 +163,7 @@ struct WalletBalanceCardView: View {
                         .fill(Color(hex: "#8A7560"))
                         .frame(width: 7, height: 7)
                     Text("Total Added: ₹\(totalAdded)")
-                        .font(.system(size: 14))
+                        .font(.inter(.regular,size: 14))
                         .foregroundColor(Color(hex: "#5C4A30"))
                 }
             }
@@ -166,11 +191,13 @@ struct WalletFilterTabsView: View {
                         }
                     } label: {
                         Text(tab.rawValue)
-                            .font(.system(size: 14, weight: selected == tab ? .semibold : .regular))
-                            .foregroundColor(selected == tab ? .white : Color(hex: "#6B7280"))
+                           // .font(.system(size: 14, weight: selected == tab ? .semibold : .regular))
+                        
+                            .font(.inter(((selected == tab) ? .semiBold : .regular),size: 14))
+                            .foregroundColor(selected == tab ? .primary : Color(hex: "#6B7280"))
                             .padding(.horizontal, 18)
                             .padding(.vertical, 10)
-                            .background(selected == tab ? Color(hex: "#F4A623") : Color.white)
+                            .background(selected == tab ? Color(hex: "#F4A623") : Color(.systemBackground))
                             .clipShape(Capsule())
                             .overlay(
                                 Capsule().stroke(
@@ -182,7 +209,7 @@ struct WalletFilterTabsView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 10)
         }
     }
 }
@@ -191,18 +218,18 @@ struct WalletFilterTabsView: View {
 
 struct WalletTransactionRowView: View {
     let transaction: WalletTransaction
-
+    
     private var amountColor: Color {
         transaction.type == "credit" ? Color(hex: "#2DB87A") : Color(hex: "#E84646")
     }
     private var amountText: String {
         let prefix = transaction.type == "credit" ? "+" : "-"
-//        return "\(prefix)₹\(String(format: "%.2f", transaction.amount))"
+        //        return "\(prefix)₹\(String(format: "%.2f", transaction.amount))"
         
         return "\(prefix)₹\(transaction.amount)"
-
+        
     }
-
+    
     var body: some View {
         HStack(spacing: 14) {
             // Icon circle
@@ -216,52 +243,61 @@ struct WalletTransactionRowView: View {
                     .frame(width: 46, height: 46)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.inter(.medium,size: 18))
                     .foregroundColor(type.iconColor)
             }
-
+            
             // Title + TxnID
             VStack(alignment: .leading, spacing: 3) {
                 Text(transaction.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(hex: "#111827"))
-                Text("Txn ID: \(transaction.txnID)")
-                    .font(.system(size: 12))
-                    .foregroundColor(Color(hex: "#9CA3AF"))
+                    .font(.inter(.medium,size: 15))
+                //.foregroundColor(Color(hex: "#111827"))
+                if (self.transaction.paymentTransactionID != nil){
+                    Text("Txn ID: \(transaction.txnID)")
+                        .font(.inter(.regular,size: 12))
+                        .foregroundColor(Color(hex: "#9CA3AF"))
+                }else{
+                    Text("Credited on")
+                        .font(.inter(.regular,size: 12))
+                        .foregroundColor(Color(hex: "#9CA3AF"))
+                }
             }
-
+            
             Spacer()
-
+            
             // Amount + date + badge
             VStack(alignment: .trailing, spacing: 4) {
                 Text(amountText)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.inter(.bold,size: 15))
                     .foregroundColor(amountColor)
-
-                Text("\(transaction.createdAt.formattedDate) • \(transaction.createdAt.formattedTime)")
-                    .font(.system(size: 11))
-                    .foregroundColor(Color(hex: "#9CA3AF"))
-
                 
-                Text(transaction.status)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(getStatusColor(status: transaction.status))
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 3)
-                    .background(getStatusColor(status: transaction.status).opacity(0.12))
-                    .clipShape(Capsule())
+                Text("\(transaction.createdAt.formattedDate) • \(transaction.createdAt.formattedTime)")
+                    .font(.inter(.regular,size: 11))
+                    .foregroundColor(Color(hex: "#9CA3AF"))
+                
+                if (self.transaction.paymentTransactionID != nil){
+                    
+                    Text(transaction.status)
+                    //.font(.system(size: 10, weight: .semibold))
+                        .font(.inter(.semiBold,size: 10))
+                        .foregroundColor(getStatusColor(status: transaction.status))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 3)
+                        .background(getStatusColor(status: transaction.status).opacity(0.12))
+                    //.clipShape(Capsule())
+                        .cornerRadius(5)
+                }
                 
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.04), radius: 6, x: 0, y: 2)
     }
     
     func getStatusColor(status:String) -> Color{
-        
         
         if status == "success"{
             return Color(hex: "#2DB87A")
@@ -270,7 +306,6 @@ struct WalletTransactionRowView: View {
         }else if status == "failed"{
             return Color(hex: "#E84646")
         }
-   
         return Color.black
     }
 }

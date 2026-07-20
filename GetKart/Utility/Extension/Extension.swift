@@ -525,6 +525,7 @@ extension String {
         let rect = text.boundingRect(with: size, options:.usesLineFragmentOrigin, attributes: attributes, context:nil)
         return rect.size.height
     }
+    
     func trim() -> String
     {
         return self.trimmingCharacters(in: CharacterSet.whitespaces)
@@ -765,3 +766,22 @@ extension Double{
     }
 
 }
+
+
+
+//MARK: String
+
+extension String {
+    func htmlAttributedString() -> NSAttributedString? {
+        guard let data = self.data(using: .utf8) else {
+            return nil
+        }
+
+        return try? NSAttributedString(
+            data: data,
+            options: [.documentType: NSAttributedString.DocumentType.html],
+            documentAttributes: nil
+        )
+    }
+}
+

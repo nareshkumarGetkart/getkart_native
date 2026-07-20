@@ -52,8 +52,9 @@ enum TransactionType {
 // MARK: - Filter Tab
 
 enum WalletFilterTab: String, CaseIterable {
+    
     case all        = "All"
-    case successful = "Successfull"
+    case successful = "Successful"
     case pending    = "Pending"
     case failed     = "Failed"
 }

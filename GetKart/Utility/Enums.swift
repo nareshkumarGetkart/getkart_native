@@ -9,9 +9,12 @@ import Foundation
 
 
 enum PaymentMethod: Int {
+   
     case phonePe = 3
     case applePay = 1
     case payUPay = 4
+    
+    case wallet = 100
 
     var title: String {
         switch self {
@@ -21,6 +24,8 @@ enum PaymentMethod: Int {
             return "apple"
         case .payUPay:
             return "Payu"
+        case .wallet:
+            return "wallet"
         }
     }
 }

@@ -9,8 +9,6 @@ import Foundation
 
 
 
-
-
 func isValidName(testStr:String) -> Bool {
     guard testStr.count > 1, testStr.count < 35 else { return false }
     
@@ -61,6 +59,3 @@ func calcAge(birthday: String) -> Int {
     let age = calcAge.year
     return age!
 }
-
-
-

@@ -370,9 +370,8 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
             
             cell.lblTitle.text = titleArray[indexPath.row]
             cell.imgVwIcon.image = UIImage(named: iconArray[indexPath.row])
-            cell.imgVwIcon.setImageTintColor(color: Themes.sharedInstance.themeColor)
             
-            let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+         /*   let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
             let theme = AppTheme(rawValue: savedTheme) ?? .system
             
            if theme == .dark{
@@ -380,7 +379,35 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
 
             }else{
                 cell.bgviewIcon.backgroundColor = UIColor(hexString: "#FFF7EA")
-            }  
+            }
+            */
+            
+            
+        
+            
+            
+            
+            
+            let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+            let theme = AppTheme(rawValue: savedTheme) ?? .system
+
+            
+            if titleArray[indexPath.row] == "My Wallet" {
+
+                cell.bgviewIcon.backgroundColor = UIColor(hexString: "#EEF7FF")
+
+            } else {
+
+                cell.bgviewIcon.backgroundColor = (theme == .dark)
+                    ? UIColor(hexString: "#3B3124")
+                    : UIColor(hexString: "#FFF6E7")
+                cell.imgVwIcon.setImageTintColor(color: Themes.sharedInstance.themeColor)
+
+            }
+
+            cell.bgviewIcon.layer.cornerRadius = 12
+            cell.bgviewIcon.clipsToBounds = true
+
             
             if titleArray[indexPath.row] == "Dark Theme"{
                 

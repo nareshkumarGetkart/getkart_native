@@ -10,6 +10,7 @@ import SwiftUI
 
 // MARK: - Color Extensions
 extension Color {
+    
     static let brandOrange = Color(red: 230/255, green: 150/255, blue: 30/255)
     static let brandOrangeLight = Color(red: 253/255, green: 235/255, blue: 200/255)
     static let promoBackground = Color(red: 235/255, green: 230/255, blue: 255/255)
@@ -23,20 +24,24 @@ extension Color {
 struct MyWalletView: View {
     var navigation: UINavigationController?
 
-    @State private var addAmount: String = "2000"
-    @State private var selectedAmount: Int? = 2000
-
-    let quickAmounts = [500, 1000, 2000, 5000]
+    @State private var addAmount: String = ""
+    @State private var selectedAmount: Int? = 0
+    @State private var quickAmounts = [500, 1000, 2000, 5000]
     
-    @StateObject private var walletObj = MyWalletViewModel()
+    @StateObject private var walletVM = MyWalletViewModel()
     @State private var paymentGateway: PaymentGatewayCentralized?
     @State private var showSheet = false
+    @State private var termsSheet = false
+    
     
     var body: some View {
         VStack(spacing: 0) {
 
             // Custom Header (matches your app-wide HeaderView pattern)
             HeaderView(navigation: navigation, title: "My Wallet")
+            .onDisappear{
+                    termsSheet = false
+            }
 
             // Divider
             Divider()
@@ -45,7 +50,7 @@ struct MyWalletView: View {
                 VStack(spacing: 16) {
 
                     // Balance Card
-                    BalanceCard(availableAmt: walletObj.balance) {
+                    BalanceCard(availableAmt: walletVM.walletObj?.balance ?? 0) {
                         self.pushToHistoryButtonAction()
                     }
 
@@ -56,15 +61,20 @@ struct MyWalletView: View {
                         quickAmounts: quickAmounts,
                         onSumbitToAddAmount: {
                             print("selected Amount == \(addAmount) to add")
-                            paymentGatewayOpen()
+                            if let amt = Int(addAmount),amt > 0 {
+                                paymentGatewayOpen()
+
+                            }
                         }
                     )
 
                     // Promo Banner
-                    PromoBanner()
+                    if (walletVM.walletObj?.bonusAmount ?? 0) > 0{
+                        PromoBanner(bonusAmount: walletVM.walletObj?.bonusAmount ?? 0)
+                    }
 
                     // Ad Banner
-                    AdBanner()
+                    AdBanner(bannerImg: walletVM.walletObj?.banner ?? "")
 
                     // How It Works
                     HowItWorksRow(onClickOfRow: {
@@ -75,23 +85,68 @@ struct MyWalletView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 32)
             }
-            .background(Color(UIColor.systemGroupedBackground))
+            .background((getThemeSelected() == .light) ? Color(UIColor.systemGroupedBackground) : Color(.systemGray5))
         }
         .navigationBarHidden(true)
-        .ignoresSafeArea(edges: .bottom)
+       
         .sheet(isPresented: $showSheet) {
-
-            WalletInfoSheetView()
-                .presentationDetents([.fraction(0.72)])
-                .presentationDragIndicator(.hidden)
-                .presentationCornerRadius(28)
+            
+            WalletInfoSheetView(points:walletVM.walletObj?.howItWorks ?? [],
+                                termsClick: {
+                showSheet = false
+                termsSheet = true
+            })
+            .presentationDetents([.fraction(0.67)])
+            .presentationDragIndicator(.hidden)
+            .presentationCornerRadius(20)
+            .presentationBackground(Color(.systemBackground)) //sheet background
         }
+        
+        .sheet(isPresented: $termsSheet) {
+            
+            WalletInfoSheetView(points:walletVM.walletObj?.bonusAmountTermsCondition ?? [],
+                                termsClick: {
+                
+            },isTerms: true)
+            .presentationDetents([.fraction(0.85)])
+            .presentationDragIndicator(.hidden)
+            .presentationCornerRadius(20)
+            .presentationBackground(Color(.systemBackground)) //sheet background
+        }
+        
+        .onChange(of: walletVM.walletObj?.bonusAmount) { bonus in
+            if selectedAmount == 0 && (bonus ?? 0) > 0 {
+                updateArrayWithCheck()
+            }
+        }
+        .ignoresSafeArea(edges: .bottom)
     }
     
     
+    func getThemeSelected() ->AppTheme{
+        
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        return theme
+    }
+    
+    func updateArrayWithCheck() {
+        
+        guard let bonus = walletVM.walletObj?.bonusAmount, bonus > 0 else { return }
+
+        selectedAmount = bonus
+        addAmount = "\(bonus)"
+
+        if !quickAmounts.contains(bonus) {
+            let index = quickAmounts.firstIndex(where: { $0 > bonus }) ?? quickAmounts.endIndex
+            quickAmounts.insert(bonus, at: index)
+        }
+    }
+    
+   
     func paymentGatewayOpen() {
         
-        paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
+        paymentGateway = PaymentGatewayCentralized()
         paymentGateway?.planObj = nil
         paymentGateway?.paymentFor = .wallet
         paymentGateway?.amount = Int(addAmount) ?? 0
@@ -100,7 +155,8 @@ struct MyWalletView: View {
             if isSuccess {
                 addAmount = ""
                 selectedAmount = 0
-                self.walletObj.getMyWalletBalance()
+                
+                self.walletVM.getMyWalletBalance()
                 let vc = UIHostingController(
                     rootView: PlanBoughtSuccessView(
                         navigationController: self.navigation,paymentType:.wallet
@@ -124,55 +180,81 @@ struct MyWalletView: View {
         self.navigation?.pushViewController(vc, animated: true)
     }
     
-    
 }
 
 // MARK: - Balance Card
 struct BalanceCard: View {
-    let availableAmt:String
-    let clickOnHistor:()->Void
+
+    let availableAmt: Int
+    let clickOnHistor: () -> Void
+
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.brandOrangeLight, lineWidth: 1.5)
+
+        VStack(spacing: 0) {
+
+            // Header
+            ZStack {
+
+                LinearGradient(
+                    stops: [
+                        .init(color: Color(red: 255/255, green: 248/255, blue: 238/255), location: 0),
+                        .init(color: Color(red: 255/255, green: 236/255, blue: 205/255), location: 0.45),
+                        .init(color: Color(red: 255/255, green: 220/255, blue: 170/255), location: 1)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
                 )
 
-            VStack(spacing: 6) {
+                // Center title
                 Text("Available Balance")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.textSecondary)
-                    .padding(.top, 20)
+                    .font(.inter(.semiBold,size: 18.0))
+                    .foregroundColor(.black)
+
+                // Top-right History
+                VStack {
+                    HStack {
+
+                        Spacer()
+
+                        Button(action: clickOnHistor) {
+                            HStack(spacing: 3) {
+                                Text("History")
+                                    .font(.inter(.medium,size: 13.0))
+                                Image(systemName: "clock.arrow.circlepath")
+                                .font(.inter(.medium,size: 12.0))                            }
+                            .foregroundColor(.black)
+                        }
+                    }
+
+                    Spacer()
+                }
+                .padding(.top, 12)
+                .padding(.trailing, 14)
+            }
+            .frame(height: 68)
+
+            Divider()
+
+            // Balance
+            VStack {
 
                 Text("₹\(availableAmt)")
-                    .font(.system(size: 44, weight: .bold))
-                    .foregroundColor(.black)
-                    .padding(.bottom, 20)
+                    .font(.inter(.bold,size: 42.0))
+                    .foregroundColor(.primary)
+                    .padding(.vertical, 22)
+
             }
             .frame(maxWidth: .infinity)
+            .background(Color(.systemBackground))
 
-            // History button
-            Button(action: {
-                clickOnHistor()
-                
-            }) {
-                HStack(spacing: 4) {
-                    Text("History")
-                        .font(.system(size: 13, weight: .medium))
-                    Image(systemName: "clock")
-                        .font(.system(size: 12))
-                }
-                .foregroundColor(.textSecondary)
-                .padding(.top, 14)
-                .padding(.trailing, 16)
-            }
         }
-        .frame(maxWidth: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                //.stroke(Color.gray.opacity(0.22), lineWidth: 1)
+                .stroke(Color.borderGray, lineWidth: 1)
+        )
     }
-    
-    
 }
 
 // MARK: - Add Amount Card
@@ -183,10 +265,10 @@ struct AddAmountCard: View {
     let onSumbitToAddAmount:()->Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 15) {
 
             // Amount Input
-            VStack(alignment: .leading, spacing: 4) {
+           /* VStack(alignment: .leading, spacing: 4) {
                 Text("Add amount *")
                     .font(.system(size: 12, weight: .regular))
                     .foregroundColor(.textSecondary)
@@ -206,7 +288,54 @@ struct AddAmountCard: View {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.borderGray, lineWidth: 1)
                 )
-            }
+                */
+                
+                ZStack(alignment: .topLeading) {
+
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.borderGray)
+
+                    Text("Add amount *")
+                        .font(.inter(.regular,size: 13.0))
+                        .foregroundColor(.textSecondary)
+                        .padding(.horizontal, 8)
+                        .background(Color(.systemBackground))
+                        .offset(x: 18, y: -8)
+
+                    HStack(spacing:8){
+
+                        Text("₹")
+                            .font(.inter(.medium,size: 15.0))
+                        TextField("", text: $addAmount)
+                            .keyboardType(.numberPad)
+                            .font(.title3)
+                            .onChange(of: addAmount) { newValue in
+
+                                    // Allow only digits
+                                    let filtered = newValue.filter { $0.isNumber }
+
+                                    // Limit to 6 digits (100000)
+                                    let limited = String(filtered.prefix(6))
+
+                                    if let amount = Int(limited) {
+                                        if amount > 100000 {
+                                            addAmount = "100000"
+                                        } else {
+                                            addAmount = limited
+                                        }
+                                    } else {
+                                        addAmount = limited
+                                    }
+                                }
+
+                    }
+                    .padding(.horizontal,18)
+                    .padding(.top,18)
+                }
+                .frame(height:55)
+                
+                
+           // }
 
             // Quick Select Amounts
             HStack(spacing: 10) {
@@ -226,24 +355,37 @@ struct AddAmountCard: View {
             Button(action: {
                 
                 if addAmount.trim().count > 0{
+                    UIApplication.shared.endEditing()
                     onSumbitToAddAmount()
                 }
               
             }) {
                 Text("Add Balance")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.inter(.semiBold,size: 16.0))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background( addAmount.isEmpty ? Color.gray : Color.brandOrange)
-                    .cornerRadius(12)
-                    .disabled(addAmount.isEmpty)
+                    .background((addAmount.isEmpty || addAmount.hasPrefix("0")) ? Color.gray : Color.brandOrange)
+                    .cornerRadius(8)
+                    .disabled(addAmount.isEmpty || addAmount.hasPrefix("0"))
             }
         }
         .padding(16)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.04), radius: 6, x: 0, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                //.stroke(Color.gray.opacity(0.22), lineWidth: 1)
+                .stroke(Color.borderGray, lineWidth: 1)
+        )
+    }
+    
+    func getThemeSelected() ->AppTheme{
+        
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        return theme
     }
 }
 
@@ -256,11 +398,16 @@ struct QuickAmountButton: View {
     var body: some View {
         Button(action: action) {
             Text("\(amount)")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(isSelected ? .brandOrange : .black)
+                .font(.inter(.medium,size: 14.0))
+                .foregroundColor(isSelected ? .brandOrange : .primary)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color.white)
+                .padding(.vertical, 12)
+                //.background(Color.white)
+                .background(
+                    isSelected
+                    ? Color(red:255/255, green:247/255, blue:236/255)
+                    : Color(.systemBackground)
+                )
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -275,84 +422,58 @@ struct QuickAmountButton: View {
 
 // MARK: - Promo Banner
 struct PromoBanner: View {
+    
+    let bonusAmount:Int
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(spacing: 12) {
             Text("🎁")
-                .font(.system(size: 28))
+                .font(.system(size: 30))
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Add ₹2,000 and above to get")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.black)
-
-                Text("Double Wallet Balance instantly!")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.purpleAccent)
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading,spacing:1){
+                    Text("Add ₹\(bonusAmount) and above to get")
+                        .font(.inter(.medium,size: 13.0))
+                        .foregroundColor(.black)
+                    
+                    Text("Double Wallet Balance instantly!")
+                        .font(.inter(.semiBold,size: 13.0))
+                    // .foregroundColor(.black)
+                        .foregroundColor(Color(hex:"#6d1797"))
+                        .foregroundColor(.purpleAccent)
+                }
 
                 Text("Enjoy 100% bonus credit on every eligible top-up.")
-                    .font(.system(size: 12))
-                    .foregroundColor(.textSecondary)
+                    .font(.inter(.regular,size: 12.0))
+                    .foregroundColor(.black)
+                    .foregroundColor(.textSecondary)//.padding(.top,8)
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.promoBackground)
         .cornerRadius(14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                //.stroke(Color.gray.opacity(0.22), lineWidth: 1)
+                .stroke(Color.borderGray, lineWidth: 1)
+        )
+        
     }
 }
 
+import Kingfisher
+
 // MARK: - Ad Banner
 struct AdBanner: View {
+    let bannerImg:String
     var body: some View {
-        ZStack(alignment: .leading) {
-            // Gradient background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(red: 0.85, green: 0.88, blue: 1.0),
-                    Color(red: 0.75, green: 0.65, blue: 0.95)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .cornerRadius(16)
-
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Small or big,")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.35))
-                    Text("every business")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.35))
-                    HStack(spacing: 4) {
-                        Text("can ")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.35))
-                        Text("grow")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.purpleAccent)
-                            .underline()
-                        Text(" with us.")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.35))
-                    }
-
-                    Spacer().frame(height: 8)
-
-                    HStack(spacing: 12) {
-                        AdFeaturePill(icon: "rocket", label: "Grow Faster")
-                        AdFeaturePill(icon: "person.2", label: "Reach More")
-                    }
-                    HStack(spacing: 12) {
-                        AdFeaturePill(icon: "chart.bar", label: "Boost Sales")
-                        AdFeaturePill(icon: "hand.thumbsup", label: "Trusted Support")
-                    }
-                }
-                .padding(.leading, 16)
-                .padding(.vertical, 18)
-
-                Spacer()
+        HStack {
+            KFImage(URL(string: bannerImg)).onSuccess { result in
+                
             }
+            .resizable()
+            .scaledToFill()
+            .clipped()
         }
         .frame(maxWidth: .infinity)
         .frame(height: 160)
@@ -391,8 +512,8 @@ struct HowItWorksRow: View {
                     .padding(.leading, 4)
 
                 Text("How it works")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.black)
+                    .font(.inter(.medium,size: 15.0))
+                    .foregroundColor(.primary)
 
                 Spacer()
 
@@ -402,10 +523,23 @@ struct HowItWorksRow: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 18)
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(14)
-            .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 1)
+            .shadow(color: Color.primary.opacity(0.04), radius: 4, x: 0, y: 1)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    //.stroke(Color.gray.opacity(0.22), lineWidth: 1)
+                    .stroke(Color.borderGray, lineWidth: 1)
+            )
         }
+    }
+    
+    
+    func getThemeSelected() ->AppTheme{
+        
+        let savedTheme = UserDefaults.standard.string(forKey: LocalKeys.appTheme.rawValue) ?? AppTheme.system.rawValue
+        let theme = AppTheme(rawValue: savedTheme) ?? .system
+        return theme
     }
 }
 

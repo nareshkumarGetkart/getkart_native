@@ -19,6 +19,7 @@ import PayUCommonUI
 import FacebookAEM
 import FacebookCore
 
+
 class PaymentGatewayCentralized{
    
     var callbackPaymentSuccess: ((_ isSuccess: Bool) -> Void)?
@@ -53,22 +54,37 @@ class PaymentGatewayCentralized{
     var itemId:Int?
     var selectedPlanId = 0
     var selIOSProductID = ""
-    
     var amount:Int = 0
+
+    var selectedMedia:PromotionMediaType?
     
     //MARK: Initialization Methods
-    func initializeDefaults(){
+    func initializeDefaults(selpaymentMethod:SelPaymentMethod = .other){
         if selectedPlanId == 0{
             //Done this because not want to add dependency of passing planmodel object only id is sufficient
             selectedPlanId = planObj?.id ?? 0
             selIOSProductID = planObj?.iosProductID ?? ""
         }
-        getPaymentSettings()
+        
+        if selpaymentMethod == .wallet{
+            if paymentFor == .boostBoard{
+                //By wallet amount boostor purchase
+                purchaseByWallet()
+            }else if paymentFor == .bannerPromotion{
+                getIntentForBannerPromotions(package_id: selectedPlanId, isWalletPayment: true)
+            }else if paymentFor == .bannerPromotionDraft{
+                revokeCampaignPaymentApi(package_id: selectedPlanId,isWalletPayment: true)
+
+            }
+       
+        }else{
+            getPaymentSettings()
+        }
     }
+    
   
     //MARK: Methods
   private  func getPaymentSettings(){
-        
     
        FaceBookAppEvents.facebookEvents(type: .payment, categoryName: "",amount: planObj?.finalPrice ?? "")
 
@@ -188,10 +204,9 @@ class PaymentGatewayCentralized{
           }
       }
     }
-    
         
-        private func updateOrderApi(order_status:Bool=true){
-
+       
+    private func updateOrderApi(order_status:Bool=true){
         
         let campaignBannerId = (campaign_banner_id ?? 0) > 0 ? "\(campaign_banner_id ?? 0)" : ""
         var params:Dictionary<String, Any> = ["merchantOrderId":self.paymentIntentId,"campaign_banner_id":campaignBannerId,"order_status":order_status]
@@ -223,11 +238,7 @@ class PaymentGatewayCentralized{
                         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
                     }
                     self.callbackPaymentSuccess?(true)
-//                    if self.sheetViewController?.options.useInlineMode == true {
-//                        self.sheetViewController?.attemptDismiss(animated: true)
-//                    } else {
-//                        self.dismiss(animated: true, completion: nil)
-//                    }
+
                 }else{
                     AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
                 }
@@ -236,11 +247,8 @@ class PaymentGatewayCentralized{
         
     }
     
-    
-
-  
-    
-    private func revokeCampaignPaymentApi(package_id:Int){
+      
+   /* private func revokeCampaignPaymentApi(package_id:Int){
         
         var params = ["banner_id":banner_id,"package_id":selectedPlanId,"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
 
@@ -296,8 +304,82 @@ class PaymentGatewayCentralized{
                 }
             }
         }
+    }*/
+    
+    
+    private func revokeCampaignPaymentApi(package_id:Int,isWalletPayment:Bool = false){
+        
+        var params = ["banner_id":banner_id,"package_id":(planObj?.id ?? ""),"payment_transaction_id":payment_transaction_id,"platform_type":"app"] as [String : Any]
+
+        if isWalletPayment{
+            //For Wallet payment
+            params["payment_method"] = "wallet"
+
+        }else if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
+        
+        URLhandler.sharedinstance.makeCall(url:  Constant.shared.revoke_campaign_payment, param: params, showLoader: true) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+            
+                
+                if code == 200{
+                    if isWalletPayment{
+                        //Wallet payment go back
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        self?.callbackPaymentSuccess?(true)
+                    }else{
+                        
+                    if let dataDict = result["data"] as? Dictionary<String, Any> {
+                        
+                        if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                            self?.campaign_banner_id = campaign_banner_id
+                        }
+                        
+                        if self?.payment_method_type == 1{
+                            
+                            self?.IAPPaymentForm(order_id: "", user_id: 0, id: 0)
+                            
+                        }else if self?.payment_method_type == 2{
+                            
+                        }else{
+                            
+                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                                
+                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    //phone pe
+                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                    let token  = payment_gateway_response["token"] as? String ?? ""
+                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                }
+                            }
+                            
+                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                //payu
+                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                self?.openPayuMoney(order_id: order_id, amount: amount)
+                            }
+                        }
+                    }
+                }
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+
+                }
+            }
+        }
     }
 
+/*
     
     private func getIntentForBannerPromotions(package_id:Int){
 
@@ -308,6 +390,7 @@ class PaymentGatewayCentralized{
             params["payment_method"] = method.title
         }
         guard let img = selectedImage?.wxCompress() else{ return }
+        
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: img, imageName: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
             
             if error == nil {
@@ -350,29 +433,84 @@ class PaymentGatewayCentralized{
                 }
             }
         }
+    }*/
+    
+    private func getIntentForBannerPromotions(package_id:Int,isWalletPayment:Bool = false){
+        
+        var params = ["package_id":(planObj?.id ?? ""),"status":"active","type":"redirect","url":strUrl,"platform_type":"app"] as [String : Any]
+        
+        if isWalletPayment{
+            //For Wallet payment
+            params["payment_method"] = "wallet"
+
+        }else if let method = PaymentMethod(rawValue: self.payment_method_type) {
+            params["payment_method"] = method.title
+        }
+        var selImg:UIImage?
+        var videoUrl:URL?
+        
+        if case .image(let image) = selectedMedia {
+            selImg = image.wxCompress()
+        }
+        
+        if case .video(let video) = selectedMedia {
+            videoUrl = video
+        }
+        
+        
+        URLhandler.sharedinstance.uploadMediaWithParameters(profileImg: selImg, imageKey: "image", videoURL: videoUrl, videoKey: "image", url: Constant.shared.campaign_payment_intent, params: params) {[weak self] responseObject, error in
+            
+            if error == nil {
+                let result = responseObject! as NSDictionary
+                let code = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                
+                if code == 200{
+                    
+                    if isWalletPayment{
+                        //Wallet payment go back
+                       
+                        self?.callbackPaymentSuccess?(true)
+                    }else{
+                        if let dataDict = result["data"] as? Dictionary<String, Any> {
+                            
+                            if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                                self?.campaign_banner_id = campaign_banner_id
+                            }
+                            
+                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                //phone pe
+                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                                
+                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                    
+                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                    let token  = payment_gateway_response["token"] as? String ?? ""
+                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                }
+                            }
+                            
+                            
+                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                //payu
+                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                self?.openPayuMoney(order_id: order_id, amount: amount)
+                            }
+                        }
+                    }
+                    
+                }else{
+                    
+                    AlertView.sharedManager.showToast(message: message)
+                    
+                }
+            }
+        }
+        
     }
-    
-    
-  /*  curl --location 'https://admin.gupsup.com/api/v1/campaign-payment-intent' \
-    --header 'Authorization: Bearer 36916|d4AUyGpAiRXqMeXmFI1Y2MxDMs3uWTqVFPoYbWfn5cbd09d4' \
-    --header 'Accept: application/json' \
-    --form 'image=@"/home/khusyal/Desktop/error_17382998.png"' \
-    --form 'country="India"' \
-    --form 'state="Maharashtra"' \
-    --form 'city="Mumbai"' \
-    --form 'area="Andheri East"' \
-    --form 'pincode="400059"' \
-    --form 'latitude="19.1136"' \
-    --form 'longitude="72.8697"' \
-    --form 'radius="15"' \
-    --form 'type="redirect"' \
-    --form 'url="https://example.com/job-promotions"' \
-    --form 'status="active"' \
-    --form 'city="Delhi"' \
-    --form 'package_id="516"' \
-    --form 'payment_method="PhonePe"'
-     
-    */
     
     
     private func createPhonePayOrder(package_id:Int){
@@ -616,6 +754,49 @@ class PaymentGatewayCentralized{
 
 
 extension PaymentGatewayCentralized{
+    
+    
+    //MARK: Wallet Boost Api
+    func purchaseByWallet(){
+        
+        var params:Dictionary<String, Any> = ["package_id":selectedPlanId]
+      
+        if let id = itemId{
+            params["item_id"] = id
+        }
+        if let id = campaign_banner_id{
+            params["campaign_banner_id"] = id
+        }
+       
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.purchase_by_wallet, param: params, methodType: .post,showLoader:true) { [weak self] responseObject, error in
+            
+            if(error != nil)
+            {
+                //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                print(error ?? "defaultValue")
+                
+            }else{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                let message = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                    if let postItemId = self?.itemId{
+                        //Post notification to update screens
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.refreshAdsScreen.rawValue), object: nil, userInfo: nil)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationKeys.boardBoostedRefresh.rawValue), object:  ["boardId":postItemId], userInfo: nil)
+                    }
+                    self?.callbackPaymentSuccess?(true)
+
+                }else{
+                    AlertView.sharedManager.displayMessageWithAlert(title: "", msg: message)
+                }
+            }
+        }
+    }
+    
     //MARK: Wallet
     
     func createPayuWalletPaymentIntent(){
@@ -707,7 +888,6 @@ extension PaymentGatewayCentralized{
                             self?.openPayuMoney(order_id: order_id, amount: amount)
 
                         }
-                        
                     }
                     
                     
@@ -747,8 +927,13 @@ extension PaymentGatewayCentralized{
  */
         var strUdf1Val = "t-\(paymentIntentId)-p-\(selectedPlanId)-item-"
         
+        
         if let postItemId = itemId{
              strUdf1Val = "t-\(paymentIntentId)-p-\(selectedPlanId)-item-\(postItemId)"
+        }
+        
+        if paymentFor == .wallet{
+            strUdf1Val = "t-\(paymentIntentId)-"
         }
         
         var strUdf4Val = strUdf1Val
@@ -767,6 +952,7 @@ extension PaymentGatewayCentralized{
             "udf5": ""
         ]*/
         
+        print("strUdf1Val == \(strUdf1Val)")
         paymentParam.additionalParam = [
             "udf1": strUdf1Val,
             "udf2": "Bearer \(userInfo.token ?? "")",
@@ -781,6 +967,7 @@ extension PaymentGatewayCentralized{
         config.merchantName = "Getkart"
         config.showExitConfirmationOnCheckoutScreen = true
 
+        print("paymentParam === \(paymentParam.additionalParam)")
         // Open PayU Checkout
         PayUCheckoutPro.open(
             on: (AppDelegate.sharedInstance.navigationController?.topViewController!)!,

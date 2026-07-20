@@ -104,10 +104,7 @@ class RealmManager: ObservableObject {
             localRealm?.deleteAll()
         }
     }
-    
 }
-
-
 */
 
 class RealmManager: ObservableObject {
