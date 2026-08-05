@@ -12,7 +12,6 @@ struct TakeSelfieView: View {
     @State private var showCapturedImage = false
     @State private var capturedImage: UIImage?
     var navigation:UINavigationController?
-   // @State private var coordinator: CameraView.CameraCoordinator?
     var businessName:String?
 
     var body: some View {
@@ -30,9 +29,7 @@ struct TakeSelfieView: View {
         }.frame(height: 44)
         
         VStack(spacing: 20) {
-          //  VStack(){
-                
-                // Title with Progress Indicator
+
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text("Take a Selfie")
@@ -52,7 +49,6 @@ struct TakeSelfieView: View {
                         .font(.subheadline)
                 }.padding(.top,15)
                 .padding(.horizontal, 20)
-          //  Spacer()
             HStack{
                 Text("Click a clear selfie").font(.manrope(.regular, size: 14)).frame(alignment: .leading)
                 Spacer()
@@ -85,24 +81,7 @@ struct TakeSelfieView: View {
                             }
                             .contentShape(Rectangle())
                     }
-                   // .padding()
-
-                    
-                    // .padding()
-                    /*
-                    Button("Re-take") {
-                        capturedImage = nil
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.clear)
-                    .foregroundColor(.orange)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.orange, lineWidth: 1)
-                    }
-                    .contentShape(Rectangle())
-                    */
+               
                     
                     Button(action: {
                         var swidtUIView = TakeFrontDocumentView(navigation:navigation)
@@ -119,26 +98,7 @@ struct TakeSelfieView: View {
                             .cornerRadius(12)
                             .contentShape(Rectangle())
                     }
-//                   .padding()
 
-
-                    
-                    
-                  /*  Button("Next") {
-                        // Navigate to next screen
-                        var swidtUIView = TakeFrontDocumentView(navigation:navigation)
-                        swidtUIView.businessName = businessName
-                        swidtUIView.capturedSelfieImage = capturedImage
-                        let hostVC = UIHostingController(rootView: swidtUIView)
-                        self.navigation?.pushViewController(hostVC, animated: true)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.orange)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .contentShape(Rectangle())
-                    //.padding(.horizontal)*/
                 }
                 .padding()
                 
@@ -164,26 +124,6 @@ struct TakeSelfieView: View {
                  
                 }.frame(height: 420).padding(.horizontal)
 
-              //  Spacer()
-                
-              /*  Button("Capture") {
-                    // Trigger photo capture and set capturedImage
-                    
-                    //coordinator?.capturePhoto()
-                    NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
-                 
-
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.orange)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .padding(.bottom,10)
-                .contentShape(Rectangle())
-                
-                */
                 Button(action: {
                     NotificationCenter.default.post(name: .init("capturePhoto"), object: nil)
                 }) {

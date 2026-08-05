@@ -27,11 +27,24 @@ class LoginVC: UIViewController {
     @IBOutlet weak var lblError:UILabel!
     @IBOutlet weak var lblCharCount:UILabel!
     @IBOutlet weak var btnContinueLogin:UIButtonX!
-    @IBOutlet weak var viewContent:UIView!
     
     @IBOutlet weak var btnContinueEmail:UIButtonX!
     @IBOutlet weak var btnContinueGmail:UIButtonX!
     @IBOutlet weak var btnContinueApple:UIButtonX!
+    
+    
+    @IBOutlet weak var bgViewMobile:UIView!
+    @IBOutlet weak var bgViewEmail:UIView!
+    
+    
+    @IBOutlet weak var txtFdEmail:UITextFieldX!
+    @IBOutlet weak var txtFdName:UITextFieldX!
+    
+    
+    @IBOutlet weak var lblTitle:UILabel!
+    @IBOutlet weak var lblSubTitle:UILabel!
+
+
     
     private var countryCode = ""
     private var socialId:String = ""
@@ -61,6 +74,17 @@ class LoginVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if Local.shared.countryName.lowercased() == "india"{
+            bgViewMobile.isHidden = false
+            bgViewEmail.isHidden = true
+            btnContinueLogin.setTitle("Continue", for: .normal)
+
+        }else{
+            bgViewMobile.isHidden = true
+            bgViewEmail.isHidden = false
+            btnContinueLogin.setTitle("Create Account", for: .normal)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -71,8 +95,11 @@ class LoginVC: UIViewController {
         btnContinueApple.layer.borderColor = UIColor.label.cgColor
         btnContinueEmail.setImageTintColor(color: .label)
         btnContinueApple.setImageTintColor(color: .label)
+        lblTitle.textColor = UIColor.label
+        lblSubTitle.textColor = UIColor.label
     }
     
+   
     func fetChAndSetInitialCodeFromLocale(){
         let locale: NSLocale = NSLocale.current as NSLocale
         let countryCode: String = locale.countryCode ?? ""
@@ -145,7 +172,9 @@ class LoginVC: UIViewController {
     @IBAction func skipButtonAction() {
        // AppEvents.shared.logEvent(AppEvents.Name("skip"))
         FaceBookAppEvents.facebookEvents(type: .skip, categoryName: "")
-
+        
+        self.txtFdName.text  = ""
+        self.txtFdEmail.text  = ""
         self.txtEmailPhone.text = ""
         if let vc = StoryBoard.main.instantiateViewController(identifier: "HomeBaseVC") as? HomeBaseVC {
             self.navigationController?.pushViewController(vc, animated: true)
@@ -159,27 +188,55 @@ class LoginVC: UIViewController {
         lblError.isHidden = true
         self.btnContinueLogin.backgroundColor = UIColor(hexString: "555357", alpha: 1.0)
         
-          if txtEmailPhone.text?.isValidEmail() == true {
-            let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
-            self.navigationController?.pushViewController(vc, animated: true)
+        /*   if txtEmailPhone.text?.isValidEmail() == true {
+         let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+         if Local.shared.countryName.lowercased() != "india"{
+         vc.userName = txtName.text
+         }
+         self.navigationController?.pushViewController(vc, animated: true)
+         
+         }else
+         */
+        if Local.shared.countryName.lowercased() != "india"{
             
-        }else if txtEmailPhone.text?.isValidPhone() == true {
-            self.saltGeneratorApi()
+            if txtFdName.text?.isValidNameWithNumber == false || ((txtFdName.text?.count ?? 0) > 50) {
+                AlertView.sharedManager.showToast(message: "Please enter your valid name.")
+            }else if txtFdEmail.text?.isValidEmail() == false{
+                AlertView.sharedManager.showToast(message: "Please enter your valid email.")
+
+            }else{
+                
+                sendEmailOTPApi()
+            }
             
-        }else {
-            txtEmailPhone.layer.borderColor = UIColor.red.cgColor
-            lblError.isHidden = false
-            self.btnContinueLogin.backgroundColor = UIColor.orange
+        }else{
+            
+            if txtEmailPhone.text?.isValidPhone() == true {
+                
+                self.saltGeneratorApi()
+                
+            }else{
+                
+                txtEmailPhone.layer.borderColor = UIColor.red.cgColor
+                lblError.isHidden = false
+                self.btnContinueLogin.backgroundColor = UIColor.orange
+            }
         }
     }
     
     
     func saltGeneratorApi(){
         
-        
         let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
 
-         let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+         var params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        
+        if Local.shared.countryName.lowercased() != "india"{
+            
+            params = ["email":(txtFdEmail.text ?? ""),"name":(txtFdName.text ?? ""),"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        }
         
      /*
         let strUrl = Constant.shared.salt_handler + "?deviceid=\(UIDevice.getDeviceUIDid())&plateform=ios&authtype=basic&appversion=\(UIDevice.appVersion)&mobile=\(txtEmailPhone.text ?? "")&countryCode=\(countryCode)"
@@ -216,7 +273,14 @@ class LoginVC: UIViewController {
     func sendOTPApi(saltKey:String){
         let shortKey = UIDevice.generateShortKeyWithSalt(customValue: UIDevice.MY_CUSTOM_KEY, salt: UIDevice.MY_CUSTOM_SALT)
 
-        let params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","salt_token":saltKey,"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        var params = ["mobile": txtEmailPhone.text ?? "", "countryCode":"\(countryCode)","salt_token":saltKey,"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        
+        if Local.shared.countryName.lowercased() != "india"{
+            
+            params = ["email":(txtFdEmail.text ?? ""),"name":(txtFdName.text ?? ""),"appversion":UIDevice.appVersion,"authtype":"\(shortKey)","plateform":"ios","deviceid":"\(UIDevice.getDeviceUIDid())"] as [String : Any]
+        
+        }
                 
         URLhandler.sharedinstance.makeCall(url: Constant.shared.send_mobile_otp_handler, param: params, methodType: .post,showLoader:false) { [weak self] responseObject, error in
 
@@ -240,10 +304,18 @@ class LoginVC: UIViewController {
                     }
 
                     
-                    let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
-                    vc.countryCode = self?.countryCode ?? ""
-                    vc.mobile =  self?.txtEmailPhone.text ?? ""
-                    self?.navigationController?.pushViewController(vc, animated: true)
+                   
+                    if Local.shared.countryName.lowercased() != "india"{
+                        let vc = UIHostingController(rootView: OTPVerificationView(navigationController: self?.navigationController,email:self?.txtFdEmail.text ?? "",name:self?.txtFdName.text ?? ""))
+                        self?.navigationController?.pushViewController(vc, animated: true)
+
+                    }else{
+                        let vc = StoryBoard.preLogin.instantiateViewController(withIdentifier: "OTPViewController") as! OTPViewController
+                        vc.countryCode = self?.countryCode ?? ""
+                        vc.mobile =  self?.txtEmailPhone.text ?? ""
+                        self?.navigationController?.pushViewController(vc, animated: true)
+
+                    }
                 }else{
                     AlertView.sharedManager.showToast(message: message)
                     
@@ -256,6 +328,42 @@ class LoginVC: UIViewController {
         }
     }
     
+    
+    func sendEmailOTPApi(){
+
+        let params: Dictionary<String,String> =  ["email":(txtFdEmail.text ?? ""),"type":"signup"]
+                
+          URLhandler.sharedinstance.makeCall(url: Constant.shared.send_email_otp, param: params, methodType: .post,showLoader:false) {[weak self]  responseObject, error in
+              
+              if(error != nil)
+              {
+                  //self.view.makeToast(message: Constant.sharedinstance.ErrorMessage , duration: 3, position: HRToastActivityPositionDefault)
+                  print(error ?? "defaultValue")
+                  
+              }else{
+                  
+                  let result = responseObject! as NSDictionary
+                  let status = result["code"] as? Int ?? 0
+                  let message = result["message"] as? String ?? ""
+
+                  if status == 200{
+                      
+                      AlertView.sharedManager.showToast(message: message)
+
+                      let vc = UIHostingController(rootView: OTPVerificationView(navigationController: self?.navigationController,email:self?.txtFdEmail.text ?? "",name:self?.txtFdName.text ?? ""))
+                      self?.navigationController?.pushViewController(vc, animated: true)
+                      
+                      self?.txtFdName.text  = ""
+                      self?.txtFdEmail.text  = ""
+                      
+                      
+                  }else{
+                      AlertView.sharedManager.showToast(message: message)
+                  }
+                  
+              }
+          }
+      }
     
     
     @IBAction func signUpBtnAction(_ sender : UIButton){

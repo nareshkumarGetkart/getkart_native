@@ -467,39 +467,45 @@ class PaymentGatewayCentralized{
                 
                 
                 if code == 200{
-                    
-                    if isWalletPayment{
-                        //Wallet payment go back
-                       
+                    if Local.shared.countryName.lowercased() != "india"{
                         self?.callbackPaymentSuccess?(true)
+                        
                     }else{
-                        if let dataDict = result["data"] as? Dictionary<String, Any> {
-                            
-                            if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
-                                self?.campaign_banner_id = campaign_banner_id
-                            }
-                            
-                            if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
-                                //phone pe
-                                self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
+                       //India
+                        if isWalletPayment{
+                            //Wallet payment go back
+                            self?.callbackPaymentSuccess?(true)
+                       
+                        }else{
+                            if let dataDict = result["data"] as? Dictionary<String, Any> {
                                 
-                                if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                if let campaign_banner_id =  dataDict["campaign_banner_id"] as? Int{
+                                    self?.campaign_banner_id = campaign_banner_id
+                                }
+                                
+                                if let payment_intentDict = dataDict["payment_intent"] as? Dictionary<String, Any> {
+                                    //phone pe
+                                    self?.paymentIntentId = payment_intentDict["id"] as? String ?? ""
                                     
-                                    let orderId = payment_gateway_response["orderId"] as? String ?? ""
-                                    let token  = payment_gateway_response["token"] as? String ?? ""
-                                    self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                    if let payment_gateway_response = payment_intentDict["payment_gateway_response"] as? Dictionary<String, Any>  {
+                                        
+                                        let orderId = payment_gateway_response["orderId"] as? String ?? ""
+                                        let token  = payment_gateway_response["token"] as? String ?? ""
+                                        self?.startCheckoutPhonePay(orderId: orderId, token: token)
+                                    }
+                                }
+                                
+                                
+                                if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
+                                    //payu
+                                    let  order_id = payment_transactionDict["order_id"] as? String ?? ""
+                                    let  amount = payment_transactionDict["amount"] as? Int ?? 0
+                                    self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
+                                    self?.openPayuMoney(order_id: order_id, amount: amount)
                                 }
                             }
-                            
-                            
-                            if let payment_transactionDict = dataDict["payment_transaction"] as? Dictionary<String, Any> {
-                                //payu
-                                let  order_id = payment_transactionDict["order_id"] as? String ?? ""
-                                let  amount = payment_transactionDict["amount"] as? Int ?? 0
-                                self?.paymentIntentId = "\(payment_transactionDict["id"] as? Int ?? 0)"
-                                self?.openPayuMoney(order_id: order_id, amount: amount)
-                            }
                         }
+
                     }
                     
                 }else{

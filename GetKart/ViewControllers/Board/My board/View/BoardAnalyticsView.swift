@@ -230,7 +230,7 @@ struct BoardAnalyticsView: View {
                     .frame(height: 1.5)
                     
                     BoardAnalyticCell(title: "Impressions", value: "\(objAnalytics?.analytics?.impressions ?? 0)", isActive: false)
-                   
+                    
                     
                     if (objAnalytics?.board?.boardType ?? 0) == 3{
                         BoardAnalyticCell(title: "Idea Clicks", value: "\(objAnalytics?.analytics?.clicks ?? 0)", isActive: false)
@@ -264,7 +264,8 @@ struct BoardAnalyticsView: View {
                         RoundedRectangle(cornerRadius: 8)
                     )
                 
-                
+                if Local.shared.countryName.lowercased() == "india" && objAnalytics?.board?.currency == "₹"{
+
                 if (objAnalytics?.board?.isFeature ?? false) == false && (objAnalytics?.board?.status ?? "").lowercased() == "approved"{
                     
                     Button(action: {
@@ -280,6 +281,7 @@ struct BoardAnalyticsView: View {
                     .buttonStyle(.plain)
                     
                 }
+            }
                 
             }.padding(.top)
         }.padding([.horizontal])
@@ -293,6 +295,8 @@ struct BoardAnalyticsView: View {
                 self.showSheetpackages = false
                 selectedPkgObj = selPkgObj
                 paymentGatewayOpen(selPaymentMethod:selPaymentMethod)
+            },openAddWallet:{
+                
             },boardType: objAnalytics?.board?.boardType ?? 0)
             
             .presentationDetents([.height(615)])

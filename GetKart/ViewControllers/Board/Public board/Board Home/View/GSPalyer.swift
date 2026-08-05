@@ -180,15 +180,21 @@ final class CachedVideoPlayerItem: AVPlayerItem {
         
         let asset = AVURLAsset(url: url.toCacheURL())
         
-        asset.resourceLoader.setDelegate(
+       /* asset.resourceLoader.setDelegate(
             VideoCacheLoader.shared,
             queue: VideoCacheLoader.shared.queue
-        )
+        )*/
         
+        asset.resourceLoader.setDelegate(
+            UnifiedVideoCache.shared,              // was: VideoCacheLoader.shared
+            queue: UnifiedVideoCache.shared.loaderQueue   // was: VideoCacheLoader.shared.queue
+        )
         self.customAsset = asset
         
         super.init(asset: asset, automaticallyLoadedAssetKeys: ["playable"])
     }
+    
+    
     
     // 🔥 REQUIRED (fix crash)
     override init(asset: AVAsset, automaticallyLoadedAssetKeys keys: [String]?) {
@@ -197,11 +203,15 @@ final class CachedVideoPlayerItem: AVPlayerItem {
             
             let newAsset = AVURLAsset(url: urlAsset.url)
             
-            newAsset.resourceLoader.setDelegate(
+           /* newAsset.resourceLoader.setDelegate(
                 VideoCacheLoader.shared,
                 queue: VideoCacheLoader.shared.queue
             )
-            
+            */
+            newAsset.resourceLoader.setDelegate(
+                UnifiedVideoCache.shared,              // was: VideoCacheLoader.shared
+                queue: UnifiedVideoCache.shared.loaderQueue   // was: VideoCacheLoader.shared.queue
+            )
             self.customAsset = newAsset
             
             super.init(asset: newAsset, automaticallyLoadedAssetKeys: keys)
@@ -282,13 +292,7 @@ extension URL {
 }
 
 extension URL {
-    
-//    func toCacheURL() -> URL {
-//        var comp = URLComponents(url: self, resolvingAgainstBaseURL: false)!
-//        comp.scheme = "cache"
-//        return comp.url!
-//    }
-    
+
     var originalURL: URL? {
         var comp = URLComponents(url: self, resolvingAgainstBaseURL: false)
         comp?.scheme = "https"
@@ -384,6 +388,8 @@ final class VideoDownloadTask: NSObject, URLSessionDataDelegate {
                     didCompleteWithError error: Error?) {
         
         processRequests()
+        
+        
     }
     
     // MARK: SERVE
@@ -426,351 +432,24 @@ final class VideoDownloadTask: NSObject, URLSessionDataDelegate {
     }
 }
 
-extension FileManager {
-    
-    func cacheFileURL(for url: URL) -> URL {
-        let name = url.absoluteString.md5
-        let dir = urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return dir.appendingPathComponent(name)
-    }
-    
-    func createFileIfNeeded(at url: URL) {
-        if !fileExists(atPath: url.path) {
-            createFile(atPath: url.path, contents: nil)
-        }
-    }
-}
-
-import CryptoKit
-
-extension String {
-    var md5: String {
-        let digest = Insecure.MD5.hash(data: Data(self.utf8))
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    }
-}
-
-struct SmartVideoPlayerView: View {
-
-    let item: ItemModel
-
-    @ObservedObject private var manager = FeedVideoManager.shared
-    @State private var isReadyToPlay = false
-    @State private var cancellables = Set<AnyCancellable>()
-
-    private var videoId: Int? { item.id }
-
-    private var player: AVQueuePlayer? {
-
-        guard let id = item.id,
-              let link = item.videoLink,
-              let url = URL(string: link) else { return nil }
-
-        return FeedVideoManager.shared.player(for: id, url: url)
-    }
-
-    private var isMuted: Bool {
-        manager.currentUnmutedId != videoId
-    }
-
-    @State private var isExpand = false
-
-    var onTapBottomButton: () -> Void
-
-    var body: some View {
-
-        VStack(spacing: 0) {
-
-            GeometryReader { geo in
-
-                ZStack(alignment: .top) {
-
-                    // PLAYER
-                    if let player {
-
-                        PlayerLayerView(player: player)
-                            .frame(minHeight: 275,maxHeight: 360)
-                            .frame(width:geo.size.width)
-                            .clipped()
-
-                            .onAppear {
-
-                                observeReadyState(player: player)
-
-                                updateMuteState()
-
-                                if let id = videoId {
-                                    FeedVideoManager.shared.play(id: id)
-                                }
-                            }
-
-                            .onDisappear {
-
-                                if let id = videoId {
-                                    FeedVideoManager.shared.pause(id: id)
-                                }
-                                isReadyToPlay = false
-                                cancellables.removeAll()
-                            }
-                        
-                        
-                    }
-
-                    // THUMBNAIL (always on top)
-                    
-                    
-                       /* AsyncImage(url: URL(string: item.image ?? "")) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            Color.gray.opacity(0.2)
-                        }.frame(width:geo.size.width)
-                        .frame(height: 285)
-                        .clipped()
-                        .opacity(isReadyToPlay ? 0 : 1)
-                        .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)*/
-                    
-                    KFImage(URL(string: item.image ?? ""))
-                        .setProcessor(
-                            // Match actual column width: screen/2 minus padding, at screen scale
-                            DownsamplingImageProcessor(size: CGSize(
-                                width: (UIScreen.main.bounds.width / 2 - 10),// * UIScreen.main.scale,
-                                height: 300 //* UIScreen.main.scale
-                            ))
-                        ).scaleFactor(UIScreen.main.scale)
-                        .cacheOriginalImage(false)
-                        //.memoryCacheExpiration(.seconds(120))   // ← drop from memory after 2 min off-screen
-                        .loadDiskFileSynchronously()
-                       .diskCacheExpiration(.days(3))
-                       .fade(duration: 0.15)
-                       .frame(width:geo.size.width)
-                       .frame(minHeight: 275,maxHeight: 360)
-                       .clipped()
-                       .opacity(isReadyToPlay ? 0 : 1)
-                       .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
-
-                    overlayUI
-                }
-            }
-            .frame(minHeight: 275,maxHeight: 360)
-            
-
-            bottomCTA
-        }
-        .background(Color.black)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
-        .onAppear{
-          //  print("SmartVideoPlayerView appear")
-            
-            if let id = videoId {
-                FeedVideoManager.shared.play(id: id)
-            }
-        }
-        // GLOBAL AUDIO STATE CHANGE
-        .onChange(of: manager.currentUnmutedId) { _ in
-            updateMuteState()
-        }
-
-        .fullScreenCover(isPresented: $isExpand) {
-
-            VideoPreviewView(
-                item: item,
-                strURl: item.videoLink ?? ""
-            )
-        }
-    }
-}
-
-private extension SmartVideoPlayerView {
-
-    var bottomCTA: some View {
-
-        HStack {
-
-            Text(item.ctaLabel ?? "")
-                .foregroundColor(.primary)
-                .font(.system(size: 14, weight: .medium))
-
-            Spacer()
-
-            Image(systemName: "arrow.up.right")
-                .renderingMode(.template)
-                .foregroundColor(.primary)
-                .font(.system(size: 12))
-        }
-        .padding(.horizontal, 10)
-        .frame(height: 35)
-        .frame(maxWidth: .infinity)
-        .background(Color(.systemBackground))
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
-        .onTapGesture {
-            onTapBottomButton()
-            outboundClickApi(boardId: item.id ?? 0)
-        }
-    }
-}
-
-
-private extension SmartVideoPlayerView {
-
-    var overlayUI: some View {
-
-        VStack {
-
-            HStack(alignment: .top) {
-
-                if item.isFeature ?? false {
-                    Text("Sponsored")
-                        .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .medium))
-                }
-
-                Spacer()
-
-                VStack(spacing: 8) {
-
-                    // MUTE BUTTON
-                    Button {
-
-                        if let id = videoId {
-                            manager.toggleSound(for: id)
-                        }
-
-                    } label: {
-                        
-                        Image(systemName:
-                                isMuted
-                              ? "speaker.slash.fill"
-                              : "speaker.wave.2.fill")
-                        
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(Color.black.opacity(0.5))
-                        .clipShape(Circle())
-                    }
-
-                    // EXPAND BUTTON
-                    Button {
-
-                        manager.muteAll()
-                        manager.pauseAll()
-                        isExpand = true
-
-                    } label: {
-
-                        Image("material-symbols_pan-zoom-rounded")
-                            .padding(8)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                }
-            }
-
-            Spacer()
-        }
-        .padding(8)
-    }
-}
-
-private extension SmartVideoPlayerView {
-    
-    private func observeReadyState(player: AVPlayer) {
-        
-        cancellables.removeAll()
-        
-        player.currentItem?.publisher(for: \.status)
-            .receive(on: DispatchQueue.main)
-            .sink { status in
-                
-                switch status {
-                    
-                case .readyToPlay:
-                  //  print("✅ Ready to play")
-                    isReadyToPlay = true
-                    
-                case .failed:
-                    print("❌ Failed")
-                    isReadyToPlay = false
-                    
-                default:
-                    isReadyToPlay = false
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
-    
-    func outboundClickApi(boardId:Int){
-        
-        let params = ["board_id":boardId]
-        
-        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
-            
-            if error == nil{
-                
-                let result = responseObject! as NSDictionary
-                let status = result["code"] as? Int ?? 0
-                _ = result["message"] as? String ?? ""
-                
-                if status == 200{
-                    
-                }else{
-                }
-            }
-        }
-    }
-    
-//    func observeReadyState(player: AVQueuePlayer) {
-//
-//        cancellables.removeAll()
-//
-//        player.publisher(for: \.timeControlStatus)
-//            .receive(on: DispatchQueue.main)
-//            .sink { status in
-//
-//               
-//
-//                if status == .playing ||
-//                   player.currentItem?.isPlaybackLikelyToKeepUp == true {
-//
-//                    isReadyToPlay = true
-//                }
-//                if status == .waitingToPlayAtSpecifiedRate {
-//
-//                    let item = player.currentItem
-//
-//                    if item?.isPlaybackLikelyToKeepUp == true {
-//                        player.play()
-//                    }
-//
-//                    if item?.isPlaybackBufferFull == true {
-//                        player.play()
-//                    }
-//                }
-//            }
-//            .store(in: &cancellables)
+//extension FileManager {
+//    
+//    func cacheFileURL(for url: URL) -> URL {
+//        let name = url.absoluteString.md5
+//        let dir = urls(for: .cachesDirectory, in: .userDomainMask)[0]
+//        return dir.appendingPathComponent(name)
 //    }
-    
-
-    func updateMuteState() {
-
-        guard let player else { return }
-        guard let id = videoId else { return }
-
-        let shouldUnmute = manager.currentUnmutedId == id
-
-        player.isMuted = !shouldUnmute
-        player.volume = shouldUnmute ? 1 : 0
-    }
-}
+//    
+//    func createFileIfNeeded(at url: URL) {
+//        if !fileExists(atPath: url.path) {
+//            createFile(atPath: url.path, contents: nil)
+//        }
+//    }
+//}
 
 
 
-
-
-
+//MARK: FeedVideoManager
 final class FeedVideoManager: ObservableObject {
     
     static let shared = FeedVideoManager()
@@ -790,44 +469,7 @@ final class FeedVideoManager: ObservableObject {
     @Published private(set) var currentUnmutedId: Int?
     
   
-    // MARK: - Get or Create Player
-//    func player(for id: Int, url: URL) -> AVQueuePlayer {
-//
-//        if let existing = players[id] {
-//
-//            if existing.items().isEmpty {
-//
-//              //  let item = AVPlayerItem(url: url)
-//                
-//                let item = CachedVideoPlayerItem(url: url)
-//                
-//                item.preferredForwardBufferDuration = 2
-//
-//                let looper = AVPlayerLooper(player: existing, templateItem: item)
-//                loopers[id] = looper
-//            }
-//
-//            return existing
-//        }
-//
-//     //   let item = AVPlayerItem(url: url)
-//        let item = CachedVideoPlayerItem(url: url)
-//        item.preferredForwardBufferDuration = 2
-//
-//        let queue = AVQueuePlayer(playerItem: item)
-//        queue.automaticallyWaitsToMinimizeStalling = false
-//        queue.actionAtItemEnd = .none
-//        queue.isMuted = true
-//        queue.volume = 0
-//
-//        let looper = AVPlayerLooper(player: queue, templateItem: item)
-//
-//        players[id] = queue
-//        loopers[id] = looper
-//
-//        return queue
-//    }
-    
+
     
     /// Pauses all players without destroying them (e.g. tab switch).
         /// Use this instead of clearAll() during memory warnings to avoid
@@ -838,7 +480,7 @@ final class FeedVideoManager: ObservableObject {
         }
     
     
-    func player(for id: Int, url: URL) -> AVQueuePlayer {
+   /* func player(for id: Int, url: URL) -> AVQueuePlayer {
 
         if let existing = players[id] {
 
@@ -871,7 +513,42 @@ final class FeedVideoManager: ObservableObject {
         loopers[id] = looper
 
         return queue
+    }*/
+    
+    func player(for id: Int, url: URL) -> AVQueuePlayer {
+
+        if let existing = players[id] {
+
+            if existing.items().isEmpty {
+
+                let item = UnifiedVideoCache.shared.playerItem(for: url)   // was: AVPlayerItem(url: url)
+                item.preferredForwardBufferDuration = 2
+
+                let looper = AVPlayerLooper(player: existing, templateItem: item)
+                loopers[id] = looper
+            }
+
+            return existing
+        }
+
+        let item = UnifiedVideoCache.shared.playerItem(for: url)   // was: AVPlayerItem(url: url)
+        item.preferredForwardBufferDuration = 2
+
+        let queue = AVQueuePlayer(playerItem: item)
+        queue.automaticallyWaitsToMinimizeStalling = false
+        queue.actionAtItemEnd = .none
+        queue.isMuted = true
+        queue.volume = 0
+
+        let looper = AVPlayerLooper(player: queue, templateItem: item)
+
+        players[id] = queue
+        loopers[id] = looper
+
+        return queue
     }
+    
+    
     // MARK: - Warmup Player (for precaching)
     
     func warmupPlayer(id: Int, url: URL) {
@@ -1023,3 +700,307 @@ final class FeedVideoManager: ObservableObject {
     }
 }
 
+
+
+struct SmartVideoPlayerView: View {
+
+    let item: ItemModel
+
+    @ObservedObject private var manager = FeedVideoManager.shared
+    @State private var isReadyToPlay = false
+    @State private var cancellables = Set<AnyCancellable>()
+
+    private var videoId: Int? { item.id }
+
+    private var player: AVQueuePlayer? {
+
+        guard let id = item.id,
+              let link = item.videoLink,
+              let url = URL(string: link) else { return nil }
+
+        return FeedVideoManager.shared.player(for: id, url: url)
+    }
+
+    private var isMuted: Bool {
+        manager.currentUnmutedId != videoId
+    }
+
+    @State private var isExpand = false
+
+    var onTapBottomButton: () -> Void
+    var onTapExpandButton: () -> Void
+
+
+    var body: some View {
+
+        VStack(spacing: 0) {
+
+            GeometryReader { geo in
+
+                ZStack(alignment: .top) {
+
+                    // PLAYER
+                    if let player {
+
+                        PlayerLayerView(player: player)
+                            .frame(minHeight: 275,maxHeight: 360)
+                            .frame(width:geo.size.width)
+                            .clipped()
+
+                            .onAppear {
+
+                                observeReadyState(player: player)
+
+                                updateMuteState()
+
+                                if let id = videoId {
+                                    FeedVideoManager.shared.play(id: id)
+                                }
+                            }
+
+                            .onDisappear {
+
+                                if let id = videoId {
+                                    FeedVideoManager.shared.pause(id: id)
+                                }
+                                isReadyToPlay = false
+                                cancellables.removeAll()
+                            }
+                        
+                        
+                    }
+
+                    // THUMBNAIL (always on top)
+                    
+                    
+                       /* AsyncImage(url: URL(string: item.image ?? "")) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Color.gray.opacity(0.2)
+                        }.frame(width:geo.size.width)
+                        .frame(height: 285)
+                        .clipped()
+                        .opacity(isReadyToPlay ? 0 : 1)
+                        .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)*/
+                    
+                    KFImage(URL(string: item.image ?? ""))
+                        .setProcessor(
+                            // Match actual column width: screen/2 minus padding, at screen scale
+                            DownsamplingImageProcessor(size: CGSize(
+                                width: (UIScreen.main.bounds.width / 2 - 10),// * UIScreen.main.scale,
+                                height: 300 //* UIScreen.main.scale
+                            ))
+                        ).scaleFactor(UIScreen.main.scale)
+                        .cacheOriginalImage(false)
+                        //.memoryCacheExpiration(.seconds(120))   // ← drop from memory after 2 min off-screen
+                        .loadDiskFileSynchronously()
+                       .diskCacheExpiration(.days(3))
+                       .fade(duration: 0.15)
+                       .frame(width:geo.size.width)
+                       .frame(minHeight: 275,maxHeight: 360)
+                       .clipped()
+                       .opacity(isReadyToPlay ? 0 : 1)
+                       .animation(.easeInOut(duration: 0.25), value: isReadyToPlay)
+
+                    overlayUI
+                }
+            }
+            .frame(minHeight: 275,maxHeight: 360)
+            
+
+            bottomCTA
+        }
+        .background(Color.black)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
+        .onAppear{
+          //  print("SmartVideoPlayerView appear")
+            
+            if let id = videoId {
+                FeedVideoManager.shared.play(id: id)
+            }
+        }
+        // GLOBAL AUDIO STATE CHANGE
+        .onChange(of: manager.currentUnmutedId) { _ in
+            updateMuteState()
+        }
+
+        //.fullScreenCover(isPresented: $isExpand) {
+
+            //ReelsView(navigationController: nil)
+//            VideoPreviewView(
+//                item: item,
+//                strURl: item.videoLink ?? ""
+//            )
+        //}
+    }
+}
+
+private extension SmartVideoPlayerView {
+
+    var bottomCTA: some View {
+
+        HStack {
+
+            Text(item.ctaLabel ?? "")
+                .foregroundColor(.primary)
+                .font(.system(size: 14, weight: .medium))
+
+            Spacer()
+
+            Image(systemName: "arrow.up.right")
+                .renderingMode(.template)
+                .foregroundColor(.primary)
+                .font(.system(size: 12))
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 35)
+        .frame(maxWidth: .infinity)
+        .background(Color(.systemBackground))
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
+        .onTapGesture {
+            onTapBottomButton()
+            outboundClickApi(boardId: item.id ?? 0)
+        }
+    }
+}
+
+
+private extension SmartVideoPlayerView {
+
+    var overlayUI: some View {
+
+        VStack {
+
+            HStack(alignment: .top) {
+
+                if item.isFeature ?? false {
+                    Text("Sponsored")
+                        .foregroundColor(.white)
+                        .font(.system(size: 14, weight: .medium))
+                }
+
+                Spacer()
+
+                VStack(spacing: 8) {
+
+                    // MUTE BUTTON
+                    Button {
+
+                        if let id = videoId {
+                            manager.toggleSound(for: id)
+                        }
+
+                    } label: {
+                        
+                        Image(systemName:
+                                isMuted
+                              ? "speaker.slash.fill"
+                              : "speaker.wave.2.fill")
+                        
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                    }
+
+                    // EXPAND BUTTON
+                    Button {
+
+                        manager.muteAll()
+                        manager.pauseAll()
+                       // isExpand = true
+                        onTapExpandButton()
+
+                    } label: {
+
+                        Image("material-symbols_pan-zoom-rounded")
+                            .padding(8)
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(8)
+    }
+}
+
+private extension SmartVideoPlayerView {
+    
+    private func observeReadyState(player: AVPlayer) {
+        
+        cancellables.removeAll()
+        
+        player.currentItem?.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { status in
+                
+                switch status {
+                    
+                case .readyToPlay:
+                  //  print("✅ Ready to play")
+                    isReadyToPlay = true
+                    
+                case .failed:
+                    print("❌ Failed")
+                    isReadyToPlay = false
+                    
+                default:
+                    isReadyToPlay = false
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    
+    func outboundClickApi(boardId:Int){
+        
+        let params = ["board_id":boardId]
+        
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.board_outbond_click, param: params,methodType: .post) { responseObject, error in
+            
+            if error == nil{
+                
+                let result = responseObject! as NSDictionary
+                let status = result["code"] as? Int ?? 0
+                _ = result["message"] as? String ?? ""
+                
+                if status == 200{
+                    
+                }else{
+                }
+            }
+        }
+    }
+
+    func updateMuteState() {
+
+        guard let player else { return }
+        guard let id = videoId else { return }
+
+        let shouldUnmute = manager.currentUnmutedId == id
+
+        player.isMuted = !shouldUnmute
+        player.volume = shouldUnmute ? 1 : 0
+    }
+}
+
+
+
+
+
+
+
+import CryptoKit
+
+extension String {
+    var md5: String {
+        let digest = Insecure.MD5.hash(data: Data(self.utf8))
+        return digest.map { String(format: "%02hhx", $0) }.joined()
+    }
+}

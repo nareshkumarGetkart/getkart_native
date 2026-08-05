@@ -105,6 +105,7 @@ struct ItemModel: Codable,Identifiable {
     var lastComment:CommentModel?
     var postDuration:Int?
     let banner: BannerHome?
+    let currency:String?
 
     enum CodingKeys: String, CodingKey {
         
@@ -150,6 +151,7 @@ struct ItemModel: Codable,Identifiable {
         case lastComment = "last_comment"
         case impressions
         case postDuration = "post_duration"
+        case currency
 
     }
 }

@@ -573,6 +573,10 @@ extension SellerProfileView {
                     outboundUrlClicked = item.outbondUrl ?? ""
                     openSafari = true
                 }
+            },onTapExpandButton: {
+                //Expand Button
+                pushToReelsView(itemObj: item)
+
             })
             .background(
                 GeometryReader { geo in
@@ -622,6 +626,12 @@ extension SellerProfileView {
                 paginationTrigger(item: item, items: items)
             }
         }
+    }
+    
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+        self.navController?.pushViewController(vc, animated: true)
     }
 }
 

@@ -22,6 +22,10 @@ struct SettingsModel: Codable {
     
     let iosNudityThreshold:Double?
     var currencySymbol:String = "₹"
+    var currency:String = "₹"
+    var currency_name:String = "₹"
+    let emoji:String?
+    let country_name:String?
     let companyName, iosVersion, defaultLanguage: String?
     let forceUpdate, androidVersion, numberWithSuffix, maintenanceMode: String?
     let privacyPolicy, termsConditions, companyTel1: String?
@@ -121,6 +125,7 @@ struct SettingsModel: Codable {
         case demoMode = "demo_mode"
         case languages, admin
         case iosPlaceKey
+        case currency_name,currency,emoji,country_name
     }
 }
 

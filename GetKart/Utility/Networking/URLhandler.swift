@@ -42,25 +42,29 @@ class URLhandler: NSObject{
         let objLoggedInUser = RealmManager.shared.fetchLoggedInUserInfo()
         
 
+        let timeZone =  Local.shared.getTimeZoneHeader() //TimeZone.current.identifier
+        
+        print("timeZone == \(timeZone)")
+        
         if objLoggedInUser.token != nil {
             
             let token = "Bearer \(objLoggedInUser.token ?? "")"
             
             if isFormData{
-                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
+                let headers =  ["Content-Type":"multipart/form-data", "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName(),"timezone":timeZone]
                 if ISDEBUG{
                     print("Header == \(headers)")
                 }
                 return HTTPHeaders.init(headers)
             }else{
-                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName()]
+                let headers =  [ "Accept":"application/json", "Authorization":token,"platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"device-model":UIDevice.getDeviceModelName(),"timezone":timeZone]
                 if ISDEBUG{
                     print("Header == \(headers)")
                 }
                 return HTTPHeaders.init(headers)
             }
         }else{
-            let headers =  ["platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"Accept":"application/json","device-model":UIDevice.getDeviceModelName()]
+            let headers =  ["platform":"ios","appversion":UIDevice.appVersion,"x-device-id":UIDevice.getDeviceUIDid(),"x-api-key":Constant.shared.xApiKey,"Accept":"application/json","device-model":UIDevice.getDeviceModelName(),"timezone":timeZone]
 //            if SALT_TOKEN_TO_SEND.count > 0{
 //                headers =  ["platform":"ios","appversion":UIDevice.appVersion,"salt_token":"\(SALT_TOKEN_TO_SEND)"]
 //            }
@@ -180,8 +184,9 @@ class URLhandler: NSObject{
     func checkAndLogout(responseCode:Int){
        
         
-        if responseCode == 401  && !isLogoutPresented{
+        if responseCode == 401  && !isLogoutPresented && Local.shared.getUserId() > 0{
             isLogoutPresented = true
+            
             AppDelegate.sharedInstance.checkUserStatusApi()
             
           /*  AlertView.sharedManager.presentAlertWith(title: "Login Issue", msg: "Your session has expired or your account may be restricted.\n Please Login again or contact Getkart Support.", buttonTitles: ["Contact Support","Login","Cancel"], onController: AppDelegate.sharedInstance.navigationController!.topViewController!) { title, index in

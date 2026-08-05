@@ -12,7 +12,10 @@ import FacebookCore
 
 var SALT_TOKEN_TO_SEND = ""
 
+
+
 class OTPViewController: UIViewController {
+    
     @IBOutlet weak var lblMobileNo:UILabel!
     @IBOutlet weak var txtOtp:UITextFieldX!
     @IBOutlet weak var btnResendOtp:UIButton!
@@ -24,12 +27,15 @@ class OTPViewController: UIViewController {
     var countryCode = ""
     var mobile = ""
     var isMobileLogin = true
+    var userName:String?
+    var emailId:String?
     
     //MARK: Controller Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         lblMobileNo.text = countryCode + mobile
         self.btnSignIn.backgroundColor = UIColor.gray
+      
         if isMobileLogin == true {
             lblMessage.text = "Sign in with mobile"
             startTimer()

@@ -358,6 +358,8 @@ struct CreateIdeaView: View {
                         showBoostSheet = false
                         isDataUploading = true
                         uploadFIleToServer(selPkgObj:selPkgObj,selPaymentMethod: selPaymentMethod)
+                    },openAddWallet:{
+                        
                     }, boardType: 3)
                 .presentationDetents([.height(615)])
                 .presentationDragIndicator(.hidden)
@@ -391,11 +393,20 @@ struct CreateIdeaView: View {
                 message: "Description must be between 20 and 400 characters."
             )
         } else{
-            if isFromEdit{
+            
+            if Local.shared.countryName.lowercased() != "india"{
+               //Other country
                 isDataUploading = true
                 uploadFIleToServer()
+                
             }else{
-                showSheet = true
+                //India
+                if isFromEdit{
+                    isDataUploading = true
+                    uploadFIleToServer()
+                }else{
+                    showSheet = true
+                }
             }
         }
     }

@@ -152,7 +152,7 @@ struct WalletBalanceCardView: View {
                     .font(.inter(.regular,size: 15))
                     .foregroundColor(Color(hex: "#8A7560"))
 
-                Text("₹\(balance)")
+                Text("\(Local.shared.currencySymbol)\(balance)")
                     .font(.inter(.bold,size: 36))
                     .foregroundColor(Color(hex: "#1A1206"))
 
@@ -162,7 +162,7 @@ struct WalletBalanceCardView: View {
                     Circle()
                         .fill(Color(hex: "#8A7560"))
                         .frame(width: 7, height: 7)
-                    Text("Total Added: ₹\(totalAdded)")
+                    Text("Total Added: \(Local.shared.currencySymbol)\(totalAdded)")
                         .font(.inter(.regular,size: 14))
                         .foregroundColor(Color(hex: "#5C4A30"))
                 }
@@ -226,7 +226,7 @@ struct WalletTransactionRowView: View {
         let prefix = transaction.type == "credit" ? "+" : "-"
         //        return "\(prefix)₹\(String(format: "%.2f", transaction.amount))"
         
-        return "\(prefix)₹\(transaction.amount)"
+        return "\(prefix)\(Local.shared.currencySymbol)\(transaction.amount)"
         
     }
     

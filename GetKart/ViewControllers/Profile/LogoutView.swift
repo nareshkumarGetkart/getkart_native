@@ -16,7 +16,7 @@ struct LogoutView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+            Color.black.opacity(0.65).edgesIgnoringSafeArea(.all)
             VStack(spacing: 20) {
                 Image("logout_illustrator") // Replace with actual asset name
                     .resizable()

@@ -336,6 +336,8 @@ struct CreatePromotionalAdsView: View {
                     packageSelectedPressed: { (selPkgObj,selPaymentMethod) in
                         isDataUploading = true
                         uploadFIleToServer(selPkgObj:selPkgObj,selPaymentMethod:selPaymentMethod)
+                    },openAddWallet:{
+                        
                     },
                     boardType: 1)
                 .presentationDetents([.height(615)])
@@ -366,11 +368,20 @@ struct CreatePromotionalAdsView: View {
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your ad")
         }else{
-            if isFromEdit{
+            
+            if Local.shared.countryName.lowercased() != "india"{
+               //Other country
                 isDataUploading = true
                 uploadFIleToServer()
+                
             }else{
-                showSheet = true
+                //India
+                if isFromEdit{
+                    isDataUploading = true
+                    uploadFIleToServer()
+                }else{
+                    showSheet = true
+                }
             }
         }
     }

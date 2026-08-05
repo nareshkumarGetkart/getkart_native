@@ -18,8 +18,8 @@ struct PlanBoughtSuccessView: View {
     
     @Environment(\.presentationMode) var presentationMode
     var navigationController: UINavigationController?
-    
     var paymentType:PaymentSuccessType? = .boost
+    var title = "Your transaction was successful!"
     
     var body: some View {
         ZStack {
@@ -34,7 +34,7 @@ struct PlanBoughtSuccessView: View {
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color(UIColor.label))
-                Text("Your transaction was successful!").font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
+                Text(title).font(Font.manrope(.regular, size: 16)).foregroundColor(Color(UIColor.label))
                 
                 HStack {
                     

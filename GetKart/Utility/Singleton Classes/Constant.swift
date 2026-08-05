@@ -14,7 +14,7 @@ enum DevEnvironment{
     case development
 }
 
-var devEnvironment: DevEnvironment = .live
+var devEnvironment: DevEnvironment = .staging
 var ISDEBUG = true
 
 final class Constant: NSObject {
@@ -294,6 +294,12 @@ final class Constant: NSObject {
         }
     }
     
+    var  get_countries:String {
+        get {
+            return "\(baseURL)/v2/get-countries"
+        }
+    }
+    
     var  board_click:String {
         get {
             return "\(baseURL)/v1/board-click"
@@ -366,6 +372,15 @@ final class Constant: NSObject {
             return "\(baseURL)/v1/get-my-board"
         }
     }
+    
+    
+    var  get_promotional_videos:String {
+        get {
+            return "\(baseURL)/v2/get-promotional-videos"
+        }
+    }
+    
+    
     
     
     var  get_myboard_details:String {

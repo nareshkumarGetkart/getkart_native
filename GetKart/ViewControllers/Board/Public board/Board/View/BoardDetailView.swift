@@ -93,6 +93,10 @@ struct BoardDetailView: View{
                                         safariURL = url
                                         FeedVideoManager.shared.muteAll()
                                     }
+                                },onTapExpandButton: {
+                                    //Expand Button
+                                    pushToReelsView(itemObj: item)
+
                                 })
                                 .background(
                                     GeometryReader { geo in
@@ -162,6 +166,10 @@ struct BoardDetailView: View{
                                             safariURL = url
                                             FeedVideoManager.shared.muteAll()
                                         }
+                                    },onTapExpandButton: {
+                                        //Expand Button
+                                        pushToReelsView(itemObj: item)
+
                                     })
                                 .background(
                                     GeometryReader { geo in
@@ -314,9 +322,15 @@ struct BoardDetailView: View{
                     .presentationDragIndicator(.visible)
                 }
         }
+       
     }
 
-
+    
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     
     private func scheduleVisibilityUpdate() {
         
@@ -970,7 +984,7 @@ struct ReelPostView: View {
                 if (post.impressions ?? 0) > 0{
                     HStack(spacing:3){
                         Image("eye").renderingMode(.template).foregroundColor(Color(.label))
-                        Text("\((post.impressions ?? 0).formatViews())").font(.inter(.medium, size: 13)).foregroundColor(Color(.label))
+                        Text("\((post.impressions ?? 0).priceFormat())").font(.inter(.medium, size: 13)).foregroundColor(Color(.label))
                     }
                 }
                 
@@ -1174,24 +1188,24 @@ struct ReelPostView: View {
     }
 }
 
-struct VerticalPager<Content: View>: UIViewControllerRepresentable {
-
-    var pages: [Content]
-    var onPageChange: ((Int) -> Void)?   //  callback
-
-    func makeUIViewController(context: Context) -> PagerVC {
-        let vc = PagerVC()
-        vc.onPageChange = onPageChange
-        vc.setPages(pages)
-        //vc.pages = pages.map { UIHostingController(rootView: $0) }
-        return vc
-    }
-
-    func updateUIViewController(_ uiViewController: PagerVC, context: Context) {
-        
-        uiViewController.setPages(pages)
-    }
-}
+//struct VerticalPager<Content: View>: UIViewControllerRepresentable {
+//
+//    var pages: [Content]
+//    var onPageChange: ((Int) -> Void)?   //  callback
+//
+//    func makeUIViewController(context: Context) -> PagerVC {
+//        let vc = PagerVC()
+//        vc.onPageChange = onPageChange
+//        vc.setPages(pages)
+//        //vc.pages = pages.map { UIHostingController(rootView: $0) }
+//        return vc
+//    }
+//
+//    func updateUIViewController(_ uiViewController: PagerVC, context: Context) {
+//        
+//        uiViewController.setPages(pages)
+//    }
+//}
 
 class PagerVC: UIViewController, UIScrollViewDelegate {
 

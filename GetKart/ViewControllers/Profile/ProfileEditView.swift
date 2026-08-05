@@ -26,6 +26,7 @@ struct ProfileEditView: View {
     var navigationController:UINavigationController?
     
     var body: some View {
+        
         HStack{
             
             Button {
@@ -43,69 +44,69 @@ struct ProfileEditView: View {
             VStack(spacing: 20) {
                 // Profile Image Section
                 ZStack {
-                  /*  if let image = selectedImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle()).padding(5)
-                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
-                        
-                        
-                        
-                    } else {
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 100, height: 100)
-                            .overlay(
-                                Image("user-circle") // <-- Replace with your placeholder asset name
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                            )
-                        //.padding(5)
-                            .overlay(Circle().stroke(Color.orange, lineWidth: 3))
-                    }
-                    
-                    Button(action: { showingImagePicker.toggle() }) {
-                        Image("edit").resizable().frame(width: 15, height: 15).aspectRatio(contentMode: .fit)
-                        
-                    }.frame(width: 30,height: 30).background(Color.orange).cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.white, lineWidth: 3)
-                        )
-                    
-                        .offset(x: 35, y: 38)
-                }
-                */
+                    /*  if let image = selectedImage {
+                     Image(uiImage: image)
+                     .resizable()
+                     .scaledToFill()
+                     .frame(width: 100, height: 100)
+                     .clipShape(Circle()).padding(5)
+                     .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+                     
+                     
+                     
+                     } else {
+                     Circle()
+                     .fill(Color.gray.opacity(0.3))
+                     .frame(width: 100, height: 100)
+                     .overlay(
+                     Image("user-circle") // <-- Replace with your placeholder asset name
+                     .resizable()
+                     .scaledToFit()
+                     .frame(width: 100, height: 100)
+                     )
+                     //.padding(5)
+                     .overlay(Circle().stroke(Color.orange, lineWidth: 3))
+                     }
+                     
+                     Button(action: { showingImagePicker.toggle() }) {
+                     Image("edit").resizable().frame(width: 15, height: 15).aspectRatio(contentMode: .fit)
+                     
+                     }.frame(width: 30,height: 30).background(Color.orange).cornerRadius(15)
+                     .overlay(
+                     RoundedRectangle(cornerRadius: 15)
+                     .stroke(Color.white, lineWidth: 3)
+                     )
+                     
+                     .offset(x: 35, y: 38)
+                     }
+                     */
                     
                     ContactImageSwiftUIView(
-                          name: fullName,                 // or pass your user's name
-                          imageUrl: nil,                      // remote URL if available
-                          fallbackImageName: "user-circle",   // local placeholder asset
-                          imgWidth: 100,
-                          imgHeight: 100,
-                          selectedImage: selectedImage        // 👈 picked image state
-                      )
-                      .overlay(Circle().stroke(Color.orange, lineWidth: 2))
-                      .padding(5)
-                      
-                      Button(action: { showingImagePicker.toggle() }) {
-                          Image("edit")
-                              .resizable()
-                              .frame(width: 15, height: 15)
-                              .aspectRatio(contentMode: .fit)
-                      }
-                      .frame(width: 30, height: 30)
-                      .background(Color.orange)
-                      .cornerRadius(15)
-                      .overlay(
-                          RoundedRectangle(cornerRadius: 15)
-                              .stroke(Color.white, lineWidth: 3)
-                      )
-                      .offset(x: 35, y: 38)
-                  }
+                        name: fullName,                 // or pass your user's name
+                        imageUrl: nil,                      // remote URL if available
+                        fallbackImageName: "user-circle",   // local placeholder asset
+                        imgWidth: 100,
+                        imgHeight: 100,
+                        selectedImage: selectedImage        // 👈 picked image state
+                    )
+                    .overlay(Circle().stroke(Color.orange, lineWidth: 2))
+                    .padding(5)
+                    
+                    Button(action: { showingImagePicker.toggle() }) {
+                        Image("edit")
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .aspectRatio(contentMode: .fit)
+                    }
+                    .frame(width: 30, height: 30)
+                    .background(Color.orange)
+                    .cornerRadius(15)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.white, lineWidth: 3)
+                    )
+                    .offset(x: 35, y: 38)
+                }
                 .sheet(isPresented: $showingImagePicker) {
                     ImagePicker(selectedImage: $selectedImage)
                 }
@@ -132,14 +133,22 @@ struct ProfileEditView: View {
                     
                 }
                 
-                
-                CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
+                if Local.shared.countryName.lowercased() != "india"{
+                  
+                    CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
+                    
+                    
+                    
+                }else{
+                    
+                    CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
                     .disabled(true) // prevents typing
                     .onTapGesture {
                         if !isMobileVerified {
                             pushToValidateMobileNumber()
                         }
                     }
+            }
                 //                CustomTextField(title: "Phone Number", text: $phoneNumber, keyboardType: .phonePad)
                 //                    .allowsHitTesting(!isMobileVerified)//.disabled(isMobileVerified)
                 //
@@ -260,24 +269,38 @@ struct ProfileEditView: View {
            
             AlertView.sharedManager.showToast(message: "Please fill all the fields.")
 
-         }else if !fullName.isValidName() || fullName.lowercased() == "guest user" || fullName.count > 50 {
+         }else if !fullName.isValidNameWithNumber || fullName.lowercased() == "guest user" || fullName.count > 50 {
+             
             AlertView.sharedManager.showToast(message: "Please enter valid name")
             
         }else if !email.isValidEmail(){
+            
             AlertView.sharedManager.showToast(message: "Please enter valid email")
 
-        }else if isMobileVerified == false{
+        }else if isMobileVerified == false && (Local.shared.countryName.lowercased() == "india"){
+            
             AlertView.sharedManager.showToast(message: "Please verify mobile number")
 
         } else if isEmailVerified == false{
+            
             AlertView.sharedManager.showToast(message: "Please verify email id")
 
-        }else {
+        }else if containsInvalidCharacters(phone: phoneNumber){
+            AlertView.sharedManager.showToast(message: "Please enter valid phone number")
+
+        } else {
             updateProfile()
         }
     }
     
     
+    func containsInvalidCharacters(phone: String) -> Bool {
+        // Allows digits, plus sign, spaces, and hyphens
+        let invalidCharRegex = "[^0-9+\\- ]"
+        let range = phone.range(of: invalidCharRegex, options: .regularExpression)
+        return range != nil // Returns true if a special character is found
+    }
+
     func verifyMobileOTPApi(otp:String){
         
         let params = ["mobile": phoneNumber, "countryCode":"+91", "otp":otp] as [String : Any]

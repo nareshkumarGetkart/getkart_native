@@ -245,17 +245,21 @@ struct FollowerRowView: View {
             Spacer()
 
             // ── Action button ──────────────────────────────────────
-            if isFollower {
-                // Followers tab → Message button
-                actionButton(title: "Message", filled: true)
+            if user.id != Local.shared.getUserId(){
+               
+                if isFollower {
+                    // Followers tab → Message button
+                    actionButton(title: "Message", filled: true)
 
-            } else {
-                // Followings tab → Follow / Unfollow button
-                actionButton(
-                    title: (user.isFollowing == true) ? "Unfollow" : "Follow",
-                    filled: true
-                )
+                } else {
+                    // Followings tab → Follow / Unfollow button
+                    actionButton(
+                        title: (user.isFollowing == true) ? "Unfollow" : "Follow",
+                        filled: true
+                    )
+                }
             }
+           
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

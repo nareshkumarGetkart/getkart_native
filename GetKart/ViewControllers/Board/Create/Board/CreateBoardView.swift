@@ -359,6 +359,7 @@ struct CreateBoardView: View {
                             .background(RoundedRectangle(cornerRadius: 8)
                                 .fill(Color(.systemBackground)))
                             .keyboardType(.URL)
+                            .textInputAutocapitalization(.never)
                         
                         Text("Add your business page link and let users discover you in just one click.")
                             .font(.inter(.regular, size: 11)).foregroundColor(Color(.gray))
@@ -458,7 +459,9 @@ struct CreateBoardView: View {
                 isDataUploading = true
                 showBoostSheet = false
                  createBoardApi(selPkgObj:selPkgObj,selPaymentMethod:selPaymentMethod)
-           },boardType: 0)
+             },openAddWallet:{
+                 
+             },boardType: 0)
            
            .presentationDetents([.height(615)])
            .presentationDragIndicator(.hidden)
@@ -503,11 +506,20 @@ struct CreateBoardView: View {
         }else if strUrl.count == 0 || !strUrl.isValidURLFormat() {
             AlertView.sharedManager.showToast(message: "Please add  valid url of your board")
         }else{
-            if isFromEdit{
+            
+            if Local.shared.countryName.lowercased() != "india"{
+               //Other country
                 isDataUploading = true
                 createBoardApi()
+                
             }else{
-                showSheet = true
+                //India
+                if isFromEdit{
+                    isDataUploading = true
+                    createBoardApi()
+                }else{
+                    showSheet = true
+                }
             }
         }
     }
@@ -760,6 +772,13 @@ struct CreateBoardView: View {
         
        
         paymentGateway?.initializeDefaults(selpaymentMethod: selPaymentMethod)
+        
+    }
+    
+    func pushToAddWallet(){
+        
+        let destVC = UIHostingController(rootView: MyWalletView(navigation: self.navigationController))
+        self.navigationController?.pushViewController(destVC, animated: true)
         
     }
 }

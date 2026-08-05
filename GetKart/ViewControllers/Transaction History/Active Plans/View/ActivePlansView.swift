@@ -110,10 +110,9 @@ struct ActivePlansCell:  View {
                     } else {
                         //ads
                         Text("\(transactionObj.package?.itemLimit ?? "") Ads").font(.inter(.medium, size: 12.0))
-                    }
-                   
-                       
+                    }                       
                 }.padding(.vertical,8)
+                
                 Spacer()
 
                 Divider().frame(height:30)
@@ -162,24 +161,22 @@ struct ActivePlansCell:  View {
                 Spacer()
 
 
-            }.background(Color(.systemOrange).opacity(0.2)).padding(.horizontal).padding(.vertical,5)
+            }.background(Color(.systemOrange).opacity(0.2))
+                .padding(.horizontal).padding(.vertical,5)
             
             VStack(spacing:5){
                 HStack{
                     Text("Purchased on").font(.inter(.medium, size: 12.0))
                     Spacer()
-                    //                    Text("Sep 10, 2025 at 08:25 PM").font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray))
-                    Text(getFormattedCreatedDate(date: transactionObj.createdAt ?? "")).font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray))
-                    
+                    //Text("Sep 10, 2025 at 08:25 PM").font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray))
+                    Text(getFormattedCreatedDate(date: transactionObj.createdAt ?? ""))
+                        .font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray))
                 }
                 
                 HStack{
-
-                        Text("Expiring on").font(.inter(.medium, size: 12.0))
-            Spacer()
-          
                     
-                    
+                    Text("Expiring on").font(.inter(.medium, size: 12.0))
+                    Spacer()
                     if  transactionObj.package?.type == "board"{
                         //Board
                         Text("after \(transactionObj.package?.itemLimit ?? "0") clicks").font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray)) //Sep 10, 2025 at 08:25 PM
@@ -190,10 +187,7 @@ struct ActivePlansCell:  View {
                     } else {
                         //ads
                         Text(getFormattedCreatedDate(date: transactionObj.endDate ?? "")).font(.inter(.regular, size: 12.0)).foregroundColor(Color(.systemGray)) //Sep 10, 2025 at 08:25 PM
-                        
-
                     }
-                    
                 }
             }.padding(.horizontal).padding(.vertical,5).padding(.bottom,8)
             

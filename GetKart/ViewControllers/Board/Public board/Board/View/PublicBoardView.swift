@@ -402,6 +402,10 @@ struct BoardListView: View {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
+                                        },onTapExpandButton: {
+                                            //Expand Button
+                                            pushToReelsView(itemObj: item)
+
                                         }
                                     ).background(
                                         GeometryReader { geo in
@@ -468,6 +472,9 @@ struct BoardListView: View {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
+                                        },onTapExpandButton: {
+                                            //Expand Button
+                                            pushToReelsView(itemObj: item)
                                         }
                                     )
                                     .background(
@@ -667,9 +674,15 @@ struct BoardListView: View {
             }
 
         }
+      
     }
     
-    
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
  
     // MARK: - Prefetch Next Videos
   private func prefetchNextVideos(from currentItem: ItemModel) {
@@ -1011,21 +1024,21 @@ struct ProductCardStaggered: View {
                         .setProcessor(
                             DownsamplingImageProcessor(size: CGSize(width: 400, height: 500))
                         )
-                       // .scaleFactor(UIScreen.main.scale)
+                    // .scaleFactor(UIScreen.main.scale)
                         .cacheOriginalImage(false)
                         .resizable()
                         .scaledToFit()
                         .clipped()
                         .cornerRadius(10)
                         .frame(width:defaultImgWidth,height:defaultImgHeight)
-
+                    
                         .shadow(
                             color: Color.black.opacity(0.10),
                             radius: 7,
                             x: 0,
                             y: 2
                         )
-            
+                    
                 }else{
                     
                     KFImage(URL(string: product.image ?? ""))
@@ -1048,7 +1061,7 @@ struct ProductCardStaggered: View {
                         .frame(maxHeight:370)
                     
                 }
-               
+                
                 VStack{
                     if (product.isFeature ?? false) {
                         HStack{
@@ -1097,58 +1110,58 @@ struct ProductCardStaggered: View {
                                 .padding(5)
                         }
                     }
-                
-            }
+                    
+                }
             }
             
             HStack(spacing:12) {
                 if (product.user?.id ?? 0) == Local.shared.getUserId(){
                     
                 }else{
-                        
-                        Button {
-                            manageLike(boardId: product.id ?? 0)
-                        } label: {
-                            HStack(spacing:1){
-                                if product.isLiked == true{
-                                    Image("like_fill").resizable().aspectRatio(contentMode: .fit)
-                                        .frame(width: 24, height: 24)
-                                   
-                                }else{
-                                    Image("like")
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .foregroundColor(.primary)
-                                        .frame(width: 24, height: 24)
-                                }
-                                                                   
-                                if (product.totalLikes ?? 0) > 0{
-                                    Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.label))
-                                        .font(Font.inter(.regular, size: 12))
-                                }
+                    
+                    Button {
+                        manageLike(boardId: product.id ?? 0)
+                    } label: {
+                        HStack(spacing:1){
+                            if product.isLiked == true{
+                                Image("like_fill").resizable().aspectRatio(contentMode: .fit)
+                                    .frame(width: 24, height: 24)
+                                
+                            }else{
+                                Image("like")
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .foregroundColor(.primary)
+                                    .frame(width: 24, height: 24)
                             }
                             
+                            if (product.totalLikes ?? 0) > 0{
+                                Text("\(product.totalLikes ?? 0)").foregroundColor(Color(.label))
+                                    .font(Font.inter(.regular, size: 12))
+                            }
                         }
-                       
-                    }
-
-                    HStack(spacing:3){
-                        Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
-                        if (product.commentsCount ?? 0) > 0{
-                            Text("\((product.commentsCount ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
-                        }
+                        
                     }
                     
-                    HStack(spacing:3){
-                        Image("eye").renderingMode(.template).foregroundColor(Color(.label))
-                        if (product.impressions ?? 0) > 0{
-                            Text("\((product.impressions ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
-                        }
+                }
+                
+                HStack(spacing:3){
+                    Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
+                    if (product.commentsCount ?? 0) > 0{
+                        Text("\((product.commentsCount ?? 0).priceFormat())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
                     }
-            
+                }
+                
+                HStack(spacing:3){
+                    Image("eye").renderingMode(.template).foregroundColor(Color(.label))
+                    if (product.impressions ?? 0) > 0{
+                        Text("\((product.impressions ?? 0).priceFormat())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
+                    }
+                }
+                
                 Spacer()
-
+                
             } .padding(.horizontal,4)
             
             
@@ -1166,12 +1179,22 @@ struct ProductCardStaggered: View {
             }.padding(.horizontal,8)
             
             
-            PriceView(
-                price: product.price ?? 0.0,
-                specialPrice: product.specialPrice ?? 0.0,
-                currencySymbol: Local.shared.currencySymbol
-            ).padding([.bottom],10).padding(.horizontal,8).padding(.top,2)
+            if let currency = product.currency{
+                PriceView(
+                    price: product.price ?? 0.0,
+                    specialPrice: product.specialPrice ?? 0.0,
+                    currencySymbol: currency
+                ).padding([.bottom],10).padding(.horizontal,8).padding(.top,2)
+            }else{
+                PriceView(
+                    price: product.price ?? 0.0,
+                    specialPrice: product.specialPrice ?? 0.0,
+                    currencySymbol: Local.shared.currencySymbol
+                ).padding([.bottom],10).padding(.horizontal,8).padding(.top,2)
+            }
+         
             
+            if Local.shared.countryName.lowercased() == "india"{
             
             if (product.user?.id ?? 0) == Local.shared.getUserId() && isToShowBoostButton{
                 
@@ -1203,6 +1226,7 @@ struct ProductCardStaggered: View {
                 
                 
             }
+        }
         }
         .background(Color(.systemBackground))
         //.shadow(color: .black.opacity(0.05), radius: 4, y: 2)

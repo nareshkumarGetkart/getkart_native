@@ -366,6 +366,7 @@ struct SafariView: UIViewControllerRepresentable {
     }
 
     func makeUIViewController(context: Context) -> SFSafariViewController {
+        print("url ==\(url)")
         let vc = SFSafariViewController(url: url)
         vc.delegate = context.coordinator
         vc.modalPresentationStyle = .fullScreen

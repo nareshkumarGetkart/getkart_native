@@ -27,12 +27,17 @@ class ProfileVC: UIViewController {
     @IBOutlet weak var btnPreviewProfile:UIButton!
 
 
-    //,"Buy Packages"
+  /*  //,"Buy Packages"
   //,"My Wallet"
     //,"wallet"
     var titleArray =  ["Anonymous","My Wallet","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","Blogs","FAQs","Share this App","Rate us","Contact us","About us","Terms & Conditions","Privacy Policy","Refunds & Cancellation policy"]
       //,"buyPackages"
-    var iconArray =  ["","wallet","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]
+    var iconArray =  ["","wallet","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","article","faq","share","rate_us","contact_us","about_us","t_c","privacypolicy","refundAndCancelationPolicy"]*/
+    
+    
+    var titleArray =  ["Anonymous","My Wallet","Promotional Banners","My Boards & Ideas","Likes","Order History & Plans","Dark Theme","Notifications","My Connections","Blocked Users","FAQs","Share this App"]
+      //,"buyPackages"
+    var iconArray =  ["","wallet","mediaPromotion","gridOpaque","like_fill","transaction","dark_theme","notification","myConnections","user-block","faq","share"]
       
     var verifiRejectedReason:String = ""
     var verifyStatus:String = ""
@@ -54,6 +59,13 @@ class ProfileVC: UIViewController {
         // Do any additional setup after loading the view.
         tblView.register(UINib(nibName: "ProfileListTblCell", bundle: nil), forCellReuseIdentifier: "ProfileListTblCell")
         tblView.register(UINib(nibName: "AnonymousUserCell", bundle: nil), forCellReuseIdentifier: "AnonymousUserCell")
+        
+        if Local.shared.countryName.lowercased() != "india"{
+            //Other country
+        titleArray =  ["Anonymous","Promotional Banners","My Boards & Ideas","Likes","Dark Theme","Notifications","My Connections","Blocked Users","FAQs","Share this App"]
+        iconArray =  ["","mediaPromotion","gridOpaque","like_fill","dark_theme","notification","myConnections","user-block","faq","share"]
+        }
+        
         getUserProfileApi()
         self.topRefreshControl.backgroundColor = .clear
         tblView.refreshControl = topRefreshControl
@@ -93,7 +105,12 @@ class ProfileVC: UIViewController {
     
     //MARK: UIButton Action Methods
     @IBAction func settingsBtnAction(_ sender : UIButton){
-        presentSettingView()
+       // presentSettingView()
+        
+        let hostingController = UIHostingController(rootView: SettingsView(navigationController: self.navigationController))
+        hostingController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(hostingController, animated: true)
+        
     }
     
     
@@ -273,7 +290,9 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
 
             return titleArray.count
         }else{
-            return (titleArray.count-2)
+//            return (titleArray.count-2)
+            return titleArray.count
+
         }
     }
     
@@ -602,7 +621,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
     
     @objc func presentSettingView(){
         
-        
+       /*
         let controller = UIHostingController(rootView: SettingsView( callbackAction: {action in }))
        
         
@@ -658,6 +677,7 @@ extension ProfileVC:UITableViewDelegate,UITableViewDataSource{
         } else {
             self.navigationController?.present(sheet, animated: true, completion: nil)
         }
+        */
     }
     
  

@@ -89,6 +89,8 @@ struct MyBoardsView: View {
                     ForEach(listArray ,id: \.id) { myBroad in
                         MyBoardCell(itemObj: myBroad,onBoostTapped: { (item, plan,selPaymentMethod) in
                             paymentGatewayOpen(selPlan: plan, item: item, selPaymentMethod: selPaymentMethod)
+                        }, onAddWalletTapped:{
+                            pushToAddWallet()
                         })
                         
                         .onTapGesture {
@@ -136,6 +138,13 @@ struct MyBoardsView: View {
     func pushToBoardAnalytics(myBroad:ItemModel){
         
         let destVC = UIHostingController(rootView: BoardAnalyticsView(navigationController: self.navigationController, boardId: myBroad.id ?? 0))
+        self.navigationController?.pushViewController(destVC, animated: true)
+        
+    }
+    
+    func pushToAddWallet(){
+        
+        let destVC = UIHostingController(rootView: MyWalletView(navigation: self.navigationController))
         self.navigationController?.pushViewController(destVC, animated: true)
         
     }
@@ -263,6 +272,7 @@ struct MyBoardCell:View {
     let itemObj:ItemModel
     @State private var showBoostSheet = false
     var onBoostTapped: (_ item: ItemModel, _ plan: PlanModel, _ selPaymentMethod:SelPaymentMethod) -> Void
+    var onAddWalletTapped:()->Void
 
     var body: some View {
         VStack(spacing:0){
@@ -310,7 +320,7 @@ struct MyBoardCell:View {
                             if (itemObj.specialPrice ?? 0.0) > 0{
                                 HStack{
                                     
-                                    Text("\(Local.shared.currencySymbol) \((itemObj.specialPrice ?? 0.0).formatNumber())")
+                                    Text("\(itemObj.currency ?? "") \((itemObj.specialPrice ?? 0.0).formatNumber())")
                                         .font(.inter(.medium, size: 18))
                                         .foregroundColor(Color(hex: "#008838"))
                                     
@@ -329,7 +339,7 @@ struct MyBoardCell:View {
                                 }
                                 
                                 HStack{
-                                    Text("\(Local.shared.currencySymbol)\((itemObj.price ?? 0.0).formatNumber())")
+                                    Text("\(itemObj.currency ?? "")\((itemObj.price ?? 0.0).formatNumber())")
                                         .font(.inter(.regular, size: 14))
                                         .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
                                     let per = (((itemObj.price ?? 0.0) - (itemObj.specialPrice ?? 0.0)) / (itemObj.price ?? 0.0)) * 100.0
@@ -341,7 +351,7 @@ struct MyBoardCell:View {
                                 
                                 HStack{
                                     if itemObj.boardType == 0{
-                                        Text("\(Local.shared.currencySymbol) \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
+                                        Text("\(itemObj.currency ?? "") \((itemObj.price ?? 0.0).formatNumber())").multilineTextAlignment(.leading).font(Font.inter(.medium, size: 18)).foregroundColor(Color(hexString: "#008838"))
                                     }else{
                                         
                                         
@@ -401,7 +411,7 @@ struct MyBoardCell:View {
                         
                         HStack(spacing:3){
                             Image("eye").resizable().renderingMode(.template).foregroundColor(.gray).frame(width: 13, height: 13)
-                            Text("Views: \((itemObj.impressions ?? 0).formatViews())").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
+                            Text("Views: \((itemObj.impressions ?? 0).priceFormat())").multilineTextAlignment(.leading).font(Font.inter(.regular, size: 11)).foregroundColor(.gray)
                         }
                         if itemObj.boardType == 1 || itemObj.boardType == 2{
                             
@@ -426,6 +436,12 @@ struct MyBoardCell:View {
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
             
+            if Local.shared.countryName.lowercased() != "india" || itemObj.currency != "₹"{
+               //Other country
+               
+                
+            }else{
+                //India
             if (itemObj.status?.lowercased() ?? "") ==  "approved" && !(itemObj.isFeature ?? false){
                 
                 HStack{
@@ -460,10 +476,16 @@ struct MyBoardCell:View {
                     .background(Color.orange.opacity(0.1))
                     .cornerRadius(8)
             }
+        }
             
         } .sheet(isPresented: $showBoostSheet) {
             BoostBoardPlanView(categoryId:itemObj.categoryID ?? 0,packageSelectedPressed: { (selPkgObj,selPaymentMethod) in
                 onBoostTapped(itemObj,selPkgObj,selPaymentMethod)
+            },openAddWallet:{
+                
+                print("Add amount to wallet")
+                onAddWalletTapped()
+                
             },boardType: itemObj.boardType ?? 0)
             
             .presentationDetents([.height(615)])

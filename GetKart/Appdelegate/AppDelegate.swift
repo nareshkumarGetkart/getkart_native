@@ -8,8 +8,6 @@
 
 //======= New Optimized code
 
-
-
 import UIKit
 import IQKeyboardManagerSwift
 import FirebaseCore
@@ -23,6 +21,7 @@ import FacebookCore
 import FacebookAEM
 import AppTrackingTransparency
 import FBSDKCoreKit
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -50,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var hasCheckedUpdateThisSession = false
     private var isBackgroundCalled = false
     private var backgroundCalledTime: TimeInterval = 0
-    private var socketConnectToken: NSObjectProtocol?
     
 
     // MARK: - App Launch
@@ -686,15 +684,23 @@ extension AppDelegate: UNUserNotificationCenterDelegate, MessagingDelegate {
     }
 }
 
-// MARK: - API Calls
+// MARK: - ATAppUpdaterDelegate
 
 extension AppDelegate: ATAppUpdaterDelegate {
-
+    
     func appUpdaterDidShowUpdateDialog() {}
     func appUpdaterUserDidLaunchAppStore() {}
     func appUpdaterUserDidCancel() {}
+    
+}
 
+// MARK: - API Calls
+extension AppDelegate{
+    
     func deviceRegisterApi() {
+        
+        self.getSettingsApi()
+        
         let params: [String: Any] = ["device_id": UIDevice.getDeviceUIDid()]
         URLhandler.sharedinstance.makeCall(
             url: Constant.shared.device_register,
@@ -707,17 +713,17 @@ extension AppDelegate: ATAppUpdaterDelegate {
             guard error == nil,
                   let result = responseObject,
                   let data = result["data"] as? [String: Any] else { return }
-
+            
             if let key = data["key"] as? String, !key.isEmpty {
                 Constant.shared.xApiKey = key
             }
             DispatchQueue.main.async {
                 self.navigateToHomeOrLogin()
             }
-            self.getSettingsApi()
+            //            self.getSettingsApi()
         }
     }
-
+    
     func deviceRefreshApi() {
         let params: [String: Any] = ["device_id": UIDevice.getDeviceUIDid()]
         URLhandler.sharedinstance.makeCall(
@@ -733,7 +739,7 @@ extension AppDelegate: ATAppUpdaterDelegate {
             Constant.shared.xApiKey = key
         }
     }
-
+    
     func getSettingsApi() {
         ApiHandler.sharedInstance.makeGetGenericData(
             isToShowLoader: false,
@@ -741,23 +747,28 @@ extension AppDelegate: ATAppUpdaterDelegate {
         ) { (obj: SettingsParse) in
             guard obj.code == 200 else { return }
             Local.shared.currencySymbol       = obj.data?.currencySymbol    ?? "₹"
+            Local.shared.currency       = obj.data?.currency    ?? "₹"
+            Local.shared.currencyName       = obj.data?.currency_name    ?? "INR"
+            Local.shared.emojiCountry       = obj.data?.emoji    ?? ""
+            Local.shared.countryName       = obj.data?.country_name    ?? ""
+            
             Local.shared.companyEmail         = obj.data?.companyEmail      ?? "support@getkart.com"
             Local.shared.companyTelelphone1   = obj.data?.companyTel1       ?? "8800957957"
             Local.shared.iosNudityThreshold   = obj.data?.iosNudityThreshold ?? 0.15
         }
     }
-
+    
     func checkUserStatusApi() {
+        
         let url = Constant.shared.user_status + "/\(Local.shared.getUserId())"
         URLhandler.sharedinstance.makeCall(url: url, param: nil, methodType: .get) { responseObject, error in
-            
             
             if error == nil{
                 if let result = responseObject{
                     
                     let code =  result["code"] as? Int ?? 0
                     let message =  result["message"] as? String ?? ""
-
+                    
                     if  let data   = result["data"] as? [String: Any]{
                         
                         if  let isActive = data["is_active"] as? Int{
@@ -777,33 +788,33 @@ extension AppDelegate: ATAppUpdaterDelegate {
                 }
             }
             
-           /* guard error == nil,
-                  let result = responseObject,
-                  let data   = result["data"] as? [String: Any],
-                  let isActive = data["is_active"] as? Int else { return }
-            URLhandler.sharedinstance.isLogoutPresented = false
-            if isActive == 0 {
-                Local.shared.removeUserData()
-                AppDelegate.sharedInstance.showLoginScreen()
-            }*/
+            /* guard error == nil,
+             let result = responseObject,
+             let data   = result["data"] as? [String: Any],
+             let isActive = data["is_active"] as? Int else { return }
+             URLhandler.sharedinstance.isLogoutPresented = false
+             if isActive == 0 {
+             Local.shared.removeUserData()
+             AppDelegate.sharedInstance.showLoginScreen()
+             }*/
             
             /*
              if let respDict =  responseObject as? Dictionary<String,Any>{
-                 let message = respDict["message"] as? String ?? ""
-                 let code = respDict["code"] as? Int ?? 0
-                 
-                 if code == 103 || message.lowercased() == "user not found"{
-                     URLhandler.sharedinstance.isLogoutPresented = false
-                     Local.shared.removeUserData()
-                     AppDelegate.sharedInstance.showLoginScreen()
-                     return
-                 }
+             let message = respDict["message"] as? String ?? ""
+             let code = respDict["code"] as? Int ?? 0
+             
+             if code == 103 || message.lowercased() == "user not found"{
+             URLhandler.sharedinstance.isLogoutPresented = false
+             Local.shared.removeUserData()
+             AppDelegate.sharedInstance.showLoginScreen()
+             return
              }
-          
+             }
+             
              */
         }
     }
-
+    
     private func getBoardDetailApi(boardId: Int) {
         let url = Constant.shared.get_board_details + "?board_id=\(boardId)"
         ApiHandler.sharedInstance.makeGetGenericData(
@@ -2162,3 +2173,30 @@ class SplashViewController: UIViewController {
 
 
 */
+
+
+
+extension AppDelegate {
+
+    func restartApp() {
+
+        // Optional: clear country-specific cache
+        ImageCache.default.clearMemoryCache()
+        URLCache.shared.removeAllCachedResponses()
+
+        let splashVC = SplashViewController()
+
+        navigationController = UINavigationController(rootViewController: splashVC)
+        navigationController?.isNavigationBarHidden = true
+
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
+
+        UIView.transition(with: window!,
+                          duration: 0.35,
+                          options: .transitionCrossDissolve,
+                          animations: nil)
+        
+        deviceRegisterApi()
+    }
+}

@@ -589,12 +589,18 @@ extension String {
             return testString.evaluate(with: self)
         }
         
-        var isValidNameWithNumber: Bool {
-            let alphaNumericRegEx = "[a-zA-Z0-9]"
-            let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)
-            return predicate.evaluate(with: self)
-        }
-        
+      var isValidNameWithNumber: Bool {
+           let trimmed = self.trimmingCharacters(in: .whitespacesAndNewlines)
+
+           guard !trimmed.isEmpty else { return false }
+
+           // Must contain at least one letter.
+           let regex = "^(?=.*[A-Za-z])[A-Za-z0-9 ]+$"
+
+           return NSPredicate(format: "SELF MATCHES %@", regex)
+               .evaluate(with: trimmed)
+       }
+    
         var isPanCardValid: Bool {
             let alphaNumericRegEx = "[A-Z]{5}[0-9]{4}[A-Z]{1}"
             let predicate = NSPredicate(format:"SELF MATCHES %@", alphaNumericRegEx)

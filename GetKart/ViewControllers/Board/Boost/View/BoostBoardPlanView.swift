@@ -22,16 +22,18 @@ struct BoostBoardPlanView: View {
     @State private var showInsufficientBalanceAlert = false
     @State private var alertMessage = ""
     
+    var openAddWallet: (() -> Void)?
+    
     init(
         categoryId: Int,
-        packageSelectedPressed: ((_ selPkgObj: PlanModel, _ selPaymentMethod: SelPaymentMethod) -> Void)? = nil,
+        packageSelectedPressed: ((_ selPkgObj: PlanModel, _ selPaymentMethod: SelPaymentMethod) -> Void)? = nil,openAddWallet:(() -> Void)? = nil,
         boardType: Int
     ) {
 
         self.categoryId = categoryId
         self.packageSelectedPressed = packageSelectedPressed
         self.boardType = boardType
-
+        self.openAddWallet = openAddWallet
         print("INIT BOARD TYPE =", boardType)
         print(" self INIT BOARD TYPE =",  self.boardType)
 
@@ -141,13 +143,14 @@ struct BoostBoardPlanView: View {
                isPresented: $showInsufficientBalanceAlert) {
 
           
-            Button("Ok", role: .cancel) { }
+            Button("Cancel", role: .cancel) { }
 
-//            Button("Add Money") {
-//
-//                // Navigate to Add Money screen
-//
-//            }
+            Button("Add Money") {
+
+                // Navigate to Add Money screen
+                openAddWallet?()
+                dismiss()
+            }
 
         } message: {
 
@@ -655,7 +658,7 @@ struct WalletPaymentCard: View {
                     Text("Getkart Wallet")
                         .font(.inter(.semiBold, size: 18))
 
-                    Text("Available Balance: ₹\(Int(walletBalance))").font(.inter(.regular, size: 12))
+                    Text("Available Balance: \(Local.shared.currencySymbol)\(Int(walletBalance))").font(.inter(.regular, size: 12))
                         .foregroundColor(.orange)
                 }
 
@@ -673,9 +676,9 @@ struct WalletPaymentCard: View {
                 HStack{
                     VStack(alignment:.leading, spacing:8){
                         
-                        Text("₹\(Int(amount)) will be deducted from your wallet balance.").font(.inter(.regular, size: 12))
+                        Text("\(Local.shared.currencySymbol)\(Int(amount)) will be deducted from your wallet balance.").font(.inter(.regular, size: 12))
                         
-                        Text("Remaining balance after payment: ₹\(Int(walletBalance - amount))").font(.inter(.regular, size: 12))
+                        Text("Remaining balance after payment: \(Local.shared.currencySymbol)\(Int(walletBalance - amount))").font(.inter(.regular, size: 12))
                             .foregroundColor(.orange)
                     }
                     Spacer()

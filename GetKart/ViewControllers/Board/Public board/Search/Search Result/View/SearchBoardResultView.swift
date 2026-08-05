@@ -156,6 +156,9 @@ struct SearchBoardResultView: View {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
+                                        },onTapExpandButton: {
+                                            //Expand Button
+                                            pushToReelsView(itemObj:item)
                                         }
                                     ).background(
                                         GeometryReader { geo in
@@ -322,6 +325,11 @@ struct SearchBoardResultView: View {
 
     }
     
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     private func prefetchNextVideos(from currentItem: ItemModel) {
 
         guard let index = vm.items.firstIndex(where: { $0.id == currentItem.id }) else { return }

@@ -18,6 +18,13 @@ final class Local {
     var isToRefreshVerifiedStatusApi = true
     var compression = 50
     var currencySymbol:String = "₹"
+    var currency = "INR"
+    var currencyName = ""
+    var emojiCountry = ""
+    var countryName = ""
+    var latitude = ""
+    var longitude = ""
+
     var companyEmail:String = "support@getkart.com"
     var companyTelelphone1:String = "8800957957"
     var bannerScrollInterval = 3
@@ -27,6 +34,16 @@ final class Local {
 
     var isLogout = false
 
+    func saveTimeZoneHeader(timezone:String){
+        UserDefaults.standard.setValue(timezone, forKey: LocalKeys.timeZoneHeader.rawValue)
+        UserDefaults.standard.synchronize()
+    }
+    
+    
+    func getTimeZoneHeader()->String{
+ 
+        return UserDefaults.standard.value(forKey: LocalKeys.timeZoneHeader.rawValue) as? String ?? TimeZone.current.identifier
+    }
     
     func saveUserId(userId:Int){
         UserDefaults.standard.setValue(userId, forKey: LocalKeys.userId.rawValue)
@@ -179,7 +196,7 @@ enum LocalKeys:String,CaseIterable{
     case longitude = "longitude"
     case appTheme = "AppTheme"
     case locality =  "locality"
-
+    case timeZoneHeader =  "timeZoneHeader"
 }
 
 

@@ -179,10 +179,6 @@ final class BoardViewModelNew: ObservableObject {
         isLastPage = false
     }
     
-    
-    
-    
-    
     deinit {
         print("DEINIT BOARD VM")
     }

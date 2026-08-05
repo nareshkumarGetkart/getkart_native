@@ -199,14 +199,10 @@ struct CompleteProfilePopup: View {
             return "Name must contain at least 2 characters"
         }
 
-     /*  // let regex = "^[A-Za-z]+(?:\\s+[A-Za-z]+)+$"
-        let regex = "^[A-Za-z]+(?:\\s+[A-Za-z]+)*$"
-
-        if NSPredicate(format: "SELF MATCHES %@", regex)
-            .evaluate(with: trimmed) == false {
-            return "Please enter a valid full name"
-        }*/
-
+        if !name.isValidNameWithNumber  || trimmed.count > 50{
+            return "Please enter your valid full name"
+        }
+     
         return nil
     }
 }

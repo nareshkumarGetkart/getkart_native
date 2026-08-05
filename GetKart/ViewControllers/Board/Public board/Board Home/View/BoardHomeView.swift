@@ -1693,13 +1693,13 @@ struct ProductCardStaggeredNew: View {
                 HStack(spacing: 3) {
                     Image("messageIcon").renderingMode(.template).foregroundColor(Color(.label))
                     if (product.commentsCount ?? 0) > 0 {
-                        Text("\((product.commentsCount ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
+                        Text("\((product.commentsCount ?? 0).priceFormat())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
                     }
                 }
                 HStack(spacing: 3) {
                     Image("eye").renderingMode(.template).foregroundColor(Color(.label))
                     if (product.impressions ?? 0) > 0 {
-                        Text("\((product.impressions ?? 0).formatViews())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
+                        Text("\((product.impressions ?? 0).priceFormat())").font(.inter(.medium, size: 12)).foregroundColor(Color(.label))
                     }
                 }
                 Spacer()
@@ -1726,20 +1726,22 @@ struct ProductCardStaggeredNew: View {
             )
             .padding([.bottom], 10).padding(.horizontal, 8).padding(.top, 2)
 
-            if (product.user?.id ?? 0) == Local.shared.getUserId(),
-               isToShowBoostButton,
-               product.isFeature == false {
-                Button { onTapBoostButton() } label: {
-                    Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
-                        .font(.inter(.semiBold, size: 14)).foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 30)
-                        .background(LinearGradient(
-                            gradient: Gradient(colors: [Color(red: 1.0, green: 0.65, blue: 0.15),
-                                                        Color(red: 0.95, green: 0.45, blue: 0.05)]),
-                            startPoint: .top, endPoint: .bottom))
-                        .cornerRadius(5)
+            if Local.shared.countryName.lowercased() == "india"{
+                if (product.user?.id ?? 0) == Local.shared.getUserId(),
+                   isToShowBoostButton,
+                   product.isFeature == false {
+                    Button { onTapBoostButton() } label: {
+                        Text("Boost \(Local.shared.currencySymbol)\(Int(product.package?.finalPrice ?? 0))")
+                            .font(.inter(.semiBold, size: 14)).foregroundColor(.white)
+                            .frame(maxWidth: .infinity, minHeight: 30)
+                            .background(LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 1.0, green: 0.65, blue: 0.15),
+                                                            Color(red: 0.95, green: 0.45, blue: 0.05)]),
+                                startPoint: .top, endPoint: .bottom))
+                            .cornerRadius(5)
+                    }
+                    .padding(.horizontal, 10).padding(.bottom, 10)
                 }
-                .padding(.horizontal, 10).padding(.bottom, 10)
             }
         }
         .background(Color(.systemBackground))

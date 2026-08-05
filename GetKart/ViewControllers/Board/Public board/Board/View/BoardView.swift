@@ -158,13 +158,16 @@ struct PriceView: View {
         if specialPrice > 0 {
             HStack(spacing: 6) {
 
+                
                 // Special price
-                Text("\(currencySymbol)\(specialPrice.indianPriceFormat())")
-                    .font(.inter(.semiBold, size: 14))
+              //  Text("\(currencySymbol)\(specialPrice.indianPriceFormat())")
+                
+                Text("\(currencySymbol)\(specialPrice.priceFormat(forSymbol:currencySymbol))")                    .font(.inter(.semiBold, size: 14))
                     .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
 
                 // Original price (striked)
-                Text("\(currencySymbol)\(price.indianPriceFormat())")
+//                Text("\(currencySymbol)\(price.indianPriceFormat())")
+                Text("\(currencySymbol)\(price.priceFormat(forSymbol:currencySymbol))")
                     .font(.inter(.medium, size: 11))
                     .foregroundColor(.gray)
                     .strikethrough(true, color: .secondary)
@@ -176,7 +179,8 @@ struct PriceView: View {
             }
         } else {
             // Normal price
-            Text("\(currencySymbol)\(price.indianPriceFormat())")
+           // Text("\(currencySymbol)\(price.indianPriceFormat())")
+            Text("\(currencySymbol)\(price.priceFormat(forSymbol:currencySymbol))")
                 .font(.inter(.semiBold, size: 14))
                 .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
         }

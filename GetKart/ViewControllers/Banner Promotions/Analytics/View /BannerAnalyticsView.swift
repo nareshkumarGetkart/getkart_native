@@ -191,17 +191,18 @@ struct BannerAnalyticsView: View {
                             RoundedRectangle(cornerRadius: 8)
                         )
                     
-                    
-                    if (objBanner?.status ?? "") == "draft" {
-                        
-                        Button {
-                            showSheetpackages = true
-                        } label: {
+                    if Local.shared.countryName.lowercased() == "india"{
+                        if (objBanner?.status ?? "") == "draft" {
                             
-                            Text("Complete Now").font(.manrope(.medium, size: 16.0)).foregroundColor(.white)
-                            
-                        }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
-                            .background(Color(hexString: "#FF9900")) .cornerRadius(12)//.padding(.bottom)
+                            Button {
+                                showSheetpackages = true
+                            } label: {
+                                
+                                Text("Complete Now").font(.manrope(.medium, size: 16.0)).foregroundColor(.white)
+                                
+                            }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
+                                .background(Color(hexString: "#FF9900")) .cornerRadius(12)//.padding(.bottom)
+                        }
                     }
                     
                 }.padding([.top])

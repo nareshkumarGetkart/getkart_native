@@ -273,10 +273,16 @@ struct BannerPromotionsView: View {
                 }
                 
             } label: {
-                
-                Text("Show Packages")
-                    .font(.manrope(.medium, size: 16.0))
-                    .foregroundColor(isFilled ? .white : .gray)
+                if Local.shared.countryName.lowercased() != "india"{
+                    Text("Submit")
+                        .font(.manrope(.medium, size: 16.0))
+                        .foregroundColor(isFilled ? .white : .gray)
+                }else{
+                    
+                    Text("Show Packages")
+                        .font(.manrope(.medium, size: 16.0))
+                        .foregroundColor(isFilled ? .white : .gray)
+                }
             }
             .frame(maxWidth: .infinity, minHeight: 55)
             .background(
@@ -469,8 +475,14 @@ extension BannerPromotionsView {
             )
             
         } else {
-            
-            showSheetpackages = true
+            if Local.shared.countryName.lowercased() != "india"{
+                
+                self.paymentGatewayOpen(selPlan: nil, selPaymentMethod: .other)
+
+            }else{
+                
+                showSheetpackages = true
+            }
         }
     }
     
@@ -623,7 +635,7 @@ extension BannerPromotionsView {
     
     
     
-    func paymentGatewayOpen(selPlan: PlanModel,selPaymentMethod:SelPaymentMethod) {
+    func paymentGatewayOpen(selPlan: PlanModel?,selPaymentMethod:SelPaymentMethod) {
                 
         paymentGateway = PaymentGatewayCentralized()   //  STRONG REFERENCE
         paymentGateway?.planObj = selPlan
@@ -636,7 +648,7 @@ extension BannerPromotionsView {
             if isSuccess {
                 let vc = UIHostingController(
                     rootView: PlanBoughtSuccessView(
-                        navigationController: self.navigationController
+                        navigationController: self.navigationController,title: "Your banner has been posted successfully!"
                     )
                 )
                 vc.modalPresentationStyle = .overFullScreen

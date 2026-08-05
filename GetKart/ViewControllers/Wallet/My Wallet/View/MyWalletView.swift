@@ -238,7 +238,7 @@ struct BalanceCard: View {
             // Balance
             VStack {
 
-                Text("₹\(availableAmt)")
+                Text("\(Local.shared.currencySymbol)\(availableAmt)")
                     .font(.inter(.bold,size: 42.0))
                     .foregroundColor(.primary)
                     .padding(.vertical, 22)
@@ -304,7 +304,7 @@ struct AddAmountCard: View {
 
                     HStack(spacing:8){
 
-                        Text("₹")
+                        Text("\(Local.shared.currencySymbol)")
                             .font(.inter(.medium,size: 15.0))
                         TextField("", text: $addAmount)
                             .keyboardType(.numberPad)
@@ -431,7 +431,7 @@ struct PromoBanner: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading,spacing:1){
-                    Text("Add ₹\(bonusAmount) and above to get")
+                    Text("Add \(Local.shared.currencySymbol)\(bonusAmount) and above to get")
                         .font(.inter(.medium,size: 13.0))
                         .foregroundColor(.black)
                     

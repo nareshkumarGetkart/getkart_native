@@ -52,6 +52,7 @@ struct BoardDetail: Codable {
     let boardType:Int? // 0= board , 1= image promotiional , 2 = video promotional , 3 = idea
     let videoLink:String?
     let expiryDate:String?
+    let currency:String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, image, description
@@ -67,6 +68,7 @@ struct BoardDetail: Codable {
         case boardType = "board_type"
         case videoLink = "video_link"
         case expiryDate = "expiry_date"
+        case currency
     }
 }
 

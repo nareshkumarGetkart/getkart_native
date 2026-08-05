@@ -92,6 +92,9 @@ struct MyViews: View {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
+                                        },onTapExpandButton: {
+                                            //Expand Button
+                                            pushToReelsView(itemObj: item)
                                         }
                                     ).background(
                                         GeometryReader { geo in
@@ -167,6 +170,10 @@ struct MyViews: View {
                                                 safariURL = url
                                                 FeedVideoManager.shared.muteAll()
                                             }
+                                        },onTapExpandButton: {
+                                            //Expand Button
+                                            pushToReelsView(itemObj: item)
+
                                         }
                                     ).background(
                                         GeometryReader { geo in
@@ -315,6 +322,13 @@ struct MyViews: View {
     func pushToDetailScreen(item:ItemModel){
         let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
         self.navigationController?.pushViewController(hostingVC, animated: true)
+    }
+    
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: - Split into 2 staggered columns

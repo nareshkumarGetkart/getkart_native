@@ -123,6 +123,14 @@ struct BoardListViewNew: View {
             .fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
         }
     }
+    
+    
+    func pushToReelsView(itemObj:ItemModel){
+        let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))
+        vc.hidesBottomBarWhenPushed = true
+
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
 
     // MARK: - Item Cell
     @ViewBuilder
@@ -135,6 +143,9 @@ struct BoardListViewNew: View {
                         safariURL = url
                         FeedVideoManager.shared.muteAll()
                     }
+                },onTapExpandButton: {
+                    //Expand Button
+                    pushToReelsView(itemObj: item)
                 }
             )
             .background(
