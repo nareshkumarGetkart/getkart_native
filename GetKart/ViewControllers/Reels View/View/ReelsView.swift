@@ -53,10 +53,15 @@ struct ReelsView: View {
                                 ReelsVideoManager.shared.pauseAll()
                                 navigationController?.popViewController(animated: true)
                             },
-                            onOpenLink: { url in       // NEW
+                            onOpenLink: { url in
+                                
                                 ReelsVideoManager.shared.pauseAll()
                                 presentedURL = url
-                            }
+                            },
+                            openProfile: {userId in
+                                
+                                pushToProfile(id: userId)
+                            },
                         )
                     }
                 }
@@ -94,5 +99,10 @@ struct ReelsView: View {
                         }
                 }
         }
+    }
+    
+    func pushToProfile(id:Int){
+        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }

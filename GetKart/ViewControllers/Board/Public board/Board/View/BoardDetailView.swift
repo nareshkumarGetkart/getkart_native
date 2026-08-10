@@ -97,6 +97,9 @@ struct BoardDetailView: View{
                                     //Expand Button
                                     pushToReelsView(itemObj: item)
 
+                                },onTapProfile: {userId in
+                                    pushToProfile(id: userId)
+
                                 })
                                 .background(
                                     GeometryReader { geo in
@@ -169,6 +172,9 @@ struct BoardDetailView: View{
                                     },onTapExpandButton: {
                                         //Expand Button
                                         pushToReelsView(itemObj: item)
+
+                                    },onTapProfile: {userId in
+                                        pushToProfile(id: userId)
 
                                     })
                                 .background(
@@ -325,6 +331,12 @@ struct BoardDetailView: View{
        
     }
 
+    
+    func pushToProfile(id:Int){
+        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     
     func pushToReelsView(itemObj:ItemModel){
         let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))

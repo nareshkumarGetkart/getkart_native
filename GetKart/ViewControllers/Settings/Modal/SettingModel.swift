@@ -56,6 +56,7 @@ struct SettingsModel: Codable {
     let languages: [Language]?
     let admin: Admin?
     let iosPlaceKey:String?
+    let timezone:String?
     
     enum CodingKeys: String, CodingKey {
         case bannerScrollInterval,iosNudityThreshold
@@ -125,7 +126,7 @@ struct SettingsModel: Codable {
         case demoMode = "demo_mode"
         case languages, admin
         case iosPlaceKey
-        case currency_name,currency,emoji,country_name
+        case currency_name,currency,emoji,country_name,timezone
     }
 }
 

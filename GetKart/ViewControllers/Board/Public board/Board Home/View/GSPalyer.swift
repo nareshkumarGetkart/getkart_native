@@ -729,6 +729,7 @@ struct SmartVideoPlayerView: View {
 
     var onTapBottomButton: () -> Void
     var onTapExpandButton: () -> Void
+    let onTapProfile:(Int) -> Void
 
 
     var body: some View {
@@ -899,7 +900,7 @@ private extension SmartVideoPlayerView {
                                 isMuted
                               ? "speaker.slash.fill"
                               : "speaker.wave.2.fill")
-                        
+                        .frame(width:20,height: 20)
                         .foregroundColor(.white)
                         .padding(8)
                         .background(Color.black.opacity(0.5))
@@ -917,10 +918,35 @@ private extension SmartVideoPlayerView {
                     } label: {
 
                         Image("material-symbols_pan-zoom-rounded")
+                            .frame(width:20,height: 20)
                             .padding(8)
                             .background(Color.black.opacity(0.5))
                             .clipShape(Circle())
                     }
+                    
+                    
+                    
+                    // Profile BUTTON
+                    Button {
+                        onTapProfile(item.user?.id ?? 0)
+                        
+                    } label: {
+                        
+                        ContactImageSwiftUIView(
+                            name: item.user?.name ?? "",
+                            imageUrl: item.user?.profile ?? "",
+                            fallbackImageName: "user-circle",
+                            imgWidth: 32,
+                            imgHeight: 32,
+                            fontsize:18
+                        )
+                        
+                        
+                        .clipShape(Circle())
+                    }
+                    
+                    
+                    
                 }
             }
 

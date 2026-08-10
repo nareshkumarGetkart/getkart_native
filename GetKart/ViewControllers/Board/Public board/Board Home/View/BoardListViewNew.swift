@@ -41,7 +41,11 @@ struct BoardListViewNew: View {
                             guard !vm.isLoading, !vm.isLastPage else { return }
                             vm.tryLoadNextPage()
                         },
-                        onOpenURL: { url in safariURL = url }
+                        onOpenURL: { url in
+                            safariURL = url
+                        }, pushToView: {item in
+                            pushToMyWalletView(item: item)
+                        },
                     )
                     
                     .padding(.horizontal, 5)
@@ -120,7 +124,9 @@ struct BoardListViewNew: View {
                             VideoPreloadManagerDefault.shared.cancelAll()
                         }
             
-            .fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
+                        .fullScreenCover(item: $safariURL) { url in
+                            SafariView(url: url)
+                        }
         }
     }
     
@@ -146,6 +152,9 @@ struct BoardListViewNew: View {
                 },onTapExpandButton: {
                     //Expand Button
                     pushToReelsView(itemObj: item)
+                },onTapProfile: {userId in
+                    pushToProfile(id: userId)
+
                 }
             )
             .background(
@@ -213,6 +222,11 @@ struct BoardListViewNew: View {
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
+    func pushToMyWalletView(item:ItemModel){
+        let hostingController = UIHostingController(rootView: MyWalletView(navigation: navigationController))
+        hostingController.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(hostingController, animated: true)
+    }
 
     func paymentGatewayOpen(product: ItemModel) {
         paymentGateway = PaymentGatewayCentralized()
@@ -238,6 +252,12 @@ struct BoardListViewNew: View {
             self.paymentGateway = nil
         }
         paymentGateway?.initializeDefaults()
+    }
+    
+    func pushToProfile(id:Int){
+        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

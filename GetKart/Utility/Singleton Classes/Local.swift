@@ -30,6 +30,9 @@ final class Local {
     var bannerScrollInterval = 3
     var placeApiKey:String = ""
     var iosNudityThreshold = 0.15
+    
+    var companyLogo:String = ""
+
 
 
     var isLogout = false

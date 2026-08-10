@@ -226,7 +226,7 @@ class ProfileVC: UIViewController {
              onCompleteProfile: {
               // ProfilePopupManager.markAsShown()
              // Navigate to profile screen
-                 self.pushToProfileScreen()
+                 self.pushToProfileEditScreen()
              }
              
              ))
@@ -244,7 +244,7 @@ class ProfileVC: UIViewController {
     }
     
    
-    func pushToProfileScreen(){
+    func pushToProfileEditScreen(){
         let destVC = UIHostingController(rootView: ProfileEditView(navigationController:self.navigationController))
         destVC.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destVC, animated: true)

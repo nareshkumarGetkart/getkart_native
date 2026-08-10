@@ -187,7 +187,9 @@ struct BannerHome: Codable {
     let title, description: String
     let campaignID: Int
     let packageInfo: JSONNull?
-
+    let redirectionType:String?
+    let appRedirection: Bool?
+    
     enum CodingKeys: String, CodingKey {
         case isCampaign = "is_campaign"
         case image
@@ -197,6 +199,7 @@ struct BannerHome: Codable {
         case title, description
         case campaignID = "campaign_id"
         case packageInfo = "package_info"
+        case redirectionType,appRedirection
     }
 }
 

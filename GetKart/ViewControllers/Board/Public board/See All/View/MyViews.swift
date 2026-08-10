@@ -95,6 +95,9 @@ struct MyViews: View {
                                         },onTapExpandButton: {
                                             //Expand Button
                                             pushToReelsView(itemObj: item)
+                                        },onTapProfile: {userId in
+                                            pushToProfile(id: userId)
+
                                         }
                                     ).background(
                                         GeometryReader { geo in
@@ -173,6 +176,9 @@ struct MyViews: View {
                                         },onTapExpandButton: {
                                             //Expand Button
                                             pushToReelsView(itemObj: item)
+
+                                        },onTapProfile: {userId in
+                                            pushToProfile(id: userId)
 
                                         }
                                     ).background(
@@ -317,6 +323,12 @@ struct MyViews: View {
             }
             .fullScreenCover(item: $safariURL) { url in SafariView(url: url) }
         
+    }
+    
+    func pushToProfile(id:Int){
+        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func pushToDetailScreen(item:ItemModel){

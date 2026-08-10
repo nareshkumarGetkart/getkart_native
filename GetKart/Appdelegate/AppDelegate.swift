@@ -510,6 +510,14 @@ extension AppDelegate {
                 nav.pushViewController(vc, animated: true)
             }
 
+        case "wallet":
+            guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
+            switchToTab(4, in: tabBar) { nav in
+                let vc = UIHostingController(rootView: MyWalletView(navigation: nav))
+                vc.hidesBottomBarWhenPushed = true
+                nav.pushViewController(vc, animated: true)
+            }
+            
         case "campaign-update":
             guard let tabBar = navigationController?.topViewController as? HomeBaseVC else { break }
 
@@ -746,15 +754,19 @@ extension AppDelegate{
             url: Constant.shared.get_system_settings
         ) { (obj: SettingsParse) in
             guard obj.code == 200 else { return }
-            Local.shared.currencySymbol       = obj.data?.currencySymbol    ?? "₹"
-            Local.shared.currency       = obj.data?.currency    ?? "₹"
-            Local.shared.currencyName       = obj.data?.currency_name    ?? "INR"
-            Local.shared.emojiCountry       = obj.data?.emoji    ?? ""
-            Local.shared.countryName       = obj.data?.country_name    ?? ""
-            
-            Local.shared.companyEmail         = obj.data?.companyEmail      ?? "support@getkart.com"
-            Local.shared.companyTelelphone1   = obj.data?.companyTel1       ?? "8800957957"
+            Local.shared.currencySymbol       = obj.data?.currencySymbol ?? "₹"
+            Local.shared.currency        = obj.data?.currency ?? "₹"
+            Local.shared.currencyName       = obj.data?.currency_name ?? "INR"
+            Local.shared.emojiCountry       = obj.data?.emoji  ?? ""
+            Local.shared.countryName       = obj.data?.country_name  ?? ""
+            Local.shared.companyEmail         = obj.data?.companyEmail ?? "support@getkart.com"
+            Local.shared.companyTelelphone1   = obj.data?.companyTel1  ?? "8800957957"
             Local.shared.iosNudityThreshold   = obj.data?.iosNudityThreshold ?? 0.15
+            Local.shared.companyLogo         = obj.data?.companyLogo  ?? ""
+
+            if let timezone = obj.data?.timezone,timezone.count>0{
+                Local.shared.saveTimeZoneHeader(timezone: timezone)
+            }
         }
     }
     

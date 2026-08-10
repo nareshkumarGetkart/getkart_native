@@ -362,8 +362,12 @@ extension BoardSearchView {
                         urlString: viewModel.banners[index].image ?? "",
                         shouldPlay: currentBanner == index,
                         action: {
-
-                            if let url = URL(string: (viewModel.banners[index].url ?? "").getValidUrl()) {
+                            
+                            
+                            if (viewModel.banners[index].redirectionType ?? "") == "wallet"{
+                                pushToMyWalletView()
+                                
+                            }else if let url = URL(string: (viewModel.banners[index].url ?? "").getValidUrl()) {
                                 safariURL = url
                             }
 
@@ -414,6 +418,15 @@ extension BoardSearchView {
         }else{
             //For apps own banner
             viewModel.captureSliderClickApi(campaignBannerId: viewModel.banners[index].campaign_id ?? 0)
+        }
+    }
+    
+    func pushToMyWalletView(){
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let hostingController = UIHostingController(rootView: MyWalletView(navigation: navigationController))
+            hostingController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(hostingController, animated: true)
         }
     }
 }

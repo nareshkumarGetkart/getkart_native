@@ -244,10 +244,13 @@ struct BoardHomeView: View {
     
     
     func pushToMyWalletView(){
-        let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
-        let hostingController = UIHostingController(rootView: MyWalletView(navigation: boardNav))
-        hostingController.hidesBottomBarWhenPushed = true
-        boardNav?.pushViewController(hostingController, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let boardNav = tabBarController?.viewControllers?[0] as? UINavigationController
+            let hostingController = UIHostingController(rootView: MyWalletView(navigation: boardNav))
+            hostingController.hidesBottomBarWhenPushed = true
+            boardNav?.pushViewController(hostingController, animated: true)
+        }
     }
 }
 
@@ -647,8 +650,28 @@ extension BoardHomeView {
     
     var headerView: some View {
         HStack {
-            Image("Logo").resizable().aspectRatio(contentMode: .fit)
-                .frame(width: 140,height: 50)
+            if Local.shared.companyLogo.count > 0, let url = URL(string: Local.shared.companyLogo) {
+                // Use KFAnimatedImage to support both static images and animated GIFs
+                KFAnimatedImage(url)
+                    .placeholder {
+                        // Optional: Show local Logo while downloading
+                        Image("Logo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 140, height: 50)
+                    }
+                    .fade(duration: 0.25)
+                    .scaledToFit() // Replaces resizable().aspectRatio(contentMode: .fit)
+                    .frame(width: 140, height: 50)
+            } else {
+                // Fallback if URL string is empty or invalid
+                Image("Logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 140, height: 50)
+            }
+
+          
             Spacer()
             interestButton
         }
@@ -718,6 +741,7 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
     let itemView: (ItemModel) -> ItemContent
     let onLastItemAppear: () -> Void
     let onOpenURL: (URL) -> Void
+    let pushToView:(ItemModel)->Void
 
     @State private var lastTriggeredItemId: Int?
 
@@ -881,13 +905,24 @@ struct PinterestMasonryFeed<ItemContent: View>: View {
         if item.boardType == 5 {
 
             BoardVideoBannerCard(product: item) { url in
-                onOpenURL(url)
+                
+                if  (item.banner?.redirectionType ?? "") == "wallet"{
+                    pushToView(item)
+                }else{
+                    onOpenURL(url)
+
+                }
             }
 
         } else {
 
             BoardBannerCard(product: item) { url in
-                onOpenURL(url)
+                
+                if (item.banner?.redirectionType ?? "") == "wallet"{
+                    pushToView(item)
+                }else{
+                    onOpenURL(url)
+                }
             }
         }
     }

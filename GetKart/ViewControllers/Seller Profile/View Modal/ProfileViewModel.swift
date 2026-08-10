@@ -10,13 +10,12 @@ import SwiftUI
 
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
+    
     static var defaultValue: CGFloat = 0
-
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
 }
-
 
 
 struct TabPaginationState<ItemModel> {
@@ -30,9 +29,7 @@ struct TabPaginationState<ItemModel> {
 class ProfileViewModel: ObservableObject {
 
     let userId: Int
-
     @Published var sellerObj:Seller?
-
     // 4 tabs states
     @Published var boardsState = TabPaginationState<ItemModel>()
     @Published var ideasState = TabPaginationState<ItemModel>()

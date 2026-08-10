@@ -112,6 +112,7 @@ struct ContactImageSwiftUIView: View {
     var imgWidth: CGFloat = 60
     var imgHeight: CGFloat = 60
     var selectedImage: UIImage? = nil   // 👈 picked image
+    var fontsize:CGFloat = 27.0
     
     var body: some View {
         ZStack {
@@ -153,7 +154,7 @@ struct ContactImageSwiftUIView: View {
         if let name = name, !name.isEmpty , name.lowercased() != "guest user" {
             // Case 2: initials
             Text(initials(from: name))
-                .font(.manrope(.semiBold, size: 27.0))
+                .font(.manrope(.semiBold, size: fontsize))
                 .foregroundColor(.white)
                 .frame(width: imgWidth, height: imgHeight)
                 .background(Color(.systemOrange))

@@ -12,7 +12,7 @@ struct ReelPageView: View {
     let safeAreaBottom: CGFloat     // NEW
     let onBack: () -> Void
     let onOpenLink: (URL) -> Void   // NEW — replaces local safariURL/fullScreenCover
-
+    let openProfile: (Int) -> Void
     @ObservedObject private var videoManager = ReelsVideoManager.shared   // NEW
     @State private var player: AVQueuePlayer?
     @State private var isPlaying = true
@@ -110,11 +110,31 @@ private extension ReelPageView {
         VStack(spacing: 10) {
 
             //ReelProgressView(player: player, isMuted: $isMuted, onToggleMute: toggleMute)
-            ReelProgressView(
-                player: player,
-                isMuted: isMuted,              // now a plain Bool, not a Binding
-                onToggleMute: toggleMute
-            )
+            HStack(spacing:0){
+                // Profile BUTTON
+                Button {
+
+                    openProfile(item.user?.id ?? 0)
+                } label: {
+                    
+                    ContactImageSwiftUIView(
+                        name: item.user?.name ?? "",
+                        imageUrl: item.user?.profile ?? "",
+                        fallbackImageName: "user-circle",
+                        imgWidth: 32,
+                        imgHeight: 32,
+                        fontsize:18
+                    )
+                    
+                    
+                    .clipShape(Circle())
+                }
+                ReelProgressView(
+                    player: player,
+                    isMuted: isMuted,              // now a plain Bool, not a Binding
+                    onToggleMute: toggleMute
+                )
+            }
             VStack(spacing: 12) {
 
                 Text(item.name ?? "")
