@@ -44,7 +44,7 @@ class URLhandler: NSObject{
 
         let timeZone =  Local.shared.getTimeZoneHeader() //TimeZone.current.identifier
         
-        print("timeZone == \(timeZone)")
+        //print("timeZone == \(timeZone)")
         
         if objLoggedInUser.token != nil {
             

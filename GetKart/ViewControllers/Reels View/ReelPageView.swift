@@ -71,7 +71,7 @@ struct ReelPageView: View {
                 }
             }
             .onChange(of: isCurrent) { nowCurrent in
-                print("🔄 isCurrent changed to \(nowCurrent) for id:", item.id ?? -1)
+               // print("🔄 isCurrent changed to \(nowCurrent) for id:", item.id ?? -1)
                 if nowCurrent {
                     playThisReel()
                 } else {

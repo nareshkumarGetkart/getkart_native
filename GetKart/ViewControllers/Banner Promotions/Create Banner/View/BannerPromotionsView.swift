@@ -292,7 +292,7 @@ struct BannerPromotionsView: View {
             )
             .cornerRadius(8)
             .padding()
-            .background(Color(.systemBackground))
+            //.background(Color(.systemBackground))
         }
         .background(Color(UIColor.systemGray6))
         

@@ -100,8 +100,95 @@ class ContactImageView: UIImageView {
 
 
 
+import SwiftUI
+import Kingfisher
 
+struct ContactImageSwiftUIView: View {
+    var name: String?
+    var imageUrl: String?
+    var fallbackImageName: String = "user-circle"
 
+    var imgWidth: CGFloat = 60
+    var imgHeight: CGFloat = 60
+
+    var selectedImage: UIImage? = nil
+    var fontsize: CGFloat = 27.0
+
+    private var downsampleSize: CGSize {
+        CGSize(
+            width: imgWidth * UIScreen.main.scale,
+            height: imgHeight * UIScreen.main.scale
+        )
+    }
+
+    var body: some View {
+        ZStack {
+            if let uiImage = selectedImage {
+
+                // MARK: - Selected Image
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+
+            } else if let urlStr = imageUrl,
+                      !urlStr.isEmpty,
+                      let url = URL(string: urlStr) {
+
+                // MARK: - Remote Image
+                KFImage(url)
+                    .placeholder {
+                        placeholderView
+                    }
+                    .setProcessor(
+                        DownsamplingImageProcessor(size: downsampleSize)
+                    )
+                    .scaleFactor(UIScreen.main.scale)
+                    .cacheMemoryOnly(false)
+                    .fade(duration: 0.15)
+                    .resizable()
+                    .scaledToFill()
+
+            } else {
+
+                // MARK: - Fallback
+                placeholderView
+            }
+        }
+        .frame(width: imgWidth, height: imgHeight)
+        .clipShape(Circle())
+    }
+
+    // MARK: - Placeholder
+
+    @ViewBuilder
+    private var placeholderView: some View {
+        if let name = name,
+           !name.isEmpty,
+           name.lowercased() != "guest user" {
+
+            Text(initials(from: name))
+                .font(.manrope(.semiBold, size: fontsize))
+                .foregroundColor(.white)
+                .frame(width: imgWidth, height: imgHeight)
+                .background(Color(.systemOrange))
+
+        } else {
+            Image(fallbackImageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: imgWidth, height: imgHeight)
+        }
+    }
+
+    private func initials(from name: String?) -> String {
+        guard let name = name, !name.isEmpty else {
+            return "?"
+        }
+
+        return String(name.prefix(1)).uppercased()
+    }
+}
+/*
 import SwiftUI
 
 
@@ -174,7 +261,7 @@ struct ContactImageSwiftUIView: View {
         return String(name.prefix(1)).uppercased()
     }
 }
-
+*/
 /*
  VStack(spacing: 20) {
      ContactImageView(name: "Radheshyam", imageUrl: nil)

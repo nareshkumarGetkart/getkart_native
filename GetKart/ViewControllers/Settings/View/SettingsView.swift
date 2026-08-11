@@ -259,6 +259,7 @@ struct SettingsView: View {
                     let code = result["code"] as? Int ?? 0
                     if code == 200{
                         RealmManager.shared.updateUserType(type: type)
+                        self.navigationController?.popViewController(animated: true)
                     }
                 }
             }
