@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import Kingfisher
 import AVFoundation
 
 struct BannerMediaView: View {
@@ -19,7 +19,6 @@ struct BannerMediaView: View {
 
     @State private var isMuted = true
     @State private var player: AVPlayer?
-   // @State private var looper: AVPlayerLooper?
     @State private var endObserver: NSObjectProtocol?
     
     var isVideo: Bool {
@@ -51,7 +50,7 @@ struct BannerMediaView: View {
 
             } else {
 
-                AsyncImage(
+               /* AsyncImage(
                     url: URL(string: urlString)
                 ) { image in
 
@@ -64,7 +63,20 @@ struct BannerMediaView: View {
                     Image("getkartplaceholder")
                         .resizable()
                         .scaledToFill()
-                }
+                }*/
+                
+            
+
+                KFImage(URL(string: urlString))
+                    .placeholder {
+                        Image("getkartplaceholder")
+                            .resizable()
+                            .scaledToFill()
+                    }
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .clipped()
             }
         }.overlay(alignment: .topTrailing) {
             if isVideo{
@@ -96,14 +108,7 @@ struct BannerMediaView: View {
             player?.pause()
             action?()
         }
-//        .onAppear {
-//
-//            createPlayerIfNeeded()
-//
-//            if shouldPlay {
-//                player?.play()
-//            }
-//        }
+
         
         .onAppear {
 
@@ -119,17 +124,11 @@ struct BannerMediaView: View {
                 }
             }
         }
-//        .onDisappear {
-//
-//            player?.pause()
-//        }
+
         .onDisappear {
 
             player?.pause()
 
-//            if let endObserver {
-//                NotificationCenter.default.removeObserver(endObserver)
-//            }
         }
         
         
@@ -171,34 +170,12 @@ struct BannerMediaView: View {
 
         guard let url = URL(string: urlString) else { return }
 
-       /* let item = AVPlayerItem(url: url)
-
-        let queuePlayer = AVQueuePlayer()
-
-       // queuePlayer.isMuted = false
-        queuePlayer.isMuted = isMuted
-        let looper = AVPlayerLooper(
-            player: queuePlayer,
-            templateItem: item
-        )
-
-        self.player = queuePlayer
-        self.looper = looper*/
-        
+      
         let item = AVPlayerItem(url: url)
 
         let player = AVPlayer(playerItem: item)
         player.isMuted = isMuted
 
-       /* endObserver = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: item,
-            queue: .main
-        ) { _ in
-
-            onVideoFinished?()
-        }*/
-        
         endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
@@ -216,11 +193,6 @@ struct BannerMediaView: View {
         self.player = player
     }
 }
-
-//#Preview {
-//    BannerMediaView()
-//}
-//
 
 
 import AVFoundation

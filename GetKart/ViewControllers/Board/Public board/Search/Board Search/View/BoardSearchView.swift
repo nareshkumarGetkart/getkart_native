@@ -400,7 +400,7 @@ extension BoardSearchView {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal,8)
         
         .onAppear {
 

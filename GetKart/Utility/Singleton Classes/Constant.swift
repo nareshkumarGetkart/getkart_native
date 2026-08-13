@@ -15,7 +15,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .live
-var ISDEBUG = false
+var ISDEBUG = true
 
 final class Constant: NSObject {
     
