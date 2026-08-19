@@ -238,9 +238,53 @@ struct CreateBoardView: View {
                         TextField("00", text: $strPrice)
                             .padding(.horizontal)
                             .frame(height: 55)
-                            .background(RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(.systemBackground)))
-                            .keyboardType(.numberPad)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemBackground))
+                            )
+                            .keyboardType(
+                                (Local.shared.countryName.lowercased() == "india" || (boardObj?.currency ?? "") == "₹")
+                                ? .numberPad
+                                : .decimalPad
+                            )
+                            .onChange(of: strPrice) { newValue in
+                                
+                                // India: only numbers
+                                if (Local.shared.countryName.lowercased() == "india" || (boardObj?.currency ?? "") == "₹"){
+                                    let filtered = newValue.filter { $0.isNumber }
+                                    
+                                    if filtered != newValue {
+                                        strPrice = filtered
+                                    }
+                                    return
+                                }
+                                
+                                // Other countries: numbers + decimal point
+                                let filtered = newValue.filter {
+                                    $0.isNumber || $0 == "."
+                                }
+                                
+                                // Allow only one decimal point
+                                let parts = filtered.split(
+                                    separator: ".",
+                                    omittingEmptySubsequences: false
+                                )
+                                
+                                if parts.count > 2 {
+                                    strPrice = String(filtered.dropLast())
+                                    return
+                                }
+                                
+                                // Maximum 2 digits after decimal
+                                if parts.count == 2 && parts[1].count > 2 {
+                                    strPrice = String(filtered.dropLast())
+                                    return
+                                }
+                                
+                                if filtered != newValue {
+                                    strPrice = filtered
+                                }
+                            }
                     }
                     // MARK: - Offer Price
 
@@ -249,39 +293,61 @@ struct CreateBoardView: View {
                         HStack{
                             TextField("00", text: $strOfferPrice).padding(.horizontal)
                                 .onChange(of: strOfferPrice) { newValue in
-                                // Allow only numbers
-                                    if strPrice.count == 0{
+                                    
+                                    if strPrice.isEmpty {
                                         strOfferPrice = ""
                                         return
                                     }
-                                let filtered = newValue.filter { $0.isNumber }
-                                if filtered != newValue {
-                                    strOfferPrice = filtered
-                                    return
+                                    
+                                    // Allow only numbers and "."
+                                    let filtered = newValue.filter {
+                                        $0.isNumber || $0 == "."
+                                    }
+                                    
+                                    // Allow only one decimal point
+                                    let decimalParts = filtered.split(
+                                        separator: ".",
+                                        omittingEmptySubsequences: false
+                                    )
+                                    
+                                    if decimalParts.count > 2 {
+                                        strOfferPrice = String(filtered.dropLast())
+                                        return
+                                    }
+                                    
+                                    // Maximum 2 digits after decimal
+                                    if decimalParts.count == 2 && decimalParts[1].count > 2 {
+                                        strOfferPrice = String(filtered.dropLast())
+                                        return
+                                    }
+                                    
+                                    if filtered != newValue {
+                                        strOfferPrice = filtered
+                                        return
+                                    }
+                                    
+                                    guard let price = Double(strPrice),
+                                          let offer = Double(filtered) else {
+                                        return
+                                    }
+                                    
+                                    // Offer price must be less than actual price
+                                    if offer >= price {
+                                        strOfferPrice = ""
+                                    }
                                 }
-
-                                guard let price = Int(strPrice),
-                                      let offer = Int(filtered) else { return }
-
-                                // Prevent offer price > actual price
-                                if offer >= price {
-                                    strOfferPrice =  "" //String(price)
-                                }
-                            }
                             Spacer()
-                            if let price = Int(strPrice),
-                               let offerPrice = Int(strOfferPrice),
+                            if let price = Double(strPrice),
+                               let offerPrice = Double(strOfferPrice),
                                price > 0 ,price >= offerPrice{
 
                                 let differencePrice = price - offerPrice
-                                let percentageOff = (differencePrice * 100) / price
+                                let percentageOff = ((differencePrice * 100) / price).rounded()
 
-                                Text("\(percentageOff)% Off").padding(.horizontal)
+                                Text("\(percentageOff.formatNumber())% Off").padding(.horizontal)
                                     .font(.inter(.regular, size: 16))
                                     .foregroundColor(Color(CustomColor.sharedInstance.priceColor))
                             }
-
-                        
                             
                         }.frame(maxWidth: .infinity,minHeight:55, maxHeight: 55)
                             .background(
@@ -289,7 +355,11 @@ struct CreateBoardView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Color(.systemBackground))
                             
-                        ).keyboardType(.numberPad).tint(Color(.systemOrange)).autocapitalization(.none)
+                        ) .keyboardType(
+                            (Local.shared.countryName.lowercased() == "india" || (boardObj?.currency ?? "") == "₹")
+                            ? .numberPad
+                            : .decimalPad)
+                            .tint(Color(.systemOrange)).autocapitalization(.none)
                     }
                     
                     //MARK: Call to action
@@ -492,9 +562,20 @@ struct CreateBoardView: View {
             AlertView.sharedManager.showToast(
                 message: "Description must be between 20 and 400 characters."
             )
-        } else if strPrice.count == 0 || ((Int(strPrice) ?? 0) <= 0) || strPrice.hasPrefix("0"){
+        }
+        /*else if strPrice.isEmpty ||
+                    (Double(strPrice) ?? 0) <= 0 ||
+                    strPrice.hasPrefix("0") {
             AlertView.sharedManager.showToast(message: "Please enter valid price")
+        }*/
+                
+        else if strPrice.isEmpty ||
+                    (Double(strPrice) ?? 0) <= 0 ||
+                    (strPrice.hasPrefix("0") && !strPrice.hasPrefix("0.")) {
+                
+                AlertView.sharedManager.showToast(message: "Please enter valid price")
             
+               
         }else if selectedCallToActionId == nil {
             
             AlertView.sharedManager.showToast(message: "Please select call to action")

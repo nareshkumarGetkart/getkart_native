@@ -261,6 +261,10 @@ struct BoardSearchView: View {
             }
             .onDisappear {
                 timer?.invalidate()
+            }.task {
+                if  Local.shared.reviewAllowed == 1{
+                    AppReviewManager.shared.requestReviewIfNeeded()
+                }
             }
     }
     

@@ -229,6 +229,10 @@ struct FavoriteBoardView: View {
                                             }
                                             
                                         },
+                                        onTapProfile: { userId in
+                                            pushToProfileScreen(userId: userId)
+
+                                        },
                                         isToShowBoostButton:false
                                     )
                                     .measureHeight(id: item.id ?? 0)
@@ -269,6 +273,8 @@ struct FavoriteBoardView: View {
                                             }else{
                                                 // paymentGatewayOpen(product: item)
                                             }
+                                        }, onTapProfile: { userId in
+                                            pushToProfileScreen(userId: userId)
                                         },
                                         isToShowBoostButton:false
                                     )
@@ -364,7 +370,18 @@ struct FavoriteBoardView: View {
     
     func pushToDetailScreen(item:ItemModel){
         let hostingVC = UIHostingController(rootView: BoardDetailView(navigationController:self.navigationController, itemObj: item))
+        hostingVC.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(hostingVC, animated: true)
+    }
+    
+    func pushToProfileScreen(userId:Int){
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let hostingVC = UIHostingController(rootView: SellerProfileView(navController:self.navigationController,userId: userId))
+            hostingVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(hostingVC, animated: true)
+            
+        }
     }
     
     // MARK: - Split into 2 staggered columns

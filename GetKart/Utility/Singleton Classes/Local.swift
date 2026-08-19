@@ -32,6 +32,7 @@ final class Local {
     var iosNudityThreshold = 0.15
     
     var companyLogo:String = ""
+    var reviewAllowed = 1
 
 
 

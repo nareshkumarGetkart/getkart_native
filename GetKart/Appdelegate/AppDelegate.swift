@@ -764,6 +764,9 @@ extension AppDelegate{
             Local.shared.iosNudityThreshold   = obj.data?.iosNudityThreshold ?? 0.15
             Local.shared.companyLogo         = obj.data?.companyLogo  ?? ""
 
+            Local.shared.reviewAllowed = obj.data?.reviewAllowed  ?? 1
+
+            
             if let timezone = obj.data?.timezone,timezone.count>0{
                 Local.shared.saveTimeZoneHeader(timezone: timezone)
             }

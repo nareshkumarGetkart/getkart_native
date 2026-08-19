@@ -13,8 +13,8 @@ import Kingfisher
 
 //MARK: - BoardHomeView
 
-private let maxEqualizationHeight: CGFloat = 100
-private let maxCardHeight: CGFloat = 350 // or whatever looks good
+ let maxEqualizationHeight: CGFloat = 100
+ let maxCardHeight: CGFloat = 350 // or whatever looks good
 
 struct BoardHomeView: View {
 
@@ -673,6 +673,7 @@ extension BoardHomeView {
 
           
             Spacer()
+            notificationButton
             interestButton
         }
         .padding(.horizontal, 8)
@@ -696,6 +697,23 @@ extension BoardHomeView {
         .cornerRadius(10)
     }
     
+    
+    var notificationButton: some View{
+        Button {
+            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+                guard let tabBar = tabBarController,
+                      let navigationController = tabBar.viewControllers?[0] as? UINavigationController else { return }
+                let hostingController = UIHostingController(rootView: NotificationView(navigation:navigationController)) 
+                hostingController.hidesBottomBarWhenPushed = true
+                navigationController.pushViewController(hostingController, animated: true)
+            }
+            
+        } label: {
+            Image("notificationOutline").padding(8)
+
+        }
+
+    }
     var emptyView: some View {
         VStack(spacing: 20) {
             Spacer()
@@ -716,520 +734,6 @@ extension BoardHomeView {
 
 
 
-enum FeedSegment: Identifiable {
-    case banner(ItemModel)
-    case staggeredChunk([ItemModel]) // always non-banner items only
-
-    var id: String {
-        switch self {
-        case .banner(let item):
-            return "banner-\(item.id ?? 0)"
-        case .staggeredChunk(let items):
-            // stable id from first+last item in chunk
-            return "chunk-\(items.first?.id ?? 0)-\(items.last?.id ?? 0)"
-        }
-    }
-}
-
-//MARK: PinterestMasonryFeed
-
-struct PinterestMasonryFeed<ItemContent: View>: View {
-
-    let items: [ItemModel]
-    var spacing: CGFloat = 8
-
-    let itemView: (ItemModel) -> ItemContent
-    let onLastItemAppear: () -> Void
-    let onOpenURL: (URL) -> Void
-    let pushToView:(ItemModel)->Void
-
-    @State private var lastTriggeredItemId: Int?
-
-    private let paginationThreshold = 7
-    private let chunkSize = 10
-
-    // MARK: - Segment
-
-    private enum Segment: Identifiable {
-        case chunk([ItemModel])
-        case banner(ItemModel)
-
-        var id: String {
-            switch self {
-            case .chunk(let items):
-                return "chunk-\(items.first?.id ?? 0)-\(items.last?.id ?? 0)"
-
-            case .banner(let item):
-                return "banner-\(item.id ?? 0)"
-            }
-        }
-    }
-
-    // MARK: - Build Segments
-
-    private var segments: [Segment] {
-
-        var result: [Segment] = []
-        var buffer: [ItemModel] = []
-
-        func flush() {
-            guard !buffer.isEmpty else { return }
-
-            var index = 0
-
-            while index < buffer.count {
-
-                let end = min(index + chunkSize, buffer.count)
-
-                result.append(
-                    .chunk(Array(buffer[index..<end]))
-                )
-
-                index += chunkSize
-            }
-
-            buffer.removeAll()
-        }
-
-        for item in items {
-
-            if item.boardType == 4 || item.boardType == 5 {
-
-                flush()
-
-                result.append(.banner(item))
-
-            } else {
-
-                buffer.append(item)
-            }
-        }
-
-        flush()
-
-        return result
-    }
-
-    // MARK: - Body
-
-    var body: some View {
-
-        LazyVStack(spacing: spacing) {
-
-            ForEach(segments) { segment in
-
-                switch segment {
-
-                case .banner(let item):
-
-                    bannerView(item: item)
-                        .frame(maxWidth: .infinity)
-                        .onAppear {
-                            checkPagination(item)
-                        }
-
-                case .chunk(let chunkItems):
-                    
-                    TwoColumnMasonryLayout(
-                        items: chunkItems,
-                        spacing: spacing,
-                        shouldEqualizeBottom: true
-                    ) {
-                        ForEach(chunkItems, id: \.id) { item in
-                            itemView(item)
-                                .onAppear {
-                                    checkPagination(item)
-                                }
-                        }
-                    }
-                }
-            }
-
-            // Backup pagination trigger
-            Color.clear
-                .frame(height: 1)
-                .id("bottom-\(items.count)")
-                .onAppear {
-
-                    guard items.count >= paginationThreshold else {
-                        return
-                    }
-
-                    onLastItemAppear()
-                }
-        }
-        .onChange(of: items.count) { _ in
-            lastTriggeredItemId = nil
-        }
-    }
-
-    // MARK: - Pagination
-
-    private func checkPagination(_ item: ItemModel) {
-
-        guard let itemId = item.id else {
-            return
-        }
-
-        guard let currentIndex = items.firstIndex(where: {
-            $0.id == itemId
-        }) else {
-            return
-        }
-
-        let triggerIndex = max(
-            items.count - paginationThreshold,
-            0
-        )
-
-        guard currentIndex >= triggerIndex else {
-            return
-        }
-
-        guard lastTriggeredItemId != itemId else {
-            return
-        }
-
-        lastTriggeredItemId = itemId
-
-        DispatchQueue.main.async {
-            onLastItemAppear()
-        }
-    }
-
-    // MARK: - Banner
-
-    @ViewBuilder
-    private func bannerView(item: ItemModel) -> some View {
-
-        if item.boardType == 5 {
-
-            BoardVideoBannerCard(product: item) { url in
-                
-                if  (item.banner?.redirectionType ?? "") == "wallet"{
-                    pushToView(item)
-                }else{
-                    onOpenURL(url)
-
-                }
-            }
-
-        } else {
-
-            BoardBannerCard(product: item) { url in
-                
-                if (item.banner?.redirectionType ?? "") == "wallet"{
-                    pushToView(item)
-                }else{
-                    onOpenURL(url)
-                }
-            }
-        }
-    }
-}
-
-//MARK: - TwoColumnMasonryLayout
-struct TwoColumnMasonryLayout: Layout {
-
-    let items: [ItemModel]
-    var spacing: CGFloat = 8
-    var shouldEqualizeBottom: Bool = true
-
-    private static let screenWidth = UIScreen.main.bounds.width
-
-    struct CacheData {
-        var frames: [CGRect] = []
-        var size: CGSize = .zero
-    }
-
-    func makeCache(subviews: Subviews) -> CacheData {
-        CacheData()
-    }
-/*
-    func sizeThatFits(
-        proposal: ProposedViewSize,
-        subviews: Subviews,
-        cache: inout CacheData
-    ) -> CGSize {
-
-        let totalWidth = proposal.width ?? Self.screenWidth
-        let columnWidth = (totalWidth - spacing) / 2
-
-        var frames = Array(
-            repeating: CGRect.zero,
-            count: subviews.count
-        )
-
-        var columnHeights: [CGFloat] = [0, 0]
-        var lastInColumn: [Int?] = [nil, nil]
-
-        for index in subviews.indices {
-
-            let column = columnHeights[0] <= columnHeights[1] ? 0 : 1
-
-            let size = subviews[index].sizeThatFits(
-                ProposedViewSize(
-                    width: columnWidth,
-                    height: nil
-                )
-            )
-
-            let x = column == 0
-                ? 0
-                : columnWidth + spacing
-
-            let y = columnHeights[column]
-
-            frames[index] = CGRect(
-                x: x,
-                y: y,
-                width: columnWidth,
-                height: size.height
-            )
-
-            columnHeights[column] += size.height + spacing
-            lastInColumn[column] = index
-        }
-
-        let leftHeight = max(
-            columnHeights[0] - spacing,
-            0
-        )
-
-        let rightHeight = max(
-            columnHeights[1] - spacing,
-            0
-        )
-
-        let maxHeight = max(
-            leftHeight,
-            rightHeight
-        )
-
-       
-        if shouldEqualizeBottom {
-
-            let leftIndex = lastInColumn[0]
-            let rightIndex = lastInColumn[1]
-
-            let leftIsVideo: Bool = {
-                guard let idx = leftIndex,
-                      idx < items.count else {
-                    return false
-                }
-
-                return items[idx].boardType == 2
-            }()
-
-            let rightIsVideo: Bool = {
-                guard let idx = rightIndex,
-                      idx < items.count else {
-                    return false
-                }
-
-                return items[idx].boardType == 2
-            }()
-
-            if leftHeight < rightHeight {
-
-                let diff = rightHeight - leftHeight
-
-                if leftIsVideo {
-
-                    // Keep video fixed.
-                    // Don't stretch anything.
-                }
-                else if let idx = leftIndex {
-
-                    frames[idx].size.height += diff
-                }
-
-            } else if rightHeight < leftHeight {
-
-                let diff = leftHeight - rightHeight
-
-                if rightIsVideo {
-
-                    // Keep video fixed.
-                    // Don't stretch anything.
-                }
-                else if let idx = rightIndex {
-
-                    frames[idx].size.height += diff
-                }
-            }
-        }
-
-        cache.frames = frames
-        cache.size = CGSize(
-            width: totalWidth,
-            height: maxHeight
-        )
-
-        return cache.size
-    }
-*/
-    
-    func sizeThatFits(
-        proposal: ProposedViewSize,
-        subviews: Subviews,
-        cache: inout CacheData
-    ) -> CGSize {
-
-        let totalWidth = proposal.width ?? Self.screenWidth
-        let columnWidth = (totalWidth - spacing) / 2
-
-        var frames = Array(repeating: CGRect.zero, count: subviews.count)
-        var columnHeights: [CGFloat] = [0, 0]
-        var lastInColumn: [Int?] = [nil, nil]
-
-        for index in subviews.indices {
-            
-            // ✅ Strict alternation: 0,1,0,1...
-            let column = index % 2
-
-            let size = subviews[index].sizeThatFits(
-                ProposedViewSize(width: columnWidth, height: nil)
-            )
-
-            let x = column == 0 ? 0 : columnWidth + spacing
-            let y = columnHeights[column]
-
-            frames[index] = CGRect(x: x, y: y, width: columnWidth, height: size.height)
-
-            columnHeights[column] += size.height + spacing
-            lastInColumn[column] = index
-        }
-
-        let leftHeight  = max(columnHeights[0] - spacing, 0)
-        let rightHeight = max(columnHeights[1] - spacing, 0)
-        let maxHeight   = max(leftHeight, rightHeight)
-
-        // ✅ Equalize bottom - but now it's always a small diff since columns are balanced
-     /*   if shouldEqualizeBottom {
-//            let leftIsVideo: Bool = {
-//                return false
-//                guard let idx = lastInColumn[0], idx < items.count else { return false }
-//                return items[idx].boardType == 2
-//            }()
-//
-//            let rightIsVideo: Bool = {
-//                return false
-//
-//                guard let idx = lastInColumn[1], idx < items.count else { return false }
-//                return items[idx].boardType == 2
-//            }()
-
-            if leftHeight < rightHeight {
-                let diff = rightHeight - leftHeight
-                if let idx = lastInColumn[0] {
-                   // frames[idx].size.height += diff
-                    
-                    // Don't stretch beyond maxCardHeight
-                           let currentH = frames[idx].size.height
-                           frames[idx].size.height = min(currentH + diff, maxCardHeight)
-                }
-            } else if rightHeight < leftHeight {
-                let diff = leftHeight - rightHeight
-                if  let idx = lastInColumn[1] {
-                   // frames[idx].size.height += diff
-                    
-                    // Don't stretch beyond maxCardHeight
-                           let currentH = frames[idx].size.height
-                           frames[idx].size.height = min(currentH + diff, maxCardHeight)
-                }
-            }
-        }
-
-        cache.frames = frames
-        cache.size = CGSize(width: totalWidth, height: maxHeight)
-        return cache.size
-        
-        */
-        
-        if shouldEqualizeBottom {
-
-            if leftHeight < rightHeight {
-
-                let diff = rightHeight - leftHeight
-
-                if let idx = lastInColumn[0] {
-
-                    let currentHeight = frames[idx].size.height
-
-                    // Never stretch too much
-                    let allowedGrowth = min(diff, maxEqualizationHeight)
-
-                    // Never exceed max card height
-                    let newHeight = min(
-                        currentHeight + allowedGrowth,
-                        580 //maxCardHeight
-                    )
-
-                    let actualGrowth = newHeight - currentHeight
-
-                    frames[idx].size.height = newHeight
-
-                    // IMPORTANT
-                    columnHeights[0] += actualGrowth
-                }
-
-            } else if rightHeight < leftHeight {
-
-                let diff = leftHeight - rightHeight
-
-                if let idx = lastInColumn[1] {
-
-                    let currentHeight = frames[idx].size.height
-
-                    let allowedGrowth = min(
-                        diff,
-                        maxEqualizationHeight
-                    )
-
-                    let newHeight = min(
-                        currentHeight + allowedGrowth,
-                        570 //maxCardHeight
-                    )
-
-                    let actualGrowth = newHeight - currentHeight
-
-                    frames[idx].size.height = newHeight
-
-                    // IMPORTANT
-                    columnHeights[1] += actualGrowth
-                }
-            }
-        }
-        cache.frames = frames
-        cache.size = CGSize(width: totalWidth, height: maxHeight)
-        return cache.size
-    }
-    
-    func placeSubviews(
-        in bounds: CGRect,
-        proposal: ProposedViewSize,
-        subviews: Subviews,
-        cache: inout CacheData
-    ) {
-
-        for index in subviews.indices {
-
-            let frame = cache.frames[index]
-
-            subviews[index].place(
-                at: CGPoint(
-                    x: bounds.minX + frame.minX,
-                    y: bounds.minY + frame.minY
-                ),
-                proposal: ProposedViewSize(
-                    width: frame.width,
-                    height: frame.height
-                )
-            )
-        }
-    }
-}
 
 
 private var goldenGradient: LinearGradient {
@@ -1301,7 +805,7 @@ struct BoardBannerCard: View {
                     }
             
         }
-        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+      //  .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         //.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         //.shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         .contentShape(Rectangle())
@@ -1418,12 +922,15 @@ struct CardItemViewNew: View {
     let onLike:           (Bool, Int) -> Void
     let onTap:            () -> Void
     let onTapBoostButton: () -> Void
+    let onTapProfile:(Int) -> Void
     var isToShowBoostButton = true
     var imageRatio: CGFloat = 1.2
  
     var body: some View {
         if item.boardType == 1 {
-            PromotionalAdsCardStaggeredNew(product: item, onTapBottomtButton: onTapBoostButton)
+            PromotionalAdsCardStaggeredNew(product: item, onTapBottomtButton: onTapBoostButton) { userId in
+                onTapProfile(userId)
+            }
         } else if item.boardType == 3 {
             IdeaCardStaggeredNew(product: item).onTapGesture(perform: onTap)
         } else {
@@ -1478,7 +985,7 @@ struct IdeaCardStaggeredNew: View {
                                 Text("Sponsored").foregroundColor(.white)
                                     .font(.inter(.bold, size: 14))
                                     .padding([.bottom, .trailing], 8)
-                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
+                                   // .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 1)
                             }
                         }
                     }
@@ -1638,7 +1145,7 @@ struct ProductCardStaggeredNew: View {
             }
         }
         .background(Color(.systemBackground))
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
+       // .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contentShape(Rectangle())
         .fullScreenCover(isPresented: $showSafari) {
@@ -1672,6 +1179,7 @@ struct PromotionalAdsCardStaggeredNew: View {
 
     let product: ItemModel
     let onTapBottomtButton: () -> Void
+    let onTapProfile:(Int) -> Void
     
     private var kfImage: some View {
         let cellular = NetworkMonitor.shared.isCellular //NetworkCondition.isCellular
@@ -1700,14 +1208,39 @@ struct PromotionalAdsCardStaggeredNew: View {
 
             ZStack(alignment: .topLeading) {
                 kfImage
-                if product.isFeature ?? false {
-                    Text("Sponsored")
-                        .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .medium)).padding(5)
+                HStack{
+                    
+                   
+                    
+                    if product.isFeature ?? false {
+                        Text("Sponsored")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14, weight: .medium)).padding(5)
+                    }
+
+                    Spacer()
+                    
+                    // Profile BUTTON
+                    Button {
+                        onTapProfile(product.user?.id ?? 0)
+                        
+                    } label: {
+                        
+                        ContactImageSwiftUIView(
+                            name: product.user?.name ?? "",
+                            imageUrl: product.user?.profile ?? "",
+                            fallbackImageName: "user-circle",
+                            imgWidth: 32,
+                            imgHeight: 32,
+                            fontsize:18
+                        )
+                        
+                        .clipShape(Circle())
+                    }.padding(5)
                 }
             }
             .frame(maxWidth: columnWidth)
-            .frame(minHeight:260, maxHeight:maxCardHeight + 10)// .frame(maxHeight:.infinity)
+            .frame(minHeight:260, maxHeight:maxCardHeight + 10)
             .layoutPriority(1)
 
             // CTA bar — fixed height, never stretches
@@ -1725,14 +1258,14 @@ struct PromotionalAdsCardStaggeredNew: View {
             .frame(height: 35)
             .frame(maxWidth: .infinity)
             .background(Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
+           // .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: -2) //  shadow added
             .onTapGesture {
                 onTapBottomtButton()
                 outboundClickApi()
             }
         }
         .background(Color(.systemBackground))
-        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        //.shadow(color: .black.opacity(0.05), radius: 4, y: 2)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .contentShape(Rectangle())
     }
@@ -1755,35 +1288,3 @@ struct PromotionalAdsCardStaggeredNew: View {
 
 
 
-import UIKit
-import ObjectiveC
-
-extension UIHostingController {
-    func disableSafeArea() {
-        guard let viewClass = object_getClass(view) else { return }
-        
-        let viewSubclassName = String(cString: class_getName(viewClass))
-            .appending("_IgnoreSafeArea")
-        
-        // Reuse if already created
-        if let viewSubclass = NSClassFromString(viewSubclassName) {
-            object_setClass(view, viewSubclass)
-            return
-        }
-        
-        guard let viewSubclass = objc_allocateClassPair(viewClass, viewSubclassName, 0) else { return }
-        
-        if let method = class_getInstanceMethod(UIView.self, #selector(getter: UIView.safeAreaInsets)) {
-            let block: @convention(block) (AnyObject) -> UIEdgeInsets = { _ in .zero }
-            class_addMethod(
-                viewSubclass,
-                #selector(getter: UIView.safeAreaInsets),
-                imp_implementationWithBlock(block),
-                method_getTypeEncoding(method)
-            )
-        }
-        
-        objc_registerClassPair(viewSubclass)
-        object_setClass(view, viewSubclass)
-    }
-}

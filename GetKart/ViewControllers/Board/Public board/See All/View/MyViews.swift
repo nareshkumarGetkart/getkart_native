@@ -142,6 +142,9 @@ struct MyViews: View {
                                                 //paymentGatewayOpen(product: item)
                                             }
                                             
+                                        }, onTapProfile: { userId in
+                                            pushToProfile(id: userId)
+
                                         },
                                         isToShowBoostButton:false
                                     )
@@ -223,6 +226,9 @@ struct MyViews: View {
                                             }else{
                                                 // paymentGatewayOpen(product: item)
                                             }
+                                        }, onTapProfile: { userId in
+                                            pushToProfile(id: userId)
+
                                         },
                                         isToShowBoostButton:false
                                     )
@@ -326,9 +332,12 @@ struct MyViews: View {
     }
     
     func pushToProfile(id:Int){
-        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
-        vc.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(vc, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     func pushToDetailScreen(item:ItemModel){

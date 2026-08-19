@@ -115,9 +115,12 @@ class ProfileVC: UIViewController {
     
     
     @IBAction func previewProfileBtnAction(_ sender : UIButton){
-        let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Local.shared.getUserId()))
-        hostingController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(hostingController, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let hostingController = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: Local.shared.getUserId()))
+            hostingController.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(hostingController, animated: true)
+        }
     }
     
     //MARK: Pull Down refresh

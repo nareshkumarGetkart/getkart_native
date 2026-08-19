@@ -140,7 +140,7 @@ struct ChangeCountry: View {
                     selCountries = country
                    
                 })
-                .presentationDetents([.fraction(0.35)])
+                .presentationDetents([.fraction(0.65)])
                 .presentationDragIndicator(.hidden)
             }
         

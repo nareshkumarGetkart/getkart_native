@@ -538,6 +538,9 @@ extension SellerProfileView {
                     },
                     onTap: { pushToDetail(item: item) },
                     onTapBoostButton: {},
+                    onTapProfile: { userId in
+                        
+                    },
                     isToShowBoostButton: false
                 )
                 .onAppear {
@@ -634,6 +637,8 @@ extension SellerProfileView {
                     } else {
                         paymentGatewayOpen(product: item)
                     }
+                },onTapProfile: { userId in
+                    selectedTab = .boards
                 },
                 isToShowBoostButton: false
             )

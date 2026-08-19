@@ -206,6 +206,9 @@ struct SearchBoardResultView: View {
                                                 paymentGatewayOpen(product: item)
                                             }
                                             
+                                        }, onTapProfile: { userId in
+                                            pushToProfile(id: userId)
+
                                         },
                                         isToShowBoostButton:true
                                     )
@@ -330,9 +333,12 @@ struct SearchBoardResultView: View {
     }
   
     func pushToProfile(id:Int){
-        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
-        vc.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(vc, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     func pushToReelsView(itemObj:ItemModel){
         let vc = UIHostingController(rootView: ReelsView(navigationController: self.navigationController,itemObj:itemObj))

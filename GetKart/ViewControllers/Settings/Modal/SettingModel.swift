@@ -57,6 +57,7 @@ struct SettingsModel: Codable {
     let admin: Admin?
     let iosPlaceKey:String?
     let timezone:String?
+    let reviewAllowed:Int?
     
     enum CodingKeys: String, CodingKey {
         case bannerScrollInterval,iosNudityThreshold
@@ -127,6 +128,7 @@ struct SettingsModel: Codable {
         case languages, admin
         case iosPlaceKey
         case currency_name,currency,emoji,country_name,timezone
+        case reviewAllowed = "review_allowed"
     }
 }
 

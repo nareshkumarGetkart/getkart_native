@@ -342,7 +342,7 @@ struct MyBoardCell:View {
                                     Text("\(itemObj.currency ?? "")\((itemObj.price ?? 0.0).formatNumber())")
                                         .font(.inter(.regular, size: 14))
                                         .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
-                                    let per = (((itemObj.price ?? 0.0) - (itemObj.specialPrice ?? 0.0)) / (itemObj.price ?? 0.0)) * 100.0
+                                    let per = ((((itemObj.price ?? 0.0) - (itemObj.specialPrice ?? 0.0)) / (itemObj.price ?? 0.0)) * 100.0).rounded()
                                     Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
                                         .foregroundColor(Color(hex: "#008838"))
                                 }

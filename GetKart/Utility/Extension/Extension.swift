@@ -771,18 +771,29 @@ extension UIImage {
 
 
 
-extension Double{
-    
+//extension Double{
+//    
+//    func formatNumber() -> String {
+//        let intValue = Int(self)  // Removes decimal
+//        let formatter = NumberFormatter()
+//        formatter.numberStyle = .decimal
+//        formatter.groupingSeparator = "," // Default is ","
+//        return formatter.string(from: NSNumber(value: intValue)) ?? "\(intValue)"
+//    }
+//
+//}
+
+extension Double {
     func formatNumber() -> String {
-        let intValue = Int(self)  // Removes decimal
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.groupingSeparator = "," // Default is ","
-        return formatter.string(from: NSNumber(value: intValue)) ?? "\(intValue)"
+        formatter.groupingSeparator = ","
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        
+        return formatter.string(from: NSNumber(value: self)) ?? "\(self)"
     }
-
 }
-
 
 
 //MARK: String

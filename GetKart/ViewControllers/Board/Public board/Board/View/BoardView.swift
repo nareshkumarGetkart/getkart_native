@@ -151,7 +151,7 @@ struct PriceView: View {
 
     private var discountPercent: Double {
         guard price > 0, specialPrice > 0 else { return 0 }
-        return ((price - specialPrice) / price) * 100
+        return (((price - specialPrice) / price) * 100).rounded()
     }
 
     var body: some View {

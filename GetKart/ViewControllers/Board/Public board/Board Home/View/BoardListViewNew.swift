@@ -178,19 +178,36 @@ struct BoardListViewNew: View {
         } else {
             CardItemViewNew(
                 item: item,
-                onLike: { isLiked, boardId in vm.updateLike(boardId: boardId, isLiked: isLiked) },
-                onTap:  { pushToDetail(item: item) },
-                onTapBoostButton: {
+                onLike: { isLiked, boardId in
+                    //Update like status
+                    vm.updateLike(boardId: boardId, isLiked: isLiked)
+                    
+                }, onTap: {
+                    //Push To Detail screen
+                    pushToDetail(item: item)
+               
+                }, onTapBoostButton: {
                     if item.boardType == 1 {
                         if let url = URL(string: (item.outbondUrl ?? "").getValidUrl()) {
                             safariURL = url
                         }
                     } else {
+                        //Open Pahyment Gateway
                         paymentGatewayOpen(product: item)
                     }
+                }, onTapProfile: {userId in
+                    //Push to profile
+                    pushToProfile(id: userId)
                 },
                 isToShowBoostButton: true
             )
+        }
+    }
+    
+    private var emptyView: some View {
+        VStack(spacing: 20) {
+            Image("no_data_found_illustrator")
+            Text("No Data Found").foregroundColor(.orange)
         }
     }
 
@@ -208,12 +225,7 @@ struct BoardListViewNew: View {
         VideoPreloadManagerDefault.shared.set(waiting: urls)
     }
 
-    private var emptyView: some View {
-        VStack(spacing: 20) {
-            Image("no_data_found_illustrator")
-            Text("No Data Found").foregroundColor(.orange)
-        }
-    }
+  
 
     private func pushToDetail(item: ItemModel) {
         let vc = UIHostingController(
@@ -222,10 +234,24 @@ struct BoardListViewNew: View {
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    
     func pushToMyWalletView(item:ItemModel){
-        let hostingController = UIHostingController(rootView: MyWalletView(navigation: navigationController))
-        hostingController.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(hostingController, animated: true)
+       
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let hostingController = UIHostingController(rootView: MyWalletView(navigation: navigationController))
+            hostingController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(hostingController, animated: true)
+        }
+    }
+    func pushToProfile(id:Int){
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 
     func paymentGatewayOpen(product: ItemModel) {
@@ -254,11 +280,7 @@ struct BoardListViewNew: View {
         paymentGateway?.initializeDefaults()
     }
     
-    func pushToProfile(id:Int){
-        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
-        vc.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
+   
 }
 
 

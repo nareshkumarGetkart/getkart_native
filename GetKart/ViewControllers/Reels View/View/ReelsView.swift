@@ -4,23 +4,23 @@ import AVFoundation
 struct ReelsView: View {
     
     let navigationController: UINavigationController?
-      let itemObj: ItemModel?
-
-      @StateObject private var viewModel: ReelsViewModel
+    let itemObj: ItemModel?
+    
+    @StateObject private var viewModel: ReelsViewModel
     @State private var presentedURL: URL?   // NEW — lives here, never recreated by VerticalPager
-
-      init(navigationController: UINavigationController?, itemObj: ItemModel?) {
-          self.navigationController = navigationController
-          self.itemObj = itemObj
-
-          let vm = ReelsViewModel()
-
-          if let itemObj {
-              vm.reels.append(itemObj)
-          }
-
-          _viewModel = StateObject(wrappedValue: vm)
-      }
+    
+    init(navigationController: UINavigationController?, itemObj: ItemModel?) {
+        self.navigationController = navigationController
+        self.itemObj = itemObj
+        
+        let vm = ReelsViewModel()
+        
+        if let itemObj {
+            vm.reels.append(itemObj)
+        }
+        
+        _viewModel = StateObject(wrappedValue: vm)
+    }
     
     var body: some View {
         GeometryReader { geo in   // ONE GeometryReader for the whole feed, not per-page
@@ -86,7 +86,7 @@ struct ReelsView: View {
                 .onDisappear {
                     ReelsVideoManager.shared.pauseAll()
                 }.onAppear{
-                  //  ReelsVideoManager.shared.resumeCurrent()
+                    //  ReelsVideoManager.shared.resumeCurrent()
                 }
                 .fullScreenCover(item: $presentedURL) { url in
                     SafariView(url: url)
@@ -102,7 +102,10 @@ struct ReelsView: View {
     }
     
     func pushToProfile(id:Int){
-        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
-        self.navigationController?.pushViewController(vc, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 }

@@ -66,7 +66,7 @@ struct BoardDetailView: View{
                     itemObj.totalLikes = likeCount
                     
                 },onClickedUserProfile: { user in
-                    self.pushToProfileScreen(user: user)
+                    self.pushToProfileScreen(id: user.id ?? 0)
                 },onClickedUserComents:{
                     if AppDelegate.sharedInstance.isUserLoggedInRequest(){
                         
@@ -144,6 +144,8 @@ struct BoardDetailView: View{
                                             paymentGatewayOpen(product: item)
                                         }
                                         
+                                    }, onTapProfile: { userId in
+                                        pushToProfile(id: userId)
                                     },
                                     isToShowBoostButton:true
                                 )
@@ -222,6 +224,9 @@ struct BoardDetailView: View{
                                             
                                             paymentGatewayOpen(product: item)
                                         }
+                                    }, onTapProfile: { userId in
+                                        pushToProfile(id: userId)
+
                                     },
                                     isToShowBoostButton:true
                                 )
@@ -317,7 +322,7 @@ struct BoardDetailView: View{
                             
                             if isToProfileOpen {
                                 if let obj = user {
-                                    pushToProfileScreen(user: obj)
+                                    self.pushToProfileScreen(id: obj.id ?? 0)
                                 }
                             }
                         },
@@ -331,11 +336,14 @@ struct BoardDetailView: View{
        
     }
 
-    
+    //MARK: Helper  methods
     func pushToProfile(id:Int){
-        let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
-        vc.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(vc, animated: true)
+        if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            
+            let vc = UIHostingController(rootView: SellerProfileView(navController: self.navigationController, userId: id))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     func pushToReelsView(itemObj:ItemModel){
@@ -606,12 +614,12 @@ struct BoardDetailView: View{
         
     }
     
-    private func pushToProfileScreen(user: User) {
-       
+    private func pushToProfileScreen(id: Int) {
+        
         if AppDelegate.sharedInstance.isUserLoggedInRequest(){
             
             let vc = UIHostingController(
-                rootView: SellerProfileView(navController: navigationController, userId: user.id ?? 0)
+                rootView: SellerProfileView(navController: navigationController, userId: id)
             )
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
@@ -1075,7 +1083,7 @@ struct ReelPostView: View {
                             Text("\(Local.shared.currencySymbol)\((post.price ?? 0.0).formatNumber())")
                                 .font(.inter(.medium, size: 15))
                                 .foregroundColor(Color(.gray)).strikethrough(true, color: .secondary)
-                            let per = (((post.price ?? 0.0) - (post.specialPrice ?? 0.0)) / (post.price ?? 0.0)) * 100.0
+                            let per = ((((post.price ?? 0.0) - (post.specialPrice ?? 0.0)) / (post.price ?? 0.0)) * 100.0).rounded()
                             Text("\(per.formatNumber())% Off").font(.inter(.medium, size: 12))
                                 .foregroundColor(Color(hex: "#008838"))
                             
