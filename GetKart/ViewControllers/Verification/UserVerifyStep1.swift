@@ -173,13 +173,16 @@ struct CustomTextField: View {
     let title: String
     @Binding var text: String
     var keyboardType: UIKeyboardType = .default
+    var placeholder: String = ""
     
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.manrope(.regular, size: 15))
                 .foregroundColor(Color(UIColor.label))
-            TextField("", text: $text).tint(Color(UIColor.systemOrange))
+            TextField( placeholder,
+                       text: $text
+            ).tint(Color(UIColor.systemOrange))
                 .padding()
                 .background(Color(UIColor.systemBackground))
                 .cornerRadius(8)

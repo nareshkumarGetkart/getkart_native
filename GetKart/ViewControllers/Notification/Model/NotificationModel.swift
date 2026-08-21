@@ -59,6 +59,37 @@ struct NotificationModel: Codable,Identifiable {
     let image: String?
     let sendTo, userID: String?
     let itemID: Int?
+    let type: Int?
+    /*const TYPE_CHAT_MESSAGE = 1;
+                    
+                    const TYPE_FOLLOWING_PRODUCT_APPROVED = 2; // Follow > user's product approved after review
+                 
+                    const TYPE_PRODUCT_EXPIRED = 3;
+                 
+                    const TYPE_BOARD_REJECTED = 4;
+                 
+                    const TYPE_BOARD_APPROVED = 5; // Promotional video board approval
+                 
+                    const TYPE_BANNER_REJECTED = 6;
+                 
+                    const TYPE_BANNER_APPROVED = 7;
+                 
+                    const TYPE_IDEA_REJECTED = 8;
+                 
+                    const TYPE_IDEA_APPROVED = 9; // Also sent to followers when idea under review gets approved
+                 
+                    const TYPE_PRODUCT_COMMENT = 10;
+                 
+                    const TYPE_PRODUCT_COMMENT_REPLY = 11;
+                 
+                    const TYPE_BOARD_BUSINESS_IMAGE_APPROVED = 12;
+                 
+                    const TYPE_BOARD_BUSINESS_IMAGE_REJECTED = 13;
+                 
+                    const TYPE_BOARD_BUSINESS_VIDEO_APPROVED= 14;
+                 
+                    const TYPE_BOARD_BUSINESS_VIDEO_REJECTED = 15;
+                    */
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -67,6 +98,7 @@ struct NotificationModel: Codable,Identifiable {
         case sendTo = "send_to"
         case userID = "user_id"
         case itemID = "item_id"
+        case type
     }
 }
 

@@ -84,17 +84,35 @@ struct NotificationView: View {
             .onAppear{
                 if listArray.count == 0 {
                     getNoticiationlistApi()
+                    readAllNotification()
                 }
             }
     }
     
     func pushToDesiredView(obj:NotificationModel){
+          /*const TYPE_CHAT_MESSAGE = 1;
+             const TYPE_FOLLOWING_PRODUCT_APPROVED = 2; // Follow > user's product approved after review
+             const TYPE_PRODUCT_EXPIRED = 3;
+             const TYPE_BOARD_REJECTED = 4;
+             const TYPE_BOARD_APPROVED = 5; // Promotional video board approval
+             const TYPE_BANNER_REJECTED = 6;
+             const TYPE_BANNER_APPROVED = 7;
+             const TYPE_IDEA_REJECTED = 8;
+             const TYPE_IDEA_APPROVED = 9; // Also sent to followers when idea under review gets approved
+             const TYPE_PRODUCT_COMMENT = 10;
+             const TYPE_PRODUCT_COMMENT_REPLY = 11;
+             const TYPE_BOARD_BUSINESS_IMAGE_APPROVED = 12;
+             const TYPE_BOARD_BUSINESS_IMAGE_REJECTED = 13;
+             const TYPE_BOARD_BUSINESS_VIDEO_APPROVED= 14;
+             const TYPE_BOARD_BUSINESS_VIDEO_REJECTED = 15; */
         
         if let itemId = obj.itemID{
+            
          /*  let hostingVC = UIHostingController(rootView: ItemDetailView(navController:  self.navigation, itemId:itemId, itemObj: nil, slug: ""))
             self.navigation?.pushViewController(hostingVC, animated: true)*/
 
         }else{
+            
             let hostingVC = UIHostingController(rootView: NotificationDetailView(navigation: self.navigation, notification: obj))
              self.navigation?.pushViewController(hostingVC, animated: true)
         }
@@ -127,6 +145,13 @@ struct NotificationView: View {
             }
         }
     }
+    
+    func readAllNotification(){
+        URLhandler.sharedinstance.makeCall(url: Constant.shared.read_all_notification, param: nil,methodType: .post) { result, error in
+            
+        }
+    }
+    
 }
 
 #Preview {

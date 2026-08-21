@@ -67,6 +67,7 @@ struct SellerModel: Codable,Identifiable {
     var isFollowing: Bool?
     let averageRating: String?
     let followersCount, followingCount, items: Int?
+    let link1, link2, link3,bio: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, email, mobile, mobileVisibility
@@ -84,7 +85,7 @@ struct SellerModel: Codable,Identifiable {
         case isVerified = "is_verified"
         case isFollowing
         case averageRating = "average_rating"
-        case followersCount, followingCount, items
+        case followersCount, followingCount, items, link1, link2, link3, bio
     }
 }
 

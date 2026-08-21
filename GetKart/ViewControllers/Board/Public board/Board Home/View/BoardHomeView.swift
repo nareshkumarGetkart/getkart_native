@@ -29,6 +29,7 @@ struct BoardHomeView: View {
     @State private var showCompleteProfilePopup = false
    // @State private var showWalletRewardPopup = false
     @StateObject private var popupState = PopupState()
+    @State private var unreadNotificationCount = 0
 
     
     var body: some View {
@@ -670,16 +671,21 @@ extension BoardHomeView {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 140, height: 50)
             }
-
-          
+            
+            
             Spacer()
             notificationButton
             interestButton
         }
         .padding(.horizontal, 8)
         .background(Color(.systemBackground))
+        .onAppear{
+            if Local.shared.getUserId() > 0{
+                getNotificationCount()
+            }
+        }
     }
-
+    
     
     var interestButton: some View {
         Button {
@@ -698,22 +704,41 @@ extension BoardHomeView {
     }
     
     
-    var notificationButton: some View{
+    var notificationButton: some View {
         Button {
-            if AppDelegate.sharedInstance.isUserLoggedInRequest(){
+            if AppDelegate.sharedInstance.isUserLoggedInRequest() {
                 guard let tabBar = tabBarController,
-                      let navigationController = tabBar.viewControllers?[0] as? UINavigationController else { return }
-                let hostingController = UIHostingController(rootView: NotificationView(navigation:navigationController)) 
+                      let navigationController = tabBar.viewControllers?[0] as? UINavigationController else {
+                    return
+                }
+                
+                let hostingController = UIHostingController(
+                    rootView: NotificationView(navigation: navigationController)
+                )
+                
                 hostingController.hidesBottomBarWhenPushed = true
-                navigationController.pushViewController(hostingController, animated: true)
+                navigationController.pushViewController(
+                    hostingController,
+                    animated: true
+                )
             }
-            
         } label: {
-            Image("notificationOutline").padding(8)
-
+            ZStack(alignment: .topTrailing) {
+                Image("notificationOutline")
+                    .padding(8)
+                
+                // Red dot when there are unread notifications
+                if unreadNotificationCount > 0 {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 8, height: 8)
+                        .offset(x: -5, y: 5)
+                }
+            }
         }
-
     }
+    
+    
     var emptyView: some View {
         VStack(spacing: 20) {
             Spacer()
@@ -721,6 +746,26 @@ extension BoardHomeView {
             Text("No Data Found")
                 .foregroundColor(.orange)
             Spacer()
+        }
+    }
+    
+    func getNotificationCount() {
+        URLhandler.sharedinstance.makeCall(
+            url: Constant.shared.get_notification_unread_count,
+            param: nil,
+            methodType: .get
+        ) { responseObject, error in
+            
+            if error == nil,
+               let result = responseObject,
+               let data = result["data"] as? [String: Any] {
+                
+                let count = data["unread_count"] as? Int ?? 0
+                
+                DispatchQueue.main.async {
+                    unreadNotificationCount = count
+                }
+            }
         }
     }
 }

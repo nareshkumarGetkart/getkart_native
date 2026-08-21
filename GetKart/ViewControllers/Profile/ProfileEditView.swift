@@ -25,6 +25,11 @@ struct ProfileEditView: View {
     @State var isDataLoading = false
     var navigationController:UINavigationController?
     
+    @State private var websiteLink1: String = ""
+    @State private var websiteLink2: String = ""
+    @State private var websiteLink3: String = ""
+    @State private var description: String = ""
+    
     var body: some View {
         
         HStack{
@@ -182,6 +187,68 @@ struct ProfileEditView: View {
                  ToggleField(title: "Show Contact Info", isOn: $isContactInfoVisible)
                  
                  */
+                
+                // Website Links
+                VStack(alignment: .leading, spacing: 0) {
+                  
+//                    Text("Add up to 3 links. (If any)")
+//                        .font(.manrope(.regular, size: 15))
+//                        .foregroundColor(Color(UIColor.label))
+//                    
+                    
+                    CustomTextField(
+                        title: "Add up to 3 links. (If any)",
+                        text: $websiteLink1,
+                        keyboardType: .URL,
+                        placeholder: "Add link"
+                    )
+                    
+                    CustomTextField(
+                        title: "",
+                        text: $websiteLink2,
+                        keyboardType: .URL,
+                        placeholder: "Add link"
+                    )
+                    
+                    CustomTextField(
+                        title: "",
+                        text: $websiteLink3,
+                        keyboardType: .URL,
+                        placeholder: "Add link"
+                    )
+                }
+                
+                // Description
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Description")
+                        .font(.manrope(.regular, size: 15))
+                        .foregroundColor(Color(UIColor.label))
+
+                    ZStack(alignment: .bottomTrailing) {
+                        TextEditor(text: $description)
+                            .frame(minHeight: 110)
+                            .padding(8)
+                            .scrollContentBackground(.hidden)
+                            .background(Color.white)
+                            .tint(.orange)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                            .onChange(of: description) { newValue in
+                                if newValue.count > 150 {
+                                    description = String(newValue.prefix(150))
+                                }
+                            }
+
+                        Text("\(description.count) / 150")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .padding(.trailing, 12)
+                            .padding(.bottom, 8)
+                    }
+                }
+                
                 // Update Button
                 Button(action: {
                     UIApplication.shared.endEditing()
@@ -288,12 +355,68 @@ struct ProfileEditView: View {
         }else if containsInvalidCharacters(phone: phoneNumber){
             AlertView.sharedManager.showToast(message: "Please enter valid phone number")
 
-        } else {
+        } else if !isValidWebsiteURL(websiteLink1) {
+            
+            AlertView.sharedManager.showToast(
+                message: "Please enter a valid Website Link 1"
+            )
+
+        } else if !isValidWebsiteURL(websiteLink2) {
+
+            AlertView.sharedManager.showToast(
+                message: "Please enter a valid Website Link 2"
+            )
+
+        } else if !isValidWebsiteURL(websiteLink3) {
+
+            AlertView.sharedManager.showToast(
+                message: "Please enter a valid Website Link 3"
+            )
+
+        }else if description.count > 0 && description.count < 5{
+            AlertView.sharedManager.showToast(
+                message: "Please enter valid description of yours."
+            )
+        }else {
             updateProfile()
         }
     }
     
-    
+    private func isValidWebsiteURL(_ value: String) -> Bool {
+        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Empty website fields are allowed
+        if trimmedValue.isEmpty {
+            return true
+        }
+
+        var urlString = trimmedValue
+
+        // Add scheme if user didn't enter one
+        if !urlString.lowercased().hasPrefix("http://") &&
+            !urlString.lowercased().hasPrefix("https://") {
+            urlString = "https://" + urlString
+        }
+
+        guard let url = URL(string: urlString),
+              let host = url.host,
+              !host.isEmpty else {
+            return false
+        }
+
+        // Host should contain a domain
+        guard host.contains(".") else {
+            return false
+        }
+
+        // Basic domain validation
+        let domainRegex = #"^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$"#
+
+        return host.range(
+            of: domainRegex,
+            options: .regularExpression
+        ) != nil
+    }
     func containsInvalidCharacters(phone: String) -> Bool {
         // Allows digits, plus sign, spaces, and hyphens
         let invalidCharRegex = "[^0-9+\\- ]"
@@ -358,8 +481,14 @@ struct ProfileEditView: View {
                         }
                     }
                 }
+              
                 self.isMobileVerified = (self.phoneNumber.count > 0) ? true : false
                 self.isEmailVerified = (self.email.count > 0) ? true : false
+                self.websiteLink1 = obj.data?.seller?.link1 ?? ""
+                self.websiteLink2 = obj.data?.seller?.link2 ?? ""
+                self.websiteLink3 = obj.data?.seller?.link3 ?? ""
+                self.description = obj.data?.seller?.bio ?? ""
+
 
                 
             }
@@ -448,8 +577,7 @@ struct ProfileEditView: View {
 //        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","notification":isNotification,"personalDetail":isContact] as [String : Any]
         
         
-        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91"] as [String : Any]
-
+        let params = ["name":fullName,"email":email,"address":address,"mobile":phoneNumber,"countryCode":"91","link1":websiteLink1,"link2":websiteLink2,"link3":websiteLink3,"bio":description] as [String : Any]
         
         URLhandler.sharedinstance.uploadImageWithParameters(profileImg: selectedImage?.wxCompress() ?? UIImage(), imageName: "profile", url: Constant.shared.update_profile, params: params) { responseObject, error in
             

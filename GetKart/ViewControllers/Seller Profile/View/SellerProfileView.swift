@@ -8,11 +8,12 @@
 import SwiftUI
 
 enum ProfileTab: Int, CaseIterable {
+    
     case boards
     case ideas
     case promoVideo
     case promoImage
-
+    
     var title: String {
         switch self {
         case .boards: return "Boards"
@@ -29,15 +30,13 @@ struct SellerProfileView: View {
     var userId: Int = 0
 
     @StateObject private var objVM: ProfileViewModel
-
     @State private var selectedTab: ProfileTab = .boards
-
     @State var showShareSheet = false
     @State var showOptionSheet = false
     @State private var isViewVisible = false
     // Masonry heights
     @State private var itemHeights: [Int: CGFloat] = [:]
-
+   
     // Pagination trigger
     private let prefetchOffset = 4
 
@@ -51,7 +50,8 @@ struct SellerProfileView: View {
 
     // Payment
     @State private var paymentGateway: PaymentGatewayCentralized?
-
+    @State private var showAllLinks = false
+    
     init(navController: UINavigationController? = nil,
          userId: Int,
          defaultTab: ProfileTab = .boards) {
@@ -344,6 +344,73 @@ extension SellerProfileView {
             }.padding(.horizontal, 12)
             .padding(.top, 12)
             .padding(.bottom, 10)
+            
+            if let seller = objVM.sellerObj {
+
+                // Bio
+                if let bio = seller.bio,
+                   !bio.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+
+                    Text(bio)
+                        .font(.inter(.regular,size:15))
+                        .foregroundColor(Color(UIColor.label))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    
+                }
+
+                // Website Links
+                let links = [
+                    seller.link1,
+                    seller.link2,
+                    seller.link3
+                ]
+                .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+
+                if !links.isEmpty {
+
+                    HStack(spacing: 5) {
+
+                        Image(systemName: "link")
+                            .font(.inter(.regular,size:13))
+                            .foregroundColor(Color(UIColor.label))
+
+                        // First link
+                        if let firstLink = links.first {
+                            // First link
+                            Text(firstLink)
+                                .font(.inter(.regular,size:15))
+                                .foregroundColor(.blue)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                        }
+
+                        // Remaining links
+                        if links.count > 1 {
+
+                            Button {
+                                showAllLinks = true
+                            } label: {
+                                Text("\(links.count - 1) more")
+                                    .font(.inter(.medium,size:15))
+                                    .foregroundColor(Color(UIColor.label))
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        Spacer()
+                    }
+                    .padding()
+
+                    // MARK: - All Links Bottom Sheet
+                    .sheet(isPresented: $showAllLinks) {
+                        AllLinksSheetView(links: links)
+                            .presentationDetents([.fraction(0.3)])
+                            .presentationDragIndicator(.visible)
+                    }
+                }
+            }
         }.background(Color(.systemBackground))
         
     }
@@ -359,6 +426,14 @@ extension SellerProfileView {
         }
     }
 
+    private func makeURL(from string: String) -> URL {
+        if let url = URL(string: string),
+           url.scheme != nil {
+            return url
+        }
+
+        return URL(string: "https://\(string)")!
+    }
     private func messageFollowButtonsView() -> some View {
         
         HStack(spacing: 12) {
@@ -471,11 +546,12 @@ extension SellerProfileView {
                 }
             }
             .padding(.top, 4)
-            .background(Color.white)
+            .background(Color(UIColor.systemBackground))
 
             Divider()
         }
-        .background(Color.white)
+       // .background(Color.white)
+        .background(Color(UIColor.systemBackground))
     }
 
     private func tabButton(title: String, isSelected: Bool) -> some View {
@@ -483,12 +559,12 @@ extension SellerProfileView {
         VStack(spacing: 6) {
 
             Text(title)
-                .font(.inter(.semiBold, size: 14))
-                .foregroundColor(isSelected ? .black : .gray)
+                .font(.inter(.semiBold, size: 15))
+                .foregroundColor(isSelected ? .primary : .gray)
                 .frame(maxWidth: .infinity)
 
             Rectangle()
-                .fill(isSelected ? Color.black : Color.clear)
+                .fill(isSelected ? Color.primary : Color.clear)
                 .frame(height: 2)
         }
         .frame(maxWidth: .infinity)

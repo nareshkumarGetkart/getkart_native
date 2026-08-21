@@ -15,7 +15,7 @@ enum DevEnvironment{
 }
 
 var devEnvironment: DevEnvironment = .staging
-var ISDEBUG = true
+var ISDEBUG = false
 
 final class Constant: NSObject {
     
@@ -81,7 +81,13 @@ final class Constant: NSObject {
 //
 //    let payuSuccessURL = "https://payu.herokuapp.com/success"
 //    let payuFailureURL = "https://payu.herokuapp.com/failure"
-//       
+//
+    
+    var get_notification_unread_count:String{
+        get{
+            return "\(baseURL)/v2/get-notification-unread-count"
+        }
+    }
     
     var get_popular_items:String{
         get{
@@ -389,6 +395,13 @@ final class Constant: NSObject {
         }
     }
 
+    
+    var read_all_notification:String{
+        get{
+            return "\(baseURL)/v2/read-all-notification"
+        }
+    }
+    
     
     var  get_board_details:String {
         get {
